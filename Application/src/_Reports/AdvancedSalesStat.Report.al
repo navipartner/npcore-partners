@@ -1,13 +1,7 @@
 report 6014490 "NPR Advanced Sales Stat."
 {
-    // NPR70.00.00.00/LS/280613 CASE 186853 : Convert Report to Nav 2013
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.55/BHR/20200728  CASE 361515 remove Key reference not used in AL
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Advanced Sales Statistics.rdlc';
-
     Caption = 'Advanced Sales Statistics';
     UseSystemPrinter = true;
 
@@ -111,12 +105,6 @@ report 6014490 "NPR Advanced Sales Stat."
                     else
                         Grey := true;
                 end;
-                //+NPR70.00.00.00
-                /*
-                // CALCSUMS
-                IF Integer.Number = 1 THEN
-                  EXIT;
-                */
                 Totals[1] += Buffer."Sales qty.";
                 Totals[2] += Buffer."Sales qty. last year";
                 Totals[3] += Buffer."Sales LCY";
@@ -131,26 +119,14 @@ report 6014490 "NPR Advanced Sales Stat."
                     Totals[8] := Totals[6] / Totals[4] * 100
                 else
                     Totals[8] := 0;
-
-                //-NPR70.00.00.00
                 if Integer.Number = Buffer.Count then
-                    CurrReport.Break;
+                    CurrReport.Break();
                 if Integer.Number > 0 then
-                    Buffer.Next;
-
-                /*
-                IF Integer.Number > Buffer.COUNT THEN
-                  CurrReport.BREAK;
-                IF Integer.Number > 0 THEN
-                  Buffer.NEXT;
-                //+NPR70.00.00.00
-                 */
-
+                    Buffer.Next();
             end;
 
             trigger OnPostDataItem()
             begin
-                //-NPR70.00.00.00
                 TotalAmt[1] := Totals[1];
                 TotalAmt[2] := Totals[2];
                 TotalAmt[3] := Totals[3];
@@ -159,29 +135,29 @@ report 6014490 "NPR Advanced Sales Stat."
                 TotalAmt[6] := Totals[6];
                 TotalAmt[7] := Totals[7];
                 TotalAmt[8] := Totals[8];
-                //+NPR70.00.00.00
             end;
 
             trigger OnPreDataItem()
+            var
+                EmptyLinesEngErr: Label 'There is only empty lines on the report.';
+                EmptyLinesDeErr: Label 'Der er kun tomme linjer på rapporten.';
             begin
-                fillTable;
+                fillTable();
 
                 // Rewind
                 UpdateSortKey;
                 if not Buffer.Find('-') then begin
                     if CurrReport.Language = 1030 then
-                        Error('Der er kun tomme linjer på rapporten.')
+                        Error(EmptyLinesDeErr)
                     else
-                        Error('There is only empty lines on the report.');
+                        Error(EmptyLinesEngErr);
                 end;
 
-                //-NPR70.00.00.00
                 if Type = Type::Period then begin
                     PeriodFilters := StrSubstNo('%1..', Periodestart);
                 end else begin
                     PeriodFilters := StrSubstNo('%1..%2', Periodestart, Periodeslut);
                 end;
-                //+NPR70.00.00.00
             end;
         }
         dataitem(Totalling; "Integer")
@@ -245,10 +221,6 @@ report 6014490 "NPR Advanced Sales Stat."
                 }
             }
         }
-
-        actions
-        {
-        }
     }
 
     labels
@@ -277,12 +249,6 @@ report 6014490 "NPR Advanced Sales Stat."
 
     trigger OnInitReport()
     begin
-        //-NPR5.39
-        // Objekt.SETRANGE(ID, 6014490);
-        // Objekt.SETRANGE(Type, 3);
-        // Objekt.FIND('-');
-        //+NPR5.39
-
         Clear(Totals);
         hideEmptyLines := true;
         Lines := 30;
@@ -296,50 +262,50 @@ report 6014490 "NPR Advanced Sales Stat."
     end;
 
     var
-        DateRecord: Record Date;
-        "Salesperson/Purchaser": Record "Salesperson/Purchaser";
-        "Item Group": Record "NPR Item Group";
-        Item: Record Item;
+        Firmaoplysninger: Record "Company Information";
         Customer: Record Customer;
-        Vendor: Record Vendor;
+        DateRecord: Record Date;
+        Item: Record Item;
+        ItemLedgerEntry: Record "Item Ledger Entry";
         Buffer: Record "NPR Advanced Sales Statistics" temporary;
+        "Item Group": Record "NPR Item Group";
+        "Salesperson/Purchaser": Record "Salesperson/Purchaser";
+        ValueEntry: Record "Value Entry";
+        Vendor: Record Vendor;
+        "Record": RecordRef;
+        Caption: FieldRef;
+        EndRef: FieldRef;
+        "Field": FieldRef;
+        FilterField: FieldRef;
+        StartRef: FieldRef;
+        TypeField: FieldRef;
+        Grey: Boolean;
         hideEmptyLines: Boolean;
-        Type: Option Period,Salesperson,ItemGroup,Item,Customer,Vendor,Projectcode;
-        Day: Option Day,Week,Month,Quarter,Year;
         Dim1Filter: Code[20];
         Dim2Filter: Code[20];
         ItemGroupFilter: Code[20];
-        Periodestart: Date;
+        ProjektKodeSlut: Code[20];
+        ProjektKodeStart: Code[20];
         Periodeslut: Date;
-        CalcLastYear: Text[50];
-        ValueEntry: Record "Value Entry";
-        ItemLedgerEntry: Record "Item Ledger Entry";
-        "Record": RecordRef;
-        "Field": FieldRef;
-        FilterField: FieldRef;
-        TypeField: FieldRef;
-        Caption: FieldRef;
-        Title: Text[30];
+        Periodestart: Date;
+        TotalAmt: array[8] of Decimal;
         Totals: array[8] of Decimal;
         d: Dialog;
         "Count": Integer;
         Lines: Integer;
-        StartRef: FieldRef;
-        EndRef: FieldRef;
-        SortBy: Option "No.",Description,"Period Start","Sales qty.","Sales qty. last year","Sales LCY","Sales LCY last year","Profit LCY","Profit LCY last year","Profit %","Profit % last year";
-        PeriodeFilter: Text[255];
-        ProjektKodeStart: Code[20];
-        ProjektKodeSlut: Code[20];
-        Grey: Boolean;
-        Firmaoplysninger: Record "Company Information";
-        TitleItem: Label 'Items';
-        TitleItemGroup: Label 'Item Groups';
         TitleCustomer: Label 'Customers';
-        TitleVendor: Label 'Vendor';
+        TitleItemGroup: Label 'Item Groups';
+        TitleItem: Label 'Items';
         TitlePeriod: Label 'Period';
-        TitleSalesperson: Label 'Salespersons';
         DialogText: Label 'Processing No. #1######## @2@@@@@@@@';
-        TotalAmt: array[8] of Decimal;
+        TitleSalesperson: Label 'Salespersons';
+        TitleVendor: Label 'Vendor';
+        Day: Option Day,Week,Month,Quarter,Year;
+        SortBy: Option "No.",Description,"Period Start","Sales qty.","Sales qty. last year","Sales LCY","Sales LCY last year","Profit LCY","Profit LCY last year","Profit %","Profit % last year";
+        Type: Option Period,Salesperson,ItemGroup,Item,Customer,Vendor,Projectcode;
+        Title: Text[30];
+        CalcLastYear: Text[50];
+        PeriodeFilter: Text[255];
         PeriodFilters: Text[255];
 
     procedure setFilter(xType: Option Period,Salesperson,ItemGroup,Item,Customer,Vendor,Projectcode; xDay: Option Day,Week,Month,Quarter,Year; GlobalDim1: Code[20]; GlobalDim2: Code[20]; DatoStart: Date; DatoEnd: Date; ItemGroup: Code[20]; LastYearCalc: Text[50]; hide: Boolean)
@@ -356,16 +322,14 @@ report 6014490 "NPR Advanced Sales Stat."
 
         if Type = Type::Period then begin
             PeriodeFilter := StrSubstNo('%1..', Periodestart);
-            ///RequestOptionsForm.LinjerInput.VISIBLE := TRUE;
-            ///RequestOptionsForm.LinjerCaption.VISIBLE := TRUE;
         end else begin
             PeriodeFilter := StrSubstNo('%1..%2', Periodestart, Periodeslut);
-            ///RequestOptionsForm.LinjerInput.VISIBLE := FALSE;
-            ///RequestOptionsForm.LinjerCaption.VISIBLE := FALSE;
         end;
     end;
 
     procedure fillTable()
+    var
+        NoTypeErr: Label 'No Type selected';
     begin
         Buffer.DeleteAll;
 
@@ -428,17 +392,15 @@ report 6014490 "NPR Advanced Sales Stat."
                     Title := TitleVendor;
                 end;
             else begin
-                    Error('No Type selected');
+                    Error(NoTypeErr);
                 end;
         end;
 
         d.Open(DialogText);
         Count := 0;
         // Henter de data vi skal bruge
-        if Type <> Type::Period then begin
-            //Lines := Record.COUNT;
+        if Type <> Type::Period then
             Lines := Record.Count - 1;
-        end;
 
         if Record.Find('-') then begin
             repeat
@@ -462,7 +424,7 @@ report 6014490 "NPR Advanced Sales Stat."
                 SetItemLedgerEntryFilter(ItemLedgerEntry, false, Format(Field.Value));
                 ItemLedgerEntry.CalcSums(Quantity);
 
-                Buffer.Init;
+                Buffer.Init();
                 if Type = Type::Period then begin
                     Buffer."Date 1" := Field.Value;
                     Buffer."No." := Format(Count);
@@ -480,7 +442,6 @@ report 6014490 "NPR Advanced Sales Stat."
                 else
                     Buffer."Profit %" := 0;
 
-
                 // Dernæst sidste år
                 SetValueEntryFilter(ValueEntry, true, Format(Field.Value));
                 ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
@@ -496,24 +457,15 @@ report 6014490 "NPR Advanced Sales Stat."
                 else
                     Buffer."Profit % last year" := 0;
 
-                //IF  Count >26 THEN MESSAGE('BufferNo.=%1,COunt=%2,Lines=%3, Record.COUNT=%4,date=%5',Count,Buffer."No.",Lines,Record.COUNT,Buffer.Date1);
-                Buffer.Insert;
-            //IF  Count >28 THEN MESSAGE('BufferNo.=%1,COunt=%2,Lines=%3, Record.COUNT=%4,date=%5',Count,Buffer."No.",Lines,Record.COUNT,Buffer.Date1);
-            //Count+=1;  //NPK
-            until (Record.Next = 0) or ((Type = Type::Period) and (Count >= Lines));
+                Buffer.Insert();
+            until (Record.Next() = 0) or ((Type = Type::Period) and (Count >= Lines));
         end;
-        d.Close;
-
-        /*//
-        IF hideEmptyLines THEN
-          Buffer.SETFILTER("Sales qty.",'<>0');
-           */
+        d.Close();
 
     end;
 
     procedure SetItemLedgerEntryFilter(var ItemLedgerEntry: Record "Item Ledger Entry"; LastYear: Boolean; "Code": Code[20])
     begin
-        //SetItemLedgerEntryFilter
         ItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code");
         ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
 
@@ -538,10 +490,7 @@ report 6014490 "NPR Advanced Sales Stat."
         if not LastYear then
             ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
         else
-            //-NPR70.00.00.00
-            //ItemLedgerEntry.SETFILTER( "Posting Date", '%1..%2', CALCDATE(CalcLastYear,Periodestart), CALCDATE(CalcLastYear,Periodeslut) );
             ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', CalcDate('<- 1Y>', Periodestart), CalcDate('<- 1Y>', Periodeslut));
-        //+NPR70.00.00.00
 
         if Type <> Type::ItemGroup then begin
             if ItemGroupFilter <> '' then
@@ -565,10 +514,6 @@ report 6014490 "NPR Advanced Sales Stat."
 
     procedure SetValueEntryFilter(var ValueEntry: Record "Value Entry"; LastYear: Boolean; "Code": Code[20])
     begin
-        //SetValueEntryFilter
-        //-NPR5.55 [361515]
-        //ValueEntry.SETCURRENTKEY( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
-        //+NPR5.55 [361515]
         ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
 
         case Type of
@@ -592,10 +537,7 @@ report 6014490 "NPR Advanced Sales Stat."
         if not LastYear then
             ValueEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
         else
-            //-NPR70.00.00.00
-            //ValueEntry.SETFILTER( "Posting Date", '%1..%2',CALCDATE(CalcLastYear,Periodestart), CALCDATE(CalcLastYear,Periodeslut) );
             ValueEntry.SetFilter("Posting Date", '%1..%2', CalcDate('<- 1Y>', Periodestart), CalcDate('<- 1Y>', Periodeslut));
-        //+NPR70.00.00.00
 
         if Type <> Type::ItemGroup then begin
             if ItemGroupFilter <> '' then

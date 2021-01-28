@@ -1,47 +1,8 @@
 report 6060108 "NPR Balancing Ticket IV"
 {
-    // 001 Af MG 7/12-01
-    // summering, og beregning noegletal for alle kasser
-    // afgraenser kun på ekspeditionsdato og type::salg
-    // 
-    // 002 af MG 24/9-02
-    // Revisionsrulle body(2) PreSection:
-    // Tilgodebevis taelles ikke laengere sammen i "case"-struktur. Saettes foerst
-    // i bunden af "Revisionsrulle body(2) PreSection"
-    // 
-    // 003 af MG 20/12-04
-    // Sum for tilgodebevis beregnes her (ind- og udgående). Rvisionsrulle >=v. 3.1b skal benyttes, ellers er der muligvis et
-    // performance problem.
-    // 
-    // 004 af MG 20/10-05
-    // Summering af debetsalg fra revisionsrullen. Alle
-    // 
-    // NPR3.0g v.Simon Schoebel 17-11-05
-    // Antal af ekspeditioner.
-    // 
-    // 005 af KSL 20/11
-    // Medtag ikke debetsalg i total omsaetningen hvis det er sat i NPK konfig.
-    // 
-    // 006 - NPR3.0a af MIJ 260608
-    // Tilfoejet Fremmed Tilgodebevis
-    // 
-    // 007 sag 110481- 20-06-11
-    // Pengeposenr tilfoejet i Audit Roll, Body (2)
-    // 
-    // NPR4.15/MMV/20150917 CASE 222832 Added foreign credit vouchers and foreign gift vouchers to total amount paid.
-    // NPR4.18/MMV/20151119 CASE 227685 Updated caption of OtherCreditCard section
-    // NPR4.18/MMV/20151201 CASE 228246 Added Sales (Qty) to match codeunit print.
-    // NPR4.18/MMV/20151210 CASE 228246 Removed checksum & rounding from bottom of print.
-    // NPR5.36/TJ /20170927 CASE 286283 Renamed variable with danish specific letters into english letters
-    // NPR5.39/JC /20171206 CASE Issue with Danish kroner text - set to blank _
-    // NPR5.39/JLK /20180219 CASE 305283 Corrected Label Payments_Lbl
-    // NPR5.49/BHR /20190115  CASE 341969 Corrections as per OMA Guidelines
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Balancing Ticket IV.rdlc';
-
     Caption = 'Counter Report Ticket IV';
-
     dataset
     {
         dataitem("Audit Roll"; "NPR Audit Roll")
@@ -51,7 +12,7 @@ report 6060108 "NPR Balancing Ticket IV"
             column(TitelTxt; TitelTXT)
             {
             }
-            column(SalesPersonName; StrSubstNo(Text10600010, Saelger.Name))
+            column(SalesPersonName; StrSubstNo(RegisterClosedLbl, Saelger.Name))
             {
             }
             column(LineNo_AuditRoll; "Line No.")
@@ -166,7 +127,7 @@ report 6060108 "NPR Balancing Ticket IV"
 
                 GlobalPeriod.SetRange("Register No.", "Register No.");
                 GlobalPeriod.SetRange("Sales Ticket No.", "Sales Ticket No.");
-                GlobalPeriod.FindLast;
+                GlobalPeriod.FindLast();
 
                 TitelTXT := Register.Description;
 
@@ -175,7 +136,7 @@ report 6060108 "NPR Balancing Ticket IV"
                 Revisionsrulle1.SetRange("Sales Ticket No.", "Sales Ticket No.");
                 Revisionsrulle1.SetRange("Sale Type", Revisionsrulle1."Sale Type"::Comment);
                 Revisionsrulle1.SetRange(Type, Revisionsrulle1.Type::"Open/Close");
-                if Revisionsrulle1.FindFirst then begin
+                if Revisionsrulle1.FindFirst() then begin
                     Revisionsrulle1.SetRange("Sales Ticket No.");
                     Revisionsrulle1.Next(-1);
                 end;
@@ -272,43 +233,34 @@ report 6060108 "NPR Balancing Ticket IV"
                 else
                     BalanceNeg := BalanceNeg + Kreditkortsaldo;
 
-                //++003
-                // ohm - 10/10/06
                 RevRulleTilgodebevis.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Type", Type);
                 if not (Opsaetning."Balancing Posting Type" = Opsaetning."Balancing Posting Type"::TOTAL) then
                     RevRulleTilgodebevis.SetRange("Register No.", "Audit Roll"."Register No.");
                 RevRulleTilgodebevis.SetFilter("Sales Ticket No.", '%1..%2', Revisionsrulle1."Sales Ticket No.", "Audit Roll"."Sales Ticket No.");
 
-                //TilgodeInd
                 RevRulleTilgodebevis.SetRange(Type, RevRulleTilgodebevis.Type::"G/L");
                 RevRulleTilgodebevis.SetRange("Sale Type", RevRulleTilgodebevis."Sale Type"::Deposit);
-                if RevRulleTilgodebevis.FindFirst then
+                if RevRulleTilgodebevis.FindFirst() then
                     repeat
                         if RevRulleTilgodebevis."Credit voucher ref." <> '' then
                             TilgodeInd := RevRulleTilgodebevis."Amount Including VAT";
-                    until RevRulleTilgodebevis.Next = 0;
+                    until RevRulleTilgodebevis.Next() = 0;
 
-                //TilgodeUd
                 RevRulleTilgodebevis.SetRange(Type, RevRulleTilgodebevis.Type::Payment);
                 RevRulleTilgodebevis.SetRange("Sale Type", RevRulleTilgodebevis."Sale Type"::Payment);
-                if RevRulleTilgodebevis.FindFirst then
+                if RevRulleTilgodebevis.FindFirst() then
                     repeat
                         if RevRulleTilgodebevis."Credit voucher ref." <> '' then
                             TilgodeUd := RevRulleTilgodebevis."Amount Including VAT";
-                    until RevRulleTilgodebevis.Next = 0;
+                    until RevRulleTilgodebevis.Next() = 0;
 
                 if (TilgodeInd - TilgodeUd) > 0 then
                     BalanceUpdate(TilgodeInd - TilgodeUd, true)
                 else
                     BalanceUpdate(TilgodeInd - TilgodeUd, false);
-                //--003
 
                 Frabon := Revisionsrulle1."Sales Ticket No.";
                 Tilbon := "Audit Roll"."Sales Ticket No.";
-
-                //BevaegPos := 0;
-                //BevaegNeg := 0;
-
                 Optaltchecks := GlobalPeriod.Cheque;
                 BalanceUpdate(Optaltchecks, Optaltchecks > 0);
 
@@ -341,8 +293,8 @@ report 6060108 "NPR Balancing Ticket IV"
             begin
                 if (Opsaetning."Balancing Posting Type" = Opsaetning."Balancing Posting Type"::TOTAL) then begin
                     "Payment Type POS".SetRange("Date Filter", Revisionsrulle2."Sale Date");
-                    Kasserec.FindFirst;
-                    Kasserecsidste.FindLast;
+                    Kasserec.FindFirst();
+                    Kasserecsidste.FindLast();
                     "Payment Type POS".SetRange("Register Filter", Kasserec."Register No.", Kasserecsidste."Register No.");
                     "Payment Type POS".SetRange("Processing Type", "Processing Type"::"Foreign Currency");
                     "Payment Type POS".SetFilter("Receipt Filter", '%1..%2', Revisionsrulle1."Sales Ticket No.", "Audit Roll"."Sales Ticket No.");
@@ -379,8 +331,8 @@ report 6060108 "NPR Balancing Ticket IV"
             begin
                 if (Opsaetning."Balancing Posting Type" = Opsaetning."Balancing Posting Type"::TOTAL) then begin
                     Gavekort.SetRange("Date Filter", Revisionsrulle2."Sale Date");
-                    Kasserec.FindFirst;
-                    Kasserecsidste.FindLast;
+                    Kasserec.FindFirst();
+                    Kasserecsidste.FindLast();
                     Gavekort.SetRange("Register Filter", Kasserec."Register No.", Kasserecsidste."Register No.");
                     Gavekort.SetRange("Processing Type", "Processing Type"::"Gift Voucher");
                     Gavekort.SetFilter("Receipt Filter", '%1..%2', Revisionsrulle1."Sales Ticket No.", "Audit Roll"."Sales Ticket No.");
@@ -410,17 +362,15 @@ report 6060108 "NPR Balancing Ticket IV"
 
             trigger OnPostDataItem()
             begin
-                //-NPR4.15
                 BetalingerTotal += "Amount in Audit Roll";
-                //+NPR4.15
             end;
 
             trigger OnPreDataItem()
             begin
                 if (Opsaetning."Balancing Posting Type" = Opsaetning."Balancing Posting Type"::TOTAL) then begin
                     "Fremmed Gavekort".SetRange("Date Filter", Revisionsrulle2."Sale Date");
-                    Kasserec.FindFirst;
-                    Kasserecsidste.FindLast;
+                    Kasserec.FindFirst();
+                    Kasserecsidste.FindLast();
                     "Fremmed Gavekort".SetRange("Register Filter", Kasserec."Register No.", Kasserecsidste."Register No.");
                     "Fremmed Gavekort".SetRange("Processing Type", "Processing Type"::"Foreign Gift Voucher");
                     "Fremmed Gavekort".SetFilter("Receipt Filter", '%1..%2', Revisionsrulle1."Sales Ticket No.", "Audit Roll"."Sales Ticket No.");
@@ -458,8 +408,8 @@ report 6060108 "NPR Balancing Ticket IV"
             begin
                 if (Opsaetning."Balancing Posting Type" = Opsaetning."Balancing Posting Type"::TOTAL) then begin
                     "Payment Type POS".SetRange("Date Filter", Revisionsrulle2."Sale Date");
-                    Kasserec.FindFirst;
-                    Kasserecsidste.FindLast;
+                    Kasserec.FindFirst();
+                    Kasserecsidste.FindLast();
                     Tilgodebevis.SetRange("Register Filter", Kasserec."Register No.", Kasserecsidste."Register No.");
                     Tilgodebevis.SetRange("Processing Type", "Processing Type"::"Credit Voucher");
                     Tilgodebevis.SetFilter("Receipt Filter", '%1..%2', Revisionsrulle1."Sales Ticket No.", "Audit Roll"."Sales Ticket No.");
@@ -489,18 +439,15 @@ report 6060108 "NPR Balancing Ticket IV"
 
             trigger OnPostDataItem()
             begin
-                //-NPR4.15
                 BetalingerTotal += "Amount in Audit Roll";
-                //+NPR4.15
             end;
 
             trigger OnPreDataItem()
             begin
-                //-NPK.006
                 if (Opsaetning."Balancing Posting Type" = Opsaetning."Balancing Posting Type"::TOTAL) then begin
                     "Fremmed Tilgodebevis".SetRange("Date Filter", Revisionsrulle2."Sale Date");
-                    Kasserec.FindFirst;
-                    Kasserecsidste.FindLast;
+                    Kasserec.FindFirst();
+                    Kasserecsidste.FindLast();
                     "Fremmed Tilgodebevis".SetRange("Register Filter", Kasserec."Register No.", Kasserecsidste."Register No.");
                     "Fremmed Tilgodebevis".SetRange("Processing Type", "Processing Type"::"Foreign Credit Voucher");
                     "Fremmed Tilgodebevis".SetFilter("Receipt Filter", '%1..%2', Revisionsrulle1."Sales Ticket No.", "Audit Roll"."Sales Ticket No.");
@@ -514,7 +461,6 @@ report 6060108 "NPR Balancing Ticket IV"
                     "Fremmed Tilgodebevis".SetFilter("Receipt Filter", '%1..%2', GlobalPeriod."Opening Sales Ticket No.", GlobalPeriod."Sales Ticket No.");
                     "Fremmed Tilgodebevis".CalcFields("Amount in Audit Roll");
                 end;
-                //+NPK.006
 
                 ShowHeader := true;
             end;
@@ -544,8 +490,8 @@ report 6060108 "NPR Balancing Ticket IV"
             begin
                 if (Opsaetning."Balancing Posting Type" = Opsaetning."Balancing Posting Type"::TOTAL) then begin
                     "Payment Type POS".SetRange("Date Filter", Revisionsrulle2."Sale Date");
-                    Kasserec.FindFirst;
-                    Kasserecsidste.FindLast;
+                    Kasserec.FindFirst();
+                    Kasserecsidste.FindLast();
                     TerminalCard.SetRange("Register Filter", Kasserec."Register No.", Kasserecsidste."Register No.");
                     TerminalCard.SetRange("Processing Type", "Processing Type"::"Terminal Card");
                     TerminalCard.SetFilter("Receipt Filter", '%1..%2', Revisionsrulle1."Sales Ticket No.", "Audit Roll"."Sales Ticket No.");
@@ -590,8 +536,8 @@ report 6060108 "NPR Balancing Ticket IV"
             begin
                 if (Opsaetning."Balancing Posting Type" = Opsaetning."Balancing Posting Type"::TOTAL) then begin
                     "Payment Type POS".SetRange("Date Filter", Revisionsrulle2."Sale Date");
-                    Kasserec.FindFirst;
-                    Kasserecsidste.FindLast;
+                    Kasserec.FindFirst();
+                    Kasserecsidste.FindLast();
                     OtherCreditCards.SetRange("Register Filter", Kasserec."Register No.", Kasserecsidste."Register No.");
                     OtherCreditCards.SetRange("Processing Type", "Processing Type"::"Other Credit Cards");
                     OtherCreditCards.SetFilter("Receipt Filter", '%1..%2', Revisionsrulle1."Sales Ticket No.", "Audit Roll"."Sales Ticket No.");
@@ -634,8 +580,8 @@ report 6060108 "NPR Balancing Ticket IV"
             begin
                 if (Opsaetning."Balancing Posting Type" = Opsaetning."Balancing Posting Type"::TOTAL) then begin
                     "Payment Type POS".SetRange("Date Filter", Revisionsrulle2."Sale Date");
-                    Kasserec.FindFirst;
-                    Kasserecsidste.FindLast;
+                    Kasserec.FindFirst();
+                    Kasserecsidste.FindLast();
                     ManualCards.SetRange("Register Filter", Kasserec."Register No.", Kasserecsidste."Register No.");
                     ManualCards.SetRange("Processing Type", "Processing Type"::"Manual Card");
                     ManualCards.SetFilter("Receipt Filter", '%1..%2', Revisionsrulle1."Sales Ticket No.", "Audit Roll"."Sales Ticket No.");
@@ -678,8 +624,8 @@ report 6060108 "NPR Balancing Ticket IV"
             begin
                 if (Opsaetning."Balancing Posting Type" = Opsaetning."Balancing Posting Type"::TOTAL) then begin
                     "Payment Type POS".SetRange("Date Filter", Revisionsrulle2."Sale Date");
-                    Kasserec.FindFirst;
-                    Kasserecsidste.FindLast;
+                    Kasserec.FindFirst();
+                    Kasserecsidste.FindLast();
                     Terminal.SetRange("Register Filter", Kasserec."Register No.", Kasserecsidste."Register No.");
                     Terminal.SetRange("Processing Type", "Processing Type"::EFT);
                     Terminal.SetFilter("Receipt Filter", '%1..%2', Revisionsrulle1."Sales Ticket No.", "Audit Roll"."Sales Ticket No.");
@@ -714,8 +660,8 @@ report 6060108 "NPR Balancing Ticket IV"
             begin
                 if (Opsaetning."Balancing Posting Type" = Opsaetning."Balancing Posting Type"::TOTAL) then begin
                     "Payment Type POS".SetRange("Date Filter", Revisionsrulle2."Sale Date");
-                    Kasserec.FindFirst;
-                    Kasserecsidste.FindLast;
+                    Kasserec.FindFirst();
+                    Kasserecsidste.FindLast();
                     ForeignCurrency.SetRange("Register Filter", Kasserec."Register No.", Kasserecsidste."Register No.");
                     ForeignCurrency.SetRange("Processing Type", "Processing Type"::"Foreign Currency");
                     ForeignCurrency.SetFilter("Receipt Filter", '%1..%2', Revisionsrulle1."Sales Ticket No.", "Audit Roll"."Sales Ticket No.");
@@ -851,22 +797,11 @@ report 6060108 "NPR Balancing Ticket IV"
                 "Period Line".SetRange("Sales Ticket No.", "Audit Roll"."Sales Ticket No.");
                 "Period Line".SetRange("Payment Type No.", PaymentTypeCounting."No.");
 
-                DetailedCounting := "Period Line".FindFirst;
+                DetailedCounting := "Period Line".FindFirst();
             end;
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
 
     labels
     {
@@ -930,7 +865,6 @@ report 6060108 "NPR Balancing Ticket IV"
     trigger OnPreReport()
     begin
         Firmaoplysninger.Get();
-        //Firmaoplysninger.CALCFIELDS(Picture);
         Opsaetning.Get;
         Debetsalg := 0;
         BetalingerTotal := 0;
@@ -941,73 +875,73 @@ report 6060108 "NPR Balancing Ticket IV"
         Firmaoplysninger: Record "Company Information";
         Revisionsrulle1: Record "NPR Audit Roll";
         Revisionsrulle2: Record "NPR Audit Roll";
-        Opsaetning: Record "NPR Retail Setup";
-        Primo: Decimal;
-        Kontantbevaeg: Decimal;
-        Dankortbevaeg: Decimal;
-        "Visa/Dkbevaeg": Decimal;
-        OtherCardNetChange: Decimal;
-        UkendteKortbevaeg: Decimal;
-        Gavekortbevaeg: Decimal;
-        Tilgodebevisbevaeg: Decimal;
-        OverfoertBank: Decimal;
-        Kassedifference: Decimal;
-        BevaegPos: Decimal;
-        BevaegNeg: Decimal;
-        BalancePos: Decimal;
-        BalanceNeg: Decimal;
-        Kreditkortsaldo: Decimal;
-        Bruttoomsaetning: Decimal;
-        Nettoomsaetning: Decimal;
-        Vareforbrug: Decimal;
-        Totalrabat: Decimal;
-        Daekningsgrad: Decimal;
-        RabatPct: Decimal;
-        Brugerrabat: Decimal;
-        Flerstyksrabat: Decimal;
-        Mixprisrabat: Decimal;
-        Perioderabat: Decimal;
-        Brugerrabpct: Decimal;
-        Flerstyksrabpct: Decimal;
-        Mixprisrabpct: Decimal;
-        Perioderabpct: Decimal;
-        Beregn: Boolean;
-        Debetsalg: Decimal;
-        Linierabat: Decimal;
-        Linierabpct: Decimal;
-        Kasserec: Record "NPR Register";
-        TitelTXT: Text[50];
-        Sidstebon: Code[30];
-        Ekspeditionstaeller: Integer;
-        OpenTime: Time;
-        CloseTime: Time;
         RevRulleTilgodebevis: Record "NPR Audit Roll";
-        TilgodeInd: Decimal;
-        TilgodeUd: Decimal;
+        GlobalPeriod: Record "NPR Period";
+        Kasserec: Record "NPR Register";
         Kasserecsidste: Record "NPR Register";
-        ReturBeloebTotal: Decimal;
-        ReturBonTotal: Integer;
+        Register: Record "NPR Register";
+        Opsaetning: Record "NPR Retail Setup";
+        Saelger: Record "Salesperson/Purchaser";
+        Beregn: Boolean;
+        DetailedCounting: Boolean;
+        ShowHeader: Boolean;
         Frabon: Code[10];
         Tilbon: Code[10];
-        Gavekortsalg: Decimal;
-        Tilgodebevisudstedelse: Decimal;
-        Udbetalinger: Decimal;
-        Debitorindbetalinger: Decimal;
-        Optaltkassebeholdning: Decimal;
-        Optaltchecks: Decimal;
-        BetalingerTotal: Decimal;
-        Text10600010: Label 'Register closed by %1';
-        Saelger: Record "Salesperson/Purchaser";
-        CountTotalFooter: Decimal;
-        Gkdebet: Decimal;
-        Cancelledtransactions: Integer;
-        Debitnewcalc: Decimal;
-        Register: Record "NPR Register";
-        DetailedCounting: Boolean;
-        Changecash: Decimal;
-        GlobalPeriod: Record "NPR Period";
-        ShowHeader: Boolean;
+        Sidstebon: Code[30];
         Afrundet: Decimal;
+        BalanceNeg: Decimal;
+        BalancePos: Decimal;
+        BetalingerTotal: Decimal;
+        BevaegNeg: Decimal;
+        BevaegPos: Decimal;
+        Brugerrabat: Decimal;
+        Brugerrabpct: Decimal;
+        Bruttoomsaetning: Decimal;
+        Changecash: Decimal;
+        CountTotalFooter: Decimal;
+        Daekningsgrad: Decimal;
+        Dankortbevaeg: Decimal;
+        Debetsalg: Decimal;
+        Debitnewcalc: Decimal;
+        Debitorindbetalinger: Decimal;
+        Flerstyksrabat: Decimal;
+        Flerstyksrabpct: Decimal;
+        Gavekortbevaeg: Decimal;
+        Gavekortsalg: Decimal;
+        Gkdebet: Decimal;
+        Kassedifference: Decimal;
+        Kontantbevaeg: Decimal;
+        Kreditkortsaldo: Decimal;
+        Linierabat: Decimal;
+        Linierabpct: Decimal;
+        Mixprisrabat: Decimal;
+        Mixprisrabpct: Decimal;
+        Nettoomsaetning: Decimal;
+        Optaltchecks: Decimal;
+        Optaltkassebeholdning: Decimal;
+        OtherCardNetChange: Decimal;
+        OverfoertBank: Decimal;
+        Perioderabat: Decimal;
+        Perioderabpct: Decimal;
+        Primo: Decimal;
+        RabatPct: Decimal;
+        ReturBeloebTotal: Decimal;
+        Tilgodebevisbevaeg: Decimal;
+        Tilgodebevisudstedelse: Decimal;
+        TilgodeInd: Decimal;
+        TilgodeUd: Decimal;
+        Totalrabat: Decimal;
+        Udbetalinger: Decimal;
+        UkendteKortbevaeg: Decimal;
+        Vareforbrug: Decimal;
+        "Visa/Dkbevaeg": Decimal;
+        Cancelledtransactions: Integer;
+        Ekspeditionstaeller: Integer;
+        ReturBonTotal: Integer;
+        RegisterClosedLbl: Label 'Register closed by %1', Comment = '%1 = Salesperson Name';
+        TitelTXT: Text[50];
+        CloseTime: Time;
+        OpenTime: Time;
 
     procedure BalanceUpdate(Beloeb: Decimal; pos: Boolean)
     begin

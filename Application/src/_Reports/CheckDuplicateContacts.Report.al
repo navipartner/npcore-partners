@@ -1,15 +1,8 @@
 report 6060112 "NPR Check Duplicate Contacts"
 {
-    // NPR4.18\JLK\20151119 CASE 227394 - Report to find matching contacts based on Name, Address and Phone No.
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
-    // NPR5.38/JLK /20180125  CASE 303595 Added ENU object caption
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Check Duplicate Contacts.rdlc';
-
     Caption = 'Check Duplicate Contacts';
-
     dataset
     {
         dataitem(IntegerComp; "Integer")
@@ -133,9 +126,6 @@ report 6060112 "NPR Check Duplicate Contacts"
             }
         }
 
-        actions
-        {
-        }
     }
 
     labels
@@ -147,41 +137,41 @@ report 6060112 "NPR Check Duplicate Contacts"
     trigger OnPreReport()
     begin
         if (not CheckName) and (not CheckAddr) and (not CheckPhone) then
-            Error(Text001);
+            Error(CheckboxErr);
 
         if CheckName then begin
-            SearchFilter += Text003;
+            SearchFilter += NameLbl;
         end;
         if CheckAddr then begin
             if SearchFilter <> '' then
-                SearchFilter += Text005
+                SearchFilter += AndAddressLbl
             else
-                SearchFilter += Text004;
+                SearchFilter += AddressLbl;
         end;
         if CheckPhone then begin
             if SearchFilter <> '' then
-                SearchFilter += Text007
+                SearchFilter += PhoneLbl
             else
-                SearchFilter += Text006;
+                SearchFilter += Phone2Lbl;
         end;
 
-        SearchFilter := Text002 + SearchFilter;
+        SearchFilter := SearchFilterLbl + SearchFilter;
     end;
 
     var
-        CheckName: Boolean;
-        CheckAddr: Boolean;
-        CheckPhone: Boolean;
+        Company: Record "Company Information";
         Cont2: Record Contact;
         TMPCont: Record Contact temporary;
+        CheckAddr: Boolean;
+        CheckName: Boolean;
+        CheckPhone: Boolean;
+        AddressLbl: Label 'Address';
+        AndAddressLbl: Label ' and Address';
+        PhoneLbl: Label ' and Phone No.';
+        NameLbl: Label 'Name';
+        Phone2Lbl: Label 'Phone No.';
+        SearchFilterLbl: Label 'Search based on: ';
+        CheckboxErr: Label 'Tick one of the check boxes';
         SearchFilter: Text;
-        Company: Record "Company Information";
-        Text001: Label 'Tick one of the check boxes';
-        Text002: Label 'Search based on: ';
-        Text003: Label 'Name';
-        Text004: Label 'Address';
-        Text005: Label ' and Address';
-        Text006: Label 'Phone No.';
-        Text007: Label ' and Phone No.';
 }
 

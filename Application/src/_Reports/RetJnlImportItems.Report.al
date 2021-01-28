@@ -1,15 +1,7 @@
 report 6014424 "NPR Ret. Jnl. - Import Items"
 {
-    // NPR5.26/MHA /20160810  CASE 248288 Field 6014409 Assortment deleted from ReqFilterFields
-    // NPR5.39/MMV /20180212  CASE 303556 Removed manual barcode logic
-    // NPR5.46/JDH /20180926 CASE 294354 Removed Import Filters. The field wasnt shown anywhere
-    // NPR5.49/BHR /20190115  CASE 341969 Corrections as per OMA Guidelines
-    // NPR5.51/ZESO/20190705  CASE 361139 Print Item Variants
-
-    UsageCategory = None;
     Caption = 'Import Items';
     ProcessingOnly = true;
-
     dataset
     {
         dataitem(Item; Item)
@@ -20,11 +12,11 @@ report 6014424 "NPR Ret. Jnl. - Import Items"
             begin
                 CalcFields("NPR Has Variants");
                 if (Inventory <= 0) and OnlyInventory then
-                    CurrReport.Skip;
+                    CurrReport.Skip();
 
-                RetailJournalLine.Reset;
+                RetailJournalLine.Reset();
                 RetailJournalLine.SetRange("No.", RetailJournalHeader."No.");
-                if RetailJournalLine.FindLast then
+                if RetailJournalLine.FindLast() then
                     LastLineNo := RetailJournalLine."Line No."
                 else
                     LastLineNo := 0;
@@ -35,7 +27,7 @@ report 6014424 "NPR Ret. Jnl. - Import Items"
                     RetailJournalLine.Validate("Line No.", LastLineNo + 10000);
                     RetailJournalLine.Validate("No.", RetailJournalHeader."No.");
                     RetailJournalLine.Validate("Item No.", Item."No.");
-                    RetailJournalLine.Insert;
+                    RetailJournalLine.Insert();
                     RetailJournalLine.Validate("Quantity to Print", 1);
                     RetailJournalLine.Validate(Description, Item.Description);
                     RetailJournalLine.Validate("Vendor No.", Item."Vendor No.");
@@ -50,54 +42,8 @@ report 6014424 "NPR Ret. Jnl. - Import Items"
                         ImportUnitCost::"Last direct cost":
                             RetailJournalLine.Validate("Last Direct Cost", Item."Last Direct Cost");
                     end;
-
-                    //-NPR5.39 [303556]
-                    //  RetailJournalLine.VALIDATE(Barcode,Item."Label Barcode");
-                    //+NPR5.39 [303556]
-                    RetailJournalLine.Modify;
+                    RetailJournalLine.Modify();
                 end else begin
-                    //-NPR5.23 [240916]
-                    //  VariaXVariantInfo.SETRANGE("Item No.",Item."No.");
-                    //  IF VariaXVariantInfo.FIND('-') THEN REPEAT
-                    //    RetailJournalLine.INIT();
-                    //    RetailJournalLine.VALIDATE("Line No.", LastLineNo + 10000);
-                    //    LastLineNo += 10000;
-                    //    RetailJournalLine.VALIDATE("No.", RetailJournalHeader."No.");
-                    //    RetailJournalLine.VALIDATE("Item No.",Item."No.");
-                    //    RetailJournalLine.VALIDATE("Variant Code",VariaXVariantInfo."Variant Code");
-                    //    RetailJournalLine.INSERT;
-                    //    Item.SETFILTER("Variant Filter",'=%1',VariaXVariantInfo."Variant Code");
-                    //    CALCFIELDS(Item.Inventory);
-                    //
-                    //    IF UseStock THEN
-                    //       RetailJournalLine.VALIDATE(Quantity,Item.Inventory)
-                    //    ELSE
-                    //       RetailJournalLine.VALIDATE(Quantity,1);
-                    //
-                    //    RetailJournalLine.VALIDATE(Description,Item.Description);
-                    //    RetailJournalLine.VALIDATE("Vendor No.",Item."Vendor No.");
-                    //    RetailJournalLine.VALIDATE("Vendor Item No.",Item."Vendor Item No.");
-                    //    RetailJournalLine.VALIDATE("Unit price",Item."Unit Price");
-                    //    RetailJournalLine.VALIDATE(RetailJournalLine.Inventory,Item.Inventory);
-                    //
-                    //    CASE ImportUnitCost OF
-                    //      ImportUnitCost::"Standard Cost"    : RetailJournalLine.VALIDATE("Unit cost",Item."Standard Cost");
-                    //      ImportUnitCost::"Unit Cost"        : RetailJournalLine.VALIDATE("Unit cost",Item."Unit Cost");
-                    //      ImportUnitCost::"Last direct cost" : RetailJournalLine.VALIDATE("Unit cost",Item."Last Direct Cost");
-                    //    END;
-                    //    AlternativeNo.RESET;
-                    //    AlternativeNo.SETRANGE(Type,AlternativeNo.Type::Item);
-                    //    AlternativeNo.SETRANGE(AlternativeNo.Code,Item."No.");
-                    //    AlternativeNo.SETRANGE("Variant Code",VariaXVariantInfo."Variant Code");
-                    //    IF AlternativeNo.FIND('-') THEN
-                    //      RetailJournalLine.VALIDATE(Barcode,AlternativeNo."Alt. No.")
-                    //    ELSE
-                    //      RetailJournalLine.VALIDATE(Barcode,Item."Label Barcode");
-                    //    RetailJournalLine.MODIFY;
-                    //    SETFILTER(Item."Variant Filter",'');
-                    //  UNTIL VariaXVariantInfo.NEXT = 0;
-                    //+NPR5.23 [240916]
-                    //-NPR5.51 [361139]
                     ItemVariants.SetRange("Item No.", Item."No.");
                     if ItemVariants.Find('-') then
                         repeat
@@ -107,22 +53,15 @@ report 6014424 "NPR Ret. Jnl. - Import Items"
                             RetailJournalLine.Validate("No.", RetailJournalHeader."No.");
                             RetailJournalLine.Validate("Item No.", Item."No.");
                             RetailJournalLine.Validate("Variant Code", ItemVariants.Code);
-                            RetailJournalLine.Insert;
+                            RetailJournalLine.Insert();
                             Item.SetFilter("Variant Filter", '=%1', ItemVariants.Code);
                             CalcFields(Item.Inventory);
-
-                            //IF UseStock THEN
-                            //RetailJournalLine.VALIDATE(Quantity,Item.Inventory)
-                            //ELSE
                             RetailJournalLine.Validate("Quantity to Print", 1);
-
                             RetailJournalLine.Validate(Description, Item.Description);
                             RetailJournalLine.Validate("Vendor No.", Item."Vendor No.");
                             RetailJournalLine.Validate("Vendor Item No.", Item."Vendor Item No.");
                             RetailJournalLine.Validate("Unit Price", Item."Unit Price");
                             RetailJournalLine.Validate(RetailJournalLine.Inventory, Item.Inventory);
-
-
 
                             case ImportUnitCost of
                                 ImportUnitCost::"Standard Cost":
@@ -133,28 +72,17 @@ report 6014424 "NPR Ret. Jnl. - Import Items"
                                     RetailJournalLine.Validate("Last Direct Cost", Item."Last Direct Cost");
                             end;
 
-
-                            CrossReference.Reset;
+                            CrossReference.Reset();
                             CrossReference.SetRange("Cross-Reference Type", CrossReference."Cross-Reference Type"::"Bar Code");
                             CrossReference.SetRange("Item No.", Item."No.");
                             CrossReference.SetRange("Variant Code", ItemVariants.Code);
                             if CrossReference.FindFirst then
                                 RetailJournalLine.Validate(Barcode, CrossReference."Cross-Reference No.");
 
-                            RetailJournalLine.Modify;
+                            RetailJournalLine.Modify();
                             SetFilter(Item."Variant Filter", '');
-                        until ItemVariants.Next = 0;
-
-                    //+NPR5.51 [361139]
+                        until ItemVariants.Next() = 0;
                 end;
-            end;
-
-            trigger OnPreDataItem()
-            begin
-                //-NPR5.46 [294354]
-                //RetailJournalHeader."Import filter" := Item.GETFILTERS;
-                //RetailJournalHeader.MODIFY;
-                //+NPR5.46 [294354]
             end;
         }
     }
@@ -174,24 +102,17 @@ report 6014424 "NPR Ret. Jnl. - Import Items"
             }
         }
 
-        actions
-        {
-        }
-    }
-
-    labels
-    {
     }
 
     var
+        CrossReference: Record "Item Cross Reference";
+        ItemVariants: Record "Item Variant";
         RetailJournalHeader: Record "NPR Retail Journal Header";
         RetailJournalLine: Record "NPR Retail Journal Line";
         OnlyInventory: Boolean;
         RetailJournalCode: Code[20];
-        ImportUnitCost: Option "Standard Cost","Unit Cost","Last direct cost";
         LastLineNo: Integer;
-        ItemVariants: Record "Item Variant";
-        CrossReference: Record "Item Cross Reference";
+        ImportUnitCost: Option "Standard Cost","Unit Cost","Last direct cost";
 
     procedure SetJournal(RetailJournalCodeIn: Code[20])
     begin

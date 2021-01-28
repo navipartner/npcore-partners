@@ -1,9 +1,7 @@
 report 6014603 "NPR ICR to Alt. No. barcodes"
 {
-    UsageCategory = None;
     Caption = 'Item Cross Reference to Alt. No. barcodes';
     ProcessingOnly = true;
-
     dataset
     {
         dataitem("Item Cross Reference"; "Item Cross Reference")
@@ -19,11 +17,10 @@ report 6014603 "NPR ICR to Alt. No. barcodes"
                 AltNo.SetFilter(Code, '<>%1', "Item No.");
                 AltNo.SetFilter("Variant Code", '<>%1', "Variant Code");
                 if not AltNo.IsEmpty then
-                    Error(Error_Clash, "Cross-Reference No.", "Item No.");
+                    Error(ClashErr, "Cross-Reference No.", "Item No.");
 
-                AltNo.Reset;
-
-                AltNo.Init;
+                AltNo.Reset();
+                AltNo.Init();
                 AltNo.Code := "Item No.";
                 AltNo."Variant Code" := "Variant Code";
                 AltNo."Base Unit of Measure" := "Unit of Measure";
@@ -33,7 +30,7 @@ report 6014603 "NPR ICR to Alt. No. barcodes"
                 if AltNo.Insert then //Don't fail on barcodes that have already been moved.
                     AddCounter += 1;
 
-                Delete;
+                Delete();
 
                 Itt += 1;
                 UpdateProgressDialog(2, Itt, Total);
@@ -53,47 +50,28 @@ report 6014603 "NPR ICR to Alt. No. barcodes"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
-    }
 
     trigger OnInitReport()
     begin
-        if not Confirm(Txt_Warning) then
+        if not Confirm(WarningQst) then
             exit;
     end;
 
     trigger OnPostReport()
     begin
-        Message(Txt_Success, AddCounter);
+        Message(SuccessMsg, AddCounter);
     end;
 
     var
-        Txt_Warning: Label 'Warning:\This report will move all barcodes from item cross references to alternative numbers.This can take a long time depending on the data size and will lock the tables in the meantime.\\Are you sure you want to continue?';
-        Txt_Success: Label '%1 barcodes were moved successfully to alternative number table.';
-        Error_Clash: Label 'Item cross reference barcode %1 for item %2 already exists as an Alt. No. on a different item. Please resolve this conflict manually and run again. No changes were made.';
-        AddCounter: Integer;
         IsDialogOpen: Boolean;
-        DialogValues: array[2] of Integer;
         ProgressDialog: Dialog;
+        AddCounter: Integer;
+        DialogValues: array[2] of Integer;
         Itt: Integer;
         Total: Integer;
-
-    local procedure "// Dialog"()
-    begin
-    end;
+        SuccessMsg: Label '%1 barcodes were moved successfully to alternative number table.', Comment = '%1 = Number of barcodes';
+        ClashErr: Label 'Item cross reference barcode %1 for item %2 already exists as an Alt. No. on a different item. Please resolve this conflict manually and run again. No changes were made.', Comment = '%1 = Cross-Reference No., %2 = Item No.';
+        WarningQst: Label 'Warning:\This report will move all barcodes from item cross references to alternative numbers.This can take a long time depending on the data size and will lock the tables in the meantime.\\Are you sure you want to continue?';
 
     local procedure OpenDialog()
     begin
@@ -124,7 +102,7 @@ report 6014603 "NPR ICR to Alt. No. barcodes"
     local procedure CloseDialog()
     begin
         if GuiAllowed then
-            ProgressDialog.Close;
+            ProgressDialog.Close();
 
         IsDialogOpen := false;
     end;

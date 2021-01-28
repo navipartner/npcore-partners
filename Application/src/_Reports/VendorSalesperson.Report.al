@@ -1,18 +1,10 @@
 report 6014529 "NPR Vendor/Salesperson"
 {
-    // NPR70.00.00.00/LS/280613 CASE 142565 : COnvert Report to NAV 2013
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
-    // NPR5.39/TJ  /20180208  CASE 302634 Renamed Name property of controls totalTurnover and totalTotalTurnover
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.54/YAHA/20200603  CASE 394857 Removed Navipartner label
-    // NPR5.54/YAHA/20200324  CASE 394883 Removed footer NaviPartner  text
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/VendorSalesperson.rdlc';
-
     Caption = 'Vendor/Salesperson';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem(Vendor; Vendor)
@@ -71,9 +63,6 @@ report 6014529 "NPR Vendor/Salesperson"
                     currentRec += 1;
 
                     d.Update(2, Round(((currentRec * 10000) / totalRec), 1));
-                    //-NPR5.39
-                    //CurrReport.CREATETOTALS(TotalSale,db);
-                    //+NPR5.39
 
                     TotalSale := 0;
                     TotalCOGS := 0;
@@ -88,18 +77,18 @@ report 6014529 "NPR Vendor/Salesperson"
                             TotalSale += "NPR Sales (LCY)";
                             TotalCOGS += "NPR COGS (LCY)";
 
-                        until Item.Next = 0 else
-                        CurrReport.Skip;
+                        until Item.Next() = 0 else
+                        CurrReport.Skip();
 
                     if TotalSale <> 0 then begin
-                        Varegruppetemp.Init;
+                        Varegruppetemp.Init();
                         Varegruppetemp."Item No." := "Salesperson/Purchaser".Code;
                         Varegruppetemp.Amount := TotalSale;
                         Varegruppetemp."Amount 2" := TotalCOGS;
                         if Varegruppetemp.Insert then;
 
                     end else
-                        CurrReport.Skip;
+                        CurrReport.Skip();
                 end;
 
                 trigger OnPreDataItem()
@@ -166,10 +155,10 @@ report 6014529 "NPR Vendor/Salesperson"
 
                     if Number = 1 then begin
                         if not Varegruppetemp.Find('-') then
-                            CurrReport.Break;
+                            CurrReport.Break();
                     end else
-                        if Varegruppetemp.Next = 0 then
-                            CurrReport.Break;
+                        if Varegruppetemp.Next() = 0 then
+                            CurrReport.Break();
 
                     if (Varegruppetemp.Amount <> 0) then begin
                         dg := ((Varegruppetemp.Amount - Varegruppetemp."Amount 2") / Varegruppetemp.Amount) * 100;
@@ -216,32 +205,10 @@ report 6014529 "NPR Vendor/Salesperson"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
-    }
-
     trigger OnInitReport()
     begin
         firmaoplysninger.Get();
         firmaoplysninger.CalcFields(Picture);
-
-        //-NPR5.39
-        // objekt.SETRANGE(ID, 6014529);
-        // objekt.SETRANGE(Type, 3);
-        // objekt.FIND('-');
-        //+NPR5.39
 
         viskunhovedtal := false;
         sortSalesPerson := true;
@@ -256,43 +223,43 @@ report 6014529 "NPR Vendor/Salesperson"
 
     var
         firmaoplysninger: Record "Company Information";
-        viskunhovedtal: Boolean;
-        dg: Decimal;
-        sortSalesPerson: Boolean;
-        visantal: Integer;
-        db: Decimal;
-        Salespersonfilter: Text[250];
         Item: Record Item;
-        numberOfSalesPeople: Integer;
         Varegruppetemp: Record "Item Amount" temporary;
-        TotalSale: Decimal;
-        TotalCOGS: Decimal;
         SalesPerson: Record "Salesperson/Purchaser";
-        totalTurnover: Decimal;
-        forbrugtotal: Decimal;
-        dbtotal: Decimal;
-        dgtotal: Decimal;
-        totalTotalTurnover: Decimal;
-        forbrugalt: Decimal;
+        sortSalesPerson: Boolean;
+        viskunhovedtal: Boolean;
+        db: Decimal;
         dbalt: Decimal;
+        dbtotal: Decimal;
+        dg: Decimal;
         dgalt: Decimal;
+        dgtotal: Decimal;
+        forbrugalt: Decimal;
+        forbrugtotal: Decimal;
+        TotalCOGS: Decimal;
+        TotalSale: Decimal;
+        totalTotalTurnover: Decimal;
+        totalTurnover: Decimal;
         d: Dialog;
         currentRec: Integer;
-        totalRec: Integer;
-        navn: Text[30];
+        numberOfSalesPeople: Integer;
         taeller: Integer;
-        Text001: Label 'Creditor: #1################### \';
+        totalRec: Integer;
+        visantal: Integer;
         Text002: Label '@2@@@@@@@@@@@@@@@@@@@@@@@@@@@@@';
-        PageNoCaptionLbl: Label 'Page';
-        Report_Caption_Lbl: Label 'Vendor/Salesperson';
-        VendorFilter: Text[200];
-        No_Caption_Lbl: Label 'No.';
-        Vendor_Caption_Lbl: Label 'Vendor';
-        Salesperson_Caption_Lbl: Label 'Salesperson';
-        Turnover_Caption_Lbl: Label 'Turnover';
         Cost_Caption_Lbl: Label 'Cost';
-        DbCaption_Lbl: Label 'DB';
         CRPct_Caption_Lbl: Label 'CR%';
+        Text001: Label 'Creditor: #1################### \';
+        DbCaption_Lbl: Label 'DB';
+        No_Caption_Lbl: Label 'No.';
+        PageNoCaptionLbl: Label 'Page';
+        Salesperson_Caption_Lbl: Label 'Salesperson';
         Total_Caption_Lbl: Label 'Total';
+        Turnover_Caption_Lbl: Label 'Turnover';
+        Vendor_Caption_Lbl: Label 'Vendor';
+        Report_Caption_Lbl: Label 'Vendor/Salesperson';
+        navn: Text[30];
+        VendorFilter: Text[200];
+        Salespersonfilter: Text[250];
 }
 

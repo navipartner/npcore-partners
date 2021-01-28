@@ -1,14 +1,7 @@
 report 6014474 "NPR Item/Sales Person Top"
 {
-    // NPR70.00.00.00/LS/280613 CASE  162050  Convert Report to Nav 2013
-    // NPR4.21/LS/20160216  CASE 234832 Correct report's variables/codes/code indentation/dataset names/Report layout
-    // NPR5.36/TJ/20170927  CASE 286283 Renamed options with danish specific letters to english words
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/ItemSales Person Top.rdlc';
-
     Caption = 'Item/Sales Person Top';
 
     dataset
@@ -64,7 +57,8 @@ report 6014474 "NPR Item/Sales Person Top"
 
                 trigger OnAfterGetRecord()
                 begin
-                    if "NPR Sales (LCY)" = 0 then CurrReport.Skip;
+                    if "NPR Sales (LCY)" = 0 then
+                        CurrReport.Skip();
 
                     if Sorting then begin
                         ItemAmount."Item No." := Code;
@@ -81,14 +75,14 @@ report 6014474 "NPR Item/Sales Person Top"
                                     ItemAmount."Amount 2" := Abs("NPR Sales (LCY)");
                                 end;
                         end;
-                        ItemAmount.Insert;
+                        ItemAmount.Insert();
                     end;
                 end;
 
                 trigger OnPreDataItem()
                 begin
                     if Sorting then
-                        ItemAmount.DeleteAll;
+                        ItemAmount.DeleteAll();
 
                     if Item.GetFilter("Date Filter") <> '' then
                         Item.CopyFilter("Date Filter", "Salesperson/Purchaser"."Date Filter");
@@ -115,10 +109,10 @@ report 6014474 "NPR Item/Sales Person Top"
                 begin
                     if Number = 1 then begin
                         if not ItemAmount.FindFirst then
-                            CurrReport.Break;
+                            CurrReport.Break();
                     end else
-                        if ItemAmount.Next = 0 then
-                            CurrReport.Break;
+                        if ItemAmount.Next() = 0 then
+                            CurrReport.Break();
 
                     if Salesperson.Get(ItemAmount."Item No.") then;
 
@@ -141,21 +135,11 @@ report 6014474 "NPR Item/Sales Person Top"
 
                 trigger OnPreDataItem()
                 begin
-                    if not Sorting then CurrReport.Break;
-                    //-NPR5.39
-                    //CurrReport.CREATETOTALS(antal2,amountCalc);
-                    //+NPR5.39
+                    if not Sorting then
+                        CurrReport.Break();
                     SetRange(Number, 1, ShowQty);
                 end;
             }
-
-            trigger OnPreDataItem()
-            begin
-                //-NPR5.39
-                //CurrReport.CREATETOTALS(antal2,amountCalc);
-                //CurrReport.CREATETOTALS("Salesperson/Purchaser"."Sales (Qty.)","Salesperson/Purchaser"."Sales (LCY)");
-                //+NPR5.39
-            end;
         }
     }
 
@@ -176,10 +160,8 @@ report 6014474 "NPR Item/Sales Person Top"
 
                         trigger OnValidate()
                         begin
-                            //-NPK7
                             ShowSort := false;
                             ShowSort := Sorting;
-                            //+NPK7
                         end;
                     }
                     field(SortBy; SortBy)
@@ -209,16 +191,10 @@ report 6014474 "NPR Item/Sales Person Top"
             }
         }
 
-        actions
-        {
-        }
-
         trigger OnOpenPage()
         begin
-            //-NPK7
             ShowSort := false;
             ShowQty := 20;
-            //+NPK7
         end;
     }
 
@@ -236,13 +212,6 @@ report 6014474 "NPR Item/Sales Person Top"
     begin
         CompanyInfo.Get();
         CompanyInfo.CalcFields(Picture);
-
-        //-NPR5.39
-        // Object.SETRANGE(ID, 6014474);
-        // Object.SETRANGE(Type, 3);
-        // Object.FIND('-');
-        //+NPR5.39
-
         if Sorting then begin
             ItemAmount.SetCurrentKey(Amount, "Amount 2", "Item No.");
             case Key of
@@ -255,17 +224,17 @@ report 6014474 "NPR Item/Sales Person Top"
     end;
 
     var
-        ItemAmount: Record "Item Amount" temporary;
-        Sorting: Boolean;
-        Salesperson: Record "Salesperson/Purchaser";
-        SortBy: Option "Qty.",Turnover;
-        "Key": Option stigende,faldende;
         CompanyInfo: Record "Company Information";
-        ShowQty: Integer;
-        Qty2: Decimal;
-        CalcAmt: Decimal;
+        ItemAmount: Record "Item Amount" temporary;
+        Salesperson: Record "Salesperson/Purchaser";
         [InDataSet]
         ShowSort: Boolean;
+        Sorting: Boolean;
+        CalcAmt: Decimal;
+        Qty2: Decimal;
+        ShowQty: Integer;
         SortByTxtConst: Label 'Sort By:';
+        SortBy: Option "Qty.",Turnover;
+        "Key": Option stigende,faldende;
 }
 

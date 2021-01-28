@@ -1,12 +1,7 @@
 report 6060105 "NPR Terminal Sales Ticket IV"
 {
-    // //NPR7.000.000  LS, 05-12-12, CASE150656
-    // NPR5.36/TJ /20170927 CASE 286283 Renamed variables with danish specific letters into english letters
-    // NPR5.49/BHR /20190115  CASE 341969 Corrections as per OMA Guidelines
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Terminal Sales Ticket IV.rdlc';
-
     Caption = 'Terminal Sales Ticket IV';
     ShowPrintStatus = false;
     UseRequestPage = false;
@@ -46,15 +41,10 @@ report 6060105 "NPR Terminal Sales Ticket IV"
 
             trigger OnAfterGetRecord()
             begin
-                //-NPR7
                 Body2 := false;
                 Body3 := false;
                 Body1 := false;
                 FirstLineText := '';
-                //MESSAGE('F¢rste=%1, EjF¢rste=%2 ,F¢rsteLinieText=%3 ,EjCut=%4',F¢rste,EjF¢rste,F¢rsteLinieText,EjCut);
-
-                //+NPR7
-
                 if IsFirst then begin
                     NotFirst := true;
                     exit;
@@ -67,7 +57,6 @@ report 6060105 "NPR Terminal Sales Ticket IV"
                 else
                     EjCut := false;
 
-                //-NPR7
                 Body1 := ((not EjCut) and NotFirst and (FirstLineText = "EFT Receipt".Text));
 
                 Body2 := ((not EjCut) and NotFirst and (FirstLineText = "EFT Receipt".Text) and
@@ -79,7 +68,6 @@ report 6060105 "NPR Terminal Sales Ticket IV"
                     Body3 := (not NotFirst and ("EFT Receipt"."No. Printed" > 0));
 
                 Body3Cnt += 1;
-                //+NPR7
             end;
 
             trigger OnPostDataItem()
@@ -104,32 +92,16 @@ report 6060105 "NPR Terminal Sales Ticket IV"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
-    }
-
     var
-        IsFirst: Boolean;
-        NotFirst: Boolean;
-        FirstLineText: Text[100];
-        EjCut: Boolean;
         Register: Record "NPR Register";
-        TxtCopy: Label '*** COPY ***';
+        Body1: Boolean;
         Body2: Boolean;
         Body3: Boolean;
-        Body1: Boolean;
+        EjCut: Boolean;
+        IsFirst: Boolean;
+        NotFirst: Boolean;
         Body3Cnt: Integer;
+        TxtCopy: Label '*** COPY ***';
+        FirstLineText: Text[100];
 }
 

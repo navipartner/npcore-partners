@@ -1,9 +1,7 @@
 report 6014561 "NPR Gift Voucher A5"
 {
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Gift Voucher A5.rdlc';
-
     Caption = 'Gift Voucher A5';
 
     dataset
@@ -81,11 +79,11 @@ report 6014561 "NPR Gift Voucher A5"
                     trigger OnAfterGetRecord()
                     var
                         POSUnit: Record "NPR POS Unit";
-                        POSSession: Codeunit "NPR POS Session";
                         POSFrontEnd: Codeunit "NPR POS Front End Management";
+                        POSSession: Codeunit "NPR POS Session";
                         POSSetup: Codeunit "NPR POS Setup";
                     begin
-                        clear(POSStore);
+                        Clear(POSStore);
                         if POSSession.IsActiveSession(POSFrontEnd) then begin
                             POSFrontEnd.GetSession(POSSession);
                             POSSession.GetSetup(POSSetup);
@@ -94,7 +92,7 @@ report 6014561 "NPR Gift Voucher A5"
                             if POSUnit.get(Register."Register No.") then
                                 POSStore.get(POSUnit."POS Store Code");
                         end;
-                        RegisterPhoneText := StrSubstNo(Text1002, POSStore."Phone No.");
+                        RegisterPhoneText := StrSubstNo(PhoneNoLbl, POSStore."Phone No.");
                         RegisterPostCodeAndCityText := POSStore."Post Code" + ' ' + POSStore.City;
                     end;
                 }
@@ -107,7 +105,7 @@ report 6014561 "NPR Gift Voucher A5"
                     "Gift Voucher".Modify(false);
 
                     if ("Gift Voucher"."No. Printed" > 1) and (RetailSetup."Copy No. on Sales Ticket") then
-                        CopyText := Text1001;
+                        CopyText := CopyLbl;
 
                     DetailsText := Format("Issue Date") + ' ' + "Register No." + ' ' + "Sales Ticket No." + ' - ' + "No." + ' - ' + Format(Time);
 
@@ -129,30 +127,11 @@ report 6014561 "NPR Gift Voucher A5"
             trigger OnAfterGetRecord()
             begin
                 if LoopCounter > 0 then
-                    CurrReport.Break;
+                    CurrReport.Break();
                 LoopCounter += 1;
             end;
-
-            trigger OnPreDataItem()
-            var
-                RetailFormCode: Codeunit "NPR Retail Form Code";
-            begin
-            end;
         }
     }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     labels
     {
         Lbl000 = 'Gift voucher';
@@ -169,21 +148,21 @@ report 6014561 "NPR Gift Voucher A5"
     end;
 
     var
-        LoopCounter: Integer;
+        BlobBuffer: Record "NPR BLOB buffer" temporary;
+        POSStore: Record "NPR POS Store";
         RetailSetup: Record "NPR Retail Setup";
-        CopyText: Text;
-        Text1001: Label 'COPY';
+        BarcodeLib: Codeunit "NPR Barcode Library";
         TempBlob: Codeunit "Temp Blob";
+        LoopCounter: Integer;
+        CopyLbl: Label 'COPY';
+        PhoneNoLbl: Label 'Phone No.: %1', Comment = '%1 = Phone No.';
+        VATNoLbl: Label 'VAT No.: %1', Comment = '%1 = VAT No.';
+        CopyText: Text;
         DetailsText: Text;
-        SalesPersonText: Text;
         RegisterPhoneText: Text;
         RegisterPostCodeAndCityText: Text;
         RegisterVatNoText: Text;
+        SalesPersonText: Text;
         ZipCodeCityText: Text;
-        BarcodeLib: Codeunit "NPR Barcode Library";
-        Text1002: Label 'Phone No.: %1';
-        Text1003: Label 'VAT No.: %1';
-        BlobBuffer: Record "NPR BLOB buffer" temporary;
-        POSStore: Record "NPR POS Store";
 }
 

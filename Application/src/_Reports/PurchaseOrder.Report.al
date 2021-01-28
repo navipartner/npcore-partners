@@ -1,15 +1,10 @@
 report 6014617 "NPR Purchase Order"
 {
-    // NPR5.42/JLK /20180521  CASE 313612 Object created adapted to make use of Word Layout
-    // NPR5.50/BHR /20190610  CASE 357186 Correct WORD Layout
-    UsageCategory = None;
     RDLCLayout = './src/_Reports/layouts/NP Purchase Order.rdlc';
     WordLayout = './src/_Reports/layouts/NP Purchase Order.docx';
-
     Caption = 'NP Purchase Order';
     DefaultLayout = Word;
     PreviewMode = PrintLayout;
-
     dataset
     {
         dataitem("Purchase Header"; "Purchase Header")
@@ -281,10 +276,10 @@ report 6014617 "NPR Purchase Order"
                         begin
                             if Number = 1 then begin
                                 if not DimSetEntry1.FindSet then
-                                    CurrReport.Break;
+                                    CurrReport.Break();
                             end else
                                 if not Continue then
-                                    CurrReport.Break;
+                                    CurrReport.Break();
 
                             Clear(DimText);
                             Continue := false;
@@ -308,7 +303,7 @@ report 6014617 "NPR Purchase Order"
                         trigger OnPreDataItem()
                         begin
                             if not ShowInternalInfo then
-                                CurrReport.Break;
+                                CurrReport.Break();
                         end;
                     }
                     dataitem("Purchase Line"; "Purchase Line")
@@ -319,7 +314,7 @@ report 6014617 "NPR Purchase Order"
 
                         trigger OnPreDataItem()
                         begin
-                            CurrReport.Break;
+                            CurrReport.Break();
                         end;
                     }
                     dataitem(RoundLoop; "Integer")
@@ -487,10 +482,10 @@ report 6014617 "NPR Purchase Order"
                             begin
                                 if Number = 1 then begin
                                     if not DimSetEntry2.FindSet then
-                                        CurrReport.Break;
+                                        CurrReport.Break();
                                 end else
                                     if not Continue then
-                                        CurrReport.Break;
+                                        CurrReport.Break();
 
                                 Clear(DimText);
                                 Continue := false;
@@ -514,7 +509,7 @@ report 6014617 "NPR Purchase Order"
                             trigger OnPreDataItem()
                             begin
                                 if not ShowInternalInfo then
-                                    CurrReport.Break;
+                                    CurrReport.Break();
 
                                 DimSetEntry2.SetRange("Dimension Set ID", "Purchase Line"."Dimension Set ID");
                             end;
@@ -537,7 +532,7 @@ report 6014617 "NPR Purchase Order"
                                 "Purchase Line"."No." := '';
                             AllowInvDisctxt := Format("Purchase Line"."Allow Invoice Disc.");
 
-                            VATAmountLine.Init;
+                            VATAmountLine.Init();
                             VATAmountLine."VAT Identifier" := "Purchase Line"."VAT Identifier";
                             VATAmountLine."VAT Calculation Type" := "Purchase Line"."VAT Calculation Type";
                             VATAmountLine."Tax Group Code" := "Purchase Line"."Tax Group Code";
@@ -549,7 +544,7 @@ report 6014617 "NPR Purchase Order"
                                 VATAmountLine."Inv. Disc. Base Amount" := "Purchase Line"."Line Amount";
                             VATAmountLine."Invoice Discount Amount" := "Purchase Line"."Inv. Discount Amount";
                             if ("Purchase Line"."VAT %" <> 0) or ("Purchase Line".Amount <> "Purchase Line"."Amount Including VAT") then
-                                VATAmountLine.InsertLine;
+                                VATAmountLine.InsertLine();
 
                             TransHeaderAmount += PrevLineAmount;
                             PrevLineAmount := "Purchase Line"."Line Amount";
@@ -562,7 +557,7 @@ report 6014617 "NPR Purchase Order"
 
                         trigger OnPostDataItem()
                         begin
-                            PurchLine.DeleteAll;
+                            PurchLine.DeleteAll();
                         end;
 
                         trigger OnPreDataItem()
@@ -574,7 +569,7 @@ report 6014617 "NPR Purchase Order"
                             do
                                 MoreLines := PurchLine.Next(-1) <> 0;
                             if not MoreLines then
-                                CurrReport.Break;
+                                CurrReport.Break();
                             PurchLine.SetRange("Line No.", 0, PurchLine."Line No.");
                             SetRange(Number, 1, PurchLine.Count);
                         end;
@@ -670,7 +665,7 @@ report 6014617 "NPR Purchase Order"
                         trigger OnPreDataItem()
                         begin
                             if VATAmount = 0 then
-                                CurrReport.Break;
+                                CurrReport.Break();
                             SetRange(Number, 1, VATAmountLine.Count);
                         end;
                     }
@@ -709,7 +704,7 @@ report 6014617 "NPR Purchase Order"
                                ("Purchase Header"."Currency Code" = '') or
                                (VATAmountLine.GetTotalVATAmount = 0)
                             then
-                                CurrReport.Break;
+                                CurrReport.Break();
 
                             SetRange(Number, 1, VATAmountLine.Count);
 
@@ -762,7 +757,7 @@ report 6014617 "NPR Purchase Order"
                         trigger OnPreDataItem()
                         begin
                             if "Purchase Header"."Buy-from Vendor No." = "Purchase Header"."Pay-to Vendor No." then
-                                CurrReport.Break;
+                                CurrReport.Break();
                         end;
                     }
                     dataitem(Total3; "Integer")
@@ -805,7 +800,7 @@ report 6014617 "NPR Purchase Order"
                         trigger OnPreDataItem()
                         begin
                             if ("Purchase Header"."Sell-to Customer No." = '') and (ShipToAddr[1] = '') then
-                                CurrReport.Break;
+                                CurrReport.Break();
                         end;
                     }
                     dataitem(PrepmtLoop; "Integer")
@@ -868,10 +863,10 @@ report 6014617 "NPR Purchase Order"
                             begin
                                 if Number = 1 then begin
                                     if not PrepmtDimSetEntry.FindSet then
-                                        CurrReport.Break;
+                                        CurrReport.Break();
                                 end else
                                     if not Continue then
-                                        CurrReport.Break;
+                                        CurrReport.Break();
 
                                 Clear(DimText);
                                 Continue := false;
@@ -889,7 +884,7 @@ report 6014617 "NPR Purchase Order"
                                         Continue := true;
                                         exit;
                                     end;
-                                until PrepmtDimSetEntry.Next = 0;
+                                until PrepmtDimSetEntry.Next() = 0;
                             end;
                         }
 
@@ -897,10 +892,10 @@ report 6014617 "NPR Purchase Order"
                         begin
                             if Number = 1 then begin
                                 if not PrepmtInvBuf.Find('-') then
-                                    CurrReport.Break;
+                                    CurrReport.Break();
                             end else
                                 if PrepmtInvBuf.Next = 0 then
-                                    CurrReport.Break;
+                                    CurrReport.Break();
 
                             if ShowInternalInfo then
                                 PrepmtDimSetEntry.SetRange("Dimension Set ID", PrepmtInvBuf."Dimension Set ID");
@@ -959,22 +954,22 @@ report 6014617 "NPR Purchase Order"
                 begin
                     Clear(PurchLine);
                     Clear(PurchPost);
-                    PurchLine.DeleteAll;
-                    VATAmountLine.DeleteAll;
+                    PurchLine.DeleteAll();
+                    VATAmountLine.DeleteAll();
                     PurchPost.GetPurchLines("Purchase Header", PurchLine, 0);
                     PurchLine.CalcVATAmountLines(0, "Purchase Header", PurchLine, VATAmountLine);
                     PurchLine.UpdateVATOnLines(0, "Purchase Header", PurchLine, VATAmountLine);
-                    VATAmount := VATAmountLine.GetTotalVATAmount;
-                    VATBaseAmount := VATAmountLine.GetTotalVATBase;
+                    VATAmount := VATAmountLine.GetTotalVATAmount();
+                    VATBaseAmount := VATAmountLine.GetTotalVATBase();
                     VATDiscountAmount :=
                       VATAmountLine.GetTotalVATDiscount("Purchase Header"."Currency Code", "Purchase Header"."Prices Including VAT");
                     TotalAmountInclVAT := VATAmountLine.GetTotalAmountInclVAT;
 
-                    PrepmtInvBuf.DeleteAll;
+                    PrepmtInvBuf.DeleteAll();
                     PurchPostPrepmt.GetPurchLines("Purchase Header", 0, PrepmtPurchLine);
-                    if not PrepmtPurchLine.IsEmpty then begin
+                    if not PrepmtPurchLine.IsEmpty() then begin
                         PurchPostPrepmt.GetPurchLinesToDeduct("Purchase Header", TempPurchLine);
-                        if not TempPurchLine.IsEmpty then
+                        if not TempPurchLine.IsEmpty() then
                             PurchPostPrepmt.CalcVATAmountLines("Purchase Header", TempPurchLine, PrePmtVATAmountLineDeduct, 1);
                     end;
                     PurchPostPrepmt.CalcVATAmountLines("Purchase Header", PrepmtPurchLine, PrepmtVATAmountLine, 0);
@@ -1012,8 +1007,7 @@ report 6014617 "NPR Purchase Order"
             begin
                 CurrReport.Language := Language.GetLanguageID("Language Code");
 
-                CompanyInfo.Get;
-
+                CompanyInfo.Get();
                 CompanyInfo.CalcFields(Picture);
 
                 if RespCenter.Get("Responsibility Center") then begin
@@ -1026,7 +1020,7 @@ report 6014617 "NPR Purchase Order"
                 DimSetEntry1.SetRange("Dimension Set ID", "Dimension Set ID");
 
                 if "Purchaser Code" = '' then begin
-                    SalesPurchPerson.Init;
+                    SalesPurchPerson.Init();
                     PurchaserText := '';
                 end else begin
                     SalesPurchPerson.Get("Purchaser Code");
@@ -1055,19 +1049,19 @@ report 6014617 "NPR Purchase Order"
                 if "Buy-from Vendor No." <> "Pay-to Vendor No." then
                     FormatAddr.PurchHeaderPayTo(VendAddr, "Purchase Header");
                 if "Payment Terms Code" = '' then
-                    PaymentTerms.Init
+                    PaymentTerms.Init()
                 else begin
                     PaymentTerms.Get("Payment Terms Code");
                     PaymentTerms.TranslateDescription(PaymentTerms, "Language Code");
                 end;
                 if "Prepmt. Payment Terms Code" = '' then
-                    PrepmtPaymentTerms.Init
+                    PrepmtPaymentTerms.Init()
                 else begin
                     PrepmtPaymentTerms.Get("Prepmt. Payment Terms Code");
                     PrepmtPaymentTerms.TranslateDescription(PrepmtPaymentTerms, "Language Code");
                 end;
                 if "Shipment Method Code" = '' then
-                    ShipmentMethod.Init
+                    ShipmentMethod.Init()
                 else begin
                     ShipmentMethod.Get("Shipment Method Code");
                     ShipmentMethod.TranslateDescription(ShipmentMethod, "Language Code");
@@ -1075,7 +1069,7 @@ report 6014617 "NPR Purchase Order"
 
                 FormatAddr.PurchHeaderShipTo(ShipToAddr, "Purchase Header");
 
-                if not CurrReport.Preview then begin
+                if not CurrReport.Preview() then begin
                     if ArchiveDocument then
                         ArchiveManagement.StorePurchDocument("Purchase Header", LogInteraction);
 
@@ -1143,10 +1137,6 @@ report 6014617 "NPR Purchase Order"
             }
         }
 
-        actions
-        {
-        }
-
         trigger OnInit()
         begin
             LogInteractionEnable := true;
@@ -1161,145 +1151,141 @@ report 6014617 "NPR Purchase Order"
         end;
     }
 
-    labels
-    {
-    }
-
     trigger OnInitReport()
     begin
-        GLSetup.Get;
-        PurchSetup.Get;
+        GLSetup.Get();
+        PurchSetup.Get();
     end;
 
     var
-        Text000: Label 'Purchaser';
-        Text001: Label 'Total %1';
-        Text002: Label 'Total %1 Incl. VAT';
-        Text003: Label ' COPY';
-        Text004: Label 'Order%1';
-        Text005: Label 'Page';
-        Text006: Label 'Total %1 Excl. VAT';
-        GLSetup: Record "General Ledger Setup";
         CompanyInfo: Record "Company Information";
-        ShipmentMethod: Record "Shipment Method";
-        PaymentTerms: Record "Payment Terms";
-        PrepmtPaymentTerms: Record "Payment Terms";
-        SalesPurchPerson: Record "Salesperson/Purchaser";
-        VATAmountLine: Record "VAT Amount Line" temporary;
-        PrepmtVATAmountLine: Record "VAT Amount Line" temporary;
-        PrePmtVATAmountLineDeduct: Record "VAT Amount Line" temporary;
-        PurchLine: Record "Purchase Line" temporary;
+        CurrExchRate: Record "Currency Exchange Rate";
         DimSetEntry1: Record "Dimension Set Entry";
         DimSetEntry2: Record "Dimension Set Entry";
         PrepmtDimSetEntry: Record "Dimension Set Entry";
+        GLSetup: Record "General Ledger Setup";
+        PaymentTerms: Record "Payment Terms";
+        PrepmtPaymentTerms: Record "Payment Terms";
         PrepmtInvBuf: Record "Prepayment Inv. Line Buffer" temporary;
-        RespCenter: Record "Responsibility Center";
-        Language: Codeunit Language;
-        CurrExchRate: Record "Currency Exchange Rate";
+        PurchLine: Record "Purchase Line" temporary;
         PurchSetup: Record "Purchases & Payables Setup";
-        PurchCountPrinted: Codeunit "Purch.Header-Printed";
-        FormatAddr: Codeunit "Format Address";
-        PurchPost: Codeunit "Purch.-Post";
+        RespCenter: Record "Responsibility Center";
+        SalesPurchPerson: Record "Salesperson/Purchaser";
+        ShipmentMethod: Record "Shipment Method";
+        PrepmtVATAmountLine: Record "VAT Amount Line" temporary;
+        PrePmtVATAmountLineDeduct: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line" temporary;
+        Supplier: Record Vendor;
         ArchiveManagement: Codeunit ArchiveManagement;
-        SegManagement: Codeunit SegManagement;
+        FormatAddr: Codeunit "Format Address";
+        Language: Codeunit Language;
+        PurchCountPrinted: Codeunit "Purch.Header-Printed";
+        PurchPost: Codeunit "Purch.-Post";
         PurchPostPrepmt: Codeunit "Purchase-Post Prepayments";
-        VendAddr: array[8] of Text[50];
-        ShipToAddr: array[8] of Text[50];
-        CompanyAddr: array[8] of Text[50];
-        BuyFromAddr: array[8] of Text[50];
-        PurchaserText: Text[30];
-        VATNoText: Text[80];
-        ReferenceText: Text[80];
-        TotalText: Text[50];
-        TotalInclVATText: Text[50];
-        TotalExclVATText: Text[50];
-        MoreLines: Boolean;
-        NoOfCopies: Integer;
-        NoOfLoops: Integer;
-        CopyText: Text[30];
-        OutputNo: Integer;
-        DimText: Text[120];
-        OldDimText: Text[75];
-        ShowInternalInfo: Boolean;
-        Continue: Boolean;
+        SegManagement: Codeunit SegManagement;
         ArchiveDocument: Boolean;
+        [InDataSet]
+        ArchiveDocumentEnable: Boolean;
+        Continue: Boolean;
         LogInteraction: Boolean;
+        [InDataSet]
+        LogInteractionEnable: Boolean;
+        MoreLines: Boolean;
+        ShowInternalInfo: Boolean;
+        PrepmtLineAmount: Decimal;
+        PrepmtTotalAmountInclVAT: Decimal;
+        PrepmtVATAmount: Decimal;
+        PrepmtVATBaseAmount: Decimal;
+        PrevLineAmount: Decimal;
+        TotalAmount: Decimal;
+        TotalAmountInclVAT: Decimal;
+        TotalAmountVAT: Decimal;
+        TotalInvDiscAmount: Decimal;
+        TotalInvoiceDiscountAmount: Decimal;
+        TotalPaymentDiscOnVAT: Decimal;
+        TotalSubTotal: Decimal;
+        TransHeaderAmount: Decimal;
+        VALVATAmountLCY: Decimal;
+        VALVATBaseLCY: Decimal;
         VATAmount: Decimal;
         VATBaseAmount: Decimal;
         VATDiscountAmount: Decimal;
-        TotalAmountInclVAT: Decimal;
-        VALVATBaseLCY: Decimal;
-        VALVATAmountLCY: Decimal;
-        VALSpecLCYHeader: Text[80];
-        VALExchRate: Text[50];
-        Text007: Label 'VAT Amount Specification in ';
-        Text008: Label 'Local Currency';
-        Text009: Label 'Exchange rate: %1/%2';
-        PrepmtVATAmount: Decimal;
-        PrepmtVATBaseAmount: Decimal;
-        PrepmtTotalAmountInclVAT: Decimal;
-        PrepmtLineAmount: Decimal;
-        PricesInclVATtxt: Text[30];
-        AllowInvDisctxt: Text[30];
-        [InDataSet]
-        ArchiveDocumentEnable: Boolean;
-        [InDataSet]
-        LogInteractionEnable: Boolean;
-        TotalSubTotal: Decimal;
-        TotalAmount: Decimal;
-        TotalInvoiceDiscountAmount: Decimal;
-        CompanyInfoPhoneNoCaptionLbl: Label 'Phone No.';
-        CompanyInfoVATRegNoCaptionLbl: Label 'VAT Registration No.';
-        CompanyInfoGiroNoCaptionLbl: Label 'Giro No.';
-        CompanyInfoBankNameCaptionLbl: Label 'Bank';
+        NoOfCopies: Integer;
+        NoOfLoops: Integer;
+        OutputNo: Integer;
         CompanyInfoBankAccNoCaptionLbl: Label 'Account No.';
-        OrderNoCaptionLbl: Label 'Order No.';
-        PageCaptionLbl: Label 'Page';
-        DocumentDateCaptionLbl: Label 'Document Date';
-        HdrDimCaptionLbl: Label 'Header Dimensions';
+        AllowInvoiceDiscCaptionLbl: Label 'Allow Invoice Discount';
+        AmountCaptionLbl: Label 'Amount';
+        CompanyInfoBankNameCaptionLbl: Label 'Bank';
+        Text003: Label ' COPY';
+        CurrencyCodeTextLbl: Label 'Currency Code';
+        DeliveryAddrLbl: Label 'Delivery address';
+        PrepmtInvBuDescCaptionLbl: Label 'Description';
         DirectUniCostCaptionLbl: Label 'Direct Unit Cost';
         PurchLineLineDiscCaptionLbl: Label 'Discount %';
-        VATDiscountAmountCaptionLbl: Label 'Payment Discount on VAT';
-        LineDimCaptionLbl: Label 'Line Dimensions';
-        PaymentDetailsCaptionLbl: Label 'Payment Details';
-        VendNoCaptionLbl: Label 'Vendor No.';
-        ShiptoAddressCaptionLbl: Label 'Ship-to Address';
-        PrepmtInvBuDescCaptionLbl: Label 'Description';
+        DocumentDateCaptionLbl: Label 'Document Date';
+        DueDateLbl: Label 'Due Date';
+        EmailIDCaptionLbl: Label 'E-Mail';
+        Text009: Label 'Exchange rate: %1/%2';
         PrepmtInvBufGLAccNoCaptionLbl: Label 'G/L Account No.';
+        CompanyInfoGiroNoCaptionLbl: Label 'Giro No.';
+        HdrDimCaptionLbl: Label 'Header Dimensions';
+        HomePageCaptionLbl: Label 'Home Page';
+        IBANCaptionLbl: Label 'IBAN';
+        InvoiceAddrLbl: Label 'Invoice address';
+        PurchLineInvDiscAmtCaptionLbl: Label 'Invoice Discount Amount';
+        VATAmtLineInvDiscBaseAmtCaptionLbl: Label 'Invoice Discount Base Amount';
+        VATAmtLineLineAmtCaptionLbl: Label 'Line Amount';
+        LineDimCaptionLbl: Label 'Line Dimensions';
+        Text008: Label 'Local Currency';
+        DocCaption: Label 'Order';
+        Text004: Label 'Order%1';
+        OrderNoCaptionLbl: Label 'Order No.';
+        PageCaptionLbl: Label 'Page';
+        Text005: Label 'Page';
+        PaymentDetailsCaptionLbl: Label 'Payment Details';
+        VATDiscountAmountCaptionLbl: Label 'Payment Discount on VAT';
+        PaymentTermsDescCaptionLbl: Label 'Payment Terms';
+        CompanyInfoPhoneNoCaptionLbl: Label 'Phone No.';
         PrepaymentSpecCaptionLbl: Label 'Prepayment Specification';
         PrepymtVATAmtSpecCaptionLbl: Label 'Prepayment VAT Amount Specification';
-        AmountCaptionLbl: Label 'Amount';
-        PurchLineInvDiscAmtCaptionLbl: Label 'Invoice Discount Amount';
+        PrepymtTermsDescCaptionLbl: Label 'Prepmt. Payment Terms';
+        Text000: Label 'Purchaser';
+        ShipmentMethodDescCaptionLbl: Label 'Shipment Method';
+        ShiptoAddressCaptionLbl: Label 'Ship-to Address';
         SubtotalCaptionLbl: Label 'Subtotal';
+        SupplierAddrLbl: Label 'Supplier';
+        SWIFTCaptionLbl: Label 'SWIFT Code';
+        TotalCaptionLbl: Label 'Total';
+        Text001: Label 'Total %1';
+        Text006: Label 'Total %1 Excl. VAT';
+        Text002: Label 'Total %1 Incl. VAT';
         VATAmtLineVATCaptionLbl: Label 'VAT %';
         VATAmtLineVATAmtCaptionLbl: Label 'VAT Amount';
         VATAmtSpecCaptionLbl: Label 'VAT Amount Specification';
-        VATIdentifierCaptionLbl: Label 'VAT Identifier';
-        VATAmtLineInvDiscBaseAmtCaptionLbl: Label 'Invoice Discount Base Amount';
-        VATAmtLineLineAmtCaptionLbl: Label 'Line Amount';
+        Text007: Label 'VAT Amount Specification in ';
         VALVATBaseLCYCaptionLbl: Label 'VAT Base';
-        TotalCaptionLbl: Label 'Total';
-        PaymentTermsDescCaptionLbl: Label 'Payment Terms';
-        ShipmentMethodDescCaptionLbl: Label 'Shipment Method';
-        PrepymtTermsDescCaptionLbl: Label 'Prepmt. Payment Terms';
-        HomePageCaptionLbl: Label 'Home Page';
-        EmailIDCaptionLbl: Label 'E-Mail';
-        AllowInvoiceDiscCaptionLbl: Label 'Allow Invoice Discount';
-        DocCaption: Label 'Order';
-        SupplierAddrLbl: Label 'Supplier';
-        InvoiceAddrLbl: Label 'Invoice address';
-        DeliveryAddrLbl: Label 'Delivery address';
-        DueDateLbl: Label 'Due Date';
-        CurrencyCodeTextLbl: Label 'Currency Code';
-        Supplier: Record Vendor;
+        VATIdentifierCaptionLbl: Label 'VAT Identifier';
+        CompanyInfoVATRegNoCaptionLbl: Label 'VAT Registration No.';
         VendorItemNoLbl: Label 'Vendor Item No.';
-        IBANCaptionLbl: Label 'IBAN';
-        SWIFTCaptionLbl: Label 'SWIFT Code';
-        TransHeaderAmount: Decimal;
-        PrevLineAmount: Decimal;
-        TotalInvDiscAmount: Decimal;
-        TotalPaymentDiscOnVAT: Decimal;
-        TotalAmountVAT: Decimal;
+        VendNoCaptionLbl: Label 'Vendor No.';
+        AllowInvDisctxt: Text[30];
+        CopyText: Text[30];
+        PricesInclVATtxt: Text[30];
+        PurchaserText: Text[30];
+        BuyFromAddr: array[8] of Text[50];
+        CompanyAddr: array[8] of Text[50];
+        ShipToAddr: array[8] of Text[50];
+        TotalExclVATText: Text[50];
+        TotalInclVATText: Text[50];
+        TotalText: Text[50];
+        VALExchRate: Text[50];
+        VendAddr: array[8] of Text[50];
+        OldDimText: Text[75];
+        ReferenceText: Text[80];
+        VALSpecLCYHeader: Text[80];
+        VATNoText: Text[80];
+        DimText: Text[120];
 
     procedure InitializeRequest(NewNoOfCopies: Integer; NewShowInternalInfo: Boolean; NewArchiveDocument: Boolean; NewLogInteraction: Boolean)
     begin

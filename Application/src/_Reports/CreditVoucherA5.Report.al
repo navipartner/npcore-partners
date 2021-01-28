@@ -1,9 +1,7 @@
 report 6014564 "NPR Credit Voucher A5"
 {
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Credit Voucher A5.rdlc';
-
     Caption = 'Credit Voucher A5';
 
     dataset
@@ -84,8 +82,8 @@ report 6014564 "NPR Credit Voucher A5"
                     trigger OnAfterGetRecord()
                     var
                         POSUnit: Record "NPR POS Unit";
-                        POSSession: Codeunit "NPR POS Session";
                         POSFrontEnd: Codeunit "NPR POS Front End Management";
+                        POSSession: Codeunit "NPR POS Session";
                         POSSetup: Codeunit "NPR POS Setup";
                     begin
                         clear(POSStore);
@@ -97,7 +95,7 @@ report 6014564 "NPR Credit Voucher A5"
                             if POSUnit.get(Register."Register No.") then
                                 POSStore.get(POSUnit."POS Store Code");
                         end;
-                        RegisterPhoneText := StrSubstNo(Text1002, POSStore."Phone No.");
+                        RegisterPhoneText := StrSubstNo(PhoneNoLbl, POSStore."Phone No.");
                         RegisterPostCodeAndCityText := POSStore."Post Code" + ' ' + POSStore.City;
                     end;
                 }
@@ -108,7 +106,7 @@ report 6014564 "NPR Credit Voucher A5"
                     "Credit Voucher".Modify(false);
 
                     if ("Credit Voucher"."No. Printed" > 1) and (RetailSetup."Copy No. on Sales Ticket") then
-                        CopyText := Text1001;
+                        CopyText := CopyLbl;
 
                     DetailsText := Format("Issue Date") + ' ' + "Register No." + ' ' + "Sales Ticket No." + ' - ' + "No." + ' - ' + Format(Time);
 
@@ -130,23 +128,12 @@ report 6014564 "NPR Credit Voucher A5"
             trigger OnAfterGetRecord()
             begin
                 if LoopCounter > 0 then
-                    CurrReport.Break;
+                    CurrReport.Break();
                 LoopCounter += 1;
             end;
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
 
     labels
     {
@@ -165,21 +152,21 @@ report 6014564 "NPR Credit Voucher A5"
     end;
 
     var
+        BlobBuffer: Record "NPR BLOB buffer" temporary;
+        POSStore: Record "NPR POS Store";
         RetailSetup: Record "NPR Retail Setup";
-        LoopCounter: Integer;
         BarcodeLib: Codeunit "NPR Barcode Library";
+        TempBlob: Codeunit "Temp Blob";
+        LoopCounter: Integer;
+        CopyLbl: Label 'COPY';
+        PhoneNoLbl: Label 'Phone No.: %1', Comment = '%1 = Phone No.';
+        VatNoLbl: Label 'VAT No.: %1', Comment = '%1 = VAT No.';
         CopyText: Text;
         DetailsText: Text;
-        Text1001: Label 'COPY';
-        Text1002: Label 'Phone No.: %1';
-        Text1003: Label 'VAT No.: %1';
-        SalespersonText: Text;
         RegisterPhoneText: Text;
         RegisterPostCodeAndCityText: Text;
         RegisterVatNoText: Text;
+        SalespersonText: Text;
         ZipCodeCityText: Text;
-        TempBlob: Codeunit "Temp Blob";
-        BlobBuffer: Record "NPR BLOB buffer" temporary;
-        POSStore: Record "NPR POS Store";
 }
 

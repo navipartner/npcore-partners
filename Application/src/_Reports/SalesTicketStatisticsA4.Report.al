@@ -1,24 +1,10 @@
 report 6014407 "NPR Sales Ticket Statistics A4"
 {
-    // NPR70.00.00.00/LS CASE 156110 : Convert Report to NAV 2013
-    // NPR4.16/TR/20140723  CASE 184250 : Report layout edited such that it fits a receip (epson 4). Report created for previewing - but does also fit receip size if printed on epson.
-    // NPR4.16/TS/20151020  CASE 222088 Changed Layout on Reports
-    // NPR5.26/LS/20151202  CASE 224592 : Corrected Report + Layout/Figures/labels
-    //                                       Changed Report name/caption/label name from Sale Statistics to Sales Ticket Statistics
-    //                                       Changed report to A4 layout as per case 229766
-    // NPR5.30/JLK /20170127  CASE 228985 Modified Item Lines, Item Lines/Sales Qty and Percentage calculation
-    // NPR5.31/JLK /20170331  CASE 268274 Changed ENU Caption
-    // NPR5.31/JLK /20170411  CASE 271517 Added Register Filter
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.40/TSA /20180327 CASE 301544 Dereferenced cu 6014452 from OnInitReport and OnPreReport
-    // NPR5.55/YAHA/20200610  CASE 394884 Header layout modification
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Ticket Statistics A4.rdlc';
-
     Caption = 'Sales Ticket Statistics A4';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem(PaymentTypePeriod; "NPR Payment Type POS")
@@ -131,28 +117,18 @@ report 6014407 "NPR Sales Ticket Statistics A4"
 
                 trigger OnAfterGetRecord()
                 begin
-                    //-NPK1.01
-                    //Profit_LCY2_Amt := "Pct."((PaymentLastYr."Norm sales in audit ex VAT"+PaymentLastYr."Debit sales in audit ex VAT")-(PaymentLastYr."Cost amount in audit roll"+PaymentLastYr."Debit cost amount audit roll")
-                    //,(PaymentLastYr."Norm sales in audit ex VAT"+PaymentLastYr."Debit sales in audit ex VAT"));
-
                     Profit_LCY2_Amt := (PaymentLastYr."Norm. Sales in Audit Excl. VAT" + PaymentLastYr."Debit Sales in Audit Excl. VAT") - (PaymentLastYr."Cost Amount in Audit Roll" + PaymentLastYr."Debit Cost Amount Audit Roll");
 
                     Profit_LCY2_Pct := "Pct."((PaymentLastYr."Norm. Sales in Audit Excl. VAT" + PaymentLastYr."Debit Sales in Audit Excl. VAT") - (PaymentLastYr."Cost Amount in Audit Roll" + PaymentLastYr."Debit Cost Amount Audit Roll")
                     , (PaymentLastYr."Norm. Sales in Audit Excl. VAT" + PaymentLastYr."Debit Sales in Audit Excl. VAT"));
 
                     SalesExVatLYr := (PaymentLastYr."Norm. Sales in Audit Excl. VAT" + PaymentLastYr."Debit Sales in Audit Excl. VAT");
-                    //+NPK1.01
-
-                    //-NPR5.30
                     Clear(NoOfItemsInAuditRollLastYr);
-                    AuditRollLastYr.Reset;
+                    AuditRollLastYr.Reset();
                     AuditRollLastYr.SetFilter("Sale Date", GetFilter("Date Filter"));
-                    //-NPR5.31
                     AuditRollLastYr.SetFilter("Register No.", GetFilter("Register Filter"));
-                    //-NPR5.31
                     AuditRollLastYr.SetRange(Type, AuditRoll.Type::Item);
                     NoOfItemsInAuditRollLastYr := AuditRollLastYr.Count;
-                    //+NPR5.30
                 end;
 
                 trigger OnPreDataItem()
@@ -184,16 +160,12 @@ report 6014407 "NPR Sales Ticket Statistics A4"
 
             trigger OnAfterGetRecord()
             begin
-                //-NPR5.30
                 Clear(NoOfItemsInAuditRoll);
-                AuditRoll.Reset;
+                AuditRoll.Reset();
                 AuditRoll.SetFilter("Sale Date", GetFilter("Date Filter"));
-                //-NPR5.31
                 AuditRoll.SetFilter("Register No.", GetFilter("Register Filter"));
-                //-NPR5.31
                 AuditRoll.SetRange(Type, AuditRoll.Type::Item);
                 NoOfItemsInAuditRoll := AuditRoll.Count;
-                //+NPR5.30
             end;
         }
         dataitem("Salesperson/Purchaser"; "Salesperson/Purchaser")
@@ -263,9 +235,6 @@ report 6014407 "NPR Sales Ticket Statistics A4"
                 DebitAmt := PaymentTypePOS."Debit Sale in Audit Roll";
                 Total := OrdinarySale + DebitAmt;
                 ekspTotal := (PaymentTypePOS."No. of Sales in Audit Roll" + PaymentTypePOS."No. of Deb. Sales in Aud. Roll");
-
-
-                //-NPR70.00.00.00/LS
                 Eksp1 := 0;
                 Debit1 := 0;
                 Sale1 := 0;
@@ -282,7 +251,7 @@ report 6014407 "NPR Sales Ticket Statistics A4"
                 TotalSaleWithoutSalesperson := 0;
                 ekspWithoutSalesperson := 0;
 
-                PaymentTypePOSTotal.Reset;
+                PaymentTypePOSTotal.Reset();
                 Clear(PaymentTypePOSTotal);
 
                 PaymentTypePOSTotal.SetRange("Salesperson Filter", '');
@@ -295,16 +264,12 @@ report 6014407 "NPR Sales Ticket Statistics A4"
                 Eksp3 := ekspWithoutSalesperson + ekspTotal;
                 Sale3 := OrdinarySale + NormalSaleWithoutSalesperson;
                 Credit3 := DebitAmt + DebitSaleWithoutSalesperson;
-                //+NPR70.00.00.00/LS
             end;
 
             trigger OnPreDataItem()
             begin
                 PaymentTypePeriod.CopyFilter("Date Filter", PaymentTypePOS."Date Filter");
                 PaymentTypePeriod.CopyFilter("Register Filter", PaymentTypePOS."Register Filter");
-                //-NPR5.39
-                //CurrReport.CREATETOTALS(OrdinarySale,DebitAmt,Total,ekspTotal);
-                //+NPR5.39
                 Clear(Total);
                 Clear(OrdinarySale);
                 Clear(DebitAmt);
@@ -484,10 +449,6 @@ report 6014407 "NPR Sales Ticket Statistics A4"
                 }
             }
         }
-
-        actions
-        {
-        }
     }
 
     labels
@@ -536,61 +497,49 @@ report 6014407 "NPR Sales Ticket Statistics A4"
 
         CompanyInformation.Get();
         CompanyInformation.CalcFields(Picture);
-
-        //-NPR5.39
-        // Object.SETRANGE(ID, 6014407);
-        // Object.SETRANGE(Type, 3);
-        // Object.FINDFIRST;
-        //+NPR5.39
     end;
 
     var
         CompanyInformation: Record "Company Information";
-        StartDate: Date;
-        EndDate: Date;
+        AuditRoll: Record "NPR Audit Roll";
+        AuditRollLastYr: Record "NPR Audit Roll";
         PaymentTypePOS: Record "NPR Payment Type POS";
-        Total: Decimal;
-        DebitAmt: Decimal;
-        OrdinarySale: Decimal;
-        NormalSaleWithoutSalesperson: Decimal;
-        DebitSaleWithoutSalesperson: Decimal;
-        TotalSaleWithoutSalesperson: Decimal;
-        ekspWithoutSalesperson: Decimal;
-        ekspTotal: Decimal;
+        PaymentTypePOSTotal: Record "NPR Payment Type POS";
         CompareDay: Boolean;
         CompareNearestDate: Boolean;
-        WeekDay: Integer;
-        Week: Integer;
-        Year: Integer;
+        EndDate: Date;
+        StartDate: Date;
         AverageAmt: Decimal;
-        Trans0001: Label 'Please specify date range!';
-        "//-NPR70.00.00.00": Integer;
-        ObjectDetails: Text[100];
-        Eksp1: Decimal;
-        Debit1: Decimal;
-        Sale1: Decimal;
-        Eksp3: Decimal;
-        Sale3: Decimal;
         Credit3: Decimal;
-        PaymentTypePOSTotal: Record "NPR Payment Type POS";
+        Debit1: Decimal;
+        DebitAmt: Decimal;
+        DebitSaleWithoutSalesperson: Decimal;
+        Eksp1: Decimal;
+        Eksp3: Decimal;
+        ekspTotal: Decimal;
+        ekspWithoutSalesperson: Decimal;
+        NoOfItemsInAuditRoll: Decimal;
+        NoOfItemsInAuditRollLastYr: Decimal;
+        NormalSaleWithoutSalesperson: Decimal;
+        OrdinarySale: Decimal;
         Profit_LCY2_Amt: Decimal;
         Profit_LCY2_Pct: Decimal;
-        "//+NPR70.00.00.00": Integer;
+        Sale1: Decimal;
+        Sale3: Decimal;
         SalesExVatLYr: Decimal;
-        NoOfItemsInAuditRoll: Decimal;
-        AuditRoll: Record "NPR Audit Roll";
-        NoOfItemsInAuditRollLastYr: Decimal;
-        AuditRollLastYr: Record "NPR Audit Roll";
+        Total: Decimal;
+        TotalSaleWithoutSalesperson: Decimal;
+        Week: Integer;
+        WeekDay: Integer;
+        Year: Integer;
         CurrReportPageNoCaptionLbl: Label 'Page';
+        Trans0001: Label 'Please specify date range!';
 
     local procedure "Pct."(Tal1: Decimal; Tal2: Decimal): Decimal
     begin
         if Tal2 = 0 then
             exit(0);
-        //-NPR5.30
-        //EXIT(ROUND(Tal1 / Tal2 * 100,0.1));
         exit(Tal1 / Tal2 * 100);
-        //+NPR5.30
     end;
 
     procedure Divider("Tal 1": Decimal; "Tal 2": Decimal): Decimal

@@ -1,21 +1,9 @@
 report 6014505 "NPR Delivery Note"
 {
-    // NPR5.25/JLK /20160803 CASE 247902 Report Upgraded from NAV 6.2
-    // NPR5.27/JLK /20161024 CASE 256226 Changes in rdlc layout required
-    //                                    Changes in Text constents to make use of variables for static information
-    //                                    Changes in report to adapt to similar layout in all repair reports
-    // NPR5.29/JLK /20161205 CASE 253270 Replaced Company Information Address in Header instead of Customer Information Address
-    // NPR5.36/JLK /20170921  CASE 286803 Increased length variable CompanyAddr to [50]
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
-    // TM1.39/THRO/20181126  CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
-    // NPR5.50/ZESO/201905006 CASE 353382 Remove Reference to Wrapper Codeunit
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Delivery Note.rdlc';
-
     Caption = 'Delivery Note';
     PreviewMode = PrintLayout;
-
     dataset
     {
         dataitem("Customer Repair"; "NPR Customer Repair")
@@ -208,12 +196,7 @@ report 6014505 "NPR Delivery Note"
                 "Customer Repair".CalcFields("Picture Documentation1", "Picture Documentation2");
                 Clear(GlobalDimension1Desc);
                 if ("Customer Repair"."Global Dimension 1 Code") <> '' then
-                    //-#[353382] [353382]
-                    //-TM1.39 [334644]
-                    //GlobalDimension1Desc := SystemEventWrapper.CaptionClassTranslate(CurrReport.LANGUAGE,'1,1,1,,');
-                    //+TM1.39 [334644]
                     GlobalDimension1Desc := CaptionClassTranslate('1,1,1,,');
-                //-#[353382] [353382]
                 TelephoneText := '';
                 if "Phone No." <> '' then
                     TelephoneText := Text006;
@@ -222,8 +205,6 @@ report 6014505 "NPR Delivery Note"
                 if "Mobile Phone No." <> '' then
                     MobileText := Text018;
 
-                //-NPR5.29
-                //FormatAddr.Company(CompanyAddr,CompanyInformation);
                 TelephoneCompText := '';
                 if CompanyInformation."Phone No." <> '' then
                     TelephoneCompText := Text006;
@@ -234,7 +215,6 @@ report 6014505 "NPR Delivery Note"
                 CompanyAddr[4] := Format(CompanyInformation."Post Code") + ' ' + CompanyInformation.City;
                 CompanyAddr[5] := TelephoneCompText + ' ' + Format(CompanyInformation."Phone No.");
                 CompressArray(CompanyAddr);
-                //+NPR5.29
 
                 Clear(CustAddress);
                 CustAddress[1] := Name;
@@ -302,13 +282,6 @@ report 6014505 "NPR Delivery Note"
             }
         }
 
-        actions
-        {
-        }
-    }
-
-    labels
-    {
     }
 
     trigger OnPreReport()
@@ -320,35 +293,35 @@ report 6014505 "NPR Delivery Note"
     var
         CompanyInformation: Record "Company Information";
         FormatAddr: Codeunit "Format Address";
-        CustAddress: array[8] of Text[50];
-        AddressLine: Text[100];
+        DefectFound: Boolean;
         AddressLineCounter: Integer;
-        CompanyAddr: array[8] of Text[50];
-        GlobalDimension1Desc: Text[80];
-        Text001: Label 'Price at not-accepted estimate';
-        Text002: Label 'LCY Incl. VAT.';
-        Text003: Label 'Repair No.:';
-        Text004: Label 'E-mail: ';
-        Text005: Label 'CVR No.: ';
-        Text006: Label 'Telephone: ';
-        Text007: Label 'Fax No.: ';
-        Text008: Label 'Name';
-        Text009: Label 'Handed In';
-        Text010: Label 'Guarantee';
-        Text011: Label 'Equipment';
-        Text012: Label 'Serial No.';
         Text013: Label 'Accessories';
+        Text005: Label 'CVR No.: ';
         Text014: Label 'Defect Description';
-        Text015: Label 'Yours sincerely,';
         Text016: Label 'Delivery Note';
+        Text004: Label 'E-mail: ';
+        Text011: Label 'Equipment';
+        Text007: Label 'Fax No.: ';
+        Text010: Label 'Guarantee';
+        Text009: Label 'Handed In';
+        Text002: Label 'LCY Incl. VAT.';
+        Text018: Label 'Mobile: ';
+        Text008: Label 'Name';
+        Text001: Label 'Price at not-accepted estimate';
         Text017: Label 'Repair Description';
-        LetterText: array[5] of Text[50];
-        TelephoneText: Text;
+        Text003: Label 'Repair No.:';
+        Text012: Label 'Serial No.';
+        Text006: Label 'Telephone: ';
+        Text015: Label 'Yours sincerely,';
+        DotDisplay: Text;
         MobileText: Text;
         StarDisplay: Text;
-        DotDisplay: Text;
-        Text018: Label 'Mobile: ';
-        DefectFound: Boolean;
         TelephoneCompText: Text;
+        TelephoneText: Text;
+        CompanyAddr: array[8] of Text[50];
+        CustAddress: array[8] of Text[50];
+        LetterText: array[5] of Text[50];
+        GlobalDimension1Desc: Text[80];
+        AddressLine: Text[100];
 }
 

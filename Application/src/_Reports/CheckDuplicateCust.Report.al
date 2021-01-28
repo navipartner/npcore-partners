@@ -1,12 +1,7 @@
 report 6060111 "NPR Check Duplicate Cust."
 {
-    // NPR4.18\JLK\20151119 CASE 227394 - Report to find matching customers based on Name, Address and Phone No.
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
-    // NPR5.38/JLK /20180125  CASE 303595 Added ENU object caption
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Check Duplicate Customers.rdlc';
-
     Caption = 'Check Duplicate Customers';
 
     dataset
@@ -65,11 +60,11 @@ report 6060111 "NPR Check Duplicate Cust."
                     trigger OnAfterGetRecord()
                     begin
                         if Number = 1 then begin
-                            if not TMPCust.FindFirst then
-                                CurrReport.Break;
+                            if not TMPCust.FindFirst() then
+                                CurrReport.Break();
                         end else
-                            if TMPCust.Next = 0 then
-                                CurrReport.Break;
+                            if TMPCust.Next() = 0 then
+                                CurrReport.Break();
                     end;
                 }
 
@@ -77,8 +72,8 @@ report 6060111 "NPR Check Duplicate Cust."
                 var
                     Cust2: Record Customer;
                 begin
-                    TMPCust.DeleteAll;
-                    Cust2.Reset;
+                    TMPCust.DeleteAll();
+                    Cust2.Reset();
 
                     Cust2.SetFilter("No.", '<>%1', Customer."No.");
                     if CheckName then
@@ -88,14 +83,14 @@ report 6060111 "NPR Check Duplicate Cust."
                     if CheckPhone then
                         Cust2.SetRange("Phone No.", "Phone No.");
 
-                    if Cust2.FindSet then
+                    if Cust2.FindSet() then
                         repeat
-                            TMPCust.Init;
+                            TMPCust.Init();
                             TMPCust.TransferFields(Cust2);
-                            TMPCust.Insert;
-                        until Cust2.Next = 0
+                            TMPCust.Insert();
+                        until Cust2.Next() = 0
                     else
-                        CurrReport.Skip;
+                        CurrReport.Skip();
                 end;
             }
 
@@ -138,9 +133,6 @@ report 6060111 "NPR Check Duplicate Cust."
             }
         }
 
-        actions
-        {
-        }
     }
 
     labels
@@ -153,40 +145,40 @@ report 6060111 "NPR Check Duplicate Cust."
     trigger OnPreReport()
     begin
         if (not CheckName) and (not CheckAddr) and (not CheckPhone) then
-            Error(Text001);
+            Error(CheckboxErr);
 
         if CheckName then begin
-            SearchFilter += Text003;
+            SearchFilter += NameLbl;
         end;
         if CheckAddr then begin
             if SearchFilter <> '' then
-                SearchFilter += Text005
+                SearchFilter += AndAddressLbl
             else
-                SearchFilter += Text004;
+                SearchFilter += AddressLbl;
         end;
         if CheckPhone then begin
             if SearchFilter <> '' then
-                SearchFilter += Text007
+                SearchFilter += PhoneLbl
             else
-                SearchFilter += Text006;
+                SearchFilter += Phone2Lbl;
         end;
 
-        SearchFilter := Text002 + SearchFilter;
+        SearchFilter := SearchFilterLbl + SearchFilter;
     end;
 
     var
-        CheckAddr: Boolean;
-        CheckPhone: Boolean;
-        CheckName: Boolean;
-        TMPCust: Record Customer temporary;
         Company: Record "Company Information";
+        TMPCust: Record Customer temporary;
+        CheckAddr: Boolean;
+        CheckName: Boolean;
+        CheckPhone: Boolean;
+        AddressLbl: Label 'Address';
+        AndAddressLbl: Label ' and Address';
+        PhoneLbl: Label ' and Phone No.';
+        NameLbl: Label 'Name';
+        Phone2Lbl: Label 'Phone No.';
+        SearchFilterLbl: Label 'Search based on: ';
+        CheckboxErr: Label 'Tick one of the check boxes';
         SearchFilter: Text;
-        Text001: Label 'Tick one of the check boxes';
-        Text002: Label 'Search based on: ';
-        Text003: Label 'Name';
-        Text004: Label 'Address';
-        Text005: Label ' and Address';
-        Text006: Label 'Phone No.';
-        Text007: Label ' and Phone No.';
 }
 

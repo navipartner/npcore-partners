@@ -1,12 +1,8 @@
 report 6014616 "NPR Retail Campaign Items"
 {
-    // NPR5.38.01/JKL /20180126 CASE 289017 Object created - Replenishment Module
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Retail Campaign Items.rdlc';
-
     Caption = 'Retail Campaign Items';
-
     dataset
     {
         dataitem("Retail Campaign Header"; "NPR Retail Campaign Header")
@@ -74,20 +70,5 @@ report 6014616 "NPR Retail Campaign Items"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
-    }
 }
 

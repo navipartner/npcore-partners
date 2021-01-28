@@ -1,15 +1,11 @@
 report 6014414 "NPR Item Sales Statistics"
 {
-    // NPR5.43/JLK /20180503 CASE 310612 Object created
-    // NPR5.44/JDH /20180726 CASE 323366 Renamed Report. This name is already used in a local NAV standard database
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Sales Statistics NPR.rdlc';
-
     Caption = 'Item Sales Statistics';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem(RunOnce; "Integer")
@@ -22,7 +18,7 @@ report 6014414 "NPR Item Sales Statistics"
                 Item: Record Item;
             begin
                 if NoDefaultFilters then
-                    CurrReport.Skip;
+                    CurrReport.Skip();
 
                 if InventoryPostingGroupFilter <> '' then begin
                     Item.SetFilter("Inventory Posting Group", InventoryPostingGroupFilter);
@@ -34,12 +30,12 @@ report 6014414 "NPR Item Sales Statistics"
                     VendorItemNoFilterTxt := StrSubstNo(VendorItemNoFilterCaption, VendorItemNoFilter);
                 end;
 
-                if Item.FindSet then
+                if Item.FindSet() then
                     repeat
-                        TempItem.Init;
+                        TempItem.Init();
                         TempItem."No." := Item."No.";
-                        TempItem.Insert;
-                    until Item.Next = 0;
+                        TempItem.Insert();
+                    until Item.Next() = 0;
             end;
 
             trigger OnPreDataItem()
@@ -74,18 +70,18 @@ report 6014414 "NPR Item Sales Statistics"
             begin
                 if not NoDefaultFilters then
                     if not TempItem.Get("Item No.") then
-                        CurrReport.Skip;
+                        CurrReport.Skip();
 
                 with TempLoopItem do begin
                     if Get("Item No.", 1) then begin
                         "Decimal 1" += Quantity;
-                        Modify;
+                        Modify();
                     end else begin
                         Init;
                         Template := "Item No.";
                         "Line No." := 1;
                         "Decimal 1" := Quantity;
-                        Insert;
+                        Insert();
                     end;
                 end;
             end;
@@ -147,10 +143,6 @@ report 6014414 "NPR Item Sales Statistics"
             }
         }
 
-        actions
-        {
-        }
-
         trigger OnOpenPage()
         begin
             ItemLedgerEntry.SetRange("Document Type", ItemLedgerEntry."Document Type"::"Sales Shipment");
@@ -170,16 +162,16 @@ report 6014414 "NPR Item Sales Statistics"
     }
 
     var
-        InventoryPostingGroupFilter: Text;
-        VendorItemNoFilter: Text;
+        Item2: Record Item;
         TempItem: Record Item temporary;
         NoDefaultFilters: Boolean;
-        Item2: Record Item;
-        InventoryPostingGroupFilterTxt: Text;
-        VendorItemNoFilterTxt: Text;
         InventoryPostingGroupFilterCaption: Label 'Inventory Posting Group Filter: %1';
+        ItemLedgEntryFilterCaption: Label 'Item Ledger Entry Filter: %1';
         VendorItemNoFilterCaption: Label 'Vendor Item No Filter: %1';
         FiltersTxt: Text;
-        ItemLedgEntryFilterCaption: Label 'Item Ledger Entry Filter: %1';
+        InventoryPostingGroupFilter: Text;
+        InventoryPostingGroupFilterTxt: Text;
+        VendorItemNoFilter: Text;
+        VendorItemNoFilterTxt: Text;
 }
 

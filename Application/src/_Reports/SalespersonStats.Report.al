@@ -1,26 +1,10 @@
 report 6014446 "NPR Salesperson Stats"
 {
-    // NPR4.14/TSA/20150731/ CASE 219602 - Clean CRLF from Lables Captions - NavInfo and Report_Lbl
-    // NPR4.14/TSA/20150731/ CASE 219602 - Changes (indent) to Comply to Critical Guidelines
-    // NPR4.14/LS/20150909  CASE 222267 Corrections to report + change variable to Std English + format codes
-    // NPR5.25/JLK /20160629 CASE 222267 Corrected RDLC Rounding to 1 (It was 2)
-    //                                   Adjusted Font Sizes
-    //                                   Added Discount type to 10
-    // NPR5.31/JLK /20170414 CASE 269893 Added filter on Audit Roll with Debit Sale
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.43/JDH /20180604 CASE 317971 Removed a danish unused label
-    // NPR5.54/YAHA/20200306 CASE 394845 Row visibility set to false for Inventory,Photo work, Afrunding, Combination & Customer
-    // NPR5.54/YAHA/20200324 CASE 394872 Removed Company Picture
-    // NPR5.55/ANPA/20200505 CASE 402925 Added '.' to Rbt1_Lbl
-    // NPR5.55/YAHA/20200610 CASE 394884 Header layout modification
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Salesperson Statistics.rdlc';
-
     Caption = 'Salesperson Statistics';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem("Salesperson/Purchaser"; "Salesperson/Purchaser")
@@ -39,17 +23,17 @@ report 6014446 "NPR Salesperson Stats"
 
             trigger OnAfterGetRecord()
             begin
-                CustAmountTemp.Init;
+                CustAmountTemp.Init();
                 CustAmountTemp."Amount (LCY)" := "NPR Sales (LCY)";
                 CustAmountTemp."Customer No." := Code;
-                CustAmountTemp.Insert;
+                CustAmountTemp.Insert();
             end;
 
             trigger OnPreDataItem()
             begin
                 CustAmountTemp.SetCurrentKey("Amount (LCY)", "Amount 2 (LCY)", "Customer No.");
                 CustAmountTemp.Ascending(false);
-                CustAmountTemp.DeleteAll;
+                CustAmountTemp.DeleteAll();
             end;
         }
         dataitem("Integer"; "Integer")
@@ -113,10 +97,10 @@ report 6014446 "NPR Salesperson Stats"
             begin
                 if Number = 1 then begin
                     if not CustAmountTemp.Find('-') then
-                        CurrReport.Break;
+                        CurrReport.Break();
                 end else
                     if CustAmountTemp.Next = 0 then
-                        CurrReport.Break;
+                        CurrReport.Break();
 
                 "Salesperson/Purchaser".Get(CustAmountTemp."Customer No.");
                 "Salesperson/Purchaser".CalcFields("NPR Sales (LCY)", "NPR Discount Amount", "NPR COGS (LCY)", "NPR Item Group Sales (LCY)");
@@ -229,10 +213,7 @@ report 6014446 "NPR Salesperson Stats"
                     AuditRoll.CalcSums("Line Discount Amount");
                     DiscountAmt[i + 1] := AuditRoll."Line Discount Amount";
                     i += 1;
-                //+NPR5.25
-                //UNTIL i = 5;
                 until i = 10;
-                //-NPR5.25
 
                 if "Salesperson/Purchaser".GetFilter("Date Filter") <> '' then begin
                     i := 0;
@@ -241,10 +222,7 @@ report 6014446 "NPR Salesperson Stats"
                         AuditRollLastYear.CalcSums("Line Discount Amount");
                         DiscountAmtLY[i + 1] := AuditRollLastYear."Line Discount Amount";
                         i += 1;
-                    //+NPR5.25
-                    //    UNTIL i = 5;
                     until i = 10;
-                    //-NPR5.25
                 end;
             end;
 
@@ -253,30 +231,14 @@ report 6014446 "NPR Salesperson Stats"
                 AuditRoll.SetCurrentKey("Register No.", "Sale Type", Type, "No.", "Sale Date", "Discount Type");
                 "Salesperson/Purchaser".CopyFilter("Date Filter", AuditRoll."Sale Date");
 
-                //-NPR5.31
-                //AuditRoll.SETRANGE("Sale Type",0);
                 AuditRoll.SetFilter("Sale Type", '%1|%2', 0, 2);
-                //+NPR5.31
                 AuditRoll.SetRange(Type, 1);
-
                 if "Salesperson/Purchaser".GetFilter("Date Filter") <> '' then begin
                     AuditRollLastYear.SetCurrentKey("Register No.", "Sale Type", Type, "No.", "Sale Date", "Discount Type");
                     AuditRollLastYear.CopyFilters(AuditRoll);
                     AuditRollLastYear.SetRange("Sale Date", StartDate, EndDate);
                 end;
             end;
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 
@@ -316,44 +278,30 @@ report 6014446 "NPR Salesperson Stats"
         CompanyInfo.Get;
         CompanyInfo.CalcFields(Picture);
 
-        //-NPR5.39
-        // Object.SETRANGE(ID, 6014446);
-        // Object.SETRANGE(Type, 3);
-        // Object.FIND('-');
-        //+NPR5.39
-
         j := '2';
 
-        //-NPR4.14
         if "Salesperson/Purchaser".GetFilter("Date Filter") <> '' then
             DateFilter := TextDateFilters + "Salesperson/Purchaser".GetFilter("Date Filter");
-
-        /*
-        IF DateFilter = '' THEN
-          DateFilter := Text001;
-        */
-        //+NPR4.14
-
     end;
 
     var
-        DateFilter: Text;
         CompanyInfo: Record "Company Information";
         CustAmountTemp: Record "Customer Amount" temporary;
-        SalespersonLastYear: Record "Salesperson/Purchaser";
-        StartDate: Date;
-        EndDate: Date;
-        ikkesoegivarepost: Boolean;
-        j: Text[30];
-        ShowExcel: Option " ",salg,db,dg,rab,gmnrab;
         AuditRoll: Record "NPR Audit Roll";
         AuditRollLastYear: Record "NPR Audit Roll";
-        i: Integer;
+        SalespersonLastYear: Record "Salesperson/Purchaser";
+        ikkesoegivarepost: Boolean;
+        EndDate: Date;
+        StartDate: Date;
         DiscountAmt: array[10] of Decimal;
         DiscountAmtLY: array[10] of Decimal;
         PctPeriodTotal: Decimal;
         PctPeriodTotalLastYear: Decimal;
+        i: Integer;
         TextDateFilters: Label 'Period :';
+        ShowExcel: Option " ",salg,db,dg,rab,gmnrab;
+        DateFilter: Text;
+        j: Text[30];
 
     local procedure "Pct."(Tal1: Decimal; Tal2: Decimal): Decimal
     begin

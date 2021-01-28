@@ -1,16 +1,10 @@
 report 6014429 "NPR Posting Overview Audit"
 {
-    // NPR70.00.00.00/LS/20150126  CASE 202874 : Convert Report to 7.1
-    // NPR5.27/JLK /20161005 CASE 252134 Added TotalAuditRoll Including VAT
-    // NPR5.39/TJ  /20180206 CASE 302634 Change OptionString property of global variable LastSalesType to english version
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Posting Overview Audit.rdlc';
-
     Caption = 'Posting Overview Audit';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem("Audit Roll"; "NPR Audit Roll")
@@ -135,10 +129,8 @@ report 6014429 "NPR Posting Overview Audit"
                  ("Line No." = LastLineNo) and ("No." = LastNo) and ("Sale Date" = LastSalesDate) then
                     PrintDankort := true;
 
-                //-NPR5.27
                 if "Audit Roll".Quantity <> 0 then
                     AuditRollTotalInclVAT += "Amount Including VAT";
-                //+NPR5.27
             end;
 
             trigger OnPreDataItem()
@@ -166,10 +158,6 @@ report 6014429 "NPR Posting Overview Audit"
                     ToolTip = 'Specifies the value of the Include Dankort field';
                 }
             }
-        }
-
-        actions
-        {
         }
     }
 
@@ -203,32 +191,26 @@ report 6014429 "NPR Posting Overview Audit"
     begin
         CompanyInformation.Get();
         CompanyInformation.CalcFields(Picture);
-
-        //-NPR5.39
-        // Object.SETRANGE(ID, 6014429);
-        // Object.SETRANGE(Type, 3);
-        // Object.FIND('-');
-        //+NPR5.39
     end;
 
     var
         CompanyInformation: Record "Company Information";
-        RegisterFilter: Code[250];
-        DateFilter: Code[250];
-        NoFilter: Code[250];
+        Item: Record Item;
         AuditRoll1: Record "NPR Audit Roll";
         RetailSetup: Record "NPR Retail Setup";
         IncludeDankort: Boolean;
-        QtyLine: Integer;
         PrintDankort: Boolean;
         LastRegisterNo: Code[10];
-        LastTicketNo: Code[20];
-        LastSalesType: Option Sale,Payment,"Debit Sale","Gift Voucher","Credit Voucher",Deposit,"Out payment",Comment,,"Open/Close";
-        LastLineNo: Integer;
-        LastNo: Code[20];
-        LastSalesDate: Date;
         AuditRollNo: Code[20];
-        Item: Record Item;
+        LastNo: Code[20];
+        LastTicketNo: Code[20];
+        DateFilter: Code[250];
+        NoFilter: Code[250];
+        RegisterFilter: Code[250];
+        LastSalesDate: Date;
         AuditRollTotalInclVAT: Decimal;
+        LastLineNo: Integer;
+        QtyLine: Integer;
+        LastSalesType: Option Sale,Payment,"Debit Sale","Gift Voucher","Credit Voucher",Deposit,"Out payment",Comment,,"Open/Close";
 }
 

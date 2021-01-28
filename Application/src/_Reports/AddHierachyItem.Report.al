@@ -1,8 +1,5 @@
 report 6151050 "NPR Add Hierachy Item"
 {
-    // #289017/JKL /20171222  CASE 289017 Object created - Replenishment Module
-
-    UsageCategory = None;
     Caption = 'Add Hierachy Item';
     ProcessingOnly = true;
 
@@ -29,30 +26,14 @@ report 6151050 "NPR Add Hierachy Item"
                 ItemHierarchyLine."Item Hierarchy Line No." := LineNo + 1;
                 ItemHierarchyLine."Item No." := Item."No.";
                 ItemHierarchyLine."Item Desc." := Item.Description;
-                if not ItemHierarchyLine.Insert then
-                    Error(SplitLineError);
+                if not ItemHierarchyLine.Insert() then
+                    Error(SplitLineErr);
             end;
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
-    }
-
     var
         LineNo: Integer;
-        SplitLineError: Label 'Splitline is not possible - Line can not be inserted!';
+        SplitLineErr: Label 'Splitline is not possible - Line can not be inserted!';
 }
 

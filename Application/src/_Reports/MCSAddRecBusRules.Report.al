@@ -1,12 +1,7 @@
 report 6060080 "NPR MCS Add Rec. Bus. Rules"
 {
-    // NPR5.30/BR  /20170220  CASE 252646 Object Created
-    // NPR5.48/TJ  /20180102  CASE 340615 Removed Product Group Code from ReqFilterFields property on dataitem Item
-
-    UsageCategory = None;
     Caption = 'MCS Add Rec. Business Rules';
     ProcessingOnly = true;
-
     dataset
     {
         dataitem("MCS Recommendations Model"; "NPR MCS Recomm. Model")
@@ -25,7 +20,7 @@ report 6060080 "NPR MCS Add Rec. Bus. Rules"
             trigger OnPreDataItem()
             begin
                 if Count <> 1 then
-                    Error(Text002);
+                    Error(NoModelErr);
             end;
         }
     }
@@ -64,20 +59,12 @@ report 6060080 "NPR MCS Add Rec. Bus. Rules"
                 }
             }
         }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
     }
 
     trigger OnPostReport()
     begin
         if GuiAllowed then
-            Message(Text001, RulesInserted);
+            Message(RulesInsertedMsg, RulesInserted);
     end;
 
     trigger OnPreReport()
@@ -86,41 +73,38 @@ report 6060080 "NPR MCS Add Rec. Bus. Rules"
     end;
 
     var
-        RuleType: Option Block,WhiteList,Upsale;
         MakeRulesActive: Boolean;
         BlockSeedItemNo: Code[20];
         RulesInserted: Integer;
-        Text001: Label '%1 rules inserted.';
-        Text002: Label 'Please select one Model to add Business Rules to.';
+        RulesInsertedMsg: Label '%1 rules inserted.', Comment = '%1 = Number of rules';
+        NoModelErr: Label 'Please select one Model to add Business Rules to.';
+        RuleType: Option Block,WhiteList,Upsale;
 
     local procedure UpdateRule(ItemCode: Code[20])
     var
         MCSRecBusinessRule: Record "NPR MCS Rec. Bus. Rule";
     begin
-        with MCSRecBusinessRule do begin
-            Reset;
-            SetRange(Type, Type::Item);
-            SetRange("No.", ItemCode);
-            DeleteAll(true);
+        MCSRecBusinessRule.SetRange(Type, MCSRecBusinessRule.Type::Item);
+        MCSRecBusinessRule.SetRange("No.", ItemCode);
+        MCSRecBusinessRule.DeleteAll(true);
 
-            Reset;
-            Init;
-            Validate("Model No.", "MCS Recommendations Model".Code);
-            Validate(Active, MakeRulesActive);
-            case RuleType of
-                RuleType::Block:
-                    Validate("Rule Type", "Rule Type"::Block);
-                RuleType::Upsale:
-                    Validate("Rule Type", "Rule Type"::Upsale);
-                RuleType::WhiteList:
-                    Validate("Rule Type", "Rule Type"::WhiteList);
-            end;
-            Validate(Type, Type::Item);
-            Validate("No.", ItemCode);
-            Validate("Block Seed Item No.", BlockSeedItemNo);
-            Insert(true);
-            RulesInserted := RulesInserted + 1;
+        MCSRecBusinessRule.Reset();
+        MCSRecBusinessRule.Init();
+        MCSRecBusinessRule.Validate("Model No.", "MCS Recommendations Model".Code);
+        MCSRecBusinessRule.Validate(Active, MakeRulesActive);
+        case RuleType of
+            RuleType::Block:
+                MCSRecBusinessRule.Validate("Rule Type", MCSRecBusinessRule."Rule Type"::Block);
+            RuleType::Upsale:
+                MCSRecBusinessRule.Validate("Rule Type", MCSRecBusinessRule."Rule Type"::Upsale);
+            RuleType::WhiteList:
+                MCSRecBusinessRule.Validate("Rule Type", MCSRecBusinessRule."Rule Type"::WhiteList);
         end;
+        MCSRecBusinessRule.Validate(Type, MCSRecBusinessRule.Type::Item);
+        MCSRecBusinessRule.Validate("No.", ItemCode);
+        MCSRecBusinessRule.Validate("Block Seed Item No.", BlockSeedItemNo);
+        MCSRecBusinessRule.Insert(true);
+        RulesInserted := RulesInserted + 1;
     end;
 }
 

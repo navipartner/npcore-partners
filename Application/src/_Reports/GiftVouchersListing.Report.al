@@ -1,13 +1,10 @@
 report 6014445 "NPR Gift Vouchers Listing"
 {
-    // NPR5.55/ZESO/20200713  CASE 402928 Object Created.
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Gift Vouchers Listing.rdlc';
-
     Caption = 'Gift Vouchers Listing';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem("Gift Voucher"; "NPR Gift Voucher")
@@ -56,38 +53,11 @@ report 6014445 "NPR Gift Vouchers Listing"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-            area(content)
-            {
-            }
-        }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
-    }
-
-    trigger OnInitReport()
-    var
-        Company: Record Company;
-        Counter: Integer;
-        RetailSetup: Record "NPR Retail Setup";
-    begin
-    end;
-
     var
         ReportNameLbl: Label 'Cashed Gift Voucher';
+        GVFiltersLbl: Label 'Filters: %1', Comment = '%1 = Filters';
         PageLbl: Label 'Page';
-        GVFilters: Text[100];
-        GVFiltersLbl: Label 'Filters: %1';
         TotalLbl: Label 'Total';
+        GVFilters: Text[100];
 }
 

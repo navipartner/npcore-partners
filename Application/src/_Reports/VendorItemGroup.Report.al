@@ -1,29 +1,10 @@
 report 6014435 "NPR Vendor/Item Group"
 {
-    // NPR70.00.00.00/LS/100713  CASE 159373 : Creation of 2013 version of Report
-    //     NPR3.1b 2005.08.02 ved Simon -    Oversaettelser
-    //     NPR3.1c 2007.06.21 v/ DB     -    afdelingsfilter virker nu
-    //     2009.01.20 JAM                    tilfoejet antal solgt sidste aar
-    //     001, NPK, MIM 05-09-07: Rettet procentvis aendring i omsaetning, antal beregning i total,
-    //                         total for salg, DG for hver varegruppe og total for perioden et aar siden.
-    //     002, NPK, DLA 15-01-08: Rettet dg udregning i footer
-    // NPR4.14/TS/20150820 CASE 22159 Change Caption of  report
-    // NPR4.16/LS/20151022  CASE 225607 removed curly braces in Documentation trigger 2nd line
-    // NPR4.16/LS/20151110  CASE 221733 Change label Report_Caption from Creditor/Item Group to Vendor/Item Group
-    // NPR5.25/JLK /20160726 CASE 247109 Changed sorting table code for a more efficient way, Missing Vendor and Item Group fields calculated and added (CR%, %Del, Purch Qty, etc.)
-    //                                   Captions changed to meaningful and correct words (Turnover, Sales Qty, Turnover Last Yr, etc.)
-    //                                   Corrected Summary details to have only Sum of Item Groups. Was previously displaying values for Vendor and Item Group and no differenciation could be made
-    //                                   Made modifications to rdlc to accomodate new change
-    // NPR5.36/JLK /20170830 CASE 287784 Changed AmountCaption to SalesQtyCaption
-    //                                   Corrected DG Percent Calculation
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/VendorItem Group.rdlc';
-
     Caption = 'Vendor/Item Group';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem(Vendor; Vendor)
@@ -130,7 +111,7 @@ report 6014435 "NPR Vendor/Item Group"
                     Clear(Omsaetningsidsteaar);
 
                     if not ("Sales (Qty.)" <> 0) then
-                        CurrReport.Skip;
+                        CurrReport.Skip();
 
                     if "Sales (LCY)" <> 0 then
                         DG := (("Sales (LCY)" - "Consumption (Amount)") / "Sales (LCY)") * 100;
@@ -155,7 +136,7 @@ report 6014435 "NPR Vendor/Item Group"
                         else
                             Clear(Pctoms);
 
-                        TempNPRBuffer.Init;
+                        TempNPRBuffer.Init();
                         TempNPRBuffer.Template := "No.";
                         TempNPRBuffer."Line No." := 0;
                         case Sorterefter of
@@ -170,7 +151,7 @@ report 6014435 "NPR Vendor/Item Group"
                         TempNPRBuffer."Decimal 2" := Omsaetningsidsteaar;
                         TempNPRBuffer."Decimal 3" := Pctoms;
                         TempNPRBuffer."Decimal 4" := Antalsidsteaar;
-                        TempNPRBuffer.Insert;
+                        TempNPRBuffer.Insert();
                     end;
 
                     if "Sales (LCY)" <> 0 then
@@ -198,11 +179,7 @@ report 6014435 "NPR Vendor/Item Group"
 
                 trigger OnPreDataItem()
                 begin
-                    TempNPRBuffer.DeleteAll;
-                    //-NPR5.39
-                    // CurrReport.CREATETOTALS(omsaetningsidsteaar);
-                    // CurrReport.CREATETOTALS(antalsidsteaar);
-                    //+NPR5.39
+                    TempNPRBuffer.DeleteAll();
                     if Vendor.GetFilter("NPR Item Group Filter") <> '' then
                         SetFilter("No.", Vendor.GetFilter("NPR Item Group Filter"));
                     if Vendor.GetFilter("Global Dimension 1 Filter") <> '' then
@@ -260,7 +237,7 @@ report 6014435 "NPR Vendor/Item Group"
                 begin
                     if (not Viskunhovedtal) and (SaleLCYSum = 0) and (PurchasesQtyCnt = 0) and (PurchaseLCYSum = 0) and (Pctoms_Sum = 0) and (SalesQtySum = 0) and (CRSum = 0) and
                        (DgSum = 0) and (AmtLYSum = 0) and (TurnoverLYSum = 0) and (SaleLCYLYSum = 0) then
-                        CurrReport.Break;
+                        CurrReport.Break();
 
                     if (CRSum <> 0) and (SaleLCYSum <> 0) then
                         CRSumPct := (CRSum / SaleLCYSum) * 100
@@ -329,11 +306,11 @@ report 6014435 "NPR Vendor/Item Group"
                 trigger OnAfterGetRecord()
                 begin
                     if Number = 1 then begin
-                        if not TempNPRBuffer.FindFirst then
-                            CurrReport.Break;
+                        if not TempNPRBuffer.FindFirst() then
+                            CurrReport.Break();
                     end else
-                        if TempNPRBuffer.Next = 0 then
-                            CurrReport.Break;
+                        if TempNPRBuffer.Next() = 0 then
+                            CurrReport.Break();
 
                     "Item Group".Get(TempNPRBuffer.Template);
                     "Item Group".CalcFields("Sales (Qty.)", "Sales (LCY)", "Consumption (Amount)");
@@ -351,7 +328,7 @@ report 6014435 "NPR Vendor/Item Group"
                 trigger OnPreDataItem()
                 begin
                     if (not Sortervaregruppe) then
-                        CurrReport.Break;
+                        CurrReport.Break();
                 end;
             }
 
@@ -369,9 +346,7 @@ report 6014435 "NPR Vendor/Item Group"
                 TurnoverLYSum := 0;
                 SaleLCYLYSum := 0;
                 PctChanges := 0;
-                //-NPR5.36
                 SumCost := 0;
-                //+NPR5.36
                 CalcFields("NPR Sales (Qty.)", "Purchases (LCY)", "NPR Sales (LCY)");
 
                 Kreditorsidsteaar.Get("No.");
@@ -408,16 +383,7 @@ report 6014435 "NPR Vendor/Item Group"
                 TurnoverLYSum := 0;
                 SaleLCYLYSum := 0;
                 PctChanges := 0;
-                //-NPR5.36
                 SumCost := 0;
-                //+NPR5.36
-
-                //-NPR5.39
-                // objekt.SETRANGE(ID, 6014435);
-                // objekt.SETRANGE(Type, 3);
-                // objekt.FIND('-');
-                // ObjectDetails:=FORMAT(objekt.ID)+', '+FORMAT(objekt."Version List");
-                //+NPR5.39
             end;
         }
         dataitem(Summary; "Integer")
@@ -523,10 +489,6 @@ report 6014435 "NPR Vendor/Item Group"
             }
         }
 
-        actions
-        {
-        }
-
         trigger OnOpenPage()
         begin
             ShowBool := false;
@@ -563,17 +525,7 @@ report 6014435 "NPR Vendor/Item Group"
 
     trigger OnInitReport()
     begin
-        //firmaoplysninger.GET();
-        //firmaoplysninger.CALCFIELDS(Picture);
         Viskunhovedtal := false;
-
-        //-NPR5.39
-        // objekt.SETRANGE(ID, 6014435);
-        // objekt.SETRANGE(Type, 3);
-        // objekt.FIND('-');
-        // ObjectDetails:=FORMAT(objekt.ID)+', '+FORMAT(objekt."Version List");
-        //+NPR5.39
-        // ObjectDetails:='222';
     end;
 
     trigger OnPreReport()
@@ -583,60 +535,58 @@ report 6014435 "NPR Vendor/Item Group"
         Omsaetningsidsteaar := 0;
         Totalantal := 0;
 
-        //+NPR5.25
         TempNPRBuffer.SetCurrentKey("Decimal 1");
         case Sorter of
             Sorter::Mindste:
                 TempNPRBuffer.Ascending(false);
         end;
-        //-NPR5.25
     end;
 
     var
-        DG: Decimal;
-        TempNPRBuffer: Record "NPR TEMP Buffer" temporary;
-        Sortervaregruppe: Boolean;
-        Sorterefter: Option antal,omsaetning,db;
-        Sorter: Option Stoerste,Mindste;
-        Viskunhovedtal: Boolean;
-        Pctoms: Decimal;
-        Foerfra: Date;
-        Foertil: Date;
-        Omsaetningsidsteaar: Decimal;
-        Kreditorsidsteaar: Record Vendor;
         Varegrupperec: Record "NPR Item Group";
-        Totalantal: Decimal;
-        Antalsidsteaar: Decimal;
-        PurchasesQtyCnt: Decimal;
-        SaleLCYSum: Decimal;
-        PurchaseLCYSum: Decimal;
-        Pctoms_Sum: Decimal;
-        SalesQtySum: Decimal;
-        CRSum: Decimal;
-        DgSum: Decimal;
-        AmtLYSum: Decimal;
-        TurnoverLYSum: Decimal;
-        SaleLCYLYSum: Decimal;
-        PctChanges: Decimal;
+        TempNPRBuffer: Record "NPR TEMP Buffer" temporary;
+        Kreditorsidsteaar: Record Vendor;
         [InDataSet]
         ShowBool: Boolean;
+        Sortervaregruppe: Boolean;
+        Viskunhovedtal: Boolean;
+        Foerfra: Date;
+        Foertil: Date;
+        AmtLYSum: Decimal;
+        Antalsidsteaar: Decimal;
+        CRSum: Decimal;
+        CRSumPct: Decimal;
+        DG: Decimal;
+        DgSum: Decimal;
+        Omsaetningsidsteaar: Decimal;
+        PctaendringItemGroup: Decimal;
+        PctaendringVen: Decimal;
+        PctChanges: Decimal;
+        Pctoms: Decimal;
+        Pctoms_Sum: Decimal;
+        PurchaseLCYSum: Decimal;
+        PurchasesQtyCnt: Decimal;
+        SaleLCYLYSum: Decimal;
+        SaleLCYSum: Decimal;
+        SalesQtySum: Decimal;
+        SumCost: Decimal;
+        SumPctaendringItemGroup: Decimal;
+        Totalantal: Decimal;
+        TotalCost: Decimal;
         TotalCr: Decimal;
         TotalCrPct: Decimal;
         TotalLastYr: Decimal;
-        TotalQty: Decimal;
-        TotalSaleLCY: Decimal;
+        TotalPctaendringItemGroup: Decimal;
+        TotalPctoms: Decimal;
         TotalPurchases: Decimal;
         TotalPurchasesQty: Decimal;
-        SumCost: Decimal;
-        TotalCost: Decimal;
-        TotalPctoms: Decimal;
+        TotalQty: Decimal;
+        TotalSaleLCY: Decimal;
         TotalSaleLCYYr: Decimal;
-        PctaendringVen: Decimal;
         TotalVendorSalesLCY: Decimal;
+        TurnoverLYSum: Decimal;
         VendorPctoms: Decimal;
-        PctaendringItemGroup: Decimal;
-        TotalPctaendringItemGroup: Decimal;
-        SumPctaendringItemGroup: Decimal;
-        CRSumPct: Decimal;
+        Sorterefter: Option antal,omsaetning,db;
+        Sorter: Option Stoerste,Mindste;
 }
 

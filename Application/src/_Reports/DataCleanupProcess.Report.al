@@ -1,13 +1,8 @@
 report 6060102 "NPR Data Cleanup Process"
 {
-    // NPR5.23/JC/20160331  CASE 237816 Changed report to a process report
-    // NPR5.48/JDH /20181109 CASE 334163 Added Caption to object
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Data Cleanup Process.rdlc';
-
     Caption = 'Data Cleanup Process';
-
     dataset
     {
         dataitem("Data Cleanup GCVI"; "NPR Data Cleanup GCVI")
@@ -36,6 +31,8 @@ report 6060102 "NPR Data Cleanup Process"
             }
 
             trigger OnAfterGetRecord()
+    var
+        SuccessLbl: Label 'SUCCESS';
             begin
 
                 DataCleanupCVI2.Get("Data Cleanup GCVI"."Cleanup Action", "Data Cleanup GCVI".Type, "Data Cleanup GCVI"."No.");
@@ -45,7 +42,7 @@ report 6060102 "NPR Data Cleanup Process"
                     DataCleanupCVI2.IsError := true;
                     ProcessResult := false;
                 end else begin
-                    DataCleanupCVI2.Status := 'SUCCESS';
+                    DataCleanupCVI2.Status := SuccessLbl;
                     DataCleanupCVI2.IsDeleted := true;
                     DataCleanupCVI2.IsProcessed := true;
                     DataCleanupCVI2.Success := true;
@@ -59,7 +56,7 @@ report 6060102 "NPR Data Cleanup Process"
                 end else begin
                     DataCleanupCVI2.Get("Data Cleanup GCVI"."Cleanup Action", "Data Cleanup GCVI".Type, "Data Cleanup GCVI"."NewNo.");
 
-                    DataCleanupCVI2.Status := 'SUCCESS';
+                    DataCleanupCVI2.Status := SuccessLbl;
                     DataCleanupCVI2.IsDeleted := true;
                     DataCleanupCVI2.IsProcessed := true;
                     DataCleanupCVI2.Success := true;
@@ -132,21 +129,15 @@ report 6060102 "NPR Data Cleanup Process"
             }
         }
 
-        actions
-        {
-        }
     }
 
-    labels
-    {
-    }
 
     var
-        CleanupAction: Option Delete,Rename,Both;
-        TableOption: Option All,Customer,Vendor,Item,GLAccount;
+        DataCleanupCVI2: Record "NPR Data Cleanup GCVI";
         [InDataSet]
         ProcessResult: Boolean;
-        DataCleanupCVI2: Record "NPR Data Cleanup GCVI";
+        TableOption: Option All,Customer,Vendor,Item,GLAccount;
+        CleanupAction: Option Delete,Rename,Both;
         NoFilter: Text;
 }
 

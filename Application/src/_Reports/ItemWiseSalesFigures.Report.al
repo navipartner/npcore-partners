@@ -1,14 +1,10 @@
 report 6060052 "NPR Item Wise Sales Figures"
 {
-    // NPR70.00.00.00/LS/20150107  CASE 202876 : Report to 2013 version
-    // NPR5.23.03/MHA/20160726  CASE 242557 Magento references updated according to MAG2.00
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Wise Sales Figures.rdlc';
-
     Caption = 'Item Wise Sales Figures';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem("Sales Line"; "Sales Line")
@@ -61,13 +57,9 @@ report 6060052 "NPR Item Wise Sales Figures"
                 SalesHeader.SetFilter(SalesHeader."Order Date", '%1..%2', FromDate, ToDate);
                 SalesHeader.SetRange(SalesHeader."No.", "Sales Line"."Document No.");
                 SalesHeader.SetRange(SalesHeader."Document Type", "Sales Line"."Document Type");
-
-                //-NPR5.23.03
-                //IF ((NOT(SalesHeader.FIND('-'))) OR (SalesHeader."Internet Order No." = 0))  THEN BEGIN
                 if (not SalesHeader.FindFirst) or (SalesHeader."NPR External Order No." = '') then begin
-                    //+NPR5.23.03
                     PreviousItemNo := SalesLine."No.";
-                    CurrReport.Skip;
+                    CurrReport.Skip();
                 end
                 else
                     if ItemTmp.Get("Sales Line"."No.") then begin
@@ -108,10 +100,6 @@ report 6060052 "NPR Item Wise Sales Figures"
                 }
             }
         }
-
-        actions
-        {
-        }
     }
 
     labels
@@ -133,14 +121,14 @@ report 6060052 "NPR Item Wise Sales Figures"
     end;
 
     var
+        Item: Record Item;
         SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
         FromDate: Date;
         ToDate: Date;
-        Item: Record Item;
         PercProfit: Decimal;
         Profit: Decimal;
         ProfitOnLineAmount: Decimal;
-        SalesLine: Record "Sales Line";
         MinusOneWeek: Label '-1W';
 }
 

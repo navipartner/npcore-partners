@@ -1,16 +1,8 @@
 report 6014434 "NPR Vendor/Debtor by date"
 {
-    // NPR70.00.00.00/LS/060514 CASE 183046 : Convert Report to Nav 2013
-    // NPR4.14/TS/20150820 CASE 22159 Change Caption of  report
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.40/TJ  /20180319  CASE 307717 Replaced hardcoded dates with DMY2DATE structure
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/VendorDebtor by date.rdlc';
-
     Caption = 'Vendor/Customer by date';
-
     dataset
     {
         dataitem("Integer"; "Integer")
@@ -52,28 +44,21 @@ report 6014434 "NPR Vendor/Debtor by date"
             begin
                 afdfilter := Vendor.GetFilter(Vendor."Global Dimension 1 Filter");
                 Vendor.SetFilter("Global Dimension 1 Filter", afdfilter);
-                //-NPR5.40 [307717]
-                //Vendor.SETRANGE("Date Filter", 010180D ,Tildato);
                 Vendor.SetRange("Date Filter", DMY2Date(1, 1, 1980), Tildato);
-                //+NPR5.40 [307717]
                 Vendor.CalcFields("Net Change (LCY)");
 
-                //-NPR70.00.00.00
                 ShowCreditor := false;
                 if (Kunmedsaldo = true) and ("Net Change (LCY)" = 0) then
                     ShowCreditor := false
                 else
                     if (Kunmedsaldo = false) and ("Net Change (LCY)" <> 0) then
                         ShowCreditor := true;
-                //+NPR70.00.00.00
             end;
 
             trigger OnPreDataItem()
             begin
-                if not PrintKreditor then CurrReport.Break;
-                //-NPR5.39
-                //CurrReport.CREATETOTALS("Net Change (LCY)");
-                //+NPR5.39
+                if not PrintKreditor then
+                    CurrReport.Break();
             end;
         }
         dataitem(Customer; Customer)
@@ -106,28 +91,21 @@ report 6014434 "NPR Vendor/Debtor by date"
             begin
                 afdfilter := Customer.GetFilter(Customer."Global Dimension 1 Filter");
                 Customer.SetFilter("Global Dimension 1 Filter", afdfilter);
-                //-NPR5.40 [307717]
-                //Customer.SETRANGE("Date Filter", 010180D ,Tildato);
                 Customer.SetRange("Date Filter", DMY2Date(1, 1, 1980), Tildato);
-                //+NPR5.40 [307717]
                 Customer.CalcFields("Net Change (LCY)");
 
-                //-NPR70.00.00.00
                 ShowCustomer := false;
                 if (Kunmedsaldo = true) and ("Net Change (LCY)" = 0) then
                     ShowCustomer := false
                 else
                     if (Kunmedsaldo = false) and ("Net Change (LCY)" <> 0) then
                         ShowCustomer := true;
-                //+NPR70.00.00.00
             end;
 
             trigger OnPreDataItem()
             begin
-                if not PrintDebitor then CurrReport.Break;
-                //-NPR5.38
-                //CurrReport.PAGENO(1);
-                //+NPR5.38
+                if not PrintDebitor then
+                    CurrReport.Break();
             end;
         }
     }
@@ -168,10 +146,6 @@ report 6014434 "NPR Vendor/Debtor by date"
                 }
             }
         }
-
-        actions
-        {
-        }
     }
 
     labels
@@ -190,35 +164,27 @@ report 6014434 "NPR Vendor/Debtor by date"
     trigger OnInitReport()
     begin
         Tildato := Today;
-        //-NPR70.00.00.00
         Kunmedsaldo := false;
         PrintKreditor := true;
         PrintDebitor := true;
-        //+NPR70.00.00.00
     end;
 
     trigger OnPreReport()
     begin
         Firmaoplysninger.Get();
         Firmaoplysninger.CalcFields(Picture);
-
-        //-NPR5.39
-        // objekt.SETRANGE(ID, 6014434);
-        // objekt.SETRANGE(Type, 3);
-        // objekt.FIND('-');
-        //+NPR5.39
     end;
 
     var
         Firmaoplysninger: Record "Company Information";
-        Tildato: Date;
         Kunmedsaldo: Boolean;
-        Totalsaldo: Decimal;
-        PrintKreditor: Boolean;
         PrintDebitor: Boolean;
-        afdfilter: Code[20];
-        afddebitor: Code[20];
-        ShowCustomer: Boolean;
+        PrintKreditor: Boolean;
         ShowCreditor: Boolean;
+        ShowCustomer: Boolean;
+        afddebitor: Code[20];
+        afdfilter: Code[20];
+        Tildato: Date;
+        Totalsaldo: Decimal;
 }
 

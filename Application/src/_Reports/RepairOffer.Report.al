@@ -1,18 +1,9 @@
 report 6014501 "NPR Repair Offer"
 {
-    // NPR5.25/JLK /20160622  CASE 244140 Report copied from 6.2ver
-    // NPR5.27/JLK /20131025  CASE 256163 Report rdlc layout changed and accomodated to other repair reports
-    //                                     Some variables and text constants renamed to more descriptive ENU words
-    // NPR5.36/JLK /20170921  CASE 286803 Increased length variable CompanyAddr to [50]
-    // TM1.39/THRO/20181126  CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
-    // NPR5.50/ZESO/201905006 CASE 353382 Remove Reference to Wrapper Codeunit
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Repair Offer.rdlc';
-
     Caption = 'Repair Offer';
     PreviewMode = PrintLayout;
-
     dataset
     {
         dataitem("Customer Repair"; "NPR Customer Repair")
@@ -161,13 +152,8 @@ report 6014501 "NPR Repair Offer"
 
                 Clear(GlobalDimension1Desc);
                 if ("Customer Repair"."Global Dimension 1 Code") <> '' then
-                    //-#[353382] [353382]
-                    //-TM1.39 [334644]
-                    //GlobalDimension1Desc := SystemEventWrapper.CaptionClassTranslate(CurrReport.LANGUAGE,'1,1,1,,');
-                    //+TM1.39 [334644]
                     GlobalDimension1Desc := CaptionClassTranslate('1,1,1,,');
-                //+#[353382] [353382]
-                CompanyInformation.Get;
+                CompanyInformation.Get();
                 CompanyInformation.CalcFields(Picture);
 
                 FormatAddr.Company(CompanyAddr, CompanyInformation);
@@ -198,7 +184,6 @@ report 6014501 "NPR Repair Offer"
                     end;
                 end;
 
-
                 if "Price when Not Accepted" <> 0 then
                     NotAccept := Text001 + ' ' + Text002 + ' ' + Format("Price when Not Accepted") + ',-'
                 else
@@ -216,22 +201,6 @@ report 6014501 "NPR Repair Offer"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
-    }
-
     trigger OnPreReport()
     begin
         DotDisplay := '  ';
@@ -240,45 +209,45 @@ report 6014501 "NPR Repair Offer"
 
     var
         CompanyInformation: Record "Company Information";
-        FormatAddr: Codeunit "Format Address";
-        CustAddress: array[8] of Text[50];
-        NotAccept: Text[150];
-        AddrLine: Text[100];
-        AddrLineCount: Integer;
-        CompanyAddr: array[8] of Text[50];
         Customer: Record Customer;
-        EstDelivery: Text[30];
-        GlobalDimension1Desc: Text[80];
-        RepDescription: Text[100];
-        Text001: Label 'For not-accepted repair offers we invoice';
-        Text002: Label 'LCY Incl. VAT';
-        Text003: Label 'Repair No.:';
-        Text004: Label 'Dear ';
-        Text005: Label 'The Repair Costs will amount to LCY ';
-        Text006: Label 'We have today received an answer from our repairer concerning your repair of ';
-        Text007: Label 'If you need more information, please contact us on Tel. No.: ';
-        Text008: Label 'If you';
-        Text009: Label 'Telephone: ';
-        Text010: Label 'Fax No.: ';
-        Text011: Label 'E-mail: ';
-        Text012: Label 'CVR No.: ';
-        Text013: Label 'want execution of the submitted repair, the delivery will be approximately';
-        Text014: Label 'from receipt of your';
-        Text016: Label ' days';
+        FormatAddr: Codeunit "Format Address";
+        ReturnNoRepair: Boolean;
+        AddrLineCount: Integer;
+        RepairCount: Integer;
         Text017: Label '2-4 weeks';
+        Text021: Label 'confirmation.';
+        Text012: Label 'CVR No.: ';
+        Text016: Label ' days';
+        Text004: Label 'Dear ';
+        Text011: Label 'E-mail: ';
+        Text010: Label 'Fax No.: ';
+        Text001: Label 'For not-accepted repair offers we invoice';
+        Text014: Label 'from receipt of your';
+        Text008: Label 'If you';
+        Text007: Label 'If you need more information, please contact us on Tel. No.: ';
+        Text023: Label 'In accordance with existing law, completed repairs are kept for up to 6 months and are then sold at the market price.';
+        Text002: Label 'LCY Incl. VAT';
+        Text024: Label 'Mobile: ';
+        Text025: Label 'Repair Description';
+        Text003: Label 'Repair No.:';
         Text018: Label 'Repair Offer';
+        Text009: Label 'Telephone: ';
+        Text005: Label 'The Repair Costs will amount to LCY ';
         Text019: Label 'The repair could not be carried out, but the product can be found in our shop';
         Text020: Label 'The repair estimate is incl. VAT. In case of hidden defects, the price may be changed.';
-        Text021: Label 'confirmation.';
+        Text013: Label 'want execution of the submitted repair, the delivery will be approximately';
+        Text006: Label 'We have today received an answer from our repairer concerning your repair of ';
         Text022: Label 'Yours sincerely,';
-        Text023: Label 'In accordance with existing law, completed repairs are kept for up to 6 months and are then sold at the market price.';
-        ReturnNoRepair: Boolean;
-        RepairCount: Integer;
-        TelephoneText: Text;
-        MobileText: Text;
-        Text024: Label 'Mobile: ';
         DotDisplay: Text;
+        MobileText: Text;
         StarDisplay: Text;
-        Text025: Label 'Repair Description';
+        TelephoneText: Text;
+        EstDelivery: Text[30];
+        CompanyAddr: array[8] of Text[50];
+        CustAddress: array[8] of Text[50];
+        GlobalDimension1Desc: Text[80];
+        AddrLine: Text[100];
+        RepDescription: Text[100];
+        NotAccept: Text[150];
 }
 

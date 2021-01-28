@@ -1,12 +1,7 @@
 report 6014458 "NPR Audit Roll Details"
 {
-    // NPR5.25/TS/20160729 CASE 241293 Audit Roll report created
-    // NPR5.27/JLK /20161005 CASE 252134 Added Sum of Audit Roll for Total Amount Incl  VAT and Amount
-    // NPR5.38/BR  /20171207 CASE 299035 Changed Key to include Sale Type field
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Audit Roll Details.rdlc';
-
     Caption = 'Audit Roll Details';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
@@ -86,18 +81,6 @@ report 6014458 "NPR Audit Roll Details"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     labels
     {
         Register_cap = 'Register No.';
@@ -124,8 +107,8 @@ report 6014458 "NPR Audit Roll Details"
     end;
 
     var
-        VatAmount: Decimal;
         CompanyInformation: Record "Company Information";
+        VatAmount: Decimal;
         Filters: Text;
 }
 

@@ -1,22 +1,10 @@
 report 6014499 "NPR Inventory Campaign Stat."
 {
-    // NPK1.01/20130603/TR CASE : 176941 - Copied from nyeste.
-    // NPR4.14/KN/20150818 CASE 220291 Added label, CampaignTotalLbl, to replace hardcoded text in textbox.
-    // NPR4.14/KN/20150821 CASE 221165 Added two labels, ChosenVendorLbl and PeriodLbl, to replace hardcoded text in textboxes.
-    // NPR5.25/JLK /20160726 CASE 247117 Corrected Net Change
-    //                                   Hide not calculated variables from rdlc
-    // NPR5.38/TS  /20180108  CASE 299279 Added Page No in advert.
-    // NPR5.38/JKL /20180125  CASE 299279 Added Vendor No. Vendor Name
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.41/JKL /20180423 CASE 299279  removed calc fields on starting date / ending dat, Consumption Inventory changed to show current inventory + location filter active
-    // NPR5.54/YAHA/20200324  CASE 394872 Removed Company Picture
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Inventory Campaign Stat..rdlc';
-
     Caption = 'Inventory Campaign Stat.';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem("Period Discount"; "NPR Period Discount")
@@ -129,32 +117,20 @@ report 6014499 "NPR Inventory Campaign Stat."
 
                 trigger OnAfterGetRecord()
                 begin
-                    //-NPR5.41 [299279]
-                    //"Period Discount Line".CALCFIELDS("Period Discount Line"."Starting Date");
-                    //+NPR5.41 [299279]
-
                     if "Distribution Item" then
                         F := 'F'
                     else
                         F := '';
 
-                    //NPR5.38 [302123]
                     Clear(Vendor);
                     if "Period Discount Line"."Vendor No." <> '' then
                         Vendor.Get("Period Discount Line"."Vendor No.");
-                    //NPR5.38 [302123]
 
                     vare.SetRange("No.", "Item No.");
                     vare.SetRange("Date Filter", 0D, "Period Discount"."Ending Date");
-                    //-NPR5.41 [299279]
                     vare.SetFilter("Location Filter", "Period Discount Line".GetFilter("Location Filter"));
-                    //+NPR5.41 [299279]
-
                     if vare.Find('-') then;
-                    //-NPR5.41 [299279]
-                    //vare.CALCFIELDS("Net Change");
                     vare.CalcFields("Net Change", Inventory);
-                    //+NPR5.41 [299279]
 
                     if VATPostingsetup.Get(vare."VAT Bus. Posting Gr. (Price)", vare."VAT Prod. Posting Group") then begin
                         momsregulering := (1 + (VATPostingsetup."VAT %" / 100)); //* "VAT %" / 100);
@@ -165,31 +141,14 @@ report 6014499 "NPR Inventory Campaign Stat."
                         teodg := Round((("Campaign Unit Price" / momsregulering) - "Campaign Unit Cost") / ("Campaign Unit Price" / momsregulering) * 100, 0.1)
                     else
                         teodg := 0;
-
-                    //+NPR5.25
-                    //vare.SETRANGE("No.", "Item No.");
-                    //vare.SETRANGE("Date Filter", 0D,"Ending date");
-                    //IF vare.FIND('-') THEN;
-                    //vare.CALCFIELDS("Net Change");
-                    //-NPR5.25
-
                     vare.SetRange("No.", "Item No.");
                     vare.SetFilter("Date Filter", '%1..%2', "Period Discount"."Starting Date", "Period Discount"."Ending Date");
-                    //-NPR5.41 [299279]
                     vare.SetFilter("Location Filter", "Period Discount Line".GetFilter("Location Filter"));
-                    //+NPR5.41 [299279]
                     if vare.Find('-') then;
-                    //+NPR5.25
-                    //vare.CALCFIELDS("COGS (LCY)","Sales (LCY)","Sales (Qty.)");
-                    //vare.CALCFIELDS("COGS (LCY)","Sales (LCY)","Sales (Qty.)","Net Change");
-                    //-NPR5.41 [299279]
-                    //vare.CALCFIELDS("COGS (LCY)","Sales (LCY)","Sales (Qty.)","Net Change");
                     vare.CalcFields("COGS (LCY)", "Sales (LCY)", "Sales (Qty.)", "Net Change", Inventory);
-                    //+NPR5.41 [299279]
-                    //-NPR5.25
                     "Quantity Sold" := vare."Sales (Qty.)";
                     if ("Quantity Sold" = 0) and kunvarermedsalg then
-                        CurrReport.Skip;
+                        CurrReport.Skip();
 
                     Turnover := vare."Sales (LCY)";
                     if vare."Sales (LCY)" <> 0 then begin
@@ -207,34 +166,13 @@ report 6014499 "NPR Inventory Campaign Stat."
                     if restk < 0 then restk := 0;
                 end;
 
-                trigger OnPreDataItem()
-                begin
-                    //-NPR5.39
-                    //CurrReport.CREATETOTALS("Quantity Sold",Turnover);
-                    //+NPR5.39
-                end;
             }
 
             trigger OnPreDataItem()
             begin
-                //-NPR5.39
-                //CurrReport.CREATETOTALS("Period Discount Line".Turnover, "Period Discount Line"."Quantity Sold",purchase, boughtFor, restk, teodg, db);
-                //+NPR5.39
                 CompanyInfo.CalcFields(Picture);
                 PeriodDiscountLineVendorNo := "Period Discount Line".GetFilter("Vendor No.");
             end;
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 
@@ -267,30 +205,25 @@ report 6014499 "NPR Inventory Campaign Stat."
 
     trigger OnInitReport()
     begin
-        CompanyInfo.Get;
-        //-NPR5.39
-        // Object.SETRANGE(ID,6014499);
-        // Object.SETRANGE(Type,3);
-        // Object.FIND('-');
-        //+NPR5.39
+        CompanyInfo.Get();
     end;
 
     var
         CompanyInfo: Record "Company Information";
+        vare: Record Item;
+        VATPostingsetup: Record "VAT Posting Setup";
         Vendor: Record Vendor;
-        F: Text[30];
         kunvarermedsalg: Boolean;
-        teodg: Decimal;
+        boughtFor: Decimal;
         db: Decimal;
         dg: Decimal;
-        vare: Record Item;
-        purchase: Decimal;
-        boughtFor: Decimal;
-        restk: Decimal;
         forbgllager: Decimal;
-        totdb: Decimal;
-        VATPostingsetup: Record "VAT Posting Setup";
         momsregulering: Decimal;
+        purchase: Decimal;
+        restk: Decimal;
+        teodg: Decimal;
+        totdb: Decimal;
+        F: Text[30];
         PeriodDiscountLineVendorNo: Text[100];
 }
 

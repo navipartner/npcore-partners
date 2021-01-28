@@ -1,13 +1,8 @@
 report 6060133 "NPR MM Visiting Report"
 {
-    // NPR5.31/KENU/20170424 CASE 270626 Object Created
-    // MM1.32/TSA/20180725  CASE 323333 Transport MM1.32 - 25 July 2018
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Visiting Report.rdlc';
-
     Caption = 'MM Visiting Report';
-
     dataset
     {
         dataitem("MM Membership"; "NPR MM Membership")
@@ -109,13 +104,12 @@ report 6060133 "NPR MM Visiting Report"
                             trigger OnAfterGetRecord()
                             begin
                                 if not ("Access Date" <> 0D) then
-                                    CurrReport.Skip;
+                                    CurrReport.Skip();
 
                                 if not ("Entry No." <> 0) then
-                                    CurrReport.Skip;
+                                    CurrReport.Skip();
 
                                 NumberOfVisits += 1;
-                                //MESSAGE(FORMAT("TM Ticket Access Entry"."Access Date") + ' ' + FORMAT("TM Ticket Access Entry"."Access Time"));
                             end;
 
                             trigger OnPreDataItem()
@@ -126,16 +120,12 @@ report 6060133 "NPR MM Visiting Report"
 
                         trigger OnAfterGetRecord()
                         begin
-                            //IF TickResReq.GET("TM Ticket"."Ticket Reservation Entry No.") THEN BEGIN
                             AdmSet.SetRange("Membership  Code", "MM Membership"."Membership Code");
-                            if AdmSet.FindFirst then
+                            if AdmSet.FindFirst() then
                                 if AdmSet."Ticket No." = "TM Ticket"."Item No." then
                                     Qty := 1
                                 else
                                     Qty := 0;
-                            // Temp := TickResReq."External Item Code";
-                            //END;
-                            //Qty := TickResReq.Quantity;
                         end;
 
                         trigger OnPreDataItem()
@@ -149,18 +139,6 @@ report 6060133 "NPR MM Visiting Report"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     labels
     {
         ReportName = 'Member Visting Report';
@@ -169,17 +147,17 @@ report 6060133 "NPR MM Visiting Report"
     }
 
     var
-        MemberName: Text;
-        NumberOfVisits: Integer;
-        TickResReq: Record "NPR TM Ticket Reservation Req.";
-        Qty: Integer;
-        Temp: Code[100];
         AdmSet: Record "NPR MM Members. Admis. Setup";
-        MembershipCode_Lbl: Label 'Membership Code';
-        DisplayName_Lbl: Label 'Display Name';
-        TicketCode_Lbl: Label 'Ticket Type Code';
+        TickResReq: Record "NPR TM Ticket Reservation Req.";
+        Temp: Code[100];
+        NumberOfVisits: Integer;
+        Qty: Integer;
         AccessDate_Lbl: Label 'Access Date';
-        Guests_Lbl: Label 'Guests';
         AccessTime_Lbl: Label 'Access Time';
+        DisplayName_Lbl: Label 'Display Name';
+        Guests_Lbl: Label 'Guests';
+        MembershipCode_Lbl: Label 'Membership Code';
+        TicketCode_Lbl: Label 'Ticket Type Code';
+        MemberName: Text;
 }
 

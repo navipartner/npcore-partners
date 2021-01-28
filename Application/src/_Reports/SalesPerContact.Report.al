@@ -1,16 +1,8 @@
 report 6014597 "NPR Sales Per Contact"
 {
-    // NPR70.00.00.00/LS/20141112  CASE 187453 : Convert Report to NAV 2013
-    // 
-    // NPR5.30/JLK /20170202  CASE 253099  Added Calcfields before turnover and modified rdlc layout to display contacts only once
-    //                                     Removed harcoded text with text constant NoDateFilter
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Per Contact.rdlc';
-
     Caption = 'Sales Per. Contact';
-
     dataset
     {
         dataitem(Contact; Contact)
@@ -22,49 +14,32 @@ report 6014597 "NPR Sales Per Contact"
             begin
                 m += 1;
 
-                //-NPR5.30
                 Clear(SumOfTurnover);
                 Clear(SumOfTurnoverLY);
-                //+NPR5.30
-
-                TurnoverTmp.Init;
+                TurnoverTmp.Init();
                 Contact1.Get("No.");
 
                 if Contact.GetFilter("Date Filter") <> '' then begin
-                    //-NPR5.30
-                    ValueEntry.Reset;
+                    ValueEntry.Reset();
                     ValueEntry.SetRange("Source No.", Contact1."No.");
                     ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
                     ValueEntry.SetFilter("Posting Date", Contact1.GetFilter("Date Filter"));
                     ValueEntry.CalcSums("Sales Amount (Actual)");
                     SumOfTurnoverLY := ValueEntry."Sales Amount (Actual)";
-                    //+NPR5.30
                 end;
 
-                //-NPR5.30
-                ValueEntry.Reset;
+                ValueEntry.Reset();
                 ValueEntry.SetRange("Source No.", "No.");
                 ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
                 ValueEntry.SetFilter("Posting Date", GetFilter("Date Filter"));
                 ValueEntry.CalcSums("Sales Amount (Actual)");
                 SumOfTurnover := ValueEntry."Sales Amount (Actual)";
 
-                //IF SumOfTurnover = 0 THEN
                 if (SumOfTurnover = 0) and (SumOfTurnoverLY = 0) then
-                    CurrReport.Skip;
-                //+NPR5.30
-
-                //-NPR5.30
-                //CALCFIELDS(Turnover);
-                //Contact1.CALCFIELDS(Turnover);
-
-                //TurnoverTmp."Decimal 1" := Multiple * Turnover;
-                //TurnoverTmp."Decimal 2" := Turnover;
-                //TurnoverTmp."Decimal 3" := Contact1.Turnover;
+                    CurrReport.Skip();
                 TurnoverTmp."Decimal 1" := Multiple * SumOfTurnover;
                 TurnoverTmp."Decimal 2" := SumOfTurnover;
                 TurnoverTmp."Decimal 3" := SumOfTurnoverLY;
-                //+NPR5.30
 
                 if SumOfTurnoverLY <> 0 then
                     TurnoverTmp."Decimal 4" := SumOfTurnover / SumOfTurnoverLY * 100
@@ -74,7 +49,7 @@ report 6014597 "NPR Sales Per Contact"
                 TurnoverTmp.Template := "No.";
                 TurnoverTmp.Description := Name;
                 TurnoverTmp."Description 2" := Address;
-                TurnoverTmp.Insert;
+                TurnoverTmp.Insert();
             end;
 
             trigger OnPreDataItem()
@@ -109,10 +84,10 @@ report 6014597 "NPR Sales Per Contact"
             column(COMPANYNAME; CompanyName)
             {
             }
-            column(QuantityFilter; StrSubstNo(Text10600002, ShowQuantity))
+            column(QuantityFilter; StrSubstNo(TopLbl, ShowQuantity))
             {
             }
-            column(ContactDateFilter; StrSubstNo(Text10600003, ContactDateFilter))
+            column(ContactDateFilter; StrSubstNo(PeriodLbl, ContactDateFilter))
             {
             }
             column(No_Contact; Contact."No.")
@@ -135,13 +110,13 @@ report 6014597 "NPR Sales Per Contact"
             begin
                 if Number = 1 then begin
                     if not TurnoverTmp.Find('-') then
-                        CurrReport.Break;
+                        CurrReport.Break();
                 end else
                     if (TurnoverTmp.Next = 0) then
-                        CurrReport.Break;
+                        CurrReport.Break();
 
                 if Number > ShowQuantity then
-                    CurrReport.Break;
+                    CurrReport.Break();
 
                 if (Number / 2) = Round((Number / 2), 1) then
                     Greyed := false
@@ -184,10 +159,6 @@ report 6014597 "NPR Sales Per Contact"
             }
         }
 
-        actions
-        {
-        }
-
         trigger OnOpenPage()
         begin
             if ShowQuantity = 0 then
@@ -214,24 +185,10 @@ report 6014597 "NPR Sales Per Contact"
     begin
         CompanyInformation.Get();
         CompanyInformation.CalcFields(Picture);
-
-        //-NPR5.39
-        // Object.SETRANGE(ID, 6014597);
-        // Object.SETRANGE(Type, 3);
-        // Object.FIND('-');
-        //+NPR5.39
         ContactDateFilter := Contact.GetFilter("Date Filter");
 
         if ContactDateFilter = '' then
-            ContactDateFilter := NoDateFilter;
-        //-NPR5.30
-        //  CASE CurrReport.LANGUAGE OF
-        //    1030: // DAN
-        //      ContactDateFilter := 'Intet dato filter';
-        //  ELSE
-        //    ContactDateFilter := 'No date filter';
-        //  END;
-        //+NPR5.30
+            ContactDateFilter := NoDateFilterLbl;
 
         if Sorting = Sorting::Largest then
             Multiple := -1
@@ -240,26 +197,26 @@ report 6014597 "NPR Sales Per Contact"
     end;
 
     var
-        Sorting: Option Largest,Smallest;
-        Multiple: Integer;
-        Contact1: Record Contact;
-        MinDate: Date;
-        MaxDate: Date;
-        MinDateLY: Date;
-        MaxDateLY: Date;
         CompanyInformation: Record "Company Information";
-        ContactDateFilter: Text[30];
+        Contact1: Record Contact;
         TurnoverTmp: Record "NPR TEMP Buffer" temporary;
-        ShowQuantity: Integer;
-        d: Dialog;
-        m: Integer;
-        i: Integer;
-        j: Integer;
         Greyed: Boolean;
-        Text10600002: Label 'Top %1';
-        Text10600003: Label 'Period: %1';
-        NoDateFilter: Label 'No date filter entered';
+        MaxDate: Date;
+        MaxDateLY: Date;
+        MinDate: Date;
+        MinDateLY: Date;
         SumOfTurnover: Decimal;
         SumOfTurnoverLY: Decimal;
+        d: Dialog;
+        i: Integer;
+        j: Integer;
+        m: Integer;
+        Multiple: Integer;
+        ShowQuantity: Integer;
+        NoDateFilterLbl: Label 'No date filter entered';
+        PeriodLbl: Label 'Period: %1', Comment = '%1 = Contact Date Filter';
+        TopLbl: Label 'Top %1', Comment = '%1 = Quantity';
+        Sorting: Option Largest,Smallest;
+        ContactDateFilter: Text[30];
 }
 

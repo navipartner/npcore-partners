@@ -1,17 +1,10 @@
 report 6014408 "NPR Item Group Overview"
 {
-    // NPR70.00.00.00/LS : Convert Report to Nav 2013
-    // NPR4.14/KN/20150818 CASE 220292 Removed field with 'NAVIPARTNER K¢benhavn 2000' caption from footer
-    // NPR5.38/JLK /20180124  CASE 300892 Corrected AL Error on Caption name
-    //                                    Obsolite property CurrReport_PAGENO
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    DefaultLayout = RDLC;
+DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Group Overview.rdlc';
-
     Caption = 'Item Group Overview';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem("Item Group"; "NPR Item Group")
@@ -64,18 +57,6 @@ report 6014408 "NPR Item Group Overview"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     labels
     {
         BelongInMainItemGrp_Caption = 'Belongs in Main Item Group';
@@ -90,19 +71,12 @@ report 6014408 "NPR Item Group Overview"
     begin
         CompanyInformation.Get();
         CompanyInformation.CalcFields(Picture);
-
-        //-NPR5.39
-        // Object.SETRANGE(ID, 6014408);
-        // Object.SETRANGE(Type, 3);
-        // Object.FIND('-');
-        //+NPR5.39
     end;
-
     var
         CompanyInformation: Record "Company Information";
-        PageNoCaptionLbl: Label 'Page';
-        Report_Caption_Lbl: Label 'Item Group Overview';
-        ItemGroupCaptionLbl: Label 'Item Group';
         DescriptionCaptionLbl: Label 'Description';
+        ItemGroupCaptionLbl: Label 'Item Group';
+        Report_Caption_Lbl: Label 'Item Group Overview';
+        PageNoCaptionLbl: Label 'Page';
 }
 

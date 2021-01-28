@@ -1,13 +1,8 @@
 report 6060127 "NPR MM Member Card Print QR"
 {
-    // MM80.1.02/TSA/20151228  CASE 229684 Touch-up and enchancements
-    // MM1.37/TJ  /20190201  CASE 350288 Using POS View Profile for register picture
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Member Card Print QR.rdlc';
-
     Caption = 'Member Card Print';
-
     dataset
     {
         dataitem("MM Member Card"; "NPR MM Member Card")
@@ -55,8 +50,6 @@ report 6060127 "NPR MM Member Card Print QR"
                 Item: Record Item;
                 MMMembershipRole: Record "NPR MM Membership Role";
             begin
-                //BarcodeLib.SetAntiAliasing(FALSE);
-                //BarcodeLib.SetShowText(FALSE);
                 BarcodeLib.SetSizeX(2);
                 BarcodeLib.SetSizeY(2);
                 BarcodeLib.SetBarcodeType('QR');
@@ -74,30 +67,10 @@ report 6060127 "NPR MM Member Card Print QR"
             var
                 RetailFormCode: Codeunit "NPR Retail Form Code";
             begin
-                //-MM1.37 [350288]
-                /*
-                IF Register.GET(RetailFormCode.FetchRegisterNumber) THEN
-                  IF Register.Picture.HASVALUE THEN
-                    Register.CALCFIELDS(Picture);
-                */
                 if POSUnit.Get(RetailFormCode.FetchRegisterNumber) then
                     if POSViewProfile.Get(POSUnit."POS View Profile") and POSViewProfile.Picture.HasValue then
                         POSViewProfile.CalcFields(Picture);
-                //+MM1.37 [350288]
-
             end;
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 

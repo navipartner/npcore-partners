@@ -1,14 +1,9 @@
 report 6014500 "NPR Register Used Goods"
 {
-    // NPR5.29/JLK /20161124  CASE 259090 Object created
-    // NPR5.29/JLK /20170109  CASE 246761 Correcyed RDLC Header Issue
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Register Used Goods.rdlc';
-
     Caption = 'Registrer Used Goods';
     PreviewMode = PrintLayout;
-
     dataset
     {
         dataitem(UsedGoodsRegistration; "NPR Used Goods Registration")
@@ -83,7 +78,7 @@ report 6014500 "NPR Register Used Goods"
                 begin
                     UsedGoodsRegistration2."Fax til Kostercentralen" := false;
                     UsedGoodsRegistration2."Kostercentralen Registered" := Today;
-                    UsedGoodsRegistration2.Modify;
+                    UsedGoodsRegistration2.Modify();
                 end;
             }
 
@@ -103,18 +98,6 @@ report 6014500 "NPR Register Used Goods"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     labels
     {
         ReportTitle = 'Used Goods Purchase';
@@ -125,21 +108,21 @@ report 6014500 "NPR Register Used Goods"
 
     trigger OnPreReport()
     begin
-        CompanyInformation.Get;
+        CompanyInformation.Get();
         CompanyInformation.CalcFields(Picture);
         DotDisplay := '  ';
     end;
 
     var
         CompanyInformation: Record "Company Information";
-        DotDisplay: Text;
-        AddressLine: Text;
-        Text001: Label 'Telephone: ';
-        Text002: Label 'Fax No.: ';
-        Text003: Label 'E-mail: ';
-        Text004: Label 'CVR No.: ';
-        i: Integer;
         FormatAddr: Codeunit "Format Address";
+        i: Integer;
+        Text004: Label 'CVR No.: ';
+        Text003: Label 'E-mail: ';
+        Text002: Label 'Fax No.: ';
+        Text001: Label 'Telephone: ';
+        AddressLine: Text;
+        DotDisplay: Text;
         CompanyAddr: array[8] of Text[30];
 }
 

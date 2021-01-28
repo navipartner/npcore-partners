@@ -1,18 +1,9 @@
 report 6014502 "NPR Repair Done"
 {
-    // NPR5.27/JLK /20161019  CASE 255004 Corrected rdlc and adjusted layout to requirements
-    //                                    Some variables and text constant name changed
-    //                                    Removed Register Information
-    // NPR5.36/JLK /20170921  CASE 286803 Increased length variable CompanyAddr to [50]
-    // TM1.39/THRO/20181126  CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
-    // NPR5.50/ZESO/201905006 CASE 353382 Remove Reference to Wrapper Codeunit
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Repair Done.rdlc';
-
     Caption = 'Repair Done';
     PreviewMode = PrintLayout;
-
     dataset
     {
         dataitem("Customer Repair"; "NPR Customer Repair")
@@ -161,12 +152,7 @@ report 6014502 "NPR Repair Done"
             begin
                 Clear(GlobDim1Desc);
                 if ("Customer Repair"."Global Dimension 1 Code") <> '' then
-                    //-#[353382] [353382]
-                    //-TM1.39 [334644]
-                    //GlobDim1Desc := SystemEventWrapper.CaptionClassTranslate(CurrReport.LANGUAGE,'1,1,1,,');
-                    //+TM1.39 [334644]
                     GlobDim1Desc := CaptionClassTranslate('1,1,1,,');
-                //+#[353382] [353382]
                 FormAdr.Company(CompanyAddr, CompanyInformation);
 
                 TelephoneText := '';
@@ -201,21 +187,9 @@ report 6014502 "NPR Repair Done"
 
             trigger OnPreDataItem()
             begin
-                CompanyInformation.Get;
+                CompanyInformation.Get();
                 CompanyInformation.CalcFields(Picture);
             end;
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 
@@ -232,35 +206,35 @@ report 6014502 "NPR Repair Done"
 
     var
         CompanyInformation: Record "Company Information";
-        FormAdr: Codeunit "Format Address";
-        DebAddress: array[8] of Text[50];
-        PriceNotAccepted: Text[100];
-        AdresseLine: Text[100];
-        AdresseLineCounter: Integer;
-        CompanyAddr: array[8] of Text[50];
-        GlobDim1Desc: Text[80];
-        Repair_Cap: Label 'Notice of Repair Done ';
-        Text001: Label 'For not-accepted repair offers we invoice LCY  ';
-        Text002: Label 'Repair No.: ';
-        Text003: Label 'Dear %1';
-        Text004: Label 'Your %1 is ready for pickup';
-        Text005: Label 'For questions regarding your repair you can contact us on %1 or E-mail %2';
-        Text006: Label 'The repair costs amount to LCY incl. VAT: ';
-        Text007: Label 'Telephone: ';
-        Text008: Label 'Fax No.: ';
-        Text009: Label 'E-mail: ';
-        Text010: Label 'CVR No.: ';
-        Text011: Label 'Yours sincerely, ';
-        Text012: Label 'Finished repairs are stored 6 months from arrival';
-        Text013: Label 'Repair Description';
-        Text014: Label 'Defect Description';
-        DotDisplay: Text;
-        StarDisplay: Text;
         Item: Record Item;
+        FormAdr: Codeunit "Format Address";
         DefectFound: Boolean;
         RepairFound: Boolean;
-        TelephoneText: Text;
-        MobileText: Text;
+        AdresseLineCounter: Integer;
+        Text010: Label 'CVR No.: ';
+        Text003: Label 'Dear %1';
+        Text014: Label 'Defect Description';
+        Text009: Label 'E-mail: ';
+        Text008: Label 'Fax No.: ';
+        Text012: Label 'Finished repairs are stored 6 months from arrival';
+        Text001: Label 'For not-accepted repair offers we invoice LCY  ';
+        Text005: Label 'For questions regarding your repair you can contact us on %1 or E-mail %2';
         Text015: Label 'Mobile: ';
+        Repair_Cap: Label 'Notice of Repair Done ';
+        Text013: Label 'Repair Description';
+        Text002: Label 'Repair No.: ';
+        Text007: Label 'Telephone: ';
+        Text006: Label 'The repair costs amount to LCY incl. VAT: ';
+        Text004: Label 'Your %1 is ready for pickup';
+        Text011: Label 'Yours sincerely, ';
+        DotDisplay: Text;
+        MobileText: Text;
+        StarDisplay: Text;
+        TelephoneText: Text;
+        CompanyAddr: array[8] of Text[50];
+        DebAddress: array[8] of Text[50];
+        GlobDim1Desc: Text[80];
+        AdresseLine: Text[100];
+        PriceNotAccepted: Text[100];
 }
 

@@ -1,12 +1,8 @@
 report 6014495 "NPR Whse. - Shipment"
 {
-    // NPR5.51/ZESO/20190724 CASE 355486 Object Created
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/NP Whse. - Shipment.rdlc';
-
     Caption = 'Whse. - Shipment';
-
     dataset
     {
         dataitem("Warehouse Shipment Header"; "Warehouse Shipment Header")
@@ -105,17 +101,17 @@ report 6014495 "NPR Whse. - Shipment"
                     }
 
                     trigger OnAfterGetRecord()
+                    var
+                        Code128Lbl: Label 'CODE128';
                     begin
                         GetLocation("Location Code");
 
-                        //CALCFIELDS("Warehouse Shipment Line"."Source No.");
                         BarcodeLib.SetShowText(true);
                         BarcodeLib.SetAntiAliasing(false);
-                        BarcodeLib.SetBarcodeType('CODE128');
+                        BarcodeLib.SetBarcodeType(Code128Lbl);
                         BarcodeLib.GenerateBarcode("Warehouse Shipment Line"."Source No.", TmpBarcode);
                         TmpBarcode.CreateInStream(InStr);
                         TmpBarcode.CreateOutStream(OuStr);
-                        GenerateBitmap(InStr, OuStr);
                         BlobBuffer.GetFromTempBlob(TmpBarcode, 1);
                     end;
                 }
@@ -128,50 +124,24 @@ report 6014495 "NPR Whse. - Shipment"
         }
     }
 
-    requestpage
-    {
-        Caption = 'Whse. - Posted Shipment';
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
-    }
-
     var
         Location: Record Location;
-        CurrReportPageNoCaptionLbl: Label 'Page';
-        WarehouseShipmentCaptionLbl: Label 'Warehouse Shipment';
+        BlobBuffer: Record "NPR BLOB buffer" temporary;
         BarcodeLib: Codeunit "NPR Barcode Library";
         TmpBarcode: Codeunit "Temp Blob";
-        PictureFormat: DotNet NPRNetImageFormat;
-        Bitmap: DotNet NPRNetBitmap;
         InStr: InStream;
-        OuStr: OutStream;
+        CurrReportPageNoCaptionLbl: Label 'Page';
         QtyPickedCaptionLbl: Label 'Qty. Picked';
-        BlobBuffer: Record "NPR BLOB buffer" temporary;
+        WarehouseShipmentCaptionLbl: Label 'Warehouse Shipment';
+        OuStr: OutStream;
 
     local procedure GetLocation(LocationCode: Code[10])
     begin
         if LocationCode = '' then
-            Location.Init
+            Location.Init()
         else
             if Location.Code <> LocationCode then
                 Location.Get(LocationCode);
-    end;
-
-    local procedure GenerateBitmap(var SourceStream: InStream; var BitmapStream: OutStream)
-    begin
-        Bitmap := Bitmap.Bitmap(SourceStream);
-        PictureFormat := PictureFormat.Png;
-        Bitmap.Save(BitmapStream, PictureFormat);
     end;
 }
 

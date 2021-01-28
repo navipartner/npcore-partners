@@ -1,16 +1,9 @@
 report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
 {
-    // NPR5.39/JLK /20180212  CASE 302797 Object created
-    // NPR5.40/JLK /20180314  CASE 307437 Added format on decimals in rdlc layout
-    // NPR5.41/JLK /20180504  CASE 307437 Seperated Report to rdlc layout only
-    // NPR5.55/ZESO/20200706  CASE 410314 Changed grouping on section Payment Specification
-    UsageCategory = None;
     RDLCLayout = './src/_Reports/layouts/Sales Ticket A4 - POS Rdlc.rdlc';
-
     Caption = 'Sales Ticket A4 - POS Rdlc';
     DefaultLayout = RDLC;
     PreviewMode = PrintLayout;
-
     dataset
     {
         dataitem(POS_Entry; "NPR POS Entry")
@@ -307,7 +300,7 @@ report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
                         Item: Record Item;
                     begin
                         if Item.Get("No.") and Item."NPR No Print on Reciept" then
-                            CurrReport.Skip;
+                            CurrReport.Skip();
                     end;
                 }
                 dataitem(POS_Sales_GLAccount_Line; "NPR POS Sales Line")
@@ -502,18 +495,6 @@ report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     labels
     {
         LineDiscountPercentageLabel = 'Disc. %';
@@ -534,30 +515,28 @@ report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
 
     trigger OnPreReport()
     begin
-        CompanyInformation.Get;
+        CompanyInformation.Get();
     end;
 
     var
-        TotalTaxText: Text;
-        StoreAddr: array[8] of Text;
-        CustAddr: array[8] of Text;
         CompanyInformation: Record "Company Information";
         CustomerNoCaption: Label 'Customer No.';
+        CustAddr: array[8] of Text;
+        StoreAddr: array[8] of Text;
+        TotalTaxText: Text;
 
     local procedure GetVATText(EntryNo: Integer): Text
     var
         POSTaxAmountLine: Record "NPR POS Tax Amount Line";
     begin
-        with POSTaxAmountLine do begin
-            SetRange("POS Entry No.", EntryNo);
-            if Count > 1 then
-                exit('');
-
-            if FindFirst then
-                exit(Format("Tax %") + '%');
-
+        POSTaxAmountLine.SetRange("POS Entry No.", EntryNo);
+        if POSTaxAmountLine.Count() > 1 then
             exit('');
-        end;
+
+        if POSTaxAmountLine.FindFirst() then
+            exit(Format(POSTaxAmountLine."Tax %") + '%');
+
+        exit('');
     end;
 }
 

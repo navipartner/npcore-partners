@@ -1,12 +1,7 @@
 report 6060044 "NPR Map Excel Item Worksh."
 {
-    // NPR5.22\BR\20160321  CASE 182391 Object Created
-    // NPR5.48/JDH /20181109 CASE 334163 Added Caption to object
-
-    UsageCategory = None;
     Caption = 'Map Excel Item Worksheet';
     ProcessingOnly = true;
-
     dataset
     {
         dataitem("Item Worksheet"; "NPR Item Worksheet")
@@ -16,20 +11,20 @@ report 6060044 "NPR Map Excel Item Worksh."
             trigger OnAfterGetRecord()
             begin
                 "Excel Import from Line No." := HeaderRow + 1;
-                Modify;
+                Modify();
             end;
 
             trigger OnPostDataItem()
             begin
-                AnalyzeData;
+                AnalyzeData();
             end;
 
             trigger OnPreDataItem()
             begin
                 if Count > 1 then
-                    Error(Text100);
+                    Error(ImportItemWorksheetErr);
                 if HeaderRow = 0 then
-                    Error(Text101);
+                    Error(HeaderRowErr);
             end;
         }
     }
@@ -55,10 +50,6 @@ report 6060044 "NPR Map Excel Item Worksh."
             }
         }
 
-        actions
-        {
-        }
-
         trigger OnOpenPage()
         var
             LocItemWorksheet: Record "NPR Item Worksheet";
@@ -75,7 +66,7 @@ report 6060044 "NPR Map Excel Item Worksh."
             FileMgt: Codeunit "File Management";
         begin
             if CloseAction = ACTION::OK then begin
-                ServerFileName := FileMgt.UploadFile(Text006, ExcelFileExtensionTok);
+                ServerFileName := FileMgt.UploadFile(ImportExcelLbl, ExcelFileExtensionTok);
                 if ServerFileName = '' then
                     exit(false);
 
@@ -86,49 +77,43 @@ report 6060044 "NPR Map Excel Item Worksh."
         end;
     }
 
-    labels
-    {
-    }
 
     trigger OnPostReport()
     begin
-        ExcelBuf.DeleteAll;
+        ExcelBuf.DeleteAll();
     end;
 
     trigger OnPreReport()
     begin
-        ExcelBuf.LockTable;
+        ExcelBuf.LockTable();
         ExcelBuf.OpenBook(ServerFileName, SheetName);
-        ExcelBuf.ReadSheet;
+        ExcelBuf.ReadSheet();
     end;
 
     var
         ExcelBuf: Record "Excel Buffer";
         ExcelBuf2: Record "Excel Buffer";
-        ServerFileName: Text;
-        SheetName: Text[250];
-        Text005: Label 'Imported from Excel ';
-        Text006: Label 'Import Excel File';
-        Text007: Label 'Analyzing Data...\\';
+        BoolTryMatch: Boolean;
+        FirstLine: Integer;
+        HeaderRow: Integer;
         ExcelFileExtensionTok: Label '.xlsx', Locked = true;
-        Text100: Label 'Please start this import from the Item Worksheet Page.';
+        ImportExcelLbl: Label 'Import Excel File';
+        HeaderRowErr: Label 'Please indicate the Header Row';
+        ImportItemWorksheetErr: Label 'Please start this import from the Item Worksheet Page.';
         ActionIfVariantUnknown: Option Skip,Create;
         ActionIfVarietyUnknown: Option Skip,Create;
-        FirstLine: Integer;
-        Text101: Label 'Please indicate the Header Row';
-        HeaderRow: Integer;
-        BoolTryMatch: Boolean;
+        ServerFileName: Text;
+        SheetName: Text[250];
 
     local procedure AnalyzeData()
     var
-        ItemWorksheetExcelColumn: Record "NPR Item Worksh. Excel Column";
         RecField: Record "Field";
+        ItemWorksheetExcelColumn: Record "NPR Item Worksh. Excel Column";
     begin
-        ExcelBuf.Reset;
+        ExcelBuf.Reset();
         ExcelBuf.SetRange("Column No.");
         ExcelBuf.SetRange("Row No.", HeaderRow);
-
-        if ExcelBuf.FindFirst then begin
+        if ExcelBuf.FindFirst() then
             repeat
                 if not ItemWorksheetExcelColumn.Get("Item Worksheet"."Item Template Name", "Item Worksheet".Name, ExcelBuf."Column No.") then begin
                     ItemWorksheetExcelColumn.Init;
@@ -145,7 +130,7 @@ report 6060044 "NPR Map Excel Item Worksh."
                 if ExcelBuf2.Get(ExcelBuf."Row No." + 3, ExcelBuf."Column No.") then
                     ItemWorksheetExcelColumn.Validate("Sample Data Row 3", ExcelBuf2."Cell Value as Text");
                 if BoolTryMatch and (ItemWorksheetExcelColumn."Map to Field Number" = 0) then begin
-                    RecField.Reset;
+                    RecField.Reset();
                     RecField.SetRange(TableNo, DATABASE::"NPR Item Worksheet Line");
                     RecField.SetFilter(FieldName, '%1', ItemWorksheetExcelColumn."Excel Header Text");
                     if RecField.FindFirst then begin
@@ -179,15 +164,14 @@ report 6060044 "NPR Map Excel Item Worksh."
                     end;
                 end;
                 ItemWorksheetExcelColumn.Modify(true);
-            until ExcelBuf.Next = 0;
-        end;
+            until ExcelBuf.Next() = 0;
     end;
 
     local procedure FormatData(TextToFormat: Text[250]): Text[250]
     var
-        FormatInteger: Integer;
-        FormatDecimal: Decimal;
         FormatDate: Date;
+        FormatDecimal: Decimal;
+        FormatInteger: Integer;
     begin
         case true of
             Evaluate(FormatInteger, TextToFormat):

@@ -1,11 +1,8 @@
 report 6014447 "NPR Sales Invoice A4 (Retail)"
 {
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Invoice A4 (Retail).rdlc';
-
     Caption = 'Sales Invoice A4 (Retail)';
-
     dataset
     {
         dataitem("Sales Invoice Header"; "Sales Invoice Header")
@@ -210,11 +207,11 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
 
                         trigger OnAfterGetRecord()
                         begin
-                            MomsBeloebLinieTemp.Init;
+                            MomsBeloebLinieTemp.Init();
                             MomsBeloebLinieTemp."VAT %" := "VAT %";
                             MomsBeloebLinieTemp."VAT Base" := Amount;
                             MomsBeloebLinieTemp."Amount Including VAT" := "Amount Including VAT";
-                            MomsBeloebLinieTemp.InsertLine;
+                            MomsBeloebLinieTemp.InsertLine();
                             case "Sales Invoice Line".Type of
                                 "Sales Invoice Line".Type::Item:
                                     begin
@@ -243,12 +240,12 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
 
                         trigger OnPreDataItem()
                         begin
-                            MomsBeloebLinieTemp.DeleteAll;
-                            FlereLinier := FindLast;
+                            MomsBeloebLinieTemp.DeleteAll();
+                            FlereLinier := FindLast();
                             while FlereLinier and (Description = '') and ("No." = '') and (Quantity = 0) and (Amount = 0) do
                                 FlereLinier := Next(-1) <> 0;
                             if not FlereLinier then
-                                CurrReport.Break;
+                                CurrReport.Break();
                             SetRange("Line No.", 0, "Line No.");
                         end;
                     }
@@ -264,7 +261,7 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
                         trigger OnPreDataItem()
                         begin
                             if MomsBeloebLinieTemp.Count <= 1 then
-                                CurrReport.Break;
+                                CurrReport.Break();
                             SetRange(Number, 1, MomsBeloebLinieTemp.Count);
                         end;
                     }
@@ -279,7 +276,7 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
                         trigger OnPreDataItem()
                         begin
                             if not VisLevAdr then
-                                CurrReport.Break;
+                                CurrReport.Break();
                         end;
                     }
                 }
@@ -297,7 +294,7 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
 
                 trigger OnPostDataItem()
                 begin
-                    if not CurrReport.Preview then
+                    if not CurrReport.Preview() then
                         SalgFaktOptaelUdskr.Run("Sales Invoice Header");
                 end;
 
@@ -318,14 +315,14 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
 
             trigger OnAfterGetRecord()
             var
-                Comments: Record "Sales Comment Line";
-                Register: Record "NPR Register";
                 Debpost: Record "Cust. Ledger Entry";
-                Bestilling: Record "NPR Retail Document Header";
                 POSStore: Record "NPR POS Store";
                 POSUnit: Record "NPR POS Unit";
-                POSSession: Codeunit "NPR POS Session";
+                Register: Record "NPR Register";
+                Bestilling: Record "NPR Retail Document Header";
+                Comments: Record "Sales Comment Line";
                 POSFrontEnd: Codeunit "NPR POS Front End Management";
+                POSSession: Codeunit "NPR POS Session";
                 POSSetup: Codeunit "NPR POS Setup";
                 Retailformcode: Codeunit "NPR Retail Form Code";
                 RestBeloeb: Decimal;
@@ -420,7 +417,7 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
                     end;
                 end;
 
-                NPRopsaetning.Get;
+                NPRopsaetning.Get();
                 case NPRopsaetning."Base for FIK-71" of
                     NPRopsaetning."Base for FIK-71"::Invoice:
                         "Betalings-ID" := PadStr('', 13 - StrLen("No."), '0') + "No." + '0';
@@ -446,7 +443,7 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
                     end;
                 end;
 
-                FirmaOplysninger.Get;
+                FirmaOplysninger.Get();
 
                 if RespCenter.Get("Responsibility Center") then begin
                     FormatAddr.RespCenter(Companyaddr, RespCenter);
@@ -512,12 +509,12 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
                                     end;
                                 end;
                             end;
-                        until Auditroll.Next = 0;
+                        until Auditroll.Next() = 0;
                 end;
 
                 Debpost.SetRange("Document Type", Debpost."Document Type"::Invoice);
                 Debpost.SetRange("Document No.", "No.");
-                if Debpost.FindFirst then begin
+                if Debpost.FindFirst() then begin
                     Debpost.CalcFields("Remaining Amount");
                     RestBeloeb := Debpost."Remaining Amount";
                 end;
@@ -529,7 +526,7 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
                     Bestilling.SetRange("Document Type", Bestilling."Document Type"::"Retail Order");
                     Bestilling.SetRange("No.", "External Document No.");
 
-                    if Bestilling.FindFirst then
+                    if Bestilling.FindFirst() then
                         PaidDeposit := Bestilling.Deposit;
                 end;
 
@@ -585,9 +582,6 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
             }
         }
 
-        actions
-        {
-        }
     }
 
     labels
@@ -623,7 +617,7 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
     var
         Opsaetning: Record "NPR Retail Setup";
     begin
-        FinansOpsaet.Get;
+        FinansOpsaet.Get();
         AntalKopier := 0;
         FirmaOplysninger.Get;
         FirmaOplysninger.CalcFields(Picture);
@@ -642,87 +636,87 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
     end;
 
     var
-        FinansOpsaet: Record "General Ledger Setup";
-        LevForm: Record "Shipment Method";
-        BetalingBetingelse: Record "Payment Terms";
-        SaelgerIndkoeber: Record "Salesperson/Purchaser";
         FirmaOplysninger: Record "Company Information";
+        Lande: Record "Country/Region";
         Deb: Record Customer;
-        MomsBeloebLinieTemp: Record "VAT Amount Line" temporary;
-        SalgFaktOptaelUdskr: Codeunit "Sales Inv.-Printed";
-        FormatAdr: Codeunit "Format Address";
+        Kunde: Record Customer;
+        FinansOpsaet: Record "General Ledger Setup";
+        Lokation: Record Location;
+        Auditroll: Record "NPR Audit Roll";
+        Retaildoc: Record "NPR Retail Document Header";
         NPRopsaetning: Record "NPR Retail Setup";
-        DebAdr: array[8] of Text[50];
-        LevAdresse: array[8] of Text[50];
-        FirmaAdr: array[8] of Text[50];
-        OrdreNrTekst: Text[30];
-        SaelgerTekst: Text[30];
-        MomsNrTekst: Text[30];
-        ReferenceTekst: Text[30];
-        TotalTekst: Text[50];
-        TotaltInklMomsTekst: Text[50];
-        Comment1: array[2] of Text[50];
+        BetalingBetingelse: Record "Payment Terms";
+        RespCenter: Record "Responsibility Center";
+        SaelgerIndkoeber: Record "Salesperson/Purchaser";
+        LevForm: Record "Shipment Method";
+        MomsBeloebLinieTemp: Record "VAT Amount Line" temporary;
+        FormatAddr: Codeunit "Format Address";
+        FormatAdr: Codeunit "Format Address";
+        DK_Localization: Codeunit "NPR Doc. Localization Proxy";
+        SalgFaktOptaelUdskr: Codeunit "Sales Inv.-Printed";
         FlereLinier: Boolean;
+        VisLevAdr: Boolean;
+        KortArt: Code[4];
+        FIKnr: Code[10];
+        EAN_No: Code[13];
+        "Betalings-ID": Code[16];
+        AcontoBeloeb: Decimal;
+        PaidDeposit: Decimal;
         AntalKopier: Integer;
         LoekkeAntal: Integer;
-        CopyText: Text[30];
-        VisLevAdr: Boolean;
-        GiroNrTxt: Text[30];
-        Kunde: Record Customer;
-        FirmaMomsNrTxT: Text[30];
-        KortArt: Code[4];
-        AcontoBeloeb: Decimal;
-        Sideskift: Integer;
-        FirmaTlf: Text[20];
-        FirmaFax: Text[20];
-        FirmaMomsnr: Text[20];
-        FirmaGironr: Text[20];
-        Sprog: Option Dansk,Engelsk;
-        Lande: Record "Country/Region";
-        "Betalings-ID": Code[16];
         o: Integer;
-        FIKnr: Code[10];
-        EANText: Text[30];
-        Reftext: Text[30];
-        Reftext2: Text[30];
-        Lokation: Record Location;
-        Companyaddr: array[8] of Text[50];
-        PaidDeposit: Decimal;
-        Dow: Text[10];
-        TxtWoy: Text[30];
-        Retaildoc: Record "NPR Retail Document Header";
-        Auditroll: Record "NPR Audit Roll";
-        Banknavn: Text[50];
-        Bankbranch: Text[30];
-        Bankkontonr: Text[30];
-        VatNo: Text[30];
-        GiroNo: Text[30];
-        RespCenter: Record "Responsibility Center";
-        FormatAddr: Codeunit "Format Address";
-        TitleText: Label 'Invoice';
+        OutputNo: Integer;
+        Sideskift: Integer;
         CopyTextStr: Label 'COPY';
         EANTextStr: Label 'EAN No.: %1';
-        Reftextstr: Label 'Ref no: %1';
-        MonTXT: Label 'Monday';
-        TueTXT: Label 'Tuesday';
-        WedTXT: Label 'Wednesday';
-        ThuTXT: Label 'Thursday';
         FriTXT: Label 'Friday';
+        TitleText: Label 'Invoice';
+        MonTXT: Label 'Monday';
+        Reftextstr: Label 'Ref no: %1';
         SatTXT: Label 'Saturday';
         SunTXT: Label 'Saturday';
+        ThuTXT: Label 'Thursday';
+        TueTXT: Label 'Tuesday';
+        WedTXT: Label 'Wednesday';
         T001: Label 'Week';
+        Sprog: Option Dansk,Engelsk;
+        Dow: Text[10];
+        FirmaFax: Text[20];
+        FirmaGironr: Text[20];
+        FirmaMomsnr: Text[20];
+        FirmaTlf: Text[20];
+        Bankbranch: Text[30];
+        Bankkontonr: Text[30];
+        CopyText: Text[30];
+        EANText: Text[30];
+        FirmaMomsNrTxT: Text[30];
+        GiroNo: Text[30];
+        GiroNrTxt: Text[30];
+        MomsNrTekst: Text[30];
+        OrdreNrTekst: Text[30];
+        ReferenceTekst: Text[30];
+        Reftext: Text[30];
+        Reftext2: Text[30];
+        SaelgerTekst: Text[30];
         SalesInvLineType: Text[30];
-        OutputNo: Integer;
-        DK_Localization: Codeunit "NPR Doc. Localization Proxy";
+        TxtWoy: Text[30];
+        VatNo: Text[30];
+        Banknavn: Text[50];
+        Comment1: array[2] of Text[50];
+        Companyaddr: array[8] of Text[50];
+        DebAdr: array[8] of Text[50];
+        FirmaAdr: array[8] of Text[50];
+        LevAdresse: array[8] of Text[50];
+        TotalTekst: Text[50];
+        TotaltInklMomsTekst: Text[50];
         DK_VariantVar: Variant;
-        EAN_No: Code[13];
 
     procedure Modulus10(ID: Code[19]): Code[10]
     var
-        Vaegttal: Integer;
         SumStr: Code[19];
-        Taeller: Integer;
         Summer: Integer;
+        Taeller: Integer;
+        Vaegttal: Integer;
     begin
         Vaegttal := 2;
         SumStr := '';

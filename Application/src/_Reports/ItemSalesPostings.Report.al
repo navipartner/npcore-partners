@@ -1,26 +1,11 @@
 report 6014439 "NPR Item Sales Postings"
 {
-    // NPR70.00.00.00/LS/010714 : CASE 187451 : Convert Report to NAV 2013
-    // NPR4.21/LS/20151210  CASE 227005  Changed report Name, Caption, report label
-    //                                   Changed code + dataset names + Layout +  deleted unused variables
-    // NPR5.23/JDH /20160513 CASE 240916 Removed Old VariaX Solution
-    // NPR5.25/JLK /20160719 CASE 247113 Captions for CostAmount_Caption, SalesAmount_Caption and SaleRCY_Caption
-    // NPR5.33/LS  /20170605 CASE 278326 Added Option to ShowVendorItemNo
-    // NPR5.33/BHR /20170629 CASE 280196 Field "Salesperson Filter" not to be use
-    // NPR5.48/ZESO/20181219 CASE 340243 Changed left margin of Report from 0 to 1.5 cm
-    // NPR5.49/ZESO/20181219 CASE 348784 Added New Column Sales Unit Price and Report filter
-    // NPR5.50/ZESO/20190528 CASE 355450 Calculate Sales(Qty) and Sales Amount(Actual) directly from Value Entry
-    // NPR5.51/ZESO/20190730 CASE 363111 Added Option to Show Vendor No
-    // NPR5.51/ZESO/20190731 CASE 332037 Removed Option Print Sale Inc. VAT
-    // NPR5.55/BHR/20200728  CASE 361515 remove Key reference not used in AL
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Sales Postings.rdlc';
-
     Caption = 'Item Sales Postings';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     UseSystemPrinter = true;
-
     dataset
     {
         dataitem("Item Ledger Entry"; "Item Ledger Entry")
@@ -99,31 +84,15 @@ report 6014439 "NPR Item Sales Postings"
                 Item.SetFilter("Location Filter", GetFilter("Location Code"));
                 Item.SetFilter("Variant Filter", GetFilter("Variant Code"));
                 Item.SetFilter("Serial No. Filter", GetFilter("Serial No."));
-                //-NPR5.33 [280196]
-                //Item.SETFILTER("Salesperson Filter", GETFILTER("Salesperson Code"));
-                //+NPR5.33 [280196]
-                //-NPR5.23 [240916]
-                // Item.SETFILTER("Size Filter", GETFILTER(Size));
-                // Item.SETFILTER("Color Filter", GETFILTER(Color));
-                //+NPR5.23 [240916]
-
-
-
                 Item.SetFilter("Date Filter", GetFilter("Posting Date"));
                 Item.CalcFields(Inventory);
-
-
                 Item.CalcFields("Sales (Qty.)", "Sales (LCY)", "COGS (LCY)", "Assembly BOM");
 
-                //-NPR5.50 [355450]
                 ItemSalesQty := 0;
                 ItemSalesAmount := 0;
                 ItemCOG := 0;
                 Profit := 0;
-                ValueEntry.Reset;
-                //-NPR5.55 [361515]
-                //ValueEntry.SETCURRENTKEY("Item Ledger Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code","Salespers./Purch. Code","Item Group No.","Item No.","Vendor No.","Source No.","Group Sale");
-                //+NPR5.55 [361515]
+                ValueEntry.Reset();
                 ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
                 ValueEntry.SetFilter("Global Dimension 1 Code", GetFilter("Global Dimension 1 Code"));
                 ValueEntry.SetFilter("Global Dimension 2 Code", GetFilter("Global Dimension 2 Code"));
@@ -136,38 +105,18 @@ report 6014439 "NPR Item Sales Postings"
                 ItemSalesAmount := ValueEntry."Sales Amount (Actual)";
                 ItemCOG := -ValueEntry."Cost Amount (Actual)";
                 Profit := ItemSalesAmount - ItemCOG;
-                //Profit := Item."Sales (LCY)" - Item."COGS (LCY)";
-
-                //IF Item."Sales (LCY)" <> 0 THEN
-                //ItemProfitPct := ROUND(Profit / Item."Sales (LCY)"  * 100,0.1)
-                //ELSE
-                //ItemProfitPct := 0;
-
                 if ItemSalesAmount <> 0 then
                     ItemProfitPct := Round(Profit / ItemSalesAmount * 100, 0.1)
                 else
                     ItemProfitPct := 0;
-                //-NPR5.50 [355450]
-
-
-                //-NPR5.51 [332037]
-                //IF PrintUsingInclVAT THEN
-                //Item."Sales (LCY)" += 0;
-                //+NPR5.51 [332037]
-
                 SetRange("Item No.", "Item No.");
-                //-NPR4.21
-                //FIND('+');
-                FindLast;
+                FindLast();
                 //+NPR4.21
                 SetFilter("Item No.", Reportfilter);
-
-                //-NPR5.33 [278326]
                 VendorItemNo := '';
                 if ShowVendorItemNo then
                     if Item1.Get("Item Ledger Entry"."Item No.") then
                         VendorItemNo := Item1."Vendor Item No.";
-                //+NPR5.33 [278326]
             end;
         }
     }
@@ -198,10 +147,6 @@ report 6014439 "NPR Item Sales Postings"
                     ToolTip = 'Specifies the value of the Show Vendor No field';
                 }
             }
-        }
-
-        actions
-        {
         }
     }
 

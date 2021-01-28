@@ -1,14 +1,11 @@
 report 6014437 "NPR Item Group Listing M/Y"
 {
-    // NPR5.50/ZESO/20190417  CASE 341710 Report Created
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Group Listing MY.rdlc';
-
     Caption = 'Item Group Listing M/Y';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem("Integer"; "Integer")
@@ -88,18 +85,17 @@ report 6014437 "NPR Item Group Listing M/Y"
                         if Quantity > 0 then begin
                             ShowMainItemGroup := true;
                             LastYearDBDKK := (Amount - Cost);
-                            TMPItem.Init;
+                            TMPItem.Init();
                             TMPItem."No." := "Sales Ticket No.";
                             TMPItem."NPR Item Group" := "Item Group";
-                            if TMPItem.Insert then
+                            if TMPItem.Insert() then
                                 EkspeditLastYear := 1;
                         end else
-                            CurrReport.Skip;
+                            CurrReport.Skip();
                     end;
 
                     trigger OnPreDataItem()
                     begin
-
                         SetFilter("Sale Date", '%1..%2', StartDateLastYear, EndDateLastYear);
                         SetFilter("Salesperson Code", Salesperson.Code);
                     end;
@@ -136,18 +132,17 @@ report 6014437 "NPR Item Group Listing M/Y"
                         if Quantity > 0 then begin
                             ShowMainItemGroup := true;
                             CurrentYearDBDKK := (Amount - Cost);
-                            TMPItem2.Init;
+                            TMPItem2.Init();
                             TMPItem2."No." := "Sales Ticket No.";
                             TMPItem2."NPR Item Group" := "Item Group";
-                            if TMPItem2.Insert then
+                            if TMPItem2.Insert() then
                                 EkspeditCurrentYear := 1;
                         end else
-                            CurrReport.Skip;
+                            CurrReport.Skip();
                     end;
 
                     trigger OnPreDataItem()
                     begin
-
                         SetFilter("Sale Date", '%1..%2', StartDate, EndDate);
                         SetFilter("Salesperson Code", Salesperson.Code);
                     end;
@@ -161,7 +156,7 @@ report 6014437 "NPR Item Group Listing M/Y"
 
             trigger OnPreDataItem()
             begin
-                CompanyInfo.Get;
+                CompanyInfo.Get();
             end;
         }
     }
@@ -202,10 +197,6 @@ report 6014437 "NPR Item Group Listing M/Y"
                     }
                 }
             }
-        }
-
-        actions
-        {
         }
     }
 
@@ -258,40 +249,36 @@ report 6014437 "NPR Item Group Listing M/Y"
     end;
 
     var
-        Month: Integer;
-        Year: Integer;
-        StartDate: Date;
-        EndDate: Date;
-        DateComparison: Boolean;
-        StartDateLastYear: Date;
-        EndDateLastYear: Date;
-        EkspeditLastYear: Decimal;
-        EkspeditCurrentYear: Decimal;
+        CompanyInfo: Record "Company Information";
         TMPItem: Record Item temporary;
         TMPItem2: Record Item temporary;
-        LastYearDBDKK: Decimal;
-        CurrentYearDBDKK: Decimal;
-        LastYearDBPercent: Decimal;
-        CurrentYearDBPercent: Decimal;
-        LastYearTotalAmount: Decimal;
-        LastYearTotalCost: Decimal;
-        CurrentYearTotalAmount: Decimal;
-        CurrentYearTotalCost: Decimal;
-        ReportName: Label 'Item Group Statistics';
-        PageNo: Label 'Page No';
-        CompanyInfo: Record "Company Information";
-        ShowSubGroups: Boolean;
+        Salesperson: Record "Salesperson/Purchaser";
+        DateComparison: Boolean;
         EndDateCalculated: Boolean;
-        TotalSales: Label 'Total Sales';
-        TotalAmountSubGroup: Decimal;
-        "---": Integer;
-        ItemGroupNo: Code[20];
         ShowItemGroup: Boolean;
         ShowMainItemGroup: Boolean;
-        Salesperson: Record "Salesperson/Purchaser";
+        ShowSubGroups: Boolean;
+        ItemGroupNo: Code[20];
+        EndDate: Date;
+        EndDateLastYear: Date;
+        StartDate: Date;
+        StartDateLastYear: Date;
+        CurrentYearDBDKK: Decimal;
+        CurrentYearDBPercent: Decimal;
+        CurrentYearTotalAmount: Decimal;
+        CurrentYearTotalCost: Decimal;
+        EkspeditCurrentYear: Decimal;
+        EkspeditLastYear: Decimal;
+        LastYearDBDKK: Decimal;
+        LastYearDBPercent: Decimal;
+        LastYearTotalAmount: Decimal;
+        LastYearTotalCost: Decimal;
+        TotalAmountSubGroup: Decimal;
+        Month: Integer;
+        Year: Integer;
+        ReportName: Label 'Item Group Statistics';
+        PageNo: Label 'Page No';
+        TotalSales: Label 'Total Sales';
 
-    local procedure ClearTotals()
-    begin
-    end;
 }
 

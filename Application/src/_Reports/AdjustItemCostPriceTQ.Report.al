@@ -1,9 +1,5 @@
 report 6059904 "NPR Adjust Item Cost/Price TQ"
 {
-    // TQ1.28.02/JDH/20161013 CASE 242568 Possible to run in 1.28 version (and before) of TQ
-    // TQ1.31/MHA /20171218  CASE 271126 Data Log Disabled during Report Run
-
-    UsageCategory = None;
     Caption = 'Adjust Item Costs/Prices';
     ProcessingOnly = true;
 
@@ -15,9 +11,7 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
 
             trigger OnPreDataItem()
             begin
-                //-TQ1.28.02
-                CurrReport.Break;
-                //+TQ1.28.02
+                CurrReport.Break();
             end;
         }
         dataitem(Item; Item)
@@ -43,7 +37,7 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
                 end;
                 NewFieldValue := OldFieldValue * AdjFactor;
 
-                GetGLSetup;
+                GetGLSetup();
                 PriceIsRnded := false;
                 if RoundingMethod.Code <> '' then begin
                     RoundingMethod."Minimum Amount" := NewFieldValue;
@@ -77,9 +71,9 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
             trigger OnPreDataItem()
             begin
                 if AdjustCard = AdjustCard::"Stockkeeping Unit Card" then
-                    CurrReport.Break;
+                    CurrReport.Break();
 
-                Window.Open(Text000);
+                Window.Open(ProcessingItems1Lbl);
             end;
         }
         dataitem("Stockkeeping Unit"; "Stockkeeping Unit")
@@ -129,16 +123,16 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
             trigger OnPreDataItem()
             begin
                 if AdjustCard = AdjustCard::"Item Card" then
-                    CurrReport.Break;
+                    CurrReport.Break();
 
                 Item.CopyFilter("No.", "Item No.");
                 Item.CopyFilter("Location Filter", "Location Code");
                 Item.CopyFilter("Variant Filter", "Variant Code");
 
                 Window.Open(
-                  Text002 +
-                  Text003 +
-                  Text004);
+                  ProcessingItems2Lbl +
+                  ProcessingLocationsLbl +
+                  ProcessingVariantsLbl);
             end;
         }
     }
@@ -163,7 +157,7 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
 
                         trigger OnValidate()
                         begin
-                            UpdateEnabled;
+                            UpdateEnabled();
                         end;
                     }
                     field(AdjustField; Selection)
@@ -176,11 +170,11 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
                         trigger OnValidate()
                         begin
                             if Selection = Selection::"Indirect Cost %" then
-                                IndirectCost37SelectionOnValid;
+                                IndirectCost37SelectionOnValid();
                             if Selection = Selection::"Profit %" then
-                                Profit37SelectionOnValidate;
+                                Profit37SelectionOnValidate();
                             if Selection = Selection::"Unit Price" then
-                                UnitPriceSelectionOnValidate;
+                                UnitPriceSelectionOnValidate();
                         end;
                     }
                     field(AdjustmentFactor; AdjFactor)
@@ -202,9 +196,6 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
             }
         }
 
-        actions
-        {
-        }
 
         trigger OnInit()
         begin
@@ -217,43 +208,32 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
         begin
             if AdjFactor = 0 then
                 AdjFactor := 1;
-            UpdateEnabled;
+            UpdateEnabled();
         end;
     }
 
-    labels
-    {
-    }
 
     trigger OnPostReport()
     begin
-        //-TQ1.31 [271126]
         DataLogMgt.DisableDataLog(false);
-        //+TQ1.31 [271126]
     end;
 
     trigger OnPreReport()
     var
         ItemView: Text;
     begin
-        //-TQ1.31 [271126]
         DataLogMgt.DisableDataLog(true);
-        //+TQ1.31 [271126]
-        //-TQ1.28.02
-        with "Task Line" do begin
-            ItemView := Item.GetView;
-            if GetFilters <> '' then
-                if Find('-') then
-                    if not CurrReport.UseRequestPage then begin
-                        ItemView := GetTableView(DATABASE::Item, ItemView);
-                        Item.SetView(ItemView);
-                        AdjustCard := GetParameterInt('ADJUST');
-                        Selection := GetParameterInt('ADJUSTFIELD');
-                        AdjFactor := GetParameterInt('ADJUSTMENTFACTOR');
-                        RoundingMethod.Code := GetParameterText('ROUNDINGMETHOD');
-                    end;
-        end;
-        //+TQ1.28.02
+        ItemView := Item.GetView;
+        if "Task Line".GetFilters <> '' then
+            if "Task Line".Find('-') then
+                if not CurrReport.UseRequestPage() then begin
+                    ItemView := "Task Line".GetTableView(DATABASE::Item, ItemView);
+                    Item.SetView(ItemView);
+                    AdjustCard := "Task Line".GetParameterInt('ADJUST');
+                    Selection := "Task Line".GetParameterInt('ADJUSTFIELD');
+                    AdjFactor := "Task Line".GetParameterInt('ADJUSTMENTFACTOR');
+                    RoundingMethod.Code := "Task Line".GetParameterText('ROUNDINGMETHOD');
+                end;
         RoundingMethod.SetRange(Code, RoundingMethod.Code);
 
         if Item.GetFilters <> '' then
@@ -261,30 +241,30 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
     end;
 
     var
-        Text000: Label 'Processing items  #1##########';
-        Text002: Label 'Processing items     #1##########\';
-        Text003: Label 'Processing locations #2##########\';
-        Text004: Label 'Processing variants  #3##########';
-        RoundingMethod: Record "Rounding Method";
         GLSetup: Record "General Ledger Setup";
         FilteredItem: Record Item;
-        Window: Dialog;
-        NewFieldValue: Decimal;
-        OldFieldValue: Decimal;
-        PriceIsRnded: Boolean;
+        RoundingMethod: Record "Rounding Method";
+        DataLogMgt: Codeunit "NPR Data Log Management";
         GLSetupRead: Boolean;
-        AdjFactor: Decimal;
-        Selection: Option "Unit Price","Profit %","Indirect Cost %","Last Direct Cost","Standard Cost";
-        AdjustCard: Option "Item Card","Stockkeeping Unit Card";
+        PriceIsRnded: Boolean;
         [InDataSet]
         Selection1Enable: Boolean;
         [InDataSet]
         Selection2Enable: Boolean;
         [InDataSet]
         Selection3Enable: Boolean;
-        SelectionErr: Label '%1 is not a valid selection.';
+        AdjFactor: Decimal;
+        NewFieldValue: Decimal;
+        OldFieldValue: Decimal;
+        Window: Dialog;
+        SelectionErr: Label '%1 is not a valid selection.', Comment = '%1 = Selection';
+        ProcessingItems1Lbl: Label 'Processing items  #1##########';
+        ProcessingItems2Lbl: Label 'Processing items     #1##########\';
+        ProcessingLocationsLbl: Label 'Processing locations #2##########\';
+        ProcessingVariantsLbl: Label 'Processing variants  #3##########';
         SelectionTxt: Label 'Unit Price,Profit %,Indirect Cost %,Last Direct Cost,Standard Cost';
-        DataLogMgt: Codeunit "NPR Data Log Management";
+        AdjustCard: Option "Item Card","Stockkeeping Unit Card";
+        Selection: Option "Unit Price","Profit %","Indirect Cost %","Last Direct Cost","Standard Cost";
 
     local procedure UpdateEnabled()
     begin
@@ -294,7 +274,7 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
     local procedure GetGLSetup()
     begin
         if not GLSetupRead then
-            GLSetup.Get;
+            GLSetup.Get();
         GLSetupRead := true;
     end;
 
@@ -327,8 +307,8 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
     begin
         if Item.GetFilters <> '' then begin
             FilteredItem.SetRange("No.", ItemNo);
-            if FilteredItem.IsEmpty then
-                CurrReport.Skip;
+            if FilteredItem.IsEmpty() then
+                CurrReport.Skip();
         end;
     end;
 }

@@ -1,17 +1,11 @@
 report 6014406 "NPR Sales Person Top 20"
 {
-    // NPR70.00.00.00/LS/230414 CASE 176115 : Conversion of Report 6014406 as RTC
-    // NPR5.36/TJ  /20170927 CASE 286283 Renamed options in variable ShowType into english
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.49/BHR /20190115  CASE 341969 Corrections as per OMA Guidelines
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Person Top 20.rdlc';
-
     Caption = 'Sales Person Top 20';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     UseSystemPrinter = true;
-
     dataset
     {
         dataitem("Salesperson/Purchaser"; "Salesperson/Purchaser")
@@ -23,9 +17,9 @@ report 6014406 "NPR Sales Person Top 20"
             begin
                 if OnlySales then
                     if "Salesperson/Purchaser"."NPR Sales (LCY)" = 0 then
-                        CurrReport.Skip;
+                        CurrReport.Skip();
 
-                SalesPersonTemp.Init;
+                SalesPersonTemp.Init();
                 SalesPersonTemp."Vendor No." := "Salesperson/Purchaser".Code;
 
                 if Sorting = Sorting::Largest then
@@ -41,11 +35,6 @@ report 6014406 "NPR Sales Person Top 20"
                     Dg := 0;
 
                 case ShowType of
-                    //-NPR5.39
-                    //  ShowType::Turnover : salesPersonTemp."Amount (LCY)" := multipl*"Sales (LCY)";
-                    //  ShowType::Turnover : salesPersonTemp."Amount 2 (LCY)" := multipl*"Discount Amount";
-                    //  ShowType::Discount : salesPersonTemp."Amount (LCY)" := multipl*"Discount Amount";
-                    //  ShowType::Discount : salesPersonTemp."Amount 2 (LCY)" := multipl*"Sales (LCY)";
                     ShowType::Turnover:
                         begin
                             SalesPersonTemp."Amount (LCY)" := Multipl * "NPR Sales (LCY)";
@@ -56,12 +45,11 @@ report 6014406 "NPR Sales Person Top 20"
                             SalesPersonTemp."Amount (LCY)" := Multipl * "NPR Discount Amount";
                             SalesPersonTemp."Amount 2 (LCY)" := Multipl * "NPR Sales (LCY)";
                         end;
-                    //+NPR5.39
                     ShowType::"Contribution Margin":
                         SalesPersonTemp."Amount (LCY)" := Multipl * Db;
                 end;
 
-                SalesPersonTemp.Insert;
+                SalesPersonTemp.Insert();
 
                 if (I = 0) or (I < ShowQty) then
                     I := I + 1
@@ -72,7 +60,6 @@ report 6014406 "NPR Sales Person Top 20"
 
                 SalesTotal += "NPR Sales (LCY)";
 
-                //-NPR70.00.00.00/LS/230414
                 if SalesTotal <> 0 then
                     SalesPct := (("Salesperson/Purchaser"."NPR Sales (LCY)") / SalesTotal) * 100;
 
@@ -83,12 +70,11 @@ report 6014406 "NPR Sales Person Top 20"
                     DiscountPctTotal := "Salesperson/Purchaser"."NPR Discount Amount" / ("Salesperson/Purchaser"."NPR Sales (LCY)" + "Salesperson/Purchaser"."NPR Discount Amount") * 100
                 else
                     DiscountPctTotal := 0;
-                //+NPR70.00.00.00/LS/230414
             end;
 
             trigger OnPreDataItem()
             begin
-                SalesPersonTemp.DeleteAll;
+                SalesPersonTemp.DeleteAll();
                 I := 0;
                 SalespersonFilter := "Salesperson/Purchaser".GetFilter("Date Filter");
             end;
@@ -175,10 +161,10 @@ report 6014406 "NPR Sales Person Top 20"
             begin
                 if Number = 1 then begin
                     if not SalesPersonTemp.FindFirst then
-                        CurrReport.Break;
+                        CurrReport.Break();
                 end else
                     if SalesPersonTemp.Next = 0 then
-                        CurrReport.Break;
+                        CurrReport.Break();
 
                 if "Salesperson/Purchaser".Get(SalesPersonTemp."Vendor No.") then
                     "Salesperson/Purchaser".CalcFields("NPR Sales (LCY)", "NPR Discount Amount", "NPR COGS (LCY)");
@@ -238,13 +224,6 @@ report 6014406 "NPR Sales Person Top 20"
             }
         }
 
-        actions
-        {
-        }
-    }
-
-    labels
-    {
     }
 
     trigger OnInitReport()
@@ -252,48 +231,39 @@ report 6014406 "NPR Sales Person Top 20"
         ShowType := ShowType::Turnover;
         Sorting := Sorting::Largest;
         ShowQty := 20;
-
-        //-NPR5.39
-        // Object.SETRANGE(ID, 6014406);
-        // Object.SETRANGE(Type, 3);
-        // Object.FIND('-');
-        //+NPR5.39
     end;
 
     trigger OnPreReport()
     begin
         J := '2';
-        //-NPR5.39
-        //ObjectDetails := FORMAT(Object.ID)+', '+FORMAT(Object."Version List");
-        //+NPR5.39
     end;
 
     var
-        SalespersonFilter: Text[250];
-        ShowType: Option Turnover,Discount,"Contribution Margin","Contribution Ratio";
-        Text001: Label 'Order By : %1';
-        TextSort: Label 'Turnover,Discount,Contribution Margin,Contribution Ratio';
-        CurrReport_PAGENOCaptionLbl: Label 'Page';
-        Report_Caption_Lbl: Label 'Sales Person Top 20';
-        ExclVatCaption_Lbl: Label 'excl. VAT';
-        Sorting: Option Largest,Smallest;
-        ShowQty: Integer;
-        I: Integer;
         SalesPersonTemp: Record "Vendor Amount" temporary;
         OnlySales: Boolean;
         Db: Decimal;
-        Multipl: Integer;
         Dg: Decimal;
-        J: Text[30];
+        DgTotal: Decimal;
         DiscountPct: Decimal;
+        DiscountPctTotal: Decimal;
         SalesPct: Decimal;
         SalesTotal: Decimal;
-        TurnoverCaptionLbl: Label 'Turnover (LCY)';
-        DiscountPctCaptionLbl: Label 'Discount Amount %';
+        I: Integer;
+        Multipl: Integer;
+        ShowQty: Integer;
         TurnoverPctCaptionLbl: Label '% of turnover';
-        ProfitCaptionLbl: Label 'Profit (LCY)';
+        DiscountPctCaptionLbl: Label 'Discount Amount %';
+        ExclVatCaption_Lbl: Label 'excl. VAT';
+        Text001: Label 'Order By : %1';
+        CurrReport_PAGENOCaptionLbl: Label 'Page';
         ProfitPctCaptionLbl: Label 'Profit %';
-        DgTotal: Decimal;
-        DiscountPctTotal: Decimal;
+        ProfitCaptionLbl: Label 'Profit (LCY)';
+        Report_Caption_Lbl: Label 'Sales Person Top 20';
+        TurnoverCaptionLbl: Label 'Turnover (LCY)';
+        TextSort: Label 'Turnover,Discount,Contribution Margin,Contribution Ratio';
+        Sorting: Option Largest,Smallest;
+        ShowType: Option Turnover,Discount,"Contribution Margin","Contribution Ratio";
+        J: Text[30];
+        SalespersonFilter: Text[250];
 }
 

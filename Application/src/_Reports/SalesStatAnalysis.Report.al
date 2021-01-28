@@ -1,22 +1,11 @@
 report 6014457 "NPR Sales Stat/Analysis"
 {
-    // NPR70.00.00.00/LS/070714  CASE 143307 : Convert Report 6014457 to Nav 2013
-    // NPR5.29/JLK /20160921  CASE 242555 Report corrected and semi complete
-    // NPR5.30/JLK /20170301  CASE 267660 Added Vendor Filter and commented code to allow search per Item Group and removed some redundant ones
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // TM1.39/THRO/20181126  CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
-    // NPR5.50/ZESO/201905006 CASE 353382 Remove Reference to Wrapper Codeunit
-    // NPR5.54/YAHA/20200324  CASE 394872 Removed Company Picture
-    // NPR5.55/YAHA/20200610  CASE 394884 Header layout modification
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales StatAnalysis.rdlc';
-
     Caption = 'Sales Stat/Analysis';
     PreviewMode = Normal;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem(ItemGroupHeader; "NPR Item Group")
@@ -110,7 +99,7 @@ report 6014457 "NPR Sales Stat/Analysis"
                 trigger OnAfterGetRecord()
                 begin
                     if ("Sales (Qty.)" = 0) and OnlySales then
-                        CurrReport.Skip;
+                        CurrReport.Skip();
 
                     CalcFields(Inventory);
                     SInventory += Inventory;
@@ -120,13 +109,10 @@ report 6014457 "NPR Sales Stat/Analysis"
                 begin
                     ItemGroupHeader.CopyFilter("Date Filter", "Date Filter");
                     ItemGroupHeader.CopyFilter("Global Dimension 1 Filter", "Global Dimension 1 Filter");
-                    //-NPR5.30
                     ItemGroupHeader.CopyFilter("Global Dimension 2 Filter", "Global Dimension 2 Filter");
                     ItemGroupHeader.CopyFilter("Vendor Filter", "Vendor No.");
-                    //+NPR5.30
-
                     if not ShowItem then
-                        CurrReport.Break;
+                        CurrReport.Break();
                 end;
             }
             dataitem(ItemGroupSub1; "NPR Item Group")
@@ -190,7 +176,7 @@ report 6014457 "NPR Sales Stat/Analysis"
                     trigger OnAfterGetRecord()
                     begin
                         if ("Sales (Qty.)" = 0) and OnlySales then
-                            CurrReport.Skip;
+                            CurrReport.Skip();
 
                         CalcFields(Inventory);
                         SInventory += Inventory;
@@ -200,13 +186,10 @@ report 6014457 "NPR Sales Stat/Analysis"
                     begin
                         ItemGroupHeader.CopyFilter("Date Filter", "Date Filter");
                         ItemGroupHeader.CopyFilter("Global Dimension 1 Filter", "Global Dimension 1 Filter");
-                        //-NPR5.30
                         ItemGroupHeader.CopyFilter("Global Dimension 2 Filter", "Global Dimension 2 Filter");
                         ItemGroupHeader.CopyFilter("Vendor Filter", "Vendor No.");
-                        //+NPR5.30
-
                         if not ShowItem then
-                            CurrReport.Break;
+                            CurrReport.Break();
                     end;
                 }
                 dataitem(ItemGroupSub2; "NPR Item Group")
@@ -270,7 +253,7 @@ report 6014457 "NPR Sales Stat/Analysis"
                         trigger OnAfterGetRecord()
                         begin
                             if ("Sales (Qty.)" = 0) and OnlySales then
-                                CurrReport.Skip;
+                                CurrReport.Skip();
 
                             CalcFields(Inventory);
                             SInventory += Inventory;
@@ -280,13 +263,10 @@ report 6014457 "NPR Sales Stat/Analysis"
                         begin
                             ItemGroupHeader.CopyFilter("Date Filter", "Date Filter");
                             ItemGroupHeader.CopyFilter("Global Dimension 1 Filter", "Global Dimension 1 Filter");
-                            //-NPR5.30
                             ItemGroupHeader.CopyFilter("Global Dimension 2 Filter", "Global Dimension 2 Filter");
                             ItemGroupHeader.CopyFilter("Vendor Filter", "Vendor No.");
-                            //+NPR5.30
-
                             if not ShowItem then
-                                CurrReport.Break;
+                                CurrReport.Break();
                         end;
                     }
                     dataitem(ItemGroupSub3; "NPR Item Group")
@@ -350,7 +330,7 @@ report 6014457 "NPR Sales Stat/Analysis"
                             trigger OnAfterGetRecord()
                             begin
                                 if ("Sales (Qty.)" = 0) and OnlySales then
-                                    CurrReport.Skip;
+                                    CurrReport.Skip();
 
                                 CalcFields(Inventory);
                                 SInventory += Inventory;
@@ -360,13 +340,10 @@ report 6014457 "NPR Sales Stat/Analysis"
                             begin
                                 ItemGroupHeader.CopyFilter("Date Filter", "Date Filter");
                                 ItemGroupHeader.CopyFilter("Global Dimension 1 Filter", "Global Dimension 1 Filter");
-                                //-NPR5.30
                                 ItemGroupHeader.CopyFilter("Global Dimension 2 Filter", "Global Dimension 2 Filter");
                                 ItemGroupHeader.CopyFilter("Vendor Filter", "Vendor No.");
-                                //+NPR5.30
-
                                 if not ShowItem then
-                                    CurrReport.Break;
+                                    CurrReport.Break();
                             end;
                         }
                         dataitem(ItemGroupSub4; "NPR Item Group")
@@ -430,7 +407,7 @@ report 6014457 "NPR Sales Stat/Analysis"
                                 trigger OnAfterGetRecord()
                                 begin
                                     if ("Sales (Qty.)" = 0) and OnlySales then
-                                        CurrReport.Skip;
+                                        CurrReport.Skip();
 
                                     CalcFields(Inventory);
                                     SInventory += Inventory;
@@ -440,23 +417,20 @@ report 6014457 "NPR Sales Stat/Analysis"
                                 begin
                                     ItemGroupHeader.CopyFilter("Date Filter", "Date Filter");
                                     ItemGroupHeader.CopyFilter("Global Dimension 1 Filter", "Global Dimension 1 Filter");
-                                    //-NPR5.30
                                     ItemGroupHeader.CopyFilter("Global Dimension 2 Filter", "Global Dimension 2 Filter");
                                     ItemGroupHeader.CopyFilter("Vendor Filter", "Vendor No.");
-                                    //+NPR5.30
-
                                     if not ShowItem then
-                                        CurrReport.Break;
+                                        CurrReport.Break();
                                 end;
                             }
 
                             trigger OnAfterGetRecord()
                             begin
                                 if ItemGroupPrinted.Get("No.") or (not (LevelsCount >= 4)) then
-                                    CurrReport.Skip;
+                                    CurrReport.Skip();
 
                                 ItemGroupPrinted."No." := "No.";
-                                ItemGroupPrinted.Insert;
+                                ItemGroupPrinted.Insert();
 
                                 CalcFields("Sales (Qty.)", "Sales (LCY)", "Consumption (Amount)");
 
@@ -479,20 +453,17 @@ report 6014457 "NPR Sales Stat/Analysis"
                                 ItemGroupHeader.CopyFilter("Date Filter", "Date Filter");
                                 ItemGroupHeader.CopyFilter("Global Dimension 1 Filter", "Global Dimension 1 Filter");
                                 ItemGroupHeader.CopyFilter("Global Dimension 2 Filter", "Global Dimension 2 Filter");
-                                //-NPR5.30
                                 ItemGroupHeader.CopyFilter("Vendor Filter", "Vendor Filter");
-                                //SETRANGE(Level,4);
-                                //+NPR5.30
                             end;
                         }
 
                         trigger OnAfterGetRecord()
                         begin
                             if ItemGroupPrinted.Get("No.") or (not (LevelsCount >= 3)) then
-                                CurrReport.Skip;
+                                CurrReport.Skip();
 
                             ItemGroupPrinted."No." := "No.";
-                            ItemGroupPrinted.Insert;
+                            ItemGroupPrinted.Insert();
 
                             CalcFields("Sales (Qty.)", "Sales (LCY)", "Consumption (Amount)");
 
@@ -515,20 +486,17 @@ report 6014457 "NPR Sales Stat/Analysis"
                             ItemGroupHeader.CopyFilter("Date Filter", "Date Filter");
                             ItemGroupHeader.CopyFilter("Global Dimension 1 Filter", "Global Dimension 1 Filter");
                             ItemGroupHeader.CopyFilter("Global Dimension 2 Filter", "Global Dimension 2 Filter");
-                            //-NPR5.30
                             ItemGroupHeader.CopyFilter("Vendor Filter", "Vendor Filter");
-                            //SETRANGE(Level,3);
-                            //+NPR5.30
                         end;
                     }
 
                     trigger OnAfterGetRecord()
                     begin
                         if ItemGroupPrinted.Get("No.") or (not (LevelsCount >= 2)) then
-                            CurrReport.Skip;
+                            CurrReport.Skip();
 
                         ItemGroupPrinted."No." := "No.";
-                        ItemGroupPrinted.Insert;
+                        ItemGroupPrinted.Insert();
 
                         CalcFields("Sales (Qty.)", "Sales (LCY)", "Consumption (Amount)");
 
@@ -551,20 +519,17 @@ report 6014457 "NPR Sales Stat/Analysis"
                         ItemGroupHeader.CopyFilter("Date Filter", "Date Filter");
                         ItemGroupHeader.CopyFilter("Global Dimension 1 Filter", "Global Dimension 1 Filter");
                         ItemGroupHeader.CopyFilter("Global Dimension 2 Filter", "Global Dimension 2 Filter");
-                        //-NPR5.30
                         ItemGroupHeader.CopyFilter("Vendor Filter", "Vendor Filter");
-                        //SETRANGE(Level,2);
-                        //+NPR5.30
                     end;
                 }
 
                 trigger OnAfterGetRecord()
                 begin
                     if ItemGroupPrinted.Get("No.") or (not (LevelsCount >= 1)) then
-                        CurrReport.Skip;
+                        CurrReport.Skip();
 
                     ItemGroupPrinted."No." := "No.";
-                    ItemGroupPrinted.Insert;
+                    ItemGroupPrinted.Insert();
 
                     CalcFields("Sales (Qty.)", "Sales (LCY)", "Consumption (Amount)");
 
@@ -587,10 +552,7 @@ report 6014457 "NPR Sales Stat/Analysis"
                     ItemGroupHeader.CopyFilter("Date Filter", "Date Filter");
                     ItemGroupHeader.CopyFilter("Global Dimension 1 Filter", "Global Dimension 1 Filter");
                     ItemGroupHeader.CopyFilter("Global Dimension 2 Filter", "Global Dimension 2 Filter");
-                    //-NPR5.30
                     ItemGroupHeader.CopyFilter("Vendor Filter", "Vendor Filter");
-                    //SETRANGE(Level,1);
-                    //+NPR5.30
                 end;
             }
             dataitem("Sum"; "Integer")
@@ -647,10 +609,10 @@ report 6014457 "NPR Sales Stat/Analysis"
                 Clear(SQty);
 
                 if ItemGroupPrinted.Get("No.") then
-                    CurrReport.Skip;
+                    CurrReport.Skip();
 
                 ItemGroupPrinted."No." := "No.";
-                ItemGroupPrinted.Insert;
+                ItemGroupPrinted.Insert();
 
                 CalcFields("Sales (Qty.)", "Sales (LCY)", "Consumption (Amount)");
 
@@ -671,10 +633,7 @@ report 6014457 "NPR Sales Stat/Analysis"
             trigger OnPreDataItem()
             begin
                 ItemGroupPrinted.SetCurrentKey("No.");
-                ItemGroupPrinted.DeleteAll;
-                //-NPR5.30
-                // SETRANGE(Level,0);
-                //+NPR5.30
+                ItemGroupPrinted.DeleteAll();
             end;
         }
         dataitem(Total; "Integer")
@@ -748,10 +707,6 @@ report 6014457 "NPR Sales Stat/Analysis"
             }
         }
 
-        actions
-        {
-        }
-
         trigger OnOpenPage()
         begin
             LevelsCount := 2;
@@ -775,111 +730,82 @@ report 6014457 "NPR Sales Stat/Analysis"
 
     trigger OnInitReport()
     begin
-        CompanyInfo.Get;
+        CompanyInfo.Get();
         CompanyInfo.CalcFields(Picture);
-
-        //-NPR5.30
-        // TxtLabeldim1 := 'Group by ' + TxtDim1;
-        // IF GLOBALLANGUAGE = 1030 THEN  //Danish
-        //  TxtLabeldim1 := 'Grupper ved ' + TxtDim1;
         CaptionClassDim1 := '1,1,1';
-
-
-
-        //-#[353382] [353382]
-        //-TM1.39 [334644]
-        //TxtDim1 := SystemEventWrapper.CaptionClassTranslate(GLOBALLANGUAGE, CaptionClassDim1);
-        //+TM1.39 [334644]
         TxtDim1 := CaptionClassTranslate(CaptionClassDim1);
-        //+#[353382] [353382]
-
-
         TxtLabeldim1 := GroupByText + TxtDim1;
-        //+NPR5.30
     end;
 
     trigger OnPreReport()
     begin
-        //-NPR5.39
-        // Object.SETRANGE(ID, 6014457);
-        // Object.SETRANGE(Type, 3);
-        // Object.FINDFIRST;
-        //+NPR5.39
-
         Clear(TotalProfit);
         Clear(TotalCoverage);
 
-        ItemGroup1.Reset;
+        ItemGroup1.Reset();
         ItemGroupHeader.CopyFilter("Date Filter", ItemGroup1."Date Filter");
         if ItemGroup1.FindSet then
             repeat
                 ItemGroup1.CalcFields("Sales (LCY)", "Consumption (Amount)");
                 TotalRevenue += ItemGroup1."Sales (LCY)";
                 TotalConsumption += ItemGroup1."Consumption (Amount)";
-            until ItemGroup1.Next = 0;
+            until ItemGroup1.Next() = 0;
 
         TotalProfit := TotalRevenue - TotalConsumption;
         TotalCoverage := Pct(TotalProfit, TotalRevenue);
     end;
 
     var
-        Coverage: Decimal;
-        TurnoverPct: Decimal;
-        Profit: Decimal;
-        CoveragePct: Decimal;
         CompanyInfo: Record "Company Information";
-        i: Integer;
-        TotalRevenue: Decimal;
-        TotalProfit: Decimal;
-        Date: Text[30];
-        DateFiltersApplied: Boolean;
-        TotalConsumption: Decimal;
-        TotalCoverage: Decimal;
-        Sale: Decimal;
-        Consumption: Decimal;
-        ItemGroupPrinted: Record "NPR Item Group" temporary;
         ItemGroup1: Record "NPR Item Group";
-        LevelsCount: Integer;
+        ItemGroupPrinted: Record "NPR Item Group" temporary;
+        DateFiltersApplied: Boolean;
+        FirstDimValue: Boolean;
         OnlySales: Boolean;
         ShowItem: Boolean;
-        FirstDimValue: Boolean;
-        TxtDim1: Text[30];
-        CaptionClassDim1: Text[30];
-        TxtLabeldim1: Text[100];
-        Text10600002: Label 'Salesstatistics/Itemgroupanalysis';
-        Text001: Label 'Percentage of last years sales';
-        SumSale: Decimal;
-        SumConsumption: Decimal;
-        SProfit: Decimal;
+        Consumption: Decimal;
+        Coverage: Decimal;
+        CoveragePct: Decimal;
+        Profit: Decimal;
+        Sale: Decimal;
         SCoverage: Decimal;
         SCoveragePct: Decimal;
-        STurnoverPct: Decimal;
         SInventory: Decimal;
+        SProfit: Decimal;
         SQty: Decimal;
-        TotalText: Label 'Total for Item Group %1';
-        TSProfit: Decimal;
+        STurnoverPct: Decimal;
+        SumConsumption: Decimal;
+        SumSale: Decimal;
+        TotalConsumption: Decimal;
+        TotalCoverage: Decimal;
+        TotalProfit: Decimal;
+        TotalRevenue: Decimal;
         TSCoverage: Decimal;
         TSCoveragePct: Decimal;
-        TSTurnoverPct: Decimal;
         TSInventory: Decimal;
+        TSProfit: Decimal;
         TSQty: Decimal;
-        TSumSale: Decimal;
+        TSTurnoverPct: Decimal;
         TSumConsumption: Decimal;
+        TSumSale: Decimal;
+        TurnoverPct: Decimal;
+        i: Integer;
+        LevelsCount: Integer;
         GroupByText: Label 'Group by ';
+        Text001: Label 'Percentage of last years sales';
+        Text10600002: Label 'Salesstatistics/Itemgroupanalysis';
+        TotalText: Label 'Total for Item Group %1';
+        CaptionClassDim1: Text[30];
+        Date: Text[30];
+        TxtDim1: Text[30];
+        TxtLabeldim1: Text[100];
 
     procedure Pct(var Value: Decimal; var Total: Decimal) Calculation: Decimal
     begin
-        //-NPR5.30
-        // IF værdi<>0 THEN
-        // IF total<>0 THEN
-        // resultat:=(værdi/total)*100
-        // ELSE
-        // resultat:=0;
         if (Value <> 0) and (Total <> 0) then
             Calculation := (Value / Total) * 100
         else
             Calculation := 0;
-        //+NPR5.30
     end;
 }
 

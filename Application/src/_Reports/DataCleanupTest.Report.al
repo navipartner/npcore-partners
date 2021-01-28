@@ -1,13 +1,8 @@
 report 6060101 "NPR Data Cleanup Test"
 {
-    // NPR5.23/JC/20160331  CASE 237816 Changed report to a process report
-    // NPR5.48/JDH /20181109 CASE 334163 Added Caption to object
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Data Cleanup Test.rdlc';
-
     Caption = 'Data Cleanup Test';
-
     dataset
     {
         dataitem("Data Cleanup GCVI"; "NPR Data Cleanup GCVI")
@@ -101,21 +96,14 @@ report 6060101 "NPR Data Cleanup Test"
             }
         }
 
-        actions
-        {
-        }
-    }
-
-    labels
-    {
     }
 
     var
         DataCleanupCVILine: Codeunit "NPR Data Cleanup GCVI Line";
         [InDataSet]
         TestResult: Boolean;
-        CleanupAction: Option Delete,Rename,Both;
         TableOption: Option All,Customer,Vendor,Item,GLAccount;
+        CleanupAction: Option Delete,Rename,Both;
         NoFilter: Text;
 }
 

@@ -1,15 +1,7 @@
 report 6150699 "NPR Re-run Data Upg. Steps"
 {
-    // NPR5.32/AP/02052017  CASE 274285  Possibility to re-run Data Upgrade Build Steps
-
-    UsageCategory = None;
     Caption = 'Re-run Data Upg. Build Steps';
     ProcessingOnly = true;
-
-    dataset
-    {
-    }
-
     requestpage
     {
 
@@ -50,13 +42,6 @@ report 6150699 "NPR Re-run Data Upg. Steps"
             }
         }
 
-        actions
-        {
-        }
-    }
-
-    labels
-    {
     }
 
     trigger OnPreReport()

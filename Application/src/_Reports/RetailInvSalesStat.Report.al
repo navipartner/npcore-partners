@@ -1,11 +1,8 @@
 report 6014662 "NPR Retail Inv.: Sales Stat."
 {
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Retail Inventory - Sales Stat..rdlc';
-
     Caption = 'Inventory - Sales Statistics';
-
     dataset
     {
         dataitem(Item; Item)
@@ -103,11 +100,11 @@ report 6014662 "NPR Retail Inv.: Sales Stat."
             begin
                 CalcFields("Assembly BOM");
 
-                SetFilters;
-                Calculate;
+                SetFilters();
+                Calculate();
 
                 if (SalesAmount = 0) and not PrintAlsoWithoutSale then
-                    CurrReport.Skip;
+                    CurrReport.Skip();
             end;
         }
     }
@@ -133,19 +130,11 @@ report 6014662 "NPR Retail Inv.: Sales Stat."
                 }
             }
         }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
     }
 
     trigger OnPreReport()
     begin
-        GLSetup.Get;
+        GLSetup.Get();
 
         ItemFilter := Item.GetFilters;
         PeriodText := Item.GetFilter("Date Filter");
@@ -165,30 +154,30 @@ report 6014662 "NPR Retail Inv.: Sales Stat."
     end;
 
     var
-        Text000: Label 'Period: %1';
-        ItemStatisticsBuf: Record "Item Statistics Buffer";
         GLSetup: Record "General Ledger Setup";
-        ItemFilter: Text;
-        PeriodText: Text;
-        SalesQty: Decimal;
-        SalesAmount: Decimal;
+        ItemStatisticsBuf: Record "Item Statistics Buffer";
+        PrintAlsoWithoutSale: Boolean;
         COGSAmount: Decimal;
         ItemProfit: Decimal;
         ItemProfitPct: Decimal;
-        UnitPrice: Decimal;
+        SalesAmount: Decimal;
+        SalesQty: Decimal;
         UnitCost: Decimal;
-        PrintAlsoWithoutSale: Boolean;
+        UnitPrice: Decimal;
+        ItemAssemblyBOMCaptionLbl: Label 'BOM';
         InvSalesStatisticsCaptLbl: Label 'Inventory - Sales Statistics';
         PageCaptionLbl: Label 'Page';
-        IncludeNotSoldItemsCaptionLbl: Label 'This report also includes items that are not sold.';
-        ItemAssemblyBOMCaptionLbl: Label 'BOM';
-        UnitCostCaptionLbl: Label 'Unit Cost';
-        UnitPriceCaptionLbl: Label 'Unit Price';
-        SalesQtyCaptionLbl: Label 'Sales (Qty.)';
-        SalesAmountCaptionLbl: Label 'Sales (LCY)';
+        Text000: Label 'Period: %1';
         ItemProfitCaptionLbl: Label 'Profit';
         ItemProfitPctCaptionLbl: Label 'Profit %';
+        SalesAmountCaptionLbl: Label 'Sales (LCY)';
+        SalesQtyCaptionLbl: Label 'Sales (Qty.)';
+        IncludeNotSoldItemsCaptionLbl: Label 'This report also includes items that are not sold.';
         TotalCaptionLbl: Label 'Total';
+        UnitCostCaptionLbl: Label 'Unit Cost';
+        UnitPriceCaptionLbl: Label 'Unit Price';
+        ItemFilter: Text;
+        PeriodText: Text;
 
     local procedure Calculate()
     begin
@@ -208,47 +197,34 @@ report 6014662 "NPR Retail Inv.: Sales Stat."
 
     local procedure SetFilters()
     begin
-        with ItemStatisticsBuf do begin
-            SetRange("Item Filter", Item."No.");
-            SetRange("Item Ledger Entry Type Filter", "Item Ledger Entry Type Filter"::Sale);
-            SetFilter("Entry Type Filter", '<>%1', "Entry Type Filter"::Revaluation);
-        end;
+        ItemStatisticsBuf.SetRange("Item Filter", Item."No.");
+        ItemStatisticsBuf.SetRange("Item Ledger Entry Type Filter", ItemStatisticsBuf."Item Ledger Entry Type Filter"::Sale);
+        ItemStatisticsBuf.SetFilter("Entry Type Filter", '<>%1', ItemStatisticsBuf."Entry Type Filter"::Revaluation);
     end;
 
     local procedure CalcSalesAmount(): Decimal
     begin
-        with ItemStatisticsBuf do begin
-            CalcFields("Sales Amount (Actual)");
-            exit("Sales Amount (Actual)");
-        end;
+        ItemStatisticsBuf.CalcFields("Sales Amount (Actual)");
+        exit(ItemStatisticsBuf."Sales Amount (Actual)");
     end;
 
     local procedure CalcCostAmount(): Decimal
     begin
-        with ItemStatisticsBuf do begin
-            CalcFields("Cost Amount (Actual)");
-            exit("Cost Amount (Actual)");
-        end;
+        ItemStatisticsBuf.CalcFields("Cost Amount (Actual)");
+        exit(ItemStatisticsBuf."Cost Amount (Actual)");
     end;
 
     local procedure CalcCostAmountNonInvnt(): Decimal
     begin
-        with ItemStatisticsBuf do begin
-            SetRange("Item Ledger Entry Type Filter");
-            CalcFields("Cost Amount (Non-Invtbl.)");
-            exit("Cost Amount (Non-Invtbl.)");
-        end;
+        ItemStatisticsBuf.SetRange("Item Ledger Entry Type Filter");
+        ItemStatisticsBuf.CalcFields("Cost Amount (Non-Invtbl.)");
+        exit(ItemStatisticsBuf."Cost Amount (Non-Invtbl.)");
     end;
 
     local procedure CalcInvoicedQty(): Decimal
     begin
-        with ItemStatisticsBuf do begin
-            //-NPR5.22
-            //SETRANGE("Entry Type Filter");
-            //+NPR5.22
-            CalcFields("Invoiced Quantity");
-            exit("Invoiced Quantity");
-        end;
+        ItemStatisticsBuf.CalcFields("Invoiced Quantity");
+        exit(ItemStatisticsBuf."Invoiced Quantity");
     end;
 
     local procedure CalcPerUnit(Amount: Decimal; Qty: Decimal): Decimal

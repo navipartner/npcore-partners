@@ -1,19 +1,11 @@
 report 6014443 "NPR Period Discount Stat."
 {
-    // NPR5.27/JLK /20161020  Report upgraded from NAV 2009
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
-    // NPR5.38/NPKNAV/20180126  CASE 299276 Transport NPR5.38 - 26 January 2018
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.54/YAHA/20200324  CASE 394872 Removed Company Picture
-    // NPR5.55/YAHA/20200610  CASE 394884 Header layout modification
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Period Discount Statistics.rdlc';
-
     Caption = 'Period Discount Statistics';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem("Period Discount"; "NPR Period Discount")
@@ -109,7 +101,7 @@ report 6014443 "NPR Period Discount Stat."
                     Clear(Item);
 
                     if ("Quantity Sold" = 0) and OnlyItemWithSales then
-                        CurrReport.Skip;
+                        CurrReport.Skip();
 
                     if "Distribution Item" then
                         DistributionItem := 'F'
@@ -134,9 +126,7 @@ report 6014443 "NPR Period Discount Stat."
                     end else
                         ProfitPerUnitPercent := 0;
 
-                    //-NPR5.38 [288276]
                     if Vendor.Get(Item."Vendor No.") then;
-                    //+NPR5.38 [288276]
                 end;
             }
             dataitem(SumOfTotal; "Integer")
@@ -181,10 +171,6 @@ report 6014443 "NPR Period Discount Stat."
                 }
             }
         }
-
-        actions
-        {
-        }
     }
 
     labels
@@ -209,7 +195,7 @@ report 6014443 "NPR Period Discount Stat."
 
     trigger OnPreReport()
     begin
-        CompanyInformation.Get;
+        CompanyInformation.Get();
         CompanyInformation.CalcFields(Picture);
 
         PercentDisplay := '%';
@@ -217,18 +203,18 @@ report 6014443 "NPR Period Discount Stat."
 
     var
         CompanyInformation: Record "Company Information";
-        PercentDisplay: Text[1];
-        PeriodLbl: Label 'Period: ';
+        Item: Record Item;
+        Vendor: Record Vendor;
         OnlyItemWithSales: Boolean;
-        DistributionItem: Text[30];
         CampaignProfitPercent: Decimal;
         ProfitPerUnit: Decimal;
-        SumProfitPerUnit: Decimal;
         ProfitPerUnitPercent: Decimal;
-        Item: Record Item;
+        SumProfitPerUnit: Decimal;
         SumTurnover: Decimal;
         TotalProfitPerUnit: Decimal;
-        Vendor: Record Vendor;
         CurrReportPageNoCaptionLbl: Label 'Page';
+        PeriodLbl: Label 'Period: ';
+        PercentDisplay: Text[1];
+        DistributionItem: Text[30];
 }
 

@@ -1,11 +1,7 @@
 report 6014515 "NPR Delete EFT Receipt"
 {
-    // NPR5.55/TJ  /20200511 CASE 404177 New object
-
-    UsageCategory = None;
     Caption = 'Delete EFT Receipt';
     ProcessingOnly = true;
-
     dataset
     {
         dataitem(Company; Company)
@@ -39,10 +35,6 @@ report 6014515 "NPR Delete EFT Receipt"
             }
         }
 
-        actions
-        {
-        }
-
         trigger OnOpenPage()
         begin
             EFTReceiptLogDateFormula := '<-5Y>';
@@ -50,21 +42,17 @@ report 6014515 "NPR Delete EFT Receipt"
         end;
     }
 
-    labels
-    {
-    }
-
     var
-        EFTReceiptLogDateFormula: Text;
         MaxSizeToDelete: Decimal;
+        EFTReceiptLogDateFormula: Text;
 
     procedure DeleteEFTReceipt(CompanyToDelete: Text[50]; LastDateToDelete: Date)
     var
         EFTReceipt: Record "NPR EFT Receipt";
         RecRef: RecordRef;
+        Counter: Integer;
         NoOfEntries: Integer;
         NoOfRowsToDeleteAllowed: Integer;
-        Counter: Integer;
         OriginalMaxSizeToDelete: Integer;
     begin
         if LastDateToDelete = 0D then
@@ -97,21 +85,21 @@ report 6014515 "NPR Delete EFT Receipt"
                     until Counter = NoOfRowsToDeleteAllowed;
             end;
         end else
-            EFTReceipt.DeleteAll;
-        Commit;
+            EFTReceipt.DeleteAll();
+        Commit();
     end;
 
     procedure GetBestKey(var RecRef: RecordRef): Integer
     var
         TMPInt: Record "Integer" temporary;
-        KRef: KeyRef;
         FRef: FieldRef;
         BestKeyNo: Integer;
         BestScore: Integer;
-        Score: Integer;
-        Qty: Integer;
         i: Integer;
         j: Integer;
+        Qty: Integer;
+        Score: Integer;
+        KRef: KeyRef;
     begin
         //The function returns the index of the best key to use given the applied filters.
         BestKeyNo := 1;
@@ -122,7 +110,7 @@ report 6014515 "NPR Delete EFT Receipt"
             while (not TMPInt.Get(FRef.Number)) and (j <= 255) do begin
                 RecRef.FilterGroup(j);
                 if FRef.GetFilter <> '' then begin
-                    TMPInt.Init;
+                    TMPInt.Init();
                     TMPInt.Number := FRef.Number;
                     TMPInt.Insert(false);
                 end;
@@ -159,9 +147,9 @@ report 6014515 "NPR Delete EFT Receipt"
 
     local procedure GetNoOfRowsToDelete(CompanyToDelete: Text; "Table": Integer; OriginalRowCount: Integer): Integer
     var
+        TableInformation: Record "Table Information";
         ActualRecordSizeToDelete: Integer;
         NoOfRowstodelete: Integer;
-        TableInformation: Record "Table Information";
     begin
         if OriginalRowCount = 0 then
             exit(0);

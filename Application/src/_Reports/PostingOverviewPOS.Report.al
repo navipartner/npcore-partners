@@ -1,13 +1,9 @@
 report 6150614 "NPR Posting Overview POS"
 {
-    // NPR5.40/JLK /20180314 CASE 307437 Object created
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Posting Overview POS.rdlc';
-
     Caption = 'Posting Overview POS';
     PreviewMode = PrintLayout;
-
     dataset
     {
         dataitem(POS_Entry; "NPR POS Entry")
@@ -273,7 +269,7 @@ report 6150614 "NPR Posting Overview POS"
                     trigger OnPreDataItem()
                     begin
                         if not IncludeCreditCardTransaction then
-                            CurrReport.Break;
+                            CurrReport.Break();
                     end;
                 }
             }
@@ -316,10 +312,6 @@ report 6150614 "NPR Posting Overview POS"
                 }
             }
         }
-
-        actions
-        {
-        }
     }
 
     labels
@@ -331,15 +323,15 @@ report 6150614 "NPR Posting Overview POS"
     }
 
     var
-        CustomerNoCaption: Label 'Customer No.';
-        TotalAmountInclTax: Decimal;
         IncludeCreditCardTransaction: Boolean;
-        NoText: Text;
-        POSStoreFilter: Text;
-        DateFilter: Text;
-        NoFilter: Text;
-        POSStoreFilterCaption: Label 'POS  Store Filter: %1';
+        TotalAmountInclTax: Decimal;
+        CustomerNoCaption: Label 'Customer No.';
         DateFilterCaption: Label 'Date Filter: %1';
         NoFilterCaption: Label 'No. Filter: %1';
+        POSStoreFilterCaption: Label 'POS  Store Filter: %1';
+        DateFilter: Text;
+        NoFilter: Text;
+        NoText: Text;
+        POSStoreFilter: Text;
 }
 

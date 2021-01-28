@@ -1,20 +1,9 @@
 report 6014563 "NPR Receipt A5 - No Addr."
 {
-    // NPR4.16/KN/20151009 CASE 220371   Created report based on report from Klarlund
-    // NPR4.16/KN/20151112 CASE 225533   Changed layout in report footer a tiny bit.
-    // NPR4.18/KN/20151120 CASE 227187   Receipt text now taken from Register settings
-    //                                   Calculations of total amount of Sales lines and total VAT amount changed.
-    // NPR4.18/KN/20151210 CASE 227187   Added pager numbers to footer. Only shown if the total number of pages is more than 1.
-    // NPR5.23/JDH /20160517 CASE 240916 Removed old VariaX Solution
-    // NPR5.38/JLK /20180124  CASE 300892 Corrected AL Error on Blank Text Constants
-    // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Receipt A5 - No Addr..rdlc';
-
     Caption = 'Receipt A5';
     PreviewMode = PrintLayout;
-
     dataset
     {
         dataitem("Audit Roll"; "NPR Audit Roll")
@@ -330,28 +319,6 @@ report 6014563 "NPR Receipt A5 - No Addr."
                                 Format(("Amount Including VAT" + "Line Discount Amount") / Quantity, 0, '<Precision,2:2><Standard Format,0>')
                             else
                                 QuantityAmountTxt := Format(Quantity);
-                            //-NPR5.23 [240916]
-                            // IF "Variance Set Up".GET("No.",Color,Size) THEN BEGIN
-                            // IF ("Variance Set Up"."Description - Color"<>Text10600008) THEN BEGIN
-                            //   ColorTxt:=Text10600009+FORMAT("Variance Set Up"."Description - Color")+' ';
-                            // END;
-                            // IF ("Variance Set Up"."Description - Size"<>'') THEN
-                            //   SizeTxt:=Text10600010+FORMAT("Variance Set Up"."Description - Size");
-                            // END ELSE IF "VariaX Configuration".GET() THEN BEGIN
-                            //  IF "VariaX Dim. Combination".GET("Variant Code","No.","VariaX Configuration"."Color Dimension") THEN BEGIN
-                            //    "VariaX Dim. Combination".CALCFIELDS(Description);
-                            //    IF "VariaX Dim. Combination".Description <> '' THEN
-                            //      ColorTxt := Text10600009+FORMAT("VariaX Dim. Combination".Description)+' ';
-                            //  END;
-                            //  IF "VariaX Dim. Combination".GET("Variant Code","No.","VariaX Configuration"."Size Dimension") THEN BEGIN
-                            //    "VariaX Dim. Combination".CALCFIELDS(Description);
-                            //    IF "VariaX Dim. Combination".Description <> '' THEN
-                            //      SizeTxt := Text10600010+FORMAT("VariaX Dim. Combination".Description);
-                            //  END;
-                            // END;
-                            //
-                            // ColorSizeTxt:=ColorTxt+SizeTxt;
-                            //+NPR5.23 [240916]
                         end;
                     }
                     dataitem("Customer Details"; Customer)
@@ -373,12 +340,11 @@ report 6014563 "NPR Receipt A5 - No Addr."
                     trigger OnAfterGetRecord()
                     begin
                         if (Type = Type::Item) and Item.Get("No.") and Item."NPR No Print on Reciept" then
-                            CurrReport.Skip;
+                            CurrReport.Skip();
 
-                        //IF ("Amount Including VAT" <> 0) AND (Type = Type::"G/L") AND ("No." = Register.Rounding) THEN BEGIN  //NPR5.53 [371955]-revoked
                         if ("Amount Including VAT" <> 0) and (Type = Type::"G/L") and ("No." = POSSetup.RoundingAccount(true)) then begin  //NPR5.53 [371955]
                             SubCurrencyGL := "Amount Including VAT";
-                            CurrReport.Skip;
+                            CurrReport.Skip();
                         end;
 
                         /** If there is a returned item, display the return receipt **/
@@ -396,18 +362,6 @@ report 6014563 "NPR Receipt A5 - No Addr."
                         /** Calculate remaining amount in case of prepayment **/
                         OutStandingAmount := 0;
 
-                        /*IF "Buffer Invoice No." <> '' THEN BEGIN
-                          CustLedgerEntry.SETRANGE("Document No.", "Buffer Invoice No.");
-                          CustLedgerEntry.SETRANGE(Prepayment, TRUE);
-                          IF CustLedgerEntry.FINDFIRST THEN BEGIN
-                            IF SalesHeader.GET(SalesHeader."Document Type"::Order,CustLedgerEntry."Prepayment Order No.") THEN BEGIN
-                              SalesOrderCalculations.SetSalesHeader(SalesHeader);
-                              OutStandingAmount := SalesOrderCalculations.GetRemaingAmount;
-                              RemainText := STRSUBSTNO(TextOutstanding,SalesHeader."No.", FORMAT(OutStandingAmount,0,'<Integer><Decimals,2>'));
-                            END;
-                          END;
-                        END;*/
-
                         /** If pay-in. Set the flag **/
                         if ("Sale Type" = "Sale Type"::Deposit) and (Type = Type::Customer) then
                             flgIndbetal := true;
@@ -424,12 +378,8 @@ report 6014563 "NPR Receipt A5 - No Addr."
                         LoopValue += 1;
 
                         TotalAmountInclVat += "Amount Including VAT";
-                        //NPR4.18
-                        //TotalVatAmount += "Amount Including VAT" - AmounT;
                         if "VAT %" <> 0 then
                             TotalVatAmount += Amount * "VAT %" / 100;
-                        //NPR4.18
-
                     end;
 
                     trigger OnPostDataItem()
@@ -478,8 +428,8 @@ report 6014563 "NPR Receipt A5 - No Addr."
 
                     trigger OnAfterGetRecord()
                     var
-                        Text10600026: Label 'Payment';
                         Text10600027: Label 'on account';
+                        Text10600026: Label 'Payment';
                     begin
                         if ("Sale Type" = "Sale Type"::Deposit) then begin
                             flgIndbetal := true;
@@ -528,12 +478,12 @@ report 6014563 "NPR Receipt A5 - No Addr."
                             PaymentTypePos.SetFilter("Processing Type", '%1|%2',
                                                      PaymentTypePos."Processing Type"::Cash,
                                                      PaymentTypePos."Processing Type"::"Foreign Currency");
-                            if PaymentTypePos.FindSet then
+                            if PaymentTypePos.FindSet() then
                                 repeat
                                     AuditTemp.SetRange("No.", PaymentTypePos."No.");
                                     if AuditTemp.Count > 0 then
                                         flgOpenDrawer := true;
-                                until (PaymentTypePos.Next = 0) or flgOpenDrawer;
+                                until (PaymentTypePos.Next() = 0) or flgOpenDrawer;
                         end;
                     end;
 
@@ -546,7 +496,7 @@ report 6014563 "NPR Receipt A5 - No Addr."
                                 ShowPageTwo := true;
 
                         if not ShowPageTwo then
-                            CurrReport.Break;
+                            CurrReport.Break();
                     end;
 
                 end;
@@ -554,9 +504,9 @@ report 6014563 "NPR Receipt A5 - No Addr."
 
             trigger OnAfterGetRecord()
             var
-                Text10600012: Label '%2 - Bon %1/%4 - %3';
                 "Salesperson/Purchaser": Record "Salesperson/Purchaser";
                 Utility: Codeunit "NPR Utility";
+                Text10600012: Label '%2 - Bon %1/%4 - %3';
             begin
                 ReceiptInfoText := StrSubstNo(Text10600012, "Audit Roll"."Sales Ticket No.",
                   Format("Audit Roll"."Sale Date"), Format("Audit Roll"."Closing Time"), "Register No.");
@@ -585,19 +535,6 @@ report 6014563 "NPR Receipt A5 - No Addr."
             end;
         }
     }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     labels
     {
         PriceWDiscLbl = 'Unit Price incl. disc.';
@@ -616,46 +553,46 @@ report 6014563 "NPR Receipt A5 - No Addr."
     end;
 
     var
-        NPRetailConfig: Record "NPR Retail Setup";
-        PrintersRegister: Record "NPR Register";
+        BlobBuffer: Record "NPR BLOB buffer" temporary;
         POSUnit: Record "NPR POS Unit";
-        "Retail Form Code": Codeunit "NPR Retail Form Code";
+        PrintersRegister: Record "NPR Register";
+        TempRetailComment: Record "NPR Retail Comment" temporary;
+        NPRetailConfig: Record "NPR Retail Setup";
+        BarcodeLib: Codeunit "NPR Barcode Library";
         POSSetup: Codeunit "NPR POS Setup";
-        SubCurrencyGL: Decimal;
-        VAT: Decimal;
-        OutStandingAmount: Decimal;
-        QuantityAmountTxt: Text[50];
-        IndbetalTXT: Text[200];
-        IndbetalTXT2: Text[50];
-        IndbetalTXT3: Text[50];
-        SalesPersonText: Text[50];
-        DiscountPctTxt: Text[50];
-        flgTilgodebevis: Boolean;
-        flgIndbetal: Boolean;
-        flgRetursalg: Boolean;
-        flgGavekort: Boolean;
+        "Retail Form Code": Codeunit "NPR Retail Form Code";
+        TempBlob: Codeunit "Temp Blob";
         flgDebitorFound: Boolean;
-        flgUdbetal: Boolean;
+        flgGavekort: Boolean;
+        flgIndbetal: Boolean;
         flgOpenDrawer: Boolean;
-        Text000: Label 'Sales Ticket No.: %1';
-        TypeAuditRolSale: Boolean;
-        SaleTypeAuditRolSale: Boolean;
-        Text001: Label 'Eksp.  %1';
-        Text002: Label 'Eksp.  %1';
-        LoopValue: Integer;
-        GuideNo: Code[20];
-        NameAndAddress: array[5] of Text[50];
+        flgRetursalg: Boolean;
+        flgTilgodebevis: Boolean;
+        flgUdbetal: Boolean;
         PrintCommAddress: Boolean;
-        CustInf: array[8] of Text[50];
-        i: Integer;
-        Text003: Label '%1, %2';
+        SaleTypeAuditRolSale: Boolean;
         ShowGuideNo: Boolean;
+        TypeAuditRolSale: Boolean;
+        GuideNo: Code[20];
+        OutStandingAmount: Decimal;
+        SubCurrencyGL: Decimal;
         TotalAmountInclVat: Decimal;
         TotalVatAmount: Decimal;
+        VAT: Decimal;
+        i: Integer;
+        LoopValue: Integer;
+        Text003: Label '%1, %2';
+        Text001: Label 'Eksp.  %1';
+        Text002: Label 'Eksp.  %1';
+        Text000: Label 'Sales Ticket No.: %1';
         ReceiptInfoText: Text;
-        BarcodeLib: Codeunit "NPR Barcode Library";
-        TempBlob: Codeunit "Temp Blob";
-        TempRetailComment: Record "NPR Retail Comment" temporary;
-        BlobBuffer: Record "NPR BLOB buffer" temporary;
+        CustInf: array[8] of Text[50];
+        DiscountPctTxt: Text[50];
+        IndbetalTXT2: Text[50];
+        IndbetalTXT3: Text[50];
+        NameAndAddress: array[5] of Text[50];
+        QuantityAmountTxt: Text[50];
+        SalesPersonText: Text[50];
+        IndbetalTXT: Text[200];
 }
 

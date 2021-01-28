@@ -1,12 +1,8 @@
 report 6060134 "NPR MM Member Info"
 {
-    // MM1.25/BHR/20171120 CASE 296024 Report to show member details
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Member Info.rdlc';
-
     Caption = 'Member Info';
-
     dataset
     {
         dataitem("MM Membership Entry"; "NPR MM Membership Entry")
@@ -94,19 +90,6 @@ report 6060134 "NPR MM Member Info"
             }
         }
     }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     labels
     {
         TxtCount = 'Membership Change Count';

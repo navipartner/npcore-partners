@@ -1,15 +1,8 @@
 report 6014427 "NPR Turnover Rate"
 {
-    // NPR70.00.00.00/LS
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.49/BHR /20190207  CASE 343119 Correct Report as per OMA
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Turnover Rate.rdlc';
-
     Caption = 'Turnover Rate';
-
     dataset
     {
         dataitem(Item; Item)
@@ -76,7 +69,7 @@ report 6014427 "NPR Turnover Rate"
                 Item2.CopyFilters(Item);
                 Item2.SetRange("No.", "No.");
                 Item2.SetFilter("Date Filter", '..%1', ValueDate);
-                if Item2.FindFirst then
+                if Item2.FindFirst() then
                     Item2.CalcFields("Net Change");
 
                 if (ValueMethod = ValueMethod::"kostpris (gns.)") then
@@ -94,10 +87,7 @@ report 6014427 "NPR Turnover Rate"
 
                 // Turnover rate
                 for x := 0 to MonthQty do
-                    //-NPR5.49 [343119]
-                    //Inventory += Calculate("No.", 0D, CALCDATE('-' + FORMAT(x) + Text10600003,EndDate));
                     Inventory += Calculate("No.", 0D, CalcDate('<-' + Format(x) + Text10600003 + '>', EndDate));
-                //+NPR5.49 [343119]
                 AvgBalanceCostPrice := (Inventory / (MonthQty + 1));
 
                 if AvgBalanceCostPrice <> 0 then
@@ -105,11 +95,9 @@ report 6014427 "NPR Turnover Rate"
                 else
                     TurnoverRate := 0;
 
-                //-NPR70.00.00.00
                 ShowSection1 := false;
                 if not IncludeItemWithNoVATSales then
                     ShowSection1 := ((SalesPeriod <> 0) or (InventoryAmt <> 0));
-                //+NPR70.00.00.00
             end;
 
             trigger OnPreDataItem()
@@ -119,10 +107,7 @@ report 6014427 "NPR Turnover Rate"
                 MonthQty := (Date2DMY(EndDate, 3) - Date2DMY(StartDate, 3)) * 12 + (Date2DMY(EndDate, 2) - Date2DMY(StartDate, 2));
 
                 if PrintSupplier then
-                    CurrReport.Break;
-                //-NPR5.39
-                //CurrReport.CREATETOTALS(InventoryAmt, SalesPeriod, AvgBalanceCostPrice, SalesCost);
-                //+NPR5.39
+                    CurrReport.Break();
             end;
         }
         dataitem(Vendor; Vendor)
@@ -164,7 +149,7 @@ report 6014427 "NPR Turnover Rate"
                     Item2.CopyFilters(Item);
                     Item2.SetRange("No.", "No.");
                     Item2.SetFilter("Date Filter", '..%1', ValueDate);
-                    if Item2.FindFirst then
+                    if Item2.FindFirst() then
                         Item2.CalcFields("Net Change");
 
                     if (ValueMethod = ValueMethod::"kostpris (gns.)") then
@@ -182,10 +167,7 @@ report 6014427 "NPR Turnover Rate"
 
                     // Turnover rate
                     for x := 0 to MonthQty do
-                        //-NPR5.49 [343119]
-                        //Inventory += Calculate("No.",0D,CALCDATE( '-' + FORMAT(x) + Text10600003, EndDate));
                         Inventory += Calculate("No.", 0D, CalcDate('<-' + Format(x) + Text10600003 + '>', EndDate));
-                    //+NPR5.49 [343119]
                     AvgBalanceCostPrice := (Inventory / (MonthQty + 1));
 
                     if AvgBalanceCostPrice <> 0 then
@@ -196,9 +178,6 @@ report 6014427 "NPR Turnover Rate"
 
                 trigger OnPreDataItem()
                 begin
-                    //-NPR5.39
-                    //CurrReport.CREATETOTALS(InventoryAmt, SalesPeriod, AvgBalanceCostPrice, SalesCost);
-                    //+NPR5.39
                     Item.CopyFilter("Date Filter", Item4."Date Filter");
                 end;
             }
@@ -209,24 +188,8 @@ report 6014427 "NPR Turnover Rate"
                 Item.CopyFilter("Vendor No.", Vendor."No.");
 
                 if not PrintSupplier then
-                    CurrReport.Break;
-
-                //-NPR5.39
-                //CurrReport.CREATETOTALS(InventoryAmt, SalesPeriod, Item4."Sales (Qty.)", AvgBalanceCostPrice, SalesCost);
-                //+NPR5.39
+                    CurrReport.Break();
             end;
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 
@@ -247,38 +210,34 @@ report 6014427 "NPR Turnover Rate"
         Item.CopyFilter("Vendor No.", Vendor."No.");
 
         if not PrintSupplier then
-            CurrReport.Break;
-
-        //-NPR5.39
-        //CurrReport.CREATETOTALS(InventoryAmt, SalesPeriod, Item4."Sales (Qty.)", AvgBalanceCostPrice, SalesCost);
-        //+NPR5.39
+            CurrReport.Break();
     end;
 
     var
-        PurchaseCostPrice: Decimal;
+        Item2: Record Item;
+        Item3: Record Item;
+        ItemCostMgt: Codeunit ItemCostManagement;
+        IncludeItemWithNoVATSales: Boolean;
+        PrintSupplier: Boolean;
+        ShowSection1: Boolean;
+        EndDate: Date;
+        StartDate: Date;
+        ValueDate: Date;
         Amt1: Decimal;
+        AvgBalanceCostPrice: Decimal;
+        AvgCost: Decimal;
+        Inventory: Decimal;
         InventoryAmt: Decimal;
+        PurchaseCostPrice: Decimal;
+        SalesCost: Decimal;
         SalesPeriod: Decimal;
         TurnoverRate: Decimal;
-        ValueDate: Date;
-        DateFilter: Text[250];
-        IncludeItemWithNoVATSales: Boolean;
-        Item2: Record Item;
-        PrintSupplier: Boolean;
-        AvgCost: Decimal;
-        ItemCostMgt: Codeunit ItemCostManagement;
-        ValueMethod: Option "sidste koebspris","kostpris (gns.)";
-        StartDate: Date;
-        EndDate: Date;
         MonthQty: Integer;
         x: Integer;
-        Inventory: Decimal;
-        AvgBalanceCostPrice: Decimal;
-        Item3: Record Item;
-        SalesCost: Decimal;
         Text001: Label 'Inv.value is based on %1';
         Text10600003: Label 'M';
-        ShowSection1: Boolean;
+        ValueMethod: Option "sidste koebspris","kostpris (gns.)";
+        DateFilter: Text[250];
 
     procedure Calculate("ItemNo.": Code[20]; FromDate: Date; ToDate: Date) ValueAmt: Decimal
     begin

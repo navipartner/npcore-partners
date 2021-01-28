@@ -1,15 +1,7 @@
 report 6014543 "NPR Item - Loss - Top 10"
 {
-    // NPR70.00.00.00/LS/300414  CASE  175117 : Creation of report
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.48/TJ  /20180102  CASE 340615 Removed Product Group Code from ReqFilterFields property on dataitem Item
-    // NPR5.48/BHR /20190111  CASE 341976 Comment Code as per OMA
-    UsageCategory = None;
-    DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item - Loss - Top 10.rdlc';
-
     Caption = 'Item Shrinkage - Top 10';
-
     dataset
     {
         dataitem(Item; Item)
@@ -23,14 +15,7 @@ report 6014543 "NPR Item - Loss - Top 10"
 
             trigger OnPreDataItem()
             begin
-                //gIMSetupRec.GET;
-
                 Item.SetCurrentKey("No.");
-                //-NPR5.48 [341976]
-                // IF Item.GETFILTER(Item."Item Category Code") <> '' THEN
-                //  Item.SETCURRENTKEY(Item."Item Category Code")
-                // ELSE
-                //+NPR5.48 [341976]
                 if Item.GetFilter("Vendor No.") <> '' then
                     Item.SetCurrentKey("Vendor No.");
 
@@ -43,8 +28,8 @@ report 6014543 "NPR Item - Loss - Top 10"
                     ItemFilters := ItemFilters + SourceCodeFilter;
                 end;
 
-                ItemReportSorting.Reset;
-                ItemReportSorting.DeleteAll;
+                ItemReportSorting.Reset();
+                ItemReportSorting.DeleteAll();
             end;
         }
         dataitem("Item Report Sorting"; "NPR TEMP Buffer")
@@ -167,18 +152,10 @@ report 6014543 "NPR Item - Loss - Top 10"
             trigger OnPreDataItem()
             begin
                 Rank := 0;
-
-                // Quantity :=  "Decimal 3";
-                // "Cost Amount" := "Decimal 2";
-                // "Sort Amount" := "Decimal 1";
-                // Quantity2     := "Decimal 4";
-
-                Reset;
+                Reset();
                 SetCurrentKey(Template, "Line No.");
                 SetCurrentKey("Decimal 1", "Short Code 1");
                 Ascending := false;
-                //SETRANGE("User ID",USERID);
-                //SETRANGE(Type,'');
             end;
         }
     }
@@ -214,19 +191,10 @@ report 6014543 "NPR Item - Loss - Top 10"
                 }
             }
         }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
     }
 
     trigger OnInitReport()
     begin
-        //gIMSetupRec.GET;
         NoOfRecordsToPrint := 10;
     end;
 
@@ -301,11 +269,10 @@ report 6014543 "NPR Item - Loss - Top 10"
         ItemLedgerEntry.CalcSums("Invoiced Quantity");
         SalesQty := ItemLedgerEntry."Invoiced Quantity";
         ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::"Negative Adjmt.");
-
-        if ItemLedgerEntry.FindFirst then begin
+        if ItemLedgerEntry.FindFirst() then begin
             repeat
                 ReasonCodeGrp := false;
-                ValueEntry.Reset;
+                ValueEntry.Reset();
                 ValueEntry.SetCurrentKey("Item Ledger Entry No.");
                 ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgerEntry."Entry No.");
                 if ValueEntry.FindFirst then
@@ -314,20 +281,14 @@ report 6014543 "NPR Item - Loss - Top 10"
                     then begin
                         if ValueEntry."Reason Code" <> '' then
                             if ReasonCode.Get(ValueEntry."Reason Code") then
-                                /////IF ReasonCode.Group = gIMSetupRec."Shrinkage Reason Group" THEN
                                 ReasonCodeGrp := true;
                     end;
                 if ReasonCodeGrp then begin
-                    Location.Reset;
+                    Location.Reset();
                     Location.SetCurrentKey(Code);
                     Location.SetRange(Code, ItemLedgerEntry."Location Code");
-                    if Location.FindFirst then;
+                    if Location.FindFirst() then;
                     ItemLedgerEntry.CalcFields("Cost Amount (Actual)");
-
-                    //        Quantity :=  "Decimal 3";
-                    //        "Cost Amount" := "Decimal 2";
-                    //        "Sort Amount" := "Decimal 1";
-                    //        Quantity2     := "Decimal 4";
 
                     ItemReportSorting.SetCurrentKey(Template, "Line No.");
                     if ItemReportSorting.Get(ItemLedgerEntry."Item No.", 1) then begin
@@ -342,10 +303,10 @@ report 6014543 "NPR Item - Loss - Top 10"
                             Sorting::Shrinkage:
                                 ItemReportSorting."Decimal 1" := Pct(ItemReportSorting."Decimal 3", ItemReportSorting."Decimal 4");
                         end;
-                        ItemReportSorting.Modify;
+                        ItemReportSorting.Modify();
                     end
                     else begin
-                        ItemReportSorting.Init;
+                        ItemReportSorting.Init();
                         ItemReportSorting.Template := ItemLedgerEntry."Item No.";
                         ItemReportSorting."Line No." := 1;
                         ItemReportSorting."Short Code 1" := ItemLedgerEntry."Item No.";
@@ -365,7 +326,7 @@ report 6014543 "NPR Item - Loss - Top 10"
                         ItemReportSorting.Insert(true);
                     end;
                 end;
-            until ItemLedgerEntry.Next = 0;
+            until ItemLedgerEntry.Next() = 0;
         end;
     end;
 

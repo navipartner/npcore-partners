@@ -1,15 +1,7 @@
 report 6014540 "NPR Items With Low Sales"
 {
-    // NPR70.00.00.00/LS/090414 CASE 175121 : Report displaying Items with low sales/profitability
-    // NPR4.14/KN/20152108 CASE  221162  Expanded column and merged two cells to fit caption
-    // NPR5.25/JLK /20160726 CASE 247119 Increase Description field from rdlc
-    //                                   Adjusted margins for pdf layout
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.48/TJ  /20180102  CASE 340615 Removed Product Group Code from ReqFilterFields property on dataitem Item
-    // NPR5.48/BHR /20190111  CASE 341976 Remove unused variables
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Items With Low Sales.rdlc';
-
     Caption = 'Items With Low Sales';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
@@ -27,20 +19,18 @@ report 6014540 "NPR Items With Low Sales"
                 CalcFields("Sales (LCY)", "Sales (Qty.)");
 
                 if ("Sales (LCY)" = 0) and not ShowNotSold then
-                    CurrReport.Skip;
+                    CurrReport.Skip();
 
-                TempItemAmount.Init;
+                TempItemAmount.Init();
                 TempItemAmount."Item No." := "No.";
-
                 TempItemAmount.Amount := "Sales (LCY)";
                 TempItemAmount."Amount 2" := "Sales (Qty.)";
-
-                TempItemAmount.Insert;
+                TempItemAmount.Insert();
                 if (RankQty = 0) or (i < RankQty) then
                     i := i + 1
                 else begin
-                    TempItemAmount.FindLast;
-                    TempItemAmount.Delete;
+                    TempItemAmount.FindLast();
+                    TempItemAmount.Delete();
                 end;
 
                 ItemSalesAmt += "Sales (LCY)";
@@ -54,7 +44,7 @@ report 6014540 "NPR Items With Low Sales"
                 Item.SetRange("Date Filter", PeriodStartDate, PeriodEndDate);
 
                 DialogBox.Open(Text001);
-                TempItemAmount.DeleteAll;
+                TempItemAmount.DeleteAll();
                 i := 0;
 
             end;
@@ -152,10 +142,10 @@ report 6014540 "NPR Items With Low Sales"
             begin
                 if Number = 1 then begin
                     if not TempItemAmount.FindFirst then
-                        CurrReport.Break;
+                        CurrReport.Break();
                 end else begin
-                    if TempItemAmount.Next = 0 then
-                        CurrReport.Break;
+                    if TempItemAmount.Next() = 0 then
+                        CurrReport.Break();
                 end;
 
                 Item.Get(TempItemAmount."Item No.");
@@ -167,7 +157,7 @@ report 6014540 "NPR Items With Low Sales"
             trigger OnPreDataItem()
             begin
                 ItemDateFilter := Item.GetFilter("Date Filter");
-                DialogBox.Close;
+                DialogBox.Close();
 
                 ItemSalesAmt := Item."Sales (LCY)";
 
@@ -213,13 +203,6 @@ report 6014540 "NPR Items With Low Sales"
             }
         }
 
-        actions
-        {
-        }
-    }
-
-    labels
-    {
     }
 
     trigger OnInitReport()
@@ -230,33 +213,33 @@ report 6014540 "NPR Items With Low Sales"
     end;
 
     var
-        Text001: Label 'Grouping Items   #1##########';
-        Text002: Label 'Period: ';
-        DialogBox: Dialog;
         TempItemAmount: Record "Item Amount" temporary;
-        ItemDateFilter: Text[30];
+        ShowNotSold: Boolean;
+        PeriodEndDate: Date;
+        PeriodStartDate: Date;
         ItemSalesAmt: Decimal;
         SalesAmounPct: Decimal;
+        DialogBox: Dialog;
         i: Integer;
-        Text004: Label 'Items With Low Sales';
-        TxtShowNotSold: Label 'Item not sold or with no inventory are included.';
-        TxtTotal: Label 'Total';
-        TxtTotalSales: Label 'Total Sales';
-        TxtPctTotalSales: Label '% of Total Sales';
-        TxtFirstCM: Label '''<-CM>''';
-        TxtLastCM: Label '''<CM>''';
-        PeriodStartDate: Date;
-        PeriodEndDate: Date;
-        TextInputDate: Label 'Please fill Period Start Date and Period Closing Date';
-        ShowNotSold: Boolean;
         RankQty: Integer;
-        PageCaptionLbl: Label 'Page';
-        Vendors_item_no_CaptionLbl: Label 'Vendors item no.';
-        TxtSalesLCYCaptionLbl: Label 'Sales (LCY)';
-        TxtSalesQuantityCaptionLbl: Label 'Sales Quantity';
+        TxtPctTotalSales: Label '% of Total Sales';
+        TxtLastCM: Label '''<CM>''';
+        TxtFirstCM: Label '''<-CM>''';
+        Text001: Label 'Grouping Items   #1##########';
         Item_descriptionCaptionLbl: Label 'Item description';
         TxtItemNoCaptionLbl: Label 'Item No.';
+        TxtShowNotSold: Label 'Item not sold or with no inventory are included.';
+        Text004: Label 'Items With Low Sales';
+        PageCaptionLbl: Label 'Page';
+        Text002: Label 'Period: ';
+        TextInputDate: Label 'Please fill Period Start Date and Period Closing Date';
         TxtRankCaptionLbl: Label 'Rank';
+        TxtSalesLCYCaptionLbl: Label 'Sales (LCY)';
+        TxtSalesQuantityCaptionLbl: Label 'Sales Quantity';
+        TxtTotal: Label 'Total';
+        TxtTotalSales: Label 'Total Sales';
+        Vendors_item_no_CaptionLbl: Label 'Vendors item no.';
+        ItemDateFilter: Text[30];
 
     procedure Pct(Number1: Decimal; Number2: Decimal): Decimal
     begin

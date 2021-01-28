@@ -1,16 +1,10 @@
 report 6014533 "NPR Inventory - flow"
 {
-    // NPR70.00.00.00/LS/20141107  CASE 187452 : Convert Report to NAV 2013
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.49/BHR /20190115  CASE 341969 Corrections as per OMA Guidelines
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Inventory - flow.rdlc';
-
     Caption = 'Inventory Flow';
     UseRequestPage = true;
     UseSystemPrinter = true;
-
     dataset
     {
         dataitem(Vendor; Vendor)
@@ -107,9 +101,9 @@ report 6014533 "NPR Inventory - flow"
 
                     trigger OnAfterGetRecord()
                     var
+                        ItemL2: Record Item;
                         ItemL3: Record Item;
                         Done: Boolean;
-                        ItemL2: Record Item;
                     begin
                         Item2.SetRange("NPR Item Group", "Item Group"."No.");
                         Item2.SetRange("Vendor No.", Item."Vendor No.");
@@ -125,8 +119,7 @@ report 6014533 "NPR Inventory - flow"
                         ItemL3.SetRange("NPR Item Group", "Item Group"."No.");
                         if Item.GetFilter("Statistics Group") <> '' then
                             ItemL3.SetRange("Statistics Group", Item."Statistics Group");
-
-                        if ItemL3.FindFirst then
+                        if ItemL3.FindFirst() then
                             repeat
                                 if ItemL3."No." = ItemNo then begin
                                     if ItemL3.Next = 0 then begin
@@ -138,12 +131,12 @@ report 6014533 "NPR Inventory - flow"
                                         Done := true;
                                     end;
                                 end;
-                                if ItemL3.Next = 0 then
+                                if ItemL3.Next() = 0 then
                                     Done := true;
                             until Done;
 
                         if NewGroup then begin
-                            if Item2.FindFirst then
+                            if Item2.FindFirst() then
                                 repeat
                                     ShowTotalGroup := true;
 
@@ -163,7 +156,7 @@ report 6014533 "NPR Inventory - flow"
                                         GroupSalesFlowQty := GroupSalesQty / (StockInventoryStart2 + GroupPurchaseQty) * 100
                                     else
                                         GroupSalesFlowQty := 0;
-                                until Item2.Next = 0;
+                                until Item2.Next() = 0;
                         end;
 
                         ShowItemGroupSection := (ShowGroups and ShowTotalGroup);
@@ -178,8 +171,8 @@ report 6014533 "NPR Inventory - flow"
 
                 trigger OnAfterGetRecord()
                 var
-                    Done: Boolean;
                     ItemL: Record Item;
+                    Done: Boolean;
                     UpdateGroupSales: Boolean;
                 begin
                     dg := 0;
@@ -187,7 +180,6 @@ report 6014533 "NPR Inventory - flow"
                         dg := ("Sales (LCY)" - "COGS (LCY)") / "Sales (LCY)" * 100;
 
                     ItemNo := "No.";
-
 
                     // Stocks - calculates inventory at the beginning and end
                     Item1.CopyFilters(Item);
@@ -227,50 +219,36 @@ report 6014533 "NPR Inventory - flow"
                                         ShowTotalGroup2 := true;
                                         Done := true;
                                     end;
-
-                                    //  ///LSIF tmpItem."Item Group" <> "Item Group"."No." THEN BEGIN
-                                    //      showTotalgroup2 := TRUE;
-                                    //      done := TRUE;
-                                    //      END;
-                                    //
                                 end;
-                                if ItemL.Next = 0 then
+                                if ItemL.Next() = 0 then
                                     Done := true;
                             until Done;
 
                         if not ShowTotalGroup2 then
                             if StockInventoryEnd = 0 then
-                                CurrReport.Skip;
+                                CurrReport.Skip();
                     end;
 
                     ShowTotalGroup2 := false;
                     if SkipNoSales then begin
                         Done := false;
                         ItemL.SetRange("Vendor No.", Item."Vendor No.");
-                        ////LS  tmpItem.SETRANGE("Item Group", "Item Group"."No.");
-                        if ItemL.FindFirst then
+                        if ItemL.FindFirst() then
                             repeat
                                 if ItemL."No." = ItemNo then begin
-                                    //tmpItem.NEXT(1);
                                     if ItemL.Next = 0 then begin
                                         ShowTotalGroup2 := true;
                                         Done := true;
                                     end;
-
-                                    //      ///LS IF tmpItem."Item Group" <> "Item Group"."No." THEN BEGIN
-                                    //       showTotalgroup2 := TRUE;
-                                    //       done := TRUE;
-                                    //       END;
-                                    //
                                 end;
-                                if ItemL.Next = 0 then
+                                if ItemL.Next() = 0 then
                                     Done := true;
                             until Done;
 
                         // if the next item does not belong to another group of products
                         if not ShowTotalGroup2 then
                             if "Sales (LCY)" = 0 then
-                                CurrReport.Skip;
+                                CurrReport.Skip();
                     end;
 
                     UpdateGroupSales := true;
@@ -312,7 +290,6 @@ report 6014533 "NPR Inventory - flow"
 
                     ItemGroupPrevious := Item."NPR Item Group";
 
-                    //-NPR70.00.00.00
                     ShowItem := false;
                     ShowItemSection := (not OnlyTotal and not SkipWithoutPortfolio and not SkipNoSales);
 
@@ -329,7 +306,6 @@ report 6014533 "NPR Inventory - flow"
                             ShowItem := true;
                         ShowItemSection := (not OnlyTotal and ShowItem);
                     end;
-                    //+NPR70.00.00.00
                 end;
 
                 trigger OnPreDataItem()
@@ -383,10 +359,6 @@ report 6014533 "NPR Inventory - flow"
                 }
             }
         }
-
-        actions
-        {
-        }
     }
 
     labels
@@ -422,38 +394,38 @@ report 6014533 "NPR Inventory - flow"
     end;
 
     var
-        SalesFlowQty: Decimal;
-        SalesFlowAmt: Decimal;
         CompanyInfo: Record "Company Information";
-        dg: Decimal;
-        SkipNoSales: Boolean;
-        OnlyTotal: Boolean;
         Item1: Record Item;
-        StockInventoryStart: Decimal;
-        StockInventoryEnd: Decimal;
-        SkipWithoutPortfolio: Boolean;
-        Regulatory: Decimal;
-        ShowGroups: Boolean;
         Item2: Record Item;
-        StockInventoryStart2: Decimal;
-        StockInventoryEnd2: Decimal;
-        ShowTotalGroup: Boolean;
-        ItemNo: Code[20];
         NewGroup: Boolean;
-        GroupSalesQty: Decimal;
+        OnlyTotal: Boolean;
+        ShowGroups: Boolean;
+        ShowItem: Boolean;
+        ShowItemGroupSection: Boolean;
+        ShowItemSection: Boolean;
+        ShowTotalGroup: Boolean;
         ShowTotalGroup2: Boolean;
+        ShowVendorSection: Boolean;
+        SkipNoSales: Boolean;
+        SkipWithoutPortfolio: Boolean;
         ItemGroupPrevious: Code[10];
-        GroupPurchaseQty: Decimal;
-        PurchaseLCY: Decimal;
-        SalesLCY: Decimal;
+        ItemNo: Code[20];
         ConsumptionLCY: Decimal;
+        dg: Decimal;
+        GroupControl: Decimal;
         GroupProfitPct: Decimal;
+        GroupPurchaseQty: Decimal;
         GroupSalesFlowAmt: Decimal;
         GroupSalesFlowQty: Decimal;
-        GroupControl: Decimal;
-        ShowVendorSection: Boolean;
-        ShowItemSection: Boolean;
-        ShowItemGroupSection: Boolean;
-        ShowItem: Boolean;
+        GroupSalesQty: Decimal;
+        PurchaseLCY: Decimal;
+        Regulatory: Decimal;
+        SalesFlowAmt: Decimal;
+        SalesFlowQty: Decimal;
+        SalesLCY: Decimal;
+        StockInventoryEnd: Decimal;
+        StockInventoryEnd2: Decimal;
+        StockInventoryStart: Decimal;
+        StockInventoryStart2: Decimal;
 }
 

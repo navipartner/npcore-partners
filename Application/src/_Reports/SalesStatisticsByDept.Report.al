@@ -1,31 +1,10 @@
 report 6014535 "NPR Sales Statistics By Dept."
 {
-    // NPR70.00.00.00/LS/140514 : Convert Report to Nav 2013
-    //           -NPR3.2 Ved Nikolai Pedersen  Rettet så sidste år udregnes rigtigt
-    //           -NPR3.2a ved Nikolai og Simon feb05 tilf¢jet db dg til varer
-    //           -NPR3.2b 2005.08.02 ved Simon Oversaettelser
-    //           -NPR3.2cNPR 5 DB rettet så filtre virker som de skal, ændret fra hovedgruppe.copyfilter-->setfilter(hovedgruppe.getfilter(......))
-    //                            samt sorteringen på hovedgruppe er ændret fra sorting(parent item group) til sorting(main item group)
-    // 
-    // NPR5.30/JDH /20170312 CASE        Removed field Balanced amount. It has been discontinued
-    // NPR5.36/TJ  /20170927 CASE 286283 Renamed variables with danish specific letters into english letters
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
-    // NPR5.39/TJ  /20180206  CASE 302634 Changed Name property of column lastYear to english version
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // TM1.39/THRO/20181126  CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
-    // NPR5.50/ZESO/201905006 CASE 353382 Remove Reference to Wrapper Codeunit
-    // NPR5.51/BHR /20190708 CASE 361268  Add filter on blank dimension
-    // NPR5.54/YAHA/20200306 CASE 394848  Increase field Percentage in RDLC
-    // NPR5.55/ANPA/20200610  CASE 402926 Changed Layout
-    // NPR5.55/YAHA/20200610  CASE 394884 Header layout modification
-    // NPR5.55/BHR/20200728  CASE 361515 remove Key reference not used in AL
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Statistics By Department.rdlc';
-
     Caption = 'Sales Statistics By Department';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem("Dimension Value"; "Dimension Value")
@@ -123,15 +102,10 @@ report 6014535 "NPR Sales Statistics By Dept."
                     else
                         firstDimValue := false;
 
-                //-NPR7
                 CurrentYearShow := true;
                 LastYearShow := true;
 
                 Clear(ValueEntryRec);
-                //-NPR5.55 [361515]
-                //ValueEntryRec.SETCURRENTKEY("Item Ledger Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code",
-                //"Salespers./Purch. Code","Item Group No.","Item No.","Vendor No.","Source No.","Group Sale");
-                //-NPR5.55 [361515]
                 ValueEntryRec.SetRange("Item Ledger Entry Type", ValueEntryRec."Item Ledger Entry Type"::Sale);
                 ValueEntryRec.SetRange("Global Dimension 1 Code", Code);
 
@@ -146,16 +120,9 @@ report 6014535 "NPR Sales Statistics By Dept."
                 if SalesPerson <> '' then
                     ValueEntryRec.SETFILTER("NPR Salesperson Code", SalesPerson);
 
-                //-NPR5.30
-                //ValueEntryRec.CALCSUMS("Sales Amount (Actual)","Cost Amount (Actual)","Purchase Amount (Actual)","Balanced amount");
                 ValueEntryRec.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)", "Purchase Amount (Actual)");
-                //+NPR5.30
 
                 Clear(ItemLedgerEntryRec);
-                //-NPR5.55 [361515]
-                //ItemLedgerEntryRec.SETCURRENTKEY("Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code",
-                //"Item Group No.","Vendor No.","Salesperson Code","Item No.","Source No.");
-                //+NPR5.55 [361515]
                 ItemLedgerEntryRec.SetRange("Entry Type", ItemLedgerEntryRec."Entry Type"::Sale);
                 ItemLedgerEntryRec.SetRange("Global Dimension 1 Code", Code);
 
@@ -180,22 +147,12 @@ report 6014535 "NPR Sales Statistics By Dept."
                 VETotalProfit := VELocSales - VELocCost;
                 VETotalProfitSalesPerc := pct(VETotalProfit, VELocSales);
                 VETotalProfitPerc := pct(VETotalProfit, VETotalGlobalProfit);
-
-                //IF sidsteår AND (dateFilter<>'') THEN
-                //  VETotalPrevYeasPerc := pct(VELocSales, VELastYearTotalSales);
-
-                //-NPR7
                 CurrentYearShow := true;
                 if ((dim1Filter <> '') and (dim1Filter <> Code)) or (VELocQty = 0) then
                     CurrentYearShow := false;
-                //+NPR7
 
                 //Second body :
                 Clear(ValueEntryLastYearRec);
-                //-NPR5.55 [361515]
-                //ValueEntryLastYearRec.SETCURRENTKEY("Item Ledger Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code",
-                //"Salespers./Purch. Code","Item Group No.","Item No.","Vendor No.","Source No.","Group Sale");
-                //+NPR5.55 [361515]
                 ValueEntryLastYearRec.SetRange("Item Ledger Entry Type", ValueEntryRec."Item Ledger Entry Type"::Sale);
                 ValueEntryLastYearRec.SetRange("Global Dimension 1 Code", Code);
 
@@ -216,16 +173,8 @@ report 6014535 "NPR Sales Statistics By Dept."
                     CalcDate('<-1Y>', ValueEntryLastYearRec.GetRangeMax("Posting Date")));
                 end;
 
-                //-NPR5.30
-                //ValueEntryLastYearRec.CALCSUMS("Sales Amount (Actual)","Cost Amount (Actual)","Purchase Amount (Actual)","Balanced amount");
                 ValueEntryLastYearRec.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)", "Purchase Amount (Actual)");
-                //+NPR5.30
-
                 Clear(ItemLedgerEntryLastYearRec);
-                //-NPR5.55 [361515]
-                //ItemLedgerEntryLastYearRec.SETCURRENTKEY("Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code",
-                //"Item Group No.","Vendor No.","Salesperson Code","Item No.","Source No.");
-                //+NPR5.55 [361515]
                 ItemLedgerEntryLastYearRec.SetRange("Entry Type", ItemLedgerEntryRec."Entry Type"::Sale);
                 ItemLedgerEntryLastYearRec.SetRange("Global Dimension 1 Code", Code);
 
@@ -262,7 +211,6 @@ report 6014535 "NPR Sales Statistics By Dept."
                 LastYearShow := (lastYear and (dateFilter <> ''));
                 if ((dim1Filter <> '') and (dim1Filter <> Code)) or (VELocLastYearTotalQty = 0) then
                     LastYearShow := false;
-                //+NPR7
             end;
         }
         dataitem(FooterTotal; "Integer")
@@ -298,16 +246,10 @@ report 6014535 "NPR Sales Statistics By Dept."
 
             trigger OnAfterGetRecord()
             begin
-                ValueEntryRec.Reset;
+                ValueEntryRec.Reset();
                 Clear(ValueEntryRec);
-                //-NPR5.55 [361515]
-                //ValueEntryRec.SETCURRENTKEY("Item Ledger Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code",
-                //"Salespers./Purch. Code","Item Group No.","Item No.","Vendor No.","Source No.","Group Sale");
-                //+NPR5.55 [361515]
                 ValueEntryRec.SetRange("Item Ledger Entry Type", ValueEntryRec."Item Ledger Entry Type"::Sale);
-                //-NPR5.51 [361268]
                 ValueEntryRec.SetFilter("Global Dimension 1 Code", '<>%1', '');
-                //+NPR5.51 [361268]
                 if dateFilter <> '' then
                     ValueEntryRec.SetFilter("Posting Date", dateFilter);
                 if dim1Filter <> '' then
@@ -319,21 +261,11 @@ report 6014535 "NPR Sales Statistics By Dept."
                 if SalesPerson <> '' then
                     ValueEntryRec.SETFILTER(ValueEntryRec."NPR Salesperson Code", SalesPerson);
 
-                //-NPR5.30
-                //ValueEntryRec.CALCSUMS("Sales Amount (Actual)","Cost Amount (Actual)","Purchase Amount (Actual)","Balanced amount");
                 ValueEntryRec.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)", "Purchase Amount (Actual)");
-                //+NPR5.30
-
 
                 Clear(ItemLedgerEntryRec);
-                //-NPR5.55 [361515]
-                //ItemLedgerEntryRec.SETCURRENTKEY("Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code",
-                //"Item Group No.","Vendor No.","Salesperson Code","Item No.","Source No.");
-                //+NPR5.55 [361515]
                 ItemLedgerEntryRec.SetRange("Entry Type", ItemLedgerEntryRec."Entry Type"::Sale);
-                //-NPR5.51 [361268]
                 ItemLedgerEntryRec.SetFilter("Global Dimension 1 Code", '<>%1', '');
-                //+NPR5.51 [361268]
                 if dateFilter <> '' then
                     ItemLedgerEntryRec.SetFilter("Posting Date", dateFilter);
                 if dim1Filter <> '' then
@@ -346,7 +278,6 @@ report 6014535 "NPR Sales Statistics By Dept."
                     ItemLedgerEntryRec.SETFILTER("NPR Salesperson Code", SalesPerson);
 
                 ItemLedgerEntryRec.CalcSums(Quantity);
-
 
                 VETotalQuantity := -ItemLedgerEntryRec.Quantity;
                 VETotalCost := -ValueEntryRec."Cost Amount (Actual)";
@@ -394,17 +325,10 @@ report 6014535 "NPR Sales Statistics By Dept."
             begin
                 //-Past year
                 if lastYear and (dateFilter <> '') then begin
-                    ValueEntryLastYearRec.Reset;
+                    ValueEntryLastYearRec.Reset();
                     Clear(ValueEntryLastYearRec);
-                    //-NPR5.55 [361515]
-                    //ValueEntryLastYearRec.SETCURRENTKEY(
-                    //"Item Ledger Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code",
-                    //"Salespers./Purch. Code","Item Group No.","Item No.","Vendor No.","Source No.","Group Sale");
-                    //+NPR5.55 [361515]
                     ValueEntryLastYearRec.SetRange("Item Ledger Entry Type", ValueEntryRec."Item Ledger Entry Type"::Sale);
-                    //-NPR5.51 [361268]
                     ValueEntryLastYearRec.SetFilter("Global Dimension 1 Code", '<>%1', '');
-                    //+NPR5.51 [361268]
 
                     if dateFilter <> '' then
                         ValueEntryLastYearRec.SetFilter("Posting Date", dateFilter);
@@ -421,20 +345,10 @@ report 6014535 "NPR Sales Statistics By Dept."
                         CalcDate('<-1Y>', ValueEntryLastYearRec.GetRangeMax("Posting Date")));
                     end;
 
-                    //-NPR5.30
-                    //ValueEntryLastYearRec.CALCSUMS(  "Sales Amount (Actual)","Cost Amount (Actual)","Purchase Amount (Actual)","Balanced amount");
                     ValueEntryLastYearRec.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)", "Purchase Amount (Actual)");
-                    //+NPR5.30
-
                     Clear(ItemLedgerEntryLastYearRec);
-                    //-NPR5.55 [361515]
-                    //ItemLedgerEntryLastYearRec.SETCURRENTKEY("Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code",
-                    //"Item Group No.","Vendor No.","Salesperson Code","Item No.","Source No.");
-                    //+NPR5.55 [361515]
                     ItemLedgerEntryLastYearRec.SetRange("Entry Type", ItemLedgerEntryRec."Entry Type"::Sale);
-                    //-NPR5.51 [361268]
                     ItemLedgerEntryLastYearRec.SetFilter("Global Dimension 1 Code", '<>%1', '');
-                    //+NPR5.51 [361268]
 
                     if dateFilter <> '' then
                         ItemLedgerEntryLastYearRec.SetFilter("Posting Date", dateFilter);
@@ -475,7 +389,6 @@ report 6014535 "NPR Sales Statistics By Dept."
                 end;
 
                 LastYearShowFooter := lastYear and (dateFilter <> '');
-                //CurrReport.SHOWOUTPUT(sidsteår AND (dateFilter<>''));
             end;
         }
         dataitem("Item Group"; "NPR Item Group")
@@ -536,10 +449,6 @@ report 6014535 "NPR Sales Statistics By Dept."
             }
         }
 
-        actions
-        {
-        }
-
         trigger OnOpenPage()
         begin
             antalniveauer := 2;
@@ -563,20 +472,13 @@ report 6014535 "NPR Sales Statistics By Dept."
 
     trigger OnInitReport()
     begin
-        firmaopl.Get;
+        firmaopl.Get();
         firmaopl.CalcFields(Picture);
 
         isGroupedByLocation := true;
 
         captionClassDim1 := '1,1,1';
-
-        //-#[353382] [353382]
-        //-TM1.39 [334644]
-        //txtDim1 := SystemEventWrapper.CaptionClassTranslate(GLOBALLANGUAGE, captionClassDim1);
-        //+TM1.39 [334644]
         txtDim1 := CaptionClassTranslate(captionClassDim1);
-
-        //+#[353382] [353382]
 
         txtLabeldim1 := 'Group by ' + txtDim1;
         if GlobalLanguage = 1030 then  //Danish
@@ -595,14 +497,8 @@ report 6014535 "NPR Sales Statistics By Dept."
         vendorFilter := "Item Group".GetFilter("Vendor Filter");
 
         Clear(ValueEntryRec);
-        //-NPR5.55 [361515]
-        //ValueEntryRec.SETCURRENTKEY("Item Ledger Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code",
-        //"Salespers./Purch. Code","Item Group No.","Item No.","Vendor No.","Source No.","Group Sale");
-        //+NPR5.55 [361515]
         ValueEntryRec.SetRange("Item Ledger Entry Type", ValueEntryRec."Item Ledger Entry Type"::Sale);
-        //-NPR5.51 [361268]
         ValueEntryRec.SetFilter("Global Dimension 1 Code", '<>%1', '');
-        //+NPR5.51 [361268]
 
         if dateFilter <> '' then
             ValueEntryRec.SetFilter("Posting Date", dateFilter);
@@ -615,20 +511,11 @@ report 6014535 "NPR Sales Statistics By Dept."
         if SalesPerson <> '' then
             ValueEntryRec.SETFILTER("NPR Salesperson Code", SalesPerson);
 
-        //-NPR5.30
-        //ValueEntryRec.CALCSUMS("Sales Amount (Actual)","Cost Amount (Actual)","Purchase Amount (Actual)","Balanced amount");
         ValueEntryRec.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)", "Purchase Amount (Actual)");
-        //+NPR5.30
 
         Clear(ItemLedgerEntryRec);
-        //-NPR5.55 [361515]
-        //ItemLedgerEntryRec.SETCURRENTKEY("Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code",
-        //"Item Group No.","Vendor No.","Salesperson Code","Item No.","Source No.");
-        //+NPR5.55 [361515]
         ItemLedgerEntryRec.SetRange("Entry Type", ItemLedgerEntryRec."Entry Type"::Sale);
-        //-NPR5.51 [361268]
         ItemLedgerEntryRec.SetFilter("Global Dimension 1 Code", '<>%1', '');
-        //+NPR5.51 [361268]
 
         if dateFilter <> '' then
             ItemLedgerEntryRec.SetFilter("Posting Date", dateFilter);
@@ -648,22 +535,11 @@ report 6014535 "NPR Sales Statistics By Dept."
         VETotalSales := ValueEntryRec."Sales Amount (Actual)";
         VETotalGlobalProfit := VETotalSales - VETotalCost;
 
-
-
-
         //-Past year
         if lastYear and (dateFilter <> '') then begin
-            //pctfjortekst:=text001;
             Clear(ValueEntryLastYearRec);
-            //-NPR5.55 [361515]
-            //ValueEntryLastYearRec.SETCURRENTKEY(
-            //"Item Ledger Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code",
-            //"Salespers./Purch. Code","Item Group No.","Item No.","Vendor No.","Source No.","Group Sale");
-            //+NPR5.55 [361515]
             ValueEntryLastYearRec.SetRange("Item Ledger Entry Type", ValueEntryRec."Item Ledger Entry Type"::Sale);
-            //-NPR5.51 [361268]
             ValueEntryLastYearRec.SetFilter("Global Dimension 1 Code", '<>%1', '');
-            //+NPR5.51 [361268]
 
             if dateFilter <> '' then
                 ValueEntryLastYearRec.SetFilter("Posting Date", dateFilter);
@@ -681,21 +557,11 @@ report 6014535 "NPR Sales Statistics By Dept."
                 CalcDate('<-1Y>', ValueEntryLastYearRec.GetRangeMin("Posting Date")),
                 CalcDate('<-1Y>', ValueEntryLastYearRec.GetRangeMax("Posting Date")));
             end;
-
-            //-NPR5.30
-            //ValueEntryLastYearRec.CALCSUMS("Sales Amount (Actual)","Cost Amount (Actual)","Purchase Amount (Actual)","Balanced amount");
             ValueEntryLastYearRec.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)", "Purchase Amount (Actual)");
-            //+NPR5.30
 
             Clear(ItemLedgerEntryLastYearRec);
-            //-NPR5.55 [361515]
-            //ItemLedgerEntryLastYearRec.SETCURRENTKEY("Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code",
-            //"Item Group No.","Vendor No.","Salesperson Code","Item No.","Source No.");
-            //+NPR5.55 [361515]
             ItemLedgerEntryLastYearRec.SetRange("Entry Type", ItemLedgerEntryRec."Entry Type"::Sale);
-            //-NPR5.51 [361268]
             ItemLedgerEntryLastYearRec.SetFilter("Global Dimension 1 Code", '<>%1', '');
-            //+NPR5.51 [361268]
             if dateFilter <> '' then
                 ItemLedgerEntryLastYearRec.SetFilter("Posting Date", dateFilter);
             if dim1Filter <> '' then
@@ -715,7 +581,6 @@ report 6014535 "NPR Sales Statistics By Dept."
 
             ItemLedgerEntryLastYearRec.CalcSums(Quantity);
 
-
             VELastYearTotalQty := -ItemLedgerEntryLastYearRec.Quantity;
             VELastYearTotalCost := -ValueEntryLastYearRec."Cost Amount (Actual)";
             VELastYearTotalSales := ValueEntryLastYearRec."Sales Amount (Actual)";
@@ -725,9 +590,6 @@ report 6014535 "NPR Sales Statistics By Dept."
             VELastYearTotalProfit := VELastYearTotalSales - VELastYearTotalCost;
             VELastYearTotalProfitSalesPerc := pct(VELastYearTotalProfit, VELastYearTotalSales);
             VELastYearTotalProfitPerc := pct(VELastYearTotalProfit, VELastYearTotalGlobalProfit);
-
-
-            //VETotalPrevYeasPerc := pct(VETotalSales, VELastYearTotalSales);
         end;
         //+Last year
 
@@ -737,70 +599,70 @@ report 6014535 "NPR Sales Statistics By Dept."
     end;
 
     var
-        dg: Decimal;
-        turnoverPct: Decimal;
-        db: Decimal;
-        dgpct: Decimal;
         firmaopl: Record "Company Information";
-        totalTurnover: Decimal;
-        totaldb: Decimal;
-        antalniveauer: Integer;
-        kunmedsalg: Boolean;
-        visvarer: Boolean;
-        lastYear: Boolean;
-        salgfjor: array[5] of Decimal;
-        forbrugfjor: array[5] of Decimal;
-        antalfjor: array[5] of Decimal;
-        pctfjortekst: Text[30];
-        dbVare: array[5] of Decimal;
-        dgVare: array[5] of Decimal;
-        first: Boolean;
-        isGroupedByLocation: Boolean;
-        firstDimValue: Boolean;
-        txtDim1: Text[30];
-        captionClassDim1: Text[30];
-        txtLabeldim1: Text[100];
-        ValueEntryRec: Record "Value Entry";
-        ItemLedgerEntryRec: Record "Item Ledger Entry";
-        VETotalQuantity: Decimal;
-        VETotalCost: Decimal;
-        VETotalSales: Decimal;
-        VETotalGlobalProfit: Decimal;
-        VETotalSalesPerc: Decimal;
-        VETotalPrevYeasPerc: Decimal;
-        VETotalProfit: Decimal;
-        VETotalProfitSalesPerc: Decimal;
-        VETotalProfitPerc: Decimal;
-        VELocQty: Decimal;
-        VELocCost: Decimal;
-        VELocSales: Decimal;
-        VELocPrevYearPerc: Decimal;
-        ValueEntryLastYearRec: Record "Value Entry";
         ItemLedgerEntryLastYearRec: Record "Item Ledger Entry";
-        VELocLastYearTotalQty: Decimal;
+        ItemLedgerEntryRec: Record "Item Ledger Entry";
+        ValueEntryLastYearRec: Record "Value Entry";
+        ValueEntryRec: Record "Value Entry";
+        CurrentYearShow: Boolean;
+        first: Boolean;
+        firstDimValue: Boolean;
+        isGroupedByLocation: Boolean;
+        kunmedsalg: Boolean;
+        lastYear: Boolean;
+        LastYearShow: Boolean;
+        LastYearShowFooter: Boolean;
+        visvarer: Boolean;
+        antalfjor: array[5] of Decimal;
+        db: Decimal;
+        dbVare: array[5] of Decimal;
+        dg: Decimal;
+        dgpct: Decimal;
+        dgVare: array[5] of Decimal;
+        forbrugfjor: array[5] of Decimal;
+        salgfjor: array[5] of Decimal;
+        totaldb: Decimal;
+        totalTurnover: Decimal;
+        turnoverPct: Decimal;
+        VELastYearTotalCost: Decimal;
+        VELastYearTotalGlobalProfit: Decimal;
+        VELastYearTotalProfit: Decimal;
+        VELastYearTotalProfitPerc: Decimal;
+        VELastYearTotalProfitSalesPerc: Decimal;
+        VELastYearTotalQty: Decimal;
+        VELastYearTotalSales: Decimal;
+        VELastYearTotalSalesPerc: Decimal;
+        VELocCost: Decimal;
         VELocLastYearTotalCost: Decimal;
+        VELocLastYearTotalProfit: Decimal;
+        VELocLastYearTotalProfitPerc: Decimal;
+        VELocLastYearTotalProfSalePerc: Decimal;
+        VELocLastYearTotalQty: Decimal;
         VELocLastYearTotalSales: Decimal;
         VELocLastYearTotalSalesPerc: Decimal;
-        VELocLastYearTotalProfit: Decimal;
-        VELocLastYearTotalProfSalePerc: Decimal;
-        VELocLastYearTotalProfitPerc: Decimal;
-        VELastYearTotalQty: Decimal;
-        VELastYearTotalCost: Decimal;
-        VELastYearTotalSales: Decimal;
-        VELastYearTotalGlobalProfit: Decimal;
-        VELastYearTotalSalesPerc: Decimal;
-        VELastYearTotalProfit: Decimal;
-        VELastYearTotalProfitSalesPerc: Decimal;
-        VELastYearTotalProfitPerc: Decimal;
-        FilterList: Text[200];
+        VELocPrevYearPerc: Decimal;
+        VELocQty: Decimal;
+        VELocSales: Decimal;
+        VETotalCost: Decimal;
+        VETotalGlobalProfit: Decimal;
+        VETotalPrevYeasPerc: Decimal;
+        VETotalProfit: Decimal;
+        VETotalProfitPerc: Decimal;
+        VETotalProfitSalesPerc: Decimal;
+        VETotalQuantity: Decimal;
+        VETotalSales: Decimal;
+        VETotalSalesPerc: Decimal;
+        antalniveauer: Integer;
+        SalesPerson: Text;
+        captionClassDim1: Text[30];
         dateFilter: Text[30];
         dim1Filter: Text[30];
         dim2Filter: Text[30];
+        pctfjortekst: Text[30];
+        txtDim1: Text[30];
         vendorFilter: Text[30];
-        CurrentYearShow: Boolean;
-        LastYearShow: Boolean;
-        LastYearShowFooter: Boolean;
-        SalesPerson: Text;
+        txtLabeldim1: Text[100];
+        FilterList: Text[200];
 
     procedure pct(var Value: Decimal; var total: Decimal) resultat: Decimal
     begin
@@ -832,7 +694,6 @@ report 6014535 "NPR Sales Statistics By Dept."
 
     procedure calcVareDg(Vare: Record Item; i: Integer)
     begin
-        //-NPR3.2a
         Clear(db);
         Clear(dg);
         Clear(dgpct);
@@ -844,7 +705,6 @@ report 6014535 "NPR Sales Statistics By Dept."
 
         dbVare[i] += db;
         dgVare[i] += dg;
-        //+NPR3.2a
     end;
 }
 
