@@ -6,7 +6,7 @@ page 6150702 "NPR POS Menu Buttons"
     ApplicationArea = All;
     PromotedActionCategories = 'New,Process,Reports,Level,Order';
     SourceTable = "NPR POS Menu Button";
-    SourceTableView = SORTING("Menu Code");
+    SourceTableView = SORTING("Menu Code",Ordinal);
 
     layout
     {
