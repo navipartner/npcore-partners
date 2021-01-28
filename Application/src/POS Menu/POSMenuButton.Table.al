@@ -259,6 +259,9 @@ table 6150701 "NPR POS Menu Button"
         key(Key1; "Menu Code", ID)
         {
         }
+        key(Key2; "Menu Code", Ordinal)
+        {
+        }
     }
 
     fieldgroups
