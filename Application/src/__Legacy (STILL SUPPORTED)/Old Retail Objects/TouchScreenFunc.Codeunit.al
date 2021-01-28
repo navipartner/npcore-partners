@@ -494,7 +494,6 @@ codeunit 6014505 "NPR Touch Screen - Func."
         Register.Status := Register.Status::Ekspedition;
         Register."Opening Cash" := Register."Closing Cash";
         Register."Closing Cash" := 0;
-        Register."Opened By Salesperson" := SalePOS."Salesperson Code";
         Register.Modify;
 
         AuditRoll.Init;

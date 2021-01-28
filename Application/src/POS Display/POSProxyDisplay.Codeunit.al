@@ -540,10 +540,6 @@ codeunit 6151002 "NPR POS Proxy - Display"
                         Message(BixolonError);
                         exit;
                     end;
-                    //+NPR5.45 [323345]
-
-                    Line1 := PadStr(Register."Display 1", 20);
-                    Line2 := PadStr(Register."Display 2", 20);
                 end;
 
             Action::Clear:

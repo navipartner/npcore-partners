@@ -25,30 +25,6 @@ page 6014491 "NPR Receipt Stats"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Period Name field';
                 }
-                field("Kassedata.""All Normal Sales in Audit Roll"""; Kassedata."All Normal Sales in Audit Roll")
-                {
-                    ApplicationArea = All;
-                    Caption = 'Balance Due (LCY)';
-                    ToolTip = 'Specifies the value of the Balance Due (LCY) field';
-                }
-                field("Kassedata.""All Debit Sales in Audit Roll"""; Kassedata."All Debit Sales in Audit Roll")
-                {
-                    ApplicationArea = All;
-                    Caption = 'Purchases (LCY)';
-                    ToolTip = 'Specifies the value of the Purchases (LCY) field';
-                }
-                field("Kassedata.""Normal Sales in Audit Roll""+Kassedata.""Debit Sales in Audit Roll"""; Kassedata."Normal Sales in Audit Roll" + Kassedata."Debit Sales in Audit Roll")
-                {
-                    ApplicationArea = All;
-                    Caption = 'Total';
-                    ToolTip = 'Specifies the value of the Total field';
-                }
-                field("Kassedata.""Attendance Count in Audit Roll""+Kassedata.""Item Count in Audit Roll Debit"""; Kassedata."Attendance Count in Audit Roll" + Kassedata."Item Count in Audit Roll Debit")
-                {
-                    ApplicationArea = All;
-                    Caption = 'No. of servings';
-                    ToolTip = 'Specifies the value of the No. of servings field';
-                }
             }
             field(PeriodType; PeriodType)
             {
@@ -110,8 +86,6 @@ page 6014491 "NPR Receipt Stats"
     begin
 
         SetDateFilter;
-        Kassedata.CalcFields("All Normal Sales in Audit Roll", "All Debit Sales in Audit Roll", "Attendance Count in Audit Roll",
-          "Item Count in Audit Roll Debit");
     end;
 
     trigger OnFindRecord(Which: Text): Boolean
@@ -145,35 +119,6 @@ page 6014491 "NPR Receipt Stats"
         VendPeriodLength := NewVendPeriodLength;
         AmountType := NewAmountType;
         CurrPage.Update(false);
-    end;
-
-    local procedure ShowVendEntries()
-    begin
-        /*SetDateFilter;
-        VendLedgEntry.RESET;
-        VendLedgEntry.SETCURRENTKEY("Vendor No.","Posting Date");
-        VendLedgEntry.SETRANGE("Vendor No.",Vend."No.");
-        VendLedgEntry.SETFILTER("Posting Date",Vend.GETFILTER("Date Filter"));
-        VendLedgEntry.SETFILTER("Global Dimension 1 Code",Vend.GETFILTER("Global Dimension 1 Filter"));
-        VendLedgEntry.SETFILTER("Global Dimension 2 Code",Vend.GETFILTER("Global Dimension 2 Filter"));
-        FORM.RUN(0,VendLedgEntry);
-         */
-
-    end;
-
-    local procedure ShowVendEntriesDue()
-    begin
-        /*SetDateFilter;
-        VendLedgEntry.RESET;
-        VendLedgEntry.SETCURRENTKEY("Vendor No.",Open,Positive,"Due Date");
-        VendLedgEntry.SETRANGE("Vendor No.",Vend."No.");
-        VendLedgEntry.SETRANGE(Open,TRUE);
-        VendLedgEntry.SETFILTER("Due Date",Vend.GETFILTER("Date Filter"));
-        VendLedgEntry.SETFILTER("Global Dimension 1 Code",Vend.GETFILTER("Global Dimension 1 Filter"));
-        VendLedgEntry.SETFILTER("Global Dimension 2 Code",Vend.GETFILTER("Global Dimension 2 Filter"));
-        FORM.RUN(0,VendLedgEntry);
-         */
-
     end;
 
     local procedure SetDateFilter()

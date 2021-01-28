@@ -38,10 +38,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
         ExchangeLabel."Unit Price" := GetUnitPriceInclVat(RecRef);
         //+NPR5.49 [345209]
         ExchangeLabel."Sales Price Incl. Vat" := GetSalesPriceInclVat(RecRef);
-        if Format(Register."Exchange Label Exchange Period") <> '' then
-            ExchangeLabel."Valid To" := CalcDate(Register."Exchange Label Exchange Period", ValidFromDate)
-        else
-            ExchangeLabel."Valid To" := CalcDate(RetailConfiguration."Exchange Label Exchange Period", ValidFromDate);
+        ExchangeLabel."Valid To" := CalcDate(RetailConfiguration."Exchange Label Exchange Period", ValidFromDate);
         ExchangeLabel."Batch No." := LabelBatchNumber;
         ExchangeLabel."Packaged Batch" := PackagedBatch;
 

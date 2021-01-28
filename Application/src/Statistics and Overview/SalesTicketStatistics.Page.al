@@ -30,54 +30,7 @@ page 6014468 "NPR Sales Ticket Statistics"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Period Name field';
                 }
-                field("Kassedata.""All Normal Sales in Audit Roll"""; Kassedata."All Normal Sales in Audit Roll")
-                {
-                    ApplicationArea = All;
-                    Caption = 'Balance Due (LCY)';
-                    ToolTip = 'Specifies the value of the Balance Due (LCY) field';
 
-                    trigger OnDrillDown()
-                    var
-                        AuditRoll: Record "NPR Audit Roll";
-                    begin
-
-                        AuditRoll.SetRange("Sale Date", "Period Start", "Period End");
-                        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
-                        AuditRoll.SetRange(Type, AuditRoll.Type::Item);
-                        Clear(AuditRollForm);
-                        AuditRollForm.SetExtFilters(true);
-                        AuditRollForm.SetTableView(AuditRoll);
-                        AuditRollForm.RunModal;
-                    end;
-                }
-                field("Kassedata.""All Debit Sales in Audit Roll"""; Kassedata."All Debit Sales in Audit Roll")
-                {
-                    ApplicationArea = All;
-                    Caption = 'Purchases (LCY)';
-                    ToolTip = 'Specifies the value of the Purchases (LCY) field';
-
-                    trigger OnDrillDown()
-                    var
-                        AuditRoll: Record "NPR Audit Roll";
-                    begin
-
-                        AuditRoll.SetRange("Sale Date", "Period Start", "Period End");
-                        //-NPR4.12
-                        //AuditRoll.SETRANGE( Type, AuditRoll.Type::"Debit Sale" );
-                        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::"Debit Sale");
-                        //+NPR4.12
-                        Clear(AuditRollForm);
-                        AuditRollForm.SetExtFilters(true);
-                        AuditRollForm.SetTableView(AuditRoll);
-                        AuditRollForm.RunModal;
-                    end;
-                }
-                field("Kassedata.""All Normal Sales in Audit Roll""+Kassedata.""All Debit Sales in Audit Roll"""; Kassedata."All Normal Sales in Audit Roll" + Kassedata."All Debit Sales in Audit Roll")
-                {
-                    ApplicationArea = All;
-                    Caption = 'Total';
-                    ToolTip = 'Specifies the value of the Total field';
-                }
                 field(totalCount; totalCount)
                 {
                     ApplicationArea = All;
@@ -174,13 +127,7 @@ page 6014468 "NPR Sales Ticket Statistics"
 
         SetDateFilter;
         SetDimensionFilters;
-        //-NPR4.10
-        //Kassedata.CALCFIELDS("All Normal Sales in Audit Roll","All Debit Sales in Audit Roll","All Count in Audit Roll",
-        //  "All Item in Audit Roll Debit");
-        Kassedata.CalcFields("All Normal Sales in Audit Roll", "All Debit Sales in Audit Roll");
-
         CalcAverage();
-        //+NPR4.10
     end;
 
     trigger OnFindRecord(Which: Text): Boolean
@@ -264,9 +211,6 @@ page 6014468 "NPR Sales Ticket Statistics"
         //+NPR5.31
         totalCount := AuditRoll.GetNoOfSales();
         AuditRoll.SetRange("Sale Type");
-        //+NPR4.12
-        totalAmount := Kassedata."All Normal Sales in Audit Roll";
-        //+NPR4.10
 
         if totalCount <> 0 then
             Average := totalAmount / totalCount
@@ -276,16 +220,6 @@ page 6014468 "NPR Sales Ticket Statistics"
 
     procedure SetDimensionFilters()
     begin
-        if Dim1Filter <> '' then
-            Kassedata.SetRange("Global Dimension 1 Filter", Dim1Filter)
-        else
-            Kassedata.SetRange("Global Dimension 1 Filter");
-
-        if Dim2Filter <> '' then
-            Kassedata.SetFilter("Global Dimension 2 Filter", Dim2Filter)
-        else
-            Kassedata.SetRange("Global Dimension 2 Filter");
-
         //-NPR4.10
         if Dim1Filter <> '' then
             AuditRoll.SetRange("Shortcut Dimension 1 Code", Dim1Filter)

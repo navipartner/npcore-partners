@@ -628,21 +628,19 @@ codeunit 6014560 "NPR Report - Sales Ticket"
     begin
         FlagOpenDrawer := true;
 
-        if not Register."Money drawer - open on special" then begin
-            FlagOpenDrawer := false;
-            if AuditRoll."No. Printed" < 1 then begin
-                AuditRoll2.SetRange("Sales Ticket No.", AuditRoll."Sales Ticket No.");
-                AuditRoll2.SetRange(Description);
-                AuditRoll2.SetRange("Sale Type");
-                PaymentTypePos.SetFilter("Processing Type", '%1|%2',
-                                         PaymentTypePos."Processing Type"::Cash,
-                                         PaymentTypePos."Processing Type"::"Foreign Currency");
-                if PaymentTypePos.FindSet then
-                    repeat
-                        AuditRoll2.SetRange("No.", PaymentTypePos."No.");
-                        FlagOpenDrawer := not AuditRoll2.IsEmpty();
-                    until (PaymentTypePos.Next = 0) or FlagOpenDrawer;
-            end;
+        FlagOpenDrawer := false;
+        if AuditRoll."No. Printed" < 1 then begin
+            AuditRoll2.SetRange("Sales Ticket No.", AuditRoll."Sales Ticket No.");
+            AuditRoll2.SetRange(Description);
+            AuditRoll2.SetRange("Sale Type");
+            PaymentTypePos.SetFilter("Processing Type", '%1|%2',
+                                     PaymentTypePos."Processing Type"::Cash,
+                                     PaymentTypePos."Processing Type"::"Foreign Currency");
+            if PaymentTypePos.FindSet then
+                repeat
+                    AuditRoll2.SetRange("No.", PaymentTypePos."No.");
+                    FlagOpenDrawer := not AuditRoll2.IsEmpty();
+                until (PaymentTypePos.Next = 0) or FlagOpenDrawer;
         end;
     end;
 
