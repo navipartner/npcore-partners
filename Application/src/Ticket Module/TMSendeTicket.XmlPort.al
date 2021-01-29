@@ -190,6 +190,13 @@ xmlport 6060124 "NPR TM Send eTicket"
 
     end;
 
+    procedure GetResponse(var ResponseMessage: Text[250]): Boolean
+    begin
+        tmpTicketReservationResponse.FindFirst();
+        ResponseMessage := tmpTicketReservationResponse."Response Message";
+        exit(tmpTicketReservationResponse.Confirmed);
+    end;
+
     local procedure CreateErrorResponse(ResponseText: Text[250])
     begin
 

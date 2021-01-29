@@ -407,12 +407,10 @@ codeunit 6060115 "NPR TM Ticket WebService"
         ImportEntry."Document Source".CreateOutStream(OutStr);
         Attributes.SetDestination(OutStr);
         Attributes.Export;
-        ImportEntry.Imported := false;
-        ImportEntry."Runtime Error" := false;
         ImportEntry.Modify(true);
         Commit();
 
-        exit(true);
+        exit(not ImportEntry."Runtime Error");
     end;
 
     procedure GetAdmissionCapacity(var AdmissionCapacityCheck: XMLport "NPR TM Admis. Capacity Check")
@@ -434,7 +432,7 @@ codeunit 6060115 "NPR TM Ticket WebService"
     begin
 
         TicketDetails.Import;
-        TicketDetails.CreatResponse();
+        TicketDetails.CreateResponse();
 
     end;
 

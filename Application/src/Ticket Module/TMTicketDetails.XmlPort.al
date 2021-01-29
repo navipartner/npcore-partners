@@ -1,12 +1,5 @@
 xmlport 6060120 "NPR TM Ticket Details"
 {
-    // TM1.24/TSA /20170911 CASE 276842 Initial Version
-    // TM1.25/NPKNAV/20171025  CASE 276842-01 Transport TM1.25 - 25 October 2017
-    // TM1.26/TSA /20171030 CASE 285601 Default only returns a non-printed tickets
-    // TM1.26.01/TSA /20171213 CASE 299811 Changed layout of the request for web
-    // TM1.35/TSA/20180725  CASE 323330 Transport TM1.35 - 25 July 2018
-    // TM1.43/TSA /20191010 CASE 367471 Added Ticket token to ticket response
-
     Caption = 'TM Ticket Details';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -247,7 +240,13 @@ xmlport 6060120 "NPR TM Ticket Details"
         exit(StrSubstNo('%1-%2', ExternalIdCount, QtySum));
     end;
 
-    procedure CreatResponse()
+    procedure GetResponse(var TmpTicketOut: Record "NPR TM Ticket")
+    var
+    begin
+        TmpTicketOut.Copy(tmpticket, true);
+    end;
+
+    procedure CreateResponse()
     var
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -287,17 +286,21 @@ xmlport 6060120 "NPR TM Ticket Details"
                 'TOKEN':
                     begin
                         TicketReservationRequest.SetFilter("Session Token ID", '=%1', filter_value);
-                        if (TicketReservationRequest.FindFirst()) then begin
-                            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
-                            if (Ticket.FindSet()) then begin
-                                tmpTicketReservationResponse.Confirmed := true;
-                                tmpTicketReservationResponse."Response Message" := '';
-                                tmpTicketReservationResponse.Modify();
-                                repeat
-                                    TmpTicket.TransferFields(Ticket, true);
-                                    TmpTicket.Insert();
-                                until (Ticket.Next() = 0);
-                            end;
+                        //if (TicketReservationRequest.FindFirst()) then begin
+                        TicketReservationRequest.SetFilter("Primary Request Line", '=%1', true);
+                        if (TicketReservationRequest.FindSet()) then begin
+                            repeat
+                                Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+                                if (Ticket.FindSet()) then begin
+                                    tmpTicketReservationResponse.Confirmed := true;
+                                    tmpTicketReservationResponse."Response Message" := '';
+                                    tmpTicketReservationResponse.Modify();
+                                    repeat
+                                        TmpTicket.TransferFields(Ticket, true);
+                                        TmpTicket.Insert();
+                                    until (Ticket.Next() = 0);
+                                end;
+                            until (TicketReservationRequest.Next() = 0)
                         end;
                     end;
 

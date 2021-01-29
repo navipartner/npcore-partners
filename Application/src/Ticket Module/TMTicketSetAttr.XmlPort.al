@@ -105,5 +105,10 @@ xmlport 6060121 "NPR TM Ticket Set Attr."
         if (not SuccessIn) then
             ResponseMessage := ResponseMessageIn;
     end;
+
+    procedure GetResponseMessage(var ResponseMessageOut: Text)
+    begin
+        ResponseMessageOut := ResponseMessage;
+    end;
 }
 

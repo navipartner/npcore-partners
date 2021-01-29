@@ -300,4 +300,11 @@ xmlport 6060108 "NPR TM Ticket Conf. Change Req"
         end;
 
     end;
+
+    procedure GetConfirmResponse(var TmpTicketReservationResponseOut: Record "NPR TM Ticket Reserv. Resp." temporary; var ErrorMessage: Text): Boolean
+    begin
+        TmpTicketReservationResponseOut.Copy(tmpTicketReservationResponse, true);
+        ErrorMessage := ResponseMessage;
+        exit(ResponseCode = 'OK');
+    end;
 }

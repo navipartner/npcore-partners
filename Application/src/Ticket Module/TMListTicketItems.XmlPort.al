@@ -1,11 +1,10 @@
 xmlport 6060112 "NPR TM List Ticket Items"
 {
-    // #376136/TSA /20200128 CASE 376136 Initial Version
-    // TM90.1.46/TSA/20200402  CASE 387877 Transport TM1.46 - 2 April 2020
 
     Caption = 'List Ticket Items';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
+    Encoding = UTF8;
 
     schema
     {
@@ -275,6 +274,11 @@ xmlport 6060112 "NPR TM List Ticket Items"
 
         Clear(ItemVariant);
         ItemVariant.Reset();
+    end;
+
+    procedure GetResponse(var TmpItemVariantOut: Record "Item Variant" temporary)
+    begin
+        TmpItemVariantOut.Copy(TmpItemVariant, true);
     end;
 
     local procedure GetFirstMagentoURL(ItemNo: Code[20]): Text
