@@ -8,7 +8,7 @@ xmlport 6060107 "NPR TM Ticket Change Request"
 
     schema
     {
-        textelement(tickets)
+        textelement(Tickets)
         {
             MinOccurs = Once;
             MaxOccurs = Once;
@@ -248,6 +248,14 @@ xmlport 6060107 "NPR TM Ticket Change Request"
 
         ResponseCode := 'OK';
         ResponseMessage := '';
+    end;
+
+    procedure GetChangeRequest(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary; ErrorMessage: Text): Boolean
+    begin
+        ErrorMessage := ResponseMessage;
+        TmpTicketReservationRequest.Copy(tmpChangeRequest, true);
+
+        exit(ResponseCode = 'OK');
     end;
 
     procedure SetError(ErrorMessage: Text)

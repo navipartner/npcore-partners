@@ -101,7 +101,7 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
             exit(true);
 
         if (not CreateTicketPrintOrderXml(TicketRequestXml, TicketReservationRequest."Session Token ID", MarkTicketAsPrinted, FailReasonText)) then begin
-            FailReasonText := GetLastErrorText();
+            //FailReasonText := GetLastErrorText();
             exit(false);
         end;
 
