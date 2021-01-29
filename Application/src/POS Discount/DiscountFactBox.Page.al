@@ -1,8 +1,5 @@
 page 6014614 "NPR Discount FactBox"
 {
-    // NPR5.41/TS /20180330 CASE FactBox created to show if Item has Mix or Period Discount.
-    // NPR5.45/TS  /20180824  CASE Added MultipleUnitPrice
-    // NPR5.48/TS  /20181218  CASE Corrected MultipleUnit Price
 
     Caption = 'Discount FactBox';
     InsertAllowed = false;
@@ -39,7 +36,7 @@ page 6014614 "NPR Discount FactBox"
                 Caption = 'Period Discount';
                 ToolTip = 'Specifies the value of the Period Discount field';
 
-                trigger OnDrillDown()
+                trigger OnAssistEdit()
                 var
                     CampaignDiscountLines: Page "NPR Campaign Discount Lines";
                     PeriodDiscountLine: Record "NPR Period Discount Line";
@@ -62,16 +59,11 @@ page 6014614 "NPR Discount FactBox"
                     QuantityDiscountHeader: Record "NPR Quantity Discount Header";
                     QuantityDiscountCard: Page "NPR Quantity Discount Card";
                 begin
-                    //-NPR5.45 [308196]
                     QuantityDiscountCard.Editable(false);
                     QuantityDiscountHeader.Reset;
-                    //-NPR5.48 [340047]
-                    //QuantityDiscountHeader.SETFILTER("Main No.", "No.");
                     QuantityDiscountHeader.SetFilter("Item No.", "No.");
-                    //+NPR5.48 [340047]
                     QuantityDiscountCard.SetTableView(QuantityDiscountHeader);
                     QuantityDiscountCard.RunModal;
-                    //+NPR5.45 [308196]
                 end;
             }
         }
@@ -84,9 +76,7 @@ page 6014614 "NPR Discount FactBox"
     trigger OnAfterGetRecord()
     begin
         HasDiscounts();
-        //-NPR5.45 [308196]
         HasMultipleUnitPrice();
-        //+NPR5.45 [308196]
     end;
 
     var
@@ -145,17 +135,11 @@ page 6014614 "NPR Discount FactBox"
     var
         QuantityDiscountHeader: Record "NPR Quantity Discount Header";
     begin
-        //-NPR5.45 [308196]
         MultipleUnitPrice := false;
-        //-NPR5.48 [340047]
-        //QuantityDiscountHeader.SETFILTER("Main No.", "No.");
-        //QuantityDiscountHeader.SETFILTER("Starting Date", '>%1', TODAY);
         QuantityDiscountHeader.SetFilter("Item No.", "No.");
         QuantityDiscountHeader.SetRange(Status, QuantityDiscountHeader.Status::Active);
-        //+NPR5.48 [340047]
         if QuantityDiscountHeader.FindFirst then
             MultipleUnitPrice := true;
-        //+NPR5.45 [308196]
     end;
 }
 
