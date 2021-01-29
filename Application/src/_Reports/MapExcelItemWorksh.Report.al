@@ -2,6 +2,8 @@ report 6060044 "NPR Map Excel Item Worksh."
 {
     Caption = 'Map Excel Item Worksheet';
     ProcessingOnly = true;
+    UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All; 
     dataset
     {
         dataitem("Item Worksheet"; "NPR Item Worksheet")

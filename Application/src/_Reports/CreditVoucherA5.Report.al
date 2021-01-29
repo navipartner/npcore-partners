@@ -1,7 +1,9 @@
 report 6014564 "NPR Credit Voucher A5"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Credit Voucher A5.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Credit Voucher A5.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Credit Voucher A5';
 
     dataset

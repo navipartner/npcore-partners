@@ -1,7 +1,9 @@
 report 6014545 "NPR Acc. Statement w FIK-Card"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Acc. Statement w FIK-Card.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Acc. Statement w FIK-Card.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Acc. Statement w FIK-Card';
 
     dataset

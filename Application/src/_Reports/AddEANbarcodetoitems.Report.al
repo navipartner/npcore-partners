@@ -1,7 +1,9 @@
 report 6060110 "NPR Add EAN barcode to items"
 {
     Caption = 'Add EAN barcode to all items';
-    ProcessingOnly = true;
+    ProcessingOnly = true; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     UseRequestPage = false;
 
     dataset

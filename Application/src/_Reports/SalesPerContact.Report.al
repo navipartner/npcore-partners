@@ -1,7 +1,9 @@
 report 6014597 "NPR Sales Per Contact"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Sales Per Contact.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Sales Per Contact.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Sales Per. Contact';
     dataset
     {

@@ -1,7 +1,9 @@
 report 6014533 "NPR Inventory - flow"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Inventory - flow.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Inventory - flow.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Inventory Flow';
     UseRequestPage = true;
     UseSystemPrinter = true;

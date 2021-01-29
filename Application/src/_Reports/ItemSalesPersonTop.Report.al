@@ -1,7 +1,9 @@
 report 6014474 "NPR Item/Sales Person Top"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/ItemSales Person Top.rdlc';
+    RDLCLayout = './src/_Reports/layouts/ItemSales Person Top.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Item/Sales Person Top';
 
     dataset

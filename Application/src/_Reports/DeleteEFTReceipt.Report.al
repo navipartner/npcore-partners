@@ -1,7 +1,9 @@
 report 6014515 "NPR Delete EFT Receipt"
 {
     Caption = 'Delete EFT Receipt';
-    ProcessingOnly = true;
+    ProcessingOnly = true; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     dataset
     {
         dataitem(Company; Company)

@@ -3,6 +3,8 @@ page 6151301 "NPR NpEc Store Card"
     Caption = 'E-commerce Store Card';
     PageType = Card;
     SourceTable = "NPR NpEc Store";
+    UsageCategory = Administration; 
+    ApplicationArea = All; 
     layout
     {
         area(content)

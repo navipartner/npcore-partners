@@ -1,7 +1,9 @@
 report 6014440 "NPR Sales Doc Confirmation A4"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Sales Doc Confirmation A4.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Sales Doc Confirmation A4.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Sales Doc Confirmation A4';
     PreviewMode = PrintLayout;
     dataset

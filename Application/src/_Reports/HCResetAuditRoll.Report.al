@@ -1,7 +1,9 @@
 report 6150901 "NPR HC Reset Audit Roll"
 {
 Caption = 'HC Reset Audit Roll';
-    ProcessingOnly = true;
+    ProcessingOnly = true; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     dataset
     {
         dataitem("HC Audit Roll"; "NPR HC Audit Roll")

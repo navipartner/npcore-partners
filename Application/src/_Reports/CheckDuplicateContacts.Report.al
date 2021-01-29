@@ -1,7 +1,9 @@
 report 6060112 "NPR Check Duplicate Contacts"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Check Duplicate Contacts.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Check Duplicate Contacts.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Check Duplicate Contacts';
     dataset
     {

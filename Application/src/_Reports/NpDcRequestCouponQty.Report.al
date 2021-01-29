@@ -2,6 +2,8 @@ report 6151590 "NPR NpDc Request Coupon Qty."
 {
     Caption = 'Request Coupon Qty.';
     ProcessingOnly = true;
+    UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
     requestpage
     {
 

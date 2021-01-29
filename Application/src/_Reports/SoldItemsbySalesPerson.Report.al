@@ -1,7 +1,9 @@
 report 6014412 "NPR Sold Items by Sales Person"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Sold Items by Sales Person.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Sold Items by Sales Person.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Sold Items By Sales Person';
     dataset
     {

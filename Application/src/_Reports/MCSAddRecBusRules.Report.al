@@ -2,6 +2,8 @@ report 6060080 "NPR MCS Add Rec. Bus. Rules"
 {
     Caption = 'MCS Add Rec. Business Rules';
     ProcessingOnly = true;
+    UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All; 
     dataset
     {
         dataitem("MCS Recommendations Model"; "NPR MCS Recomm. Model")

@@ -1,7 +1,9 @@
 report 6060111 "NPR Check Duplicate Cust."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Check Duplicate Customers.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Check Duplicate Customers.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Check Duplicate Customers';
 
     dataset

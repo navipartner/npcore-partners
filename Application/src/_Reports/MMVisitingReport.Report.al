@@ -3,6 +3,8 @@ report 6060133 "NPR MM Visiting Report"
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Visiting Report.rdlc';
     Caption = 'MM Visiting Report';
+    UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
     dataset
     {
         dataitem("MM Membership"; "NPR MM Membership")

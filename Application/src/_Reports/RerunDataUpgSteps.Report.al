@@ -1,7 +1,9 @@
 report 6150699 "NPR Re-run Data Upg. Steps"
 {
     Caption = 'Re-run Data Upg. Build Steps';
-    ProcessingOnly = true;
+    ProcessingOnly = true; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     requestpage
     {
 

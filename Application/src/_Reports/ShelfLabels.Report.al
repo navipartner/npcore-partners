@@ -1,7 +1,9 @@
 report 6014428 "NPR Shelf Labels"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Shelf Labels.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Shelf Labels.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Shelf Labels';
     PreviewMode = PrintLayout;
     UseSystemPrinter = true;

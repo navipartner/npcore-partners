@@ -1,7 +1,9 @@
 report 6014504 "NPR Customer Note"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Customer Note.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Customer Note.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Customer Note';
     PreviewMode = PrintLayout;
     dataset

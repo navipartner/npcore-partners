@@ -4,6 +4,7 @@ page 6060054 "NPR Item Worksh. Field Setup"
     PageType = List;
     SourceTable = "NPR Item Worksh. Field Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

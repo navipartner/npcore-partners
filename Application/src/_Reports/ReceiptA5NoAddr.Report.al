@@ -1,7 +1,9 @@
 report 6014563 "NPR Receipt A5 - No Addr."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Receipt A5 - No Addr..rdlc';
+    RDLCLayout = './src/_Reports/layouts/Receipt A5 - No Addr..rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Receipt A5';
     PreviewMode = PrintLayout;
     dataset

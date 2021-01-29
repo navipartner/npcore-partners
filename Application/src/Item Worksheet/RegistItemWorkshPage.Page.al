@@ -9,6 +9,8 @@ page 6060047 "NPR Regist. Item Worksh. Page"
     PopulateAllFields = true;
     SaveValues = true;
     SourceTable = "NPR Regist. Item Worksh Line";
+    UsageCategory = Administration;
+    ApplicationArea = All; 
 
     layout
     {

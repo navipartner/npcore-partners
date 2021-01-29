@@ -1,7 +1,9 @@
 report 6014501 "NPR Repair Offer"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Repair Offer.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Repair Offer.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Repair Offer';
     PreviewMode = PrintLayout;
     dataset

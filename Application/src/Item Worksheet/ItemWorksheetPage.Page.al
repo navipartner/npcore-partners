@@ -8,6 +8,8 @@ page 6060042 "NPR Item Worksheet Page"
     RefreshOnActivate = true;
     SaveValues = true;
     SourceTable = "NPR Item Worksheet Line";
+    UsageCategory = Documents;
+    ApplicationArea = All; 
 
     layout
     {

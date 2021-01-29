@@ -4,7 +4,9 @@ page 6151305 "NPR NpEc Customer Mapping"
     DelayedInsert = true;
     PageType = List;
     SourceTable = "NPR NpEc Customer Mapping";
-    UsageCategory = Administration;
+    UsageCategory = Lists;
+    ApplicationArea = All; 
+
     layout
     {
         area(content)

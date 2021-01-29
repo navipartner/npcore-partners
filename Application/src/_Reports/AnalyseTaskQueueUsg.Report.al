@@ -1,7 +1,9 @@
 report 6059900 "NPR Analyse Task Queue Usg."
 {
 DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Analyse Task Queue Usage.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Analyse Task Queue Usage.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Analyse Task Queue Usage';
     dataset
     {

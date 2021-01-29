@@ -1,7 +1,9 @@
 report 6060102 "NPR Data Cleanup Process"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Data Cleanup Process.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Data Cleanup Process.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Data Cleanup Process';
     dataset
     {
