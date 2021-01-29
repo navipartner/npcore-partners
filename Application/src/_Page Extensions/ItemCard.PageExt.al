@@ -1,71 +1,7 @@
 pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
 {
     layout
-    {
-        addbefore(Item)
-        {
-            group(NPR_Control6150668)
-            {
-                ShowCaption = false;
-                group(NPR_Control6150618)
-                {
-                    ShowCaption = false;
-                    field(NPR_SearchNo; SearchNo)
-                    {
-                        Caption = 'Find Item Card';
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Find Item Card field';
-                        trigger OnValidate()
-                        var
-                            BarcodeLibrary: Codeunit 6014528;
-                            ItemNo: Code[20];
-                            VariantCode: Code[10];
-                            ResolvingTable: Integer;
-                        begin
-                            IF FORMAT(OriginalRec) <> FORMAT(Rec) THEN
-                                MODIFY(TRUE);
-
-                            IF BarcodeLibrary.TranslateBarcodeToItemVariant(SearchNo, ItemNo, VariantCode, ResolvingTable, TRUE) THEN BEGIN
-                                SETRANGE("No.", ItemNo);
-                                FINDFIRST;
-                            END;
-
-                            CLEAR(SearchNo);
-                        end;
-                    }
-                }
-                group(NPR_Control6150616)
-                {
-                    ShowCaption = false;
-                    field(NPR_Barcode; Barcode)
-                    {
-                        caption = 'Create barcode';
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Create barcode field';
-                        trigger OnValidate()
-                        var
-                            VarietyCloneData: Codeunit 6059972;
-                        begin
-                            VarietyCloneData.AddCustomBarcode("No.", '', Barcode);
-                            Barcode := '';
-                        end;
-
-                        trigger OnAssistEdit()
-                        var
-                            VarietyCloneData: Codeunit 6059972;
-                        begin
-                            VarietyCloneData.LookupBarcodes("No.", '');
-                        end;
-
-                    }
-
-                }
-            }
-
-        }
-
-
-
+    { 
         addafter(Description)
         {
             field("NPR Description 2"; "Description 2")
