@@ -7,6 +7,7 @@ page 6060049 "NPR Item Worksh. Missing Setup"
                       ORDER(Ascending)
                       WHERE("Missing Records" = FILTER(> 0));
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

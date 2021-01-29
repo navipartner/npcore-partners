@@ -1,7 +1,9 @@
 report 6014555 "NPR Attribute Filter"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/NPR Attribute Filter.rdlc';
+    RDLCLayout = './src/_Reports/layouts/NPR Attribute Filter.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'NPR Attribute Filter';
 
     dataset

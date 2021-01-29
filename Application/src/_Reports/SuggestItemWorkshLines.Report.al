@@ -1,7 +1,9 @@
 report 6060040 "NPR Suggest Item Worksh. Lines"
 {
     Caption = 'Suggest Item Worksheet Lines';
-    ProcessingOnly = true;
+    ProcessingOnly = true; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     dataset
     {
         dataitem("Item Worksheet"; "NPR Item Worksheet")

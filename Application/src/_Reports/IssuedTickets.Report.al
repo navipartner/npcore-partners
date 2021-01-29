@@ -1,7 +1,9 @@
 report 6014413 "NPR Issued Tickets"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Issued Tickets.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Issued Tickets.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Issued Tickets';
     dataset
     {

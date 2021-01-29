@@ -1,7 +1,9 @@
 report 6014459 "NPR Balancing Report A4 POS"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Balancing Report -A4 - POS.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Balancing Report -A4 - POS.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Balancing Report -A4 - POS';
 
     dataset

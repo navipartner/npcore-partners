@@ -1,7 +1,9 @@
 report 6014424 "NPR Ret. Jnl. - Import Items"
 {
     Caption = 'Import Items';
-    ProcessingOnly = true;
+    ProcessingOnly = true; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     dataset
     {
         dataitem(Item; Item)

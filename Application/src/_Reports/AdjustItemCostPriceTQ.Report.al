@@ -1,7 +1,9 @@
 report 6059904 "NPR Adjust Item Cost/Price TQ"
 {
     Caption = 'Adjust Item Costs/Prices';
-    ProcessingOnly = true;
+    ProcessingOnly = true; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
 
     dataset
     {

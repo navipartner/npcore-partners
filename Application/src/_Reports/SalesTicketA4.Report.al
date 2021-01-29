@@ -1,7 +1,9 @@
 report 6014410 "NPR Sales Ticket A4"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Sales Ticket A4.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Sales Ticket A4.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Sales Ticket A4';
     PreviewMode = PrintLayout;
     dataset

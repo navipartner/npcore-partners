@@ -1,7 +1,9 @@
 report 6060100 "NPR Data Cleanup Fill"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Data Cleanup Fill.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Data Cleanup Fill.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Data Cleanup Customer';
     dataset
     {

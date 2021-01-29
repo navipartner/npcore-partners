@@ -1,7 +1,9 @@
 report 6014481 "NPR Ret. Jnl. Imp. Per. Disc."
 {
     Caption = 'Import Periode Discounts';
-    ProcessingOnly = true;
+    ProcessingOnly = true; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     dataset
     {
         dataitem(RetailJournalHeader; "NPR Retail Journal Header")

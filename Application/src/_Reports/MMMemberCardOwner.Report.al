@@ -4,6 +4,8 @@ report 6060135 "NPR MM Member Card Owner"
     RDLCLayout = './src/_Reports/layouts/MM Member Card Owner.rdlc';
     Caption = 'Member Card Owner';
     ShowPrintStatus = false;
+    UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All; 
     dataset
     {
         dataitem("MM Member Card"; "NPR MM Member Card")

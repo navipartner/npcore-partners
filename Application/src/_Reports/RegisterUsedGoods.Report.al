@@ -1,7 +1,9 @@
 report 6014500 "NPR Register Used Goods"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Register Used Goods.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Register Used Goods.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Registrer Used Goods';
     PreviewMode = PrintLayout;
     dataset
