@@ -27,6 +27,7 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
         WebResponse: HttpResponseMessage;
         WebClient: HttpClient;
         Headers: HttpHeaders;
+        ContentHeaders: HttpHeaders;
         XmlDoc: XmlDocument;
         OutStr: OutStream;
         Response: Text;
@@ -35,6 +36,7 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
         AuthText: Text;
         InStrm: InStream;
         TempBlob: Codeunit "Temp Blob";
+        XmlText: Text;
     begin
         if NcTask.Type <> NcTask.Type::Insert then
             exit;
@@ -68,10 +70,21 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
 
         WebRequest.SetRequestUri(NpGpGlobalSalesSetup."Service Url");
         WebRequest.Method := 'POST';
+
+        XmlDoc.WriteTo(XmlText);
+        WebRequest.Content.WriteFrom(XmlText);
+
         WebRequest.GetHeaders(Headers);
-        Headers.Clear();
-        Headers.Add('Content-Type', 'text/xml; charset=utf-8');
+        WebRequest.Content.GetHeaders(ContentHeaders);
+
+        if ContentHeaders.Contains('Content-Type') then
+            ContentHeaders.Remove('Content-Type');
+        ContentHeaders.Add('Content-Type', 'text/xml; charset=utf-8');
+
+        if Headers.Contains('SOAPAction') then
+            Headers.Remove('SOAPAction');
         Headers.Add('SOAPAction', 'InsertPosSalesEntries');
+
         // Basic Authorization?
         //AuthText := StrSubstNo('%1:%2', NpGpGlobalSalesSetup."Service Username", ServicePassword);
         //AuthText := Base64Convert.ToBase64(AuthText);
