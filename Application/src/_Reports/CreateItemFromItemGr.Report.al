@@ -1,7 +1,9 @@
 report 6014610 "NPR Create Item From ItemGr."
 {
     Caption = 'Create Item(s) From Item Group';
-    ProcessingOnly = true;
+    ProcessingOnly = true; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     dataset
     {
         dataitem("Item Group"; "NPR Item Group")

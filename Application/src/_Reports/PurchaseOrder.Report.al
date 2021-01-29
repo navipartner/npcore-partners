@@ -1,7 +1,9 @@
 report 6014617 "NPR Purchase Order"
 {
     RDLCLayout = './src/_Reports/layouts/NP Purchase Order.rdlc';
-    WordLayout = './src/_Reports/layouts/NP Purchase Order.docx';
+    WordLayout = './src/_Reports/layouts/NP Purchase Order.docx'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'NP Purchase Order';
     DefaultLayout = Word;
     PreviewMode = PrintLayout;

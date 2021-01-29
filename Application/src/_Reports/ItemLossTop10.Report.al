@@ -1,7 +1,9 @@
 report 6014543 "NPR Item - Loss - Top 10"
 {
     RDLCLayout = './src/_Reports/layouts/Item - Loss - Top 10.rdlc';
-    Caption = 'Item Shrinkage - Top 10';
+    Caption = 'Item Shrinkage - Top 10'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     dataset
     {
         dataitem(Item; Item)

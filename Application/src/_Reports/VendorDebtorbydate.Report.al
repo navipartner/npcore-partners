@@ -1,7 +1,9 @@
 report 6014434 "NPR Vendor/Debtor by date"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/VendorDebtor by date.rdlc';
+    RDLCLayout = './src/_Reports/layouts/VendorDebtor by date.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Vendor/Customer by date';
     dataset
     {

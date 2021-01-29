@@ -1,7 +1,9 @@
 report 6151597 "NPR NpDc Request Priority"
 {
     Caption = 'Request Priority';
-    ProcessingOnly = true;
+    ProcessingOnly = true;   
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     requestpage
     {
 

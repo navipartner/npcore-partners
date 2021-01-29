@@ -4,6 +4,9 @@ report 6151405 "NPR Magento Credit Voucher"
     RDLCLayout = './src/_Reports/layouts/Magento Credit Voucher.rdlc';
     Caption = 'Magento - Credit Voucher';
     PreviewMode = PrintLayout;
+    UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All; 
+
     dataset
     {
         dataitem("Credit Voucher"; "NPR Credit Voucher")

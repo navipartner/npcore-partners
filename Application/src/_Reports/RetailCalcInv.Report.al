@@ -1,7 +1,9 @@
 report 6014663 "NPR Retail Calc. Inv."
 {
     Caption = 'Retail Calculate Inventory';
-    ProcessingOnly = true;
+    ProcessingOnly = true; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     dataset
     {
         dataitem(Item; Item)

@@ -1,7 +1,9 @@
 report 6014662 "NPR Retail Inv.: Sales Stat."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Retail Inventory - Sales Stat..rdlc';
+    RDLCLayout = './src/_Reports/layouts/Retail Inventory - Sales Stat..rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Inventory - Sales Statistics';
     dataset
     {

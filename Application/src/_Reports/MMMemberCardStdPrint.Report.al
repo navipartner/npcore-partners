@@ -3,6 +3,8 @@ report 6060123 "NPR MM Member Card Std Print"
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Member Card Std Print.rdlc';
     PreviewMode = PrintLayout;
+    UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

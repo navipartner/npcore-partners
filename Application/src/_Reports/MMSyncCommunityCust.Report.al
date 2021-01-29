@@ -2,6 +2,8 @@ report 6060128 "NPR MM Sync. Community Cust."
 {
     Caption = 'Sync. Community Customers';
     ProcessingOnly = true;
+    UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
     dataset
     {
         dataitem(Community; "NPR MM Member Community")

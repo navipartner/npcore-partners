@@ -1,7 +1,9 @@
 report 6014401 "NPR Counter Report A4"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Counter Report A4.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Counter Report A4.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Counter Report A4';
     dataset
     {

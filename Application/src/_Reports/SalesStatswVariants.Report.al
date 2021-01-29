@@ -1,7 +1,9 @@
 report 6014611 "NPR Sales Stats w/ Variants"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Sales Statistics w Variants.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Sales Statistics w Variants.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Item - Sales Statistics';
     PreviewMode = PrintLayout;
     dataset

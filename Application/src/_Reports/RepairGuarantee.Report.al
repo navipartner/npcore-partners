@@ -1,7 +1,9 @@
 report 6014503 "NPR Repair Guarantee"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Repair Guarantee.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Repair Guarantee.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Repair Guarantee';
     PreviewMode = PrintLayout;
     dataset

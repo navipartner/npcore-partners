@@ -1,7 +1,9 @@
 report 6060065 "NPR Sales Statistics"
 {
     Caption = 'Sales Statistic';
-    ProcessingOnly = true;
+    ProcessingOnly = true; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     dataset
     {
         dataitem("Catalog Supplier"; "NPR Catalog Supplier")

@@ -1,7 +1,9 @@
 report 6014602 "NPR Alt. No. to ICR barcodes"
 {
     Caption = 'Alt. No. to Item Cross Reference barcodes';
-    ProcessingOnly = true;
+    ProcessingOnly = true; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     dataset
     {
         dataitem("Alternative No."; "NPR Alternative No.")

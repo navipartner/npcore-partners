@@ -1,7 +1,9 @@
 report 6014502 "NPR Repair Done"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Repair Done.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Repair Done.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Repair Done';
     PreviewMode = PrintLayout;
     dataset

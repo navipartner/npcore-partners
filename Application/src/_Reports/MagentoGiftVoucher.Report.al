@@ -4,6 +4,8 @@ report 6151406 "NPR Magento Gift Voucher"
     RDLCLayout = './src/_Reports/layouts/Magento Gift Voucher.rdlc';
     Caption = 'Magento Gift Voucher';
     PreviewMode = PrintLayout;
+    UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All; 
     dataset
     {
         dataitem("Gift Voucher"; "NPR Gift Voucher")

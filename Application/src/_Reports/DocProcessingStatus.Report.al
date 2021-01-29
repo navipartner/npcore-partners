@@ -1,7 +1,9 @@
 report 6014463 "NPR Doc. Processing Status"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Document Processing Status.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Document Processing Status.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Document Processing Status';
     dataset
     {

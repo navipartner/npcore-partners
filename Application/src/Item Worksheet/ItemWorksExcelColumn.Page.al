@@ -3,7 +3,8 @@ page 6060053 "NPR Item Works. Excel Column"
     Caption = 'Item Worksheet Excel Column';
     PageType = List;
     SourceTable = "NPR Item Worksh. Excel Column";
-    UsageCategory = Administration;
+    UsageCategory = Lists;
+    ApplicationArea = All; 
     layout
     {
         area(content)

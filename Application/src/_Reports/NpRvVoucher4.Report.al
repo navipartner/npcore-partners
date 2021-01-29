@@ -1,7 +1,9 @@
 report 6151016 "NPR NpRv Voucher 4"
 {
     RDLCLayout = './src/_Reports/layouts/NpRv Voucher 4.rdlc';
-    WordLayout = './src/_Reports/layouts/NpRv Voucher 4.docx';
+    WordLayout = './src/_Reports/layouts/NpRv Voucher 4.docx'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'NpRv Voucher';
     DefaultLayout = Word;
     dataset

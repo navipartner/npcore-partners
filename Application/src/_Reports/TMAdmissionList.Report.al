@@ -1,7 +1,9 @@
 report 6060126 "NPR TM Admission List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/TM Admission List.rdlc';
+    RDLCLayout = './src/_Reports/layouts/TM Admission List.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'TM Admission List';
     dataset
     {

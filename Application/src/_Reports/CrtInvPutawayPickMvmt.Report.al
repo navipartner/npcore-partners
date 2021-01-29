@@ -1,7 +1,9 @@
 report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
 {
     Caption = 'Create Invt. Put-away/Pick/Movement';
-    ProcessingOnly = true;
+    ProcessingOnly = true; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     dataset
     {
         dataitem("Warehouse Request"; "Warehouse Request")

@@ -1,7 +1,9 @@
 report 6014510 "NPR Purch Return Order"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Purch Return Order NP.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Purch Return Order NP.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Return Order';
     PreviewMode = PrintLayout;
     dataset

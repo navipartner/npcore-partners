@@ -2,6 +2,8 @@ report 6060137 "NPR MM Membership Batch Renew"
 {
     Caption = 'Membership Batch Renew';
     ProcessingOnly = true;
+    UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
     dataset
     {
         dataitem(ReportMembership; "NPR MM Membership")

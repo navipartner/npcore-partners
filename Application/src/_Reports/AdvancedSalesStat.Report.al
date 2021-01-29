@@ -1,7 +1,9 @@
 report 6014490 "NPR Advanced Sales Stat."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Advanced Sales Statistics.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Advanced Sales Statistics.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Advanced Sales Statistics';
     UseSystemPrinter = true;
 

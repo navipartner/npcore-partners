@@ -1,7 +1,9 @@
 report 6014452 "NPR Sales Ticket Stats/Date"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Sales Ticket StatisticsDate.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Sales Ticket StatisticsDate.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Sales Ticket Statistics/Date';
     EnableHyperlinks = true;
     dataset

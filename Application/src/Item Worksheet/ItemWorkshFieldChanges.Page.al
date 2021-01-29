@@ -4,7 +4,8 @@ page 6060055 "NPR Item Worksh. Field Changes"
     Editable = false;
     PageType = List;
     SourceTable = "NPR Item Worksh. Field Change";
-    UsageCategory = Administration;
+    UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

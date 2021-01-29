@@ -1,7 +1,9 @@
 report 6060043 "NPR Export Excel Item Worksh."
 {
     Caption = 'Export Excel Item Worksheet';
-    ProcessingOnly = true;
+    ProcessingOnly = true; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     UseRequestPage = false;
 
     dataset

@@ -4,6 +4,8 @@ report 6060130 "NPR MM Membership Points Value"
     RDLCLayout = './src/_Reports/layouts/MM Membership Points Value.rdlc';
     Caption = 'Membership Points Summary';
     PreviewMode = PrintLayout;
+    UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
     dataset
     {
         dataitem("MM Membership"; "NPR MM Membership")

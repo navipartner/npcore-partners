@@ -1,7 +1,9 @@
 report 6014601 "NPR Update Barcodes"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Update Barcodes.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Update Barcodes.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Update Barcodes';
     PreviewMode = PrintLayout;
     dataset

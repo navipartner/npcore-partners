@@ -1,7 +1,9 @@
 report 6060042 "NPR Import Excel Item Worksh."
 {
     Caption = 'Import Excel Item Worksheet';
-    ProcessingOnly = true;
+    ProcessingOnly = true; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     dataset
     {
         dataitem("Item Worksheet"; "NPR Item Worksheet")

@@ -1,7 +1,9 @@
 report 6014574 "NPR Ret. Jnl.: Imp. Ret. Sales"
 {
     Caption = 'Import Return Sales';
-    ProcessingOnly = true;
+    ProcessingOnly = true; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     dataset
     {
         dataitem(RetailJournalHeader; "NPR Retail Journal Header")

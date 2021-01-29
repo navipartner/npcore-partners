@@ -1,7 +1,9 @@
 report 6014482 "NPR Ret. Jnl. Imp. Mix Disc."
 {
     Caption = 'Import Mixed Discounts';
-    ProcessingOnly = true;
+    ProcessingOnly = true; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     dataset
     {
         dataitem(RetailJournalHeader; "NPR Retail Journal Header")

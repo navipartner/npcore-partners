@@ -1,7 +1,9 @@
 report 6014505 "NPR Delivery Note"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Delivery Note.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Delivery Note.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Delivery Note';
     PreviewMode = PrintLayout;
     dataset

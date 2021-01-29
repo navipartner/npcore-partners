@@ -1,7 +1,9 @@
 report 6060108 "NPR Balancing Ticket IV"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Balancing Ticket IV.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Balancing Ticket IV.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Counter Report Ticket IV';
     dataset
     {

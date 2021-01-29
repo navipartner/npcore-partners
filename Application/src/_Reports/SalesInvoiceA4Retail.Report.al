@@ -1,7 +1,9 @@
 report 6014447 "NPR Sales Invoice A4 (Retail)"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Sales Invoice A4 (Retail).rdlc';
+    RDLCLayout = './src/_Reports/layouts/Sales Invoice A4 (Retail).rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Sales Invoice A4 (Retail)';
     dataset
     {

@@ -1,7 +1,9 @@
 report 6014618 "NPR Skip Sales Shipment Print"
 {
     Caption = 'Skip Sales Shipment Print';
-    ProcessingOnly = true;
+    ProcessingOnly = true; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     ShowPrintStatus = false;
     UseRequestPage = false;
 

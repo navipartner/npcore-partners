@@ -1,7 +1,9 @@
 report 6060105 "NPR Terminal Sales Ticket IV"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Terminal Sales Ticket IV.rdlc';
+    RDLCLayout = './src/_Reports/layouts/Terminal Sales Ticket IV.rdlc'; 
+    UsageCategory = ReportsAndAnalysis; 
+    ApplicationArea = All;
     Caption = 'Terminal Sales Ticket IV';
     ShowPrintStatus = false;
     UseRequestPage = false;
