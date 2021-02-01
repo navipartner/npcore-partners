@@ -3,9 +3,14 @@
     "description": "These rules must be respected by all the AL code written within the company.",
     "rules": [
         {
+            "id": "AS0031",
+            "action":"Warning",
+            "justification": "Actions that have been published should not be deleted."
+        },          
+        {
             "id": "AS0032",
             "action":"Warning",
-            "justification": "This should be worning when we publish to AppSource."
+            "justification": "Controls that have been published should not be deleted"
         },        
         {
             "id": "AS0053",
