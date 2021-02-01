@@ -1,33 +1,12 @@
 page 6060121 "NPR TM Ticket BOM"
 {
-    // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
-    // TM1.07/TSA/20160125  CASE 232495 Added field Default for auto selection for admission code
-    // TM1.11/TSA/20160404  CASE 232250 Added new field Prefered Sales Display Method
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // TM1.16/TSA/20160816  CASE 245455 Transport TM1.16 - 19 July 2016
-    // TM1.18/TSA/20170103  CASE 262095 Added field Revoke Policy
-    // TM1.20/TSA/20170323  CASE 269171 Added field Refund Price %
-    // TM1.22/TSA/20170526   CASE 278142 Added Create Prepaid/Postpaid Tickets buttons
-    // TM1.26/NPKNAV/20171122  CASE 285601-01 Transport TM1.26 - 22 November 2017
-    // TM1.27/TSA /20180115 CASE 301459 Improving error handling
-    // TM1.28/TSA /20180221 CASE 305707 Added support for ticket base calendar
-    // TM1.29/TSA /20180314 CASE 308129 Support pre/post tickets with variant codes
-    // TM1.36/TSA /20180801 CASE 316463 Added "Allow Rescan Within (Sec.)" field
-    // TM1.38/TSA /20181012 CASE 332109 Added eTicket
-    // TM1.38/TSA /20181026 CASE 308962 Adding setup to manage prepaid / postpaid tickets
-    // TM1.42/TSA /20190411 CASE 351050 Added "Revisit Condition (Statistics)"
-    // TM1.43/TSA /20190910 CASE 368043 Refactored usage of External Item Code
-    // TM1.45/TSA /20191120 CASE 378212 Added "Sales Start Date", "Sales Until Date",
-    // TM1.45/TSA /20191127 CASE 379766 Delegates ticket activation method to Ticket BOM, added activation method to page
-    // TM1.46/TSA /20200123 CASE 386850 Set ignore schedule filter
-    // TM1.46/TSA /20200127 CASE 387138 Added "Publish Ticket URL"
-    // TM1.48/TSA/20200730  CASE 411704 Transport TM1.48 - 30 July 2020
 
     Caption = 'Ticket BOM';
     PageType = List;
     SourceTable = "NPR TM Ticket Admission BOM";
     UsageCategory = Administration;
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+    ContextSensitiveHelpPage = 'pages/viewpage.action?pageId=284917767#TicketManagement-_Toc516786672TicketAdmissionBOM';
 
     layout
     {
@@ -202,7 +181,7 @@ page 6060121 "NPR TM Ticket BOM"
                 Caption = 'Admissions';
                 Image = WorkCenter;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket Admissions";
@@ -215,7 +194,7 @@ page 6060121 "NPR TM Ticket BOM"
                 Caption = 'Ticket Setup';
                 Image = Setup;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket Setup";
