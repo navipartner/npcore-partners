@@ -11,6 +11,12 @@
             "id": "AW0007",
             "action":"Warning",
             "justification": "The Web client does not support displaying Repeater controls that contain FlowFilter fields!"
+        },
+        {
+            "id": "AW0006",
+            "action":"Error",
+            "justification": "Pages and reports must use the UsageCategory and ApplicationArea properties to be searchable."
         }
+
     ]
 }
