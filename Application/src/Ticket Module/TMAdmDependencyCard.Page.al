@@ -4,6 +4,7 @@ page 6014484 "NPR TM Adm. Dependency Card"
     UsageCategory = None;
     SourceTable = "NPR TM Adm. Dependency";
     Caption = 'Admission Dependency Card';
+    ContextSensitiveHelpPage = 'display/ENT/Ticket+Admission+Dependencies';
 
     layout
     {

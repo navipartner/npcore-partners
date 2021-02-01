@@ -7,6 +7,7 @@ page 6014512 "NPR TM Adm. Dependency List"
     ShowFilter = false;
     DelayedInsert = true;
     UsageCategory = None;
+    ContextSensitiveHelpPage = 'display/ENT/Ticket+Admission+Dependencies';
 
     layout
     {
