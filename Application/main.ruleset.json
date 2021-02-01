@@ -3,19 +3,24 @@
     "description": "These rules must be respected by all the AL code written within the company.",
     "rules": [
         {
+            "id": "AS0032",
+            "action":"Warning",
+            "justification": "This should be worning when we publish to AppSource."
+        },        
+        {
             "id": "AS0053",
             "action":"Hidden",
             "justification": "We want to use some of the AppSourceCop checks while we're OnPrem."
+        },        
+        {
+            "id": "AW0006",
+            "action":"Error",
+            "justification": "Pages and reports must use the UsageCategory and ApplicationArea properties to be searchable."
         },
         {
             "id": "AW0007",
             "action":"Warning",
             "justification": "The Web client does not support displaying Repeater controls that contain FlowFilter fields!"
-        },
-        {
-            "id": "AW0006",
-            "action":"Error",
-            "justification": "Pages and reports must use the UsageCategory and ApplicationArea properties to be searchable."
         }
 
     ]
