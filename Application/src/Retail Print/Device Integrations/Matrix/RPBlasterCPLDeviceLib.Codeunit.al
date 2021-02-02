@@ -23,22 +23,15 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
 
     EventSubscriberInstance = Manual;
 
-    trigger OnRun()
-    begin
-    end;
-
     var
         TempPattern: Text[50];
         ESC: Codeunit "NPR RP Escape Code Library";
         PrintBuffer: Text;
         Initialized: Boolean;
-        SETTING_MEDIASIZE: Label 'Dimensions of media - syntax: width[0-500],height[0-500]';
-        Error_InvalidDeviceSetting: Label 'Invalid device setting: %1';
+        MediaSizeSettingMsg: Label 'Dimensions of media - syntax: width[0-500],height[0-500]';
+        InvalidDeviceSettingErr: Label 'Invalid device setting: %1';
 
-    local procedure "// Interface implementation"()
-    begin
-    end;
-
+    #region Interface Implementation
     local procedure DeviceCode(): Text
     begin
         exit('BLASTER');
@@ -118,16 +111,11 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
         tmpRetailList.Choice := DeviceCode();
         tmpRetailList.Insert;
     end;
+    #endregion
 
-    procedure "// ShortHandFunctions"()
-    begin
-    end;
-
+    #region ShortHandFunctions
     procedure InitJob(var DeviceSettings: Record "NPR RP Device Settings")
     begin
-        //-NPR5.51 [360975]
-        //PrintBuffer := '';
-        //+NPR5.51 [360975]
         Initialized := false;
 
         if DeviceSettings.FindSet then
@@ -136,7 +124,7 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
                     'MEDIA_SIZE':
                         InitializePrinter(DeviceSettings.Value);
                     else
-                        Error(Error_InvalidDeviceSetting, DeviceSettings.Name);
+                        Error(InvalidDeviceSettingErr, DeviceSettings.Name);
                 end;
             until DeviceSettings.Next = 0;
     end;
@@ -282,22 +270,16 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
 
     procedure GetPrintBytes(): Text
     begin
-        //-NPR5.20
         exit(PrintBuffer);
-        //+NPR5.20
     end;
 
     procedure SetPrintBytes(PrintBytes: Text)
     begin
-        //-NPR5.20
         PrintBuffer := PrintBytes;
-        //+NPR5.20
     end;
+    #endregion
 
-    procedure "// Info Functions"()
-    begin
-    end;
-
+    #region Info Functions
     procedure IsBarcodeFont(FontCode: Text): Boolean
     begin
         exit(FontCode in ['UPCA', 'UPCE', 'UPCE1', 'UPCA+', 'EAN8', 'EAN13', 'EAN8+', 'EAN13+', 'EAN128', 'ADD2', 'ADD5', 'CODE39',
@@ -309,11 +291,9 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
     begin
         exit(0);
     end;
+    #endregion
 
-    local procedure "// Advanced Functions"()
-    begin
-    end;
-
+    #region Advanced Functions
     local procedure Adjust(variable: Text[30]; nnn: Integer)
     begin
         // Ref sheet 18
@@ -567,11 +547,9 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
         TempPattern := 'WIDTH %1';
         AddToBuffer(StrSubstNo(TempPattern, nnn));
     end;
+    #endregion
 
-    local procedure "-- Aux Functions"()
-    begin
-    end;
-
+    #region Aux Functions
     local procedure AddToBuffer(Text: Text[1024])
     begin
         AddTextToBuffer(Text);
@@ -589,16 +567,14 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
 
     procedure LatinConvert(Input: Text[1024]) Output: Text[1024]
     var
-        txtTo: Label 'ÈÛ¹ÉßÄ®ÃÙÚ²â¿';
-        txtFrom: Label '‘›†’«Ž™š‚ÔŠ';
+        ToTxt: Label 'ÈÛ¹ÉßÄ®ÃÙÚ²â¿', Locked = true;
+        FromTxt: Label '‘›†’«Ž™š‚ÔŠ', Locked = true;
     begin
-        Output := ConvertStr(Input, txtFrom, txtTo);
+        Output := ConvertStr(Input, FromTxt, ToTxt);
     end;
+    #endregion
 
-    procedure "// Lookup Functions"()
-    begin
-    end;
-
+    #region Lookup Functions
     procedure SelectFont(var Value: Text): Boolean
     var
         RetailList: Record "NPR Retail List" temporary;
@@ -678,7 +654,7 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
 
     local procedure ConstructDeviceSettingList(var tmpRetailList: Record "NPR Retail List" temporary)
     begin
-        AddOption(tmpRetailList, SETTING_MEDIASIZE, 'MEDIA_SIZE');
+        AddOption(tmpRetailList, MediaSizeSettingMsg, 'MEDIA_SIZE');
     end;
 
     procedure AddOption(var RetailList: Record "NPR Retail List" temporary; Choice: Text; Value: Text)
@@ -688,5 +664,5 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
         RetailList.Value := Value;
         RetailList.Insert;
     end;
+    #endregion
 }
-
