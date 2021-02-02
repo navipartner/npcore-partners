@@ -4,18 +4,58 @@
     "rules": [
         {
             "id": "AS0018",
-            "action":"Warning",
+            "action":"Hidden",
             "justification": "A procedure belonging to the public API should not be removed."
         },
         {
             "id": "AS0019",
-            "action":"Warning",
+            "action":"Hidden",
             "justification": "Event attributes should not be removed."
         },
         {
             "id": "AS0020",
-            "action":"Warning",
+            "action":"Hidden",
             "justification": "The type of events should not be changed."
+        },
+        {
+            "id": "AS0021",
+            "action":"Hidden",
+            "justification": "An argument in an event attribute should not be changed to false."
+        },        
+        {
+            "id": "AS0022",
+            "action":"Hidden",
+            "justification": "An external scope should not be removed."
+        },
+        {
+            "id": "AS0023",
+            "action":"Hidden",
+            "justification": "A return type should not be modified in external procedures."
+        },        
+        {
+            "id": "AS0024",
+            "action":"Hidden",
+            "justification": "Parameters should not be removed or added in external procedures."
+        },        
+        {
+            "id": "AS0025",
+            "action":"Hidden",
+            "justification": "Parameters should not be modified, renamed, or removed from events.."
+        },
+        {
+            "id": "AS0026",
+            "action":"Hidden",
+            "justification": "The type and subtype of parameters should not be modified in events and external procedures."
+        },
+        {
+            "id": "AS0027",
+            "action":"Hidden",
+            "justification": "Modifying the array size of a parameter in events and external procedures should not be performed."
+        },
+        {
+            "id": "AS0028",
+            "action":"Hidden",
+            "justification": "Reducing the array size of a parameter in events and external procedures is should not be performed."
         },
         {
             "id": "AS0029",
