@@ -16,15 +16,25 @@
             "id": "AS0020",
             "action":"Warning",
             "justification": "The type of events should not be changed."
-        },        
+        },
+        {
+            "id": "AS0029",
+            "action":"Hidden",
+            "justification": "Pages and PageExtensions that have been published should not be deleted, since dependent extensions may break."
+        },
+        {
+            "id": "AS0030",
+            "action":"Hidden",
+            "justification": "Pages that have been published should not be renamed."
+        },                
         {
             "id": "AS0031",
-            "action":"Warning",
+            "action":"Hidden",
             "justification": "Actions that have been published should not be deleted."
         },          
         {
             "id": "AS0032",
-            "action":"Warning",
+            "action":"Hidden",
             "justification": "Controls that have been published should not be deleted"
         },        
         {
