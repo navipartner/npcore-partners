@@ -1,8 +1,5 @@
 page 6184850 "NPR FR Audit Setup"
 {
-    // NPR5.48/MMV /20181025 CASE 318028 Created object
-    // NPR5.51/MMV /20190611 CASE 356076 Added field 35 & action icons.
-
     Caption = 'FR Audit Setup';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -17,59 +14,59 @@ page 6184850 "NPR FR Audit Setup"
         {
             group(General)
             {
-                field("Certification No."; "Certification No.")
+                field("Certification No."; Rec."Certification No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Certification No. field';
                 }
-                field("Certification Category"; "Certification Category")
+                field("Certification Category"; Rec."Certification Category")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Certification Category field';
                 }
-                field("Signing Certificate Password"; "Signing Certificate Password")
+                field("Signing Certificate Password"; Rec."Signing Certificate Password")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Signing Certificate Password field';
                 }
-                field("Signing Certificate Thumbprint"; "Signing Certificate Thumbprint")
+                field("Signing Certificate Thumbprint"; Rec."Signing Certificate Thumbprint")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Signing Certificate Thumbprint field';
                 }
-                field("Monthly Workshift Duration"; "Monthly Workshift Duration")
+                field("Monthly Workshift Duration"; Rec."Monthly Workshift Duration")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Monthly Workshift Duration field';
                 }
-                field("Yearly Workshift Duration"; "Yearly Workshift Duration")
+                field("Yearly Workshift Duration"; Rec."Yearly Workshift Duration")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Yearly Workshift Duration field';
                 }
-                field("Last Auto Archived Workshift"; "Last Auto Archived Workshift")
+                field("Last Auto Archived Workshift"; Rec."Last Auto Archived Workshift")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Last Auto Archived Workshift field';
                 }
-                field("Auto Archive URL"; "Auto Archive URL")
+                field("Auto Archive URL"; Rec."Auto Archive URL")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Auto Archive URL field';
                 }
-                field("Auto Archive API Key"; "Auto Archive API Key")
+                field("Auto Archive API Key"; Rec."Auto Archive API Key")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Auto Archive API Key field';
                 }
-                field("Auto Archive SAS"; "Auto Archive SAS")
+                field("Auto Archive SAS"; Rec."Auto Archive SAS")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Auto Archive SAS field';
                 }
-                field("Item VAT Identifier Filter"; "Item VAT Identifier Filter")
+                field("Item VAT Identifier Filter"; Rec."Item VAT Identifier Filter")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item VAT Identifier Filter field';
@@ -79,9 +76,9 @@ page 6184850 "NPR FR Audit Setup"
                         FRAuditMgt: Codeunit "NPR FR Audit Mgt.";
                         NewFilter: Text;
                     begin
-                        NewFilter := FRAuditMgt.GetItemVATIdentifierFilter("Item VAT Identifier Filter");
+                        NewFilter := FRAuditMgt.GetItemVATIdentifierFilter(Rec."Item VAT Identifier Filter");
                         if NewFilter <> '' then
-                            "Item VAT Identifier Filter" := NewFilter;
+                            Rec."Item VAT Identifier Filter" := NewFilter;
                     end;
                 }
             }
@@ -126,12 +123,10 @@ page 6184850 "NPR FR Audit Setup"
                     POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
                     POSUnit: Record "NPR POS Unit";
                 begin
-                    //-NPR5.51 [356076]
                     if PAGE.RunModal(0, POSUnit) <> ACTION::LookupOK then
                         exit;
 
                     POSAuditLogMgt.InitializeLog(POSUnit."No.");
-                    //+NPR5.51 [356076]
                 end;
             }
             action(LogPartnerModification)
@@ -153,7 +148,6 @@ page 6184850 "NPR FR Audit Setup"
                     InputDialog: Page "NPR Input Dialog";
                     ID: Integer;
                 begin
-                    //-NPR5.51 [356076]
                     if PAGE.RunModal(0, POSUnit) <> ACTION::LookupOK then
                         exit;
 
@@ -171,7 +165,6 @@ page 6184850 "NPR FR Audit Setup"
                         exit;
 
                     POSAuditLogMgt.LogPartnerModification(POSUnit."No.", DescriptionOut);
-                    //+NPR5.51 [356076]
                 end;
             }
             action(UnitNoSeries)
@@ -203,13 +196,12 @@ page 6184850 "NPR FR Audit Setup"
 
     trigger OnOpenPage()
     begin
-        if not Get then begin
-            Init;
-            Insert;
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 
     var
         CAPTION_PARTNER_MOD: Label 'Modification description';
 }
-

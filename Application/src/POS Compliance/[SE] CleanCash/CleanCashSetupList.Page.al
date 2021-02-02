@@ -1,6 +1,5 @@
 page 6184500 "NPR CleanCash Setup List"
 {
-
     Caption = 'CleanCash POS Unit Setup';
     PageType = List;
     SourceTable = "NPR CleanCash Setup";
@@ -14,35 +13,35 @@ page 6184500 "NPR CleanCash Setup List"
         {
             repeater(Group)
             {
-                field(Register; Register)
+                field(Register; Rec.Register)
                 {
                     Caption = 'POS Unit No.';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the CleanCash setup associated with this POS Unit.';
                 }
-                field("Connection String"; "Connection String")
+                field("Connection String"; Rec."Connection String")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies CleanCash connection string. Example: http://<username>:<password>@online.cleancash.se:8081/xccsp';
                 }
-                field("Organization ID"; "Organization ID")
+                field("Organization ID"; Rec."Organization ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the dealer "Organisation Number" (10 digits).';
                 }
-                field("CleanCash Register No."; "CleanCash Register No.")
+                field("CleanCash Register No."; Rec."CleanCash Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the POS Terminal Id registered with CleanCash server.';
                 }
 
-                field("CleanCash No. Series"; "CleanCash No. Series")
+                field("CleanCash No. Series"; Rec."CleanCash No. Series")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the numberseries used for CleanCash receipt number.';
                 }
 
-                field("Last Z Report Time"; "Last Z Report Time")
+                field("Last Z Report Time"; Rec."Last Z Report Time")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -50,17 +49,16 @@ page 6184500 "NPR CleanCash Setup List"
                     Description = 'Unknow or unclear usage.';
                 }
 
-                field(Training; Training)
+                field(Training; Rec.Training)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies that the POS is in training mode. This will send receipts to CleanCash, but they will be ignored in an audit. "CleanCash Training Mode" will be printed on the receipt.';
                 }
-                field("Show Error Message"; "Show Error Message")
+                field("Show Error Message"; Rec."Show Error Message")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies that CleanCash problems will be show as messages when they occur.';
                 }
-
             }
         }
     }
@@ -119,4 +117,3 @@ page 6184500 "NPR CleanCash Setup List"
         page.Run(page::"NPR CleanCash Transaction Card", CleanCashTransaction);
     end;
 }
-

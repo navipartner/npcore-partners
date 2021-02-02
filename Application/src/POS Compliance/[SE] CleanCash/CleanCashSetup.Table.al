@@ -86,14 +86,9 @@ table 6184500 "NPR CleanCash Setup"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnInsert()
     begin
         if Rec."CleanCash Register No." = '' then
             Rec."CleanCash Register No." := Register;
     end;
 }
-
