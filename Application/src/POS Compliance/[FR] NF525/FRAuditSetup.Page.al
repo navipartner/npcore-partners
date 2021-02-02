@@ -97,6 +97,7 @@ page 6184850 "NPR FR Audit Setup"
                 Caption = 'Upload Certificate';
                 Image = ImportCodes;
                 Promoted = true;
+                PromotedOnly = true; 
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -114,6 +115,7 @@ page 6184850 "NPR FR Audit Setup"
                 Caption = 'Initialize JET';
                 Image = CreateBins;
                 Promoted = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -137,6 +139,7 @@ page 6184850 "NPR FR Audit Setup"
                 Caption = 'Log Partner Modification';
                 Image = SocialSecurity;
                 Promoted = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -176,6 +179,7 @@ page 6184850 "NPR FR Audit Setup"
                 Caption = 'Unit No. Series Setup';
                 Image = NumberSetup;
                 Promoted = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR FR Audit No. Series";
@@ -187,6 +191,7 @@ page 6184850 "NPR FR Audit Setup"
                 Caption = 'POS Entry Related Info List';
                 Image = CoupledQuote;
                 Promoted = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR FR POS Audit Log Aux. Info";

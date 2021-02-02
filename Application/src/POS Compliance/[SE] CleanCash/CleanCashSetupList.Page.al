@@ -73,6 +73,7 @@ page 6184500 "NPR CleanCash Setup List"
             {
                 Caption = 'Get CleanCash Identity';
                 Promoted = true;
+                PromotedOnly = true; 
                 ApplicationArea = All;
                 ToolTip = 'Request the CleanCash Unit Identity from CleanCash Server. This will also confirm that your setup is correct.';
                 Image = Start; 
@@ -89,6 +90,7 @@ page 6184500 "NPR CleanCash Setup List"
             {
                 Caption = 'Get CleanCash Status';
                 Promoted = true;
+                PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Request the CleanCash Status from CleanCash Server. This will also confirm that your setup is correct.';
                 Image = Start; 
