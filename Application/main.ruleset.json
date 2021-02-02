@@ -3,6 +3,21 @@
     "description": "These rules must be respected by all the AL code written within the company.",
     "rules": [
         {
+            "id": "AS0018",
+            "action":"Warning",
+            "justification": "A procedure belonging to the public API should not be removed."
+        },
+        {
+            "id": "AS0019",
+            "action":"Warning",
+            "justification": "Event attributes should not be removed."
+        },
+        {
+            "id": "AS0020",
+            "action":"Warning",
+            "justification": "The type of events should not be changed."
+        },        
+        {
             "id": "AS0031",
             "action":"Warning",
             "justification": "Actions that have been published should not be deleted."
