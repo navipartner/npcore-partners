@@ -1,9 +1,5 @@
 xmlport 6184850 "NPR FR Audit Archive"
 {
-    // NPR5.48/MMV /20181025 CASE 318028 Created object
-    // NPR5.51/MMV /20190614 CASE 356076 French audit 2nd iteration
-    // NPR5.51/MHA /20190724 CASE 343352 Added filter on "Document Type" to Data Items IssuedCoupon and AppliedCoupon
-
     Caption = 'FR Audit Archive';
     Direction = Export;
     Encoding = UTF8;
@@ -316,11 +312,9 @@ xmlport 6184850 "NPR FR Audit Archive"
                             POSAuditLog.SetRange("Record ID", "POS Entry".RecordId);
                             POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::GRANDTOTAL);
                             TTSignature := GetAuditSignature(POSAuditLog);
-                            //-NPR5.51 [356076]
                             TGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 1);
                             TPerpetualAbsoluteGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 2);
                             TPerpetualGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 3);
-                            //+NPR5.51 [356076]
                         end;
                     }
                     textelement(PaymentLines)
@@ -577,7 +571,6 @@ xmlport 6184850 "NPR FR Audit Archive"
                     InStream: InStream;
                     LastZReport: Record "NPR POS Workshift Checkpoint";
                 begin
-                    //-NPR5.51 [356076]
                     if LastZReportEntryNo <> 0 then begin
                         LastZReport.Get(LastZReportEntryNo);
                         FromPOSEntry := LastZReport."POS Entry No.";
@@ -595,7 +588,6 @@ xmlport 6184850 "NPR FR Audit Archive"
 
 
                     LastZReportEntryNo := ZCheckpoint."Entry No.";
-                    //+NPR5.51 [356076]
                 end;
 
                 trigger OnPreXmlItem()
@@ -679,7 +671,6 @@ xmlport 6184850 "NPR FR Audit Archive"
 
                 LastWorkshiftCheckpoint.SetRange("POS Unit No.", PCheckpoint."POS Unit No.");
                 LastWorkshiftCheckpoint.SetRange(Type, PCheckpoint.Type);
-                //-NPR5.51 [356076]
                 LastWorkshiftCheckpoint.SetRange("Period Type", PCheckpoint."Period Type");
                 LastWorkshiftCheckpoint.SetRange(Open, false);
                 LastWorkshiftCheckpoint.SetFilter("Entry No.", '<%1', PCheckpoint."Entry No.");
@@ -713,7 +704,6 @@ xmlport 6184850 "NPR FR Audit Archive"
                     LastWorkshiftCheckpoint.Reset;
                     LastWorkshiftCheckpoint.Get(POSAuditLog2."Record ID");
                     FromZReportEntry := LastWorkshiftCheckpoint."Entry No.";
-                    //+NPR5.51 [356076]
                     JETEntry.SetFilter("Entry No.", '<=%1', ToJETEntry);
                 end;
 
@@ -724,27 +714,13 @@ xmlport 6184850 "NPR FR Audit Archive"
                 POSAuditLog.FindFirst;
                 PExternalID := POSAuditLog."External ID";
                 PSignature := GetAuditSignature(POSAuditLog);
-                //-NPR5.51 [356076]
                 PGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 1);
                 PPerpetualAbsoluteGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 2);
                 PPerpetualGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 3);
 
                 POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::ARCHIVE_CREATE);
                 ArchiveSignature := GetAuditSignature(POSAuditLog);
-                //+NPR5.51 [356076]
             end;
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 
@@ -772,19 +748,11 @@ xmlport 6184850 "NPR FR Audit Archive"
 
     local procedure GetSplitStringValue(Value: Text; Separator: Char; Index: Integer): Text
     var
-        String: DotNet NPRNetString;
-        SplitArray: DotNet NPRNetArray;
-        CharArray: DotNet NPRNetArray;
-        Char: Char;
+        String: Text;
+        SplitArray: List of [Text];
     begin
-        //-NPR5.51 [356076]
-        CharArray := CharArray.CreateInstance(GetDotNetType(Char), 1);
-        CharArray.SetValue(Separator, 0);
-
         String := Value;
-        SplitArray := String.Split(CharArray);
-        exit(SplitArray.GetValue(Index - 1));
-        //+NPR5.51 [356076]
+        SplitArray := String.Split(Separator);
+        exit(SplitArray.Get(Index));
     end;
 }
-

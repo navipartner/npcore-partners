@@ -31,6 +31,4 @@ enum 6014405 "NPR CleanCash Request Type" implements "NPR CleanCash XCCSP Interf
         Caption = 'Register Return Receipt';
         Implementation = "NPR CleanCash XCCSP Interface" = "NPR CleanCash Receipt Msg.";
     }
-
-
 }

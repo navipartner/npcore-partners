@@ -1,8 +1,5 @@
 table 6184851 "NPR FR Audit No. Series"
 {
-    // NPR5.48/MMV /20181025 CASE 318028 Created object
-    // NPR5.51/MMV /20190614 CASE 356076 Added field 6
-
     Caption = 'FR Audit No. Series';
     DataClassification = CustomerContent;
 
@@ -52,9 +49,4 @@ table 6184851 "NPR FR Audit No. Series"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

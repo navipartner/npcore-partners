@@ -20,5 +20,4 @@ enum 6014404 "NPR CleanCash Unit Storage Status"
     {
         Caption = '';
     }
-
 }

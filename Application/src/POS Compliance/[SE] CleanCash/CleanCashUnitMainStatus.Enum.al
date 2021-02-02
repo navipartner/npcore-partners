@@ -40,5 +40,4 @@ enum 6014403 "NPR CleanCash Unit Main Status"
     {
         Caption = '';
     }
-
 }

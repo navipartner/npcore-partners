@@ -1,7 +1,5 @@
 table 6184852 "NPR FR POS Audit Log Aux. Info"
 {
-    // NPR5.48/MMV /20181025 CASE 318028 Created object
-
     Caption = 'FR POS Audit Log Aux. Info';
     DataClassification = CustomerContent;
 
@@ -82,9 +80,4 @@ table 6184852 "NPR FR POS Audit Log Aux. Info"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

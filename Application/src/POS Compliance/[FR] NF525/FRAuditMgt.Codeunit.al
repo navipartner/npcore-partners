@@ -1,15 +1,6 @@
 codeunit 6184850 "NPR FR Audit Mgt."
 {
-    // NPR5.48/MMV /20181025 CASE 318028 Created object
-    // NPR5.49/MMV /20190306 CASE 348167 Skip footer if no POS entry
-    // NPR5.51/MMV /20190611 CASE 356076 French regulation, 2nd audit.
-    // NPR5.55/MMV /20200626 CASE 408900 French regulation, 3rd audit.
-
     SingleInstance = true;
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         FRCertificationSetup: Record "NPR FR Audit Setup";
@@ -42,18 +33,13 @@ codeunit 6184850 "NPR FR Audit Mgt."
         POSAuditProfile: Record "NPR POS Audit Profile";
     begin
         if not Initialized then begin
-            //-NPR5.51 [356076]
-            //  Initialized := TRUE;
-            //+NPR5.51 [356076]
             if not POSAuditProfile.Get(POSAuditProfileCode) then
                 exit(false);
             if POSAuditProfile."Audit Handler" <> HandlerCode() then
                 exit(false);
             FRCertificationSetup.SetAutoCalcFields("Signing Certificate");
             FRCertificationSetup.Get;
-            //-NPR5.51 [356076]
             Initialized := true;
-            //+NPR5.51 [356076]
             Enabled := true;
         end;
         exit(Enabled);
@@ -113,10 +99,8 @@ codeunit 6184850 "NPR FR Audit Mgt."
                 exit(NoSeriesManagement.GetNextNo(FRCertificationNoSeries."Period No. Series", Today, true));
             EventType::MonthPeriod:
                 exit(NoSeriesManagement.GetNextNo(FRCertificationNoSeries."Grand Period No. Series", Today, true));
-            //-NPR5.51 [356076]
             EventType::YearPeriod:
                 exit(NoSeriesManagement.GetNextNo(FRCertificationNoSeries."Yearly Period No. Series", Today, true));
-        //+NPR5.51 [356076]
         end;
     end;
 
@@ -182,37 +166,25 @@ codeunit 6184850 "NPR FR Audit Mgt."
         POSAuditLog: Record "NPR POS Audit Log";
         POSEntry: Record "NPR POS Entry";
     begin
-        //-NPR5.51 [356076]
         POSWorkshifts.SetRange("POS Unit No.", POSWorkshiftCheckpoint."POS Unit No.");
         POSWorkshifts.SetRange(Type, POSWorkshifts.Type::PREPORT);
         POSWorkshifts.SetRange("Period Type", PeriodType);
-        //-NPR5.55 [408900]
         POSWorkshifts.SetRange(Open, false);
         POSWorkshifts.SetFilter("POS Entry No.", '<>%1', 0);
-        //+NPR5.55 [408900]
         if not POSWorkshifts.FindLast then begin
             //Find the first workshift created after JET was initialized in-case we have old workshifts that should not be handled.
             GetJETInitRecord(POSAuditLog, POSWorkshiftCheckpoint."POS Unit No.", true);
 
             POSWorkshifts.SetRange("Period Type");
             POSWorkshifts.SetRange(Type, POSWorkshifts.Type::ZREPORT);
-            //-NPR5.55 [408900]
             POSWorkshifts.SetFilter("POS Entry No.", '>=%1&<>%2', POSAuditLog."Acted on POS Entry No.", 0);
-            //+NPR5.55 [408900]
             if not POSWorkshifts.FindFirst then
                 exit(false);
         end;
         FromWorkshiftEntryOut := POSWorkshifts."Entry No.";
 
-        //-NPR5.55 [408900]
         POSEntry.Get(POSWorkshifts."POS Entry No.");
         exit(CalcDate(PeriodDateCalcFormula, POSEntry."Document Date") <= Today);
-        //+NPR5.55 [408900]
-        //+NPR5.51 [356076]
-    end;
-
-    local procedure "---Fill Base Values"()
-    begin
     end;
 
     procedure FillSignatureBaseValues(var POSAuditLog: Record "NPR POS Audit Log"; IsInitialHandling: Boolean)
@@ -227,21 +199,17 @@ codeunit 6184850 "NPR FR Audit Mgt."
         if IsInitialHandling then begin
             if GetLastUnitEventSignature(POSAuditLog."Active POS Unit No.", PreviousEventLogRecord, POSAuditLog."External Type") then
                 POSAuditLog."Previous Electronic Signature" := PreviousEventLogRecord."Electronic Signature";
-            //-NPR5.51 [356076]
             POSAuditLog."External Implementation" := ImplementationCode();
-            //+NPR5.51 [356076]
             POSAuditLog."Certificate Implementation" := 'RSA_2048_SHA1';
             POSAuditLog."Certificate Thumbprint" := FRCertificationSetup."Signing Certificate Thumbprint";
             POSAuditLog."Handled by External Impl." := true;
         end;
 
-        //-NPR5.51 [356076]
         if POSAuditLog."External Implementation" <> ImplementationCode() then //Can only validate the current version of the implementation as the rules & fields might have changed over time.
             Error(ERROR_VALIDATE_VERSION, ImplementationCode);
 
         if POSAuditLog."Certificate Thumbprint" <> FRCertificationSetup."Signing Certificate Thumbprint" then
             Error(ERROR_VALIDATE_CERT, FRCertificationSetup."Signing Certificate Thumbprint");
-        //+NPR5.51 [356076]
 
         POSAuditLog."Previous Electronic Signature".CreateInStream(InStream);
         while (not InStream.EOS) do
@@ -272,22 +240,15 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
     local procedure FillJETBase(var POSAuditLog: Record "NPR POS Audit Log"; PreviousSignature: Text): Text
     begin
-        with POSAuditLog do
-            //-NPR5.51 [356076]
-            //  EXIT(STRSUBSTNO('%1,%2,%3,%4,%5,%6,%7,%8,%9',
-            exit(StrSubstNo('%1,%2,%3,%4,%5,%6,%7,%8',
-              //+NPR5.51 [356076]
-              FormatAlphanumeric("External ID"),
-              "External Code",
-              FormatAlphanumeric("Additional Information"),
-              FormatDatetime("Log Timestamp"),
-              FormatAlphanumeric("Active Salesperson Code"),
-              FormatAlphanumeric("Active POS Unit No."),
-              //-NPR5.51 [356076]
-              //    '',
-              //+NPR5.51 [356076]
-              Format((PreviousSignature <> ''), 0, 2),
-              FormatText(PreviousSignature)));
+        exit(StrSubstNo('%1,%2,%3,%4,%5,%6,%7,%8',
+            FormatAlphanumeric(POSAuditLog."External ID"),
+            POSAuditLog."External Code",
+            FormatAlphanumeric(POSAuditLog."Additional Information"),
+            FormatDatetime(POSAuditLog."Log Timestamp"),
+            FormatAlphanumeric(POSAuditLog."Active Salesperson Code"),
+            FormatAlphanumeric(POSAuditLog."Active POS Unit No."),
+            Format((PreviousSignature <> ''), 0, 2),
+            FormatText(PreviousSignature)));
     end;
 
     local procedure FillTicketBase(var POSAuditLog: Record "NPR POS Audit Log"; PreviousSignature: Text): Text
@@ -299,22 +260,17 @@ codeunit 6184850 "NPR FR Audit Mgt."
     begin
         POSEntry.Get(POSAuditLog."Record ID");
 
-        //-NPR5.51 [356076]
         TaxBreakdown := GetSaleTaxBreakdownString(POSEntry, false);
         TaxTotal := GetSaleTotalInclTax(POSEntry, false);
-        //+NPR5.51 [356076]
 
-        with POSAuditLog do
-            exit(StrSubstNo('%1,%2,%3,%4,%5,%6,%7',
-              FormatAlphanumeric(TaxBreakdown),
-              FormatNumeric(TaxTotal),
-              FormatDatetime("Log Timestamp"),
-              FormatAlphanumeric("Acted on POS Entry Fiscal No."),
-              //-NPR5.51 [356076]
-              POSAuditLog."External Description",
-              //+NPR5.51 [356076]
-              Format((PreviousSignature <> ''), 0, 2),
-              FormatText(PreviousSignature)));
+        exit(StrSubstNo('%1,%2,%3,%4,%5,%6,%7',
+            FormatAlphanumeric(TaxBreakdown),
+            FormatNumeric(TaxTotal),
+            FormatDatetime(POSAuditLog."Log Timestamp"),
+            FormatAlphanumeric(POSAuditLog."Acted on POS Entry Fiscal No."),
+            POSAuditLog."External Description",
+            Format((PreviousSignature <> ''), 0, 2),
+            FormatText(PreviousSignature)));
     end;
 
     local procedure FillGrandTotalBase(var POSAuditLog: Record "NPR POS Audit Log"; PreviousSignature: Text): Text
@@ -332,24 +288,19 @@ codeunit 6184850 "NPR FR Audit Mgt."
                 begin
                     RecRef.SetTable(POSWorkshiftCheckpoint);
                     POSWorkshiftCheckpoint.Find;
-                    //-NPR5.51 [356076]
                     TaxBreakdown := GetWorkshiftTaxBreakdownString(POSWorkshiftCheckpoint);
                     TaxTotal := GetWorkshiftTotalInclTax(POSWorkshiftCheckpoint);
-                    //+NPR5.51 [356076]
                     POSEntry.Get(POSWorkshiftCheckpoint."POS Entry No.");
-                    //-NPR5.51 [356076]
                     PerpetualAmount := GetWorkshiftPerpetualAmount(POSWorkshiftCheckpoint);
                     POSAuditLog."Additional Information" := StrSubstNo('%1|%2|%3',
                         Format(TaxTotal, 0, '<Precision,2:2><Standard Format,9>'),
                         Format(GetWorkshiftPerpetualAbsoluteAmount(POSWorkshiftCheckpoint), 0, '<Precision,2:2><Standard Format,9>'),
                         Format(PerpetualAmount, 0, '<Precision,2:2><Standard Format,9>'));
-                    //+NPR5.51 [356076]
                 end;
             DATABASE::"NPR POS Entry":
                 begin
                     RecRef.SetTable(POSEntry);
                     POSEntry.Find;
-                    //-NPR5.51 [356076]
                     TaxBreakdown := GetSaleTaxBreakdownString(POSEntry, true);
                     TaxTotal := GetSaleTotalInclTax(POSEntry, true);
                     PerpetualAmount := GetSalePerpetualAmount(POSEntry);
@@ -357,23 +308,17 @@ codeunit 6184850 "NPR FR Audit Mgt."
                         Format(TaxTotal, 0, '<Precision,2:2><Standard Format,9>'),
                         Format(GetSalePerpetualAbsoluteAmount(POSEntry), 0, '<Precision,2:2><Standard Format,9>'),
                         Format(PerpetualAmount, 0, '<Precision,2:2><Standard Format,9>'));
-                    //+NPR5.51 [356076]
                 end;
         end;
 
-        with POSAuditLog do
-            //-NPR5.51 [356076]
-            exit(StrSubstNo('%1,%2,%3,%4,%5,%6,%7',
-              //+NPR5.51 [356076]
-              FormatAlphanumeric(TaxBreakdown),
-              FormatNumeric(TaxTotal),
-              //-NPR5.51 [356076]
-              FormatNumeric(PerpetualAmount),
-              //+NPR5.51 [356076]
-              FormatDatetime("Log Timestamp"),
-              FormatAlphanumeric(POSEntry."Fiscal No."),
-              Format((PreviousSignature <> ''), 0, 2),
-              FormatText(PreviousSignature)));
+        exit(StrSubstNo('%1,%2,%3,%4,%5,%6,%7',
+            FormatAlphanumeric(TaxBreakdown),
+            FormatNumeric(TaxTotal),
+            FormatNumeric(PerpetualAmount),
+            FormatDatetime(POSAuditLog."Log Timestamp"),
+            FormatAlphanumeric(POSEntry."Fiscal No."),
+            Format((PreviousSignature <> ''), 0, 2),
+            FormatText(PreviousSignature)));
     end;
 
     local procedure FillDuplicatePrintBase(var POSAuditLog: Record "NPR POS Audit Log"; PreviousSignature: Text): Text
@@ -394,16 +339,15 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
         POSAuditLog."Additional Information" := Format(ReprintNo);
 
-        with POSAuditLog do
-            exit(StrSubstNo('%1,%2,%3,%4,%5,%6,%7,%8',
-              FormatAlphanumeric("External ID"),
-              'Ticket',
-              POSAuditLog."Additional Information",
-              FormatAlphanumeric("Active Salesperson Code"),
-              FormatDatetime("Log Timestamp"),
-              FormatAlphanumeric(POSAuditLog."Acted on POS Entry Fiscal No."),
-              Format((PreviousSignature <> ''), 0, 2),
-              FormatText(PreviousSignature)));
+        exit(StrSubstNo('%1,%2,%3,%4,%5,%6,%7,%8',
+            FormatAlphanumeric(POSAuditLog."External ID"),
+            'Ticket',
+            POSAuditLog."Additional Information",
+            FormatAlphanumeric(POSAuditLog."Active Salesperson Code"),
+            FormatDatetime(POSAuditLog."Log Timestamp"),
+            FormatAlphanumeric(POSAuditLog."Acted on POS Entry Fiscal No."),
+            Format((PreviousSignature <> ''), 0, 2),
+            FormatText(PreviousSignature)));
     end;
 
     local procedure FillArchiveFileBase(var POSAuditLog: Record "NPR POS Audit Log"; PreviousSignature: Text): Text
@@ -415,24 +359,17 @@ codeunit 6184850 "NPR FR Audit Mgt."
     begin
         POSWorkshiftCheckpoint.Get(POSAuditLog."Record ID");
 
-        //-NPR5.51 [356076]
         TaxBreakdown := GetWorkshiftTaxBreakdownString(POSWorkshiftCheckpoint);
         TaxTotal := GetWorkshiftTotalInclTax(POSWorkshiftCheckpoint);
-        //+NPR5.51 [356076]
 
-        with POSAuditLog do
-            exit(StrSubstNo('%1,%2,%3,%4,%5,%6,%7',
-              FormatAlphanumeric(TaxBreakdown),
-              FormatNumeric(TaxTotal),
-              FormatDatetime("Log Timestamp"),
-              FormatAlphanumeric("Active POS Unit No."),
-              'Archive',
-              Format((PreviousSignature <> ''), 0, 2),
-              FormatText(PreviousSignature)));
-    end;
-
-    local procedure "---Sign"()
-    begin
+        exit(StrSubstNo('%1,%2,%3,%4,%5,%6,%7',
+            FormatAlphanumeric(TaxBreakdown),
+            FormatNumeric(TaxTotal),
+            FormatDatetime(POSAuditLog."Log Timestamp"),
+            FormatAlphanumeric(POSAuditLog."Active POS Unit No."),
+            'Archive',
+            Format((PreviousSignature <> ''), 0, 2),
+            FormatText(PreviousSignature)));
     end;
 
     local procedure SignRecord(var POSAuditLog: Record "NPR POS Audit Log")
@@ -463,57 +400,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
         SignRecord(POSAuditLog);
     end;
 
-    local procedure SignDataExport(var POSAuditLog: Record "NPR POS Audit Log")
-    var
-        BaseValue: Text;
-        PreviousEventLogRecord: Record "NPR POS Audit Log";
-        HasPreviousSignature: Boolean;
-        InStream: InStream;
-        PreviousSignature: Text;
-    begin
-        POSAuditLog."External Code" := '110';
-        POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
-        POSAuditLog."External Type" := 'JET';
-        POSAuditLog."External Description" := 'Data Export';
-
-        FillSignatureBaseValues(POSAuditLog, true);
-        SignRecord(POSAuditLog);
-    end;
-
-    local procedure SignDataImport(var POSAuditLog: Record "NPR POS Audit Log")
-    var
-        BaseValue: Text;
-        PreviousEventLogRecord: Record "NPR POS Audit Log";
-        HasPreviousSignature: Boolean;
-        InStream: InStream;
-        PreviousSignature: Text;
-    begin
-        POSAuditLog."External Code" := '140';
-        POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
-        POSAuditLog."External Type" := 'JET';
-        POSAuditLog."External Description" := 'Data Export';
-
-        FillSignatureBaseValues(POSAuditLog, true);
-        SignRecord(POSAuditLog);
-    end;
-
-    local procedure SignPermissionModify(var POSAuditLog: Record "NPR POS Audit Log")
-    var
-        BaseValue: Text;
-        PreviousEventLogRecord: Record "NPR POS Audit Log";
-        HasPreviousSignature: Boolean;
-        InStream: InStream;
-        PreviousSignature: Text;
-    begin
-        POSAuditLog."External Code" := '130';
-        POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
-        POSAuditLog."External Type" := 'JET';
-        POSAuditLog."External Description" := 'User permission modification';
-
-        FillSignatureBaseValues(POSAuditLog, true);
-        SignRecord(POSAuditLog);
-    end;
-
     local procedure SignDrawerCount(var POSAuditLog: Record "NPR POS Audit Log")
     var
         BaseValue: Text;
@@ -528,28 +414,9 @@ codeunit 6184850 "NPR FR Audit Mgt."
         POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
         POSAuditLog."External Type" := 'JET';
         POSAuditLog."External Description" := 'Cash Drawer Counting';
-        //-NPR5.51 [356076]
         POSWorkshiftCheckpoint.Get(POSAuditLog."Record ID");
         POSEntry.Get(POSWorkshiftCheckpoint."POS Entry No.");
         POSAuditLog."Additional Information" := Format(POSEntry."Fiscal No.");
-        //+NPR5.51 [356076]
-
-        FillSignatureBaseValues(POSAuditLog, true);
-        SignRecord(POSAuditLog);
-    end;
-
-    local procedure SignDataPurge(var POSAuditLog: Record "NPR POS Audit Log")
-    var
-        BaseValue: Text;
-        PreviousEventLogRecord: Record "NPR POS Audit Log";
-        HasPreviousSignature: Boolean;
-        InStream: InStream;
-        PreviousSignature: Text;
-    begin
-        POSAuditLog."External Code" := '200';
-        POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
-        POSAuditLog."External Type" := 'JET';
-        POSAuditLog."External Description" := 'Data Purge';
 
         FillSignatureBaseValues(POSAuditLog, true);
         SignRecord(POSAuditLog);
@@ -589,40 +456,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
         SignRecord(POSAuditLog);
     end;
 
-    local procedure SignComplianceModification(var POSAuditLog: Record "NPR POS Audit Log")
-    var
-        BaseValue: Text;
-        PreviousEventLogRecord: Record "NPR POS Audit Log";
-        HasPreviousSignature: Boolean;
-        PreviousSignature: Text;
-        InStream: InStream;
-    begin
-        POSAuditLog."External Code" := '270';
-        POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
-        POSAuditLog."External Type" := 'JET';
-        POSAuditLog."External Description" := 'Compliance Data Modification';
-
-        FillSignatureBaseValues(POSAuditLog, true);
-        SignRecord(POSAuditLog);
-    end;
-
-    local procedure SignSetupModification(var POSAuditLog: Record "NPR POS Audit Log")
-    var
-        BaseValue: Text;
-        PreviousEventLogRecord: Record "NPR POS Audit Log";
-        HasPreviousSignature: Boolean;
-        InStream: InStream;
-        PreviousSignature: Text;
-    begin
-        POSAuditLog."External Code" := '300';
-        POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
-        POSAuditLog."External Type" := 'JET';
-        POSAuditLog."External Description" := 'POS Setup Data Modification';
-
-        FillSignatureBaseValues(POSAuditLog, true);
-        SignRecord(POSAuditLog);
-    end;
-
     local procedure SignArchiveAttempt(var POSAuditLog: Record "NPR POS Audit Log")
     var
         BaseValue: Text;
@@ -633,7 +466,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         POSEntry: Record "NPR POS Entry";
     begin
-        //-NPR5.51 [356076]
         POSWorkshiftCheckpoint.Get(POSAuditLog."Record ID");
         if POSWorkshiftCheckpoint."Period Type" = YearlyPeriodType() then begin
             POSAuditLog."External Code" := '30';
@@ -641,17 +473,14 @@ codeunit 6184850 "NPR FR Audit Mgt."
             POSAuditLog."External Type" := 'JET';
             POSAuditLog."External Description" := 'Yearly Archive';
         end else begin
-            //+NPR5.51 [356076]
             POSAuditLog."External Code" := '20';
             POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
             POSAuditLog."External Type" := 'JET';
             POSAuditLog."External Description" := 'Period Archive';
         end;
 
-        //-NPR5.51 [356076]
         POSEntry.Get(POSWorkshiftCheckpoint."POS Entry No.");
         POSAuditLog."Additional Information" := Format(POSEntry."Fiscal No.");
-        //+NPR5.51 [356076]
 
         FillSignatureBaseValues(POSAuditLog, true);
         SignRecord(POSAuditLog);
@@ -670,9 +499,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
         POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
         POSAuditLog."External Type" := 'JET';
         POSAuditLog."External Description" := 'Log In';
-        //-NPR5.51 [356076]
         POSAuditLog."Additional Information" := Format(POSAuditLog."Active Salesperson Code");
-        //+NPR5.51 [356076]
 
         FillSignatureBaseValues(POSAuditLog, true);
         SignRecord(POSAuditLog);
@@ -690,9 +517,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
         POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
         POSAuditLog."External Type" := 'JET';
         POSAuditLog."External Description" := 'Log Out';
-        //-NPR5.51 [356076]
         POSAuditLog."Additional Information" := Format(POSAuditLog."Active Salesperson Code");
-        //+NPR5.51 [356076]
 
         FillSignatureBaseValues(POSAuditLog, true);
         SignRecord(POSAuditLog);
@@ -700,7 +525,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
     local procedure SignItemRMA(var POSAuditLog: Record "NPR POS Audit Log")
     begin
-        //-NPR5.51 [356076]
         POSAuditLog."External Code" := '190';
         POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
         POSAuditLog."External Type" := 'JET';
@@ -708,7 +532,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
         FillSignatureBaseValues(POSAuditLog, true);
         SignRecord(POSAuditLog);
-        //+NPR5.51 [356076]
     end;
 
     local procedure SignWorkshift(var POSAuditLog: Record "NPR POS Audit Log")
@@ -728,33 +551,25 @@ codeunit 6184850 "NPR FR Audit Mgt."
         POSEntry.Get(POSWorkshiftCheckpoint."POS Entry No.");
         POSEntry.TestField("Salesperson Code");
 
-        //-NPR5.51 [356076]
         if not (POSWorkshiftCheckpoint.Type in [POSWorkshiftCheckpoint.Type::ZREPORT, POSWorkshiftCheckpoint.Type::PREPORT]) then
             exit;
-        //+NPR5.51 [356076]
 
-        //-NPR5.51 [356076]
         if (POSWorkshiftCheckpoint.Type = POSWorkshiftCheckpoint.Type::PREPORT) and (POSWorkshiftCheckpoint."Period Type" = YearlyPeriodType()) then begin
             POSAuditLog."External Code" := '60';
             POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
             POSAuditLog."External Type" := 'JET';
             POSAuditLog."External Description" := 'Year Closing';
         end else begin
-            //+NPR5.51 [356076]
             POSAuditLog."External Code" := '50';
             POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
             POSAuditLog."External Type" := 'JET';
-            //-NPR5.51 [356076]
             if POSWorkshiftCheckpoint.Type = POSWorkshiftCheckpoint.Type::ZREPORT then
                 POSAuditLog."External Description" := 'Period Closing (Z-Report)'
             else
                 POSAuditLog."External Description" := 'Period Closing (Month Report)';
-            //+NPR5.51 [356076]
         end;
 
-        //-NPR5.51 [356076]
         POSAuditLog."Additional Information" := Format(POSEntry."Fiscal No.");
-        //+NPR5.51 [356076]
 
         FillSignatureBaseValues(POSAuditLog, true);
         SignRecord(POSAuditLog);
@@ -773,22 +588,18 @@ codeunit 6184850 "NPR FR Audit Mgt."
     begin
         POSEntry.Get(POSAuditLog."Record ID");
 
-        //-NPR5.51 [356076]
         //TICKET event might also trigger a "Non-item amount" custom JET event depending on sale contents:
         LogNonItemAmounts(POSEntry);
-        //+NPR5.51 [356076]
 
         POSAuditLog."External ID" := POSEntry."Fiscal No.";
         POSAuditLog."External Code" := '';
         POSAuditLog."External Type" := 'TICKET';
 
-        //-NPR5.51 [356076]
         if IsFullRMA(POSEntry) then begin
             POSAuditLog."External Description" := 'Cancellation (Ticket)'
         end else begin
             POSAuditLog."External Description" := 'Sale (Ticket)'
         end;
-        //+NPR5.51 [356076]
 
         CreatePOSEntryRelatedInfoRecord(POSEntry); //Store/company data needs to be persistent.
 
@@ -820,13 +631,11 @@ codeunit 6184850 "NPR FR Audit Mgt."
                         POSAuditLog."External ID" := GetNextEventNoSeries(2, POSWorkshiftCheckpoint."POS Unit No.");
                     end else
                         if POSWorkshiftCheckpoint.Type = POSWorkshiftCheckpoint.Type::PREPORT then begin
-                            //-NPR5.51 [356076]
                             if POSWorkshiftCheckpoint."Period Type" = YearlyPeriodType then begin
                                 POSAuditLog."External Description" := 'Yearly Grand Total';
                                 POSAuditLog."External ID" := GetNextEventNoSeries(4, POSWorkshiftCheckpoint."POS Unit No.");
                             end else
                                 if POSWorkshiftCheckpoint."Period Type" = MonthlyPeriodType() then begin
-                                    //+NPR5.51 [356076]
                                     POSAuditLog."External Description" := 'Monthly Grand Total';
                                     POSAuditLog."External ID" := GetNextEventNoSeries(3, POSWorkshiftCheckpoint."POS Unit No.");
                                 end;
@@ -894,23 +703,18 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
     local procedure SignCancelSale(var POSAuditLog: Record "NPR POS Audit Log")
     begin
-        //-NPR5.51 [356076]
         POSAuditLog."External Code" := '320';
         POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
         POSAuditLog."External Type" := 'JET';
         POSAuditLog."External Description" := 'Cancel Sale';
-        //-NPR5.51 [356076]
         POSAuditLog."Additional Information" := Format(POSAuditLog."Active Salesperson Code");
-        //+NPR5.51 [356076]
 
         FillSignatureBaseValues(POSAuditLog, true);
         SignRecord(POSAuditLog);
-        //+NPR5.51 [356076]
     end;
 
     local procedure SignNonItemAmount(var POSAuditLog: Record "NPR POS Audit Log")
     begin
-        //-NPR5.51 [356076]
         POSAuditLog."External Code" := '910';
         POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
         POSAuditLog."External Type" := 'JET';
@@ -918,11 +722,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
         FillSignatureBaseValues(POSAuditLog, true);
         SignRecord(POSAuditLog);
-        //+NPR5.51 [356076]
-    end;
-
-    local procedure "---Amount Calculation"()
-    begin
     end;
 
     local procedure GetSaleTaxBreakdownString(POSEntry: Record "NPR POS Entry"; OnlyIncludeItems: Boolean) TaxBreakdown: Text
@@ -931,7 +730,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
         POSTaxAmountLine2: Record "NPR POS Tax Amount Line";
         tmpPOSTaxAmountLine: Record "NPR POS Tax Amount Line" temporary;
     begin
-        //-NPR5.51 [356076]
         POSTaxAmountLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         if OnlyIncludeItems then begin
             POSTaxAmountLine.SetFilter("VAT Identifier", FRCertificationSetup."Item VAT Identifier Filter");
@@ -959,18 +757,15 @@ codeunit 6184850 "NPR FR Audit Mgt."
                     TaxBreakdown += PadLeft(FormatNumeric(POSTaxAmountLine."Tax %"), 4, '0') + ':' + PadLeft(FormatNumeric(POSTaxAmountLine2."Amount Including Tax"), 4, '0');
                 end;
             until POSTaxAmountLine.Next = 0;
-        //+NPR5.51 [356076]
     end;
 
     local procedure GetSaleTotalInclTax(POSEntry: Record "NPR POS Entry"; OnlyIncludeItems: Boolean): Decimal
     begin
-        //-NPR5.51 [356076]
         if OnlyIncludeItems then begin
             exit(POSEntry."Item Sales (LCY)" + POSEntry."Item Returns (LCY)")
         end else begin
             exit(POSEntry."Amount Incl. Tax");
         end;
-        //+NPR5.51 [356076]
     end;
 
     local procedure GetSalePerpetualAbsoluteAmount(POSEntryIn: Record "NPR POS Entry"): Decimal
@@ -981,7 +776,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
     begin
         //Implied only include item amounts as per audit requirements.
 
-        //-NPR5.51 [356076]
         POSWorkshiftCheckpoint.SetRange("POS Unit No.", POSEntryIn."POS Unit No.");
         POSWorkshiftCheckpoint.SetRange(Type, POSWorkshiftCheckpoint.Type::ZREPORT);
         POSWorkshiftCheckpoint.SetRange(Open, false);
@@ -1000,7 +794,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
         Perpetual += (POSEntry."Item Sales (LCY)" + Abs(POSEntry."Item Returns (LCY)"));
 
         exit(Perpetual);
-        //+NPR5.51 [356076]
     end;
 
     local procedure GetSalePerpetualAmount(POSEntryIn: Record "NPR POS Entry"): Decimal
@@ -1011,7 +804,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
     begin
         //Implied only include item amounts as per audit requirements.
 
-        //-NPR5.51 [356076]
         POSWorkshiftCheckpoint.SetRange("POS Unit No.", POSEntryIn."POS Unit No.");
         POSWorkshiftCheckpoint.SetRange(Type, POSWorkshiftCheckpoint.Type::ZREPORT);
         POSWorkshiftCheckpoint.SetRange(Open, false);
@@ -1029,7 +821,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
         Perpetual += (POSEntry."Item Sales (LCY)" + POSEntry."Item Returns (LCY)");
 
         exit(Perpetual);
-        //+NPR5.51 [356076]
     end;
 
     local procedure GetWorkshiftTaxBreakdownString(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint") TaxBreakdown: Text
@@ -1040,7 +831,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
     begin
         //Implied only include item amounts as per audit requirements.
 
-        //-NPR5.51 [356076]
         POSWorkshiftTaxCheckpoint.SetRange("Workshift Checkpoint Entry No.", POSWorkshiftCheckpoint."Entry No.");
         POSWorkshiftTaxCheckpoint.SetFilter("VAT Identifier", FRCertificationSetup."Item VAT Identifier Filter");
         if POSWorkshiftTaxCheckpoint.FindSet then
@@ -1063,38 +853,27 @@ codeunit 6184850 "NPR FR Audit Mgt."
                     TaxBreakdown += PadLeft(FormatNumeric(POSWorkshiftTaxCheckpoint."Tax %"), 4, '0') + ':' + FormatNumeric(POSWorkshiftTaxCheckpoint2."Amount Including Tax");
                 end;
             until POSWorkshiftTaxCheckpoint.Next = 0;
-        //+NPR5.51 [356076]
     end;
 
     local procedure GetWorkshiftTotalInclTax(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"): Decimal
     begin
-        //-NPR5.51 [356076]
         //Implied only include item amounts as per audit requirements.
 
         exit(POSWorkshiftCheckpoint."Direct Item Sales (LCY)" + POSWorkshiftCheckpoint."Direct Item Returns (LCY)");
-        //+NPR5.51 [356076]
     end;
 
     local procedure GetWorkshiftPerpetualAbsoluteAmount(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"): Decimal
     begin
-        //-NPR5.51 [356076]
         //Implied only include item amounts as per audit requirements.
 
         exit(POSWorkshiftCheckpoint."Perpetual Dir. Item Sales(LCY)" + Abs(POSWorkshiftCheckpoint."Perpetual Dir. Item Ret. (LCY)"));
-        //+NPR5.51 [356076]
     end;
 
     local procedure GetWorkshiftPerpetualAmount(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"): Decimal
     begin
-        //-NPR5.51 [356076]
         //Implied only include item amounts as per audit requirements.
 
         exit(POSWorkshiftCheckpoint."Perpetual Dir. Item Sales(LCY)" + POSWorkshiftCheckpoint."Perpetual Dir. Item Ret. (LCY)");
-        //+NPR5.51 [356076]
-    end;
-
-    local procedure "---Aux"()
-    begin
     end;
 
     local procedure CreatePOSEntryRelatedInfoRecord(POSEntry: Record "NPR POS Entry")
@@ -1110,27 +889,23 @@ codeunit 6184850 "NPR FR Audit Mgt."
         SalespersonPurchaser.Get(POSEntry."Salesperson Code");
         CompanyInformation.Get;
 
-        with FRPOSEntryRelatedInfo do begin
-            Init;
-            "POS Entry No." := POSEntry."Entry No.";
-            "NPR Version" := CopyStr(Licenseinformation.GetRetailVersion(), 1, MaxStrLen("NPR Version"));
-            "Store Name" := POSStore.Name;
-            "Store Name 2" := POSStore."Name 2";
-            "Store Address" := POSStore.Address;
-            "Store Address 2" := POSStore."Address 2";
-            "Store Post Code" := POSStore."Post Code";
-            "Store City" := POSStore.City;
-            "Store Siret" := POSStore."Registration No.";
-            "Store Country/Region Code" := POSStore."Country/Region Code";
-            RecRef.GetTable(CompanyInformation);
-            //-NPR5.51 [356076]
-            if RecRef.FieldExist(10802) then
-                APE := RecRef.Field(10802).Value;
-            //+NPR5.51 [356076]
-            "Intra-comm. VAT ID" := CompanyInformation."VAT Registration No.";
-            "Salesperson Name" := SalespersonPurchaser.Name;
-            Insert;
-        end;
+        FRPOSEntryRelatedInfo.Init;
+        FRPOSEntryRelatedInfo."POS Entry No." := POSEntry."Entry No.";
+        FRPOSEntryRelatedInfo."NPR Version" := CopyStr(Licenseinformation.GetRetailVersion(), 1, MaxStrLen(FRPOSEntryRelatedInfo."NPR Version"));
+        FRPOSEntryRelatedInfo."Store Name" := POSStore.Name;
+        FRPOSEntryRelatedInfo."Store Name 2" := POSStore."Name 2";
+        FRPOSEntryRelatedInfo."Store Address" := POSStore.Address;
+        FRPOSEntryRelatedInfo."Store Address 2" := POSStore."Address 2";
+        FRPOSEntryRelatedInfo."Store Post Code" := POSStore."Post Code";
+        FRPOSEntryRelatedInfo."Store City" := POSStore.City;
+        FRPOSEntryRelatedInfo."Store Siret" := POSStore."Registration No.";
+        FRPOSEntryRelatedInfo."Store Country/Region Code" := POSStore."Country/Region Code";
+        RecRef.GetTable(CompanyInformation);
+        if RecRef.FieldExist(10802) then
+            FRPOSEntryRelatedInfo.APE := RecRef.Field(10802).Value;
+        FRPOSEntryRelatedInfo."Intra-comm. VAT ID" := CompanyInformation."VAT Registration No.";
+        FRPOSEntryRelatedInfo."Salesperson Name" := SalespersonPurchaser.Name;
+        FRPOSEntryRelatedInfo.Insert;
     end;
 
     local procedure DecodeBase64URL(Text: Text): Text
@@ -1148,7 +923,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
     local procedure FormatAlphanumeric(Text: Text): Text
     begin
-        //EXIT(DELCHR(Text,'=',DELCHR(Text,'=','1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')));
         //As per auditing consultant: Alphanumeric is not supposed to be a literal interpretation, so will be treated as text...
         exit(FormatText(Text));
     end;
@@ -1181,28 +955,21 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
     local procedure MonthlyPeriodType(): Text
     begin
-        //-NPR5.51 [356076]
         exit('FR_NF525_MONTH');
-        //+NPR5.51 [356076]
     end;
 
     local procedure YearlyPeriodType(): Text
     begin
-        //-NPR5.51 [356076]
         exit('FR_NF525_YEAR');
-        //+NPR5.51 [356076]
     end;
 
     local procedure ImplementationCode(): Text
     begin
-        //-NPR5.51 [356076]
         exit(HandlerCode + '_V3');
-        //+NPR5.51 [356076]
     end;
 
     procedure GetJETInitRecord(var POSAuditLog: Record "NPR POS Audit Log"; POSUnitNo: Code[10]; WithError: Boolean): Boolean
     begin
-        //-NPR5.51 [356076]
         POSAuditLog.SetRange("Acted on POS Unit No.", POSUnitNo);
         POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::LOG_INIT);
         POSAuditLog.SetRange("Handled by External Impl.", true);
@@ -1212,7 +979,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
             exit(true);
         end else
             exit(POSAuditLog.FindFirst());
-        //+NPR5.51 [356076]
     end;
 
     local procedure LogNonItemAmounts(POSEntry: Record "NPR POS Entry")
@@ -1223,7 +989,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
         AddInfo: Text;
         Amount: Decimal;
     begin
-        //-NPR5.51 [356076]
         POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSSalesLine.SetFilter(Type, '<>%1&<>%2&<>%3', POSSalesLine.Type::Item, POSSalesLine.Type::Rounding, POSSalesLine.Type::Comment);
         if POSSalesLine.IsEmpty then
@@ -1233,7 +998,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
         AddInfo := StrSubstNo('%1|%2', POSEntry."Fiscal No.", Format(Amount, 0, '<Precision,2:2><Standard Format,9>'));
 
         POSAuditLogMgt.CreateEntryCustom(POSEntry.RecordId, 'NON_ITEM_AMOUNT', POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.", 'Sale amount not from items', AddInfo);
-        //+NPR5.51 [356076]
     end;
 
     local procedure IsFullRMA(POSEntry: Record "NPR POS Entry"): Boolean
@@ -1241,7 +1005,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
         POSSalesLine: Record "NPR POS Sales Line";
         POSRMALine: Record "NPR POS RMA Line";
     begin
-        //-NPR5.51 [356076]
         POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
         if not POSSalesLine.FindSet then
@@ -1255,7 +1018,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
         until POSSalesLine.Next = 0;
 
         exit(true);
-        //+NPR5.51 [356076]
     end;
 
     procedure GetItemVATIdentifierFilter(CurrentValue: Text) NewValue: Text
@@ -1263,7 +1025,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
         FilterPageBuilder: FilterPageBuilder;
         VATPostingSetup: Record "VAT Posting Setup";
     begin
-        //-NPR5.51 [356076]
         FilterPageBuilder.AddRecord(VATPostingSetup.TableCaption, VATPostingSetup);
 
         if CurrentValue <> '' then begin
@@ -1276,11 +1037,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
             VATPostingSetup.SetView(FilterPageBuilder.GetView(VATPostingSetup.TableCaption, false));
             exit(VATPostingSetup.GetFilter("VAT Identifier"));
         end;
-        //+NPR5.51 [356076]
-    end;
-
-    local procedure "---Subscribers"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150619, 'OnLookupAuditHandler', '', true, true)]
@@ -1309,9 +1065,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
         if not IsEnabled(POSUnit."POS Audit Profile") then
             exit;
 
-        //-NPR5.51 [356076]
         POSWorkshiftCheckpoint.TestField(Type, POSWorkshiftCheckpoint.Type::PREPORT);
-        //+NPR5.51 [356076]
 
         //Export Archive
         POSWorkshiftCheckpoint.SetRecFilter;
@@ -1339,15 +1093,11 @@ codeunit 6184850 "NPR FR Audit Mgt."
             exit;
         LoadCertificate();
 
-        //-NPR5.55 [408900]
         //Shave off milliseconds from timestamp to prevent sql rounding on commit causing signature invalidation later.
         Evaluate(POSAuditLog."Log Timestamp", CopyStr(Format(POSAuditLog."Log Timestamp", 0, 9), 1, 19) + '.000Z', 9);
-        //+NPR5.55 [408900]
 
-        //-NPR5.51 [356076]
         if POSAuditLog."Action Type" <> POSAuditLog."Action Type"::LOG_INIT then
             GetJETInitRecord(POSAuditLogInit, POSUnit."No.", true); //Failsafe - first record MUST be JET INIT.
-        //+NPR5.51 [356076]
 
         case POSAuditLog."Action Type" of
             POSAuditLog."Action Type"::DIRECT_SALE_END:
@@ -1372,7 +1122,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
                 SignGrandTotal(POSAuditLog); //Only item amount & item VAT amounts are stored and signed.
             POSAuditLog."Action Type"::ARCHIVE_CREATE:
                 SignArchiveFile(POSAuditLog);
-            //-NPR5.51 [356076]
             POSAuditLog."Action Type"::CANCEL_SALE_END:
                 SignCancelSale(POSAuditLog);
             POSAuditLog."Action Type"::SIGN_OUT:
@@ -1386,16 +1135,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
                             SignNonItemAmount(POSAuditLog); //Diff between item amounts and everything else in a sale (prepayment, deposit, outpayment, vouchers)
                     end;
                 end;
-        //+NPR5.51 [356076]
-
-        //Events below are not performed directly on the POS so they are not handled for compliance.
-
-        //POSAuditLog.Type::DATA_EXPORT : SignDataExport(POSAuditLog);
-        //POSAuditLog.Type::DATA_IMPORT : SignDataImport(POSAuditLog);
-        //POSAuditLog.Type::PERMISSION_MODIFY : SignPermissionModify(POSAuditLog);
-        //POSAuditLog.Type::DATA_PURGE : SignDataPurge(POSAuditLog);
-        //POSAuditLog.Type::COMPLIANCE_MODIFICATION : SignComplianceModification(POSAuditLog);
-        //POSAuditLog.Type::SETUP_MODIFICATION : SignSetupModification(POSAuditLog);
         end;
     end;
 
@@ -1412,11 +1151,8 @@ codeunit 6184850 "NPR FR Audit Mgt."
         POSUnit: Record "NPR POS Unit";
     begin
         POSEntry.SetRange("Document No.", ReceiptNo);
-        //-NPR5.49 [348167]
-        //POSEntry.FINDFIRST;
         if not POSEntry.FindFirst then
             exit;
-        //+NPR5.49 [348167]
         if not POSUnit.Get(POSEntry."POS Unit No.") then
             exit;
         if not IsEnabled(POSUnit."POS Audit Profile") then
@@ -1472,16 +1208,11 @@ codeunit 6184850 "NPR FR Audit Mgt."
         POSAuditLog.SetCurrentKey("Entry No.");
         POSAuditLog.SetAscending("Entry No.", true);
 
-        //Refresh all the stored data strings/hashes.
         if POSAuditLog.FindSet then
             repeat
                 FillSignatureBaseValues(POSAuditLog, false);
                 POSAuditLog.Modify;
             until POSAuditLog.Next = 0;
-
-        //-NPR5.51 [356076]
-        //COMMIT;
-        //+NPR5.51 [356076]
 
         //Check signatures against fresh data strings/hash
         if POSAuditLog.FindSet then begin
@@ -1517,9 +1248,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
         end;
 
         Message(CAPTION_SIGNATURES_VALID, POSAuditLog.Count());
-        //-NPR5.51 [356076]
         Error(''); //Rollback modifications to entries done while recalculating & verifying signature.
-        //+NPR5.51 [356076]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150627, 'OnBeforePostWorkshift', '', false, false)]
@@ -1530,7 +1259,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
         POSWorkshiftCheckpointMgt: Codeunit "NPR POS Workshift Checkpoint";
         FromWorkshiftEntry: Integer;
     begin
-        //-NPR5.51 [356076]
         if POSWorkshiftCheckpoint."POS Unit No." = '' then
             exit;
         if POSWorkshiftCheckpoint.Type <> POSWorkshiftCheckpoint.Type::ZREPORT then
@@ -1542,16 +1270,11 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
         POSEntry.Get(POSWorkshiftCheckpoint."POS Entry No.");
 
-        //-NPR5.55 [408900]
         if TriggerWorkshiftCheckpoint(POSWorkshiftCheckpoint, MonthlyPeriodType(), FRCertificationSetup."Monthly Workshift Duration", FromWorkshiftEntry) then
-            //+NPR5.55 [408900]
             POSWorkshiftCheckpointMgt.CreatePeriodCheckpoint(POSWorkshiftCheckpoint."POS Entry No.", POSUnit."No.", FromWorkshiftEntry, POSWorkshiftCheckpoint."Entry No.", MonthlyPeriodType());
 
-        //-NPR5.55 [408900]
         if TriggerWorkshiftCheckpoint(POSWorkshiftCheckpoint, YearlyPeriodType(), FRCertificationSetup."Yearly Workshift Duration", FromWorkshiftEntry) then
-            //+NPR5.55 [408900]
             POSWorkshiftCheckpointMgt.CreatePeriodCheckpoint(POSWorkshiftCheckpoint."POS Entry No.", POSUnit."No.", FromWorkshiftEntry, POSWorkshiftCheckpoint."Entry No.", YearlyPeriodType());
-        //+NPR5.51 [356076]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnBeforeInitSale', '', false, false)]
@@ -1572,7 +1295,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
         RecRef: RecordRef;
         FieldRef: FieldRef;
     begin
-        //-NPR5.51 [356076]
         //Error upon POS login if any configuration is missing or clearly not set according to compliance
 
         FrontEnd.GetSession(POSSession);
@@ -1653,7 +1375,5 @@ codeunit 6184850 "NPR FR Audit Mgt."
             FieldRef := RecRef.Field(10802);
             FieldRef.TestField();
         end;
-        //+NPR5.51 [356076]
     end;
 }
-

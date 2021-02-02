@@ -157,5 +157,4 @@ table 6014438 "NPR CleanCash Trans. Request"
 
         }
     }
-
 }

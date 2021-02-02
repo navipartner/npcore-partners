@@ -1,8 +1,5 @@
 table 6150637 "NPR POS Audit Log"
 {
-    // NPR5.48/MMV /20180605 CASE 318028 Created object
-    // NPR5.51/MMV /20190611 CASE 356076 French regulation, 2nd audit.
-
     Caption = 'POS Audit Log';
     DataClassification = CustomerContent;
     LookupPageID = "NPR POS Audit Log";
@@ -30,7 +27,7 @@ table 6150637 "NPR POS Audit Log"
         }
         field(4; "Table Name"; Text[250])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
                                                                            "Object ID" = FIELD("Table ID")));
             Caption = 'Table Name';
             Editable = false;
@@ -201,9 +198,4 @@ table 6150637 "NPR POS Audit Log"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

@@ -22,7 +22,7 @@ page 6014603 "NPR CleanCash Transactions"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the transactions unique entry number.';
                 }
-                field("POS Unit No."; "POS Unit No.")
+                field("POS Unit No."; Rec."POS Unit No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies POS Unit making the request.';
@@ -162,5 +162,4 @@ page 6014603 "NPR CleanCash Transactions"
             }
         }
     }
-
 }
