@@ -1,8 +1,5 @@
 table 6184850 "NPR FR Audit Setup"
 {
-    // NPR5.48/MMV /20181025 CASE 318028 Created object
-    // NPR5.51/MMV /20190611 CASE 356076 Added field 35, 60
-
     Caption = 'FR Audit Setup';
     DataClassification = CustomerContent;
 
@@ -83,9 +80,4 @@ table 6184850 "NPR FR Audit Setup"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

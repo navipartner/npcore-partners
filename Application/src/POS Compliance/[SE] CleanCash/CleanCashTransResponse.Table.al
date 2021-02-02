@@ -106,5 +106,4 @@ table 6014455 "NPR CleanCash Trans. Response"
             Clustered = true;
         }
     }
-
 }

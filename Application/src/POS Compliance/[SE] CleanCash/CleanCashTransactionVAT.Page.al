@@ -36,10 +36,7 @@ page 6014599 "NPR CleanCash Transaction VAT"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the net VAT amount.';
                 }
-
             }
         }
-
     }
-
 }

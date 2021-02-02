@@ -45,5 +45,4 @@ table 6014454 "NPR CleanCash Trans. VAT"
             Clustered = true;
         }
     }
-
 }

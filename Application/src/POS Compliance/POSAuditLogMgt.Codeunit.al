@@ -1,13 +1,5 @@
 codeunit 6150619 "NPR POS Audit Log Mgt."
 {
-    // NPR5.48/MMV /20190121 CASE 318028 Created object
-    // NPR5.51/MMV /20190611 CASE 356076 French regulation, 2nd audit.
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ERROR_NO_LOG_VALIDATION: Label 'No log validation routine found';
         ERROR_MOD_DESC: Label 'A description of the modification is required';
@@ -41,33 +33,25 @@ codeunit 6150619 "NPR POS Audit Log Mgt."
         POSEntry.Get(POSWorkshiftCheckpoint."POS Entry No.");
         CreateEntry(POSWorkshiftCheckpoint.RecordId, POSAuditLog."Action Type"::ARCHIVE_ATTEMPT, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
         Commit;
-        //-NPR5.51 [356076]
         CreateEntry(POSWorkshiftCheckpoint.RecordId, POSAuditLog."Action Type"::ARCHIVE_CREATE, POSEntry."Entry No.", POSEntry."Fiscal No.", POSWorkshiftCheckpoint."POS Unit No.");
-        //+NPR5.51 [356076]
         OnArchiveWorkshiftPeriod(POSWorkshiftCheckpoint);
     end;
 
     procedure CreateEntry(RecordIDIn: RecordID; Type: Integer; ActedOnPOSEntryNo: Integer; ActedOnPOSEntryFiscalNo: Code[20]; ActedOnPOSUnitNo: Code[10])
     begin
-        //-NPR5.51 [356076]
         CreateEntryFull(RecordIDIn, Type, ActedOnPOSEntryNo, ActedOnPOSEntryFiscalNo, ActedOnPOSUnitNo, '', '', '');
-        //+NPR5.51 [356076]
     end;
 
     procedure CreateEntryExtended(RecordIDIn: RecordID; Type: Integer; ActedOnPOSEntryNo: Integer; ActedOnPOSEntryFiscalNo: Code[20]; ActedOnPOSUnitNo: Code[10]; Description: Text[250]; AddInfo: Text)
     begin
-        //-NPR5.51 [356076]
         CreateEntryFull(RecordIDIn, Type, ActedOnPOSEntryNo, ActedOnPOSEntryFiscalNo, ActedOnPOSUnitNo, Description, AddInfo, '');
-        //+NPR5.51 [356076]
     end;
 
     procedure CreateEntryCustom(RecordIDIn: RecordID; Subtype: Text[250]; ActedOnPOSEntryNo: Integer; ActedOnPOSEntryFiscalNo: Code[20]; ActedOnPOSUnitNo: Code[10]; Description: Text[250]; AddInfo: Text)
     var
         POSAuditLog: Record "NPR POS Audit Log";
     begin
-        //-NPR5.51 [356076]
         CreateEntryFull(RecordIDIn, POSAuditLog."Action Type"::CUSTOM, ActedOnPOSEntryNo, ActedOnPOSEntryFiscalNo, ActedOnPOSUnitNo, Description, AddInfo, Subtype);
-        //+NPR5.51 [356076]
     end;
 
     local procedure CreateEntryFull(RecordIDIn: RecordID; Type: Integer; ActedOnPOSEntryNo: Integer; ActedOnPOSEntryFiscalNo: Code[20]; ActedOnPOSUnitNo: Code[10]; Description: Text[250]; AddInfo: Text; CustomType: Text)
@@ -83,7 +67,6 @@ codeunit 6150619 "NPR POS Audit Log Mgt."
         SalePOS: Record "NPR Sale POS";
         POSEntry: Record "NPR POS Entry";
     begin
-        //-NPR5.51 [356076]
         POSAuditLog.Init;
 
         if POSSession.IsActiveSession(FrontEnd) then begin
@@ -121,7 +104,6 @@ codeunit 6150619 "NPR POS Audit Log Mgt."
         OnHandleAuditLogBeforeInsert(POSAuditLog);
 
         POSAuditLog.Insert(true);
-        //+NPR5.51 [356076]
     end;
 
     procedure ShowAuditLogForRecord(RecordIDIn: RecordID)
@@ -156,11 +138,9 @@ codeunit 6150619 "NPR POS Audit Log Mgt."
         RecordID: RecordID;
         POSAuditLog: Record "NPR POS Audit Log";
     begin
-        //-NPR5.51 [356076]
         //Some regulations require POS specific partner modification log flow.
 
         POSAuditLogMgt.CreateEntryExtended(RecordID, POSAuditLog."Action Type"::PARTNER_MODIFICATION, 0, '', POSUnitNo, '', Description);
-        //+NPR5.51 [356076]
     end;
 
     procedure InitializeLog(POSUnitNo: Text)
@@ -170,7 +150,6 @@ codeunit 6150619 "NPR POS Audit Log Mgt."
         ERROR_AUDIT_LOG: Label '%1 for %2 %3 already contains data';
         POSUnit: Record "NPR POS Unit";
     begin
-        //-NPR5.51 [356076]
         //Some regulations require POS specific log init event.
 
         POSAuditLog.SetRange("Active POS Unit No.", POSUnitNo);
@@ -180,11 +159,6 @@ codeunit 6150619 "NPR POS Audit Log Mgt."
         POSUnit.Get(POSUnitNo);
 
         POSAuditLogMgt.CreateEntry(POSUnit.RecordId, POSAuditLog."Action Type"::LOG_INIT, 0, '', POSUnitNo);
-        //-NPR5.51 [356076]
-    end;
-
-    local procedure "---Publishers"()
-    begin
     end;
 
     [IntegrationEvent(false, false)]
@@ -207,4 +181,3 @@ codeunit 6150619 "NPR POS Audit Log Mgt."
     begin
     end;
 }
-
