@@ -121,6 +121,7 @@ page 6014603 "NPR CleanCash Transactions"
             {
                 Caption = 'CleanCash Transaction Card';
                 Promoted = true;
+                PromotedOnly = true;
                 Ellipsis = true;
                 ToolTip = 'Open Transaction Card';
                 ApplicationArea = All;
