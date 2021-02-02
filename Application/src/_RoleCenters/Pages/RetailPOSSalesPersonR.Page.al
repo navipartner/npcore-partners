@@ -920,14 +920,6 @@ page 6151241 "NPR Retail POS- Sales Person R"
                             {
 
                                 Caption = 'Reports and Analysis';
-                                action("NPR Stock Campaign stat.")
-                                {
-                                    Caption = 'NPR Stock Campaign stat.';
-                                    Image = Report;
-                                    RunObject = Report "NPR Inventory Campaign Stat.";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Stock Campaign stat. action';
-                                }
                                 action("NPR Period Discount Statistics")
                                 {
                                     Caption = 'NPR Period Discount Statistics';
