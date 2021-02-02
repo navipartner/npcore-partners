@@ -80,7 +80,67 @@
         {
             "id": "AS0053",
             "action":"Hidden",
-            "justification": "We want to use some of the AppSourceCop checks while we're OnPrem."
+            "justification": "The compilation target of an application must be a value that is allowed in a multi-tenant SaaS environment."
+        },
+        {
+            "id": "AS0063",
+            "action":"Hidden",
+            "justification": "Removing a var modifier in events is not allowed."
+        },
+        {
+            "id": "AS0064",
+            "action":"Hidden",
+            "justification": "Interface implementations that have been published must not be deleted."
+        },
+        {
+            "id": "AS0065",
+            "action":"Hidden",
+            "justification": "Interfaces that have been published must not be deleted."
+        },
+        {
+            "id": "AS0066",
+            "action":"Hidden",
+            "justification": "A new method to an interface that has been published must not be added."
+        },
+        {
+            "id": "AS0067",
+            "action":"Hidden",
+            "justification": "Adding an interface to an enum that has been published must have a default implementation."
+        },
+        {
+            "id": "AS0068",
+            "action":"Hidden",
+            "justification": "Changing a table extension's target is not allowed."
+        },
+        {
+            "id": "AS0082",
+            "action":"Hidden",
+            "justification": "It is not allowed to rename an enum value."
+        },
+        {
+            "id": "AS0083",
+            "action":"Hidden",
+            "justification": "It is not allowed to delete a value from an enum."
+        },
+        {
+            "id": "AS0088",
+            "action":"Hidden",
+            "justification": "Objects with an ID that can be referenced and which have been published must not be deleted."
+        },
+        {
+            "id": "AS0089",
+            "action":"Hidden",
+            "justification": "Objects that can be referenced and which have been published must not be deleted."
+        },
+        {
+            "id": "AS0090",
+            "action":"Hidden",
+            "justification": "Objects that can be referenced and which have been published must not be renamed."
+        },
+        {
+            "id": "AS0091",
+            "action":"Hidden",
+            "justification": "One or more dependencies of the previous version of the extension could not be found."
         },        
         {
             "id": "AW0006",
