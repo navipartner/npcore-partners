@@ -1,9 +1,5 @@
 page 6014492 "NPR Retail Comments"
 {
-    // 
-    // StartdateVisible
-    // EndateVisible
-
     AutoSplitKey = true;
     Caption = 'NPR Comment Sheet';
     PageType = List;
@@ -18,42 +14,42 @@ page 6014492 "NPR Retail Comments"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Date"; Date)
+                field("Date"; Rec.Date)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Date field';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field("Sales Person Code"; "Sales Person Code")
+                field("Sales Person Code"; Rec."Sales Person Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Person Code field';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Comment field';
                 }
-                field("Long Comment"; "Long Comment")
+                field("Long Comment"; Rec."Long Comment")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Long comment field';
                 }
-                field("Hide on printout"; "Hide on printout")
+                field("Hide on printout"; Rec."Hide on printout")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Hide on printout field';
                 }
-                field("Start Date"; "Start Date")
+                field("Start Date"; Rec."Start Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Start Date field';
                 }
-                field("End Date"; "End Date")
+                field("End Date"; Rec."End Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the End Date field';
@@ -62,36 +58,27 @@ page 6014492 "NPR Retail Comments"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetupNewLine;
+        Rec.SetupNewLine();
     end;
 
     trigger OnOpenPage()
     begin
-
-        if "Table ID" = 6060001 then begin
-            //CurrForm."Start Date".VISIBLE := TRUE;
+        if Rec."Table ID" = 6060001 then begin
             StartdateVisible := true;
-            //CurrForm."End Date".VISIBLE := TRUE;
             EndateVisible := true;
         end
         else begin
-            //CurrForm."Start Date".VISIBLE := FALSE;
             StartdateVisible := false;
-            //CurrForm."End Date".VISIBLE := FALSE;
             EndateVisible := false;
         end;
     end;
 
     var
         [InDataSet]
-        StartdateVisible: Boolean;
-        [InDataSet]
         EndateVisible: Boolean;
+        [InDataSet]
+        StartdateVisible: Boolean;
 }
 

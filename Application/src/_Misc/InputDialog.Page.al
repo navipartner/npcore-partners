@@ -1,12 +1,5 @@
 page 6014449 "NPR Input Dialog"
 {
-    // NPR4.01/JDH/20150319  CASE 202681 changed function setVariable - parameters made "nonVariable"
-    // PN1.08/MHA/20151214  CASE 228859 Pdf2Nav (New Version List)
-    // NPR5.29/VB/20161127 CASE 259086 Removing last remnants of the .NET Control Add-in
-    // NPR5.34/BR  /20170704 CASE 282922 Added AutoCloseOnValidate functionalit
-    // NPR5.41/TS  /20180105 CASE 300893 Removed SourceTableTemporary as Page is not bound to Table
-    //                                   Caption on ActionContainer Removed
-
     Caption = 'Input Dialog';
     PageType = StandardDialog;
     UsageCategory = Administration;
@@ -139,18 +132,14 @@ page 6014449 "NPR Input Dialog"
         }
     }
 
-    actions
-    {
-    }
-
     var
-        Text: Text[100];
-        TextInputs: array[10] of Text;
-        Vars: array[10] of Variant;
-        Captions: array[10] of Text;
-        ControlCount: Integer;
-        IsVisible: array[10] of Boolean;
         AutoCloseOnValidate: Boolean;
+        IsVisible: array[10] of Boolean;
+        ControlCount: Integer;
+        Captions: array[10] of Text;
+        TextInputs: array[10] of Text;
+        Text: Text[100];
+        Vars: array[10] of Variant;
 
     procedure SetInput(ControlID: Integer; Variable: Variant; Description: Text[250])
     begin
@@ -210,12 +199,13 @@ page 6014449 "NPR Input Dialog"
     local procedure StoreInput(ControlID: Integer; var Value: Text; var Variable: Variant)
     var
         BoolVar: Boolean;
-        IntegerVar: Integer;
-        DecimalVar: Decimal;
-        TextVar: Text;
         CodeVar: Code[20];
         DateVar: Date;
+        DecimalVar: Decimal;
+        IntegerVar: Integer;
+        TextVar: Text;
         TimeVar: Time;
+        InputTypeErr: Label 'Unsupported input type.';
     begin
         case true of
             Variable.IsBoolean:
@@ -254,15 +244,13 @@ page 6014449 "NPR Input Dialog"
                     Variable := TimeVar;
                 end;
             else
-                Error('Unsupported input type.')
+                Error(InputTypeErr)
         end;
 
         Value := Format(Vars[ControlID]);
 
-        //-NPR5.34 [282922]
         if (ControlID = ControlCount) and AutoCloseOnValidate then
             CurrPage.Close;
-        //+NPR5.34 [282922]
     end;
 
     procedure SetAutoCloseOnValidate(ParAutoCloseOnValidate: Boolean)

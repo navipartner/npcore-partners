@@ -1,7 +1,5 @@
 table 6014473 "NPR Store Group"
 {
-    // NPR4.16/TJ/20151115 CASE 222281 Table Created
-
     Caption = 'Store Group';
     DataClassification = CustomerContent;
 
@@ -29,10 +27,6 @@ table 6014473 "NPR Store Group"
         key(Key1; "Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

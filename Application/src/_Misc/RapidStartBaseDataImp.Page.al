@@ -20,12 +20,12 @@ page 6014615 "NPR RapidStart Base Data Imp."
                 ToolTip = 'Specifies the value of the package field';
                 trigger OnLookup(var value: Text): Boolean
                 var
-                    rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
-                    AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
-                    packageList: List of [Text];
                     tmpRetailList: Record "NPR Retail List" temporary;
-                    package: Text;
+                    AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+                    rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
+                    packageList: List of [Text];
                     BaseUri: Text;
+                    package: Text;
                     Secret: Text;
                 begin
                     BaseUri := AzureKeyVaultMgt.GetSecret('NpRetailBaseDataBaseUrl');
@@ -100,10 +100,10 @@ page 6014615 "NPR RapidStart Base Data Imp."
 
                 trigger OnAction()
                 var
-                    rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
                     AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
-                    packageName: Text;
+                    rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
                     BaseUri: Text;
+                    packageName: Text;
                     Secret: Text;
                 begin
                     packageName := package.Replace('.rapidstart', '');
@@ -135,9 +135,9 @@ page 6014615 "NPR RapidStart Base Data Imp."
     end;
 
     var
+        ActionBackAllowed: Boolean;
         ActionFinishAllowed: Boolean;
         ActionNextAllowed: Boolean;
-        ActionBackAllowed: Boolean;
         AdjustTableNames: Boolean;
         currentStep: Integer;
         package: Text;

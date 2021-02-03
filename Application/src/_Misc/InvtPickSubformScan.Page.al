@@ -6,8 +6,6 @@ page 6014461 "NPR Invt. Pick Subform Scan"
     LinksAllowed = false;
     MultipleNewLines = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "Warehouse Activity Line";
     SourceTableView = WHERE("Activity Type" = CONST("Invt. Pick"));
 
@@ -18,42 +16,42 @@ page 6014461 "NPR Invt. Pick Subform Scan"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Action Type"; "Action Type")
+                field("Action Type"; Rec."Action Type")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the action type.';
                 }
-                field("Source Document"; "Source Document")
+                field("Source Document"; Rec."Source Document")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Source Document field';
                 }
-                field("Source No."; "Source No.")
+                field("Source No."; Rec."Source No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Source No. field';
                 }
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item No. field';
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Serial No."; "Serial No.")
+                field("Serial No."; Rec."Serial No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -64,13 +62,13 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                         SerialNoOnAfterValidate;
                     end;
                 }
-                field("Serial No. Blocked"; "Serial No. Blocked")
+                field("Serial No. Blocked"; Rec."Serial No. Blocked")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Serial No. Blocked field';
                 }
-                field("Lot No."; "Lot No.")
+                field("Lot No."; Rec."Lot No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -81,152 +79,152 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                         LotNoOnAfterValidate;
                     end;
                 }
-                field("Lot No. Blocked"; "Lot No. Blocked")
+                field("Lot No. Blocked"; Rec."Lot No. Blocked")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Lot No. Blocked field';
                 }
-                field("Expiration Date"; "Expiration Date")
+                field("Expiration Date"; Rec."Expiration Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Expiration Date field';
                 }
-                field("Location Code"; "Location Code")
+                field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Location Code field';
                 }
-                field("Bin Code"; "Bin Code")
+                field("Bin Code"; Rec."Bin Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Bin Code field';
 
                     trigger OnValidate()
                     begin
-                        BinCodeOnAfterValidate;
+                        BinCodeOnAfterValidate();
                     end;
                 }
-                field("Shelf No."; "Shelf No.")
+                field("Shelf No."; Rec."Shelf No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Shelf No. field';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field("Qty. (Base)"; "Qty. (Base)")
+                field("Qty. (Base)"; Rec."Qty. (Base)")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Qty. (Base) field';
                 }
-                field("Qty. to Handle"; "Qty. to Handle")
+                field("Qty. to Handle"; Rec."Qty. to Handle")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Qty. to Handle field';
 
                     trigger OnValidate()
                     begin
-                        QtytoHandleOnAfterValidate;
+                        QtytoHandleOnAfterValidate();
                     end;
                 }
-                field("Qty. Handled"; "Qty. Handled")
+                field("Qty. Handled"; Rec."Qty. Handled")
                 {
                     ApplicationArea = All;
                     Visible = true;
                     ToolTip = 'Specifies the value of the Qty. Handled field';
                 }
-                field("Qty. to Handle (Base)"; "Qty. to Handle (Base)")
+                field("Qty. to Handle (Base)"; Rec."Qty. to Handle (Base)")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Qty. to Handle (Base) field';
                 }
-                field("Qty. Handled (Base)"; "Qty. Handled (Base)")
+                field("Qty. Handled (Base)"; Rec."Qty. Handled (Base)")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Qty. Handled (Base) field';
                 }
-                field("Qty. Outstanding"; "Qty. Outstanding")
+                field("Qty. Outstanding"; Rec."Qty. Outstanding")
                 {
                     ApplicationArea = All;
                     Visible = true;
                     ToolTip = 'Specifies the value of the Qty. Outstanding field';
                 }
-                field("Qty. Outstanding (Base)"; "Qty. Outstanding (Base)")
+                field("Qty. Outstanding (Base)"; Rec."Qty. Outstanding (Base)")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Qty. Outstanding (Base) field';
                 }
-                field("Due Date"; "Due Date")
+                field("Due Date"; Rec."Due Date")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Due Date field';
                 }
-                field("Unit of Measure Code"; "Unit of Measure Code")
+                field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit of Measure Code field';
                 }
-                field("Qty. per Unit of Measure"; "Qty. per Unit of Measure")
+                field("Qty. per Unit of Measure"; Rec."Qty. per Unit of Measure")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Qty. per Unit of Measure field';
                 }
-                field("Shipping Advice"; "Shipping Advice")
+                field("Shipping Advice"; Rec."Shipping Advice")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Shipping Advice field';
                 }
-                field("Destination Type"; "Destination Type")
+                field("Destination Type"; Rec."Destination Type")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Destination Type field';
                 }
-                field("Destination No."; "Destination No.")
+                field("Destination No."; Rec."Destination No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Destination No. field';
                 }
-                field("Shipping Agent Code"; "Shipping Agent Code")
+                field("Shipping Agent Code"; Rec."Shipping Agent Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Shipping Agent Code field';
                 }
-                field("Shipping Agent Service Code"; "Shipping Agent Service Code")
+                field("Shipping Agent Service Code"; Rec."Shipping Agent Service Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Shipping Agent Service Code field';
                 }
-                field("Shipment Method Code"; "Shipment Method Code")
+                field("Shipment Method Code"; Rec."Shipment Method Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Shipment Method Code field';
                 }
-                field("Special Equipment Code"; "Special Equipment Code")
+                field("Special Equipment Code"; Rec."Special Equipment Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Special Equipment Code field';
                 }
-                field("Assemble to Order"; "Assemble to Order")
+                field("Assemble to Order"; Rec."Assemble to Order")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -257,7 +255,7 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                         WhseActivityHeader: Record "Warehouse Activity Header";
                         InventoryPickScan: Page "NPR Inventory Pick Scan";
                     begin
-                        CallSplitLine;
+                        CallSplitLine();
                         WhseActivityHeader.Get(Rec."Activity Type", Rec."No.");
                         InventoryPickScan.UpdateRemQtyToPick(WhseActivityHeader);
                     end;
@@ -276,7 +274,7 @@ page 6014461 "NPR Invt. Pick Subform Scan"
 
                     trigger OnAction()
                     begin
-                        ShowSourceLine;
+                        ShowSourceLine();
                     end;
                 }
                 action("Bin Contents List")
@@ -288,7 +286,7 @@ page 6014461 "NPR Invt. Pick Subform Scan"
 
                     trigger OnAction()
                     begin
-                        ShowBinContents;
+                        ShowBinContents();
                     end;
                 }
                 group("Item Availability by")
@@ -304,7 +302,7 @@ page 6014461 "NPR Invt. Pick Subform Scan"
 
                         trigger OnAction()
                         begin
-                            ShowItemAvailabilityByEvent;
+                            Rec.ShowItemAvailabilityByEvent();
                         end;
                     }
                     action(Period)
@@ -316,7 +314,7 @@ page 6014461 "NPR Invt. Pick Subform Scan"
 
                         trigger OnAction()
                         begin
-                            ShowItemAvailabilityByPeriod;
+                            Rec.ShowItemAvailabilityByPeriod();
                         end;
                     }
                     action("Variant")
@@ -328,7 +326,7 @@ page 6014461 "NPR Invt. Pick Subform Scan"
 
                         trigger OnAction()
                         begin
-                            ShowItemAvailabilityByVariant;
+                            Rec.ShowItemAvailabilityByVariant();
                         end;
                     }
                     action(Location)
@@ -341,7 +339,7 @@ page 6014461 "NPR Invt. Pick Subform Scan"
 
                         trigger OnAction()
                         begin
-                            ShowItemAvailabilityByLocation;
+                            Rec.ShowItemAvailabilityByLocation();
                         end;
                     }
                 }
@@ -356,7 +354,7 @@ page 6014461 "NPR Invt. Pick Subform Scan"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Activity Type" := xRec."Activity Type";
+        Rec."Activity Type" := xRec."Activity Type";
     end;
 
     var
@@ -364,14 +362,14 @@ page 6014461 "NPR Invt. Pick Subform Scan"
 
     local procedure ShowSourceLine()
     begin
-        WMSMgt.ShowSourceDocLine("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
+        WMSMgt.ShowSourceDocLine(Rec."Source Type", Rec."Source Subtype", Rec."Source No.", Rec."Source Line No.", Rec."Source Subline No.");
     end;
 
     local procedure ShowBinContents()
     var
         BinContent: Record "Bin Content";
     begin
-        BinContent.ShowBinContents("Location Code", "Item No.", "Variant Code", '')
+        BinContent.ShowBinContents(Rec."Location Code", Rec."Item No.", Rec."Variant Code", '')
     end;
 
     procedure AutofillQtyToHandle()
@@ -379,7 +377,7 @@ page 6014461 "NPR Invt. Pick Subform Scan"
         WhseActivLine: Record "Warehouse Activity Line";
     begin
         WhseActivLine.Copy(Rec);
-        AutofillQtyToHandle(WhseActivLine);
+        Rec.AutofillQtyToHandle(WhseActivLine);
     end;
 
     procedure DeleteQtyToHandle()
@@ -387,7 +385,7 @@ page 6014461 "NPR Invt. Pick Subform Scan"
         WhseActivLine: Record "Warehouse Activity Line";
     begin
         WhseActivLine.Copy(Rec);
-        DeleteQtyToHandle(WhseActivLine);
+        Rec.DeleteQtyToHandle(WhseActivLine);
     end;
 
     local procedure CallSplitLine()
@@ -395,7 +393,7 @@ page 6014461 "NPR Invt. Pick Subform Scan"
         WhseActivLine: Record "Warehouse Activity Line";
     begin
         WhseActivLine.Copy(Rec);
-        SplitLine(WhseActivLine);
+        Rec.SplitLine(WhseActivLine);
         CurrPage.Update(false);
     end;
 
@@ -422,7 +420,7 @@ page 6014461 "NPR Invt. Pick Subform Scan"
 
     procedure UpdateForm()
     begin
-        CurrPage.Update;
+        CurrPage.Update();
     end;
 
     local procedure SerialNoOnAfterValidate()
@@ -431,12 +429,12 @@ page 6014461 "NPR Invt. Pick Subform Scan"
         ItemTrackingMgt: Codeunit "Item Tracking Management";
         EntriesExist: Boolean;
     begin
-        if "Serial No." <> '' then
-            ExpDate := ItemTrackingMgt.ExistingExpirationDate("Item No.", "Variant Code",
-                "Lot No.", "Serial No.", false, EntriesExist);
+        if Rec."Serial No." <> '' then
+            ExpDate := ItemTrackingMgt.ExistingExpirationDate(Rec."Item No.", Rec."Variant Code",
+                Rec."Lot No.", Rec."Serial No.", false, EntriesExist);
 
         if ExpDate <> 0D then
-            "Expiration Date" := ExpDate;
+            Rec."Expiration Date" := ExpDate;
     end;
 
     local procedure LotNoOnAfterValidate()
@@ -445,22 +443,22 @@ page 6014461 "NPR Invt. Pick Subform Scan"
         ItemTrackingMgt: Codeunit "Item Tracking Management";
         EntriesExist: Boolean;
     begin
-        if "Lot No." <> '' then
-            ExpDate := ItemTrackingMgt.ExistingExpirationDate("Item No.", "Variant Code",
-                "Lot No.", "Serial No.", false, EntriesExist);
+        if Rec."Lot No." <> '' then
+            ExpDate := ItemTrackingMgt.ExistingExpirationDate(Rec."Item No.", Rec."Variant Code",
+                Rec."Lot No.", Rec."Serial No.", false, EntriesExist);
 
         if ExpDate <> 0D then
-            "Expiration Date" := ExpDate;
+            Rec."Expiration Date" := ExpDate;
     end;
 
     local procedure BinCodeOnAfterValidate()
     begin
-        CurrPage.Update;
+        CurrPage.Update();
     end;
 
     local procedure QtytoHandleOnAfterValidate()
     begin
-        CurrPage.SaveRecord;
+        CurrPage.SaveRecord();
     end;
 }
 

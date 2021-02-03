@@ -1,11 +1,10 @@
 codeunit 6150898 "NPR Stack of [Integer]"
 {
     var
+        CannotPeekErr: Label 'Cannot peek into an empty stack.';
+        CannotPopErr: Label 'Cannot pop a value from an empty stack.';
+        InvalidOperationErr: Label 'Invalid operation. %1', Comment = '%1 = Operation';
         _listOfInteger: List of [Integer];
-
-        LabelInvalidOperation: Label 'Invalid operation. %1';
-        LabelCannotPop: Label 'Cannot pop a value from an empty stack.';
-        LabelCannotPeek: Label 'Cannot peek into an empty stack.';
 
     procedure Contains(Value: Integer): Boolean;
     begin
@@ -25,7 +24,7 @@ codeunit 6150898 "NPR Stack of [Integer]"
     procedure Pop() Result: Integer;
     begin
         if _listOfInteger.Count = 0 then
-            Error(LabelInvalidOperation, LabelCannotPop);
+            Error(InvalidOperationErr, CannotPopErr);
 
         _listOfInteger.Get(_listOfInteger.Count, Result);
         _listOfInteger.RemoveAt(_listOfInteger.Count);
@@ -34,7 +33,7 @@ codeunit 6150898 "NPR Stack of [Integer]"
     procedure Peek() Result: Integer;
     begin
         if _listOfInteger.Count = 0 then
-            Error(LabelInvalidOperation, LabelCannotPeek);
+            Error(InvalidOperationErr, CannotPeekErr);
 
         _listOfInteger.Get(_listOfInteger.Count, Result);
     end;

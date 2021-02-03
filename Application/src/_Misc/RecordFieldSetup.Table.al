@@ -1,7 +1,5 @@
 table 6014431 "NPR Record Field Setup"
 {
-    // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj field 1
-
     Caption = 'Record Field Setup';
     DataClassification = CustomerContent;
 
@@ -121,10 +119,6 @@ table 6014431 "NPR Record Field Setup"
         key(Key1; "Table ID")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

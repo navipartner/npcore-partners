@@ -14,13 +14,13 @@ page 6014547 "NPR Field Lookup"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     Caption = 'No.';
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field("Field Caption"; "Field Caption")
+                field("Field Caption"; Rec."Field Caption")
                 {
                     ApplicationArea = All;
                     Caption = 'Field Caption';
@@ -28,10 +28,6 @@ page 6014547 "NPR Field Lookup"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

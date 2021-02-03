@@ -1,13 +1,7 @@
 page 6014601 "NPR Item Availability FactBox"
 {
-    // NPR5.31/BR  /20170426  CASE 272849  Object Created
-    // NPR5.43/BHR /20180626  CASE 319926  Add field "Qty. on Sales Order","Qty. on Purch. Order"
-    // NPR5.44/TS  /20180706  CASE 320700  Added Field Sales (Qty )
-
     Caption = 'Item Availability Details';
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     RefreshOnActivate = true;
     ShowFilter = true;
     SourceTable = Item;
@@ -16,7 +10,7 @@ page 6014601 "NPR Item Availability FactBox"
     {
         area(content)
         {
-            field("No."; "No.")
+            field("No."; Rec."No.")
             {
                 ApplicationArea = All;
                 Caption = 'Item No.';
@@ -42,22 +36,22 @@ page 6014601 "NPR Item Availability FactBox"
                     CurrPage.Update(true);
                 end;
             }
-            field(Inventory; Inventory)
+            field(Inventory; Rec.Inventory)
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Inventory field';
             }
-            field("Qty. on Sales Order"; "Qty. on Sales Order")
+            field("Qty. on Sales Order"; Rec."Qty. on Sales Order")
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Qty. on Sales Order field';
             }
-            field("Qty. on Purch. Order"; "Qty. on Purch. Order")
+            field("Qty. on Purch. Order"; Rec."Qty. on Purch. Order")
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Qty. on Purch. Order field';
             }
-            field("Sales (Qty.)"; "Sales (Qty.)")
+            field("Sales (Qty.)"; Rec."Sales (Qty.)")
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Sales (Qty.) field';
@@ -65,24 +59,19 @@ page 6014601 "NPR Item Availability FactBox"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnAfterGetCurrRecord()
     begin
-        CalcFields("NPR Has Variants");
+        Rec.CalcFields("NPR Has Variants");
         HasVariants := "NPR Has Variants";
     end;
 
     trigger OnAfterGetRecord()
     begin
-        LocationFilter := GetFilter("Location Filter");
+        LocationFilter := Rec.GetFilter("Location Filter");
     end;
 
     var
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
-        TextAllLocations: Label 'All Locations';
         [InDataSet]
         HasVariants: Boolean;
         [InDataSet]
@@ -98,16 +87,16 @@ page 6014601 "NPR Item Availability FactBox"
     procedure CalcAvailability(): Decimal
     var
         AvailableToPromise: Codeunit "Available to Promise";
+        LookaheadDateformula: DateFormula;
+        AvailabilityDate: Date;
         GrossRequirement: Decimal;
         ScheduledReceipt: Decimal;
         PeriodType: Option Day,Week,Month,Quarter,Year;
-        AvailabilityDate: Date;
-        LookaheadDateformula: DateFormula;
     begin
         AvailabilityDate := WorkDate;
 
-        SetRange("Date Filter", 0D, AvailabilityDate);
-        SetRange("Drop Shipment Filter", false);
+        Rec.SetRange("Date Filter", 0D, AvailabilityDate);
+        Rec.SetRange("Drop Shipment Filter", false);
 
         exit(
           AvailableToPromise.QtyAvailabletoPromise(

@@ -1,159 +1,78 @@
 codeunit 6014442 "NPR Event Subscriber (Cust)"
 {
-    // NPR5.23/JDH /20160516 CASE 241673 Created for customer events
-    // NPR5.22.01/TJ/20160517 CASE 241673 Rearranged code and added events
-    // NPR5.23/LS  /20160608 CASE 226819 Exit OnBeforeInsertEvent - Replaced by new Phone Lookup Functionality
-    // NPR5.25/TS/20160622 CASE 244813 Added Action Item Ledger Entries
-    // NPR5.26/JDH/20160923 CASE 253243 Removed function that was just doing nothing (OnbeforeInsert subscriber)
-    // NPR5.29/TJ /20170113 CASE 262797 Added new subscribers to page 21 Customer Card
-    // NPR5.31/TJ  /20170425 CASE 271060 Exiting if Payment Terms Code is empty in function OnAfterValidateEventPaymentTermsCode
-    // NPR5.33/BHR /20170526 CASE 277663 Add subscriber to page 21(Action Auditroll) "Customer card"
-    // NPR5.40/BHR /20180306 CASE 307028 Allow rename of customers for POS transactions
-    // NPR5.41/JDH /20180426 CASE 312644  Added indirect permissions to table Audit roll
-
     Permissions = TableData "NPR Audit Roll" = rimd;
 
-    trigger OnRun()
-    begin
-    end;
-
     var
-        SalesSetup: Record "Sales & Receivables Setup";
-        SalesSetupFetched: Boolean;
         RetailSetup: Record "NPR Retail Setup";
+        SalesSetup: Record "Sales & Receivables Setup";
         RetailSetupFetched: Boolean;
+        SalesSetupFetched: Boolean;
 
-    [EventSubscriber(ObjectType::Table, 18, 'OnAfterInsertEvent', '', false, false)]
-    local procedure OnAfterInsertEvent(var Rec: Record Customer; RunTrigger: Boolean)
+    [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterInsertEvent', '', false, false)]
+    local procedure CustomerOnAfterInsertEvent(var Rec: Record Customer; RunTrigger: Boolean)
     var
         NoSeriesMgt: Codeunit NoSeriesManagement;
-        Text001: Label 'Number must not be blank!';
+        NoNumberErr: Label 'Number must not be blank!';
     begin
-        //-NPR5.22.01
-        /*
-        IF RunTrigger THEN
-        //-NPR70.00.00.00
-          StdTableCode.DebitorOnInsert(Rec);
-        //+NPR70.00.00.00
-        */
         if not RunTrigger then
             exit;
 
-        with Rec do begin
-            if "NPR Type" <> "NPR Type"::Cash then begin
-                if "No." = '' then begin
-                    GetSalesSetup;
-                    SalesSetup.TestField("Customer Nos.");
-                    //-NPR5.22
-                    //      NrSerieStyring.InitSeries(SalgOpsæt."Customer Nos.",xIDeb."No. Series",0D,"No.","No. Series");
-                    NoSeriesMgt.InitSeries(SalesSetup."Customer Nos.", '', 0D, "No.", "No. Series");
-                    //+NPR5.22
-                    "Invoice Disc. Code" := "No.";
-                end;
-            end else
-                if "No." = '' then
-                    Error(Text001);
-            "NPR Primary Key Length" := StrLen("No.");
-            Modify;
-        end;
-        //+NPR5.22.01
-
+        if Rec."NPR Type" <> Rec."NPR Type"::Cash then begin
+            if Rec."No." = '' then begin
+                GetSalesSetup;
+                SalesSetup.TestField("Customer Nos.");
+                NoSeriesMgt.InitSeries(SalesSetup."Customer Nos.", '', 0D, Rec."No.", Rec."No. Series");
+                Rec."Invoice Disc. Code" := Rec."No.";
+            end;
+        end else
+            if Rec."No." = '' then
+                Error(NoNumberErr);
+        Rec."NPR Primary Key Length" := StrLen(Rec."No.");
+        Rec.Modify();
     end;
 
-    [EventSubscriber(ObjectType::Table, 18, 'OnBeforeDeleteEvent', '', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeDeleteEvent', '', true, false)]
     local procedure OnBeforeDeleteEvent(var Rec: Record Customer; RunTrigger: Boolean)
     var
-        SalesPOS: Record "NPR Sale POS";
-        SalesLinePOS: Record "NPR Sale Line POS";
         AuditRoll: Record "NPR Audit Roll";
-        Text001: Label 'You can''t delete customer %1 as there are one or more non posted entries.';
-        Text002: Label 'You can''t delete customer %1 as it is used on an active sales document.';
-        Text003: Label 'You can''t delete customer %1 as it is used on active cash payment.';
-    begin
-        //-NPR5.22.01
-        /*
-        IF RunTrigger THEN
-        //-NPR70.00.00.00
-          StdTableCode.DebitorOnDelete1(Rec);
-        //+NPR70.00.00.00
-        */
-        if not RunTrigger then
-            exit;
-
-        with Rec do begin
-            if "No." = '' then
-                exit;
-
-            AuditRoll.SetCurrentKey("Sale Type", Type, "No.", Posted);
-            AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Deposit);
-            AuditRoll.SetRange(Type, AuditRoll.Type::Customer);
-
-            //-NPR5.22
-            //  Revisionsrulle.SETRANGE("No.",xDDeb."No.");
-            AuditRoll.SetRange("No.", "No.");
-            //+NPR5.22
-
-            AuditRoll.SetRange(Posted, false);
-            if AuditRoll.FindFirst then
-                Error(Text001, "No.");
-
-            SalesPOS.SetRange("Customer No.", "No.");
-            if SalesPOS.FindFirst then
-                Error(Text002, "No.");
-
-            SalesLinePOS.SetRange("Sale Type", SalesLinePOS."Sale Type"::Deposit);
-            SalesLinePOS.SetRange(Type, SalesLinePOS.Type::Customer);
-            SalesLinePOS.SetRange("No.", "No.");
-            if SalesLinePOS.FindFirst then
-                Error(Text003, "No.");
-        end;
-        //+NPR5.22.01
-
-    end;
-
-    [EventSubscriber(ObjectType::Table, 18, 'OnBeforeRenameEvent', '', false, false)]
-    local procedure OnBeforeRenameEvent(var Rec: Record Customer; var xRec: Record Customer; RunTrigger: Boolean)
-    var
-        SalesPOS: Record "NPR Sale POS";
         SalesLinePOS: Record "NPR Sale Line POS";
-        Text001: Label 'You can''t rename customer %1 as it is used on an active sales document.';
-        Text002: Label 'You can''t rename customer %1 as it is used on active cash payment.';
+        SalesPOS: Record "NPR Sale POS";
+        DeleteCustActiveCashErr: Label 'You can''t delete customer %1 as it is used on active cash payment.', Comment = '%1 = Customer';
+        DeleteCustActiveSalesDocErr: Label 'You can''t delete customer %1 as it is used on an active sales document.', Comment = '%1 = Customer';
+        DeleteCustActivePostedEntriesErr: Label 'You can''t delete customer %1 as there are one or more non posted entries.', Comment = '%1 = Customer';
     begin
-
-
-        //-NPR5.22.01
         if not RunTrigger then
             exit;
 
-        //-NPR5.40 [307028]
-        // SalesPOS.SETRANGE("Customer No.",xRec."No.");
-        // IF SalesPOS.FINDFIRST THEN
-        //  ERROR(Text001,xRec."No.");
-        //
-        // SalesLinePOS.SETRANGE("Sale Type",SalesLinePOS."Sale Type"::Deposit);
-        // SalesLinePOS.SETRANGE(Type,SalesLinePOS.Type::Customer);
-        // SalesLinePOS.SETRANGE("No.",xRec."No.");
-        // IF SalesLinePOS.FINDFIRST THEN
-        //  ERROR(Text002,xRec."No.");
-        //+NPR5.40 [307028]
-        //+NPR5.22.01
+        if Rec."No." = '' then
+            exit;
+
+        AuditRoll.SetCurrentKey("Sale Type", Type, "No.", Posted);
+        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Deposit);
+        AuditRoll.SetRange(Type, AuditRoll.Type::Customer);
+        AuditRoll.SetRange("No.", Rec."No.");
+        AuditRoll.SetRange(Posted, false);
+        if AuditRoll.FindFirst() then
+            Error(DeleteCustActivePostedEntriesErr, Rec."No.");
+
+        SalesPOS.SetRange("Customer No.", Rec."No.");
+        if SalesPOS.FindFirst() then
+            Error(DeleteCustActiveSalesDocErr, Rec."No.");
+
+        SalesLinePOS.SetRange("Sale Type", SalesLinePOS."Sale Type"::Deposit);
+        SalesLinePOS.SetRange(Type, SalesLinePOS.Type::Customer);
+        SalesLinePOS.SetRange("No.", Rec."No.");
+        if SalesLinePOS.FindFirst() then
+            Error(DeleteCustActiveCashErr, Rec."No.");
     end;
 
-    [EventSubscriber(ObjectType::Table, 18, 'OnAfterRenameEvent', '', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterRenameEvent', '', true, false)]
     local procedure OnAfterRenameEvent(var Rec: Record Customer; var xRec: Record Customer; RunTrigger: Boolean)
     var
         AuditRoll: Record "NPR Audit Roll";
-        SalesPOS: Record "NPR Sale POS";
         SalesLinePOS: Record "NPR Sale Line POS";
+        SalesPOS: Record "NPR Sale POS";
     begin
-        //-NPR5.22.01
-        //took part of the code from StdTableCode.DebitorOnRename(Rec,xRec) and split it into OnBefore and OnAfter
-        /*
-        IF RunTrigger THEN
-        //-NPR70.00.00.00
-          StdTableCode.DebitorOnRename(Rec,xRec);
-        //+NPR70.00.00.00
-        */
         if not RunTrigger then
             exit;
 
@@ -162,12 +81,9 @@ codeunit 6014442 "NPR Event Subscriber (Cust)"
         AuditRoll.SetRange(Type, AuditRoll.Type::Customer);
         AuditRoll.SetRange("No.", xRec."No.");
         AuditRoll.SetRange(Posted, false);
-        if AuditRoll.FindFirst then
+        if AuditRoll.FindFirst() then
             AuditRoll.ModifyAll("No.", Rec."No.");
-        //+NPR5.22.01
 
-
-        //-NPR5.40 [307028]
         if not RunTrigger then
             exit;
 
@@ -178,48 +94,32 @@ codeunit 6014442 "NPR Event Subscriber (Cust)"
         SalesLinePOS.SetRange(Type, SalesLinePOS.Type::Customer);
         SalesLinePOS.SetRange("No.", xRec."No.");
         SalesLinePOS.ModifyAll("No.", Rec."No.");
-
-        //+NPR5.40 [307028]
-
     end;
 
-    [EventSubscriber(ObjectType::Table, 18, 'OnAfterValidateEvent', 'Payment Terms Code', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterValidateEvent', 'Payment Terms Code', true, false)]
     local procedure OnAfterValidateEventPaymentTermsCode(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     var
         PaymentTerms: Record "Payment Terms";
-        Text001: Label 'Specify %1 for %2!';
-        Text002: Label 'Want to convert customer %1 from type cash to type customer?';
+        PaymentTermsErr: Label 'Specify %1 for %2!', Comment = '%1 = Due Date Calculation, %2 = Payment Terms Code';
+        ConvertCustQst: Label 'Want to convert customer %1 from type cash to type customer?', Comment = '%1 = Customer Name';
     begin
-        //-NPR5.22.01
-        /*
-        //-NPR70.00.00.00
-        StdTableCode.DebitorBetaling(Rec,xRec);
-        //+NPR70.00.00.00
-        */
+        if Rec."Payment Terms Code" = '' then
+            exit;
+        PaymentTerms.Get(Rec."Payment Terms Code");
+        if Format(PaymentTerms."Due Date Calculation") = '' then
+            Error(PaymentTermsErr, PaymentTerms.FieldCaption("Due Date Calculation"), PaymentTerms.Code);
+        if Format(PaymentTerms."Due Date Calculation") = Format(0D) then
+            Rec."NPR Type" := Rec."NPR Type"::Cash
+        else
+            Rec."NPR Type" := Rec."NPR Type"::Customer;
 
-        with Rec do begin
-            //-NPR5.31 [271060]
-            if "Payment Terms Code" = '' then
-                exit;
-            //+NPR5.31 [271060]
-            PaymentTerms.Get("Payment Terms Code");
-            if Format(PaymentTerms."Due Date Calculation") = '' then
-                Error(Text001, PaymentTerms.FieldCaption("Due Date Calculation"), PaymentTerms.Code); //FIELDNAME changed to FIELDCAPTION and needs to be translated to english
-            if Format(PaymentTerms."Due Date Calculation") = Format(0D) then
-                "NPR Type" := "NPR Type"::Cash
-            else
-                "NPR Type" := "NPR Type"::Customer;
-
-            if (xRec."NPR Type" = xRec."NPR Type"::Cash) and (xRec."NPR Type" <> "NPR Type") then begin
-                if not Confirm(Text002, false) then begin
-                    "Payment Terms Code" := xRec."Payment Terms Code";
-                    "NPR Type" := "NPR Type"::Cash;
-                end else
-                    "NPR Type" := "NPR Type"::Customer;
-            end;
+        if (xRec."NPR Type" = xRec."NPR Type"::Cash) and (xRec."NPR Type" <> Rec."NPR Type") then begin
+            if not Confirm(StrSubstNo(ConvertCustQst, Rec.Name), false) then begin
+                Rec."Payment Terms Code" := xRec."Payment Terms Code";
+                Rec."NPR Type" := Rec."NPR Type"::Cash;
+            end else
+                Rec."NPR Type" := Rec."NPR Type"::Customer;
         end;
-        //+NPR5.22.01
-
     end;
 
     local procedure GetSalesSetup(): Boolean
@@ -244,77 +144,65 @@ codeunit 6014442 "NPR Event Subscriber (Cust)"
         exit(true);
     end;
 
-    [EventSubscriber(ObjectType::Page, 22, 'OnAfterActionEvent', 'NPR ItemLedgerEntries', false, false)]
-    local procedure Page22CustomerListActionEventItemLedgerEntries(var Rec: Record Customer)
+    [EventSubscriber(ObjectType::Page, Page::"Customer List", 'OnAfterActionEvent', 'NPR ItemLedgerEntries', false, false)]
+    local procedure CustomerListActionEventItemLedgerEntries(var Rec: Record Customer)
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
-        //-NPR5.25
         ItemLedgerEntry.SetRange("Source No.", Rec."No.");
         PAGE.RunModal(PAGE::"Item Ledger Entries", ItemLedgerEntry);
-        //+NPR5.25
     end;
 
-    [EventSubscriber(ObjectType::Page, 22, 'OnAfterActionEvent', 'NPR AuditRoll', false, false)]
-    local procedure Page22OnAfterActionEventAuditRoll(var Rec: Record Customer)
+    [EventSubscriber(ObjectType::Page, Page::"Customer List", 'OnAfterActionEvent', 'NPR AuditRoll', false, false)]
+    local procedure CustomerListOnAfterActionEventAuditRoll(var Rec: Record Customer)
     var
         AuditRoll: Record "NPR Audit Roll";
     begin
-        //-NPR5.33 [277663]
         AuditRoll.SetCurrentKey("Customer No.");
         AuditRoll.SetRange("Customer No.", Rec."No.");
         PAGE.RunModal(PAGE::"NPR Audit Roll", AuditRoll);
-        //+NPR5.33 [277663]
     end;
 
-    [EventSubscriber(ObjectType::Page, 21, 'OnAfterActionEvent', 'NPR ItemLedgerEntries', false, false)]
-    local procedure Page21OnAfterActionEventItemLedgerEntries(var Rec: Record Customer)
+    [EventSubscriber(ObjectType::Page, Page::"Customer Card", 'OnAfterActionEvent', 'NPR ItemLedgerEntries', false, false)]
+    local procedure CustomerCardOnAfterActionEventItemLedgerEntries(var Rec: Record Customer)
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
-        //-NPR5.29 [262797]
         ItemLedgerEntry.SetRange("Source No.", Rec."No.");
         PAGE.RunModal(PAGE::"Item Ledger Entries", ItemLedgerEntry);
-        //+NPR5.29 [262797]
     end;
 
-    [EventSubscriber(ObjectType::Page, 21, 'OnAfterActionEvent', 'NPR AlternativeNo', false, false)]
-    local procedure Page21OnAfterActionEventAlternativNo(var Rec: Record Customer)
+    [EventSubscriber(ObjectType::Page, Page::"Customer Card", 'OnAfterActionEvent', 'NPR AlternativeNo', false, false)]
+    local procedure CustomerCardOnAfterActionEventAlternativNo(var Rec: Record Customer)
     var
         AlternativeNo: Record "NPR Alternative No.";
     begin
-        //-NPR5.29 [262797]
         AlternativeNo.SetRange(Type, AlternativeNo.Type::Customer);
         AlternativeNo.SetRange(AlternativeNo.Code, Rec."No.");
         PAGE.RunModal(PAGE::"NPR Alternative Number", AlternativeNo);
-        //+NPR5.29 [262797]
     end;
 
-    [EventSubscriber(ObjectType::Page, 21, 'OnAfterActionEvent', 'NPR PrintShippingLabel', false, false)]
-    local procedure Page21OnAfterActionEventPrintShippingLabel(var Rec: Record Customer)
+    [EventSubscriber(ObjectType::Page, Page::"Customer Card", 'OnAfterActionEvent', 'NPR PrintShippingLabel', false, false)]
+    local procedure CustomerCardOnAfterActionEventPrintShippingLabel(var Rec: Record Customer)
     var
+        Customer: Record Customer;
         LabelLibrary: Codeunit "NPR Label Library";
         RecRef: RecordRef;
-        Customer: Record Customer;
     begin
-        //-NPR5.29 [262797]
         Customer := Rec;
         Customer.SetRecFilter;
         RecRef.GetTable(Customer);
         LabelLibrary.PrintCustomShippingLabel(RecRef, '');
-        //+NPR5.29 [262797]
     end;
 
-    [EventSubscriber(ObjectType::Page, 21, 'OnAfterActionEvent', 'NPR AuditRoll', false, false)]
-    local procedure Page21OnAfterActionEventAuditRoll(var Rec: Record Customer)
+    [EventSubscriber(ObjectType::Page, Page::"Customer Card", 'OnAfterActionEvent', 'NPR AuditRoll', false, false)]
+    local procedure CustomerCardOnAfterActionEventAuditRoll(var Rec: Record Customer)
     var
         AuditRoll: Record "NPR Audit Roll";
     begin
-        //-NPR5.33 [277663]
         AuditRoll.SetCurrentKey("Customer No.");
         AuditRoll.SetRange("Customer No.", Rec."No.");
         PAGE.RunModal(PAGE::"NPR Audit Roll", AuditRoll);
-        //+NPR5.33 [277663]
     end;
 }
 

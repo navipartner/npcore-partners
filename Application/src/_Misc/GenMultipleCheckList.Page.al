@@ -1,12 +1,10 @@
 page 6014650 "NPR Gen. Multiple Check List"
 {
-    // NPR5.48/TJ  /20181129 CASE 318531 New object
-
-    UsageCategory = None;
     Caption = 'Select options';
     LinksAllowed = false;
     ShowFilter = false;
-
+    UsageCategory = Lists;
+    ApplicationArea = All;
     layout
     {
         area(content)
@@ -154,14 +152,10 @@ page 6014650 "NPR Gen. Multiple Check List"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnOpenPage()
     begin
         if OptionString = '' then
-            Error(Text001);
+            Error(SetOptionErr);
         PrepareArray();
         SetVisible();
         ReadFilter();
@@ -192,7 +186,7 @@ page 6014650 "NPR Gen. Multiple Check List"
         BooleanVisible19: Boolean;
         BooleanVisible20: Boolean;
         OptionString: Text;
-        Text001: Label 'You need to call function SetOption before running this page!';
+        SetOptionErr: Label 'You need to call function SetOption before running this page!';
         OptionFilter: Text;
         TypeHelper: Codeunit "Type Helper";
 

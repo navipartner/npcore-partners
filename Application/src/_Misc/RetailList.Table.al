@@ -34,18 +34,5 @@ table 6014536 "NPR Retail List"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
-
-    trigger OnInsert()
-    var
-        nummerserie: Code[20];
-    begin
-    end;
-
-    var
-        Nrseriestyring: Codeunit NoSeriesManagement;
 }
 

@@ -1,7 +1,5 @@
 table 6059778 "NPR Sync Profile Setup"
 {
-    // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj -field 4
-
     Caption = 'Sync Profile Setup';
     DataPerCompany = false;
     DataClassification = CustomerContent;
@@ -62,41 +60,27 @@ table 6059778 "NPR Sync Profile Setup"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnInsert()
     begin
-        addTableDescription;
+        addTableDescription();
     end;
 
     trigger OnRename()
     begin
-        addTableDescription;
+        addTableDescription();
     end;
 
     var
-        objectRecord: Record "Object";
         AllObj: Record AllObj;
 
     procedure addTableDescription()
     begin
-        //-NPR5.46 [322752]
-        // CLEAR(objectRecord);
-        // objectRecord.INIT;
-        // objectRecord.SETRANGE(Type, objectRecord.Type::Table);
-        // objectRecord.SETRANGE(ID, "Table No.");
-        // IF objectRecord.FIND('-') THEN
-        //  Description := objectRecord.Name;
-
         Clear(AllObj);
-        AllObj.Init;
+        AllObj.Init();
         AllObj.SetRange("Object Type", AllObj."Object Type"::Table);
         AllObj.SetRange("Object ID", "Table No.");
         if AllObj.Find('-') then
             Description := AllObj."Object Name";
-        //+NPR5.46 [322752]
     end;
 }
 

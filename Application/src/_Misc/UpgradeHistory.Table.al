@@ -1,11 +1,8 @@
 table 6151000 "NPR Upgrade History"
 {
-    // NPR5.41/THRO/20180425 CASE 311567 Table created
-
     Caption = 'NPR Upgrade History';
     DataClassification = CustomerContent;
     DataPerCompany = false;
-
     fields
     {
         field(1; "Entry No."; Integer)
@@ -31,10 +28,6 @@ table 6151000 "NPR Upgrade History"
         key(Key1; "Entry No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 
