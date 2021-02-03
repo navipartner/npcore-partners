@@ -1,12 +1,5 @@
 table 6151570 "NPR AF Setup"
 {
-    // NPR5.36/CLVA/20170710 CASE 269792 AF Setup
-    // NPR5.38/CLVA/20171024 CASE 289636 Added Messages Service fields
-    // NPR5.38/CLVA/20180123 CASE 279861 Added OIO validation fields
-    // NPR5.40/THRO/20180315 CASE 307195 Added LookUpPageID and DrillDownPageID
-    // NPR5.43/CLVA/20180529 CASE 279861 Added field OIO Validation - Enable
-    // NPR5.48/JDH /20181109 CASE 334163 Added caption to field OIO Validation - Enable
-
     Caption = 'AF Setup';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR AF Setup";
@@ -61,6 +54,9 @@ table 6151570 "NPR AF Setup"
         {
             Caption = 'Notification - API Key';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This Field won''t be used anymore';
+            ObsoleteTag = 'NPR AF Setup cleanup';
         }
         field(201; "Notification - Base Url"; Text[100])
         {
