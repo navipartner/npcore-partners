@@ -1,8 +1,5 @@
 table 6151153 "NPR Authentication Log"
 {
-    // NPR5.48/TSA /20181211 CASE 320425 Initial Version
-    // NPR5.49/TSA /20190401 CASE 320425 Added object caption
-
     Caption = 'Authentication Log';
     DataClassification = CustomerContent;
 
@@ -55,10 +52,6 @@ table 6151153 "NPR Authentication Log"
         key(Key1; "Entry No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

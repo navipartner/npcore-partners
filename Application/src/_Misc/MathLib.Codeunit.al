@@ -1,38 +1,8 @@
 codeunit 6014456 "NPR MathLib"
 {
-
     trigger OnRun()
     begin
-
         Message(Format(evalStr2Dec('2+3')));
-
-        /*
-        MESSAGE('Ln(20) = %1',Ln(20));
-        MESSAGE('Lg(7) = %1',Log(7));
-        
-        MESSAGE('6! = %1',"!"(6));
-        MESSAGE('Sin(30) = %1',Sin("Grad>Rad"(30)));
-        MESSAGE('Cos(30) = %1',Cos("Grad>Rad"(30)));
-        MESSAGE('Tan(30) = %1',Tan("Grad>Rad"(30)));
-        MESSAGE('30° adjusted by PI = %1',Adjust(30));
-        MESSAGE('Squareroot of 30 = %1',Sqrt(30));
-        MESSAGE('the greatest common Divisor of 35 and 25 = %1',gcd(35,25));
-        MESSAGE('the least common multipler of 35 and 25 = %1',lcm(35,25));
-        MESSAGE('29 is %1 prime, 30 is %2 prime',Prime(29),Prime(30));
-        MESSAGE('the CrossFoot of 123 is %1',CrossFoot(123));
-        MESSAGE('PI = %1, Exp = %2, e (euler) = %3',Pi,E,Euler);
-        MESSAGE('the sign of -23 is %1, the sign of 45 is %2',Sign(-23),Sign(45));
-        MESSAGE('the max of 23 and 45 is %1',Max(23,45));
-        MESSAGE('the min of 23 and 45 is %1',Min(23,45));
-        MESSAGE('the Integer of 34,567 is %1',Int(34.567));
-        
-        //EuklDistance
-        //ManhDistance
-        //StreetDistance
-        //ConvLongtitute2Km
-        //ConvLatitude2Km
-        */
-
     end;
 
     procedure "!"(x: Decimal) Fakultet: Decimal
@@ -88,8 +58,10 @@ codeunit 6014456 "NPR MathLib"
     end;
 
     procedure ArcTan(x: Decimal): Decimal
+    var
+        ArcTanErr: Label 'ArcTan (still) not Avaible)';
     begin
-        Error('ArcTan (still) not Avaible)');
+        Error(ArcTanErr);
     end;
 
     procedure Log(x: Decimal): Decimal
@@ -122,10 +94,10 @@ codeunit 6014456 "NPR MathLib"
     procedure CalcLog(Base: Decimal; x: Decimal): Decimal
     var
         Down: Decimal;
-        Up: Decimal;
         Step: Decimal;
-        Steps: Integer;
+        Up: Decimal;
         LeadingZeros: Integer;
+        Steps: Integer;
         LeadingZeroString: Text[30];
     begin
         Clear(Steps);
@@ -144,7 +116,7 @@ codeunit 6014456 "NPR MathLib"
             //On Values 0..1 (except 0) the leading zeros are the offset in -Integer
             //i.e. 0,0027 leads to -2, because the LOG will be something between -2 and zero.
             Down := -StrLen(CopyStr(Format(x, 0, '<decimals,0>'), 2)) -
-              StrLen(DelChr(CopyStr(Format(x, 0, '<decimals,0>'), 2), '<', '0'));
+             StrLen(DelChr(CopyStr(Format(x, 0, '<decimals,0>'), 2), '<', '0'));
             Up := 0;
         end;
 
@@ -353,14 +325,13 @@ codeunit 6014456 "NPR MathLib"
         dec: Decimal;
         lastDec: Decimal;
         tmpDec: Decimal;
-        tmp: Text[30];
         i: Integer;
         N: Integer;
-        t1: Text[1];
         lastMod: Text[1];
+        t1: Text[1];
+        tmp: Text[30];
     begin
         //evalStr2Dec
-
         N := StrLen(str);
 
         lastMod := '';

@@ -1,7 +1,5 @@
 page 6060064 "NPR EAN Prefixes per Countries"
 {
-    // NPR5.46/NPKNAV/20181008  CASE 327838 Transport NPR5.46 - 8 October 2018
-
     AutoSplitKey = false;
     Caption = 'EAN Prefixes per Countries';
     PageType = List;
@@ -16,27 +14,23 @@ page 6060064 "NPR EAN Prefixes per Countries"
         {
             repeater(Group)
             {
-                field("Country Code"; "Country Code")
+                field("Country Code"; Rec."Country Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Country Code field';
                 }
-                field("Country Name"; "Country Name")
+                field("Country Name"; Rec."Country Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Country Name field';
                 }
-                field(Prefix; Prefix)
+                field(Prefix; Rec.Prefix)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Prefix field';
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

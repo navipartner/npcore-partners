@@ -1,9 +1,5 @@
 table 6060101 "NPR Data Cleanup GCVI"
 {
-    // NPR4.02/JC/20150318  CASE 207094 Data collect for Customer, Vendor and Item
-    // NPR4.10/JC/20150422  CASE 207094 Added Description Field
-    // NPR5.23/JC/20160330  CASE 237816 Extend with G/L account & rename
-
     Caption = 'Data Cleanup GCVI';
     DataClassification = CustomerContent;
 
@@ -181,19 +177,13 @@ table 6060101 "NPR Data Cleanup GCVI"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnInsert()
     begin
         "Date Created" := Today;
         "Time Created" := Time;
         "User Created" := UserId;
 
-        //-NPR4.10
         UpdateDescription();
-        //+NPR4.10
     end;
 
     trigger OnModify()
@@ -202,27 +192,22 @@ table 6060101 "NPR Data Cleanup GCVI"
         "Time Modified" := Time;
         "User Modified" := UserId;
 
-        //-NPR4.10
         UpdateDescription();
-        //+NPR4.10
     end;
 
     trigger OnRename()
     begin
-        //-NPR4.10
         UpdateDescription();
-        //+NPR4.10
     end;
 
     var
         Customer: Record Customer;
-        Vendor: Record Vendor;
-        Item: Record Item;
         GLAccount: Record "G/L Account";
+        Item: Record Item;
+        Vendor: Record Vendor;
 
     local procedure UpdateDescription()
     begin
-        //-NPR4.10
         case Type of
             Type::Customer:
                 begin
@@ -241,15 +226,12 @@ table 6060101 "NPR Data Cleanup GCVI"
                     if Item.Get("No.") then
                         Description := Item.Description;
                 end;
-            //-NPR5.23
             Type::"G/L Account":
                 begin
                     if GLAccount.Get("No.") then
                         Description := GLAccount.Name;
                 end;
-        //+NPR5.23
         end;
-        //+NPR4.10
     end;
 }
 

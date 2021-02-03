@@ -1,19 +1,11 @@
 codeunit 6014445 "NPR Event Subscriber (Sales)"
 {
-    // NPR5.29/TJ/CASE 262797 Added new subscriber to page 42 Sales Order
-    // NPR5.29/NPKNAV/20170127  CASE 261423 Transport NPR5.29 - 27 januar 2017
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         SalesHeaderFetched: Boolean;
         SalesHeader: Record "Sales Header";
 
-    [EventSubscriber(ObjectType::Table, 36, 'OnAfterValidateEvent', 'Prices Including VAT', false, false)]
-    local procedure PricesIncludingVATOnAfterValidate(var Rec: Record "Sales Header"; var xRec: Record "Sales Header"; CurrFieldNo: Integer)
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterValidateEvent', 'Prices Including VAT', false, false)]
+    local procedure SalesHeaderPricesIncludingVATOnAfterValidate(var Rec: Record "Sales Header"; var xRec: Record "Sales Header"; CurrFieldNo: Integer)
     var
         SalesLine: Record "Sales Line";
     begin
@@ -31,14 +23,14 @@ codeunit 6014445 "NPR Event Subscriber (Sales)"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 37, 'OnAfterValidateEvent', 'Unit Price', false, false)]
-    local procedure UnitPriceOnAfterValidate(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterValidateEvent', 'Unit Price', false, false)]
+    local procedure SalesLineUnitPriceOnAfterValidate(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
     begin
         CalcItemGroupUnitCost(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 37, 'OnAfterValidateEvent', 'VAT Prod. Posting Group', false, false)]
-    local procedure VATProdPostingGroupOnAfterValidate(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterValidateEvent', 'VAT Prod. Posting Group', false, false)]
+    local procedure SalesLineVATProdPostingGroupOnAfterValidate(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
     begin
         CalcItemGroupUnitCost(Rec);
     end;
@@ -64,19 +56,17 @@ codeunit 6014445 "NPR Event Subscriber (Sales)"
         exit(true);
     end;
 
-    [EventSubscriber(ObjectType::Page, 42, 'OnAfterActionEvent', 'NPR PrintShippingLabel', false, false)]
-    local procedure Page42OnAfterActionEventPrintShippingLabel(var Rec: Record "Sales Header")
+    [EventSubscriber(ObjectType::Page, Page::"Sales Order", 'OnAfterActionEvent', 'NPR PrintShippingLabel', false, false)]
+    local procedure SalesOrderOnAfterActionEventPrintShippingLabel(var Rec: Record "Sales Header")
     var
         LabelLibrary: Codeunit "NPR Label Library";
         RecRef: RecordRef;
         SalesHeader: Record "Sales Header";
     begin
-        //-NPR5.29 [262797]
         SalesHeader := Rec;
         SalesHeader.SetRecFilter;
         RecRef.GetTable(SalesHeader);
         LabelLibrary.PrintCustomShippingLabel(RecRef, '');
-        //+NPR5.29 [262797]
     end;
 }
 

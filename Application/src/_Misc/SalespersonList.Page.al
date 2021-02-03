@@ -1,7 +1,5 @@
 page 6151490 "NPR Salesperson List"
 {
-    // NPR5.55/ALPO/20200422 CASE 400925 User friendly salesperson selection using multi-selection mode
-
     Caption = 'Salesperson List';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -30,13 +28,13 @@ page 6151490 "NPR Salesperson List"
                         Mark(Selected);
                     end;
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -46,13 +44,9 @@ page 6151490 "NPR Salesperson List"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnAfterGetRecord()
     begin
-        Selected := Mark;
+        Selected := Rec.Mark();
     end;
 
     var
@@ -66,7 +60,7 @@ page 6151490 "NPR Salesperson List"
 
     procedure SetDataset(var Salesperson: Record "Salesperson/Purchaser")
     begin
-        Copy(Salesperson, true);
+        Rec.Copy(Salesperson, true);
     end;
 
     procedure GetDataset(var Salesperson: Record "Salesperson/Purchaser")

@@ -1,7 +1,5 @@
 table 6060056 "NPR Inv. Overview Line"
 {
-    // NPR5.34/BR  /20170726   CASE 282748 Object Created
-
     Caption = 'Inventory Overview Line';
     DataClassification = CustomerContent;
 
@@ -49,10 +47,6 @@ table 6060056 "NPR Inv. Overview Line"
         key(Key1; "Item No.", "Variant Code", "Location Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

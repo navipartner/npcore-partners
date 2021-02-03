@@ -5,7 +5,8 @@ codeunit 6014402 "NPR License Information"
 
     trigger OnRun()
     begin
-        if not InLicenseFile(Type, ID) then Error('');
+        if not InLicenseFile(Rec.Type, Rec.ID) then
+            Error('');
     end;
 
     var
@@ -19,7 +20,7 @@ codeunit 6014402 "NPR License Information"
         PermissionRange.SetFilter(From, '<=%1', "Object No");
         PermissionRange.SetFilter("To", '>=%1', "Object No");
         PermissionRange.SetRange("Execute Permission", PermissionRange."Execute Permission"::Yes);
-        exit(not PermissionRange.IsEmpty);
+        exit(not PermissionRange.IsEmpty());
     end;
 
     procedure HasPermission("Object Type": Integer; "Object No": Integer): Boolean
@@ -29,15 +30,15 @@ codeunit 6014402 "NPR License Information"
         User: Record User;
     begin
         User.SetRange("User Name", UserId);
-        User.FindFirst;
+        User.FindFirst();
 
         AccessControl.SetRange("User Security ID", User."User Security ID");
-        AccessControl.FindSet;
+        AccessControl.FindSet();
 
         Permission.SetRange("Role ID", AccessControl."Role ID");
         Permission.SetRange("Object Type", "Object Type");
         Permission.SetFilter("Object ID", '%1|%2', "Object No", 0);
-        exit(not Permission.IsEmpty);
+        exit(not Permission.IsEmpty());
     end;
 
     procedure PaymentManagementLicensed(): Boolean

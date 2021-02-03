@@ -7,11 +7,11 @@ codeunit 6014602 "NPR Import Base NPR Data"
 
     procedure ImportRapidPackageFromFeed(package: Text)
     var
-        rapidStartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
-        packageName: Text;
         autoRapidstartImportLog: Record "NPR Auto Rapidstart Import Log";
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        rapidStartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
         BaseUri: Text;
+        packageName: Text;
         Secret: Text;
     begin
         packageName := package.Replace('.rapidstart', '');
