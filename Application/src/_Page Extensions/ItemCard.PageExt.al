@@ -57,18 +57,6 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                     NPR_CheckItemGroup();
                 end;
             }
-
-            field("NPR Condition"; "NPR Condition")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the NPR Condition field';
-            }
-
-            field("NPR Season"; "NPR Season")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the NPR Season field';
-            }
         }
 
         addafter(AssemblyBOM)

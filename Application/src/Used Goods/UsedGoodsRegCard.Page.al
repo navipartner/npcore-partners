@@ -1,10 +1,5 @@
 page 6014506 "NPR Used Goods Reg. Card"
 {
-    // NPR5.26/TS/20160726 CASE 246761 Added code in Item No. Created
-    // NPR5.27/TS/20161027 CASE 246761 Removed Unued/Deleted Fields.
-    // NPR5.30/TS/20161221  CASE 246761 Renamed variables
-    // NPR5.41/TS  /20180105 CASE 300893 Removed Caption on ActionContainer
-    // NPR5.54/MITH/20200304 CASE 394335 Added button to print label after creating item from used goods.
 
     UsageCategory = None;
     Caption = 'Used Item Registration Card';
@@ -34,11 +29,9 @@ page 6014506 "NPR Used Goods Reg. Card"
 
                         trigger OnAssistEdit()
                         begin
-                            //-NPR5.26
                             if Assistedit(xRec) then
                                 CurrPage.Update;
                             Link := "No.";
-                            //+NPR5.26
                         end;
                     }
                     field("Location Code"; "Location Code")
@@ -81,7 +74,6 @@ page 6014506 "NPR Used Goods Reg. Card"
                             SelectedItem: Record Item;
                             FotoOps: Record "NPR Retail Contr. Setup";
                         begin
-                            //-NPR5.26
                             if xRec."Item No. Created" <> '' then
                                 Error(ErrUsedGoodAlreadySet);
 
@@ -100,19 +92,16 @@ page 6014506 "NPR Used Goods Reg. Card"
                             SelectedItem.Get("Item No. Created");
                             if SelectedItem."NPR Second-hand number" <> '' then
                                 Error(ErrItemAlreadySH);
-                            Stand := SelectedItem."NPR Condition";
                             "Salgspris inkl. Moms" := SelectedItem."Unit Price";
                             "Unit Cost" := SelectedItem."Unit Cost";
                             "Item Group No." := SelectedItem."NPR Item Group";
                             Subject := SelectedItem.Description;
                             "Search Name" := SelectedItem."Search Description";
-                            //"Brugtvare lagermetode" :=
                             Modify;
                             SelectedItem."NPR Second-hand number" := "No.";
                             SelectedItem."NPR Second-hand" := true;
                             SelectedItem.Modify(true);
                             Message(StrSubstNo(Text10600001, "Item No. Created"));
-                            //+NPR5.26
                         end;
                     }
                     field(Link; Link)
@@ -235,9 +224,6 @@ page 6014506 "NPR Used Goods Reg. Card"
 
                     RetailSetup.Get;
                     Clear(UsedGoodsRegistration);
-                    //-NPR5.27
-                    //IF "Kostercentralen Registered" <> 0D THEN ERROR(Text10600000);
-                    //+NPR5.27
                     RetailSetup.TestField("Used Goods No. Management");
                     if Link = '' then
                         Link := "No.";
@@ -251,13 +237,7 @@ page 6014506 "NPR Used Goods Reg. Card"
                     UsedGoodsRegistration."Address 2" := "Address 2";
                     UsedGoodsRegistration."Post Code" := "Post Code";
                     UsedGoodsRegistration.Identification := Identification;
-                    //-NPR5.27
-                    //UsedGoodsRegistration."CPR No." := "CPR No.";
-                    //+NPR5.27
                     UsedGoodsRegistration."Identification Number" := "Identification Number";
-                    //-NPR5.27
-                    //UsedGoodsRegistration.Puljemomsordning := Puljemomsordning;
-                    //+NPR5.27
                     UsedGoodsRegistration.By := By;
                     UsedGoodsRegistration."Salesperson Code" := "Salesperson Code";
                     UsedGoodsRegistration.Link := Link;
@@ -294,7 +274,7 @@ page 6014506 "NPR Used Goods Reg. Card"
                                     TempUsedGoodsRegistration := UsedGoodsRegistration;
                                     TempUsedGoodsRegistration.Insert;
                                 until UsedGoodsRegistration.Next = 0;
-                            PageAction :=// FORM.RUNMODAL(FORM::"Used Goods Link List",TempUsedGoodsRegistration);
+                            PageAction :=
                                           PAGE.RunModal(PAGE::"NPR Used Goods Link List", TempUsedGoodsRegistration);
 
                             if PageAction = ACTION::LookupOK then
@@ -305,7 +285,6 @@ page 6014506 "NPR Used Goods Reg. Card"
                             UsedGoodsRegistration.FilterGroup := 2;
                             UsedGoodsRegistration.SetRange("No.", "No.");
                             UsedGoodsRegistration.FilterGroup := 0;
-                            //FORM.RUNMODAL(FORM::"Used Goods Link List",UsedGoodsRegistration);
                             PAGE.RunModal(PAGE::"NPR Used Goods Link List", UsedGoodsRegistration);
                         end;
                     end;
@@ -321,13 +300,8 @@ page 6014506 "NPR Used Goods Reg. Card"
                     begin
 
                         TestField(Subject);
-                        //TESTFIELD(Kostpris);
                         TestField("Purchased By Customer No.");
-                        //-NPR5.30
-                        //TESTFIELD(Blocked,FALSE);
-                        //+NPR5.30
                         TestField("Salesperson Code");
-                        // TESTFIELD("Kostercentralen Registreret d.");
                         TestField("Salgspris inkl. Moms");
                         CODEUNIT.Run((CODEUNIT::"NPR Convert used goods"), Rec);
                     end;
@@ -343,11 +317,7 @@ page 6014506 "NPR Used Goods Reg. Card"
                     var
                         "Convert used goods": Codeunit "NPR Convert used goods";
                     begin
-                        //-NPR5.26
-                        //-NPR5.27
                         "Convert used goods".UsedGoods2SalesCreditMemo(Rec);
-                        //+NPR5.27
-                        //+NPR5.26
                     end;
                 }
                 action("Item Card")
@@ -393,8 +363,6 @@ page 6014506 "NPR Used Goods Reg. Card"
                     Image = PrintDocument;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Print Registration Card action';
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = "Report";
 
                     trigger OnAction()
                     var
@@ -432,7 +400,6 @@ page 6014506 "NPR Used Goods Reg. Card"
                         PrintLabelAndDisplay: Codeunit "NPR Label Library";
                         ReportSelectionRetail: Record "NPR Report Selection Retail";
                     begin
-                        //+NPR5.54
                         TestField(Subject);
                         TestField("Purchased By Customer No.");
                         TestField("Salesperson Code");
@@ -442,7 +409,6 @@ page 6014506 "NPR Used Goods Reg. Card"
                         TestField("Item No. Created");
                         Item.Get("Item No. Created");
                         PrintLabelAndDisplay.ResolveVariantAndPrintItem(Item, ReportSelectionRetail."Report Type"::"Price Label");
-                        //-NPR5.54
                     end;
                 }
             }
@@ -451,18 +417,6 @@ page 6014506 "NPR Used Goods Reg. Card"
 
     trigger OnAfterGetRecord()
     begin
-        /*
-        CurrForm.Ny.VISIBLE(FALSE);
-        CurrForm.Hoved.VISIBLE(FALSE);
-        CurrForm.Link.VISIBLE(FALSE);
-        IF (Link <> '') AND (Nummer <> Link) THEN CurrForm.Link.VISIBLE(TRUE);
-        IF Nummer = Link THEN CurrForm.Hoved.VISIBLE(TRUE);
-        IF Link = '' THEN BEGIN
-          CurrForm.Ny.VISIBLE(TRUE);
-          Link := Nummer;
-        END;
-        */
-        //-NPR5.30
         if (Link <> '') and ("No." <> Link) then
             Status := Status::SubPost;
         if "No." = Link then
@@ -471,19 +425,9 @@ page 6014506 "NPR Used Goods Reg. Card"
             Status := Status::SinglePost;
             Link := "No.";
         end;
-        //+NPR5.30
-
+    
     end;
 
-    trigger OnOpenPage()
-    begin
-        /*
-        CurrForm.Ny.VISIBLE(FALSE);
-        CurrForm.Hoved.VISIBLE(FALSE);
-        CurrForm.Link.VISIBLE(FALSE);
-        */
-
-    end;
 
     var
         RetailSetup: Record "NPR Retail Setup";

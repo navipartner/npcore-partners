@@ -100,7 +100,6 @@ report 6014428 "NPR Shelf Labels"
 
                 Clear(ItemVariant);
                 if Item.Get("Item No.") then begin
-                    TMPRetail_Journal_Line_Col1."New Item No." := Item."NPR Season";
                     GetItemNPRAttr(Item);
                     if ItemVariant.Get(Item."No.", "Variant Code") then;
                 end;
