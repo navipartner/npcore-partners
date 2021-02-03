@@ -1,16 +1,5 @@
 codeunit 6150699 "NPR Retail Data Model Upg Mgt."
 {
-    // NPR5.30/AP  /20170209 CASE 261728 Initail upgrade build. Create new NPRetailSetup, POS Units, POS Stores and POS Payment Bins with basic parameters.
-    // NPR5.30/MMV /20170221 CASE 261964 Initialize new tax free structure.
-    //                                   EXIT out based on clienttype or permissions.
-    // NPR5.30/TJ  /20170222 CASE 266258 Step 3 skipped
-    // NPR5.30/AP  /20170222 CASE 261728 Re-arranged GetCurrentDataModelBuild-function to place it on top (easier to se current Data Model Build)
-    //                                   Added seperate entry point for Data Upgrade CU and changed back TestUpgradeDataModel to local scope
-    // NPR5.30.01/MMV /20170330 CASE 271098 Fixed errors in step 2.
-    // NPR5.32/AP  /20170501 CASE 274285 Possible to re-run Build Steps. Better visibilty for log entries.
-    // NPR5.32/MMV /20170507 CASE 241995 Added step 4 - Retail print upgrade.
-    // NPR5.38/MMV /20180119 CASE 300683 Skip subscriber when installing extension
-    // TM1.39/THRO/20181126 CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
 
 
     trigger OnRun()
@@ -88,7 +77,6 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
         NPRetailSetup."Prev. Data Model Build" := NPRetailSetup."Data Model Build";
         NPRetailSetup."Data Model Build" := UpgradeDataModel(NPRetailSetup."Prev. Data Model Build" + 1, GetCurrentDataModelBuild());
         NPRetailSetup."Last Data Model Build Upgrade" := CurrentDateTime();
-        NPRetailSetup."Last Data Model Build User ID" := UserId();
         if not RunSilent then begin
             NPRetailSetup.Modify();
             CreateLogEntry(DataModelUpgEndedTxt, 0, 0, NPRetailSetup."Data Model Build");
@@ -177,7 +165,6 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
     var
         d: Dialog;
     begin
-        //-NPR5.32 [274285]
         if FromBuildStep = ToBuildStep then begin
             if not Confirm('Re-run Data Model Upgrade Build Step %1?', false, FromBuildStep, ToBuildStep) then
                 exit;
@@ -193,20 +180,16 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
         UpgradeDataModel(FromBuildStep, ToBuildStep);
 
         NPRetailSetup."Last Data Model Build Upgrade" := CurrentDateTime;
-        NPRetailSetup."Last Data Model Build User ID" := UserId;
         if ToBuildStep > NPRetailSetup."Data Model Build" then
             NPRetailSetup."Data Model Build" := ToBuildStep;
         NPRetailSetup.Modify;
-        //+NPR5.32 [274285]
     end;
 
     procedure ReRunFromLogEntry(DataModelUpgradeLogEntry: Record "NPR Data Model Upg. Log Entry")
     begin
-        //-NPR5.32 [274285]
         if DataModelUpgradeLogEntry."Data Model Build" < 1 then
             Error('Cannot re-run Build Step %1', DataModelUpgradeLogEntry."Data Model Build");
         ReRunUpgradeBuilds(DataModelUpgradeLogEntry."Data Model Build", DataModelUpgradeLogEntry."Data Model Build");
-        //+NPR5.32 [274285]
     end;
 
     local procedure UpgradeDataModelBuildStep1()
@@ -221,7 +204,6 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
         HasRegistersWithLocationCode: Boolean;
         HasRegistersWithoutLocationCode: Boolean;
     begin
-        //Retail Setup
         if TryOpenTable(RecRef, 6014400, 'Retail Setup') then begin
             if RecRef.FindFirst then begin
                 if TryGetField(RecRef, FieldRef, 20, 'Posting Source Code') then
@@ -229,12 +211,11 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
             end;
         end;
 
-        //Create POS Stores, POS Units and POS Payment Bins from Registers
         if TryOpenTable(RecRef, 6014401, 'Register') then begin
             if not RecRef.FindSet then
                 CreateLogEntry(StrSubstNo('No existing cash registers found!', POSUnit.TableCaption, POSUnit."No."), 1, 1, 1)
             else
-                repeat //Initail test-only run
+                repeat 
                     if TryGetField(RecRef, FieldRef, 8, 'Location Code') then begin
                         if Format(FieldRef.Value) = '' then
                             HasRegistersWithoutLocationCode := true
@@ -264,9 +245,6 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
                             CreateLogEntry(StrSubstNo('Created %1 %2', POSPaymentBin.TableCaption, POSPaymentBin."No."), 1, 0, 1);
                         end;
 
-                        //If all registers has location code - then use that as store code.
-                        //If no registers has location code - then use '1' as store code.
-                        //Else create store code for each register
                         if TryGetField(RecRef, FieldRef, 8, 'Location Code') then
                             LocationCode := FieldRef.Value
                         else
@@ -287,7 +265,7 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
                             POSStore.Insert;
                             CreateLogEntry(StrSubstNo('Created %1 %2', POSStore.TableCaption, POSStore.Code), 1, 0, 1);
                         end;
-                        //Store name and address inherited from Register
+
                         if POSStore.Name = '' then
                             if TryGetField(RecRef, FieldRef, 256, 'Name') then
                                 POSStore.Name := CopyStr(Format(FieldRef.Value), 1, MaxStrLen(POSStore.Name));
@@ -318,7 +296,6 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
                         if POSStore."VAT Registration No." = '' then
                             if TryGetField(RecRef, FieldRef, 267, 'VAT No.') then
                                 POSStore."VAT Registration No." := CopyStr(Format(FieldRef.Value), 1, MaxStrLen(POSStore."VAT Registration No."));
-                        //Store posting setup
                         if POSStore."Gen. Bus. Posting Group" = '' then
                             if TryGetField(RecRef, FieldRef, 18, 'Gen. Business Posting Group') then
                                 POSStore."Gen. Bus. Posting Group" := FieldRef.Value;
@@ -327,7 +304,6 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
                                 POSStore."VAT Bus. Posting Group" := FieldRef.Value;
                         POSStore.Modify;
 
-                        //Set Store Code on POS Unit if not set already
                         if POSUnit."POS Store Code" = '' then begin
                             POSUnit."POS Store Code" := POSStore.Code;
                             POSUnit.Modify;
@@ -351,7 +327,6 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
         CheckPrefix: Boolean;
         POSUnitNo: Code[10];
     begin
-        //-NPR5.30 [261964]
         TaxFreeVoucher.SetRange("Handler ID", '');
         if not TaxFreeVoucher.IsEmpty then begin
             TaxFreeVoucher.ModifyAll("Handler ID", 'PREMIER_PI');
@@ -371,9 +346,7 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
                     POSUnitNo := FieldRef.Value;
                 if not TaxFreeUnit.Get(POSUnitNo) then begin
                     TaxFreeUnit.Init;
-                    //-NPR5.30.01 [271098]
                     TaxFreeUnit."POS Unit No." := POSUnitNo;
-                    //+NPR5.30.01 [271098]
                     if TryGetField(RecRef, FieldRef, 701, 'Tax Free Merchant ID') then
                         MerchantID := FieldRef.Value;
                     if TryGetField(RecRef, FieldRef, 702, 'Tax Free VAT Number') then
@@ -403,7 +376,6 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
                         Clear(TaxFreeUnit);
                 end;
             until RecRef.Next = 0;
-        //+NPR5.30 [261964]
     end;
 
     local procedure UpgradeDataModelBuildStep4()
@@ -412,7 +384,6 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
         FieldRef: FieldRef;
         Name: Text;
     begin
-        //-NPR5.32 [241995]
         if TryOpenTable(RecRef, 6014561, 'RP Data Items') then
             if RecRef.FindSet(true) then
                 repeat
@@ -424,7 +395,6 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
                         end;
                     end;
                 until RecRef.Next = 0;
-        //+NPR5.32 [241995]
     end;
 
     local procedure "-- Auxiliary functions for steps"()
@@ -438,26 +408,17 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
     begin
         tmpHandlerParameters.Parameter := 'Merchant ID';
         tmpHandlerParameters."Data Type" := tmpHandlerParameters."Data Type"::Text;
-        //-NPR5.30.01 [271098]
-        //tmpHandlerParameters.Value := MerchantID;
         tmpHandlerParameters.Validate(Value, MerchantID);
-        //+NPR5.30.01 [271098]
         tmpHandlerParameters.Insert;
 
         tmpHandlerParameters.Parameter := 'VAT Number';
         tmpHandlerParameters."Data Type" := tmpHandlerParameters."Data Type"::Text;
-        //-NPR5.30.01 [271098]
-        //tmpHandlerParameters.Value := VATNumber;
         tmpHandlerParameters.Validate(Value, VATNumber);
-        //+NPR5.30.01 [271098]
         tmpHandlerParameters.Insert;
 
         tmpHandlerParameters.Parameter := 'Country Code';
         tmpHandlerParameters."Data Type" := tmpHandlerParameters."Data Type"::Integer;
-        //-NPR5.30.01 [271098]
-        //tmpHandlerParameters.Value := CountryCode;
         tmpHandlerParameters.Validate(Value, CountryCode);
-        //+NPR5.30.01 [271098]
         tmpHandlerParameters.Insert;
 
         tmpHandlerParameters.SerializeParameterBLOB(TaxFreeUnit);
