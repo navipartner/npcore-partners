@@ -111,11 +111,6 @@ page 6014424 "NPR Retail Setup"
                 group(Auxiliary)
                 {
                     Caption = 'Diverse';
-                    field("Posting No. Management"; "Posting No. Management")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Posting No. Management field';
-                    }
                     field("Variance No. Management"; "Variance No. Management")
                     {
                         ApplicationArea = All;
@@ -431,34 +426,11 @@ page 6014424 "NPR Retail Setup"
             grid("Sales Ticket Layout")
             {
                 Caption = 'Sales Ticket Layout';
+
                 group("Text")
                 {
                     Caption = 'Text';
-                    field("Sales Ticket Line Text1"; "Sales Ticket Line Text1")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Sales Ticket Line Text1 field';
-                    }
-                    field("Sales Ticket Line Text2"; "Sales Ticket Line Text2")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Sales Ticket Line Text2 field';
-                    }
-                    field("Sales Ticket Line Text3"; "Sales Ticket Line Text3")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Sales Ticket Line Text3 field';
-                    }
-                    field("Sales Ticket Line Text4"; "Sales Ticket Line Text4")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Sales Ticket Line Text4 field';
-                    }
-                    field("Sales Ticket Line Text5"; "Sales Ticket Line Text5")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Sales Ticket Line Text5 field';
-                    }
+
                     field("Sales Ticket Line Text6"; "Sales Ticket Line Text6")
                     {
                         ApplicationArea = All;
@@ -708,11 +680,6 @@ page 6014424 "NPR Retail Setup"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Vendor When Creation field';
                     }
-                    field("Prices Include VAT"; "Prices Include VAT")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Prices Include VAT field';
-                    }
                     field("Costing Method Standard"; "Costing Method Standard")
                     {
                         ApplicationArea = All;
@@ -877,11 +844,6 @@ page 6014424 "NPR Retail Setup"
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Posting Audit Roll field';
-                    }
-                    field("Posting When Balancing"; "Posting When Balancing")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Posting When Balancing field';
                     }
                     field("Debug Posting"; "Debug Posting")
                     {
@@ -1160,7 +1122,6 @@ page 6014424 "NPR Retail Setup"
                             Nummerserie: Record "No. Series";
                         begin
 
-                            TestField("Posting No. Management");
                             TestField("Variance No. Management");
                             TestField("Credit Voucher No. Management");
                             TestField("Gift Voucher No. Management");
@@ -1173,9 +1134,6 @@ page 6014424 "NPR Retail Setup"
                             TestField("Cash Cust. No. Series");
                             TestField("Internal EAN No. Management");
                             TestField("External EAN-No. Management");
-
-                            if not Nummerserie.Get("Posting No. Management") then
-                                OpretNummerserie("Posting No. Management", FieldName("Posting No. Management"), false);
 
                             if not Nummerserie.Get("Variance No. Management") then
                                 OpretNummerserie("Variance No. Management", FieldName("Variance No. Management"), false);

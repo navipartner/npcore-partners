@@ -16,6 +16,9 @@ table 6014400 "NPR Retail Setup"
             Caption = 'Prices Include VAT';
             DataClassification = CustomerContent;
             Description = 'Moms med i salgspriser';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(5; "Posting When Balancing"; Option)
         {
@@ -23,36 +26,54 @@ table 6014400 "NPR Retail Setup"
             DataClassification = CustomerContent;
             OptionCaption = 'Total,Per Register';
             OptionMembers = Total,"Per Register";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(14; "Sales Ticket Line Text1"; Code[50])
         {
             Caption = 'Sales Ticket Line Text1';
             DataClassification = CustomerContent;
             Description = 'Ekstratekst til bon';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(15; "Sales Ticket Line Text2"; Code[50])
         {
             Caption = 'Sales Ticket Line Text2';
             DataClassification = CustomerContent;
             Description = 'Ekstratekst til bon';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(16; "Sales Ticket Line Text3"; Code[50])
         {
             Caption = 'Sales Ticket Line Text3';
             DataClassification = CustomerContent;
             Description = 'Ekstratekst til bon';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(17; "Sales Ticket Line Text4"; Code[50])
         {
             Caption = 'Sales Ticket Line Text4';
             DataClassification = CustomerContent;
             Description = 'Ekstratekst til bon';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(18; "Sales Ticket Line Text5"; Code[50])
         {
             Caption = 'Sales Ticket Line Text5';
             DataClassification = CustomerContent;
             Description = 'Ekstratekst til bon';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(20; "Posting Source Code"; Code[10])
         {
@@ -67,6 +88,9 @@ table 6014400 "NPR Retail Setup"
             DataClassification = CustomerContent;
             Description = 'Nummerserie til kassebogf¢ring';
             TableRelation = "No. Series";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(52; "Used Goods No. Management"; Code[10])
         {

@@ -1,11 +1,5 @@
 page 6014452 "NPR Mixed Discount List"
 {
-    // NPR4.14/TS  /20150818  CASE 220970 Action Card removed from Actions
-    // NPR5.29/TJ  /20170123  CASE 263787 Commented out code under action Dimensions-Multiple and set Visible property to FALSE
-    // NPR5.31/MHA /20170110  CASE 262904 Added field 100 "Mix Type"
-    // NPR5.51/SARA/20190826  CASE 365799 Able to delete more than one lines at a time
-    // NPR5.55/TJ  /20200421  CASE 400524 Added action Dimensions
-
     Caption = 'Mix Discount List';
     CardPageID = "NPR Mixed Discount";
     Editable = true;
@@ -128,13 +122,6 @@ page 6014452 "NPR Mixed Discount List"
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Lot field';
-                }
-                field("Unit price incl VAT"; "Unit price incl VAT")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Price Includes VAT field';
                 }
             }
         }
