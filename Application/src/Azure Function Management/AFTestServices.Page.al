@@ -99,26 +99,7 @@ page 6151572 "NPR AF Test Services"
     {
         area(processing)
         {
-            group(ActionGroup6014414)
-            {
-                Caption = 'Spire Barcode';
-                action(GenerateBarcode)
-                {
-                    Caption = 'Generate Barcode';
-                    Image = Task;
-                    Promoted = true;
-				    PromotedOnly = true;
-                    PromotedIsBig = true;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Generate Barcode action';
 
-                    trigger OnAction()
-                    begin
-                        AFAPISpireBarcode.GenerateBarcode(Rec);
-                        CurrPage.Update;
-                    end;
-                }
-            }
             group("Notification Hub")
             {
                 Caption = 'Notification Hub';
@@ -126,7 +107,7 @@ page 6151572 "NPR AF Test Services"
                 {
                     Caption = 'Notifications';
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedIsBig = true;
                     RunObject = Page "NPR AF Notification Hub List";
                     ApplicationArea = All;
@@ -142,7 +123,7 @@ page 6151572 "NPR AF Test Services"
                     Caption = 'Send SMS';
                     Image = SendConfirmation;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedIsBig = true;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Send SMS action';
@@ -172,7 +153,6 @@ page 6151572 "NPR AF Test Services"
     }
 
     var
-        AFAPISpireBarcode: Codeunit "NPR AF API - Spire Barcode";
         TempBlob: Codeunit "Temp Blob";
         MSGSender: Text;
         MSGPhoneNumber: Text;
