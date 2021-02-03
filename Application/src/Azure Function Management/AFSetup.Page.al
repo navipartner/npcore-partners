@@ -34,25 +34,7 @@ page 6151570 "NPR AF Setup"
                     ToolTip = 'Specifies the value of the Web Service Url field';
                 }
             }
-            group("Spire Barcode")
-            {
-                Caption = 'Spire Barcode';
-                field("Spire Barcode - API Key"; "Spire Barcode - API Key")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Spire Barcode - API Key field';
-                }
-                field("Spire Barcode - Base Url"; "Spire Barcode - Base Url")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Spire Barcode - Base Url field';
-                }
-                field("Spire Barcode - API Routing"; "Spire Barcode - API Routing")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Spire Barcode - API Routing field';
-                }
-            }
+
             group(Control6014405)
             {
                 Caption = 'Notification Hub';

@@ -39,16 +39,25 @@ table 6151570 "NPR AF Setup"
         {
             Caption = 'Spire Barcode - API Key';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This Field won''t be used anymore';
+            ObsoleteTag = 'NPR AF Setup cleanup';
         }
         field(101; "Spire Barcode - Base Url"; Text[100])
         {
             Caption = 'Spire Barcode - Base Url';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This Field won''t be used anymore';
+            ObsoleteTag = 'NPR AF Setup cleanup';
         }
         field(102; "Spire Barcode - API Routing"; Text[100])
         {
             Caption = 'Spire Barcode - API Routing';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This Field won''t be used anymore';
+            ObsoleteTag = 'NPR AF Setup cleanup';
         }
         field(200; "Notification - API Key"; Text[100])
         {
