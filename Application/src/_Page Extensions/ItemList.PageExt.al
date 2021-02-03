@@ -136,13 +136,6 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 ToolTip = 'Specifies the value of the NPR Label Barcode field';
             }
 
-            field("NPR Season"; "NPR Season")
-            {
-                ApplicationArea = All;
-                Visible = false;
-                ToolTip = 'Specifies the value of the NPR Season field';
-            }
-
             field("NPR Item Brand"; "NPR Item Brand")
             {
                 ApplicationArea = All;

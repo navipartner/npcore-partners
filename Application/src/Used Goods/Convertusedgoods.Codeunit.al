@@ -1,10 +1,5 @@
 codeunit 6014501 "NPR Convert used goods"
 {
-    // NPR4.10/TSA/20150518 CASE 213150  Changed behaviour of F34 "Puljemomsordning", never post to the item ledger
-    // NPR5.26/TS/20160805 CASE 246761 Aded Function UsedGoods2SalesCreditMemo
-    // NPR5.31/TS  /20161221  CASE  246761 Reworked Function Bogf¢rBrugtVare
-    // NPR5.34/TS  /20170511  CASE 274836  Adding Cross reference when creating Item from Used Items
-    // NPR5.39/TJ  /20180212  CASE 302634  Removed unused variables
 
     TableNo = "NPR Used Goods Registration";
 
@@ -14,9 +9,6 @@ codeunit 6014501 "NPR Convert used goods"
     begin
         if "Item No. Created" <> '' then
             Error(t001, "Item No. Created");
-        //-NPR5.31
-        //TESTFIELD(Blocked,FALSE);
-        //+NPR5.31
         RetailSetup.Get;
         FotoOps.Get;
         RetailSetup.TestField("Internal EAN No. Management");
@@ -39,13 +31,8 @@ codeunit 6014501 "NPR Convert used goods"
             Vare.Validate(Description, Subject);
             Vare.Validate("Search Description", "Search Name");
             Vare.Validate("NPR Item Group", "Item Group No.");
-            //-NPR5.31
-            // Vare.VALIDATE(Blocked,Blocked);
-            //+NPR5.31
             Vare.Validate("Unit Price", "Salgspris inkl. Moms");
             Vare.Validate("Unit Cost", "Unit Cost");
-            Vare."NPR Condition" := Stand;
-            //-NPR5.34
             ItemCrossReference.Init;
             ItemCrossReference."Item No." := Vare."No.";
             ItemCrossReference."Unit of Measure" := Vare."Base Unit of Measure";
@@ -53,26 +40,20 @@ codeunit 6014501 "NPR Convert used goods"
             ItemCrossReference."Cross-Reference No." := Vare."No.";
             ItemCrossReference.Description := Vare.Description;
             ItemCrossReference.Insert();
-            //+NPR5.34
+            
 
 
             if FotoOps."Used Goods Serial No. Mgt." then begin
                 if Serienummer <> '' then begin
                     FotoOps.TestField("Used Goods Item Tracking Code");
                     "Brugtvare lagermetode" := "Brugtvare lagermetode"::Serienummer;
-                    //-NPR5.31
                     Vare."Item Tracking Code" := FotoOps."Used Goods Item Tracking Code";
-                    //-NPR5.31
                 end else begin
                     "Brugtvare lagermetode" := FotoOps."Used Goods Inventory Method";
                 end;
             end else
                 "Brugtvare lagermetode" := FotoOps."Used Goods Inventory Method";
-            //-NPR5.31
-            // Vare."Item Tracking Code" := FotoOps."Brugtvare varesporingskode";
-            //+NPR5.31
             Vare.Validate("Costing Method", "Brugtvare lagermetode");
-            //  Vare.Puljemomsordning  := Puljemomsordning;
             Varegruppe.Get(Vare."NPR Item Group");
             Varegruppe.TestField("Inventory Posting Group");
             VirkBogfGrp.Get(Varegruppe."Gen. Bus. Posting Group");
@@ -90,13 +71,8 @@ codeunit 6014501 "NPR Convert used goods"
             Vare.Modify;
         end;
         Kosterreg := Rec;
-        //-NPR4.10 [213150]
-        //IF Puljemomsordning THEN
-        //Bogf¢rBrugtVare(Vare);
-        //+NPR4.10 [213150]
-        //-NPR5.31
         CreateItemJournal(Vare, Kosterreg);
-        //+NPR5.31
+        
     end;
 
     var
@@ -141,7 +117,6 @@ codeunit 6014501 "NPR Convert used goods"
         LineNo: Integer;
         Txt002: Label 'Created from Used Goods Registration %1';
     begin
-        //-NPR5.26
         UsedGoodsRegistration.TestField(Blocked, false);
         UsedGoodsRegistration.TestField("Purchased By Customer No.");
         UsedGoodsRegistration.TestField("Salesperson Code");
@@ -182,7 +157,7 @@ codeunit 6014501 "NPR Convert used goods"
             until UsedGoodsRegistrationRec.Next = 0;
 
         Message(Txt001, SalesHeader."No.");
-        //+NPR5.26
+        
     end;
 
     procedure CreateItemJournal(Item: Record Item; var UsedGoodsRegistration: Record "NPR Used Goods Registration")
@@ -193,7 +168,6 @@ codeunit 6014501 "NPR Convert used goods"
         ItemGroup: Record "NPR Item Group";
         ItemJnlPostLine: Codeunit "Item Jnl.-Post Line";
     begin
-        //-NPR5.31
         TempItemJournalLine.DeleteAll;
         TempItemJournalLine."Line No." := 10000;
         TempItemJournalLine."Document No." := UsedGoodsRegistration."No.";
@@ -220,11 +194,8 @@ codeunit 6014501 "NPR Convert used goods"
         ReservationEntry.Init;
         ReservationEntry."Entry No." += 1;
         ReservationEntry.Positive := false;
-        //-NPR5.31 [246761]
-        //ReservationEntry."Item No." := UsedGoodsRegistration."No.";
         ReservationEntry."Item No." := Item."No.";
         ReservationEntry."Location Code" := UsedGoodsRegistration."Location Code";
-        //-NPR5.31 [246761]
         ReservationEntry."Quantity (Base)" := 1;
         ReservationEntry."Reservation Status" := ReservationEntry."Reservation Status"::Prospect;
         ReservationEntry."Source Type" := 83;
@@ -242,7 +213,6 @@ codeunit 6014501 "NPR Convert used goods"
         ReservationEntry."Created By" := UsedGoodsRegistration."Salesperson Code";
         ReservationEntry.Insert;
         ItemJnlPostLine.Run(TempItemJournalLine);
-        //+NPR5.31
     end;
 }
 
