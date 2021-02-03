@@ -69,13 +69,10 @@ codeunit 6151572 "NPR AF API WebService"
         if AFSetup.Get then begin
             if AFSetup."Customer Tag" = '' then begin
                 AFSetup."Enable Azure Functions" := true;
-                if AFSetup."Notification - API Key" = '' then begin
-                    AFSetup."Notification - API Key" := AzureKeyVaultMgt.GetSecret('NpAFSetupDefaultApiKey');
-                    AFSetup."Notification - API Routing" := AzureKeyVaultMgt.GetSecret('NpAFSetupDefaultApiRouting');
-                    AFSetup."Notification - Base Url" := AzureKeyVaultMgt.GetSecret('NpAFSetupDefaultBaseUrl');
-                    AFSetup."Notification - Conn. String" := AzureKeyVaultMgt.GetSecret('NpAFSetupDefaultConnString');
-                    AFSetup."Notification - Hub Path" := AzureKeyVaultMgt.GetSecret('NpAFSetupDefaultHubPath');
-                end;
+                AFSetup."Notification - API Routing" := AzureKeyVaultMgt.GetSecret('NpAFSetupDefaultApiRouting');
+                AFSetup."Notification - Base Url" := AzureKeyVaultMgt.GetSecret('NpAFSetupDefaultBaseUrl');
+                AFSetup."Notification - Conn. String" := AzureKeyVaultMgt.GetSecret('NpAFSetupDefaultConnString');
+                AFSetup."Notification - Hub Path" := AzureKeyVaultMgt.GetSecret('NpAFSetupDefaultHubPath');
                 AFSetup.Modify(true);
             end;
             AFSetup.TestField("Customer Tag");
@@ -83,7 +80,6 @@ codeunit 6151572 "NPR AF API WebService"
         end else begin
             AFSetup.Init;
             AFSetup."Enable Azure Functions" := true;
-            AFSetup."Notification - API Key" := AzureKeyVaultMgt.GetSecret('NpAFSetupDefaultApiKey');
             AFSetup."Notification - API Routing" := AzureKeyVaultMgt.GetSecret('NpAFSetupDefaultApiRouting');
             AFSetup."Notification - Base Url" := AzureKeyVaultMgt.GetSecret('NpAFSetupDefaultBaseUrl');
             AFSetup."Notification - Conn. String" := AzureKeyVaultMgt.GetSecret('NpAFSetupDefaultConnString');

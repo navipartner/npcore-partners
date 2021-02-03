@@ -1,9 +1,5 @@
 page 6151570 "NPR AF Setup"
 {
-    // NPR5.36/NPKNAV/20171003  CASE 269792 Transport NPR5.36 - 3 October 2017
-    // NPR5.38/CLVA/20171024 CASE 289636 Added Messages Service fields
-    // NPR5.38/CLVA/20180123 CASE 279861 Added OIO Validation fields
-    // NPR5.43/CLVA/20180529 CASE 279861 Added field "OIO Validation - Enable"
 
     Caption = 'AF Setup';
     PageType = Card;
@@ -60,11 +56,6 @@ page 6151570 "NPR AF Setup"
             group(Control6014405)
             {
                 Caption = 'Notification Hub';
-                field("Notification - API Key"; "Notification - API Key")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Notification - API Key field';
-                }
                 field("Notification - Base Url"; "Notification - Base Url")
                 {
                     ApplicationArea = All;
