@@ -26,6 +26,9 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Season';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won"t be used anymore';
+            ObsoleteTag = 'Refactoring 2/2/2021';
         }
         field(6014409; "NPR Create Alt. No. Automatic"; Boolean)
         {
@@ -99,6 +102,9 @@ tableextension 6014427 "NPR Item" extends Item
             Description = 'NPR7.100.000';
             OptionCaption = 'New,Mint,Mint boxed,A,B,C,D,E,F,B+';
             OptionMembers = New,Mint,"Mint boxed",A,B,C,D,E,F,"B+";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won"t be used anymore';
+            ObsoleteTag = 'Refactoring 2/2/2021';
         }
         field(6014503; "NPR Second-hand"; Boolean)
         {
@@ -463,7 +469,6 @@ tableextension 6014427 "NPR Item" extends Item
         }
     }
 
-    //Unsupported feature: Property Modification (Fields) on "DropDown(FieldGroup 1)".
 
 }
 
