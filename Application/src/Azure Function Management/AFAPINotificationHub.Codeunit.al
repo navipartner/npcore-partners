@@ -1,7 +1,5 @@
 codeunit 6151574 "NPR AF API - Notification Hub"
 {
-    // NPR5.36/CLVA/20170710 CASE 269792 AF API - NotificationHub
-
 
     trigger OnRun()
     begin
@@ -26,13 +24,11 @@ codeunit 6151574 "NPR AF API - Notification Hub"
             exit;
 
         AFSetup.Get;
-        AFSetup.TestField("Notification - API Key");
         AFSetup.TestField("Notification - Base Url");
         AFSetup.TestField("Notification - API Routing");
         AFSetup.TestField("Notification - Conn. String");
         AFSetup.TestField("Customer Tag");
 
-        AFArgumentsNotificationHub."API Key" := AFSetup."Notification - API Key";
         AFArgumentsNotificationHub."Base Url" := AFSetup."Notification - Base Url";
         AFArgumentsNotificationHub."API Routing" := AFSetup."Notification - API Routing";
         AFArgumentsNotificationHub."Hub Connection String" := AFSetup."Notification - Conn. String";
@@ -164,7 +160,6 @@ codeunit 6151574 "NPR AF API - Notification Hub"
             exit;
 
         AFSetup.Get;
-        AFSetup.TestField("Notification - API Key");
         AFSetup.TestField("Notification - Base Url");
         AFSetup.TestField("Notification - API Routing");
         AFSetup.TestField("Notification - Conn. String");
@@ -176,7 +171,6 @@ codeunit 6151574 "NPR AF API - Notification Hub"
         AFArgumentsNotificationHub."Action Type" := ActionType;
         AFArgumentsNotificationHub."Action Value" := ActionValue;
         AFArgumentsNotificationHub."Notification Color" := NotificationColor;
-        AFArgumentsNotificationHub."API Key" := AFSetup."Notification - API Key";
         AFArgumentsNotificationHub."Base Url" := AFSetup."Notification - Base Url";
         AFArgumentsNotificationHub."API Routing" := AFSetup."Notification - API Routing";
         AFArgumentsNotificationHub."Hub Connection String" := AFSetup."Notification - Conn. String";
