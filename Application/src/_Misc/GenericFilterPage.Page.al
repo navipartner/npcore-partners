@@ -1,9 +1,5 @@
 page 6014649 "NPR Generic Filter Page"
 {
-    // NPR5.45/NPKNAV/20180903  CASE 318531 Transport NPR5.45 - 31 August 2018
-    // NPR5.48/TJ    /20181130  CASE 318531 Additional features added
-    // NPR5.51/TJ    /20190715  CASE 318531 Fixed a bug with having single field in the filter
-
     Caption = 'Generic Filter Page';
     DataCaptionExpression = PageCaptionExpr;
     DeleteAllowed = false;
@@ -33,18 +29,16 @@ page 6014649 "NPR Generic Filter Page"
 
                         trigger OnLookup(var Text: Text): Boolean
                         var
+                            IntegerRec: Record "Integer";
                             GenericKeyList: Page "NPR Generic Key List";
                             SelectedKeyIndex: Integer;
-                            IntegerRec: Record "Integer";
                         begin
-                            //-NPR5.48 [318531]
                             GenericKeyList.SetParameters(RecRef, SortingKey);
                             GenericKeyList.LookupMode := true;
                             if GenericKeyList.RunModal = ACTION::LookupOK then begin
                                 GenericKeyList.GetRecord(IntegerRec);
                                 SortingKey := GenericKeyList.GetSortingKey(IntegerRec.Number);
                             end;
-                            //+NPR5.48 [318531]
                         end;
                     }
                     field(Descending; Descending)
@@ -57,13 +51,13 @@ page 6014649 "NPR Generic Filter Page"
             }
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field("Field Caption"; "Field Caption")
+                field("Field Caption"; Rec."Field Caption")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -78,13 +72,12 @@ page 6014649 "NPR Generic Filter Page"
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
-                        Variant: Variant;
-                        RelationRecRef: RecordRef;
-                        RelationKeyRef: KeyRef;
-                        RelationFieldRef: FieldRef;
                         GenericMultipleCheckList: Page "NPR Gen. Multiple Check List";
+                        RelationRecRef: RecordRef;
+                        RelationFieldRef: FieldRef;
+                        RelationKeyRef: KeyRef;
+                        Variant: Variant;
                     begin
-                        //-NPR5.48 [318531]
                         case true of
                             FldRef.Relation <> 0:
                                 begin
@@ -109,24 +102,11 @@ page 6014649 "NPR Generic Filter Page"
                         end;
                         if FilterText <> '' then
                             FilterOnValidate();
-                        //+NPR5.48 [318531]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.48 [318531]
-                        /*
-                        GetFieldRef();
-                        ResetFieldFilter();
-                        IF FilterText <> '' THEN BEGIN
-                          FldRef.SETFILTER(FilterText);
-                          Include := TRUE;
-                          MARK(TRUE);
-                        END;
-                        */
                         FilterOnValidate();
-                        //+NPR5.48 [318531]
-
                     end;
                 }
                 field(Include; Include)
@@ -137,18 +117,12 @@ page 6014649 "NPR Generic Filter Page"
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.48 [318531]
                         GetFieldRef();
-                        //+NPR5.48 [318531]
                         if not Include then begin
-                            //-NPR5.48 [318531]
                             RemoveFieldFromRawFilter(FldRef.Name);
-                            //+NPR5.48 [318531]
                             ResetFieldFilter();
                             FilterText := '';
-                            //-NPR5.48 [318531]
                             Static := false;
-                            //+NPR5.48 [318531]
                             Mark(false);
                         end;
                     end;
@@ -163,12 +137,11 @@ page 6014649 "NPR Generic Filter Page"
                     var
                         FilterValue: Text;
                     begin
-                        //-NPR5.48 [318531]
                         if FilterText = '' then
                             exit;
                         GetFieldRef();
                         if not Static then begin
-                            if not Confirm(ConfirmStaticDisable) then begin
+                            if not Confirm(StaticDisableQst) then begin
                                 Static := not Static;
                                 exit;
                             end;
@@ -177,7 +150,6 @@ page 6014649 "NPR Generic Filter Page"
                             FilterText := FldRef.GetFilter;
                             WriteRawFilter(FldRef.Name, FilterText);
                         end;
-                        //+NPR5.48 [318531]
                     end;
                 }
             }
@@ -193,7 +165,7 @@ page 6014649 "NPR Generic Filter Page"
                 Caption = 'Show All Fields';
                 Image = AllLines;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -201,7 +173,7 @@ page 6014649 "NPR Generic Filter Page"
 
                 trigger OnAction()
                 begin
-                    MarkedOnly(false);
+                    Rec.MarkedOnly(false);
                 end;
             }
             action(FilteredFields)
@@ -209,7 +181,7 @@ page 6014649 "NPR Generic Filter Page"
                 Caption = 'Show Filtered Fields';
                 Image = FilterLines;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -225,7 +197,7 @@ page 6014649 "NPR Generic Filter Page"
                 Caption = 'Remove All Filters';
                 Image = RemoveFilterLines;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -245,69 +217,58 @@ page 6014649 "NPR Generic Filter Page"
     begin
         FilterText := '';
         Include := false;
-        //-NPR5.48 [318531]
         Static := false;
-        //+NPR5.48 [318531]
         GetFieldRef();
-        //-NPR5.48 [318531]
         ResetFieldFilter();
         RawFilter := ReadRawFilter(FldRef.Name);
-        //IF FldRef.GETFILTER <> '' THEN BEGIN
         if RawFilter <> '' then begin
             FldRef.SetFilter(RawFilter);
-            //+NPR5.48 [318531]
             FilterText := FldRef.GetFilter;
             Include := true;
-            //-NPR5.48 [318531]
             Static := FilterText <> RawFilter;
             if Static then
                 FilterText := RawFilter;
-            //+NPR5.48 [318531]
         end;
     end;
 
     trigger OnOpenPage()
     begin
-        FilterGroup := 2;
-        SetRange(TableNo, RecRef.Number);
-        FilterGroup := 0;
-        //-NPR5.48 [318531]
+        Rec.FilterGroup := 2;
+        Rec.SetRange(TableNo, RecRef.Number);
+        Rec.FilterGroup := 0;
         InitKeyWords();
         SetOrder();
         SetCurrKey();
-        //+NPR5.48 [318531]
         ShowFilteredFields();
         PageCaptionExpr := RecRef.Caption;
     end;
 
     var
-        FilterText: Text;
-        TableID: Integer;
+        GenericFilterPageMgt: Codeunit "NPR Generic Filter Page Mgt.";
         RecRef: RecordRef;
         FldRef: FieldRef;
-        Include: Boolean;
-        PageCaptionExpr: Text;
-        CompleteFilterText: Text;
-        Static: Boolean;
-        OriginalFilterText: Text;
-        FilterKeyWord: Text;
-        WhereKeyWord: Text;
-        ConfirmStaticDisable: Label 'This will apply standard filter and static filter will be lost. Do you want to continue?';
-        SortingKey: Text;
         "Descending": Boolean;
-        SortingKeyWord: Text;
-        DescendingKeyWord: Text;
-        GenericFilterPageMgt: Codeunit "NPR Generic Filter Page Mgt.";
+        Include: Boolean;
+        Static: Boolean;
+        TableID: Integer;
         OnlySimpleKeysSupportedErr: Label 'Only related tables with simple primary keys are supported.';
+        StaticDisableQst: Label 'This will apply standard filter and static filter will be lost. Do you want to continue?';
+        CompleteFilterText: Text;
+        DescendingKeyWord: Text;
+        FilterKeyWord: Text;
+        FilterText: Text;
+        OriginalFilterText: Text;
+        PageCaptionExpr: Text;
+        SortingKey: Text;
+        SortingKeyWord: Text;
+        WhereKeyWord: Text;
 
     local procedure InitKeyWords()
     begin
-        //-NPR5.48 [318531]
         FilterKeyWord := '=FILTER(';
         WhereKeyWord := ' WHERE(';
         SortingKeyWord := 'SORTING(';
         DescendingKeyWord := ') ORDER(Descending)';
-        //+NPR5.48 [318531]
     end;
 
     procedure SetRecRef(var RecRef2: RecordRef)
@@ -322,7 +283,7 @@ page 6014649 "NPR Generic Filter Page"
 
     local procedure GetFieldRef()
     begin
-        FldRef := RecRef.Field("No.");
+        FldRef := RecRef.Field(Rec."No.");
     end;
 
     local procedure ResetFieldFilter()
@@ -332,38 +293,30 @@ page 6014649 "NPR Generic Filter Page"
 
     local procedure ResetAllFilters()
     begin
-        Reset;
-        FilterGroup := 2;
-        SetRange(TableNo, RecRef.Number);
-        FilterGroup := 0;
-        RecRef.Reset;
+        Rec.Reset();
+        Rec.FilterGroup := 2;
+        Rec.SetRange(TableNo, RecRef.Number);
+        Rec.FilterGroup := 0;
+        RecRef.Reset();
         FilterText := '';
         Include := false;
-        //-NPR5.48 [318531]
         Static := false;
         CompleteFilterText := '';
-        //+NPR5.48 [318531]
     end;
 
     local procedure ShowFilteredFields()
     var
         i: Integer;
     begin
-        //-NPR5.48 [318531]
-        //IF RecRef.HASFILTER THEN BEGIN
         if CompleteFilterText <> '' then begin
-            //+NPR5.48 [318531]
             for i := 1 to RecRef.FieldCount do begin
                 FldRef := RecRef.FieldIndex(i);
-                //-NPR5.48 [318531]
-                //IF FldRef.GETFILTER <> '' THEN BEGIN
                 if ReadRawFilter(FldRef.Name) <> '' then begin
-                    //+NPR5.48 [318531]
                     Get(RecRef.Number, FldRef.Number);
-                    Mark(true);
+                    Rec.Mark(true);
                 end;
             end;
-            MarkedOnly(true);
+            Rec.MarkedOnly(true);
         end;
     end;
 
@@ -371,7 +324,6 @@ page 6014649 "NPR Generic Filter Page"
     var
         Position: Integer;
     begin
-        //-NPR5.48 [318531]
         Position := StrPos(CompleteFilterText, FieldName + FilterKeyWord);
         case true of
             Position = 0:
@@ -383,31 +335,25 @@ page 6014649 "NPR Generic Filter Page"
         Position := StrPos(CompleteFilterText, FieldName + FilterKeyWord) + StrLen(FieldName) + StrLen(FilterKeyWord);
         FilterValue := CopyStr(CompleteFilterText, Position);
         exit(CopyStr(FilterValue, 1, StrPos(FilterValue, ')') - 1));
-        //+NPR5.48 [318531]
     end;
 
     local procedure WriteRawFilter(FieldName: Text; FilterValue: Text)
     begin
-        //-NPR5.48 [318531]
         if CompleteFilterText <> '' then begin
             if CompleteFilterText[StrLen(CompleteFilterText)] = ')' then
                 CompleteFilterText := CopyStr(CompleteFilterText, 1, StrLen(CompleteFilterText) - 1);
-            //-NPR5.51 [318531]
             if CompleteFilterText <> '' then
-                //+NPR5.51 [318531]
                 CompleteFilterText += ',';
         end;
         CompleteFilterText += FieldName + FilterKeyWord + FilterValue + '))';
-        //+NPR5.48 [318531]
     end;
 
     local procedure RemoveFieldFromRawFilter(FieldName: Text)
     var
-        FilterValue: Text;
-        Position: Integer;
         Length: Integer;
+        Position: Integer;
+        FilterValue: Text;
     begin
-        //-NPR5.48 [318531]
         FilterValue := ReadRawFilter(FieldName);
         if FilterValue = '' then
             exit;
@@ -423,12 +369,10 @@ page 6014649 "NPR Generic Filter Page"
             CompleteFilterText := CopyStr(CompleteFilterText, 2);
         if StrPos(CompleteFilterText, WhereKeyWord + ',') > 0 then
             CompleteFilterText := DelStr(CompleteFilterText, StrLen(WhereKeyWord + ','), 1);
-        //+NPR5.48 [318531]
     end;
 
     procedure ReturnRawFilter() "Filter": Text
     begin
-        //-NPR5.48 [318531]
         Filter := CompleteFilterText;
         if (CompleteFilterText <> '') and (StrPos(CompleteFilterText, WhereKeyWord) = 0) then
             Filter := WhereKeyWord + CompleteFilterText;
@@ -436,12 +380,10 @@ page 6014649 "NPR Generic Filter Page"
             Filter := CopyStr(DescendingKeyWord, 2) + Filter;
         Filter := SortingKeyWord + SortingKey + ')' + Filter;
         exit(Filter);
-        //+NPR5.48 [318531]
     end;
 
     local procedure FilterOnValidate()
     begin
-        //-NPR5.48 [318531]
         GetFieldRef();
         ResetFieldFilter();
         RemoveFieldFromRawFilter(FldRef.Name);
@@ -450,24 +392,22 @@ page 6014649 "NPR Generic Filter Page"
             WriteRawFilter(FldRef.Name, FilterText);
             Static := FilterText <> FldRef.GetFilter;
             Include := true;
-            Mark(true);
+            Rec.Mark(true);
         end else begin
             Include := false;
             Static := false;
-            Mark(false);
+            Rec.Mark(false);
         end;
-        //+NPR5.48 [318531]
     end;
 
     local procedure SetCurrKey()
     var
-        SortingKeyEndPos: Integer;
-        FilterStartPosition: Integer;
-        KeyRefHere: KeyRef;
-        i: Integer;
         FieldRefHere: FieldRef;
+        FilterStartPosition: Integer;
+        i: Integer;
+        SortingKeyEndPos: Integer;
+        KeyRefHere: KeyRef;
     begin
-        //-NPR5.48 [318531]
         if StrPos(CompleteFilterText, SortingKeyWord) <> 0 then begin
             case true of
                 Descending:
@@ -491,21 +431,16 @@ page 6014649 "NPR Generic Filter Page"
             CompleteFilterText := CopyStr(CompleteFilterText, FilterStartPosition);
         end else
             SortingKey := GenericFilterPageMgt.ReadKeyString(RecRef, 1);
-        //+NPR5.48 [318531]
     end;
 
     local procedure SetOrder()
     begin
-        //-NPR5.48 [318531]
         Descending := StrPos(CompleteFilterText, DescendingKeyWord) <> 0;
-        //+NPR5.48 [318531]
     end;
 
     procedure SetRawFilter(RawFilter: Text)
     begin
-        //-NPR5.48 [318531]
         CompleteFilterText := RawFilter;
-        //+NPR5.48 [318531]
     end;
 }
 

@@ -1,10 +1,8 @@
 page 6060045 "NPR Item Search Page"
 {
-    // NPR4.18\BR\20160209  CASE 182391 Object Created
-
-    UsageCategory = None;
     Caption = 'Item Search Page';
-
+    UsageCategory = Documents;
+    ApplicationArea = All;
     layout
     {
         area(content)
@@ -79,7 +77,7 @@ page 6060045 "NPR Item Search Page"
                 Caption = 'Search';
                 Image = "Action";
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -87,7 +85,7 @@ page 6060045 "NPR Item Search Page"
 
                 trigger OnAction()
                 begin
-                    FindItem
+                    FindItem();
                 end;
             }
         }
@@ -95,14 +93,14 @@ page 6060045 "NPR Item Search Page"
 
     var
         ItemNumberManagement: Codeunit "NPR Item Number Mgt.";
-        ExternalItemNo: Text[50];
-        ExternalType: Option All,VendorItemNo,Barcode,CrossReference,AlternativeNo;
-        UnitOfMeasure: Code[10];
-        VendorNo: Code[20];
-        ItemNo: Code[20];
-        VariantCode: Code[1];
         FoundItem: Boolean;
+        VariantCode: Code[1];
+        UnitOfMeasure: Code[10];
+        ItemNo: Code[20];
+        VendorNo: Code[20];
         Searchtime: Decimal;
+        ExternalType: Option All,VendorItemNo,Barcode,CrossReference,AlternativeNo;
+        ExternalItemNo: Text[50];
 
     local procedure FindItem()
     var

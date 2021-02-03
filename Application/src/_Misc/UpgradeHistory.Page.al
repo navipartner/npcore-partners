@@ -1,7 +1,5 @@
 page 6151000 "NPR Upgrade History"
 {
-    // NPR5.41/THRO/20180425 CASE 311567 Page created
-
     Caption = 'NPR Upgrade History';
     Editable = false;
     PageType = List;
@@ -17,22 +15,18 @@ page 6151000 "NPR Upgrade History"
         {
             repeater(Group)
             {
-                field("Upgrade Time"; "Upgrade Time")
+                field("Upgrade Time"; Rec."Upgrade Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Upgrade Time field';
                 }
-                field(Version; Version)
+                field(Version; Rec.Version)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Version field';
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

@@ -1,32 +1,28 @@
 codeunit 6014441 "NPR Event Subscriber (Item)"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
-        RetailSetup: Record "NPR Retail Setup";
-        RetailSetupFetched: Boolean;
         InventorySetup: Record "Inventory Setup";
-        InventorySetupFetched: Boolean;
+        RetailSetup: Record "NPR Retail Setup";
         SalesSetup: Record "Sales & Receivables Setup";
+        InventorySetupFetched: Boolean;
+        RetailSetupFetched: Boolean;
         SalesSetupFetched: Boolean;
-        Error_LabelBarcode: Label 'Barcode %1 cannot be selected unless it is present in %2 or %3 for this item.';
-        Error_ItemCrossRef: Label 'Bar Code %1 cannot be linked to Item %2 if item %3 exits. ';
-        ErrStd: Label 'Item %1 can''t be Group sale as it''s Costing Method is Standard.';
         Text000: Label 'Alternative No. %1 %2 already exists.';
+        Error_ItemCrossRef: Label 'Bar Code %1 cannot be linked to Item %2 if item %3 exits. ';
+        Error_LabelBarcode: Label 'Barcode %1 cannot be selected unless it is present in %2 or %3 for this item.';
         Text001: Label 'Can''t create number as no product group has been selected.';
-        Text002: Label 'You can''t delete item %1 because it is part of an active sales document.';
-        Text003: Label 'You can''t delete item %1 as there aren''t any posted entries for it.';
-        Text004: Label 'You can''t delete %1 %2 as it''s contained in one or more period discount lines.';
+        ErrStd: Label 'Item %1 can''t be Group sale as it''s Costing Method is Standard.';
         Text005: Label 'You can''t delete %1 %2 as it''s contained in one or more mixed discount lines.';
+        Text004: Label 'You can''t delete %1 %2 as it''s contained in one or more period discount lines.';
+        Text003: Label 'You can''t delete item %1 as there aren''t any posted entries for it.';
+        Text002: Label 'You can''t delete item %1 because it is part of an active sales document.';
 
     [EventSubscriber(ObjectType::Table, 27, 'OnBeforeInsertEvent', '', true, false)]
     local procedure OnBeforeInsertEventLicenseCheck(var Rec: Record Item; RunTrigger: Boolean)
     var
+        InvtSetup: Record "Inventory Setup";
         ItemGroup: Record "NPR Item Group";
         NoSeriesMgt: Codeunit NoSeriesManagement;
-        InvtSetup: Record "Inventory Setup";
         TempItem: Record Item temporary;
     begin
         Rec."NPR Last Changed at" := CurrentDateTime;
@@ -117,9 +113,9 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
     local procedure OnBeforeDeleteEventLicenseCheck(var Rec: Record Item; RunTrigger: Boolean)
     var
         AuditRoll: Record "NPR Audit Roll";
-        SalesLinePOS: Record "NPR Sale Line POS";
-        PeriodDiscountLine: Record "NPR Period Discount Line";
         MixedDiscountLine: Record "NPR Mixed Discount Line";
+        PeriodDiscountLine: Record "NPR Period Discount Line";
+        SalesLinePOS: Record "NPR Sale Line POS";
     begin
         if not RunTrigger then
             exit;
@@ -178,9 +174,9 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
     [EventSubscriber(ObjectType::Table, 27, 'OnBeforeValidateEvent', 'No.', true, false)]
     local procedure OnBeforeValidateEventNo(var Rec: Record Item; var xRec: Record Item; CurrFieldNo: Integer)
     var
-        Utility: Codeunit "NPR Utility";
-        AlternativeNo: Record "NPR Alternative No.";
         Item: Record Item;
+        AlternativeNo: Record "NPR Alternative No.";
+        Utility: Codeunit "NPR Utility";
     begin
         GetRetailSetup;
 
@@ -232,8 +228,8 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
     [EventSubscriber(ObjectType::Table, 27, 'OnAfterValidateEvent', 'NPR Item Group', true, false)]
     local procedure OnAfterValidateEventItemGroupLicenseCheck(var Rec: Record Item; var xRec: Record Item; CurrFieldNo: Integer)
     var
-        RetailTableCode: Codeunit "NPR Std. Table Code";
         ItemGroup: Record "NPR Item Group";
+        RetailTableCode: Codeunit "NPR Std. Table Code";
     begin
         //haven't moved code RetailTableCode.VareTVGOVAfter as it is being used from several places
         if ItemGroup.Get(Rec."NPR Item Group") then
@@ -259,12 +255,12 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
     [EventSubscriber(ObjectType::Table, 27, 'OnAfterValidateEvent', 'NPR Label Barcode', false, false)]
     local procedure OnAfterValidateLabelBarcode(var Rec: Record Item; var xRec: Record Item; CurrFieldNo: Integer)
     var
-        BarcodeLibrary: Codeunit "NPR Barcode Library";
-        ItemNo: Code[20];
-        VariantCode: Code[10];
-        ResolvingTable: Integer;
-        AltNo: Record "NPR Alternative No.";
         ItemCrossRef: Record "Item Cross Reference";
+        AltNo: Record "NPR Alternative No.";
+        BarcodeLibrary: Codeunit "NPR Barcode Library";
+        VariantCode: Code[10];
+        ItemNo: Code[20];
+        ResolvingTable: Integer;
     begin
         if StrLen(Rec."NPR Label Barcode") > 0 then begin
             if BarcodeLibrary.TranslateBarcodeToItemVariant(Rec."NPR Label Barcode", ItemNo, VariantCode, ResolvingTable, false) then
@@ -389,18 +385,18 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
     var
         ItemGroup: Record "NPR Item Group";
         Vendor: Record Vendor;
-        VendorList: Page "Vendor List";
-        InternNo: Code[20];
+        NoSeriesManagement: Codeunit NoSeriesManagement;
         Utility: Codeunit "NPR Utility";
+        VendorList: Page "Vendor List";
+        EndNo: Code[20];
+        InternNo: Code[20];
         ISBNBooklandEAN: Code[20];
+        Check: Integer;
+        Ciffer: Integer;
         i: Integer;
         n: Integer;
-        Check: Integer;
-        Weight: Integer;
-        Ciffer: Integer;
         Remainder: Integer;
-        EndNo: Code[20];
-        NoSeriesManagement: Codeunit NoSeriesManagement;
+        Weight: Integer;
     begin
         //made a new function so this EXIT doesn't exit from event subscriber completelly
         if (xRec."No." <> '') and (xRec."No." <> Rec."No.") then

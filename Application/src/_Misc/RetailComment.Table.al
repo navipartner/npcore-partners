@@ -103,10 +103,6 @@ table 6014429 "NPR Retail Comment"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     procedure SetupNewLine()
     var
         BemLinie: Record "NPR Retail Comment";
@@ -124,13 +120,10 @@ table 6014429 "NPR Retail Comment"
 
     procedure Copylines(var from1: Record "NPR Retail Comment")
     var
-        nextline: Integer;
         to1: Record "NPR Retail Comment";
-        t001: Label 'You have to set table id';
+        nextline: Integer;
+        TableIDErr: Label 'You have to set table id';
     begin
-        //copylines
-        //ohm
-
         nextline := 10000;
 
         to1.CopyFilters(Rec);
@@ -139,10 +132,10 @@ table 6014429 "NPR Retail Comment"
 
         if from1.Find('-') then
             repeat
-                Init;
+                Init();
                 TransferFields(from1, false);
                 if to1.GetFilter("Table ID") = '' then
-                    Error(t001);
+                    Error(TableIDErr);
                 Evaluate("Table ID", to1.GetFilter("Table ID"));
 
                 if to1.GetFilter("No.") <> '' then
@@ -160,7 +153,7 @@ table 6014429 "NPR Retail Comment"
                 "Line No." := nextline;
                 Insert(true);
                 nextline += 10000;
-            until from1.Next = 0;
+            until from1.Next() = 0;
     end;
 }
 

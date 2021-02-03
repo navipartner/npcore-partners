@@ -1,11 +1,7 @@
 page 6014420 "NPR Master No. Input Dialog"
 {
-    // NPR5.23/LS  /20160616 CASE 226819 Input Master No.
-
     Caption = 'Master No. Input Dialog';
     PageType = StandardDialog;
-    UsageCategory = Administration;
-    ApplicationArea = All;
 
     layout
     {
@@ -26,14 +22,9 @@ page 6014420 "NPR Master No. Input Dialog"
         }
     }
 
-    actions
-    {
-    }
-
     var
-        "InputNo.": Text;
-        Vars: array[10] of Variant;
         Captions: Text;
+        "InputNo.": Text;
 
     procedure SetInput(Variable: Variant; Description: Text[250])
     begin
@@ -51,10 +42,6 @@ page 6014420 "NPR Master No. Input Dialog"
         CodeVar: Code[20];
     begin
         Evaluate(CodeVar, Value);
-    end;
-
-    local procedure InputNo()
-    begin
     end;
 }
 

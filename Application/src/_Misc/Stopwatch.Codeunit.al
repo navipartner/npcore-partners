@@ -3,8 +3,7 @@ codeunit 6150897 "NPR Stopwatch"
     var
         _start: Dictionary of [Text, DateTime];
         _elapsed: Dictionary of [Text, Duration];
-
-        LabelErrorUnknownStopwatch: Label 'Unknown stopwatch identifier: %1';
+        UnknownStopwatchErr: Label 'Unknown stopwatch identifier: %1', Comment = '%1 = ID';
 
     procedure Elapsed(Id: Text) Result: Duration;
     var
@@ -68,7 +67,7 @@ codeunit 6150897 "NPR Stopwatch"
         EndTimeStamp := CurrentDateTime();
 
         if (not _start.ContainsKey(Id)) then
-            Error(LabelErrorUnknownStopwatch, Id);
+            Error(UnknownStopwatchErr, Id);
 
         if (_elapsed.ContainsKey(Id)) then begin
             _elapsed.Get(Id, ElapsedThisPeriod);

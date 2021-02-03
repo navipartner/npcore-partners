@@ -25,9 +25,9 @@ table 6014441 "NPR Company All"
             trigger OnValidate()
             begin
                 npc_remote.ChangeCompany(Company.Name);
-                if npc_remote.Get then begin
+                if npc_remote.Get() then begin
                     npc_remote."Company No." := "npc - Company No.";
-                    npc_remote.Modify;
+                    npc_remote.Modify();
                 end;
             end;
         }
@@ -39,9 +39,9 @@ table 6014441 "NPR Company All"
             trigger OnValidate()
             begin
                 icomm_remote.ChangeCompany(Company.Name);
-                if icomm_remote.Get then begin
+                if icomm_remote.Get() then begin
                     icomm_remote."NAS - Enabled" := "icomm - NAS Enabled";
-                    icomm_remote.Modify;
+                    icomm_remote.Modify();
                 end;
             end;
         }
@@ -53,9 +53,9 @@ table 6014441 "NPR Company All"
             trigger OnValidate()
             begin
                 npc_remote.ChangeCompany(Company.Name);
-                if npc_remote.Get then begin
+                if npc_remote.Get() then begin
                     npc_remote."Post Sale" := "npc - Sales posting";
-                    npc_remote.Modify;
+                    npc_remote.Modify();
                 end;
             end;
         }
@@ -69,9 +69,9 @@ table 6014441 "NPR Company All"
             trigger OnValidate()
             begin
                 npc_remote.ChangeCompany(Company.Name);
-                if npc_remote.Get then begin
+                if npc_remote.Get() then begin
                     npc_remote."Immediate postings" := "npc - Immediate postings";
-                    npc_remote.Modify;
+                    npc_remote.Modify();
                 end;
             end;
         }
@@ -84,13 +84,9 @@ table 6014441 "NPR Company All"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     var
         company: Record Company;
-        npc_remote: Record "NPR Retail Setup";
         icomm_remote: Record "NPR I-Comm";
+        npc_remote: Record "NPR Retail Setup";
 }
 

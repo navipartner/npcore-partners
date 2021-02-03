@@ -1,16 +1,11 @@
 codeunit 6150632 "NPR JavaScript Bridge Mgt."
 {
-
-    trigger OnRun()
-    begin
-    end;
-
     var
-        Bridge: ControlAddIn "NPR Bridge";
         Initialized: Boolean;
-        Text_BridgeNotInitialzied: Label 'JavaScript Bridge has not been initialized. Please, make sure to call Initialize before invoking individual Bridge functions.';
-        Text_RequestedDependencyScriptNotFound: Label 'Requested dependency script %1 is not available in your instance of Microsoft Dynamics NAV. It must be deployed in Web Client Dependencies before you can use this module.';
+        Bridge: ControlAddIn "NPR Bridge";
         AdHocModuleId: Integer;
+        BridgeNotInitialziedErr: Label 'JavaScript Bridge has not been initialized. Please, make sure to call Initialize before invoking individual Bridge functions.';
+        RequestedDependencyScriptNotFoundErr: Label 'Requested dependency script %1 is not available in your instance of Microsoft Dynamics NAV. It must be deployed in Web Client Dependencies before you can use this module.', Comment = '%1 = Requested dependency script';
 
     procedure Initialize(BridgeIn: ControlAddIn "NPR Bridge")
     begin
@@ -18,7 +13,7 @@ codeunit 6150632 "NPR JavaScript Bridge Mgt."
         Initialized := true;
     end;
 
-    procedure InvokeMethod(Method: Text; EventContent: DotNet NPRNetObject): Boolean
+    procedure InvokeMethod(Method: Text; EventContent: JsonObject): Boolean
     begin
         case Method of
             'RequestModule':
@@ -30,13 +25,9 @@ codeunit 6150632 "NPR JavaScript Bridge Mgt."
         exit(true);
     end;
 
-    local procedure "--- Common public methods ---"()
-    begin
-    end;
-
     procedure SetSize(Width: Text; Height: Text)
     var
-        SetSizeRequest: DotNet NPRNetDictionary_Of_T_U;
+        SetSizeRequest: JsonObject;
     begin
         InitializeRequest('SetSize', SetSizeRequest);
         if Width <> '' then
@@ -48,7 +39,7 @@ codeunit 6150632 "NPR JavaScript Bridge Mgt."
 
     procedure SetStyle(Style: Text)
     var
-        SetStyleRequest: DotNet NPRNetDictionary_Of_T_U;
+        SetStyleRequest: JsonObject;
     begin
         // Sets a stylesheet. You can set as many different styles as you want.
 
@@ -59,12 +50,11 @@ codeunit 6150632 "NPR JavaScript Bridge Mgt."
 
     procedure SetScript(Script: Text)
     var
-        SetScriptRequest: DotNet NPRNetDictionary_Of_T_U;
+        SetScriptRequest: JsonObject;
     begin
         // Invokes a simple JavaScript. This should only be used for simpler features, and not for full-blown modules.
         // The scripts invoked through SetScript will execute immediately without any safety checks, but they don't
         // come with the safety check of dependencies. They always run, and thus may cause runtime errors.
-
         InitializeRequest('SetScript', SetScriptRequest);
         SetScriptRequest.Add('script', Script);
         InvokeFrontEndAsync(SetScriptRequest);
@@ -72,7 +62,7 @@ codeunit 6150632 "NPR JavaScript Bridge Mgt."
 
     procedure RegisterAdHocModule(ModuleName: Text; Html: Text; Css: Text; Script: Text)
     var
-        RegisterModuleRequest: DotNet NPRNetDictionary_Of_T_U;
+        RegisterModuleRequest: JsonObject;
     begin
         SetStyle(Css);
         AdHocModuleId += 1;
@@ -88,25 +78,17 @@ codeunit 6150632 "NPR JavaScript Bridge Mgt."
         InvokeFrontEndAsync(RegisterModuleRequest);
     end;
 
-    local procedure "--- End-to-end public methods to perform specific bridge operations ---"()
-    begin
-    end;
-
     procedure EmbedHtml(Html: Text)
     begin
         RegisterAdHocModule('EmbeddedHtml', Html, '', '');
     end;
 
-    local procedure "--- InvokeMethod method implementations ---"()
-    begin
-    end;
-
-    local procedure Method_RequestModule(EventContent: DotNet NPRNetObject)
+    local procedure Method_RequestModule(EventContent: JsonObject)
     var
         Web: Record "NPR Web Client Dependency";
-        JSON: Codeunit "NPR POS JSON Management";
         FrontEnd: Codeunit "NPR POS Front End Management";
-        RegisterModuleRequest: DotNet NPRNetDictionary_Of_T_U;
+        JSON: Codeunit "NPR POS JSON Management";
+        RegisterModuleRequest: JsonObject;
         Module: Text;
         Script: Text;
     begin
@@ -115,7 +97,7 @@ codeunit 6150632 "NPR JavaScript Bridge Mgt."
 
         Script := Web.GetJavaScript(Module);
         if Script = '' then
-            Error(Text_RequestedDependencyScriptNotFound, Module);
+            Error(RequestedDependencyScriptNotFoundErr, Module);
 
         InitializeRequest('RegisterModule', RegisterModuleRequest);
         RegisterModuleRequest.Add('Name', Module);
@@ -126,76 +108,18 @@ codeunit 6150632 "NPR JavaScript Bridge Mgt."
     local procedure MakeSureBridgeIsInitialized()
     begin
         if not Initialized then
-            Error(Text_BridgeNotInitialzied);
+            Error(BridgeNotInitialziedErr);
     end;
 
-    local procedure InitializeRequest(Method: Text; var Request: DotNet NPRNetDictionary_Of_T_U)
+    local procedure InitializeRequest(Method: Text; var Request: JsonObject)
     begin
-        Request := Request.Dictionary();
         Request.Add('Method', Method);
     end;
 
-    local procedure InvokeFrontEndAsync(Request: DotNet NPRNetDictionary_Of_T_U)
-    var
-        JsonRequest: JsonObject;
-        DictKey: Text;
-        DictVar: Variant;
-        DictText: Text;
-        DictInteger: Integer;
-        DictDecimal: Decimal;
-        DictBigInteger: BigInteger;
-        DictGuid: Guid;
-        DictBoolean: Boolean;
-        DictDate: Date;
-        DictDateTime: DateTime;
+    local procedure InvokeFrontEndAsync(Request: JsonObject)
     begin
         MakeSureBridgeIsInitialized();
-        foreach DictKey in Request.Keys do begin
-            DictVar := Request.Item(DictKey);
-            case true of
-                DictVar.IsText:
-                    begin
-                        DictText := DictVar;
-                        JsonRequest.Add(DictKey, DictText);
-                    end;
-                DictVar.IsInteger:
-                    begin
-                        DictInteger := DictVar;
-                        JsonRequest.Add(DictKey, DictInteger);
-                    end;
-                DictVar.IsBigInteger:
-                    begin
-                        DictBigInteger := DictVar;
-                        JsonRequest.Add(DictKey, DictBigInteger);
-                    end;
-                DictVar.IsDecimal:
-                    begin
-                        DictDecimal := DictVar;
-                        JsonRequest.Add(DictKey, DictDecimal);
-                    end;
-                DictVar.IsGuid:
-                    begin
-                        DictGuid := DictVar;
-                        JsonRequest.Add(DictKey, DictGuid);
-                    end;
-                DictVar.IsBoolean:
-                    begin
-                        DictBoolean := DictVar;
-                        JsonRequest.Add(DictKey, DictBoolean);
-                    end;
-                DictVar.IsDate:
-                    begin
-                        DictDate := DictVar;
-                        JsonRequest.Add(DictKey, DictDate);
-                    end;
-                DictVar.IsDateTime:
-                    begin
-                        DictDateTime := DictVar;
-                        JsonRequest.Add(DictKey, DictDateTime);
-                    end;
-            end;
-        end;
-        Bridge.InvokeFrontEndAsync(JsonRequest);
+        Bridge.InvokeFrontEndAsync(Request);
     end;
 }
 

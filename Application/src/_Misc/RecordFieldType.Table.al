@@ -2,7 +2,6 @@ table 6060133 "NPR Record Field Type"
 {
     Caption = 'Record Field Type';
     DataClassification = CustomerContent;
-
     fields
     {
         field(1; "Code"; Code[20])
@@ -39,10 +38,6 @@ table 6060133 "NPR Record Field Type"
         key(Key1; "Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

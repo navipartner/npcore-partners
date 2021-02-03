@@ -1,57 +1,50 @@
 codeunit 6060073 "NPR CSV Splitter"
 {
-    // NPR5.27/BR  /20160927 CASE 252817 Object Created
-
-
     trigger OnRun()
     begin
-        //Initialize('',',','"',SplitMethod::GroupByColumn,7,'',1,3,FALSE);
         Initialize('', ',', '"', 0, 0, '', 1, 3, true);
-        Process;
+        Process();
     end;
 
     var
-        InputFileName: Text;
-        SplitMethod: Option "0",GroupByColumn,SplitOnValueFirstField;
-        SplitOnColumn: Integer;
-        SplitOnValue: Text;
-        FileTextEncoding: Option "MS-DOS","UTF-8","UTF-16",WINDOWS;
-        HeaderRows: Integer;
-        FileName: Text;
-        FieldSeparator: Char;
-        FieldDelimiter: Char;
-        ExportToServer: Boolean;
-        NumberOfLines: Integer;
-        NumberOfFiles: Integer;
-        TextMaxLines: Label 'File to large: cannot read more than %1 lines. ';
-        TextInitializeCodeUnit: Label 'Codeunit %1 not initialized.';
-        ColumnValue: array[99] of Text;
-        LineFileNo: array[1000] of Integer;
-        ClientSelectedFilename: Text;
-        Instr: InStream;
         ExcelBuffer: Record "Excel Buffer" temporary;
-        WindowIsOpen: Boolean;
-        Window: Dialog;
         FileMgt: Codeunit "File Management";
-        MaxNoOfColumns: Integer;
-        SheetName: Text;
-        TextImportFile: Label 'Import Excel File';
-        TextFileExtension: Label '*.*', Locked = true;
+        ExportToServer: Boolean;
+        WindowIsOpen: Boolean;
+        FieldDelimiter: Char;
+        FieldSeparator: Char;
+        Window: Dialog;
         InputFile: File;
+        Instr: InStream;
+        HeaderRows: Integer;
+        LineFileNo: array[1000] of Integer;
+        MaxNoOfColumns: Integer;
+        NumberOfFiles: Integer;
+        NumberOfLines: Integer;
+        SplitOnColumn: Integer;
+        FileExtensionLbl: Label '*.*', Locked = true;
+        MaxLinesErr: Label 'File to large: cannot read more than %1 lines. ';
+        ImportFileLbl: Label 'Import Excel File';
+        SplitMethod: Option "0",GroupByColumn,SplitOnValueFirstField;
+        FileTextEncoding: Option "MS-DOS","UTF-8","UTF-16",WINDOWS;
+        ClientSelectedFilename: Text;
+        ColumnValue: array[99] of Text;
+        FileName: Text;
+        InputFileName: Text;
+        SheetName: Text;
+        SplitOnValue: Text;
 
     procedure Process(): Text
-    var
-        TextSplitComplete: Label 'File split complete.';
     begin
-        ImportFile;
+        ImportFile();
         if IsExcelFile(InputFileName) then begin
-            ReadExcel;
+            ReadExcel();
         end else begin
-            OpenFile;
-            FillArray;
+            OpenFile();
+            FillArray();
         end;
-        AssignLinestoFiles;
-        BuildNewFiles;
+        AssignLinestoFiles();
+        BuildNewFiles();
         UpdateWindow('');
         if (NumberOfFiles > 0) and (ExportToServer) then begin
             if Exists(InputFileName) then
@@ -63,9 +56,9 @@ codeunit 6060073 "NPR CSV Splitter"
 
     procedure Initialize(ParInputFilename: Text; ParFieldSeparator: Char; ParFieldDelimiter: Char; ParSplitMethod: Option "0",GroupByColumn,SplitOnValueFirstField; ParSplitOnColumn: Integer; ParSplitOnValue: Text; ParHeaderRows: Integer; ParFileTextEncoding: Option "MS-DOS","UTF-8","UTF-16",WINDOWS; ParExportToServer: Boolean)
     var
-        TextInitializing: Label 'Initializing';
+        InitializingLbl: Label 'Initializing';
     begin
-        UpdateWindow(TextInitializing);
+        UpdateWindow(InitializingLbl);
         InputFileName := ParInputFilename;
         FieldSeparator := ParFieldSeparator;
         FieldDelimiter := ParFieldDelimiter;
@@ -84,8 +77,7 @@ codeunit 6060073 "NPR CSV Splitter"
 
     local procedure ImportFile()
     var
-        TextImporting: Label 'Importing File.';
-        TextNoFileSelected: Label 'No file selected.';
+        NoFileSelectedErr: Label 'No file selected.';
     begin
         UpdateWindow('');
         if InputFileName <> '' then begin
@@ -94,13 +86,10 @@ codeunit 6060073 "NPR CSV Splitter"
             end;
         end;
 
-        //  IF NOT UPLOADINTOSTREAM('Import','',' All Files (*.*)|*.*',ClientSelectedFilename,Instr) THEN
-        //    ERROR(TextNoFileSelected);
-
         if GuiAllowed then
-            InputFileName := FileMgt.UploadFile(TextImportFile, TextFileExtension);
+            InputFileName := FileMgt.UploadFile(ImportFileLbl, FileExtensionLbl);
         if InputFileName = '' then
-            Error(TextNoFileSelected);
+            Error(NoFileSelectedErr);
     end;
 
     local procedure OpenFile()
@@ -120,32 +109,32 @@ codeunit 6060073 "NPR CSV Splitter"
 
     local procedure ReadExcel()
     var
-        TextNoRowsRead: Label 'No rows could be read.';
+        NoRowsReadErr: Label 'No rows could be read.';
     begin
         if SheetName = '' then
             SheetName := ExcelBuffer.SelectSheetsName(InputFileName);
-        ExcelBuffer.LockTable;
+        ExcelBuffer.LockTable();
         ExcelBuffer.OpenBook(InputFileName, SheetName);
-        ExcelBuffer.ReadSheet;
+        ExcelBuffer.ReadSheet();
         if not ExcelBuffer.FindLast then
-            Error(TextNoRowsRead);
+            Error(NoRowsReadErr);
         NumberOfLines := ExcelBuffer."Row No.";
-        ExcelBuffer.CloseBook;
+        ExcelBuffer.CloseBook();
     end;
 
     local procedure FillArray()
     var
-        Size: Integer;
-        CSVLine: Text;
-        NoOfFields: Integer;
         LineEnumerator: Integer;
-        TextBuildingLines: Label 'Parsing Lines.';
+        NoOfFields: Integer;
+        Size: Integer;
+        BuildingLinesLbl: Label 'Parsing Lines.';
+        CSVLine: Text;
     begin
-        UpdateWindow(TextBuildingLines);
+        UpdateWindow(BuildingLinesLbl);
         LineEnumerator := 0;
         while not Instr.EOS do begin
             if LineEnumerator = 1000 then
-                Error(TextMaxLines, LineEnumerator);
+                Error(MaxLinesErr, LineEnumerator);
             LineEnumerator += 1;
             Size := Instr.ReadText(CSVLine);
             if Size <> 0 then begin
@@ -153,7 +142,7 @@ codeunit 6060073 "NPR CSV Splitter"
             end;
         end;
         NumberOfLines := LineEnumerator;
-        InputFile.Close;
+        InputFile.Close();
     end;
 
     local procedure ParseLine(LineEnumarator: Integer; CSVLine: Text): Integer
@@ -166,18 +155,18 @@ codeunit 6060073 "NPR CSV Splitter"
             FieldEnumerator += 1;
             FieldValue := NextField(CSVLine);
             if FieldValue <> '' then begin
-                ExcelBuffer.Init;
+                ExcelBuffer.Init();
                 ExcelBuffer.Validate("Row No.", LineEnumarator);
                 ExcelBuffer.Validate("Column No.", FieldEnumerator);
                 ExcelBuffer.Validate("Cell Value as Text", FieldValue);
-                ExcelBuffer.Insert;
+                ExcelBuffer.Insert();
             end;
         until (CSVLine = '') or (FieldEnumerator = 99);
-        ExcelBuffer.Init;
+        ExcelBuffer.Init();
         ExcelBuffer.Validate("Row No.", LineEnumarator);
         ExcelBuffer.Validate("Column No.", FieldEnumerator + 1);
         ExcelBuffer.Validate("Cell Value as Text", GetEndofLineText);
-        ExcelBuffer.Insert;
+        ExcelBuffer.Insert();
         exit(FieldEnumerator);
     end;
 
@@ -188,12 +177,12 @@ codeunit 6060073 "NPR CSV Splitter"
 
     local procedure ForwardTokenizer(var VarText: Text; PSeparator: Char; PQuote: Char) RField: Text
     var
-        Separator: Char;
-        Quote: Char;
-        IsQuoted: Boolean;
-        InputText: Text;
-        NextFieldPos: Integer;
         IsNextField: Boolean;
+        IsQuoted: Boolean;
+        Quote: Char;
+        Separator: Char;
+        NextFieldPos: Integer;
+        InputText: Text;
         NextByte: Text[1];
     begin
 
@@ -250,13 +239,11 @@ codeunit 6060073 "NPR CSV Splitter"
     local procedure AssignLinestoFiles()
     var
         LineEnumerator: Integer;
-        TextAssigningLines: Label 'Assigning %1 Lines to new files.';
+        AssigningLinesLbl: Label 'Assigning %1 Lines to new files.', Comment = '%1 = Number of lines';
     begin
-        UpdateWindow(StrSubstNo(TextAssigningLines, NumberOfLines));
+        UpdateWindow(StrSubstNo(AssigningLinesLbl, NumberOfLines));
         if NumberOfFiles = 0 then
             NumberOfFiles := 1;
-        //IF SplitMethod = 0  THEN
-        //  ERROR(TextInitializeCodeUnit,CODEUNIT::"CSV Splitter");
         LineEnumerator := 0;
         repeat
             LineEnumerator += 1;
@@ -266,15 +253,15 @@ codeunit 6060073 "NPR CSV Splitter"
 
     local procedure AssignLinetoFile(LineEnumerator: Integer)
     var
-        I: Integer;
         FileFound: Boolean;
+        I: Integer;
         FieldValue: Text;
     begin
         if ExcelBuffer.Get(LineEnumerator, SplitOnColumn) then
             FieldValue := ExcelBuffer."Cell Value as Text"
         else
             FieldValue := '';
-        ExcelBuffer.Reset;
+        ExcelBuffer.Reset();
         ExcelBuffer.SetRange("Row No.", LineEnumerator);
         if ExcelBuffer.FindLast then begin
             if MaxNoOfColumns < ExcelBuffer."Column No." then
@@ -283,7 +270,7 @@ codeunit 6060073 "NPR CSV Splitter"
         case SplitMethod of
             0:
                 begin
-                    ExcelBuffer.Init;
+                    ExcelBuffer.Init();
                     ExcelBuffer.Validate("Row No.", LineEnumerator);
                     ExcelBuffer.Validate("Column No.", 999);
                     ExcelBuffer.Validate("Cell Value as Text", Format(1));
@@ -291,7 +278,7 @@ codeunit 6060073 "NPR CSV Splitter"
                 end;
             SplitMethod::GroupByColumn:
                 begin
-                    ExcelBuffer.Init;
+                    ExcelBuffer.Init();
                     ExcelBuffer.Validate("Row No.", LineEnumerator);
                     ExcelBuffer.Validate("Column No.", 999);
                     ExcelBuffer.Validate("Cell Value as Text", FieldValue);
@@ -301,7 +288,7 @@ codeunit 6060073 "NPR CSV Splitter"
                 begin
                     if SplitOnValue = FieldValue then
                         NumberOfFiles += 1;
-                    ExcelBuffer.Init;
+                    ExcelBuffer.Init();
                     ExcelBuffer.Validate("Row No.", LineEnumerator);
                     ExcelBuffer.Validate("Column No.", 999);
                     ExcelBuffer.Validate("Cell Value as Text", Format(NumberOfFiles));
@@ -312,27 +299,27 @@ codeunit 6060073 "NPR CSV Splitter"
 
     local procedure BuildNewFiles()
     var
-        I: Integer;
-        J: Integer;
+        AllLinesExported: Boolean;
         OutputFile: File;
         Instr: InStream;
-        AllLinesExported: Boolean;
-        TxtbuildingFile: Label 'Building file %1.';
+        I: Integer;
+        J: Integer;
+        BuildingFileLbl: Label 'Building file %1.', Comment = '%1 = Number of building file';
     begin
-        if ExportToServer then begin
+        if ExportToServer then
             if FileMgt.ServerDirectoryExists(GetDirectoryName) then
                 FileMgt.ServerRemoveDirectory(GetDirectoryName, true);
-        end;
+
         I := 0;
         repeat
             I := I + 1;
-            UpdateWindow(StrSubstNo(TxtbuildingFile, I));
-            ExcelBuffer.Reset;
+            UpdateWindow(StrSubstNo(BuildingFileLbl, I));
+            ExcelBuffer.Reset();
             ExcelBuffer.SetRange("Column No.", 999);
             ExcelBuffer.SetFilter(ExcelBuffer.Comment, '=%1', '');
             if HeaderRows > 0 then
                 ExcelBuffer.SetRange("Row No.", HeaderRows + 1, 9999999);
-            if ExcelBuffer.FindFirst then begin
+            if ExcelBuffer.FindFirst() then begin
                 CreateOutputfile(I, OutputFile);
                 if not ExportToServer then
                     OutputFile.CreateInStream(Instr);
@@ -345,18 +332,18 @@ codeunit 6060073 "NPR CSV Splitter"
                         OutputFile.Write(BuildLine(J));
                     until J = HeaderRows;
                 end;
-                if ExcelBuffer.FindSet then
+                if ExcelBuffer.FindSet() then
                     repeat
                         if ExcelBuffer.Comment = '' then begin
                             ExcelBuffer.Validate(Comment, StrSubstNo('File %1', Format(I)));
-                            ExcelBuffer.Modify;
+                            ExcelBuffer.Modify();
                             OutputFile.Write(BuildLine(ExcelBuffer."Row No."));
                         end;
-                    until ExcelBuffer.Next = 0;
+                    until ExcelBuffer.Next() = 0;
                 if not ExportToServer then begin
                     DownloadFromStream(Instr, 'Export', '', 'All Files (*.*)|*.*', FileName);
                 end;
-                OutputFile.Close;
+                OutputFile.Close();
                 Clear(OutputFile);
             end else begin
                 AllLinesExported := true;
@@ -405,12 +392,13 @@ codeunit 6060073 "NPR CSV Splitter"
     var
         ColumnNo: Integer;
         FieldValue: Text;
+        BuiltLineAndColumnLbl: Label 'Line %1 column %2 being built', Comment = '%1 = Line, %2 = Column';
     begin
         LineText := '';
         ColumnNo := 0;
         repeat
             ColumnNo += 1;
-            UpdateWindow(StrSubstNo('Line %1 column %2 being built', LineNo, ColumnNo));
+            UpdateWindow(StrSubstNo(BuiltLineAndColumnLbl, LineNo, ColumnNo));
             if ExcelBuffer.Get(LineNo, ColumnNo) then
                 FieldValue := ExcelBuffer."Cell Value as Text"
             else
@@ -423,8 +411,10 @@ codeunit 6060073 "NPR CSV Splitter"
     end;
 
     local procedure GetEndofLineText(): Text
+    var
+        EndOfLineLbl: Label 'ENDOFLINE', Locked = true;
     begin
-        exit('ENDOFLINE');
+        exit(EndOfLineLbl);
     end;
 
     local procedure GetDirectoryName(): Text
@@ -434,7 +424,7 @@ codeunit 6060073 "NPR CSV Splitter"
 
     local procedure UpdateWindow(WindowText: Text)
     var
-        TextSplittingStatus: Label 'Splitting file: #1################################################################';
+        SplittingStatusLbl: Label 'Splitting file: #1################################################################';
     begin
         if not GuiAllowed then
             exit;
@@ -444,7 +434,7 @@ codeunit 6060073 "NPR CSV Splitter"
             exit;
         end;
         if not WindowIsOpen then begin
-            Window.Open(TextSplittingStatus, WindowText);
+            Window.Open(SplittingStatusLbl, WindowText);
             WindowIsOpen := true;
         end;
         Window.Update(1, WindowText);

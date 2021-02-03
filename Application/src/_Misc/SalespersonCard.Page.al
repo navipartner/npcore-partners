@@ -1,23 +1,9 @@
 page 6014428 "NPR Salesperson Card"
 {
-    // 
-    // //-3.1a Ved Nikolai Pedersen
-    //   Tilf¢jet F9 åbern form 5117
-    // 
-    // //-NPR3.c d.25.05.05 v. Simon Sch¢bel
-    //   Oversættelse
-    // NPR4.14/TS/20150818 CASE 220962 Removed field Item Filter,Item Group Filter,Global Dim 1 Filter
-    // NPR5.26/TS/20160809 CASE 248269 Removed Actions Add to Staff Sale and Related Customer
-    // NPR5.26/CLVA/20160902 CASE 48272 Added actions Camera and Identify. Added field Picture
-    // NPR5.30/TJ  /20170222 CASE 266875 Removed function AutoCreateCustomer as it's not used anywhere
-    // NPR5.41/TS  /20180105 CASE 300893 Removed Caption on ActionContainer
-    // NPR5.42/TS  /20180509 CASE 313970 Added Masjked on field Register Password
-    // NPR5.53/BHR /20190810 CASE 369354 Removed Fields 'New Customer creation'
-
-    UsageCategory = None;
     Caption = 'Salesperson/Purchaser Card';
     SourceTable = "Salesperson/Purchaser";
-
+    UsageCategory = Documents;
+    ApplicationArea = All;
     layout
     {
         area(content)
@@ -25,52 +11,52 @@ page 6014428 "NPR Salesperson Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Job Title"; "Job Title")
+                field("Job Title"; Rec."Job Title")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Job Title field';
                 }
-                field("E-Mail"; "E-Mail")
+                field("E-Mail"; Rec."E-Mail")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the E-Mail field';
                 }
-                field("Phone No."; "Phone No.")
+                field("Phone No."; Rec."Phone No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Phone No. field';
                 }
-                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                 }
-                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
-                field("Commission %"; "Commission %")
+                field("Commission %"; Rec."Commission %")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Commission % field';
                 }
-                field("Maximum Cash Returnsale"; "NPR Maximum Cash Returnsale")
+                field("Maximum Cash Returnsale"; Rec."NPR Maximum Cash Returnsale")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Maximum Cash Returnsale field';
                 }
-                field(Picture; "NPR Picture")
+                field(Picture; Rec."NPR Picture")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Picture field';
@@ -79,18 +65,18 @@ page 6014428 "NPR Salesperson Card"
             group(Security)
             {
                 Caption = 'Security';
-                field("Register Password"; "NPR Register Password")
+                field("Register Password"; Rec."NPR Register Password")
                 {
                     ApplicationArea = All;
                     ExtendedDatatype = Masked;
                     ToolTip = 'Specifies the value of the NPR Register Password field';
                 }
-                field("Reverse Sales Ticket"; "NPR Reverse Sales Ticket")
+                field("Reverse Sales Ticket"; Rec."NPR Reverse Sales Ticket")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Reverse Sales Ticket field';
                 }
-                field("Locked-to Register No."; "NPR Locked-to Register No.")
+                field("Locked-to Register No."; Rec."NPR Locked-to Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Locked-to Register No. field';
@@ -99,32 +85,32 @@ page 6014428 "NPR Salesperson Card"
             group(Retail)
             {
                 Caption = 'Retail';
-                field("Hide Register Imbalance"; "NPR Hide Register Imbalance")
+                field("Hide Register Imbalance"; Rec."NPR Hide Register Imbalance")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Hide Register Imbalance field';
                 }
-                field("Sales (Qty.)"; "NPR Sales (Qty.)")
+                field("Sales (Qty.)"; Rec."NPR Sales (Qty.)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Sales (Qty.) field';
                 }
-                field("Discount Amount"; "NPR Discount Amount")
+                field("Discount Amount"; Rec."NPR Discount Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Discount Amount field';
                 }
-                field("Item Group Sales (LCY)"; "NPR Item Group Sales (LCY)")
+                field("Item Group Sales (LCY)"; Rec."NPR Item Group Sales (LCY)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Item Group Sales (LCY) field';
                 }
-                field("Sales (LCY)"; "NPR Sales (LCY)")
+                field("Sales (LCY)"; Rec."NPR Sales (LCY)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Sales (LCY) field';
                 }
-                field("COGS (LCY)"; "NPR COGS (LCY)")
+                field("COGS (LCY)"; Rec."NPR COGS (LCY)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR COGS (LCY) field';
@@ -186,7 +172,5 @@ page 6014428 "NPR Salesperson Card"
         }
     }
 
-    var
-        npc: Record "NPR Retail Setup";
 }
 

@@ -1,7 +1,5 @@
 page 6014623 "NPR Generic Key List"
 {
-    // NPR5.48/TJ  /20181129 CASE 318531 New object
-
     Caption = 'Select sorting key';
     Editable = false;
     PageType = List;
@@ -25,36 +23,32 @@ page 6014623 "NPR Generic Key List"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnAfterGetRecord()
     begin
-        SortingKey := SortingKeyArr[Number];
+        SortingKey := SortingKeyArr[Rec.Number];
     end;
 
     trigger OnOpenPage()
     begin
         if not RecRefSet then
-            Error(Text001);
+            Error(SetParametersErr);
         KeyCount := RecRef.KeyCount;
-        FilterGroup := 2;
-        SetRange(Number, 1, KeyCount);
-        FilterGroup := 0;
+        Rec.FilterGroup := 2;
+        Rec.SetRange(Number, 1, KeyCount);
+        Rec.FilterGroup := 0;
         BuildKeyList();
-        SetPosition(Rec.FieldName(Number) + '=CONST(' + Format(CurrSortingKeyIndex) + ')');
+        Rec.SetPosition(Rec.FieldName(Number) + '=CONST(' + Format(CurrSortingKeyIndex) + ')');
     end;
 
     var
         RecRef: RecordRef;
         RecRefSet: Boolean;
-        SortingKey: Text;
-        SortingKeyArr: array[40] of Text;
-        Text001: Label 'You must use function SetParameters before running the page.';
-        CurrSortingKey: Text;
         CurrSortingKeyIndex: Integer;
         KeyCount: Integer;
+        SetParametersErr: Label 'You must use function SetParameters before running the page.';
+        CurrSortingKey: Text;
+        SortingKey: Text;
+        SortingKeyArr: array[40] of Text;
 
     procedure SetParameters(RecRefHere: RecordRef; CurrSortingKeyHere: Text)
     begin
@@ -65,8 +59,8 @@ page 6014623 "NPR Generic Key List"
 
     local procedure BuildKeyList()
     var
-        i: Integer;
         GenericFilterPageMgt: Codeunit "NPR Generic Filter Page Mgt.";
+        i: Integer;
     begin
         for i := 1 to KeyCount do begin
             SortingKeyArr[i] := GenericFilterPageMgt.ReadKeyString(RecRef, i);

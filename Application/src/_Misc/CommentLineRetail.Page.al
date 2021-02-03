@@ -1,8 +1,5 @@
 page 6014479 "NPR Comment Line - Retail"
 {
-    // NPR5.36/TJ  /20170809  CASE 286283 Removed unused functions
-    // NPR5.48/TJ  /20190129  CASE 340446 Added version NPHC1.00 as used by codeunit 6151558
-
     Caption = 'Comment Line - Retail';
     PageType = List;
     UsageCategory = Administration;
@@ -16,12 +13,12 @@ page 6014479 "NPR Comment Line - Retail"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Comment field';
@@ -30,13 +27,9 @@ page 6014479 "NPR Comment Line - Retail"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine;
+        Rec.SetUpNewLine();
     end;
 }
 

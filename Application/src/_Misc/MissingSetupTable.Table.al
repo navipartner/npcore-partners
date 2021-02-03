@@ -1,8 +1,5 @@
 table 6060049 "NPR Missing Setup Table"
 {
-    // NPR4.19\BR\20160216  CASE 182391 Object Created
-    // NPR5.46/NPKNAV/20181008  CASE 322752 Transport NPR5.46 - 8 October 2018
-
     Caption = 'Missing Setup Table';
     DataClassification = CustomerContent;
 
@@ -41,7 +38,7 @@ table 6060049 "NPR Missing Setup Table"
         }
         field(70; "Missing Records"; Integer)
         {
-            CalcFormula = Count ("NPR Missing Setup Record" WHERE("Table ID" = FIELD("Table ID"),
+            CalcFormula = Count("NPR Missing Setup Record" WHERE("Table ID" = FIELD("Table ID"),
                                                               "Field No." = FIELD("Field No.")));
             Caption = 'Missing Records';
             Editable = false;
@@ -49,7 +46,7 @@ table 6060049 "NPR Missing Setup Table"
         }
         field(100; "Table Name"; Text[50])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Table ID")));
             Caption = 'Table Name';
             Editable = false;
@@ -57,7 +54,7 @@ table 6060049 "NPR Missing Setup Table"
         }
         field(110; "Field Name"; Text[50])
         {
-            CalcFormula = Lookup (Field.FieldName WHERE(TableNo = FIELD("Table ID"),
+            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = FIELD("Table ID"),
                                                         "No." = FIELD("Field No.")));
             Caption = 'Field Name';
             Editable = false;
@@ -65,7 +62,7 @@ table 6060049 "NPR Missing Setup Table"
         }
         field(120; "Related Table Name"; Text[50])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Related Table ID")));
             Caption = 'Related Table Name';
             Editable = false;
@@ -73,7 +70,7 @@ table 6060049 "NPR Missing Setup Table"
         }
         field(130; "Related Field Name"; Text[50])
         {
-            CalcFormula = Lookup (Field.FieldName WHERE(TableNo = FIELD("Related Table ID"),
+            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = FIELD("Related Table ID"),
                                                         "No." = FIELD("Related Field No.")));
             Caption = 'Related Field Name';
             Editable = false;
@@ -86,10 +83,6 @@ table 6060049 "NPR Missing Setup Table"
         key(Key1; "Table ID", "Field No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

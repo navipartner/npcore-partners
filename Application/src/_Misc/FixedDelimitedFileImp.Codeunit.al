@@ -1,8 +1,5 @@
 codeunit 6060072 "NPR Fixed/Delimited File Imp."
 {
-    // NPR5.27/BR  /20160926 CASE 252817 Object Created based on Codeunit 1241
-    // NPR5.38/MHA /20180105  CASE 301053 Removed name Separator from return Variable of function GetSeparator() as it is a reserved name in V2
-
     Permissions = TableData "Data Exch. Field" = rimd;
     TableNo = "Data Exch.";
 
@@ -14,25 +11,23 @@ codeunit 6060072 "NPR Fixed/Delimited File Imp."
         LineNo: Integer;
         SkippedLineNo: Integer;
     begin
-        with DataExchDef do begin
-            Get("Data Exch. Def Code");
-            case "File Encoding" of
-                "File Encoding"::"MS-DOS":
-                    "File Content".CreateInStream(ReadStream, TEXTENCODING::MSDos);
-                "File Encoding"::WINDOWS:
-                    "File Content".CreateInStream(ReadStream, TEXTENCODING::Windows);
-                "File Encoding"::"UTF-8":
-                    "File Content".CreateInStream(ReadStream, TEXTENCODING::UTF8);
-                "File Encoding"::"UTF-16":
-                    "File Content".CreateInStream(ReadStream, TEXTENCODING::UTF16);
-            end;
-            LineNo := 1;
-            repeat
-                ReadLen := ReadStream.ReadText(ReadText);
-                if ReadLen > 0 then
-                    ParseLine(ReadText, Rec, LineNo, SkippedLineNo);
-            until ReadLen = 0;
+        DataExchDef.Get("Data Exch. Def Code");
+        case DataExchDef."File Encoding" of
+            DataExchDef."File Encoding"::"MS-DOS":
+                Rec."File Content".CreateInStream(ReadStream, TEXTENCODING::MSDos);
+            DataExchDef."File Encoding"::WINDOWS:
+                Rec."File Content".CreateInStream(ReadStream, TEXTENCODING::Windows);
+            DataExchDef."File Encoding"::"UTF-8":
+                Rec."File Content".CreateInStream(ReadStream, TEXTENCODING::UTF8);
+            DataExchDef."File Encoding"::"UTF-16":
+                Rec."File Content".CreateInStream(ReadStream, TEXTENCODING::UTF16);
         end;
+        LineNo := 1;
+        repeat
+            ReadLen := ReadStream.ReadText(ReadText);
+            if ReadLen > 0 then
+                ParseLine(ReadText, Rec, LineNo, SkippedLineNo);
+        until ReadLen = 0;
     end;
 
     var
@@ -44,10 +39,10 @@ codeunit 6060072 "NPR Fixed/Delimited File Imp."
         DataExchColumnDef: Record "Data Exch. Column Def";
         DataExchField: Record "Data Exch. Field";
         StartPosition: Integer;
-        FileTypeNotSupported: Label 'File Type %1 is not supported.';
+        FileTypeNotSupportedErr: Label 'File Type %1 is not supported.', Comment = '%1 = File Type';
     begin
         DataExchLineDef.SetRange("Data Exch. Def Code", DataExch."Data Exch. Def Code");
-        DataExchLineDef.FindFirst;
+        DataExchLineDef.FindFirst();
 
         if ((LineNo + SkippedLineNo) <= DataExchDef."Header Lines") or
            ((DataExchLineDef."Data Line Tag" <> '') and (StrPos(Line, DataExchLineDef."Data Line Tag") <> 1))
@@ -58,14 +53,13 @@ codeunit 6060072 "NPR Fixed/Delimited File Imp."
 
         DataExchColumnDef.SetRange("Data Exch. Def Code", DataExch."Data Exch. Def Code");
         DataExchColumnDef.SetRange("Data Exch. Line Def Code", DataExchLineDef.Code);
-        DataExchColumnDef.FindSet;
+        DataExchColumnDef.FindSet();
 
         StartPosition := 1;
         repeat
             if DataExchColumnDef.Constant <> '' then begin
                 DataExchField.InsertRecXMLField(DataExch."Entry No.", LineNo, DataExchColumnDef."Column No.", '',
                   DataExchColumnDef.Constant, DataExchLineDef.Code);
-
             end else begin
                 case DataExchDef."File Type" of
                     DataExchDef."File Type"::"Fixed Text":
@@ -80,10 +74,10 @@ codeunit 6060072 "NPR Fixed/Delimited File Imp."
                               ExtractFirstDelimitedPart(Line, GetSeparator), DataExchLineDef.Code);
                         end;
                     else
-                        Error(FileTypeNotSupported, DataExchDef."File Type");
+                        Error(FileTypeNotSupportedErr, DataExchDef."File Type");
                 end;
             end;
-        until DataExchColumnDef.Next = 0;
+        until DataExchColumnDef.Next() = 0;
         LineNo += 1;
     end;
 
@@ -91,30 +85,19 @@ codeunit 6060072 "NPR Fixed/Delimited File Imp."
     var
         Chr: Char;
     begin
-        with DataExchDef do
-            case "Column Separator" of
-                //-NPR5.38 [301053]
-                // "Column Separator"::Tab :
-                //  Separator[1] := 9;
-                // "Column Separator"::Semicolon :
-                //  Separator := ';';
-                // "Column Separator"::Comma :
-                //  Separator := ',';
-                // "Column Separator"::Space :
-                //  Separator := ' ';
-                "Column Separator"::Tab:
-                    begin
-                        Chr := 9;
-                        exit(Format(Chr));
-                    end;
-                "Column Separator"::Semicolon:
-                    exit(';');
-                "Column Separator"::Comma:
-                    exit(',');
-                "Column Separator"::Space:
-                    exit(' ');
-            //+NPR5.38 [301053]
-            end;
+        case DataExchDef."Column Separator" of
+            DataExchDef."Column Separator"::Tab:
+                begin
+                    Chr := 9;
+                    exit(Format(Chr));
+                end;
+            DataExchDef."Column Separator"::Semicolon:
+                exit(';');
+            DataExchDef."Column Separator"::Comma:
+                exit(',');
+            DataExchDef."Column Separator"::Space:
+                exit(' ');
+        end;
     end;
 
     local procedure ExtractFirstDelimitedPart(var Line: Text; Separator: Text[1]) FirstPart: Text

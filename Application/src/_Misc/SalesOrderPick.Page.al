@@ -1,12 +1,5 @@
 page 6014518 "NPR Sales Order Pick"
 {
-    // NPR4.18/JC/20151202  CASE 227142 Sales Order Pick
-    // NPR5.23.03/MHA/20160726  CASE 242557 Magento reference updated according to MAG2.00
-    // NPR5.36/THRO/20170908 CASE 285645 Added action PostAndSendPdf2Nav
-    // NPR5.41/TS  /20180105 CASE 300893 Chabged Post to Post Order as function Post already exist.
-    // NPR5.48/TS  /20181206 CASE 338656 Added Missing Picture to Action
-    // NPR5.51/THRO/20190718 CASE 361514 Named actions "Post and Print" and "Post and Email" (for AL Conversion)
-
     Caption = 'Sales Order';
     PageType = Card;
     UsageCategory = Administration;
@@ -33,11 +26,11 @@ page 6014518 "NPR Sales Order Pick"
                     Clear(ItemVariantBarcode);
                     ItemFoundonLines := false;
                     if SalesOrderNoSearch <> '' then begin
-                        SalesOrderTestSearch.Get("Document Type"::Order, SalesOrderNoSearch);
-                        Reset;
-                        SetRange("Document Type", "Document Type"::Order);
-                        SetRange("No.", SalesOrderNoSearch);
-                        CurrPage.Update;
+                        SalesOrderTestSearch.Get(Rec."Document Type"::Order, SalesOrderNoSearch);
+                        Rec.Reset();
+                        Rec.SetRange("Document Type", "Document Type"::Order);
+                        Rec.SetRange("No.", SalesOrderNoSearch);
+                        CurrPage.Update();
                     end else
                         ItemBarcodeInput := '';
                 end;
@@ -58,7 +51,7 @@ page 6014518 "NPR Sales Order Pick"
                     if ItemBarcodeInput <> '' then begin
                         AlternativeNo.SetRange(Type, AlternativeNo.Type::Item);
                         AlternativeNo.SetRange("Alt. No.", ItemBarcodeInput);
-                        AlternativeNo.FindFirst;
+                        AlternativeNo.FindFirst();
                         ItemBarcode.Get(AlternativeNo.Code);
 
                         if AlternativeNo."Variant Code" <> '' then
@@ -68,12 +61,12 @@ page 6014518 "NPR Sales Order Pick"
                         SalesLinesSearch.SetRange("Document No.", "No.");
                         SalesLinesSearch.SetRange(Type, SalesLinesSearch.Type::Item);
                         SalesLinesSearch.SetRange("No.", ItemBarcode."No.");
-                        SalesLinesSearch.FindFirst;
+                        SalesLinesSearch.FindFirst();
 
                         ItemFoundonLines := true;
 
                         CurrPage.SalesLines.PAGE.UpdateQtyToShipOnLines(ItemBarcode."No.", ItemVariantBarcode.Code, 1);
-                        CurrPage.Update;
+                        CurrPage.Update();
                     end;
                 end;
             }
@@ -92,7 +85,7 @@ page 6014518 "NPR Sales Order Pick"
             group(General)
             {
                 Caption = 'General';
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
@@ -101,11 +94,11 @@ page 6014518 "NPR Sales Order Pick"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
-                            CurrPage.Update;
+                        if Rec.AssistEdit(xRec) then
+                            CurrPage.Update();
                     end;
                 }
-                field("Sell-to Customer No."; "Sell-to Customer No.")
+                field("Sell-to Customer No."; Rec."Sell-to Customer No.")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
@@ -114,10 +107,10 @@ page 6014518 "NPR Sales Order Pick"
 
                     trigger OnValidate()
                     begin
-                        SelltoCustomerNoOnAfterValidat;
+                        SelltoCustomerNoOnAfterValidat();
                     end;
                 }
-                field("Sell-to Contact No."; "Sell-to Contact No.")
+                field("Sell-to Contact No."; Rec."Sell-to Contact No.")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
@@ -125,105 +118,105 @@ page 6014518 "NPR Sales Order Pick"
 
                     trigger OnValidate()
                     begin
-                        if GetFilter("Sell-to Contact No.") = xRec."Sell-to Contact No." then
-                            if "Sell-to Contact No." <> xRec."Sell-to Contact No." then
-                                SetRange("Sell-to Contact No.");
+                        if Rec.GetFilter("Sell-to Contact No.") = xRec."Sell-to Contact No." then
+                            if Rec."Sell-to Contact No." <> xRec."Sell-to Contact No." then
+                                Rec.SetRange("Sell-to Contact No.");
                     end;
                 }
-                field("Sell-to Customer Name"; "Sell-to Customer Name")
+                field("Sell-to Customer Name"; Rec."Sell-to Customer Name")
                 {
                     ApplicationArea = All;
                     QuickEntry = false;
                     ToolTip = 'Specifies the value of the Sell-to Customer Name field';
                 }
-                field("Sell-to Customer Name 2"; "Sell-to Customer Name 2")
+                field("Sell-to Customer Name 2"; Rec."Sell-to Customer Name 2")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sell-to Customer Name 2 field';
                 }
-                field("Sell-to Address"; "Sell-to Address")
+                field("Sell-to Address"; Rec."Sell-to Address")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Sell-to Address field';
                 }
-                field("Sell-to Address 2"; "Sell-to Address 2")
+                field("Sell-to Address 2"; Rec."Sell-to Address 2")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Sell-to Address 2 field';
                 }
-                field("Sell-to Post Code"; "Sell-to Post Code")
+                field("Sell-to Post Code"; Rec."Sell-to Post Code")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Sell-to Post Code field';
                 }
-                field("Sell-to City"; "Sell-to City")
+                field("Sell-to City"; Rec."Sell-to City")
                 {
                     ApplicationArea = All;
                     QuickEntry = false;
                     ToolTip = 'Specifies the value of the Sell-to City field';
                 }
-                field("Sell-to Contact"; "Sell-to Contact")
+                field("Sell-to Contact"; Rec."Sell-to Contact")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sell-to Contact field';
                 }
-                field("No. of Archived Versions"; "No. of Archived Versions")
+                field("No. of Archived Versions"; Rec."No. of Archived Versions")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the No. of Archived Versions field';
                 }
-                field("Posting Date"; "Posting Date")
+                field("Posting Date"; Rec."Posting Date")
                 {
                     ApplicationArea = All;
                     QuickEntry = false;
                     ToolTip = 'Specifies the value of the Posting Date field';
                 }
-                field("Order Date"; "Order Date")
+                field("Order Date"; Rec."Order Date")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                     QuickEntry = false;
                     ToolTip = 'Specifies the value of the Order Date field';
                 }
-                field("Document Date"; "Document Date")
+                field("Document Date"; Rec."Document Date")
                 {
                     ApplicationArea = All;
                     QuickEntry = false;
                     ToolTip = 'Specifies the value of the Document Date field';
                 }
-                field("Requested Delivery Date"; "Requested Delivery Date")
+                field("Requested Delivery Date"; Rec."Requested Delivery Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Requested Delivery Date field';
                 }
-                field("Promised Delivery Date"; "Promised Delivery Date")
+                field("Promised Delivery Date"; Rec."Promised Delivery Date")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Promised Delivery Date field';
                 }
-                field("Quote No."; "Quote No.")
+                field("Quote No."; Rec."Quote No.")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Quote No. field';
                 }
-                field("External Document No."; "External Document No.")
+                field("External Document No."; Rec."External Document No.")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the External Document No. field';
                 }
-                field("Your Reference"; "Your Reference")
+                field("Your Reference"; Rec."Your Reference")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Your Reference field';
                 }
-                field("Salesperson Code"; "Salesperson Code")
+                field("Salesperson Code"; Rec."Salesperson Code")
                 {
                     ApplicationArea = All;
                     QuickEntry = false;
@@ -231,40 +224,40 @@ page 6014518 "NPR Sales Order Pick"
 
                     trigger OnValidate()
                     begin
-                        SalespersonCodeOnAfterValidate;
+                        SalespersonCodeOnAfterValidate();
                     end;
                 }
-                field("Campaign No."; "Campaign No.")
+                field("Campaign No."; Rec."Campaign No.")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Campaign No. field';
                 }
-                field("Opportunity No."; "Opportunity No.")
+                field("Opportunity No."; Rec."Opportunity No.")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Opportunity No. field';
                 }
-                field("Responsibility Center"; "Responsibility Center")
+                field("Responsibility Center"; Rec."Responsibility Center")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Responsibility Center field';
                 }
-                field("Assigned User ID"; "Assigned User ID")
+                field("Assigned User ID"; Rec."Assigned User ID")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Assigned User ID field';
                 }
-                field("Job Queue Status"; "Job Queue Status")
+                field("Job Queue Status"; Rec."Job Queue Status")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Job Queue Status field';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
@@ -281,7 +274,7 @@ page 6014518 "NPR Sales Order Pick"
             group(Invoicing)
             {
                 Caption = 'Invoicing';
-                field("Bill-to Customer No."; "Bill-to Customer No.")
+                field("Bill-to Customer No."; Rec."Bill-to Customer No.")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
@@ -289,142 +282,142 @@ page 6014518 "NPR Sales Order Pick"
 
                     trigger OnValidate()
                     begin
-                        BilltoCustomerNoOnAfterValidat;
+                        BilltoCustomerNoOnAfterValidat();
                     end;
                 }
-                field("Bill-to Contact No."; "Bill-to Contact No.")
+                field("Bill-to Contact No."; Rec."Bill-to Contact No.")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Bill-to Contact No. field';
                 }
-                field("Bill-to Name"; "Bill-to Name")
+                field("Bill-to Name"; Rec."Bill-to Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Bill-to Name field';
                 }
-                field("Bill-to Name 2"; "Bill-to Name 2")
+                field("Bill-to Name 2"; Rec."Bill-to Name 2")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Bill-to Name 2 field';
                 }
-                field("Bill-to Address"; "Bill-to Address")
+                field("Bill-to Address"; Rec."Bill-to Address")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Bill-to Address field';
                 }
-                field("Bill-to Address 2"; "Bill-to Address 2")
+                field("Bill-to Address 2"; Rec."Bill-to Address 2")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Bill-to Address 2 field';
                 }
-                field("Bill-to Post Code"; "Bill-to Post Code")
+                field("Bill-to Post Code"; Rec."Bill-to Post Code")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Bill-to Post Code field';
                 }
-                field("Bill-to City"; "Bill-to City")
+                field("Bill-to City"; Rec."Bill-to City")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Bill-to City field';
                 }
-                field("Bill-to Contact"; "Bill-to Contact")
+                field("Bill-to Contact"; Rec."Bill-to Contact")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Bill-to Contact field';
                 }
-                field("Bill-to Company"; "NPR Bill-to Company")
+                field("Bill-to Company"; Rec."NPR Bill-to Company")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Bill-to Company field';
                 }
-                field("Bill-To Vendor No."; "NPR Bill-To Vendor No.")
+                field("Bill-To Vendor No."; Rec."NPR Bill-To Vendor No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Bill-To Vendor No. field';
                 }
-                field("Bill-to E-mail"; "NPR Bill-to E-mail")
+                field("Bill-to E-mail"; Rec."NPR Bill-to E-mail")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Bill-to E-mail field';
                 }
-                field("Document Processing"; "NPR Document Processing")
+                field("Document Processing"; Rec."NPR Document Processing")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Document Processing field';
                 }
-                field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
+                field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Shortcut Dimension 1 Code field';
 
                     trigger OnValidate()
                     begin
-                        ShortcutDimension1CodeOnAfterV;
+                        ShortcutDimension1CodeOnAfterV();
                     end;
                 }
-                field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
+                field("Shortcut Dimension 2 Code"; Rec."Shortcut Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Shortcut Dimension 2 Code field';
 
                     trigger OnValidate()
                     begin
-                        ShortcutDimension2CodeOnAfterV;
+                        ShortcutDimension2CodeOnAfterV();
                     end;
                 }
-                field("Payment Terms Code"; "Payment Terms Code")
+                field("Payment Terms Code"; Rec."Payment Terms Code")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Payment Terms Code field';
                 }
-                field("Due Date"; "Due Date")
+                field("Due Date"; Rec."Due Date")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Due Date field';
                 }
-                field("Payment Discount %"; "Payment Discount %")
+                field("Payment Discount %"; Rec."Payment Discount %")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Payment Discount % field';
                 }
-                field("Pmt. Discount Date"; "Pmt. Discount Date")
+                field("Pmt. Discount Date"; Rec."Pmt. Discount Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Pmt. Discount Date field';
                 }
-                field("Payment Method Code"; "Payment Method Code")
+                field("Payment Method Code"; Rec."Payment Method Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Payment Method Code field';
                 }
-                field("Direct Debit Mandate ID"; "Direct Debit Mandate ID")
+                field("Direct Debit Mandate ID"; Rec."Direct Debit Mandate ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Direct Debit Mandate ID field';
                 }
-                field("Prices Including VAT"; "Prices Including VAT")
+                field("Prices Including VAT"; Rec."Prices Including VAT")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Prices Including VAT field';
 
                     trigger OnValidate()
                     begin
-                        PricesIncludingVATOnAfterValid;
+                        PricesIncludingVATOnAfterValid();
                     end;
                 }
-                field("VAT Bus. Posting Group"; "VAT Bus. Posting Group")
+                field("VAT Bus. Posting Group"; Rec."VAT Bus. Posting Group")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the VAT Bus. Posting Group field';
                 }
-                field("Magento Payment Amount"; "NPR Magento Payment Amount")
+                field("Magento Payment Amount"; Rec."NPR Magento Payment Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Magento Payment Amount field';
@@ -433,103 +426,103 @@ page 6014518 "NPR Sales Order Pick"
             group(Shipping)
             {
                 Caption = 'Shipping';
-                field("Ship-to Code"; "Ship-to Code")
+                field("Ship-to Code"; Rec."Ship-to Code")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Ship-to Code field';
                 }
-                field("Ship-to Name"; "Ship-to Name")
+                field("Ship-to Name"; Rec."Ship-to Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ship-to Name field';
                 }
-                field("Ship-to Name 2"; "Ship-to Name 2")
+                field("Ship-to Name 2"; Rec."Ship-to Name 2")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ship-to Name 2 field';
                 }
-                field("Ship-to Address"; "Ship-to Address")
+                field("Ship-to Address"; Rec."Ship-to Address")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Ship-to Address field';
                 }
-                field("Ship-to Address 2"; "Ship-to Address 2")
+                field("Ship-to Address 2"; Rec."Ship-to Address 2")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Ship-to Address 2 field';
                 }
-                field("Ship-to Post Code"; "Ship-to Post Code")
+                field("Ship-to Post Code"; Rec."Ship-to Post Code")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Ship-to Post Code field';
                 }
-                field("Ship-to City"; "Ship-to City")
+                field("Ship-to City"; Rec."Ship-to City")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ship-to City field';
                 }
-                field("Ship-to Contact"; "Ship-to Contact")
+                field("Ship-to Contact"; Rec."Ship-to Contact")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Ship-to Contact field';
                 }
-                field("Location Code"; "Location Code")
+                field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Location Code field';
                 }
-                field("Outbound Whse. Handling Time"; "Outbound Whse. Handling Time")
+                field("Outbound Whse. Handling Time"; Rec."Outbound Whse. Handling Time")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Outbound Whse. Handling Time field';
                 }
-                field("Shipment Method Code"; "Shipment Method Code")
+                field("Shipment Method Code"; Rec."Shipment Method Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Shipment Method Code field';
                 }
-                field("Shipping Agent Code"; "Shipping Agent Code")
+                field("Shipping Agent Code"; Rec."Shipping Agent Code")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Shipping Agent Code field';
                 }
-                field("Shipping Agent Service Code"; "Shipping Agent Service Code")
+                field("Shipping Agent Service Code"; Rec."Shipping Agent Service Code")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Shipping Agent Service Code field';
                 }
-                field("Shipping Time"; "Shipping Time")
+                field("Shipping Time"; Rec."Shipping Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Shipping Time field';
                 }
-                field("Late Order Shipping"; "Late Order Shipping")
+                field("Late Order Shipping"; Rec."Late Order Shipping")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Late Order Shipping field';
                 }
-                field("Package Tracking No."; "Package Tracking No.")
+                field("Package Tracking No."; Rec."Package Tracking No.")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Package Tracking No. field';
                 }
-                field("Shipment Date"; "Shipment Date")
+                field("Shipment Date"; Rec."Shipment Date")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Shipment Date field';
                 }
-                field("Shipping Advice"; "Shipping Advice")
+                field("Shipping Advice"; Rec."Shipping Advice")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
@@ -537,12 +530,12 @@ page 6014518 "NPR Sales Order Pick"
 
                     trigger OnValidate()
                     begin
-                        if "Shipping Advice" <> xRec."Shipping Advice" then
-                            if not Confirm(Text001, false, FieldCaption("Shipping Advice")) then
-                                Error(Text002);
+                        if Rec."Shipping Advice" <> xRec."Shipping Advice" then
+                            if not Confirm(ChangeRecordsQst, false, Rec.FieldCaption("Shipping Advice")) then
+                                Error(UpdateErr);
                     end;
                 }
-                field("Delivery Location"; "NPR Delivery Location")
+                field("Delivery Location"; Rec."NPR Delivery Location")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Delivery Location field';
@@ -564,7 +557,7 @@ page 6014518 "NPR Sales Order Pick"
                     Caption = 'Re&lease';
                     Image = ReleaseDoc;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     ShortCutKey = 'Ctrl+F9';
                     ApplicationArea = All;
@@ -582,7 +575,7 @@ page 6014518 "NPR Sales Order Pick"
                     Caption = 'Re&open';
                     Image = ReOpen;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Re&open action';
@@ -604,7 +597,7 @@ page 6014518 "NPR Sales Order Pick"
                     Caption = 'Quantity to Ship 0';
                     Image = Shipment;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -622,7 +615,7 @@ page 6014518 "NPR Sales Order Pick"
                     Ellipsis = true;
                     Image = PostOrder;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
@@ -640,7 +633,7 @@ page 6014518 "NPR Sales Order Pick"
                     Ellipsis = true;
                     Image = PostPrint;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F9';
@@ -672,7 +665,7 @@ page 6014518 "NPR Sales Order Pick"
                     Caption = 'Post and Pdf2Nav';
                     Image = PostSendTo;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Post and handle as set up in ''Document Processing''';
@@ -711,18 +704,18 @@ page 6014518 "NPR Sales Order Pick"
 
     trigger OnAfterGetCurrRecord()
     begin
-        DynamicEditable := CurrPage.Editable;
+        DynamicEditable := CurrPage.Editable();
     end;
 
     trigger OnAfterGetRecord()
     begin
-        JobQueueVisible := "Job Queue Status" = "Job Queue Status"::"Scheduled for Posting";
+        JobQueueVisible := Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting";
     end;
 
     trigger OnDeleteRecord(): Boolean
     begin
-        CurrPage.SaveRecord;
-        exit(ConfirmDeletion);
+        CurrPage.SaveRecord();
+        exit(Rec.ConfirmDeletion());
     end;
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
@@ -732,74 +725,73 @@ page 6014518 "NPR Sales Order Pick"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Responsibility Center" := UserMgt.GetSalesFilter;
+        Rec."Responsibility Center" := UserMgt.GetSalesFilter();
     end;
 
     trigger OnOpenPage()
     begin
         if UserMgt.GetSalesFilter <> '' then begin
-            FilterGroup(2);
-            SetRange("Responsibility Center", UserMgt.GetSalesFilter);
-            FilterGroup(0);
+            Rec.FilterGroup(2);
+            Rec.SetRange("Responsibility Center", UserMgt.GetSalesFilter);
+            Rec.FilterGroup(0);
         end;
 
-        SetRange("Date Filter", 0D, WorkDate - 1);
+        Rec.SetRange("Date Filter", 0D, WorkDate - 1);
 
-        SetDocNoVisible;
+        SetDocNoVisible();
     end;
 
     var
-        Text000: Label 'Unable to run this function while in View mode.';
-        CopySalesDoc: Report "Copy Sales Document";
-        MoveNegSalesLines: Report "Move Negative Sales Lines";
-        ReportPrint: Codeunit "Test Report-Print";
-        DocPrint: Codeunit "Document-Print";
-        ArchiveManagement: Codeunit ArchiveManagement;
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-        SalesCalcDiscountByType: Codeunit "Sales - Calc Discount By Type";
-        ChangeExchangeRate: Page "Change Exchange Rate";
-        UserMgt: Codeunit "User Setup Management";
-        Usage: Option "Order Confirmation","Work Order","Pick Instruction";
-        [InDataSet]
-        JobQueueVisible: Boolean;
-        Text001: Label 'Do you want to change %1 in all related records in the warehouse?';
-        Text002: Label 'The update has been interrupted to respect the warning.';
-        DynamicEditable: Boolean;
-        DocNoVisible: Boolean;
-        ExternalDocNoMandatory: Boolean;
-        SalesOrderNoSearch: Code[20];
-        ItemBarcodeInput: Code[20];
         ItemBarcode: Record Item;
         ItemVariantBarcode: Record "Item Variant";
         AlternativeNo: Record "NPR Alternative No.";
+        CopySalesDoc: Report "Copy Sales Document";
+        MoveNegSalesLines: Report "Move Negative Sales Lines";
+        ArchiveManagement: Codeunit ArchiveManagement;
+        DocPrint: Codeunit "Document-Print";
+        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
+        SalesCalcDiscountByType: Codeunit "Sales - Calc Discount By Type";
+        ReportPrint: Codeunit "Test Report-Print";
+        UserMgt: Codeunit "User Setup Management";
+        ChangeExchangeRate: Page "Change Exchange Rate";
+        DocNoVisible: Boolean;
+        DynamicEditable: Boolean;
+        ExternalDocNoMandatory: Boolean;
         ItemFoundonLines: Boolean;
+        [InDataSet]
+        JobQueueVisible: Boolean;
+        ItemBarcodeInput: Code[20];
+        SalesOrderNoSearch: Code[20];
+        ChangeRecordsQst: Label 'Do you want to change %1 in all related records in the warehouse?';
+        UpdateErr: Label 'The update has been interrupted to respect the warning.';
+        ViewModeErr: Label 'Unable to run this function while in View mode.';
 
     local procedure Post(PostingCodeunitID: Integer)
     begin
-        SendToPosting(PostingCodeunitID);
-        if "Job Queue Status" = "Job Queue Status"::"Scheduled for Posting" then
-            CurrPage.Close;
+        Rec.SendToPosting(PostingCodeunitID);
+        if Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting" then
+            CurrPage.Close();
         CurrPage.Update(false);
     end;
 
     procedure UpdateAllowed(): Boolean
     begin
         if CurrPage.Editable = false then
-            Error(Text000);
+            Error(ViewModeErr);
         exit(true);
     end;
 
     local procedure ApproveCalcInvDisc()
     begin
-        CurrPage.SalesLines.PAGE.ApproveCalcInvDisc;
+        CurrPage.SalesLines.PAGE.ApproveCalcInvDisc();
     end;
 
     local procedure SelltoCustomerNoOnAfterValidat()
     begin
-        if GetFilter("Sell-to Customer No.") = xRec."Sell-to Customer No." then
-            if "Sell-to Customer No." <> xRec."Sell-to Customer No." then
-                SetRange("Sell-to Customer No.");
-        CurrPage.Update;
+        if Rec.GetFilter("Sell-to Customer No.") = xRec."Sell-to Customer No." then
+            if Rec."Sell-to Customer No." <> xRec."Sell-to Customer No." then
+                Rec.SetRange("Sell-to Customer No.");
+        CurrPage.Update();
     end;
 
     local procedure SalespersonCodeOnAfterValidate()
@@ -809,22 +801,22 @@ page 6014518 "NPR Sales Order Pick"
 
     local procedure BilltoCustomerNoOnAfterValidat()
     begin
-        CurrPage.Update;
+        CurrPage.Update();
     end;
 
     local procedure ShortcutDimension1CodeOnAfterV()
     begin
-        CurrPage.Update;
+        CurrPage.Update();
     end;
 
     local procedure ShortcutDimension2CodeOnAfterV()
     begin
-        CurrPage.Update;
+        CurrPage.Update();
     end;
 
     local procedure PricesIncludingVATOnAfterValid()
     begin
-        CurrPage.Update;
+        CurrPage.Update();
     end;
 
     local procedure AccountCodeOnAfterValidate()
@@ -834,7 +826,7 @@ page 6014518 "NPR Sales Order Pick"
 
     local procedure Prepayment37OnAfterValidate()
     begin
-        CurrPage.Update;
+        CurrPage.Update();
     end;
 
     local procedure SetDocNoVisible()
@@ -842,7 +834,7 @@ page 6014518 "NPR Sales Order Pick"
         DocumentNoVisibility: Codeunit DocumentNoVisibility;
         DocType: Option Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order",Reminder,FinChMemo;
     begin
-        DocNoVisible := DocumentNoVisibility.SalesDocumentNoIsVisible(DocType::Order, "No.");
+        DocNoVisible := DocumentNoVisibility.SalesDocumentNoIsVisible(DocType::Order, Rec."No.");
     end;
 }
 

@@ -5,7 +5,7 @@ codeunit 6014494 "NPR Azure Key Vault Mgt."
 
     procedure GetSecret(Name: Text) KeyValue: Text
     var
-        "NPR GetSecretFailedMessage": Label 'Failed to retrieve Azure KeyVault secret %1';
+        GetSecretFailedErr: Label 'Failed to retrieve Azure KeyVault secret %1', Comment = '%1 = Azure KeyVault secret name';
     begin
         if not InMemorySecretProvider.GetSecret(Name, KeyValue) then begin
             if not AppKeyVaultSecretProviderInitialised then
@@ -17,7 +17,7 @@ codeunit 6014494 "NPR Azure Key Vault Mgt."
             if AppKeyVaultSecretProvider.GetSecret(Name, KeyValue) then
                 InMemorySecretProvider.AddSecret(Name, KeyValue)
             else
-                Error("NPR GetSecretFailedMessage", Name);
+                Error(GetSecretFailedErr, Name);
         end;
     end;
 

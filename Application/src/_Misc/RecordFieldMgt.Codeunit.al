@@ -1,19 +1,14 @@
 codeunit 6060133 "NPR Record Field Mgt."
 {
-
-    trigger OnRun()
-    begin
-    end;
-
     var
-        Text001: Label 'No table relation has been setup';
+        TableRelationErr: Label 'No table relation has been setup';
 
     procedure TranslateCaptionClass(Ref: Text): Text
     var
         RecordFieldSetup: Record "NPR Record Field Setup";
         RecordFieldType: Record "NPR Record Field Type";
-        TableNo: Integer;
         GlobalFieldNo: Integer;
+        TableNo: Integer;
     begin
         // definition of ref: [TableNo],[Global position]
         if StrPos(Ref, ',') > 0 then begin
@@ -122,14 +117,14 @@ codeunit 6060133 "NPR Record Field Mgt."
 
     procedure DoLookup(LookupTableNo: Integer; CurrentValue: Code[20]; var NewValue: Code[20]): Boolean
     var
+        Country: Record "Country/Region";
         Currency: Record Currency;
         Language: Record Language;
-        Country: Record "Country/Region";
         Salesperson: Record "Salesperson/Purchaser";
     begin
         case LookupTableNo of
             0:
-                Error(Text001);
+                Error(TableRelationErr);
             4:
                 begin
                     if Currency.Get(CurrentValue) then;
@@ -161,10 +156,6 @@ codeunit 6060133 "NPR Record Field Mgt."
                     end;
                 end;
         end;
-    end;
-
-    procedure GetShortcutValues(var RecordField: array[20] of Text)
-    begin
     end;
 }
 

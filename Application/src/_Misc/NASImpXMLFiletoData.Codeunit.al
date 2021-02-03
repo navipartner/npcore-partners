@@ -1,8 +1,5 @@
 codeunit 6014403 "NPR NAS Imp. XML File to Data"
 {
-    // NPR5.25/BR /20160628 CASE 244303 Added GUIALLOWEDs to allow running in task queue
-    // NPR5.30/NPKNAV/20170310  CASE 267601 Transport NPR5.30 - 26 January 2017
-
     Permissions = TableData "Data Exch. Field" = rimd;
     TableNo = "Data Exch.";
 
@@ -18,24 +15,25 @@ codeunit 6014403 "NPR NAS Imp. XML File to Data"
     end;
 
     var
-        ProgressMsg: Label 'Preparing line number #1#######';
-        ProgressWindow: Dialog;
         WindowOpen: Boolean;
         StartTime: DateTime;
+        ProgressWindow: Dialog;
+        ProgressMsg: Label 'Preparing line number #1#######';
 
     local procedure ParseParentChildDocument(DataExch: Record "Data Exch.")
     var
         DataExchDef: Record "Data Exch. Def";
         DataExchLineDef: Record "Data Exch. Line Def";
         XMLDOMManagement: Codeunit "XML DOM Management";
-        XmlDocument: DotNet "NPRNetXmlDocument";
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        XmlNamespaceManager: DotNet NPRNetXmlNamespaceManager;
+        Document: XmlDocument;
+        NamespaceManager: XmlNamespaceManager;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
         XmlStream: InStream;
         CurrentLineNo: Integer;
-        NodeID: Text[250];
         I: Integer;
         NodeCount: Integer;
+        NodeID: Text[250];
     begin
         DataExchDef.Get(DataExch."Data Exch. Def Code");
         DataExchLineDef.SetRange("Data Exch. Def Code", DataExchDef.Code);
@@ -43,38 +41,40 @@ codeunit 6014403 "NPR NAS Imp. XML File to Data"
         if not DataExchLineDef.FindSet then
             exit;
 
-        XmlDocument := XmlDocument.XmlDocument;
         DataExch."File Content".CreateInStream(XmlStream);
-        XmlDocument.Load(XmlStream);
-        DataExchLineDef.ValidateNamespace(XmlDocument.DocumentElement);
-        XMLDOMManagement.AddNamespaces(XmlNamespaceManager, XmlDocument);
-
+        XmlDocument.ReadFrom(XmlStream, Document);
+        ValidateAndAddNamespace(Document, DataExchLineDef, NamespaceManager);
         repeat
-            XMLDOMManagement.FindNodesWithNamespaceManager(
-              XmlDocument, EscapeMissingNamespacePrefix(DataExchLineDef."Data Line Tag"), XmlNamespaceManager, XmlNodeList);
+            Document.SelectNodes(
+              EscapeMissingNamespacePrefix(DataExchLineDef."Data Line Tag"), NamespaceManager, NodeList);
+
             CurrentLineNo := 1;
-            NodeCount := XmlNodeList.Count;
+            NodeCount := NodeList.Count;
             for I := 1 to NodeCount do begin
                 NodeID := IncreaseNodeID('', CurrentLineNo);
-                ParseParentChildLine(
-                  XmlNodeList.ItemOf(I - 1), NodeID, '', CurrentLineNo, DataExchLineDef, DataExch."Entry No.", XmlNamespaceManager);
+                if NodeList.Get(I, Node) then
+                    ParseParentChildLine(
+                      Node, NodeID, '', CurrentLineNo, DataExchLineDef, DataExch."Entry No.", NamespaceManager);
                 CurrentLineNo += 1;
             end;
-        until DataExchLineDef.Next = 0;
+        until DataExchLineDef.Next() = 0;
     end;
 
-    local procedure ParseParentChildLine(CurrentXmlNode: DotNet NPRNetXmlNode; NodeID: Text[250]; ParentNodeID: Text[250]; CurrentLineNo: Integer; CurrentDataExchLineDef: Record "Data Exch. Line Def"; EntryNo: Integer; XmlNamespaceManager: DotNet NPRNetXmlNamespaceManager)
+    local procedure ParseParentChildLine(CurrentXmlNode: XmlNode; NodeID: Text[250]; ParentNodeID: Text[250]; CurrentLineNo: Integer; CurrentDataExchLineDef: Record "Data Exch. Line Def"; EntryNo: Integer; NamespaceManager: XmlNamespaceManager)
     var
         DataExchColumnDef: Record "Data Exch. Column Def";
-        DataExchLineDef: Record "Data Exch. Line Def";
         DataExchField: Record "Data Exch. Field";
+        DataExchLineDef: Record "Data Exch. Line Def";
         XMLDOMManagement: Codeunit "XML DOM Management";
-        XmlNodeList: DotNet NPRNetXmlNodeList;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
+        Document: XmlDocument;
         CurrentIndex: Integer;
-        CurrentNodeID: Text[250];
-        LastLineNo: Integer;
         I: Integer;
+        LastLineNo: Integer;
         NodeCount: Integer;
+        CurrentNodeID: Text[250];
+        NodeValue: Text;
     begin
         DataExchField.InsertRecXMLFieldDefinition(EntryNo, CurrentLineNo, NodeID, ParentNodeID, '', CurrentDataExchLineDef.Code);
 
@@ -85,23 +85,23 @@ codeunit 6014403 "NPR NAS Imp. XML File to Data"
 
         CurrentIndex := 1;
 
-        if DataExchColumnDef.FindSet then
+        if DataExchColumnDef.FindSet() then
             repeat
-                XMLDOMManagement.FindNodesWithNamespaceManager(
-                  CurrentXmlNode,
-                  GetRelativePath(DataExchColumnDef.Path, CurrentDataExchLineDef."Data Line Tag"),
-                  XmlNamespaceManager,
-                  XmlNodeList);
+                CurrentXmlNode.SelectNodes(
+                    GetRelativePath(DataExchColumnDef.Path, CurrentDataExchLineDef."Data Line Tag"),
+                    NamespaceManager, NodeList);
 
-                NodeCount := XmlNodeList.Count;
+                NodeCount := NodeList.Count;
                 for I := 1 to NodeCount do begin
                     CurrentNodeID := IncreaseNodeID(NodeID, CurrentIndex);
                     CurrentIndex += 1;
-                    InsertColumn(
-                      DataExchColumnDef.Path, CurrentLineNo, CurrentNodeID, ParentNodeID, XmlNodeList.ItemOf(I - 1).InnerText,
-                      CurrentDataExchLineDef, EntryNo);
+                    if NodeList.Get(I, Node) then begin
+                        InsertColumn(
+                          DataExchColumnDef.Path, CurrentLineNo, CurrentNodeID, ParentNodeID, Node.AsXmlElement().InnerText,
+                          CurrentDataExchLineDef, EntryNo);
+                    end;
                 end;
-            until DataExchColumnDef.Next = 0;
+            until DataExchColumnDef.Next() = 0;
 
         // insert Constant values
         DataExchColumnDef.SetFilter(Path, '%1', '');
@@ -118,29 +118,29 @@ codeunit 6014403 "NPR NAS Imp. XML File to Data"
         DataExchLineDef.SetRange("Data Exch. Def Code", CurrentDataExchLineDef."Data Exch. Def Code");
         DataExchLineDef.SetRange("Parent Code", CurrentDataExchLineDef.Code);
 
-        if DataExchLineDef.FindSet then
+        if DataExchLineDef.FindSet() then
             repeat
-                XMLDOMManagement.FindNodesWithNamespaceManager(
-                  CurrentXmlNode,
+                Document.SelectNodes(
                   GetRelativePath(DataExchLineDef."Data Line Tag", CurrentDataExchLineDef."Data Line Tag"),
-                  XmlNamespaceManager,
-                  XmlNodeList);
+                  NamespaceManager,
+                  NodeList);
 
                 DataExchField.SetRange("Data Exch. No.", EntryNo);
                 DataExchField.SetRange("Data Exch. Line Def Code", DataExchLineDef.Code);
                 LastLineNo := 1;
-                if DataExchField.FindLast then
+                if DataExchField.FindLast() then
                     LastLineNo := DataExchField."Line No." + 1;
 
-                NodeCount := XmlNodeList.Count;
+                NodeCount := NodeList.Count;
                 for I := 1 to NodeCount do begin
                     CurrentNodeID := IncreaseNodeID(NodeID, CurrentIndex);
-                    ParseParentChildLine(
-                      XmlNodeList.ItemOf(I - 1), CurrentNodeID, NodeID, LastLineNo, DataExchLineDef, EntryNo, XmlNamespaceManager);
+                    if NodeList.Get(I, Node) then
+                        ParseParentChildLine(
+                          Node, CurrentNodeID, NodeID, LastLineNo, DataExchLineDef, EntryNo, NamespaceManager);
                     CurrentIndex += 1;
                     LastLineNo += 1;
                 end;
-            until DataExchLineDef.Next = 0;
+            until DataExchLineDef.Next() = 0;
     end;
 
     local procedure InsertColumn(Path: Text; LineNo: Integer; NodeId: Text[250]; ParentNodeId: Text[250]; Value: Text; var DataExchLineDef: Record "Data Exch. Line Def"; EntryNo: Integer)
@@ -153,7 +153,7 @@ codeunit 6014403 "NPR NAS Imp. XML File to Data"
         DataExchColumnDef.SetRange("Data Exch. Line Def Code", DataExchLineDef.Code);
         DataExchColumnDef.SetRange(Path, Path);
 
-        if DataExchColumnDef.FindFirst then begin
+        if DataExchColumnDef.FindFirst() then begin
             UpdateProgressWindow(LineNo);
             DataExchField.InsertRecXMLFieldWithParentNodeID(EntryNo, LineNo, DataExchColumnDef."Column No.", NodeId, ParentNodeId, Value,
               DataExchLineDef.Code);
@@ -204,15 +204,14 @@ codeunit 6014403 "NPR NAS Imp. XML File to Data"
     var
         PopupDelay: Integer;
     begin
-        //-NPR5.25 [244303]
         if not GuiAllowed then
             exit;
-        //+NPR5.25 [244303]
         PopupDelay := 1000;
         if CurrentDateTime - StartTime < PopupDelay then
             exit;
 
-        StartTime := CurrentDateTime; // only update every PopupDelay ms
+        StartTime := CurrentDateTime;// only update every PopupDelay ms
+
 
         if not WindowOpen then begin
             ProgressWindow.Open(ProgressMsg);
@@ -227,5 +226,24 @@ codeunit 6014403 "NPR NAS Imp. XML File to Data"
         RegEx: Codeunit DotNet_Regex;
     begin
         exit(RegEx.IsMatch(Input, '^[a-zA-Z0-9]*$'));
+    end;
+
+    local procedure ValidateAndAddNamespace(var Document: XmlDocument; DataExchLineDef: Record "Data Exch. Line Def"; var NamespaceManager: XmlNamespaceManager)
+    var
+        Element: XmlElement;
+        NamespaceURI: Text;
+        PrefixOfNamespace: Text;
+        IncorrectNamespaceErr: Label 'The imported file contains unsupported namespace "%1". The supported namespace is ''%2''.', Comment = '%1 = file namespace, %2 = supported namespace';
+    begin
+        if not Document.GetRoot(Element) then
+            exit;
+        NamespaceURI := Element.NamespaceUri();
+        if DataExchLineDef.Namespace <> '' then
+            if NamespaceURI <> DataExchLineDef.Namespace then
+                Error(IncorrectNamespaceErr, NamespaceURI, DataExchLineDef.Namespace);
+        NamespaceManager.NameTable(Document.NameTable);
+        Element.GetPrefixOfNamespace(NamespaceURI, PrefixOfNamespace);
+        if NamespaceURI <> '' then
+            NamespaceManager.AddNamespace(PrefixOfNamespace, NamespaceURI);
     end;
 }

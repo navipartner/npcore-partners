@@ -1,12 +1,12 @@
 page 6014583 "NPR JS Bridge"
 {
-    UsageCategory = None;
     Caption = 'JS Bridge';
     DeleteAllowed = false;
     Editable = false;
     InsertAllowed = false;
     ModifyAllowed = false;
-
+    UsageCategory = Administration;
+    ApplicationArea = All;
     layout
     {
         area(content)
@@ -26,7 +26,6 @@ page 6014583 "NPR JS Bridge"
 
                 trigger ActionCompleted(JsonText: Text);
                 begin
-                    //Message(JsonText);
                     CurrPage.Close();
                 end;
             }

@@ -1,11 +1,5 @@
 page 6014480 "NPR Object List"
 {
-    // NPR70.00.01.01/MH/20150119  Added "Object Type"::Table to RUN Action.
-    // NPR5.26/MMV /20160825 CASE 241549 Changed page type from card to list to get search bar in web client.
-    // NPR5.27/TR  /20161019  CASE 255778 Added ShortCutKeys for all actions.
-    // NPR5.41/TS  /20180105  CASE 300893 Removed Caption on Action Container
-    // NPR5.48/TS  /20181206 CASE 338656 Added Missing Picture to Action
-
     Caption = 'Object List';
     Editable = false;
     PageType = List;
@@ -24,17 +18,17 @@ page 6014480 "NPR Object List"
             repeater(Control1160150004)
             {
                 ShowCaption = false;
-                field("Object Type"; "Object Type")
+                field("Object Type"; Rec."Object Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Object Type field';
                 }
-                field("Object ID"; "Object ID")
+                field("Object ID"; Rec."Object ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Object ID field';
                 }
-                field("Object Name"; "Object Name")
+                field("Object Name"; Rec."Object Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Object Name field';
@@ -55,14 +49,14 @@ page 6014480 "NPR Object List"
                     Caption = 'Table';
                     Image = "Table";
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     ShortCutKey = 'Ctrl+Alt+b';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Table action';
 
                     trigger OnAction()
                     begin
-                        SetRange("Object Type", ObjectTypeOpt::Table);
+                        Rec.SetRange("Object Type", ObjectTypeOpt::Table);
                     end;
                 }
                 action("CodeUnit")
@@ -70,14 +64,14 @@ page 6014480 "NPR Object List"
                     Caption = 'CodeUnit';
                     Image = ExplodeBOM;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     ShortCutKey = 'Ctrl+Alt+c';
                     ApplicationArea = All;
                     ToolTip = 'Executes the CodeUnit action';
 
                     trigger OnAction()
                     begin
-                        SetRange("Object Type", ObjectTypeOpt::Codeunit);
+                        Rec.SetRange("Object Type", ObjectTypeOpt::Codeunit);
                     end;
                 }
                 action("Report")
@@ -85,14 +79,14 @@ page 6014480 "NPR Object List"
                     Caption = 'Report';
                     Image = "Report";
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     ShortCutKey = 'Ctrl+Alt+p';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Report action';
 
                     trigger OnAction()
                     begin
-                        SetRange("Object Type", ObjectTypeOpt::Report);
+                        Rec.SetRange("Object Type", ObjectTypeOpt::Report);
                     end;
                 }
                 action("Page")
@@ -100,14 +94,14 @@ page 6014480 "NPR Object List"
                     Caption = 'Page';
                     Image = VendorLedger;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     ShortCutKey = 'Ctrl+Alt+g';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Page action';
 
                     trigger OnAction()
                     begin
-                        SetRange("Object Type", ObjectTypeOpt::Page);
+                        Rec.SetRange("Object Type", ObjectTypeOpt::Page);
                     end;
                 }
                 action("XMLPort")
@@ -115,14 +109,14 @@ page 6014480 "NPR Object List"
                     Caption = 'XMLPort';
                     Image = Export;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     ShortCutKey = 'Ctrl+Alt+x';
                     ApplicationArea = All;
                     ToolTip = 'Executes the XMLPort action';
 
                     trigger OnAction()
                     begin
-                        SetRange("Object Type", ObjectTypeOpt::XMLPort);
+                        Rec.SetRange("Object Type", ObjectTypeOpt::XMLPort);
                     end;
                 }
                 action(All)
@@ -130,14 +124,14 @@ page 6014480 "NPR Object List"
                     Caption = 'All';
                     Image = AllLines;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     ShortCutKey = 'Ctrl+Alt+a';
                     ApplicationArea = All;
                     ToolTip = 'Executes the All action';
 
                     trigger OnAction()
                     begin
-                        Reset;
+                        Rec.Reset();
                     end;
                 }
             }
@@ -146,7 +140,7 @@ page 6014480 "NPR Object List"
                 Caption = 'Run';
                 Image = Start;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+r';
@@ -155,28 +149,18 @@ page 6014480 "NPR Object List"
 
                 trigger OnAction()
                 begin
-                    //-NPR70.00.00.01
-                    //IF "Object Type"="Object Type"::Codeunit THEN
-                    //  CODEUNIT.RUN("Object ID");
-                    //IF "Object Type"="Object Type"::Report THEN
-                    //  REPORT.RUN("Object ID");
-                    //IF "Object Type"="Object Type"::Page THEN
-                    //  PAGE.RUN("Object ID");
-                    //IF "Object Type"="Object Type"::XMLport THEN
-                    //  XMLPORT.RUN("Object ID");
-                    case "Object Type" of
-                        "Object Type"::Table:
-                            HyperLink(GetUrl(CLIENTTYPE::Current, CompanyName, OBJECTTYPE::Table, "Object ID"));
-                        "Object Type"::Page:
-                            PAGE.Run("Object ID");
-                        "Object Type"::Report:
-                            REPORT.Run("Object ID");
-                        "Object Type"::Codeunit:
-                            CODEUNIT.Run("Object ID");
-                        "Object Type"::XMLport:
-                            XMLPORT.Run("Object ID");
+                    case Rec."Object Type" of
+                        Rec."Object Type"::Table:
+                            HyperLink(GetUrl(CLIENTTYPE::Current, CompanyName, OBJECTTYPE::Table, Rec."Object ID"));
+                        Rec."Object Type"::Page:
+                            PAGE.Run(Rec."Object ID");
+                        Rec."Object Type"::Report:
+                            REPORT.Run(Rec."Object ID");
+                        Rec."Object Type"::Codeunit:
+                            CODEUNIT.Run(Rec."Object ID");
+                        Rec."Object Type"::XMLport:
+                            XMLPORT.Run(Rec."Object ID");
                     end;
-                    //+NPR70.00.01.01
                 end;
             }
         }

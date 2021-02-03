@@ -1,15 +1,5 @@
 codeunit 6014593 "NPR Change Log Auto Enabler"
 {
-    // NPR5.29/NPKNAV/20170127  CASE 262678 Transport NPR5.29 - 27 januar 2017
-    // NPR5.38/LS  /20171218 CASE 300124 Set property OnMissingLicense to Skip for function OnAfterInitialization
-    // NPR5.38/MMV /20180119 CASE 300683 Skip subscriber when installing extension
-    // TM1.39/THRO/20181126  CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         RunSilent: Boolean;
 
@@ -36,8 +26,8 @@ codeunit 6014593 "NPR Change Log Auto Enabler"
 
     procedure TestChangeLogSetup(var RetailSetup: Record "NPR Retail Setup")
     var
-        ChangeLogSetupTable: Record "Change Log Setup (Table)";
         ChangeLogSetup: Record "Change Log Setup";
+        ChangeLogSetupTable: Record "Change Log Setup (Table)";
     begin
         if RetailSetup."Auto Changelog Level" = RetailSetup."Auto Changelog Level"::None then
             exit;

@@ -1,7 +1,5 @@
 xmlport 6014403 "NPR Export G/L Entries"
 {
-    // NPR4.16/JDH/20151115 CASE 226013 first version created
-
     Caption = 'Export G/L Entries';
     Direction = Export;
     Format = VariableText;
@@ -54,19 +52,6 @@ xmlport 6014403 "NPR Export G/L Entries"
                 {
                 }
             }
-        }
-    }
-
-    requestpage
-    {
-        Caption = 'Export G/L Entries';
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 }
