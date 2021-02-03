@@ -178,30 +178,6 @@ page 6151570 "NPR AF Setup"
                     ToolTip = 'Specifies the value of the Msg Service - Icon field';
                 }
             }
-            group("OIO Validation")
-            {
-                Caption = 'OIO Validation';
-                field("OIO Validation - Enable"; "OIO Validation - Enable")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the OIO Validation - Enable field';
-                }
-                field("OIO Validation - API Key"; "OIO Validation - API Key")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the OIO Validation - API Key field';
-                }
-                field("OIO Validation - Base Url"; "OIO Validation - Base Url")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the OIO Validation - Base Url field';
-                }
-                field("OIO Validation - API Routing"; "OIO Validation - API Routing")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the OIO Validation - API Routing field';
-                }
-            }
         }
     }
 
@@ -214,7 +190,7 @@ page 6151570 "NPR AF Setup"
                 Caption = 'Test';
                 Image = Task;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR AF Test Services";
@@ -226,7 +202,7 @@ page 6151570 "NPR AF Setup"
                 Caption = 'Enable Webservice';
                 Image = "Action";
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Codeunit "NPR AF API WebService";

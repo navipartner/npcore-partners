@@ -31,7 +31,7 @@ table 6151570 "NPR AF Setup"
         }
         field(12; "Web Service Is Published"; Boolean)
         {
-            CalcFormula = Exist ("Web Service" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Exist("Web Service" WHERE("Object Type" = CONST(Codeunit),
                                                      "Service Name" = CONST('azurefunction_service')));
             Caption = 'Web Service Is Published';
             Editable = false;
@@ -150,7 +150,7 @@ table 6151570 "NPR AF Setup"
         }
         field(311; "Msg Service - Report Caption"; Text[249])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
                                                                            "Object ID" = FIELD("Msg Service - Report ID")));
             Caption = 'Msg Service - Report Caption';
             Editable = false;
@@ -184,21 +184,33 @@ table 6151570 "NPR AF Setup"
         {
             Caption = 'OIO Validation - API Key';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This Field won''t be used anymore';
+            ObsoleteTag = 'NPR AF Setup cleanup';
         }
         field(401; "OIO Validation - Base Url"; Text[100])
         {
             Caption = 'OIO Validation - Base Url';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This Field won''t be used anymore';
+            ObsoleteTag = 'NPR AF Setup cleanup';
         }
         field(402; "OIO Validation - API Routing"; Text[100])
         {
             Caption = 'OIO Validation - API Routing';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This Field won''t be used anymore';
+            ObsoleteTag = 'NPR AF Setup cleanup';
         }
         field(403; "OIO Validation - Enable"; Boolean)
         {
             Caption = 'OIO Validation - Enable';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This Field won''t be used anymore';
+            ObsoleteTag = 'NPR AF Setup cleanup';
         }
     }
 
