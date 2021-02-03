@@ -2531,22 +2531,7 @@ codeunit 6014435 "NPR Retail Form Code"
                 exit(true);
 
             Contact.Init;
-            //-NPR5.53 [369354]
-            //  IF RetailSetupGlobal."Create New Customer" THEN BEGIN
-            //    IF RetailSetupGlobal."New Customer Creation" = RetailSetupGlobal."New Customer Creation"::"1" THEN BEGIN
-            //    END;
-            //  END ELSE BEGIN
-            //    ERROR(ErrNoCash);
-            //  END;
-            //+NPR5.53 [369354]
-            //-NPR5.26 [252881]
-            //IF CONFIRM(MsgTDC,TRUE) THEN
-            //  IF Navneopslag.GetTDCCustBuffer( CustomerNo, TDCNavneBufferRecTmp, FALSE ) THEN
-            //    TDCNavneBufferRecTmp.NavneBuff2Contact( TDCNavneBufferRecTmp, Contact );
-            //
-            //Contact."No." := CustomerNo;
             Contact.Validate("No.", CustomerNo);
-            //+NPR5.26 [252881]
             Contact.Type := Contact.Type::Person;
 
             Contact.Insert;
@@ -2558,57 +2543,24 @@ codeunit 6014435 "NPR Retail Form Code"
             ContactCard.SetTableView(Contact);
             Return := ContactCard.RunModal;
             if (Return = ACTION::OK) or (Return = ACTION::LookupOK) then begin
-                //-NPR5.26
                 if Contact.Get then
-                    //+NPR5.26
                     Contact.Modify;
+
                 exit(true);
             end else begin
                 if Contact."No." <> '' then
                     if Confirm(DeleteCust, true, Contact."No.", Contact.Name) then
                         Contact.Delete;
+
                 exit(false);
             end;
         end else begin
             if Customer.Get(CustomerNo) then
                 exit(true);
-            //-NPR5.53 [369354]
-            //  IF RetailSetupGlobal."Create New Customer" THEN BEGIN
-            //    CASE RetailSetupGlobal."New Customer Creation" OF
-            //      RetailSetupGlobal."New Customer Creation"::"2":
-            //        ERROR(ErrNoCust);
-            //      RetailSetupGlobal."New Customer Creation"::"1":
-            //        BEGIN
-            //          Salesperson.GET(SalespersonCode);
-            //          CASE Salesperson."Customer Creation" OF
-            //            Salesperson."Customer Creation"::"0" :
-            //              ERROR(ErrNoCust);
-            //            Salesperson."Customer Creation"::"1" :
-            //              ERROR(ErrNoCust);
-            //          END;
-            //        END;
-            //    END;
-            //  END ELSE BEGIN
-            //    ERROR(ErrNoCust);
-            //  END;
-            //+NPR5.53 [369354]
-            //-NPR5.26 [252881]
-            //IF CONFIRM( MsgTDC, TRUE ) THEN BEGIN
-            //  IF Navneopslag.GetTDCCustBuffer( CustomerNo, TDCNavneBufferRecTmp, FALSE) THEN
-            //    TDCNavneBufferRecTmp.NavneBuff2Debitor( TDCNavneBufferRecTmp, Customer );
-            //END;
-            //
-            //Customer."No." := CustomerNo;
+
             Customer.Validate("No.", CustomerNo);
-            //+NPR5.26 [252881]
             Customer."NPR Type" := RetailSetupGlobal."Customer type";
 
-            //-NPR5.30 [264913]
-            /*
-            Customer."Payment Terms Code" := NPC."Terms of Payment";
-            Customer.VALIDATE( "Gen. Bus. Posting Group", NPC."Gen. Bus. Posting Group" );
-            Customer.VALIDATE( "Customer Posting Group", NPC."Customer Posting Group" );
-            */
             if RetailSetupGlobal."Customer Config. Template" <> '' then begin
                 ConfigTemplateHeader.Get(RetailSetupGlobal."Customer Config. Template");
                 TempCustomer := Customer;
@@ -2619,10 +2571,9 @@ codeunit 6014435 "NPR Retail Form Code"
                 Customer."Payment Terms Code" := TempCustomer."Payment Terms Code";
                 Customer.Validate("Gen. Bus. Posting Group", TempCustomer."Gen. Bus. Posting Group");
                 Customer.Validate("Customer Posting Group", TempCustomer."Customer Posting Group");
+                Customer."Prices Including VAT" := TempCustomer."Prices Including VAT";
             end;
-            //+NPR5.30 [264913]
 
-            Customer."Prices Including VAT" := RetailSetupGlobal."Prices Include VAT";
             Customer.Insert;
 
             Commit;
@@ -2631,15 +2582,15 @@ codeunit 6014435 "NPR Retail Form Code"
             CustomerCard.LookupMode(true);
             Return := CustomerCard.RunModal;
             if (Return = ACTION::OK) or (Return = ACTION::LookupOK) then begin
-                //-NPR5.26
                 if Customer.Get then
-                    //+NPR5.26
                     Customer.Modify;
+
                 exit(true);
             end else begin
                 if Customer."No." <> '' then
                     if Confirm(DeleteCust, true, Customer."No.", Customer.Name) then
                         Customer.Delete;
+
                 exit(false);
             end;
         end;

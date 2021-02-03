@@ -363,7 +363,6 @@ codeunit 85002 "NPR Library - POS Master Data"
 
         if not RetailSetup.Get then
             RetailSetup.Insert;
-        RetailSetup."Prices Include VAT" := true;
         RetailSetup."Prices incl. VAT" := true;
         RetailSetup.Modify;
     end;
@@ -376,6 +375,7 @@ codeunit 85002 "NPR Library - POS Master Data"
         NPRLibraryInventory.CreateItem(Item);
         Item.Validate("VAT Bus. Posting Gr. (Price)", POSStore."VAT Bus. Posting Group");
 
+        Item."Price Includes VAT" := true;
         Item."Unit Price" := LibraryRandom.RandDec(1000, 2) + 1; //more than 1
         Item."Unit Cost" := LibraryRandom.RandDecInDecimalRange(0.01, Item."Unit Price", 1);
         Item.Modify;

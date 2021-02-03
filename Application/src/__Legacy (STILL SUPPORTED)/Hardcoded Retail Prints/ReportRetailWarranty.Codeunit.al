@@ -196,9 +196,6 @@ codeunit 6014576 "NPR Report: Retail Warranty"
         Printer.AddLine('');
 
 
-        Printer.AddTextField(1, 1, RetailConfiguration."Sales Ticket Line Text1");
-        Printer.AddTextField(1, 1, RetailConfiguration."Sales Ticket Line Text2");
-        Printer.AddTextField(1, 1, RetailConfiguration."Sales Ticket Line Text3");
         Printer.AddTextField(1, 1, RetailConfiguration."Sales Ticket Line Text6");
         Printer.AddTextField(1, 1, RetailConfiguration."Sales Ticket Line Text7");
     end;

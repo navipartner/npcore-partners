@@ -27,6 +27,7 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
         ItemGroup: Record "NPR Item Group";
         NoSeriesMgt: Codeunit NoSeriesManagement;
         InvtSetup: Record "Inventory Setup";
+        TempItem: Record Item temporary;
     begin
         Rec."NPR Last Changed at" := CurrentDateTime;
         Rec."NPR Last Changed by" := CopyStr(UserId, 1, MaxStrLen(Rec."NPR Last Changed by"));
@@ -45,18 +46,39 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
                     InvtSetup.TestField("Item Nos.");
                     NoSeriesMgt.InitSeries(InvtSetup."Item Nos.", Rec."No. Series", 0D, Rec."No.", Rec."No. Series");
                 end;
+
+                if ItemGroup."Config. Template Header" <> '' then
+                    if ApplyTemplateToTempItem(Rec, TempItem, ItemGroup."Config. Template Header") then
+                        Rec."Price Includes VAT" := TempItem."Price Includes VAT";
             end;
         end;
 
         if not Rec."NPR Group sale" then
             Rec."Costing Method" := RetailSetup."Costing Method Standard";
 
-        Rec."Price Includes VAT" := RetailSetup."Prices Include VAT";
-
         if Rec."Price Includes VAT" and (SalesSetup."VAT Bus. Posting Gr. (Price)" <> '') then
             Rec."VAT Bus. Posting Gr. (Price)" := SalesSetup."VAT Bus. Posting Gr. (Price)";
 
         Rec."Last Date Modified" := Today;
+    end;
+
+    local procedure ApplyTemplateToTempItem(var Item: Record Item; var TempItem: Record Item temporary; ConfigTemplHeaderCode: Code[10]): Boolean
+    var
+        ConfigTemplateHeader: Record "Config. Template Header";
+        RecRef: RecordRef;
+        ConfigTemplateMgt: Codeunit "Config. Template Management";
+    begin
+        if not TempItem.IsTemporary then
+            exit(false);
+
+        ConfigTemplateHeader.Get(ConfigTemplHeaderCode);
+        TempItem := Item;
+        TempItem.Insert;
+        RecRef.GetTable(TempItem);
+        ConfigTemplateMgt.ApplyTemplateLinesWithoutValidation(ConfigTemplateHeader, RecRef);
+        RecRef.SetTable(TempItem);
+
+        exit(true);
     end;
 
     [EventSubscriber(ObjectType::Table, 27, 'OnAfterInsertEvent', '', true, false)]

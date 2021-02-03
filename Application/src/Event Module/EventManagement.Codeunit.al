@@ -554,27 +554,6 @@ codeunit 6060150 "NPR Event Management"
             until POSEntry2.Next = 0;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014414, 'OnAfterRunPostItemLedger', '', true, true)]
-    local procedure PostTempAuditRollOnAfterRunPostItemLedger(var Rec: Record "NPR Audit Roll Posting")
-    var
-        JobPlanningLineInvoice: Record "Job Planning Line Invoice";
-        PostedDocType: Enum "Job Planning Line Invoice Document Type";
-        SkipThisEntry: Boolean;
-    begin
-        if Rec.FindSet then
-            repeat
-                AuditRollPosting := Rec;
-                SkipThisEntry := not AuditRollPosting."Item Entry Posted";
-                if not SkipThisEntry then begin
-                    JobPlanningLineInvoice.SetRange("NPR POS Unit No.", AuditRollPosting."Register No.");
-                    SkipThisEntry := not JobPlanningLineInvoiceExists(DATABASE::"NPR Sale POS", Enum::"Sales Document Type".FromInteger(0), AuditRollPosting."Sales Ticket No.", JobPlanningLineInvoice, PostedDocType);
-                end;
-                POSDocPostType := POSDocPostType::"Audit Roll";
-                if not SkipThisEntry then
-                    PostEventSalesDoc(JobPlanningLineInvoice, PostedDocType, AuditRollPosting."Posted Doc. No.", AuditRollPosting."Sale Date");
-            until Rec.Next = 0;
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6151005, 'OnAfterLoadFromQuote', '', true, true)]
     local procedure POSActionLoadFromQuoteOnAfterLoadFromQuote(POSQuoteEntry: Record "NPR POS Quote Entry"; var SalePOS: Record "NPR Sale POS")
     var

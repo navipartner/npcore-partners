@@ -77,18 +77,6 @@ table 6014411 "NPR Mixed Discount"
                 end;
             end;
         }
-        field(9; "Unit price incl VAT"; Boolean)
-        {
-            CalcFormula = Lookup ("NPR Retail Setup"."Prices Include VAT");
-            Caption = 'Price Includes VAT';
-            FieldClass = FlowField;
-
-            trigger OnValidate()
-            begin
-                if "Unit price incl VAT" <> xRec."Unit price incl VAT" then
-                    Error(Text1060000);
-            end;
-        }
         field(10; "No. Serie"; Code[20])
         {
             Caption = 'No. Series';
@@ -352,7 +340,6 @@ table 6014411 "NPR Mixed Discount"
     begin
         "Created the" := Today;
         RetailSetup.Get;
-        "Unit price incl VAT" := RetailSetup."Prices Include VAT";
         DatePeriod.SetRange("Period Type", DatePeriod."Period Type"::Date);
         "Starting date" := Today;
         if DatePeriod.FindLast then

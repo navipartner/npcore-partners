@@ -656,55 +656,6 @@ page 6014432 "NPR Audit Roll"
                         Filter[1] := PaymentEntries();
                     end;
                 }
-                action(Post)
-                {
-                    Caption = 'Post';
-                    Image = Post;
-                    ShortCutKey = 'F11';
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Post action';
-
-                    trigger OnAction()
-                    var
-                        PostAuditRoll: Codeunit "NPR Post audit roll";
-                    begin
-                        Clear(AuditRollGlobal);
-                        PostAuditRoll.ShowProgress(true);
-                        PostAuditRoll.RunCode(AuditRollGlobal);
-                    end;
-                }
-                action("Post Sales Ticket")
-                {
-                    Caption = 'Post Sales Ticket';
-                    Image = Post;
-                    Promoted = true;
-				    PromotedOnly = true;
-                    PromotedCategory = Category4;
-                    ShortCutKey = 'Shift+F11';
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Post Sales Ticket action';
-
-                    trigger OnAction()
-                    begin
-                        PostReceipt;
-                    end;
-                }
-                action("Posting of Range")
-                {
-                    Caption = 'Posting of Range';
-                    Image = Post;
-                    ShortCutKey = 'Ctrl+F11';
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Posting of Range action';
-
-                    trigger OnAction()
-                    var
-                        PostAuditRoll: Codeunit "NPR Post audit roll";
-                    begin
-                        PostAuditRoll.ShowProgress(true);
-                        PostAuditRoll.RunCode(Rec);
-                    end;
-                }
                 action("Move Sales Ticket to Warranty")
                 {
                     Caption = 'Move Sales Ticket to Warranty';
@@ -1036,36 +987,36 @@ page 6014432 "NPR Audit Roll"
         TextAdvancedPosting: Label 'WARNING: Advanced Posting is active. Audit Roll is not used for posting.';
         ClicktoSeePOSEntries: Label 'Click here to see POS Entries.';
 
-    procedure PostReceipt()
-    var
-        AuditRoll4: Record "NPR Audit Roll";
-        PostTempAuditRoll: Codeunit "NPR Post Temp Audit Roll";
-        AuditRollPosting: Record "NPR Audit Roll Posting";
-        TX001: Label 'Posted ?';
-        PostDocNo: Code[20];
-    begin
-        AuditRoll4 := Rec;
-        AuditRoll4.SetCurrentKey("Register No.", "Sales Ticket No.");
-        AuditRoll4.SetRange("Register No.", "Register No.");
-        AuditRoll4.SetRange("Sales Ticket No.", "Sales Ticket No.");
-        if Confirm(TX001, true, AuditRoll4.GetFilters) then begin
-            AuditRollPosting.DeleteAll;
-            AuditRollPosting.TransferFromRevSilent(AuditRoll4, AuditRollPosting);
-            PostDocNo := PostTempAuditRoll.GetNewPostingNo(true);
-            PostTempAuditRoll.SetPostingNo(PostDocNo);
+    // procedure PostReceipt()
+    // var
+    //     AuditRoll4: Record "NPR Audit Roll";
+    //     PostTempAuditRoll: Codeunit "NPR Post Temp Audit Roll";
+    //     AuditRollPosting: Record "NPR Audit Roll Posting";
+    //     TX001: Label 'Posted ?';
+    //     PostDocNo: Code[20];
+    // begin
+    //     AuditRoll4 := Rec;
+    //     AuditRoll4.SetCurrentKey("Register No.", "Sales Ticket No.");
+    //     AuditRoll4.SetRange("Register No.", "Register No.");
+    //     AuditRoll4.SetRange("Sales Ticket No.", "Sales Ticket No.");
+    //     if Confirm(TX001, true, AuditRoll4.GetFilters) then begin
+    //         AuditRollPosting.DeleteAll;
+    //         AuditRollPosting.TransferFromRevSilent(AuditRoll4, AuditRollPosting);
+    //         PostDocNo := PostTempAuditRoll.GetNewPostingNo(true);
+    //         PostTempAuditRoll.SetPostingNo(PostDocNo);
 
-            PostTempAuditRoll.RunPost(AuditRollPosting);
-            AuditRollPosting.UpdateChangesSilent;
+    //         PostTempAuditRoll.RunPost(AuditRollPosting);
+    //         AuditRollPosting.UpdateChangesSilent;
 
-            AuditRollPosting.DeleteAll;
-            AuditRollPosting.TransferFromRevSilentItemLedg(AuditRoll4, AuditRollPosting);
-            PostTempAuditRoll.SetPostingNo(PostDocNo);
+    //         AuditRollPosting.DeleteAll;
+    //         AuditRollPosting.TransferFromRevSilentItemLedg(AuditRoll4, AuditRollPosting);
+    //         PostTempAuditRoll.SetPostingNo(PostDocNo);
 
-            PostTempAuditRoll.RunPostItemLedger(AuditRollPosting);
-            AuditRollPosting.UpdateChangesSilent;
-        end;
+    //         PostTempAuditRoll.RunPostItemLedger(AuditRollPosting);
+    //         AuditRollPosting.UpdateChangesSilent;
+    //     end;
 
-    end;
+    // end;
 
     procedure ModifyAllowed(): Boolean
     begin
