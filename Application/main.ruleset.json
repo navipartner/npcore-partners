@@ -151,7 +151,11 @@
             "id": "AW0007",
             "action":"Warning",
             "justification": "The Web client does not support displaying Repeater controls that contain FlowFilter fields!"
-        }
-
+        },
+        {
+            "id": "AW0011",
+            "action":"Error",
+            "justification": "Add PromotedOnly="true" to some or all promoted actions to avoid identical actions from appearing in both the promoted and default sections of the command bar."
+        }        
     ]
 }
