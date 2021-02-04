@@ -1,14 +1,5 @@
 table 6059966 "NPR MPOS App Setup"
 {
-    // NPR5.33/NPKNAV/20170630  CASE 267203 Transport NPR5.33 - 30 June 2017
-    // NPR5.34/CLVA/20170703 CASE 280444 Upgrading MPOS functionality to transcendence
-    // NPR5.36/MMV /20170926 CASE 291652 Added quickfix field 1000
-    // NPR5.36/NPKNAV/20171003  CASE 280444-01 Transport NPR5.36 - 3 October 2017
-    // NPR5.38/CLVA/20171011 CASE 289636 Added fields "Receipt Report ID" and "Receipt Report Caption"
-    // NPR5.39/BR  /20180214 CASE 304312 Renamed field "Receipt Report ID" and "Receipt Report Caption" to "Audit Roll Report ID" and "Audit Roll Report Caption", and added fields "POS Entry Report ID" and "POS Entry Report Caption"
-    // NPR5.39/JDH /20180220 CASE 305746 Audit Roll Report Caption + POS Entry Report Caption changed to 249 characters
-    // NPR5.54/TJ  /20200303 CASE 393290 Removed fields 14 "Audit Roll Report ID", 15 "Audit Roll Report Caption", 20 "POS Entry Report ID" and 21 "POS Entry Report Caption"
-
     Caption = 'MPOS App Setup';
     DataClassification = CustomerContent;
 
@@ -24,11 +15,13 @@ table 6059966 "NPR MPOS App Setup"
         {
             Caption = 'Payment Gateway';
             DataClassification = CustomerContent;
-            TableRelation = "NPR MPOS Payment Gateway";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore.';
+            ObsoleteTag = 'NPR MPOS App Setup table';
         }
         field(12; "Web Service Is Published"; Boolean)
         {
-            CalcFormula = Exist ("Web Service" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Exist("Web Service" WHERE("Object Type" = CONST(Codeunit),
                                                      "Service Name" = CONST('mpos_service')));
             Caption = 'Web Service Is Published';
             Editable = false;
@@ -48,6 +41,9 @@ table 6059966 "NPR MPOS App Setup"
         {
             Caption = 'Custom Web Service URL';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore.';
+            ObsoleteTag = 'NPR MPOS App Setup table';
         }
         field(18; "Receipt Source Type"; Option)
         {

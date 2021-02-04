@@ -1,12 +1,10 @@
 table 6059965 "NPR MPOS Adyen Transactions"
 {
-    // NPR5.31/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
-    // NPR5.33/NPKNAV/20170630  CASE 267203 Transport NPR5.33 - 30 June 2017
-    // NPR5.34/CLVA/20170703 CASE 280444 Upgrading MPOS functionality to transcendence
-
     Caption = 'MPOS Adyen Transactions';
     DataClassification = CustomerContent;
-
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Removing MPOS Payment Gateway';
+    ObsoleteTag = 'Removing MPOS Payment Gateway';
     fields
     {
         field(1; "Transaction No."; Integer)
@@ -82,7 +80,7 @@ table 6059965 "NPR MPOS Adyen Transactions"
         {
             Caption = 'Payment Gateway';
             DataClassification = CustomerContent;
-            TableRelation = "NPR MPOS Payment Gateway";
+            ObsoleteState = Removed;
         }
         field(23; "Merchant Id"; Text[30])
         {
