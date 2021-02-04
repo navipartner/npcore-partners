@@ -112,6 +112,8 @@ page 6151244 "NPR Retail Web Manager RC"
                     ToolTip = 'Executes the Item Group Overview action';
                 }
             }
+        }
+        area(Processing){
 
             group("Setup Group")
             {
@@ -218,6 +220,7 @@ page 6151244 "NPR Retail Web Manager RC"
                 group(Lists)
                 {
                     Caption = 'Lists';
+                    Image = List; 
                     action(Items)
                     {
                         Caption = 'Items';
@@ -279,6 +282,7 @@ page 6151244 "NPR Retail Web Manager RC"
                 group(Business2Business)
                 {
                     Caption = 'Business2Business';
+                    Image = BusinessRelation; 
                     action(DisplayGroups)
                     {
                         Caption = 'Display Group';
@@ -303,6 +307,7 @@ page 6151244 "NPR Retail Web Manager RC"
                 group(OrderProcessing)
                 {
                     Caption = 'Order Processing';
+                    Image = Order; 
                     action(Contacts)
                     {
                         Caption = 'Contacts';
@@ -338,6 +343,8 @@ page 6151244 "NPR Retail Web Manager RC"
                 }
                 group(Tasks)
                 {
+                    Caption = 'Tasks';
+                    Image = Task; 
                     action(ImportList)
                     {
                         Caption = 'Import List';
@@ -380,6 +387,8 @@ page 6151244 "NPR Retail Web Manager RC"
                 }
                 group(Archive)
                 {
+                    Caption = 'Archive';
+                    Image = Archive; 
                     action(PostedSalesInv)
                     {
                         Caption = 'Posted Sales Invoices';
@@ -404,7 +413,7 @@ page 6151244 "NPR Retail Web Manager RC"
                 action(NaviConnectSetupAction)
                 {
                     Caption = 'NaviConnect Setup';
-                    Image = List;
+                    Image = Setup;
                     RunObject = page "NPR Nc Setup";
                     ApplicationArea = All;
                     ToolTip = 'Executes the NaviConnect Setup action';
@@ -412,7 +421,7 @@ page 6151244 "NPR Retail Web Manager RC"
                 action(NpXmlSetup)
                 {
                     Caption = 'NpXml Setup';
-                    Image = List;
+                    Image = Setup;
                     RunObject = page "NPR NpXml Setup";
                     ApplicationArea = All;
                     ToolTip = 'Executes the NpXml Setup action';
@@ -429,7 +438,7 @@ page 6151244 "NPR Retail Web Manager RC"
                 action(TaskSetup)
                 {
                     Caption = 'Task Setup';
-                    Image = List;
+                    Image = Setup;
                     RunObject = page "NPR NpXml Setup";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Task Setup action';
