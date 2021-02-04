@@ -567,9 +567,11 @@ codeunit 6014545 "NPR RP Blaster CPL Device Lib."
 
     procedure LatinConvert(Input: Text[1024]) Output: Text[1024]
     var
-        ToTxt: Label 'ÈÛ¹ÉßÄ®ÃÙÚ²â¿', Locked = true;
-        FromTxt: Label '‘›†’«Ž™š‚ÔŠ', Locked = true;
+        ToTxt: Text;
+        FromTxt: Text;
     begin
+        FromTxt := '‘›†’«Ž™š‚ÔŠ';
+        ToTxt := 'ÈÛ¹ÉßÄ®ÃÙÚ²â¿';
         Output := ConvertStr(Input, FromTxt, ToTxt);
     end;
     #endregion
