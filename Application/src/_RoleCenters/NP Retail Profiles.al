@@ -25,15 +25,6 @@ profile "NPR WEB MANAGER"
     Enabled = true;
     Promoted = false;
 }
-profile "NPR MANAGER"
-{
-    Description = 'NP Retail Manager';
-    Caption = 'NP Retail Manager';
-    ProfileDescription = '';
-    RoleCenter = "NPR Retail: Manager RoleCenter";
-    Enabled = true;
-    Promoted = false;
-}
 profile "NPR ENTERTAINMENT"
 {
     Description = 'NP Retail Entertainment';
