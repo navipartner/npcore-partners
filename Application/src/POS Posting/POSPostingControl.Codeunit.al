@@ -10,14 +10,13 @@ codeunit 6150637 "NPR POS Posting Control"
     procedure AutomaticPostPeriodRegister(var POSPeriodRegister: Record "NPR POS Period Register")
     var
         POSEntry: Record "NPR POS Entry";
-        NPRetailSetup: Record "NPR NP Retail Setup";
         POSPostingProfile: Record "NPR POS Posting Profile";
+        POSUnit: Record "NPR POS Unit";
         ItemPost: Boolean;
         POSPost: Boolean;
         SessionNo: Integer;
     begin
-        NPRetailSetup.Get;
-        NPRetailSetup.GetPostingProfile(POSPeriodRegister."POS Unit No.", POSPostingProfile);
+        POSUnit.GetPostingProfile(POSPeriodRegister."POS Unit No.", POSPostingProfile);
         case POSPostingProfile."Automatic Item Posting" of
             POSPostingProfile."Automatic Item Posting"::No,
           POSPostingProfile."Automatic Item Posting"::AfterSale:
@@ -62,12 +61,12 @@ codeunit 6150637 "NPR POS Posting Control"
     var
         NPRetailSetup: Record "NPR NP Retail Setup";
         POSPostingProfile: Record "NPR POS Posting Profile";
+        POSUnit: Record "NPR POS Unit";
         ItemPost: Boolean;
         POSPost: Boolean;
         SessionNo: Integer;
     begin
-        NPRetailSetup.Get;
-        NPRetailSetup.GetPostingProfile(POSEntry."POS Unit No.", POSPostingProfile);
+        POSUnit.GetPostingProfile(POSEntry."POS Unit No.", POSPostingProfile);
         ItemPost := (POSPostingProfile."Automatic Item Posting" = POSPostingProfile."Automatic Item Posting"::AfterSale);
         POSPost := (POSPostingProfile."Automatic POS Posting" = POSPostingProfile."Automatic POS Posting"::AfterSale);
         if POSPostingProfile."Automatic Posting Method" = POSPostingProfile."Automatic Posting Method"::Direct then begin

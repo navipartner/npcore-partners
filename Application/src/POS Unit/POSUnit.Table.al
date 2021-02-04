@@ -1,29 +1,5 @@
 table 6150615 "NPR POS Unit"
 {
-    // NPR5.29/AP/20170126 CASE 261728 Recreated ENU-captions
-    // NPR5.30/AP/20170209 CASE 261728 Renamed field "Store Code" -> "POS Store Code"
-    //                                 Added field 11 "Default POS Payment Bin"
-    // NPR5.36/JDH /20171003 CASE ?????? someone added field Status
-    // NPR5.37/TSA /20171024 CASE 293905 Added field Lock Timeout
-    // NPR5.38/BR  /20171124 CASE 297087 Changed Initvalue of Status field to CLOSED
-    // NPR5.45/MHA /20180803 CASE 323705 Added fields 300, 305, 310 to enable overload of Item Price functionality
-    // NPR5.45/MHA /20180814 CASE 319706 Added field 200 Ean Box Sales Setup
-    // NPR5.45/TJ  /20180809 CASE 323728 New field Kiosk Mode Unlock PIN
-    // NPR5.45/MHA /20180820 CASE 321266 Added field 205 "POS Sales Workflow Set"
-    // NPR5.48/MMV /20181026 CASE 318028 French certification
-    // NPR5.49/TJ  /20181115 CASE 335739 New field "POS View Profile"
-    // NPR5.49/TSA /20190311 CASE 348458 New field "EOD Managed by POS Unit"
-    // NPR5.51/SARA/20190823 CASE 363578 New field 'SMS Profile'
-    // NPR5.52/ALPO/20190923 CASE 365326 New field "POS Posting Profile" (Posting related fields moved to POS Posting Profiles from NP Retail Setup)
-    // NPR5.52/SARA/20190924 CASE 368395 Delete field 'SMS Profile'(SMS profile move to POS End of Day Profile)
-    // NPR5.52/MHA /20191016 CASE 371388 Field 400 "Global POS Sales Setup" moved from Np Retail Setup to POS Unit
-    // NPR5.53/ALPO/20191021 CASE 371956 Dimensions: POS Store & POS Unit integration
-    // NPR5.54/BHR /20200210 CASE 389444 Create field 'POS Unit Receipt Text Profile'
-    // NPR5.54/TSA /20200219 CASE 391850 Added "POS Named Actions Profile"
-    // NPR5.54/TSA /20200221 CASE 392247 Added "POS Type"
-    // NPR5.55/ZESO/20200603 CASE 407613 Added "POS Unit Serial No"
-    // NPR5.55/ALPO/20200730 CASE 414938 POS Store/POS Unit - Restaurant link (added "POS Restaurant Profile")
-
     Caption = 'POS Unit';
     DataClassification = CustomerContent;
     DataCaptionFields = "No.", Name;
@@ -98,11 +74,7 @@ table 6150615 "NPR POS Unit"
             var
                 POSSetup: Record "NPR POS Setup";
             begin
-                //-NPR5.54 [391850]
-                // POSSetup.GET ();
                 POSSetup.Get("POS Named Actions Profile");
-                //+NPR5.54 [391850]
-
                 if ("Lock Timeout" <> "Lock Timeout"::NEVER) then
                     POSSetup.TestField("Lock POS Action Code");
             end;
@@ -146,7 +118,6 @@ table 6150615 "NPR POS Unit"
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NPR5.45 [323705]
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
                 EventSubscription.SetRange("Publisher Object ID", GetPublisherCodeunitId());
                 EventSubscription.SetRange("Published Function", GetPublisherFunction());
@@ -155,14 +126,12 @@ table 6150615 "NPR POS Unit"
 
                 "Item Price Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
                 "Item Price Function" := EventSubscription."Subscriber Function";
-                //+NPR5.45 [323705]
             end;
 
             trigger OnValidate()
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NPR5.45 [323705]
                 if "Item Price Codeunit ID" = 0 then begin
                     "Item Price Function" := '';
                     exit;
@@ -175,12 +144,11 @@ table 6150615 "NPR POS Unit"
                 if "Item Price Function" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Item Price Function");
                 EventSubscription.FindFirst;
-                //+NPR5.45 [323705]
             end;
         }
         field(305; "Item Price Codeunit Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
                                                              "Object ID" = FIELD("Item Price Codeunit ID")));
             Caption = 'Item Price Codeunit Name';
             Description = 'NPR5.45';
@@ -197,7 +165,6 @@ table 6150615 "NPR POS Unit"
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NPR5.45 [323705]
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
                 EventSubscription.SetRange("Publisher Object ID", GetPublisherCodeunitId());
                 EventSubscription.SetRange("Published Function", GetPublisherFunction());
@@ -206,14 +173,12 @@ table 6150615 "NPR POS Unit"
 
                 "Item Price Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
                 "Item Price Function" := EventSubscription."Subscriber Function";
-                //+NPR5.45 [323705]
             end;
 
             trigger OnValidate()
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NPR5.45 [323705]
                 if "Item Price Function" = '' then begin
                     "Item Price Codeunit ID" := 0;
                     exit;
@@ -226,7 +191,6 @@ table 6150615 "NPR POS Unit"
                 if "Item Price Function" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Item Price Function");
                 EventSubscription.FindFirst;
-                //+NPR5.45 [323705]
             end;
         }
         field(400; "Global POS Sales Setup"; Code[10])
@@ -261,6 +225,7 @@ table 6150615 "NPR POS Unit"
             DataClassification = CustomerContent;
             Description = 'NPR5.52';
             TableRelation = "NPR POS Posting Profile";
+            NotBlank = true;
         }
         field(540; "POS Unit Receipt Text Profile"; Code[20])
         {
@@ -304,16 +269,14 @@ table 6150615 "NPR POS Unit"
 
     trigger OnDelete()
     begin
-        DimMgt.DeleteDefaultDim(DATABASE::"NPR POS Unit", "No.");  //NPR5.53 [371956]
+        DimMgt.DeleteDefaultDim(DATABASE::"NPR POS Unit", "No.");
     end;
 
     trigger OnInsert()
     begin
-        //-NPR5.53 [371956]
         DimMgt.UpdateDefaultDim(
           DATABASE::"NPR POS Unit", "No.",
           "Global Dimension 1 Code", "Global Dimension 2 Code");
-        //+NPR5.53 [371956]
     end;
 
     var
@@ -328,16 +291,21 @@ table 6150615 "NPR POS Unit"
 
     local procedure GetPublisherCodeunitId(): Integer
     begin
-        //-NPR5.45 [323705]
         exit(CODEUNIT::"NPR POS Sales Price Calc. Mgt.");
-        //+NPR5.45 [323705]
     end;
 
     local procedure GetPublisherFunction(): Text
     begin
-        //-NPR5.45 [323705]
         exit('OnFindItemPrice');
-        //+NPR5.45 [323705]
+    end;
+
+    procedure GetPostingProfile(POSUnitNo: Code[10]; var POSPostingProfile: Record "NPR POS Posting Profile")
+    var
+        POSUnit: Record "NPR POS Unit";
+    begin
+        POSUnit.Get(POSUnitNo);
+        POSUnit.TestField("POS Posting Profile");
+        POSPostingProfile.Get(POSUnit."POS Posting Profile");
     end;
 }
 

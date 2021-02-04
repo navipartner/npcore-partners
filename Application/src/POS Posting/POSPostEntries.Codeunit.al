@@ -1167,15 +1167,14 @@ codeunit 6150615 "NPR POS Post Entries"
 
     local procedure GetPOSPostingProfile(var POSEntry: Record "NPR POS Entry"; var POSPostingProfile: Record "NPR POS Posting Profile")
     var
-        NPRetailSetup: Record "NPR NP Retail Setup";
+        POSUnit: Record "NPR POS Unit";
         POSEntry2: Record "NPR POS Entry";
     begin
-        NPRetailSetup.Get();
         POSEntry2.Copy(POSEntry);
         if POSEntry2."POS Unit No." = '' then
             if not POSEntry2.FindFirst() then
                 POSEntry2.Init();
-        NPRetailSetup.GetPostingProfile(POSEntry2."POS Unit No.", POSPostingProfile);
+        POSUnit.GetPostingProfile(POSEntry2."POS Unit No.", POSPostingProfile);
     end;
 
     local procedure MarkPOSEntries(OptStatus: Option Posted,Error; POSPostingLogEntryNo: Integer; var POSEntry: Record "NPR POS Entry"; var POSEntryWithError: Record "NPR POS Entry")

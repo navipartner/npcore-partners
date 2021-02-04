@@ -168,6 +168,7 @@ codeunit 85006 "NPR POS Payment Tests"
 
     procedure InitializeData()
     var
+        POSPostingProfile: Record "NPR POS Posting Profile";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryEFT: Codeunit "NPR Library - EFT";
     begin
@@ -179,9 +180,9 @@ codeunit 85006 "NPR POS Payment Tests"
 
         if not _Initialized then begin
             NPRLibraryPOSMasterData.CreatePOSSetup(_POSSetup);
-            NPRLibraryPOSMasterData.CreateDefaultPostingSetup();
+            NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
             NPRLibraryPOSMasterData.CreatePOSStore(_POSStore);
-            NPRLibraryPOSMasterData.CreatePOSUnit(_POSUnit, _POSStore.Code);
+            NPRLibraryPOSMasterData.CreatePOSUnit(_POSUnit, _POSStore.Code, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreatePOSPaymentMethod(_POSPaymentMethod, _POSPaymentMethod."Processing Type"::CASH, '', false);
             _Initialized := true;
         end;

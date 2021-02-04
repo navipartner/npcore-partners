@@ -4,15 +4,14 @@ codeunit 6150639 "NPR POS AutoPost PeriodRegist."
 
     trigger OnRun()
     var
-        POSPostingControl: Codeunit "NPR POS Posting Control";
-        NPRetailSetup: Record "NPR NP Retail Setup";
+        POSUnit: Record "NPR POS Unit";
         POSEntry: Record "NPR POS Entry";
         POSPostingProfile: Record "NPR POS Posting Profile";
+        POSPostingControl: Codeunit "NPR POS Posting Control";
         ItemPost: Boolean;
         POSPost: Boolean;
     begin
-        NPRetailSetup.Get;
-        NPRetailSetup.GetPostingProfile("POS Unit No.", POSPostingProfile);
+        POSUnit.GetPostingProfile(Rec."POS Unit No.", POSPostingProfile);
         ItemPost := (POSPostingProfile."Automatic Item Posting" = POSPostingProfile."Automatic Item Posting"::AfterSale);
         POSPost := (POSPostingProfile."Automatic POS Posting" = POSPostingProfile."Automatic POS Posting"::AfterSale);
         POSEntry.SetRange(POSEntry."POS Period Register No.", "No.");

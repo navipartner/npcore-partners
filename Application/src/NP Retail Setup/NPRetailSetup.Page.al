@@ -51,11 +51,6 @@ page 6150613 "NPR NP Retail Setup"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Advanced Posting Activated field';
                 }
-                field("Default POS Posting Profile"; "Default POS Posting Profile")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Default POS Posting Profile field';
-                }
             }
         }
     }
