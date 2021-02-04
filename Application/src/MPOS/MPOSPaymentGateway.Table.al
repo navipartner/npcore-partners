@@ -5,8 +5,9 @@ table 6059967 "NPR MPOS Payment Gateway"
 
     Caption = 'MPOS Payment Gateway';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR MPOS Payment Gateway";
-    LookupPageID = "NPR MPOS Payment Gateway";
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Removing MPOS Payment Gateway';
+    ObsoleteTag = 'Removing MPOS Payment Gateway';
 
     fields
     {

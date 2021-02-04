@@ -1,14 +1,10 @@
 table 6059968 "NPR MPOS Nets Transactions"
 {
-    // NPR5.33/NPKNAV/20170630  CASE 267203 Transport NPR5.33 - 30 June 2017
-    // NPR5.34/CLVA/20170703 CASE 280444 Upgrading MPOS functionality to transcendence
-    // NPR5.51/CLVA/20190808 CASE 364011 Added field "EFT Transaction Entry No."
-
     Caption = 'MPOS Nets Transactions';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR MPOS Nets Trx List";
-    LookupPageID = "NPR MPOS Nets Trx List";
-
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Removing MPOS Payment Gateway';
+    ObsoleteTag = 'Removing MPOS Payment Gateway';
     fields
     {
         field(1; "Transaction No."; Integer)
@@ -84,7 +80,7 @@ table 6059968 "NPR MPOS Nets Transactions"
         {
             Caption = 'Payment Gateway';
             DataClassification = CustomerContent;
-            TableRelation = "NPR MPOS Payment Gateway";
+            ObsoleteState = Removed;
         }
         field(23; "Merchant Id"; Text[30])
         {
