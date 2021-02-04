@@ -736,18 +736,17 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                 ApplicationArea = All;
                 ToolTip = 'Executes the MPOS App Setup action';
                 }
-                group("CS Setup")
+                
+                    
+                action("AF Setup")
                 {
-                    Caption = 'Setup';
-                    action("AF Setup")
-                    {
-                    Caption = 'AF Setup';
-                    RunObject = page "NPR AF Setup";
-                    Image = Setup;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the AF Setup action';
-                    }
+                Caption = 'Azure Setup';
+                RunObject = page "NPR AF Setup";
+                Image = Setup;
+                ApplicationArea = All;
+                ToolTip = 'Executes the AF Setup action';
                 }
+                
             }
             group("Posting Setup")
             {
