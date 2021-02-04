@@ -355,20 +355,6 @@ codeunit 6151006 "NPR POS Quote Mgt."
         exit(false);
     end;
 
-    [Obsolete('Please use native Business Central objects instead of dotnet classes.')]
-    procedure LoadPOSSaleData(POSQuoteEntry: Record "NPR POS Quote Entry"; var XmlDoc: DotNet "NPRNetXmlDocument"): Boolean
-    var
-        InStr: InStream;
-    begin
-        if not POSQuoteEntry."POS Sales Data".HasValue then
-            exit(false);
-        POSQuoteEntry.CalcFields("POS Sales Data");
-        POSQuoteEntry."POS Sales Data".CreateInStream(InStr, TEXTENCODING::UTF8);
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.Load(InStr);
-        exit(not IsNull(XmlDoc));
-    end;
-
     procedure LoadPOSSaleData(POSQuoteEntry: Record "NPR POS Quote Entry"; var XmlDoc: XmlDocument): Boolean
     var
         InStr: InStream;
@@ -378,19 +364,6 @@ codeunit 6151006 "NPR POS Quote Mgt."
         POSQuoteEntry.CalcFields("POS Sales Data");
         POSQuoteEntry."POS Sales Data".CreateInStream(InStr, TEXTENCODING::UTF8);
         exit(XmlDocument.ReadFrom(InStr, XmlDoc));
-    end;
-
-    [Obsolete('Please use native Business Central objects instead of dotnet classes.')]
-    procedure Xml2POSSale(var XmlDoc: DotNet "NPRNetXmlDocument"; var SalePOS: Record "NPR Sale POS")
-    var
-        Xml: Text;
-        BCXmlDoc: XmlDocument;
-    begin
-        XmlDocument.ReadFrom(XmlDoc.InnerXml, BCXmlDoc);
-        Xml2POSSale(BCXmlDoc, SalePOS);
-        BCXmlDoc.WriteTo(Xml);
-        XmlDoc := XmlDoc.XmlDocument();
-        XmlDoc.LoadXml(Xml);
     end;
 
     procedure Xml2POSSale(var XmlDoc: XmlDocument; var SalePOS: Record "NPR Sale POS")
@@ -714,36 +687,20 @@ codeunit 6151006 "NPR POS Quote Mgt."
         TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        StreamReader: DotNet NPRNetStreamReader;
         POSSalesData: Text;
         InStr: InStream;
         Path: Text;
+        XmlDoc: XmlDocument;
     begin
         if not POSQuoteEntry."POS Sales Data".HasValue then
             exit;
 
         POSQuoteEntry.CalcFields("POS Sales Data");
-        if IsWebClient() then begin
-            POSQuoteEntry."POS Sales Data".CreateInStream(InStr);
-            StreamReader := StreamReader.StreamReader(InStr);
-            POSSalesData := StreamReader.ReadToEnd();
-            POSSalesData := NpXmlDomMgt.PrettyPrintXml(POSSalesData);
-            Message(POSSalesData);
-            exit;
-        end;
-
-        TempBlob.FromRecord(POSQuoteEntry, POSQuoteEntry.FieldNo("POS Sales Data"));
-        Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + POSQuoteEntry."Sales Ticket No." + '.xml', false);
-        HyperLink(Path);
-    end;
-
-    local procedure IsWebClient(): Boolean
-    var
-        ActiveSession: Record "Active Session";
-    begin
-        if ActiveSession.Get(ServiceInstanceId, SessionId) then
-            exit(ActiveSession."Client Type" = ActiveSession."Client Type"::"Web Client");
-        exit(false);
+        POSQuoteEntry."POS Sales Data".CreateInStream(InStr);
+        XmlDocument.ReadFrom(InStr, XmlDoc);
+        XmlDoc.WriteTo(POSSalesData);
+        POSSalesData := NpXmlDomMgt.PrettyPrintXml(POSSalesData);
+        Message(POSSalesData);
     end;
 
     local procedure OnPOSSale2Xml(SalePOS: Record "NPR Sale POS"; XmlRoot: XmlElement)
