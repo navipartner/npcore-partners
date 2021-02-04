@@ -1,5 +1,21 @@
 codeunit 6150700 "NPR POS Session"
 {
+    // This object is used to manage session state for a POS session.
+    // 
+    // Some very important information:
+    // - It must never ever ever be set to SingleInstance=Yes. Never. Did I say never? Good. So - never.
+    // - In Transcendence, there should be no single-instance codeunits at all. If you ever feel like creating one,
+    //   please talk to me (Vjeko), and let's discuss.
+    // - An instance of this codeunit is created by the POS page, and one (and only one) instance of this codeunit
+    //   belongs to an instance of the POS page. Once the page closes, the codeunit instance dies.
+    // - One of the primary goals of this codeunit is to contain the reference to the Framework control add-in and to
+    //   allow other codeunits to talk to the JavaScript. Therefore, the variable of this codeunit type must be passed
+    //   to all functions that may have anything to do with front end. This is no problem, because all events that are
+    //   ever sent from the front end pass the instance to this codeunit as a part of the event signature, and then
+    //   any event subscribers should make sure to pass this instance around.
+    // - Never keep a global variable of this codeunit type. It should only be locals and parameters. No globals.
+    // - No business logic belongs in here. This is infrastructure only.
+
     EventSubscriberInstance = Manual;
 
     var
@@ -163,10 +179,11 @@ codeunit 6150700 "NPR POS Session"
     end;
 
     procedure InitializeSessionId(HardwareIdIn: Text; SessionNameIn: Text; HostNameIn: Text)
+    var
+        HardwareIdInErr: Label 'Hardware ID from front end is blank. This is a programming error.';
     begin
         if HardwareIdIn = '' then
-            Error('Hardware ID from front end is blank. This is a programming error.');
-
+            Error(HardwareIdInErr);
         HardwareId := HardwareIdIn;
         SessionName := SessionNameIn;
         HostName := HostNameIn;
@@ -319,7 +336,6 @@ codeunit 6150700 "NPR POS Session"
 
     procedure RetrieveActionStateSafe("Key": Text; var "Object": Variant): Boolean
     begin
-
         if ActionState.ContainsKey(Key) then begin
             RetrieveActionState(Key, Object);
             exit(true);
@@ -581,14 +597,15 @@ codeunit 6150700 "NPR POS Session"
     end;
 
     procedure ChangeViewRestaurant()
+    var
+        RestViewNotSupportedErr: Label 'Restaurant view is not supported in this version. Change the setup on the POS View Profile. The default view is selected.';
     begin
-
         if (IsDragonglassSession()) then begin
-            Error('FrontEnd.RestaurantView() missing');
+            FrontEnd.RestaurantView(Setup);
             exit;
         end;
 
-        Message('Restaurant view is not supported in this version. Change the setup on the POS View Profile. The default view is selected.');
+        Message(RestViewNotSupportedErr);
         ChangeViewSale();
     end;
 

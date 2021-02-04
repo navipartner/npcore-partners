@@ -207,19 +207,6 @@ page 6150661 "NPR NPRE Waiter Pad Subform"
                     Visible = false;
                     ToolTip = 'Specifies the value of the Amount Incl. VAT field';
                 }
-                field("Meal Flow"; Rec."Meal Flow")
-                {
-                    ApplicationArea = All;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Meal Flow field';
-                }
-                field("Meal Flow Description"; Rec."Meal Flow Description")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Meal Flow Description field';
-                }
                 field("Line Status"; Rec."Line Status")
                 {
                     ApplicationArea = All;

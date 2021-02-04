@@ -56,6 +56,11 @@ table 6150673 "NPR NPRE Serv.Flow Profile"
                 end;
             end;
         }
+        field(50; "Only if Fully Paid"; Boolean)
+        {
+            Caption = 'Only if Fully Paid';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

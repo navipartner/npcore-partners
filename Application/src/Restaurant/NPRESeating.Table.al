@@ -83,15 +83,13 @@ table 6150665 "NPR NPRE Seating"
         }
         field(100; "Current Waiter Pad FF"; Code[20])
         {
-            CalcFormula = Lookup("NPR NPRE Seat.: WaiterPadLink"."Waiter Pad No." WHERE("Seating Code" = FIELD(Code),
-                                                                                          Closed = CONST(false)));
+            CalcFormula = Lookup("NPR NPRE Seat.: WaiterPadLink"."Waiter Pad No." WHERE("Seating Code" = FIELD(Code), Closed = CONST(false)));
             Caption = 'Current Waiter Pad';
             FieldClass = FlowField;
         }
         field(101; "Multiple Waiter Pad FF"; Integer)
         {
-            CalcFormula = Count("NPR NPRE Seat.: WaiterPadLink" WHERE("Seating Code" = FIELD(Code),
-                                                                        Closed = CONST(false)));
+            CalcFormula = Count("NPR NPRE Seat.: WaiterPadLink" WHERE("Seating Code" = FIELD(Code), Closed = CONST(false)));
             Caption = 'Multiple Waiter Pad';
             FieldClass = FlowField;
         }
@@ -110,8 +108,12 @@ table 6150665 "NPR NPRE Seating"
     }
 
     trigger OnDelete()
+    var
+        LocationLayout: Record "NPR NPRE Location Layout";
     begin
         DimMgt.DeleteDefaultDim(DATABASE::"NPR NPRE Seating", Code);
+        if LocationLayout.Get("Code") then
+            LocationLayout.Delete();
     end;
 
     trigger OnInsert()
@@ -127,18 +129,26 @@ table 6150665 "NPR NPRE Seating"
         UpdateCurrentWaiterPadDescription;
     end;
 
+    trigger OnRename()
+    var
+        LocationLayout: Record "NPR NPRE Location Layout";
+    begin
+        if LocationLayout.Get(xRec.Code) then
+            LocationLayout.Rename(Rec.Code);
+    end;
+
     var
         DimMgt: Codeunit DimensionManagement;
 
     procedure UpdateCurrentWaiterPadDescription()
     var
-        NPHSeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
+        SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
     begin
         CalcFields("Current Waiter Pad FF");
         if "Current Waiter Pad FF" <> '' then begin
-            if NPHSeatingWaiterPadLink.Get(Code, "Current Waiter Pad FF") then begin
-                NPHSeatingWaiterPadLink.CalcFields("Waiter Pad Description FF");
-                "Current Waiter Pad Description" := NPHSeatingWaiterPadLink."Waiter Pad Description FF";
+            if SeatingWaiterPadLink.Get(Code, "Current Waiter Pad FF") then begin
+                SeatingWaiterPadLink.CalcFields("Waiter Pad Description FF");
+                "Current Waiter Pad Description" := SeatingWaiterPadLink."Waiter Pad Description FF";
             end;
         end;
     end;

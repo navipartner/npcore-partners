@@ -70,7 +70,7 @@ table 6150660 "NPR NPRE Waiter Pad"
         }
         field(31; "Status Description FF"; Text[50])
         {
-            CalcFormula = Lookup("NPR NPRE Flow Status".Description WHERE(Code = FIELD(Status)));
+            CalcFormula = Lookup("NPR NPRE Flow Status".Description WHERE(Code = FIELD(Status), "Status Object" = CONST(WaiterPad)));
             Caption = 'Status Description';
             Editable = false;
             FieldClass = FlowField;
@@ -85,13 +85,11 @@ table 6150660 "NPR NPRE Waiter Pad"
         {
             Caption = 'Billed Number of Guests';
             DataClassification = CustomerContent;
-            Description = 'NPR5.53';
         }
         field(42; "No. of Guests on POS Sales"; Integer)
         {
             CalcFormula = Sum("NPR Sale POS"."NPRE Number of Guests" WHERE("NPRE Pre-Set Waiter Pad No." = FIELD("No.")));
             Caption = 'No. of Guests on POS Sales';
-            Description = 'NPR5.55';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -99,14 +97,31 @@ table 6150660 "NPR NPRE Waiter Pad"
         {
             Caption = 'Serving Step Code';
             DataClassification = CustomerContent;
-            Description = 'NPR5.53';
             TableRelation = "NPR NPRE Flow Status".Code WHERE("Status Object" = CONST(WaiterPadLineMealFlow));
+            trigger OnValidate()
+            var
+                ServingStep: Record "NPR NPRE Flow Status";
+                WPStatus: Record "NPR NPRE Flow Status";
+                WPStatusNew: Record "NPR NPRE Flow Status";
+                UpdateStatus: Boolean;
+            begin
+                if ServingStep.Get("Serving Step Code", ServingStep."Status Object"::WaiterPadLineMealFlow) then
+                    if ServingStep."Waiter Pad Status Code" <> '' then begin
+                        UpdateStatus := Status = '';
+                        if not UpdateStatus then begin
+                            WPStatus.Get(Status, WPStatus."Status Object"::WaiterPad);
+                            WPStatusNew.Get(ServingStep."Waiter Pad Status Code", WPStatusNew."Status Object"::WaiterPad);
+                            UpdateStatus := WPStatusNew."Flow Order" >= WPStatus."Flow Order";
+                        end;
+                        if UpdateStatus then
+                            Validate(Status, ServingStep."Waiter Pad Status Code");
+                    end;
+            end;
         }
         field(51; "Serving Step Description"; Text[50])
         {
-            CalcFormula = Lookup("NPR NPRE Flow Status".Description WHERE(Code = FIELD("Serving Step Code")));
+            CalcFormula = Lookup("NPR NPRE Flow Status".Description WHERE(Code = FIELD("Serving Step Code"), "Status Object" = CONST(WaiterPadLineMealFlow)));
             Caption = 'Serving Step Description';
-            Description = 'NPR5.53';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -114,14 +129,12 @@ table 6150660 "NPR NPRE Waiter Pad"
         {
             Caption = 'Last Req. Serving Step Code';
             DataClassification = CustomerContent;
-            Description = 'NPR5.53';
             TableRelation = "NPR NPRE Flow Status".Code WHERE("Status Object" = CONST(WaiterPadLineMealFlow));
         }
         field(53; "Last Req. Serving Step Descr."; Text[50])
         {
-            CalcFormula = Lookup("NPR NPRE Flow Status".Description WHERE(Code = FIELD("Last Req. Serving Step Code")));
+            CalcFormula = Lookup("NPR NPRE Flow Status".Description WHERE(Code = FIELD("Last Req. Serving Step Code"), "Status Object" = CONST(WaiterPadLineMealFlow)));
             Caption = 'Last Req. Serving Step Descr.';
-            Description = 'NPR5.53';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -139,7 +152,6 @@ table 6150660 "NPR NPRE Waiter Pad"
         {
             Caption = 'Pre-receipt Printed';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
         }
         field(100; "Print Category Filter"; Code[20])
         {
@@ -186,25 +198,37 @@ table 6150660 "NPR NPRE Waiter Pad"
         end;
     end;
 
-    local procedure OnDeleteWaiterPad(var NPHWaiterPad: Record "NPR NPRE Waiter Pad")
+    local procedure OnDeleteWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad")
     var
-        NPHWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
-        NPHSeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         POSInfoWaiterPadLink: Record "NPR POS Info NPRE Waiter Pad";
     begin
-        if not (NPHWaiterPad."No." <> '') then exit;
+        if WaiterPad."No." = '' then
+            exit;
 
-        NPHWaiterPadLine.Reset;
-        NPHWaiterPadLine.SetRange("Waiter Pad No.", NPHWaiterPad."No.");
-        if not NPHWaiterPadLine.IsEmpty then
-            NPHWaiterPadLine.DeleteAll(true);
+        WaiterPadLine.Reset;
+        WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
+        if not WaiterPadLine.IsEmpty then
+            WaiterPadLine.DeleteAll(true);
 
-        NPHSeatingWaiterPadLink.Reset;
-        NPHSeatingWaiterPadLink.SetFilter("Waiter Pad No.", '=%1', NPHWaiterPad."No.");
-        if not NPHSeatingWaiterPadLink.IsEmpty then NPHSeatingWaiterPadLink.DeleteAll;
+        SeatingWaiterPadLink.Reset;
+        SeatingWaiterPadLink.SetRange("Waiter Pad No.", WaiterPad."No.");
+        if not SeatingWaiterPadLink.IsEmpty then
+            SeatingWaiterPadLink.DeleteAll;
 
-        POSInfoWaiterPadLink.SetRange("Waiter Pad No.", NPHWaiterPad."No.");
+        POSInfoWaiterPadLink.SetRange("Waiter Pad No.", WaiterPad."No.");
         if not POSInfoWaiterPadLink.IsEmpty then
             POSInfoWaiterPadLink.DeleteAll;
+    end;
+
+    procedure CloseWaiterPad()
+    var
+        WaiterPadManagement: Codeunit "NPR NPRE Waiter Pad Mgt.";
+        ConfirmCloseQst: Label 'Once closed, you wouldn''t be able to reopen the waiter pad again.\Are you sure you want to continue and close the waiter pad %1?';
+    begin
+        if not Confirm(ConfirmCloseQst, false, Rec."No.") then
+            exit;
+        WaiterPadManagement.CloseWaiterPad(Rec, true);
     end;
 }

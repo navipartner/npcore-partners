@@ -68,6 +68,18 @@ page 6150633 "NPR NPRE Select Flow Status"
                         AssignPrintCategories;
                     end;
                 }
+                field(Color; Rec.Color)
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                    Visible = false;
+                }
+                field("Icon Class"; Rec."Icon Class")
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                    Visible = false;
+                }
             }
         }
     }
@@ -84,7 +96,7 @@ page 6150633 "NPR NPRE Select Flow Status"
                     Enabled = PrintCategoriesEnabled;
                     Image = CoupledOrder;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = ShowPrintCategories;

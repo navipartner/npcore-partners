@@ -37,6 +37,11 @@ page 6150679 "NPR NPRE Flow Statuses"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Flow Order field';
                 }
+                field("Waiter Pad Status Code"; Rec."Waiter Pad Status Code")
+                {
+                    ApplicationArea = All;
+                    Visible = IsServingSteps;
+                }
                 field(AssignedPrintCategories; Rec.AssignedPrintCategoriesAsFilterString())
                 {
                     ApplicationArea = All;
@@ -48,6 +53,18 @@ page 6150679 "NPR NPRE Flow Statuses"
                     begin
                         AssignPrintCategories;
                     end;
+                }
+                field("Available in Front-End"; Rec."Available in Front-End")
+                {
+                    ApplicationArea = All;
+                }
+                field(Color; Rec.Color)
+                {
+                    ApplicationArea = All;
+                }
+                field("Icon Class"; Rec."Icon Class")
+                {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -65,7 +82,7 @@ page 6150679 "NPR NPRE Flow Statuses"
                     Enabled = PrintCategoriesEnabled;
                     Image = CoupledOrder;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = ShowPrintCategories;
@@ -83,8 +100,8 @@ page 6150679 "NPR NPRE Flow Statuses"
 
     trigger OnAfterGetCurrRecord()
     begin
-        ShowPrintCategories :=
-          (Rec."Status Object" = Rec."Status Object"::WaiterPadLineMealFlow) and (ServingStepDiscoveryMethod = 0);
+        IsServingSteps := Rec."Status Object" = Rec."Status Object"::WaiterPadLineMealFlow;
+        ShowPrintCategories := IsServingSteps and (ServingStepDiscoveryMethod = 0);
         PrintCategoriesEnabled := ShowPrintCategories and (Rec.Code <> '');
     end;
 
@@ -94,22 +111,24 @@ page 6150679 "NPR NPRE Flow Statuses"
         CurrFilterGr: Integer;
     begin
         StatusObjectVisible := not CurrPage.LookupMode;
-        ServingStepDiscoveryMethod := SetupProxy.ServingStepDiscoveryMethod();
-        if ServingStepDiscoveryMethod = 0 then begin
-            ShowPrintCategories := Rec.GetFilter("Status Object") = Format(Rec."Status Object"::WaiterPadLineMealFlow);
-            if not ShowPrintCategories then begin
-                CurrFilterGr := Rec.FilterGroup;
-                if CurrFilterGr <> 2 then begin
-                    Rec.FilterGroup(2);
-                    ShowPrintCategories := Rec.GetFilter("Status Object") = Format(Rec."Status Object"::WaiterPadLineMealFlow);
-                    Rec.FilterGroup(CurrFilterGr);
-                end;
+
+        IsServingSteps := Rec.GetFilter("Status Object") = Format(Rec."Status Object"::WaiterPadLineMealFlow);
+        if not IsServingSteps then begin
+            CurrFilterGr := Rec.FilterGroup;
+            if CurrFilterGr <> 2 then begin
+                Rec.FilterGroup(2);
+                IsServingSteps := Rec.GetFilter("Status Object") = Format(Rec."Status Object"::WaiterPadLineMealFlow);
+                Rec.FilterGroup(CurrFilterGr);
             end;
         end;
+
+        ServingStepDiscoveryMethod := SetupProxy.ServingStepDiscoveryMethod();
+        ShowPrintCategories := IsServingSteps and (ServingStepDiscoveryMethod = 0);
     end;
 
     var
         ServingStepDiscoveryMethod: Integer;
+        IsServingSteps: Boolean;
         PrintCategoriesEnabled: Boolean;
         ShowPrintCategories: Boolean;
         StatusObjectVisible: Boolean;

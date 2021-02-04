@@ -11,9 +11,6 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
     //       ActionOnCancelError := ActionOnCancelError::SaveAsQuote;
     //     END;
     // 
-    // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
-    // NPR5.55/ALPO/20200720 CASE 391678 Log sale resume to POS Entry
-
 
     trigger OnRun()
     begin
@@ -90,11 +87,11 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
             end;
 
         CancelErrorText := '';
-        CancelFailed := false;  //NPR5.55 [391678]
+        CancelFailed := false;
         if ActionOption = ActionOption::CancelAndNew then begin
             ActionOption := ActionOption::" ";
             if not TryCancelSale(SalePOS, POSSession) then begin
-                CancelFailed := true;  //NPR5.55 [391678]
+                CancelFailed := true;
                 if ActionOnCancelError = ActionOnCancelError::" " then
                     ActionOnCancelError := StrMenu(SelectAction_OptionsMsg, 1, StrSubstNo(CannotCancelMsg, CancelErrorText) + '\\' + SelectAction_InstructionMsg);
                 case ActionOnCancelError of
@@ -116,8 +113,7 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
           (ActionOption = ActionOption::Resume) and ((SalePOS.Date <> Today) or (SalePOS."Register No." <> POSUnit."No."));
 
         if (ActionOption = ActionOption::SaveAsQuote) or ForceSaveAsQuote then begin
-            //POSQuoteEntryNo := DoSaveAsPOSQuote(SalePOS,ForceSaveAsQuote OR SkipDialog);  //NPR5.55 [391678]-revoked
-            POSQuoteEntryNo := DoSaveAsPOSQuote(POSSession, SalePOS, ForceSaveAsQuote or SkipDialog, CancelFailed);  //NPR5.55 [391678]
+            POSQuoteEntryNo := DoSaveAsPOSQuote(POSSession, SalePOS, ForceSaveAsQuote or SkipDialog, CancelFailed);
             if not ForceSaveAsQuote then begin
                 POSQuoteEntryNo := 0;
                 ActionOption := ActionOption::" ";
@@ -135,14 +131,12 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
         POSQuoteEntry: Record "NPR POS Quote Entry";
         POSActionSavePOSQuote: Codeunit "NPR POS Action: SavePOSQuote";
     begin
-        //-NPR5.55 [391678]
         //Do not save as POS quotes unfinished sales with no lines
         if not SalePOS.SalesLinesExist then
             SkipDialog := true
         else
-            //+NPR5.55 [391678]
             POSActionSavePOSQuote.CreatePOSQuote(SalePOS, POSQuoteEntry);
-        //-NPR5.55 [391678]
+
         if not CancelFailed then begin
             Commit;
             AltSaleCancelDescription := StrSubstNo(SaleWasParkedTxt, CurrentDateTime);
@@ -151,7 +145,6 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
         end;
         if CancelFailed then
             SalePOS.Delete(true);
-        //+NPR5.55 [391678]
         Commit;
 
         if not SkipDialog then
@@ -182,14 +175,11 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
     begin
         if not POSQuoteEntry.Get(POSQuoteEntryNo) then
             exit(false);
-        //EXIT(POSActionLoadPOSQuote.LoadFromQuote(POSQuoteEntry,SalePOS));  //NPR5.55 [391678]-revoked
-        //-NPR5.55 [391678]
         if POSActionLoadPOSQuote.LoadFromQuote(POSQuoteEntry, SalePOS) then begin
             LogSaleResume(SalePOS, POSQuoteEntry."Sales Ticket No.");
             exit(true);
         end else
             exit(false);
-        //+NPR5.55 [391678]
     end;
 
     procedure DoCancelSale(SalePOS: Record "NPR Sale POS"; POSSession: Codeunit "NPR POS Session")
@@ -202,11 +192,17 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
     local procedure TryCancelSale(SalePOS: Record "NPR Sale POS"; POSSession: Codeunit "NPR POS Session") Success: Boolean
     var
         POSTryCancelSale: Codeunit "NPR POS Try Resume&CancelSale";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         Position: Integer;
     begin
+        if SalePOS."NPRE Pre-Set Waiter Pad No." <> '' then begin
+            WaiterPadPOSMgt.ClearSaleHdrNPREPresetFields(SalePOS, true);
+            Commit;
+        end;
+
         Clear(POSTryCancelSale);
         POSTryCancelSale.Initialize(POSSession);
-        POSTryCancelSale.SetAlternativeDescription(AltSaleCancelDescription);  //NPR5.55 [391678]
+        POSTryCancelSale.SetAlternativeDescription(AltSaleCancelDescription);
         ClearLastError;
         Success := POSTryCancelSale.Run(SalePOS);
         if not Success then begin
@@ -223,17 +219,13 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
     var
         POSCreateEntry: Codeunit "NPR POS Create Entry";
     begin
-        //-NPR5.55 [391678]
         POSCreateEntry.InsertResumeSaleEntry(
           SalePOS."Register No.", SalePOS."Salesperson Code", FromTicketNo, SalePOS."Sales Ticket No.");
-        //+NPR5.55 [391678]
     end;
 
     procedure SetAlternativeCancelDescription(NewAltSaleCancelDescription: Text)
     begin
-        //-NPR5.55 [391678]
         AltSaleCancelDescription := NewAltSaleCancelDescription;
-        //+NPR5.55 [391678]
     end;
 
     [IntegrationEvent(false, false)]
@@ -241,4 +233,3 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
     begin
     end;
 }
-

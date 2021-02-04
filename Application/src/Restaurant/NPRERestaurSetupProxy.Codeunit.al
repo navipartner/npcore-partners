@@ -144,7 +144,7 @@ codeunit 6150675 "NPR NPRE Restaur. Setup Proxy"
     begin
         MakeSureIsInitialized;
         if not ServiceFlowProfileOut.Get(Restaurant."Service Flow Profile") then
-            Clear(ServiceFlowProfileOut.Code);
+            Clear(ServiceFlowProfileOut);
     end;
 
     procedure ServingStepDiscoveryMethod(): Integer

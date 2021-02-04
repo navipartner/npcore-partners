@@ -12,7 +12,6 @@ codeunit 6150664 "NPR NPRE Restaurant Print"
         NowhereToSend: Label 'Neither Kitchen Printing nor KDS is activated. You need to activate at least one of them to be able to use this functionality.';
         ServingReqestedMsg: Label 'Serving of %1 requested for seating %2 (waiter pad %3).';
         NotTempErr: Label '%1: function call on a non-temporary variable. This is a programming bug, not a user error. Please contact system vendor.';
-        ObsoleteFunctionCalledMsg: Label 'Obsolete function called: %1.\This is a programming bug, not a user error. Please contact system vendor.\Call stack:\%2';
 
     procedure PrintWaiterPadPreReceiptPressed(WaiterPad: Record "NPR NPRE Waiter Pad")
     begin
@@ -51,168 +50,6 @@ codeunit 6150664 "NPR NPRE Restaurant Print"
         NPHWaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
         exit(PrintWaiterPadLinesToKitchen(WaiterPad, NPHWaiterPadLine, PrintType, FlowStatusCode, ForceResend, ShowMsgIfNothingToSend));
     end;
-
-    #region Obsolete - PrintWaiterPadLinesToKitchen
-    [Obsolete('CU6150664-PrintWaiterPadLinesToKitchen', 'NPR5.55 [382428]')]
-    procedure "[Obsolete]PrintWaiterPadLinesToKitchen"(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLineIn: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; FlowStatusCode: Code[10]; ForceResend: Boolean; ShowNothingToSendErr: Boolean): Boolean
-    var
-        FlowStatusTmp: Record "NPR NPRE Flow Status" temporary;
-        PrintCategoryTmp: Record "NPR NPRE Print/Prod. Cat." temporary;
-        SeatingLocation: Record "NPR NPRE Seating Location";
-        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
-        WaiterPadLine2: Record "NPR NPRE Waiter Pad Line";
-        WaiterPadLineOut: Record "NPR NPRE Waiter Pad Line";
-        PrintTemplateBuffer: Record "NPR NPRE W.Pad.Line Outp.Buf." temporary;
-        KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
-        PrintCategoryFilter: Text;
-        PrintDateTime: DateTime;
-        SelectedSendOption: Option Cancel,"Only New",All;
-        OutputType: Integer;
-        AskResendConfirmation: Boolean;
-        KDSUpdated: Boolean;
-        OutputTypeIsActive: Boolean;
-    begin
-        Error(ObsoleteFunctionCalledMsg, 'CU6150664.[Obsolete]PrintWaiterPadLinesToKitchen', GetLastErrorCallstack);  //NPR5.55 [382428]
-        //-NPR5.55 [382428]-revoked
-        /*
-        SetupProxy.InitializeUsingWaiterPad(WaiterPad);
-        IF NOT (SetupProxy.KitchenPrintingActivated OR SetupProxy.KDSActivated) THEN
-          //EXIT;  //NPR5.55 [399170]-revoked
-          ERROR(NowhereToSend);  //NPR5.55 [399170]
-        
-        IF NOT ForceResend THEN BEGIN
-          AskResendConfirmation := SetupProxy.ResendAllOnNewLines = SeatingLocation."Resend All On New Lines"::Ask;
-          IF NOT AskResendConfirmation THEN
-            ForceResend := SetupProxy.ResendAllOnNewLines = SeatingLocation."Resend All On New Lines"::Yes;
-        END;
-        
-        WaiterPadLine.COPY(WaiterPadLineIn);
-        WaiterPadLine.FILTERGROUP(2);
-        WaiterPadLine.SETFILTER(Type,'<>%1',WaiterPadLine.Type::Comment);
-        WaiterPadLine.FILTERGROUP(0);
-        //WaiterPadLine.SETAUTOCALCFIELDS("No. of Print Categories","Sent to Kitchen");  //NPR5.55 [399170]-revoked
-        //-NPR5.55 [399170]/[382428]
-        WaiterPadLine.SETAUTOCALCFIELDS(
-          "No. of Print Categories", "Total No. of Print Categories", "No. of Serving Steps", "Total No. of Serving Steps",
-          "Sent to Kitchen", "Sent to Kitchen Qty. (Base)");
-        //+NPR5.55 [399170]/[382428]
-        
-        PrintTemplateBuffer.DELETEALL;
-        FlowStatusTmp.DELETEALL;
-        PrintDateTime := CURRENTDATETIME;
-        FlowStatus.SETRANGE("Status Object",FlowStatus."Status Object"::WaiterPadLineMealFlow);
-        IF FlowStatusCode <> '' THEN
-          FlowStatus.SETRANGE(Code,FlowStatusCode);
-        IF FlowStatus.FINDSET THEN
-          REPEAT
-            FlowStatusTmp := FlowStatus;
-            FlowStatusTmp.INSERT;
-          UNTIL FlowStatus.NEXT = 0;
-        IF FlowStatusCode = '' THEN BEGIN
-          FlowStatusTmp.INIT;
-          FlowStatusTmp."Status Object" := FlowStatus."Status Object"::WaiterPadLineMealFlow;
-          FlowStatusTmp.Code := '';
-          FlowStatusTmp.INSERT;
-        END;
-        
-        InitTempPrintCategoryList(PrintCategoryTmp);
-        
-        //-NPR5.55 [399170]
-        FOR OutputType := WaiterPadLine."Output Type Filter"::Print TO WaiterPadLine."Output Type Filter"::KDS DO BEGIN
-          OutputTypeIsActive :=
-            ((OutputType = WaiterPadLine."Output Type Filter"::Print) AND SetupProxy.KitchenPrintingActivated) OR
-            ((OutputType = WaiterPadLine."Output Type Filter"::KDS) AND SetupProxy.KDSActivated);
-          IF OutputTypeIsActive THEN BEGIN
-            WaiterPadLineOut.RESET;
-            WaiterPadLine.SETRANGE("Output Type Filter",OutputType);
-        //+NPR5.55 [399170]
-            IF FlowStatusTmp.FINDSET THEN
-              REPEAT
-                PrintCategoryFilter := FlowStatusTmp.AssignedPrintCategoriesAsFilterString();
-                IF (PrintCategoryFilter <> '') OR (FlowStatusTmp.Code = '') THEN BEGIN
-                  IF PrintCategoryFilter <> '' THEN
-                    PrintCategoryTmp.SETFILTER(Code,PrintCategoryFilter)
-                  ELSE
-                    PrintCategoryTmp.SETRANGE(Code,'');
-                  IF PrintCategoryTmp.FINDSET THEN
-                    REPEAT
-                      WaiterPadLine.SETRANGE("Print Category Filter",PrintCategoryTmp.Code);
-                      WaiterPadLine.SETRANGE("Serving Step Filter",FlowStatusTmp.Code);
-                      WaiterPadLine.SETRANGE("Print Type Filter",PrintType);
-                      IF WaiterPadLine.FINDSET THEN
-                        REPEAT
-                          //IF AskResendConfirmation AND NOT ForceResend AND WaiterPadLine."Sent to Kitchen" THEN BEGIN  //NPR5.55 [399170]-revoked
-                          //-NPR5.55 [399170]
-                          IF AskResendConfirmation AND NOT ForceResend AND WaiterPadLine."Sent to Kitchen" AND
-                             (WaiterPadLine."Quantity (Base)" = WaiterPadLine."Sent to Kitchen Qty. (Base)")
-                          THEN BEGIN
-                          //+NPR5.55 [399170]
-                            AskResendConfirmation := FALSE;
-                            SelectedSendOption :=
-                              STRMENU(ResendOptions,1,
-                                STRSUBSTNO(LinesHaveAlreadyBeenSent,WaiterPad.FIELDCAPTION("Serving Step Code"),FlowStatusTmp.Code,PrintCategoryTmp.TABLECAPTION,PrintCategoryTmp.Code));
-                            IF SelectedSendOption = SelectedSendOption::Cancel THEN
-                              ERROR('');
-                            ForceResend := SelectedSendOption = SelectedSendOption::All;
-                          END;
-        
-                          WaiterPadLine2.COPY(WaiterPadLine);
-                          WaiterPadLine2.SETRANGE("Print Category Filter");
-                          WaiterPadLine2.CALCFIELDS("No. of Print Categories");
-                          IF ((WaiterPadLine."No. of Print Categories" > 0) OR
-                              ((WaiterPadLine2."No. of Print Categories" = 0) AND (PrintCategoryTmp.Code = '')))
-                             AND
-                             //(NOT WaiterPadLine."Sent to Kitchen" OR ForceResend)  //NPR5.55 [399170]-revoked
-                             (NOT WaiterPadLine."Sent to Kitchen" OR (WaiterPadLine."Quantity (Base)" <> WaiterPadLine."Sent to Kitchen Qty. (Base)") OR ForceResend)  //NPR5.55 [399170]
-                          THEN BEGIN
-                            WaiterPadLineOut := WaiterPadLine;
-                            WaiterPadLineOut.MARK := TRUE;
-                          END;
-                        UNTIL WaiterPadLine.NEXT = 0;
-        
-                      WaiterPadLineOut.MARKEDONLY(TRUE);
-                      IF NOT WaiterPadLineOut.ISEMPTY THEN BEGIN
-                        //IF SetupProxy.KitchenPrintingActivated THEN  //NPR5.55 [399170]-revoked
-                        IF OutputType = WaiterPadLine."Output Type Filter"::Print THEN  //NPR5.55 [399170]
-                          IF FindPrintTemplates(WaiterPad,WaiterPadLineOut,PrintType,PrintCategoryTmp.Code,FlowStatusTmp.Code{!},PrintTemplateBuffer) THEN BEGIN
-                            WaiterPadLineOut.FINDSET;
-                            REPEAT
-                              LogWaiterPadLinePrint(WaiterPadLineOut,PrintType,FlowStatusTmp.Code,PrintCategoryTmp.Code,PrintDateTime,0);
-                            UNTIL WaiterPadLineOut.NEXT = 0;
-                          END;
-        
-                        //IF SetupProxy.KDSActivated THEN  //NPR5.55 [399170]-revoked
-                        IF OutputType = WaiterPadLine."Output Type Filter"::KDS THEN  //NPR5.55 [399170]
-                          KDSUpdated := KitchenOrderMgt.SendWPLinesToKitchen(WaiterPadLineOut,FlowStatusTmp.Code,PrintCategoryTmp.Code,PrintType,PrintDateTime) OR KDSUpdated;
-                      END;
-                      WaiterPadLineOut.RESET;
-                    UNTIL PrintCategoryTmp.NEXT = 0;
-                END;
-              UNTIL FlowStatusTmp.NEXT = 0;
-        //-NPR5.55 [399170]
-          END;
-        END;
-        //+NPR5.55 [399170]
-        
-        IF PrintTemplateBuffer.ISEMPTY AND NOT KDSUpdated THEN BEGIN
-          //-NPR5.55 [399170]-revoked
-          //MESSAGE(NothingToSendLbl);
-          //EXIT;
-          //+NPR5.55 [399170]-revoked
-          //-NPR5.55 [399170]
-          IF ShowNothingToSendErr THEN
-            ERROR(NothingToSendLbl);
-          EXIT(FALSE);
-          //+NPR5.55 [399170]
-        END;
-        
-        SendToPrint(PrintTemplateBuffer);
-        EXIT(TRUE);  //NPR5.55 [399170]
-        */
-        //+NPR5.55 [382428]-revoked
-
-    end;
-    #endregion
 
     procedure PrintWaiterPadLinesToKitchen(WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLineIn: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; FlowStatusCode: Code[10]; ForceResend: Boolean; ShowNothingToSendErr: Boolean): Boolean
     var
@@ -519,16 +356,27 @@ codeunit 6150664 "NPR NPRE Restaurant Print"
         PrintTemplate.SetRange("Serving Step", ServingStep);
         if PrintTemplate.IsEmpty and (PrintCategoryCode <> '') then
             PrintTemplate.SetRange("Print Category Code", '');
-        if PrintTemplate.IsEmpty and (ServingStep <> '') then
+        if PrintTemplate.IsEmpty and (ServingStep <> '') then begin
+            if PrintCategoryCode <> '' then
+                PrintTemplate.SetRange("Print Category Code", PrintCategoryCode);
             PrintTemplate.SetRange("Serving Step", '');
+            if PrintTemplate.IsEmpty and (PrintCategoryCode <> '') then
+                PrintTemplate.SetRange("Print Category Code", '');
+        end;
+
         if PrintTemplate.IsEmpty and (SeatingLocation."Restaurant Code" <> '') then begin
             PrintTemplate.SetRange("Restaurant Code", '');
             PrintTemplate.SetRange("Serving Step", ServingStep);
             PrintTemplate.SetRange("Print Category Code", PrintCategoryCode);
             if PrintTemplate.IsEmpty and (PrintCategoryCode <> '') then
                 PrintTemplate.SetRange("Print Category Code", '');
-            if PrintTemplate.IsEmpty and (ServingStep <> '') then
+            if PrintTemplate.IsEmpty and (ServingStep <> '') then begin
+                if PrintCategoryCode <> '' then
+                    PrintTemplate.SetRange("Print Category Code", PrintCategoryCode);
                 PrintTemplate.SetRange("Serving Step", '');
+                if PrintTemplate.IsEmpty and (PrintCategoryCode <> '') then
+                    PrintTemplate.SetRange("Print Category Code", '');
+            end;
         end;
         if not PrintTemplate.FindSet then
             exit(false);
@@ -668,7 +516,7 @@ codeunit 6150664 "NPR NPRE Restaurant Print"
         if WaiterPad."Serving Step Code" <> '' then
             FlowStatus.Get(WaiterPad."Serving Step Code", FlowStatus."Status Object"::WaiterPadLineMealFlow);
 
-        if PAGE.RunModal(0, FlowStatus) = ACTION::LookupOK then
+        if PAGE.RunModal(0, FlowStatus) = Action::LookupOK then
             RequestRunServingStepToKitchen(WaiterPad, false, FlowStatus.Code);
     end;
 
@@ -683,7 +531,7 @@ codeunit 6150664 "NPR NPRE Restaurant Print"
             FlowStatus.Get(WaiterPad."Serving Step Code", FlowStatus."Status Object"::WaiterPadLineMealFlow);
         FlowStatusNew.Get(NewFlowStatusCode, FlowStatus."Status Object"::WaiterPadLineMealFlow);
         if (FlowStatusNew."Flow Order" > FlowStatus."Flow Order") or (WaiterPad."Serving Step Code" = '') then
-            WaiterPad."Serving Step Code" := NewFlowStatusCode;
+            WaiterPad.Validate("Serving Step Code", NewFlowStatusCode);
         WaiterPad."Last Req. Serving Step Code" := NewFlowStatusCode;
         WaiterPad.Modify;
     end;
