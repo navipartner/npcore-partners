@@ -444,13 +444,10 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
     local procedure POSPosting(POSPeriodRegister: Record "NPR POS Period Register")
     var
         POSPeriodRegisterPostingFilter: Record "NPR POS Period Register";
-        NPRetailSetup: Record "NPR NP Retail Setup";
+        NPRPOSUnit: Record "NPR POS Unit";
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin
-        if (not NPRetailSetup.Get()) then
-            exit;
-
-        NPRetailSetup.GetPostingProfile(POSPeriodRegister."POS Unit No.", POSPostingProfile);
+        NPRPOSUnit.GetPostingProfile(POSPeriodRegister."POS Unit No.", POSPostingProfile);
         with POSPostingProfile do
             case ("Automatic POS Posting") of
                 "Automatic POS Posting"::No:
@@ -492,14 +489,10 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
     local procedure ItemPosting(POSPeriodRegister: Record "NPR POS Period Register")
     var
         POSPeriodRegisterPostingFilter: Record "NPR POS Period Register";
-        NPRetailSetup: Record "NPR NP Retail Setup";
         POSUnit: Record "NPR POS Unit";
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin
-        if (not NPRetailSetup.Get()) then
-            exit;
-
-        NPRetailSetup.GetPostingProfile(POSPeriodRegister."POS Unit No.", POSPostingProfile);
+        POSUnit.GetPostingProfile(POSPeriodRegister."POS Unit No.", POSPostingProfile);
         with POSPostingProfile do
             case ("Automatic Item Posting") of
                 "Automatic Item Posting"::No:
