@@ -61,7 +61,6 @@ codeunit 6150825 "NPR POS Action - MPOS Native"
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR Sale POS";
         JSONString: Text;
-        MPOSPaymentGateway: Record "NPR MPOS Payment Gateway";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR Sale Line POS";
         Barcode: Text;
@@ -95,17 +94,11 @@ codeunit 6150825 "NPR POS Action - MPOS Native"
                 end;
             NativeActionSetting::EOD:
                 begin
-                    MPOSAppSetup.TestField("Payment Gateway");
-                    MPOSPaymentGateway.Get(MPOSAppSetup."Payment Gateway");
-                    MPOSPaymentGateway.TestField("Merchant Id");
-                    JSONString := BuildJSONParams(Format(NativeActionSetting), MPOSPaymentGateway."Merchant Id", SalePOS."Register No.", '', '', Err_EODFailed);
+                    JSONString := BuildJSONParams(Format(NativeActionSetting), '', SalePOS."Register No.", '', '', Err_EODFailed);
                 end;
             NativeActionSetting::PRINTLASTRECEIPT:
                 begin
-                    MPOSAppSetup.TestField("Payment Gateway");
-                    MPOSPaymentGateway.Get(MPOSAppSetup."Payment Gateway");
-                    MPOSPaymentGateway.TestField("Merchant Id");
-                    JSONString := BuildJSONParams(Format(NativeActionSetting), MPOSPaymentGateway."Merchant Id", '', '', '', Err_EODFailed);
+                    JSONString := BuildJSONParams(Format(NativeActionSetting), '', '', '', '', Err_EODFailed);
                 end;
             NativeActionSetting::SCANDITITEMINFO:
                 begin
