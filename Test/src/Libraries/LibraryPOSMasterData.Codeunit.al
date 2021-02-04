@@ -4,7 +4,7 @@ codeunit 85002 "NPR Library - POS Master Data"
     begin
     end;
 
-    procedure CreatePOSUnit(var POSUnit: Record "NPR POS Unit"; POSStoreCode: Code[10])
+    procedure CreatePOSUnit(var POSUnit: Record "NPR POS Unit"; POSStoreCode: Code[10]; POSProfileCode: Code[20])
     var
         POSStore: Record "NPR POS Store";
         Register: Record "NPR Register";
@@ -26,6 +26,7 @@ codeunit 85002 "NPR Library - POS Master Data"
         POSUnit.Validate(Status, POSUnit.Status::CLOSED);
         CreatePOSAuditProfile(POSAuditProfile);
         POSUnit."POS Audit Profile" := POSAuditProfile.Code;
+        POSUnit."POS Posting Profile" := POSProfileCode;
         POSUnit.Insert(true);
 
         CreatePeriodRegister(POSUnit);
@@ -45,9 +46,6 @@ codeunit 85002 "NPR Library - POS Master Data"
         LibraryWarehouse: Codeunit "Library - Warehouse";
     begin
         NPRetailSetup.Get;
-        NPRetailSetup.TestField("Default POS Posting Profile");
-        POSPostingProfile.Get(NPRetailSetup."Default POS Posting Profile");
-        POSPostingProfile.TestField("Default POS Entry No. Series");
         POSStore.Init;
         POSStore.Validate(
           Code,
@@ -55,7 +53,6 @@ codeunit 85002 "NPR Library - POS Master Data"
             LibraryUtility.GenerateRandomCode(POSStore.FieldNo(Code), DATABASE::"NPR POS Store"), 1,
             LibraryUtility.GetFieldLength(DATABASE::"NPR POS Store", POSStore.FieldNo(Code))));
 
-        POSStore."POS Entry Doc. No. Series" := POSPostingProfile."Default POS Entry No. Series";
         LibraryERM.CreateGeneralPostingSetupInvt(GeneralPostingSetup);
         POSStore.Validate("Gen. Bus. Posting Group", GeneralPostingSetup."Gen. Bus. Posting Group");
         LibraryERM.CreateVATPostingSetupWithAccounts(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT", 25);
@@ -326,18 +323,25 @@ codeunit 85002 "NPR Library - POS Master Data"
         VATPostingSetup.Modify;
     end;
 
-    procedure CreateDefaultPostingSetup()
+    procedure CreateDefaultPostingSetup(var POSPostingProfile: Record "NPR POS Posting Profile")
+    begin
+        CreateDefaultPostingProfile(POSPostingProfile);
+
+        CreateDefaultNPRetailSetup();
+
+        CreateDefaultRetailSetup();
+    end;
+
+
+    local procedure CreateDefaultPostingProfile(var POSPostingProfile: Record "NPR POS Posting Profile")
     var
-        POSPostingProfile: Record "NPR POS Posting Profile";
-        NPRetailSetup: Record "NPR NP Retail Setup";
         LibraryERM: Codeunit "Library - ERM";
-        RetailSetup: Record "NPR Retail Setup";
         LibraryUtility: Codeunit "Library - Utility";
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
     begin
         POSPostingProfile.Init;
-        POSPostingProfile.Code := 'DEFAULT';
+        POSPostingProfile.Code := LibraryUtility.GenerateRandomCode20(POSPostingProfile.FieldNo(Code), Database::"NPR POS Posting Profile");
         if not POSPostingProfile.Find then
             POSPostingProfile.Insert;
 
@@ -353,14 +357,23 @@ codeunit 85002 "NPR Library - POS Master Data"
         LibraryUtility.CreateNoSeriesLine(NoSeriesLine, NoSeries.Code, 'TEST_PE_1', 'TEST_PE_999999999');
         POSPostingProfile."Default POS Entry No. Series" := NoSeries.Code;
         POSPostingProfile.Modify;
+    end;
 
+    local procedure CreateDefaultNPRetailSetup()
+    var
+        NPRetailSetup: Record "NPR NP Retail Setup";
+    begin
         if not NPRetailSetup.Get then
             NPRetailSetup.Insert;
         NPRetailSetup."Advanced POS Entries Activated" := true;
         NPRetailSetup."Advanced Posting Activated" := true;
-        NPRetailSetup."Default POS Posting Profile" := POSPostingProfile.Code;
         NPRetailSetup.Modify;
+    end;
 
+    local procedure CreateDefaultRetailSetup()
+    var
+        RetailSetup: Record "NPR Retail Setup";
+    begin
         if not RetailSetup.Get then
             RetailSetup.Insert;
         RetailSetup."Prices incl. VAT" := true;

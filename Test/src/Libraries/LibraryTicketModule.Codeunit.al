@@ -9,6 +9,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         AdmissionSchedule: Record "NPR TM Admis. Schedule";
         ScheduleLine: Record "NPR TM Admis. Schedule Lines";
         TicketSetup: Record "NPR TM Ticket Setup";
+        POSPostingProfile: Record "NPR POS Posting Profile";
         NprMasterData: Codeunit "NPR Library - POS Master Data";
         ScheduleManager: Codeunit "NPR TM Admission Sch. Mgt.";
         AdmissionCode: Code[20];
@@ -17,7 +18,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         TicketTypeCode: Code[10];
     begin
 
-        NprMasterData.CreateDefaultPostingSetup();
+        NprMasterData.CreateDefaultPostingSetup(POSPostingProfile);
         WorkDate(Today);
 
         // Used for smoke testing

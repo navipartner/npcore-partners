@@ -7,16 +7,13 @@ codeunit 6150616 "NPR POS Post Item Entries"
         POSStore: Record "NPR POS Store";
         POSEntry: Record "NPR POS Entry";
         POSSalesLine: Record "NPR POS Sales Line";
-        NPRetailSetup: Record "NPR NP Retail Setup";
         TempItemToAdjust: Record Item temporary;
-        POSPostingProfile: Record "NPR POS Posting Profile";
         GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
         AdjustCostItemEntries: Report "Adjust Cost - Item Entries";
         PostInventoryCosttoGL: Report "Post Inventory Cost to G/L";
         FileManagement: Codeunit "File Management";
     begin
         OnBeforePostPOSEntry(Rec);
-        NPRetailSetup.Get;
 
         POSEntry := Rec;
         with POSEntry do begin
@@ -37,8 +34,6 @@ codeunit 6150616 "NPR POS Post Item Entries"
                 Error(StrSubstNo(TextAllreadyPosted, "Entry No."));
 
             CheckPostingrestrictions(POSEntry);
-
-            NPRetailSetup.GetPostingProfile(POSEntry."POS Unit No.", POSPostingProfile);
 
             POSSalesLine.Reset;
             POSSalesLine.SetRange("POS Entry No.", "Entry No.");

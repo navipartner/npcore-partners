@@ -155,10 +155,11 @@ codeunit 6150708 "NPR POS Setup"
 
     local procedure FindPOSPostingProfile()
     var
-        NPRetailSetup: Record "NPR NP Retail Setup";
+        POSUnit: Record "NPR POS Unit";
     begin
-        NPRetailSetup.Get;
-        NPRetailSetup.GetPostingProfile(POSUnitRec."No.", POSPostingProfile);
+        //-NPR5.53 [371955]
+        POSUnit.GetPostingProfile(POSUnitRec."No.", POSPostingProfile);
+        //+NPR5.53 [371955]
     end;
 
     local procedure FindPOSRestaurantProfile()

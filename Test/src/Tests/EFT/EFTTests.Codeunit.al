@@ -2803,6 +2803,7 @@ codeunit 85004 "NPR EFT Tests"
 
     procedure InitializeData()
     var
+        POSPostingProfile: Record "NPR POS Posting Profile";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -2816,9 +2817,9 @@ codeunit 85004 "NPR EFT Tests"
 
         if not _Initialized then begin
             NPRLibraryPOSMasterData.CreatePOSSetup(_POSSetup);
-            NPRLibraryPOSMasterData.CreateDefaultPostingSetup();
+            NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
             NPRLibraryPOSMasterData.CreatePOSStore(_POSStore);
-            NPRLibraryPOSMasterData.CreatePOSUnit(_POSUnit, _POSStore.Code);
+            NPRLibraryPOSMasterData.CreatePOSUnit(_POSUnit, _POSStore.Code, POSPostingProfile.Code);
             NPRLibraryEFT.CreateEFTPaymentTypePOS(_PaymentTypePOS, _POSUnit, _POSStore);
             NPRLibraryEFT.CreateMockEFTSetup(_EFTSetup, _POSUnit."No.", _PaymentTypePOS."No.");
             _Initialized := true;

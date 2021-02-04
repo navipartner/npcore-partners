@@ -61,6 +61,9 @@ table 6150613 "NPR NP Retail Setup"
             DataClassification = CustomerContent;
             Description = 'NPR5.52';
             TableRelation = "NPR POS Posting Profile";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(231; "Standard Conditions"; Text[250])
         {
@@ -221,23 +224,6 @@ table 6150613 "NPR NP Retail Setup"
     local procedure GetPublisherFunction(): Text
     begin
         exit('OnFindItemPrice');
-    end;
-
-    procedure GetPostingProfile(POSUnitNo: Code[10]; var POSPostingProfile: Record "NPR POS Posting Profile")
-    var
-        POSUnit: Record "NPR POS Unit";
-    begin
-        if POSUnitNo <> '' then begin
-            POSUnit.Get(POSUnitNo);
-            if POSUnit."POS Posting Profile" <> '' then begin
-                POSPostingProfile.Get(POSUnit."POS Posting Profile");
-                exit;
-            end else
-                if "Default POS Posting Profile" = '' then
-                    POSUnit.TestField("POS Posting Profile");
-        end;
-        TestField("Default POS Posting Profile");
-        POSPostingProfile.Get("Default POS Posting Profile");
     end;
 }
 
