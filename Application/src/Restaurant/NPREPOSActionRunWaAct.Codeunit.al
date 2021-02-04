@@ -1,9 +1,5 @@
 codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
 {
-    var
-        ActionDescription: Label 'An action to run Waiter Pad functions';
-        WPadNotSelectedErr: Label 'Please select a waiter pad first.';
-
     local procedure ActionCode(): Text
     begin
         exit('RUN_W/PAD_ACTION');
@@ -16,6 +12,8 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
+    var
+        ActionDescription: Label 'An action to run Waiter Pad functions directly from Sales View';
     begin
         if Sender.DiscoverAction(
             ActionCode(),
@@ -52,6 +50,7 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
         ServingStepToRequest: Code[10];
         ClearSaleOnFinish: Boolean;
         ReturnToDefaultView: Boolean;
+        WPadNotSelectedErr: Label 'Please select a waiter pad first.';
     begin
         if not Action.IsThisAction(ActionCode) then
             exit;

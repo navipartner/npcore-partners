@@ -2,8 +2,8 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
 {
     var
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
-        InQuotes: Label '''%1''', Comment = '{Fixed}';
-        EmptyCodeINQuotes: Label '''''', Comment = '{Fixed}';
+        InQuotes: Label '''%1''', Locked = true;
+        EmptyCodeINQuotes: Label '''''', Locked = true;
 
     procedure LinkSeatingToWaiterPad(WaiterPadNo: Code[20]; SeatingCode: Code[20]) LinkAdded: Boolean
     var
@@ -98,7 +98,7 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         NewWaiterPadNo: Code[20];
     begin
         HospitalitySetup.Get;
-        HospitalitySetup.TestField(HospitalitySetup."Waiter Pad No. Serie");
+        HospitalitySetup.TestField("Waiter Pad No. Serie");
 
         NewWaiterPadNo := NoSeriesManagement.GetNextNo(HospitalitySetup."Waiter Pad No. Serie", Today, true);
 
@@ -176,12 +176,11 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         if WaiterPadLine.FindSet then begin
             repeat
                 NPHWaiterPadPOSManagement.SplitWaiterPadLine(WaiterPad, WaiterPadLine, WaiterPadLine.Quantity, MergeToWaiterPad);
-            until (0 = WaiterPadLine.Next);
+            until WaiterPadLine.Next = 0;
         end;
 
         CloseWaiterPad(WaiterPad, false);
         exit(true);
-
     end;
 
     procedure CloseWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad"; ForceClose: Boolean)
@@ -190,6 +189,9 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         Handled: Boolean;
         OK: Boolean;
     begin
+        if WaiterPad.Closed then
+            exit;
+
         SetupProxy.InitializeUsingWaiterPad(WaiterPad);
 
         OnBeforeCloseWaiterPad(WaiterPad, SetupProxy, ForceClose, Handled);
@@ -278,10 +280,10 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
                     exit(WPIsServed(WaiterPad, SetupProxy));
 
             ServiceFlowProfile."Close Waiter Pad On"::Payment:
-                exit(WPIsPaid(WaiterPad));
+                exit(WPIsPaid(WaiterPad, ServiceFlowProfile."Only if Fully Paid"));
 
             ServiceFlowProfile."Close Waiter Pad On"::"Payment if Served":
-                if WPIsPaid(WaiterPad) then
+                if WPIsPaid(WaiterPad, ServiceFlowProfile."Only if Fully Paid") then
                     exit(WPIsServed(WaiterPad, SetupProxy));
         end;
 
@@ -308,18 +310,23 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         exit(false);
     end;
 
-    local procedure WPIsPaid(WaiterPad: Record "NPR NPRE Waiter Pad"): Boolean
+    local procedure WPIsPaid(WaiterPad: Record "NPR NPRE Waiter Pad"; OnlyIfFullyPaid: Boolean): Boolean
     var
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
     begin
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
+        WaiterPadLine.SetFilter(Type, '<>%1', WaiterPadLine.Type::Comment);
         if WaiterPadLine.FindSet then
             repeat
-                if WaiterPadLine.Quantity > WaiterPadLine."Billed Quantity" then
-                    exit(false);
+                if not OnlyIfFullyPaid then begin
+                    if WaiterPadLine."Billed Quantity" <> 0 then
+                        exit(true);
+                end else
+                    if WaiterPadLine.Quantity > WaiterPadLine."Billed Quantity" then
+                        exit(false);
             until WaiterPadLine.Next = 0;
 
-        exit(true);
+        exit(OnlyIfFullyPaid);
     end;
 
     local procedure WPIsServed(WaiterPad: Record "NPR NPRE Waiter Pad"; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy"): Boolean

@@ -121,50 +121,53 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         TouchedWaiterPadLineTmp: Record "NPR NPRE Waiter Pad Line" temporary;
         NPHHospitalityPrint: Codeunit "NPR NPRE Restaurant Print";
+        SaleLinesExist: Boolean;
     begin
         SaleLinePOS.Reset;
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, SalePOS.Date);
         SaleLinePOS.SetRange("Sale Type", SalePOS."Sale type");
-        if not SaleLinePOS.FindSet(CleanupSale) then
-            exit;
-
-        TouchedWaiterPadLineTmp.DeleteAll;
-
-        CopySaleHdrPOSInfo(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", WaiterPad."No.", true);
-        repeat
-            MoveSaleLineFromPOSToWaiterPad(SalePOS, SaleLinePOS, WaiterPad, WaiterPadLine);
-            TouchedWaiterPadLineTmp := WaiterPadLine;
-            TouchedWaiterPadLineTmp.Insert;
-        until SaleLinePOS.Next = 0;
-
-        WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
-        WaiterPadLine.SetRange("Sale Retail ID", SalePOS."Retail ID");
-        WaiterPadLine.SetAutoCalcFields("Kitchen Order Sent", "Serving Requested");
-        if WaiterPadLine.FindSet then
+        SaleLinesExist := SaleLinePOS.FindSet(CleanupSale);
+        if SaleLinesExist then begin
+            TouchedWaiterPadLineTmp.DeleteAll;
+            CopySaleHdrPOSInfo(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", WaiterPad."No.", true);
             repeat
+                MoveSaleLineFromPOSToWaiterPad(SalePOS, SaleLinePOS, WaiterPad, WaiterPadLine);
                 TouchedWaiterPadLineTmp := WaiterPadLine;
-                if not TouchedWaiterPadLineTmp.Find then begin
-                    if (WaiterPadLine."Kitchen Order Sent" or WaiterPadLine."Serving Requested") and
-                       (WaiterPadLine.Type = WaiterPadLine.Type::Item)
-                    then begin
-                        if WaiterPadLine.Quantity <> 0 then begin
-                            WaiterPadLine.Validate(Quantity, 0);
-                            WaiterPadLine.Modify;
-                            WaiterPadLine.Mark := true;
-                        end;
-                    end else
-                        WaiterPadLine.Delete(true);
-                end;
-            until WaiterPadLine.Next = 0;
+                TouchedWaiterPadLineTmp.Insert;
+            until SaleLinePOS.Next = 0;
+
+            WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
+            WaiterPadLine.SetRange("Sale Retail ID", SalePOS."Retail ID");
+            WaiterPadLine.SetAutoCalcFields("Kitchen Order Sent", "Serving Requested");
+            if WaiterPadLine.FindSet then
+                repeat
+                    TouchedWaiterPadLineTmp := WaiterPadLine;
+                    if not TouchedWaiterPadLineTmp.Find then begin
+                        if (WaiterPadLine."Kitchen Order Sent" or WaiterPadLine."Serving Requested") and
+                           (WaiterPadLine.Type = WaiterPadLine.Type::Item)
+                        then begin
+                            if WaiterPadLine.Quantity <> 0 then begin
+                                WaiterPadLine.Validate(Quantity, 0);
+                                WaiterPadLine.Modify;
+                                WaiterPadLine.Mark := true;
+                            end;
+                        end else
+                            WaiterPadLine.Delete(true);
+                    end;
+                until WaiterPadLine.Next = 0;
+        end;
 
         if CleanupSale then begin
-            SaleLinePOS.DeleteAll(true);
-            ClearSaleHdrNPREPresetFields(SalePOS, false);
+            if SaleLinesExist then
+                SaleLinePOS.DeleteAll(true);
+            ClearSaleHdrNPREPresetFields(SalePOS, true);
         end;
-        WaiterPadLine.SetRange("Sale Retail ID");
+        if not SaleLinesExist then
+            exit;
 
+        WaiterPadLine.SetRange("Sale Retail ID");
         WaiterPadLine.MarkedOnly(true);
         if not WaiterPadLine.IsEmpty then
             NPHHospitalityPrint.SetWaiterPadPreReceiptPrinted(WaiterPad, false, true);
@@ -761,6 +764,32 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
                 else
                     WaiterPadLine.Validate("Billed Qty. (Base)", WaiterPadLine."Billed Qty. (Base)" + POSSalesLine."Quantity (Base)");
                 WaiterPadLine.Modify;
+            end;
+
+            if WaiterPad.Get(WaiterPadLine."Waiter Pad No.") then
+                WaiterPadMgt.CloseWaiterPad(WaiterPad, false);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Retail Form Code", 'OnBeforeAuditRoleLineInsertEvent', '', true, false)]
+    local procedure UpdateBilledQtyOnLegacyPOSSalePost(sender: Codeunit "NPR Retail Form Code"; var SalePOS: Record "NPR Sale POS"; var SaleLinePos: Record "NPR Sale Line POS"; var AuditRole: Record "NPR Audit Roll")
+    var
+        NPRetailSetup: Record "NPR NP Retail Setup";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+    begin
+        if not NPRetailSetup.Get() or NPRetailSetup."Advanced Posting Activated" then
+            exit;
+        if IsNullGuid(SaleLinePos."Retail ID") then
+            exit;
+        WaiterPadLine.SetRange("Sale Line Retail ID", SaleLinePos."Retail ID");
+        if WaiterPadLine.FindFirst() then begin
+            if SaleLinePos."Quantity (Base)" <> 0 then begin
+                if WaiterPadLine."Qty. per Unit of Measure" = SaleLinePos."Qty. per Unit of Measure" then
+                    WaiterPadLine.Validate("Billed Quantity", WaiterPadLine."Billed Quantity" + SaleLinePos.Quantity)
+                else
+                    WaiterPadLine.Validate("Billed Qty. (Base)", WaiterPadLine."Billed Qty. (Base)" + SaleLinePos."Quantity (Base)");
+                WaiterPadLine.Modify();
             end;
 
             if WaiterPad.Get(WaiterPadLine."Waiter Pad No.") then

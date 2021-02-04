@@ -15,7 +15,7 @@ page 6150669 "NPR NPRE Restaurant Setup"
             group(General)
             {
                 Caption = 'General';
-                field("Waiter Pad No. Serie"; Rec."Waiter Pad No. Serie")
+                field("Waiter Pad No. Series"; Rec."Waiter Pad No. Serie")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Waiter Pad No. Serie field';
@@ -101,6 +101,83 @@ page 6150669 "NPR NPRE Restaurant Setup"
                     }
                 }
             }
+            group(POSActions)
+            {
+                Caption = 'POS Actions';
+
+                field("Save Layout Action"; Rec."Save Layout Action")
+                {
+                    ApplicationArea = All;
+
+                    trigger OnAssistEdit()
+                    begin
+                        ParamMgt.EditParametersForField(Rec."Save Layout Action", Rec.RecordId, Rec.FieldNo("Save Layout Action"));
+                    end;
+                }
+                field("Select Restaurant Action"; Rec."Select Restaurant Action")
+                {
+                    ApplicationArea = All;
+
+                    trigger OnAssistEdit()
+                    begin
+                        ParamMgt.EditParametersForField(Rec."Select Restaurant Action", Rec.RecordId, Rec.FieldNo("Select Restaurant Action"));
+                    end;
+                }
+                field("Select Table Action"; Rec."Select Table Action")
+                {
+                    ApplicationArea = All;
+
+                    trigger OnAssistEdit()
+                    begin
+                        ParamMgt.EditParametersForField(Rec."Select Table Action", Rec.RecordId, Rec.FieldNo("Select Table Action"));
+                    end;
+                }
+                field("New Waiter Pad Action"; Rec."New Waiter Pad Action")
+                {
+                    ApplicationArea = All;
+
+                    trigger OnAssistEdit()
+                    begin
+                        ParamMgt.EditParametersForField(Rec."New Waiter Pad Action", Rec.RecordId, Rec.FieldNo("New Waiter Pad Action"));
+                    end;
+                }
+                field("Select Waiter Pad Action"; Rec."Select Waiter Pad Action")
+                {
+                    ApplicationArea = All;
+
+                    trigger OnAssistEdit()
+                    begin
+                        ParamMgt.EditParametersForField(Rec."Select Waiter Pad Action", Rec.RecordId, Rec.FieldNo("Select Waiter Pad Action"));
+                    end;
+                }
+                field("Set Waiter Pad Status Action"; Rec."Set Waiter Pad Status Action")
+                {
+                    ApplicationArea = All;
+
+                    trigger OnAssistEdit()
+                    begin
+                        ParamMgt.EditParametersForField(Rec."Set Waiter Pad Status Action", Rec.RecordId, Rec.FieldNo("Set Waiter Pad Status Action"));
+                    end;
+                }
+                field("Set Table Status Action"; Rec."Set Table Status Action")
+                {
+                    ApplicationArea = All;
+
+                    trigger OnAssistEdit()
+                    begin
+                        ParamMgt.EditParametersForField(Rec."Set Table Status Action", Rec.RecordId, Rec.FieldNo("Set Table Status Action"));
+                    end;
+                }
+                field("Set Number of Guests Action"; Rec."Set Number of Guests Action")
+                {
+                    ApplicationArea = All;
+
+                    trigger OnAssistEdit()
+                    begin
+                        ParamMgt.EditParametersForField(Rec."Set Number of Guests Action", Rec.RecordId, Rec.FieldNo("Set Number of Guests Action"));
+                    end;
+                }
+            }
             part(PrintTemplates; "NPR NPRE Print Templ. Subpage")
             {
                 Caption = 'Print Templates';
@@ -126,7 +203,7 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 Caption = 'Restaurants';
                 Image = NewBranch;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR NPRE Restaurants";
@@ -169,5 +246,6 @@ page 6150669 "NPR NPRE Restaurant Setup"
     end;
 
     var
+        ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
         ShowKDS: Boolean;
 }

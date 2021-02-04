@@ -56,24 +56,22 @@ table 6150661 "NPR NPRE Waiter Pad Line"
         {
             Caption = 'Meal Flow';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
-            ObsoleteReason = 'Will be removed in later versions';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replaced with table 6150674 "NPR NPRE Assigned Flow Status"';
             TableRelation = "NPR NPRE Flow Status".Code WHERE("Status Object" = CONST(WaiterPadLineMealFlow));
         }
         field(41; "Meal Flow Description"; Text[50])
         {
-            CalcFormula = Lookup("NPR NPRE Flow Status".Description WHERE(Code = FIELD("Meal Flow")));
             Caption = 'Meal Flow Description';
-            ObsoleteState = Pending;
-            ObsoleteReason = 'Will be removed in later versions';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replaced with table 6150674 "NPR NPRE Assigned Flow Status"';
             FieldClass = FlowField;
         }
         field(42; "Meal Flow Order"; Integer)
         {
-            CalcFormula = Lookup("NPR NPRE Flow Status"."Flow Order" WHERE(Code = FIELD("Meal Flow")));
             Caption = 'Meal Flow Order';
-            ObsoleteState = Pending;
-            ObsoleteReason = 'Will be removed in later versions';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replaced with table 6150674 "NPR NPRE Assigned Flow Status"';
             FieldClass = FlowField;
         }
         field(45; "Line Status"; Code[10])

@@ -1,8 +1,5 @@
 codeunit 6150738 "NPR POS Try Resume&CancelSale"
 {
-    // NPR5.54/JAKUBV/20200408  CASE 364658 Transport NPR5.54 - 8 April 2020
-    // NPR5.55/ALPO/20200810 CASE 391678 Log sale cancelling to POS Entry
-
     TableNo = "NPR Sale POS";
 
     trigger OnRun()
@@ -17,7 +14,6 @@ codeunit 6150738 "NPR POS Try Resume&CancelSale"
         POSSession: Codeunit "NPR POS Session";
         AltSaleCancelDescription: Text;
         Initialized: Boolean;
-        NotInitializedMsg: Label 'Codeunit ''POS Try Resume and Cancel Sale'' was invoked in uninitialized state. This is a programming bug, not a user error.';
 
     procedure Initialize(POSSessionIn: Codeunit "NPR POS Session")
     begin
@@ -26,9 +22,11 @@ codeunit 6150738 "NPR POS Try Resume&CancelSale"
     end;
 
     local procedure CheckInitialized()
+    var
+        NotInitializedErr: Label 'Codeunit ''POS Try Resume and Cancel Sale'' was invoked in uninitialized state. This is a programming bug, not a user error.';
     begin
         if not Initialized then
-            Error(NotInitializedMsg);
+            Error(NotInitializedErr);
     end;
 
     local procedure ResumeAndCancelSale(SalePOS: Record "NPR Sale POS")
@@ -41,6 +39,7 @@ codeunit 6150738 "NPR POS Try Resume&CancelSale"
         Setup: Codeunit "NPR POS Setup";
     begin
         CheckInitialized();
+        POSSession.GetFrontEnd(POSFrontEndMgt, true);
 
         POSSession.GetSetup(Setup);
         Setup.GetRegisterRecord(CashRegister);
@@ -51,16 +50,14 @@ codeunit 6150738 "NPR POS Try Resume&CancelSale"
         POSSaleLine.Init(SalePOS."Register No.", SalePOS."Sales Ticket No.", POSSale, Setup, POSFrontEndMgt);
 
         POSActionCancelSale.CheckSaleBeforeCancel(POSSession);
-        POSActionCancelSale.SetAlternativeDescription(AltSaleCancelDescription);  //NPR5.55 [391678]
+        POSActionCancelSale.SetAlternativeDescription(AltSaleCancelDescription);
         if not POSActionCancelSale.CancelSale(POSSession) then
             Error('');
     end;
 
     procedure SetAlternativeDescription(NewAltSaleCancelDescription: Text)
     begin
-        //-NPR5.55 [391678]
         AltSaleCancelDescription := NewAltSaleCancelDescription;
-        //+NPR5.55 [391678]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150739, 'OnBeforePromptResumeSale', '', false, false)]
@@ -71,7 +68,5 @@ codeunit 6150738 "NPR POS Try Resume&CancelSale"
         ActionOption := ActionOption::CancelAndNew;
         ActionOnCancelError := ActionOnCancelError::SaveAsQuote;
         */
-
     end;
 }
-

@@ -23,6 +23,13 @@ table 6150655 "NPR POS NPRE Rest. Profile"
             DataClassification = CustomerContent;
             TableRelation = "NPR NPRE Restaurant";
         }
+
+        field(30; "Default Seating Location"; Code[10])
+        {
+            Caption = 'Default Seating Location';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPRE Seating Location" where("Restaurant Code" = field("Restaurant Code"));
+        }
     }
 
     keys

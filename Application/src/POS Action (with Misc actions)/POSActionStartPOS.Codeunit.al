@@ -1,12 +1,5 @@
 codeunit 6150858 "NPR POS Action: Start POS"
 {
-    // NPR5.46/TSA /20181004 CASE 328338 Initial Version
-    // NPR5.48/TSA /20181120 CASE 336921 Open a new period on confirm bin
-    // NPR5.49/TSA /20190313 CASE 348458 Check state of master POS when its a managed POS
-    // NPR5.50/TSA /20190403 CASE 350974 Make sure the unit is open prior to logging the open event (empty table issue)
-    // NPR5.50/TSA /20190423 CASE 352483 Printing a receipt on begin workshift
-
-
     trigger OnRun()
     begin
     end;
@@ -25,33 +18,27 @@ codeunit 6150858 "NPR POS Action: Start POS"
 
     local procedure ActionCode(): Code[20]
     begin
-
         exit('START_POS');
     end;
 
     local procedure ActionVersion(): Code[10]
     begin
-
         exit('1.3');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-
-        with Sender do
-            if DiscoverAction(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion(),
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple)
-            then begin
-
-                RegisterWorkflowStep('ConfirmBin', 'context.ConfirmBin && confirm ({title: labels.title, caption: context.BinContents}).no(respond());');
-                RegisterWorkflow(true);
-
-            end;
+        if Sender.DiscoverAction(
+            ActionCode(),
+            ActionDescription,
+            ActionVersion(),
+            Sender.Type::Generic,
+            Sender."Subscriber Instances Allowed"::Multiple)
+        then begin
+            Sender.RegisterWorkflowStep('ConfirmBin', 'context.ConfirmBin && confirm ({title: labels.title, caption: context.BinContents}).no(respond());');
+            Sender.RegisterWorkflow(true);
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
@@ -59,7 +46,6 @@ codeunit 6150858 "NPR POS Action: Start POS"
     var
         RetailSetup: Record "NPR Retail Setup";
     begin
-
         Captions.AddActionCaption(ActionCode, 'title', Title);
         Captions.AddActionCaption(ActionCode, 'balancenow', BalanceNow);
     end;
@@ -76,7 +62,6 @@ codeunit 6150858 "NPR POS Action: Start POS"
         POSUnit: Record "NPR POS Unit";
         BinContentsHTML: Text;
     begin
-
         if not Action.IsThisAction(ActionCode) then
             exit;
 
@@ -85,7 +70,6 @@ codeunit 6150858 "NPR POS Action: Start POS"
         POSSession.GetSetup(Setup);
         Setup.GetPOSUnit(POSUnit);
 
-        //-NPR5.49 [348458]
         POSUnit.Get(POSUnit."No."); // refresh state
 
         if (POSUnit."POS End of Day Profile" <> '') then begin
@@ -107,17 +91,8 @@ codeunit 6150858 "NPR POS Action: Start POS"
 
             end;
         end;
-        //+NPR5.49 [348458]
-
-        //-NPR5.49 [348458]
-        // POSUnit.Status := POSUnit.Status::CLOSED;
-        // Context.SetContext ('ConfirmBin', (POSUnit.Status = POSUnit.Status::CLOSED));
-        // BinContentsHTML := '';
-        //
-        // IF (POSUnit.Status = POSUnit.Status::CLOSED) THEN BEGIN
 
         Context.SetContext('ConfirmBin', true);
-        //+NPR5.49 [348458]
 
         POSWorkshiftCheckpoint.SetFilter("POS Unit No.", '=%1', POSUnit."No.");
         POSWorkshiftCheckpoint.SetFilter(Open, '=%1', false);
@@ -132,10 +107,7 @@ codeunit 6150858 "NPR POS Action: Start POS"
 
             if (POSPaymentBinCheckpoint.FindSet()) then begin
                 BinContentsHTML := StrSubstNo('<b>%1</b><p>', Expected);
-                //-NPR5.50 [352483]
-                //BinContentsHTML += '<center><table border="0" cellspacing="0" width="150">';
                 BinContentsHTML += '<center><table border="0" cellspacing="0" width="250">';
-                //+NPR5.50 [352483]
 
                 repeat
                     BinContentsHTML += StrSubstNo('<tr><td align="left"><b>%1:&nbsp;</b></td><td align="right"><b>&nbsp;%2</b></td></tr>',
@@ -144,12 +116,8 @@ codeunit 6150858 "NPR POS Action: Start POS"
 
                 BinContentsHTML += '</table></center>';
                 BinContentsHTML += StrSubstNo('<p><b>%1</b>', ConfirmBin);
-
             end;
         end;
-
-        // END
-
 
         Context.SetContext('BinContents', BinContentsHTML);
         FrontEnd.SetActionContext(ActionCode, Context);
@@ -160,6 +128,7 @@ codeunit 6150858 "NPR POS Action: Start POS"
     var
         POSUnit: Record "NPR POS Unit";
         POSAction: Record "NPR POS Action";
+        POSViewProfile: Record "NPR POS View Profile";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         SalePOS: Record "NPR Sale POS";
         POSEndofDayProfile: Record "NPR POS End of Day Profile";
@@ -172,7 +141,6 @@ codeunit 6150858 "NPR POS Action: Start POS"
         OpeningEntryNo: Integer;
         BinContentsConfirmed: Boolean;
     begin
-
         if not Action.IsThisAction(ActionCode) then
             exit;
 
@@ -182,27 +150,21 @@ codeunit 6150858 "NPR POS Action: Start POS"
 
         POSSession.GetSetup(Setup);
         Setup.GetPOSUnit(POSUnit);
-        //-NPR5.49 [348458]
         POSUnit.Get(POSUnit."No."); // refresh state
-        //+NPR5.49 [348458]
 
         case WorkflowStep of
             'ConfirmBin':
                 begin
-
                     JSON.SetScope('$ConfirmBin', true);
                     BinContentsConfirmed := JSON.GetBoolean('confirm', true);
 
                     if (not BinContentsConfirmed) then begin
-
-                        //-NPR5.49 [348458]
                         if (POSUnit."POS End of Day Profile" <> '') then begin
                             POSEndofDayProfile.Get(POSUnit."POS End of Day Profile");
                             if (POSEndofDayProfile."End of Day Type" = POSEndofDayProfile."End of Day Type"::MASTER_SLAVE) then
                                 if (POSEndofDayProfile."Master POS Unit No." <> POSUnit."No.") then
                                     Error(''); // This POS is managed, we dont allow balancing on this POS as an individual
                         end;
-                        //+NPR5.49 [348458]
 
                         // *****
                         // The Magical Confirm!
@@ -230,45 +192,37 @@ codeunit 6150858 "NPR POS Action: Start POS"
 
                         POSUnit.Get(POSUnit."No.");
 
-                        //-NPR5.48 [336921]
-                        //POSUnit.Status := POSUnit.Status::OPEN;
-                        //POSUnit.MODIFY ();
-
-                        //-NPR5.50 [350974]
-                        // OpeningEntryNo := POSCreateEntry.InsertUnitOpenEntry (POSUnit."No.", Setup.Salesperson());
-                        // POSOpenPOSUnit.OpenPosUnitNoWithPeriodEntryNo (POSUnit."No.", OpeningEntryNo);
                         POSOpenPOSUnit.ClosePOSUnitOpenPeriods(POSUnit."No."); // make sure pos period register is correct
                         POSOpenPOSUnit.OpenPOSUnit(POSUnit);
                         OpeningEntryNo := POSCreateEntry.InsertUnitOpenEntry(POSUnit."No.", Setup.Salesperson());
                         POSOpenPOSUnit.SetOpeningEntryNo(POSUnit."No.", OpeningEntryNo);
-                        //+NPR5.50 [350974]
-                        //+NPR5.48 [336921]
 
                         Commit;
-                        //-NPR5.50 [352483]
                         PrintBeginWorkshift(POSUnit."No.");
-                        //+NPR5.50 [352483]
 
                         // Start Sale
                         POSSession.StartTransaction();
-                        POSSession.GetSale(POSSale);
-                        POSSale.GetCurrentSale(SalePOS);
-                        POSSession.ChangeViewSale();
-                    end;
+                        //POSSession.GetSale(POSSale);
+                        //POSSale.GetCurrentSale(SalePOS);
+                        //POSSession.ChangeViewSale();
 
+                        POSSession.GetSetup(Setup);
+                        Setup.GetPOSViewProfile(POSViewProfile);
+                        case POSViewProfile."Initial Sales View" of
+                            POSViewProfile."Initial Sales View"::SALES_VIEW:
+                                POSSession.ChangeViewSale();
+                            POSViewProfile."Initial Sales View"::RESTAURANT_VIEW:
+                                POSSession.ChangeViewRestaurant();
+                        end;
+                    end;
                 end;
         end;
-    end;
-
-    local procedure "--"()
-    begin
     end;
 
     local procedure DaysSinceLastBalance(PosUnitNo: Code[10]): Integer
     var
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
     begin
-
         POSWorkshiftCheckpoint.SetFilter("POS Unit No.", '=%1', PosUnitNo);
         POSWorkshiftCheckpoint.SetFilter(Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
         POSWorkshiftCheckpoint.SetFilter(Open, '=%1', false);
@@ -283,7 +237,6 @@ codeunit 6150858 "NPR POS Action: Start POS"
     var
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
     begin
-
         POSWorkshiftCheckpoint.SetFilter("POS Unit No.", '=%1', UnitNo);
         POSWorkshiftCheckpoint.SetFilter(Open, '=%1', false);
         POSWorkshiftCheckpoint.SetFilter(Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
@@ -305,8 +258,6 @@ codeunit 6150858 "NPR POS Action: Start POS"
         ReportSelectionRetail: Record "NPR Report Selection Retail";
         RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
     begin
-
-        //-NPR5.50 [352483]
         POSWorkshiftCheckpoint.SetFilter("POS Unit No.", '=%1', UnitNo);
         POSWorkshiftCheckpoint.SetFilter(Open, '=%1', false);
         POSWorkshiftCheckpoint.SetFilter(Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
@@ -322,7 +273,5 @@ codeunit 6150858 "NPR POS Action: Start POS"
         POSWorkshiftCheckpoint.FindFirst();
         RecRef.GetTable(POSWorkshiftCheckpoint);
         RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Begin Workshift (POS Entry)");
-        //+NPR5.50 [352483]
     end;
 }
-

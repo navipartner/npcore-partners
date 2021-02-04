@@ -6,6 +6,7 @@ page 6150667 "NPR NPRE Seating Location"
     SourceTable = "NPR NPRE Seating Location";
     UsageCategory = Administration;
     ApplicationArea = All;
+    PopulateAllFields = true;
 
     layout
     {
@@ -67,7 +68,7 @@ page 6150667 "NPR NPRE Seating Location"
                     Caption = 'Seatings';
                     Image = Lot;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPR NPRE Seating List";
