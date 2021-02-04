@@ -50,7 +50,7 @@ jobs:
         containerAdminPassword: $(containerAdminPassword)
         serverInstanceName: $(serverInstanceName)
         alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Application
-        analyzers: 'AppSourceCop,UICop'
+        analyzers: 'AppSourceCop,UICop,CodeCop'
         dependancies:
         - package:
             source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
