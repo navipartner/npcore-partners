@@ -3,6 +3,7 @@ page 6150665 "NPR NPRE Seating"
     Caption = 'Seating';
     PageType = Card;
     SourceTable = "NPR NPRE Seating";
+    PopulateAllFields = true;
     UsageCategory = None;
 
     layout

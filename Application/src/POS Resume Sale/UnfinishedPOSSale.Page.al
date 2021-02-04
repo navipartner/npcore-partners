@@ -1,7 +1,5 @@
 page 6150746 "NPR Unfinished POS Sale"
 {
-    // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
-
     Caption = 'Unfinished POS Sale';
     Editable = false;
     InstructionalText = 'There is an unfinished sale, do you want to resume it?';
@@ -14,52 +12,52 @@ page 6150746 "NPR Unfinished POS Sale"
     {
         area(content)
         {
-            field(Control6014409; '')
+            label(AddInstructionLbl)
             {
                 ApplicationArea = All;
-                CaptionClass = Format(GenerateInstructions());
+                CaptionClass = GenerateInstructions();
                 MultiLine = true;
                 ShowCaption = false;
                 ToolTip = 'Specifies the value of the '''' field';
             }
             group(Details)
             {
-                field("Register No."; "Register No.")
+                field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Cash Register No. field';
                 }
-                field("Sales Ticket No."; "Sales Ticket No.")
+                field("Sales Ticket No."; Rec."Sales Ticket No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Ticket No. field';
                 }
-                field("Salesperson Code"; "Salesperson Code")
+                field("Salesperson Code"; Rec."Salesperson Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
-                field("Date"; Date)
+                field("Date"; Rec.Date)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Date field';
                 }
-                field("Start Time"; "Start Time")
+                field("Start Time"; Rec."Start Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Start Time field';
                 }
-                field("Customer No."; "Customer No.")
+                field("Customer No."; Rec."Customer No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer No. field';
                 }
-                field("Customer Name"; "Customer Name")
+                field("Customer Name"; Rec."Customer Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer Name field';
                 }
-                field(Amount; Amount)
+                field(Amount; Rec.Amount)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount field';
@@ -69,7 +67,7 @@ page 6150746 "NPR Unfinished POS Sale"
                         DrillDownDocument;
                     end;
                 }
-                field("Amount Including VAT"; "Amount Including VAT")
+                field("Amount Including VAT"; Rec."Amount Including VAT")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount Including VAT field';
@@ -79,7 +77,7 @@ page 6150746 "NPR Unfinished POS Sale"
                         DrillDownDocument;
                     end;
                 }
-                field("Payment Amount"; "Payment Amount")
+                field("Payment Amount"; Rec."Payment Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Payment Amount field';
@@ -91,10 +89,6 @@ page 6150746 "NPR Unfinished POS Sale"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 
     var
@@ -125,4 +119,3 @@ page 6150746 "NPR Unfinished POS Sale"
         UnfinishedPOSSaleTransact.RunModal;
     end;
 }
-

@@ -38,8 +38,7 @@ codeunit 6150662 "NPR NPRE Seating Mgt."
         if SeatingList.RunModal = ACTION::LookupOK then begin
             SeatingList.GetRecord(Seating);
             SeatingCode := Seating.Code;
-        end
-        else
+        end else
             Error('');
 
         exit(SeatingCode);
@@ -67,6 +66,16 @@ codeunit 6150662 "NPR NPRE Seating Mgt."
             exit;
 
         SetSeatingStatus(SeatingCode, ServiceFlowProfile."Seating Status after Clearing");
+    end;
+
+    procedure SetSeatingIsReady(SeatingCode: Code[10])
+    var
+        RestSetup: Record "NPR NPRE Restaurant Setup";
+    begin
+        if not RestSetup.Get or (RestSetup."Seat.Status: Ready" = '') then
+            exit;
+
+        SetSeatingStatus(SeatingCode, RestSetup."Seat.Status: Ready");
     end;
 
     procedure SetSeatingIsOccupied(SeatingCode: Code[10])

@@ -87,7 +87,7 @@ page 6150663 "NPR NPRE Waiter Pad List"
                     Caption = 'Print Pre Receipt';
                     Image = PrintCheck;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -96,6 +96,26 @@ page 6150663 "NPR NPRE Waiter Pad List"
                     trigger OnAction()
                     begin
                         HospitalityPrint.PrintWaiterPadPreReceiptPressed(Rec);
+                    end;
+                }
+            }
+            group(Status)
+            {
+                Caption = 'Status';
+                action(CloseWaiterPad)
+                {
+                    Caption = 'Close waiter pad';
+                    Image = CloseDocument;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the Close waiter pad action';
+
+                    trigger OnAction()
+                    begin
+                        Rec.CloseWaiterPad();
                     end;
                 }
             }

@@ -19,6 +19,11 @@ table 6150664 "NPR NPRE Flow Status"
             DataClassification = CustomerContent;
             OptionCaption = 'Seating,Waiter Pad,Waiter Pad Line Meal Flow,Waiter Pad Line Status';
             OptionMembers = Seating,WaiterPad,WaiterPadLineMealFlow,WaiterPadLineStatus;
+            trigger OnValidate()
+            begin
+                IF "Status Object" <> "Status Object"::WaiterPadLineMealFlow THEN
+                    "Waiter Pad Status Code" := '';
+            end;
         }
         field(5; Description; Text[50])
         {
@@ -28,6 +33,33 @@ table 6150664 "NPR NPRE Flow Status"
         field(6; "Flow Order"; Integer)
         {
             Caption = 'Flow Order';
+            DataClassification = CustomerContent;
+        }
+        field(10; "Waiter Pad Status Code"; Code[10])
+        {
+            Caption = 'Waiter Pad Status Code';
+            DataClassification = CustomerContent;
+            TableRelation = if ("Status Object" = CONST(WaiterPadLineMealFlow)) "NPR NPRE Flow Status".Code WHERE("Status Object" = CONST(WaiterPad));
+            trigger OnValidate()
+            begin
+                if "Waiter Pad Status Code" <> '' then
+                    TestField("Status Object", "Status Object"::WaiterPadLineMealFlow);
+            end;
+        }
+        field(90; "Available in Front-End"; Boolean)
+        {
+            Caption = 'Available in Front-End';
+            DataClassification = CustomerContent;
+        }
+        field(100; Color; Text[30])
+        {
+            Caption = 'Color';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPRE Color Table".Description;
+        }
+        field(110; "Icon Class"; Text[30])
+        {
+            Caption = 'Icon Class';
             DataClassification = CustomerContent;
         }
     }
@@ -48,6 +80,10 @@ table 6150664 "NPR NPRE Flow Status"
         {
         }
     }
+    trigger OnInsert()
+    begin
+        CheckSameCodeDoesNotExist(Rec);
+    end;
 
     trigger OnDelete()
     begin
@@ -56,12 +92,13 @@ table 6150664 "NPR NPRE Flow Status"
 
     trigger OnRename()
     begin
+        CheckSameCodeDoesNotExist(Rec);
         WaiterPadMgt.MoveAssignedPrintCategories(xRec.RecordId, RecordId);
     end;
 
     var
-        InQuotes: Label '''%1''';
-        EmptyCodeINQuotes: Label '''''', Comment = '{Fixed}';
+        InQuotes: Label '''%1''', Locked = true;
+        EmptyCodeINQuotes: Label '''''', Locked = true;
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
 
     procedure AssignedPrintCategoriesAsFilterString(): Text
@@ -97,6 +134,23 @@ table 6150664 "NPR NPRE Flow Status"
 
         if (Code = '') and (PrintCategoryString <> '') and not PrintCategory.Get('') then
             PrintCategoryString := StrSubstNo('%1|%2', EmptyCodeINQuotes, PrintCategoryString);
+
         exit(PrintCategoryString);
+    end;
+
+    local procedure CheckSameCodeDoesNotExist(FlowStatus: Record "NPR NPRE Flow Status")
+    var
+        FlowStatus2: Record "NPR NPRE Flow Status";
+        SameAlreadyExistsTxt: Label 'En entry of type %1 with the same code already exists. Entries of type %1 and %2 must have mutually unique codes.';
+    begin
+        if not (FlowStatus."Status Object" in [FlowStatus."Status Object"::WaiterPad, FlowStatus."Status Object"::WaiterPadLineMealFlow]) then
+            exit;
+        if FlowStatus."Status Object" = FlowStatus."Status Object"::WaiterPad then
+            FlowStatus2."Status Object" := FlowStatus2."Status Object"::WaiterPadLineMealFlow
+        else
+            FlowStatus2."Status Object" := FlowStatus2."Status Object"::WaiterPad;
+        FlowStatus2."Code" := FlowStatus."Code";
+        if FlowStatus2.Find() then
+            Error(SameAlreadyExistsTxt, FlowStatus2."Status Object", FlowStatus."Status Object");
     end;
 }

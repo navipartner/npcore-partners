@@ -26,6 +26,17 @@ page 6150695 "NPR NPRE Serv. Flow Prof. Card"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Close Waiter Pad On field';
+
+                    trigger OnValidate()
+                    begin
+                        UpdateControls();
+                    end;
+                }
+                field("Only if Fully Paid"; Rec."Only if Fully Paid")
+                {
+                    ApplicationArea = All;
+                    Enabled = IsCloseOnPayment;
+                    ToolTip = 'Specifies whether waiter pads will be closed only after full payment';
                 }
                 field("Clear Seating On"; Rec."Clear Seating On")
                 {
@@ -52,4 +63,17 @@ page 6150695 "NPR NPRE Serv. Flow Prof. Card"
             }
         }
     }
+
+    var
+        IsCloseOnPayment: Boolean;
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        UpdateControls();
+    end;
+
+    local procedure UpdateControls()
+    begin
+        IsCloseOnPayment := Rec."Close Waiter Pad On" in [Rec."Close Waiter Pad On"::Payment, Rec."Close Waiter Pad On"::"Payment if Served"];
+    end;
 }

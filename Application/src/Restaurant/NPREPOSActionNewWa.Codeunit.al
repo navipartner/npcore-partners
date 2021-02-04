@@ -30,20 +30,22 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         then begin
             Sender.RegisterWorkflowStep('addPresetValuesToContext', 'respond();');
             Sender.RegisterWorkflowStep('seatingInput',
-              'if (param.FixedSeatingCode) {' +
-              '  context.seatingCode = param.FixedSeatingCode;' +
-              '  respond();' +
-              '} else {' +
-              '  switch(param.InputType + "") {' +
-              '    case "0":' +
-              '      stringpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +
-              '      break;' +
-              '    case "1":' +
-              '      intpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +
-              '      break;' +
-              '    case "2":' +
-              '      respond();' +
-              '      break;' +
+              'if (!context.seatingCode) || (!param.UseSeatingFromContext) {' +
+              '  if (param.FixedSeatingCode) {' +
+              '    context.seatingCode = param.FixedSeatingCode;' +
+              '    respond();' +
+              '  } else {' +
+              '    switch(param.InputType + "") {' +
+              '      case "0":' +
+              '        stringpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +
+              '        break;' +
+              '      case "1":' +
+              '        intpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +
+              '        break;' +
+              '      case "2":' +
+              '        respond();' +
+              '        break;' +
+              '    }' +
               '  }' +
               '}'
             );
@@ -76,6 +78,7 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
             Sender.RegisterTextParameter('LocationFilter', '');
             Sender.RegisterBooleanParameter('OpenWaiterPad', false);
             Sender.RegisterBooleanParameter('AskForNumberOfGuests', false);
+            Sender.RegisterBooleanParameter('UseSeatingFromContext', false);
         end;
     end;
 
@@ -178,10 +181,22 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
 
     local procedure OnActionAddPresetValuesToContext(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session")
     var
+        SalePOS: Record "NPR Sale POS";
+        Seating: Record "NPR NPRE Seating";
+        POSSale: Codeunit "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
     begin
         POSSession.GetSetup(POSSetup);
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+
         JSON.SetContext('restaurantCode', POSSetup.RestaurantCode());
+
+        if SalePOS."NPRE Pre-Set Seating Code" <> '' then begin
+            Seating.Get(SalePOS."NPRE Pre-Set Seating Code");
+            JSON.SetContext('seatingCode', SalePOS."NPRE Pre-Set Seating Code");
+        end;
+
         FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
@@ -242,12 +257,18 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
 
         DataSource.AddColumn('TableNo', 'Pre-selected Seating (table) code', DataType::String, true);
         DataSource.AddColumn('WaiterPadNo', 'Pre-selected Waiter Pad No.', DataType::String, true);
+        DataSource.AddColumn('NoOfGuests', 'Number of guests', DataType::Integer, true);
+        DataSource.AddColumn('TableStatus', 'Seating (table) status', DataType::String, true);
+        DataSource.AddColumn('WPadStatus', 'Waiter pad status', DataType::String, true);
+        DataSource.AddColumn('MealFlowStatus', 'Meal flow status', DataType::String, true);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDataSourceExtensionReadData', '', true, false)]
     local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         SalePOS: Record "NPR Sale POS";
+        Seating: Record "NPR NPRE Seating";
+        WaiterPad: Record "NPR NPRE Waiter Pad";
         POSSale: Codeunit "NPR POS Sale";
     begin
         if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
@@ -258,7 +279,21 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
+        if Seating.Get(SalePOS."NPRE Pre-Set Seating Code") then
+            Seating.CalcFields("Status Description FF")
+        else
+            Seating.Init();
+        if WaiterPad.Get(SalePOS."NPRE Pre-Set Waiter Pad No.") then
+            WaiterPad.CalcFields("Status Description FF", "Serving Step Description")
+        else
+            WaiterPad.Init();
+
+
         DataRow.Add('TableNo', SalePOS."NPRE Pre-Set Seating Code");
         DataRow.Add('WaiterPadNo', SalePOS."NPRE Pre-Set Waiter Pad No.");
+        DataRow.Add('NoOfGuests', SalePOS."NPRE Number of Guests");
+        DataRow.Add('TableStatus', Seating."Status Description FF");
+        DataRow.Add('WPadStatus', WaiterPad."Status Description FF");
+        DataRow.Add('MealFlowStatus', WaiterPad."Serving Step Description");
     end;
 }
