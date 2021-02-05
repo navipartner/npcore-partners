@@ -64,22 +64,20 @@ codeunit 6150706 "NPR POS Sale Line"
     local procedure InitLine()
     var
         Register: Record "NPR Register";
+        POSStore: Record "NPR POS Store";
     begin
-        with Rec do begin
-            if not (UsePresetLineNo and ("Line No." <> 0)) then
-                "Line No." := GetNextLineNo();
+        if not (UsePresetLineNo and (Rec."Line No." <> 0)) then
+            Rec."Line No." := GetNextLineNo();
 
-            Init;
-            "Register No." := Sale."Register No.";
-            "Sales Ticket No." := Sale."Sales Ticket No.";
-            Date := Sale.Date;
-            "Sale Type" := "Sale Type"::Sale;
-            Type := Type::Item;
+        Rec.Init();
+        Rec."Register No." := Sale."Register No.";
+        Rec."Sales Ticket No." := Sale."Sales Ticket No.";
+        Rec.Date := Sale.Date;
+        Rec."Sale Type" := Rec."Sale Type"::Sale;
+        Rec.Type := Rec.Type::Item;
 
-            if Register.Get(Setup.Register()) then begin
-                "Location Code" := Register."Location Code";
-            end;
-        end;
+        Setup.GetPOSStore(POSStore);
+        Rec."Location Code" := POSStore."Location Code";
     end;
 
     procedure GetNextLineNo() NextLineNo: Integer
@@ -447,17 +445,17 @@ codeunit 6150706 "NPR POS Sale Line"
         Item: Record Item;
         ItemVariant: Record "Item Variant";
         ItemVariants: Page "NPR Item Variants";
-        Register: Record "NPR Register";
+        POSStore: Record "NPR POS Store";
     begin
         if ItemNo = '' then exit;
         if not Item.Get(ItemNo) then exit;
 
         ItemVariant.SetFilter(ItemVariant."Item No.", Item."No.");
         ItemVariant.SetFilter(ItemVariant."NPR Blocked", '=%1', false);
-        if ItemVariant.IsEmpty then exit;
+        if ItemVariant.IsEmpty() then exit;
 
-        if (Register.Get(Sale."Register No.")) then
-            ItemVariants.SetLocationCodeFilter(Register."Location Code");
+        if POSStore.Get(Sale."POS Store Code") then
+            ItemVariants.SetLocationCodeFilter(POSStore."Location Code");
 
         ItemVariants.Editable(false);
         ItemVariants.LookupMode(true);

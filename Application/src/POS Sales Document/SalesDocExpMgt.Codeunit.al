@@ -1541,11 +1541,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         Register: Record "NPR Register";
     begin
         case UseLocationFrom of
-            UseLocationFrom::Register:
-                begin
-                    Register.Get(SalePOS."Register No.");
-                    exit(Register."Location Code");
-                end;
             UseLocationFrom::"POS Store":
                 begin
                     POSStore.Get(SalePOS."POS Store Code");

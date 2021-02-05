@@ -754,6 +754,7 @@ codeunit 6014467 "NPR Retail Journal Code"
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
         Register: Record "NPR Register";
+        LocationCode: Code[10];
     begin
         //-NPR5.49 [334538]
         if not SetRetailJnl(RetailJnlCode) then
@@ -768,13 +769,16 @@ codeunit 6014467 "NPR Retail Journal Code"
                     RetailJnlLine.SetItem("No.", '', '');
                     RetailJnlLine."Quantity to Print" := Abs(Quantity);
                     RetailJnlLine.Validate("Calculation Date", "Sale Date");
-                    if Register.Get("Register No.") then
-                        RetailJnlLine.Validate("Location Filter", Register."Location Code");
+                    LocationCode := GetStoreLocationCode();
+                    if LocationCode = '' then begin
+                        Register.Get("Register No.");
+                        LocationCode := GetPOSUnitLocationCode(Register);
+                    end;
+                    RetailJnlLine.Validate("Location Filter", LocationCode);
                     RetailJnlLine.Insert();
                 until Next = 0;
         end;
         RetailJnlLine.CloseGUI;
-        //+NPR5.49 [334538]
     end;
 
     local procedure RunDynamicRequestPage(var ReturnFilters: Text; Filters: Text): Boolean
@@ -854,6 +858,33 @@ codeunit 6014467 "NPR Retail Journal Code"
 
         exit(RecRef.FindSet);
         //-NPR5.49 [334538]
+    end;
+
+    local procedure GetStoreLocationCode(): Code[10]
+    var
+        POSSession: Codeunit "NPR POS Session";
+        POSFrontEnd: Codeunit "NPR POS Front End Management";
+        POSSetup: Codeunit "NPR POS Setup";
+        POSStore: Record "NPR POS Store";
+    begin
+        if not POSSession.IsActiveSession(POSFrontEnd) then
+            exit('');
+        POSFrontEnd.GetSession(POSSession);
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetPOSStore(POSStore);
+        exit(POSStore."Location Code");
+    end;
+
+    local procedure GetPOSUnitLocationCode(Register: Record "NPR Register"): Code[10]
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSStore: Record "NPR POS Store";
+    begin
+        if not POSUnit.get(Register."Register No.") then
+            exit;
+        if not POSStore.get(POSUnit."POS Store Code") then
+            exit;
+        exit(POSStore."Location Code");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014413, 'OnBeforePrintRetailJournal', '', true, true)]

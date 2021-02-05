@@ -1,8 +1,8 @@
 report 6014574 "NPR Ret. Jnl.: Imp. Ret. Sales"
 {
     Caption = 'Import Return Sales';
-    ProcessingOnly = true; 
-    UsageCategory = ReportsAndAnalysis; 
+    ProcessingOnly = true;
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     dataset
     {
@@ -13,7 +13,7 @@ report 6014574 "NPR Ret. Jnl.: Imp. Ret. Sales"
         dataitem(Register; "NPR Register")
         {
             DataItemTableView = SORTING("Register No.");
-            RequestFilterFields = "Register No.", "Location Code";
+            RequestFilterFields = "Register No.";
             dataitem(AuditRoll; "NPR Audit Roll")
             {
                 DataItemLink = "Register No." = FIELD("Register No.");
@@ -21,6 +21,8 @@ report 6014574 "NPR Ret. Jnl.: Imp. Ret. Sales"
                 RequestFilterFields = "Sale Date";
 
                 trigger OnAfterGetRecord()
+                var
+                    LocationCode: Code[10];
                 begin
                     Clear(RetailJournalLine);
                     RetailJournalLine.Validate("No.", RetailJournalHeader."No.");
@@ -28,7 +30,10 @@ report 6014574 "NPR Ret. Jnl.: Imp. Ret. Sales"
                     RetailJournalLine.Validate("Item No.", AuditRoll."No.");
                     RetailJournalLine.Validate("Quantity to Print", Abs(AuditRoll.Quantity));
                     RetailJournalLine.Validate("Calculation Date", AuditRoll."Sale Date");
-                    RetailJournalLine.Validate("Location Filter", Register."Location Code");
+                    LocationCode := GetStoreLocationCode();
+                    if LocationCode = '' then
+                        LocationCode := GetPOSUnitLocationCode();
+                    RetailJournalLine.Validate("Location Filter", LocationCode);
                     RetailJournalLine.Insert(true);
                     NextNo += 10000;
                 end;
@@ -57,5 +62,32 @@ report 6014574 "NPR Ret. Jnl.: Imp. Ret. Sales"
     var
         RetailJournalLine: Record "NPR Retail Journal Line";
         NextNo: Integer;
+
+    local procedure GetStoreLocationCode(): Code[10]
+    var
+        POSSession: Codeunit "NPR POS Session";
+        POSFrontEnd: Codeunit "NPR POS Front End Management";
+        POSSetup: Codeunit "NPR POS Setup";
+        POSStore: Record "NPR POS Store";
+    begin
+        if not POSSession.IsActiveSession(POSFrontEnd) then
+            exit('');
+        POSFrontEnd.GetSession(POSSession);
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetPOSStore(POSStore);
+        exit(POSStore."Location Code");
+    end;
+
+    local procedure GetPOSUnitLocationCode(): Code[10]
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSStore: Record "NPR POS Store";
+    begin
+        if not POSUnit.get(Register."Register No.") then
+            exit;
+        if not POSStore.get(POSUnit."POS Store Code") then
+            exit;
+        exit(POSStore."Location Code");
+    end;
 }
 
