@@ -25,8 +25,6 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
         NoSeriesMgt: Codeunit NoSeriesManagement;
         TempItem: Record Item temporary;
     begin
-        Rec."NPR Last Changed at" := CurrentDateTime;
-        Rec."NPR Last Changed by" := CopyStr(UserId, 1, MaxStrLen(Rec."NPR Last Changed by"));
         if not RunTrigger then
             exit;
 
@@ -54,8 +52,6 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
 
         if Rec."Price Includes VAT" and (SalesSetup."VAT Bus. Posting Gr. (Price)" <> '') then
             Rec."VAT Bus. Posting Gr. (Price)" := SalesSetup."VAT Bus. Posting Gr. (Price)";
-
-        Rec."Last Date Modified" := Today;
     end;
 
     local procedure ApplyTemplateToTempItem(var Item: Record Item; var TempItem: Record Item temporary; ConfigTemplHeaderCode: Code[10]): Boolean
@@ -89,18 +85,6 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
         if Rec."NPR Item Group" <> '' then
             Rec.Validate("NPR Item Group");
         Rec.Modify;
-    end;
-
-    [EventSubscriber(ObjectType::Table, 27, 'OnBeforeModifyEvent', '', true, false)]
-    local procedure OnBeforeModifyEventLicenseCheck(var Rec: Record Item; var xRec: Record Item; RunTrigger: Boolean)
-    begin
-        Rec."NPR Last Changed at" := CurrentDateTime;
-        Rec."NPR Last Changed by" := CopyStr(UserId, 1, MaxStrLen(Rec."NPR Last Changed by"));
-        if not RunTrigger then
-            exit;
-
-        Rec."Last Date Modified" := Today;
-        Rec."NPR Primary Key Length" := StrLen(Rec."No."); //this line shouldn't be needed as primary key length can't be changed in modify trigger
     end;
 
     [EventSubscriber(ObjectType::Table, 27, 'OnAfterModifyEvent', '', true, true)]
@@ -507,20 +491,7 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
             end;
         end;
 
-        if IsEan13(Rec."No.") then
-            Rec."NPR Label Barcode" := Rec."No.";
         Rec.Validate("NPR Item Group");
-    end;
-
-    local procedure IsEan13(Input: Text): Boolean
-    begin
-        if StrLen(Input) <> 13 then
-            exit(false);
-
-        if DelChr(Input, '=', '0123456789') <> '' then
-            exit(false);
-
-        exit(StrCheckSum(Input, '1313131313131') = 0);
     end;
 
     local procedure UpdateVendorItemCrossRef(var Item: Record Item; xItem: Record Item)

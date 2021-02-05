@@ -1,13 +1,7 @@
 tableextension 6014427 "NPR Item" extends Item
 {
-    LookupPageID = "Item List";
-    DrillDownPageID = "Item List";
     fields
     {
-        modify(Description)
-        {
-            Width = 50;
-        }
         field(6014400; "NPR Item Group"; Code[10])
         {
             Caption = 'Item Group';
@@ -82,12 +76,14 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Last Changed at';
             DataClassification = CustomerContent;
             Description = 'NPR5.48';
+            ObsoleteState = Removed;
         }
         field(6014440; "NPR Last Changed by"; Code[50])
         {
             Caption = 'Last Changed by';
             DataClassification = CustomerContent;
             Description = 'NPR5.48';
+            ObsoleteState = Removed;
         }
         field(6014500; "NPR Second-hand number"; Code[20])
         {
@@ -200,6 +196,7 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Shelf Label Type';
             DataClassification = CustomerContent;
             Description = 'NPR5.51';
+            ObsoleteState = Removed;
         }
         field(6059784; "NPR Ticket Type"; Code[10])
         {
