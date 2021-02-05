@@ -654,21 +654,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Configuration Questionnaire action';
                 }
-                action("Export Wizard")
-                {
-                    Caption = 'Export Wizard';
-                    RunObject = page "NPR Table Export Wizard";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Export Wizard action';
-                }
-
-                action("Import Wizard")
-                {
-                    Caption = 'Import Wizard';
-                    RunObject = page "NPR Table Import Wizard";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Import Wizard action';
-                }
                 action(Users)
                 {
                     Caption = 'Users';
