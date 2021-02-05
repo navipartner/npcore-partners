@@ -88,7 +88,8 @@ page 6060131 "NPR MM Member Cards ListPart"
                 Caption = 'Print Card';
                 Image = PrintVoucher;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Print Card action';
 
@@ -104,7 +105,8 @@ page 6060131 "NPR MM Member Cards ListPart"
                 Caption = 'Card Card';
                 Image = Voucher;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
                 RunObject = Page "NPR MM Member Card Card";
                 RunPageLink = "Entry No." = FIELD("Entry No.");
                 RunPageView = SORTING("Entry No.");

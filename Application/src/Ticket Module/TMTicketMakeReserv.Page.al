@@ -304,7 +304,8 @@ page 6060113 "NPR TM Ticket Make Reserv."
                 Caption = 'Select Schedule';
                 Image = ChangeDate;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
                 PromotedIsBig = true;
 
 

@@ -218,7 +218,8 @@ page 6014406 "NPR Register Card"
                     Caption = 'Autofill';
                     Image = Interaction;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    PromotedOnly = true;
                     PromotedIsBig = true;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Autofill action';

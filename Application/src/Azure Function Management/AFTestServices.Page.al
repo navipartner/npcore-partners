@@ -107,7 +107,7 @@ page 6151572 "NPR AF Test Services"
                     Caption = 'Generate Barcode';
                     Image = Task;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedIsBig = true;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Generate Barcode action';
@@ -126,7 +126,8 @@ page 6151572 "NPR AF Test Services"
                 {
                     Caption = 'Notifications';
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    PromotedOnly = true;
                     PromotedIsBig = true;
                     RunObject = Page "NPR AF Notification Hub List";
                     ApplicationArea = All;
@@ -142,11 +143,10 @@ page 6151572 "NPR AF Test Services"
                     Caption = 'Send SMS';
                     Image = SendConfirmation;
                     Promoted = true;
-				    PromotedOnly = true;
-                    PromotedIsBig = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Send SMS action';
-
                     trigger OnAction()
                     var
                         SMSManagement: Codeunit "NPR SMS Management";
