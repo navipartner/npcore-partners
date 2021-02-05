@@ -129,11 +129,6 @@ page 6014406 "NPR Register Card"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Register Change Account field';
                     }
-                    field("Location Code"; Rec."Location Code")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Location Code field';
-                    }
                     field("VAT Customer No."; Rec."VAT Customer No.")
                     {
                         ApplicationArea = All;

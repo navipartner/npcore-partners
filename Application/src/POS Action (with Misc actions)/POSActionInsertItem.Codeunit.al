@@ -192,7 +192,7 @@ codeunit 6150723 "NPR POS Action: Insert Item"
         UserInformationErrorWarning: Text;
         Item: Record Item;
         ItemCrossReference: Record "Item Cross Reference";
-        Register: Record "NPR Register";
+        POSStore: Record "NPR POS Store";
         Setup: Codeunit "NPR POS Setup";
         ItemIdentifier: Text;
         ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;
@@ -218,8 +218,8 @@ codeunit 6150723 "NPR POS Action: Insert Item"
                     Message(UserInformationErrorWarning);
                 SerialNumberInput := '';
                 POSSession.GetSetup(Setup);
-                Register.Get(Setup.Register());
-                SelectSerialNoFromList(ItemCrossReference, Register."Location Code", 1, false, SerialNumberInput);
+                Setup.GetPOSStore(POSStore);
+                SelectSerialNoFromList(ItemCrossReference, POSStore."Location Code", 1, false, SerialNumberInput);
                 if SerialNumberInput = '' then
                     Error('');
             end;

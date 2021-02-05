@@ -1,19 +1,5 @@
 codeunit 6150813 "NPR POS Action: Item Lookup"
 {
-    // NPR5.34/BR  /20170710  CASE 283668 Added option to Lookup SKU's
-    // NPR5.34/BR  /20170724  CASE 284814  Added possibility to set a tableview
-    // NPR5.36/TSA /20171003  CASE 292281 Trans. Issue with Variuos Item Sales Price
-    // NPR5.40/VB  /20180306  CASE 306347 Refactored InvokeWorkflow call.
-    // NPR5.41/TSA /20180411  CASE 308522 Added Action option to filter item and SKU on location code from POS Store or Cash Register
-    // NPR5.41/TSA /20180412  CASE 311104 Refactoring runmodal and invoke workflow as 2 step rather than one, since the workflow order gets out of sequence.
-    // NPR5.46/MHA /20180925  CASE 329616 Position should be set based on current Sales Line in OnLookupItem()
-    // NPR5.54/TSA /20200220  CASE 391850 Added handling for POS Setup per unit
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is a built in function for handling lookup';
         Setup: Codeunit "NPR POS Setup";
@@ -26,35 +12,26 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.3');
+        exit('1.4');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do begin
-            if DiscoverAction(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion(),
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple) then begin
-                //No UI yet to support lookup, so no trancendance UI worksteps
+        if Sender.DiscoverAction(
+          ActionCode(),
+          ActionDescription,
+          ActionVersion(),
+          Sender.Type::Generic,
+          Sender."Subscriber Instances Allowed"::Multiple) then begin
+            //No UI yet to support lookup, so no trancendance UI worksteps
 
-                RegisterWorkflowStep('do_lookup', 'respond();');
-                //-NPR5.41 [311104]
-                RegisterWorkflowStep('complete_lookup', 'respond();');
-                //+NPR5.41 [311104]
-
-                RegisterWorkflow(false);
-                RegisterOptionParameter('LookupType', CreateOptionString, '');
-                RegisterTextParameter('View', '');
-
-                //-NPR5.41 [308522]
-                RegisterOptionParameter('LocationFilter', 'POS Store,Cash Register,Use View', 'POS Store');
-                //+NPR5.41 [308522]
-
-            end;
+            Sender.RegisterWorkflowStep('do_lookup', 'respond();');
+            Sender.RegisterWorkflowStep('complete_lookup', 'respond();');
+            Sender.RegisterWorkflow(false);
+            Sender.RegisterOptionParameter('LookupType', CreateOptionString, '');
+            Sender.RegisterTextParameter('View', '');
+            Sender.RegisterOptionParameter('LocationFilter', 'POS Store,Cash Register,Use View', 'POS Store');
         end;
     end;
 
@@ -64,14 +41,11 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
         if not Action.IsThisAction(ActionCode) then
             exit;
 
-
         case WorkflowStep of
             'do_lookup':
                 OnLookup(POSSession, FrontEnd, Context);
-            //-NPR5.41 [311104]
             'complete_lookup':
                 CompleteLookup(POSSession, FrontEnd, Context);
-        //+NPR5.41 [311104]
         end;
 
         Handled := true;
@@ -88,10 +62,6 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
 
         //No UI yet to support lookup
         Handled := true;
-    end;
-
-    local procedure "--"()
-    begin
     end;
 
     local procedure OnLookup(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
@@ -118,13 +88,10 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
                     //Not yet implementet
                 end;
 
-            //-NPR5.34 [283668]
             LookupType::SKU:
                 begin
                     OnLookupSKU(POSSession, FrontEnd, Context);
                 end;
-            //+NPR5.34 [283668]
-
             else begin
                     Error('LookUp type %1 is not supported.', Format(LookupType));
                 end;
@@ -152,29 +119,17 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
         if ItemView <> '' then
             Item.SetView(ItemView);
 
-        //-NPR5.41 [308522]
         LocationFilterOption := JSON.GetInteger('LocationFilter', false);
         case LocationFilterOption of
             -1, 0:
                 Item.SetFilter("Location Filter", '=%1', GetStoreLocation(POSSession));
             1:
-                Item.SetFilter("Location Filter", '=%1', GetRegisterLocation(POSSession));
+                Item.SetFilter("Location Filter", '=%1', GetStoreLocation(POSSession));
         end;
-        //+NPR5.41 [308522]
 
         Item.SetFilter(Blocked, '=%1', false);
         Item.SetFilter("NPR Blocked on Pos", '=%1', false);
 
-        //-NPR5.46 [329616]
-        // ItemList.EDITABLE(FALSE);
-        // ItemList.LOOKUPMODE(TRUE);
-        // ItemList.SETTABLEVIEW(Item);
-        // IF ItemList.RUNMODAL = ACTION::LookupOK THEN BEGIN
-        //  ItemList.GETRECORD(Item);
-        //  ItemNo := Item."No.";
-        // END ELSE BEGIN
-        //  ItemNo := '';
-        // END;
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         if SaleLinePOS.Type = SaleLinePOS.Type::Item then
@@ -182,17 +137,9 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
 
         if PAGE.RunModal(PAGE::"Item List", Item) = ACTION::LookupOK then
             ItemNo := Item."No.";
-        //+NPR5.46 [329616]
 
-        //-NPR5.41 [311104]
         JSON.SetContext('selected_itemno', ItemNo);
         FrontEnd.SetActionContext(ActionCode(), JSON);
-        // IF ItemNo = '' THEN BEGIN
-        //  EXIT;
-        // END ELSE BEGIN
-        //   AddItemToSale(ItemNo, POSSession, FrontEnd, Context);
-        // END;
-        //+NPR5.41 [311104]
     end;
 
     local procedure CompleteLookup(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
@@ -203,8 +150,6 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
         ItemNo: Code[20];
         ItemView: Text;
     begin
-
-        //-NPR5.41 [311104]
         JSON.InitializeJObjectParser(Context, FrontEnd);
         ItemNo := JSON.GetString('selected_itemno', true);
         if ItemNo = '' then begin
@@ -212,7 +157,6 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
         end else begin
             AddItemToSale(ItemNo, POSSession, FrontEnd, Context);
         end;
-        //+NPR5.41 [311104]
     end;
 
     local procedure OnLookupSKU(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
@@ -236,16 +180,13 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
         if SKUView <> '' then
             StockkeepingUnit.SetView(SKUView);
 
-        //-NPR5.41 [308522]
         LocationFilterOption := JSON.GetInteger('LocationFilter', false);
         case LocationFilterOption of
             -1, 0:
                 StockkeepingUnit.SetFilter("Location Code", '=%1', GetStoreLocation(POSSession));
             1:
-                StockkeepingUnit.SetFilter("Location Code", '=%1', GetRegisterLocation(POSSession));
+                StockkeepingUnit.SetFilter("Location Code", '=%1', GetStoreLocation(POSSession));
         end;
-        //StockkeepingUnit.SETFILTER("Location Code", '=%1',POSStore."Location Code");
-        //+NPR5.41 [308522]
 
         StockkeepingUnitList.Editable(false);
         StockkeepingUnitList.LookupMode(true);
@@ -257,15 +198,8 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
             ItemNo := '';
         end;
 
-        //-NPR5.41 [311104]
         JSON.SetContext('selected_itemno', ItemNo);
         FrontEnd.SetActionContext(ActionCode(), JSON);
-        // IF ItemNo = '' THEN BEGIN
-        //  EXIT;
-        // END ELSE BEGIN
-        //   AddItemToSale(ItemNo, POSSession, FrontEnd, Context);
-        // END;
-        //+NPR5.41 [311104]
     end;
 
     local procedure AddItemToSale(ItemNo: Code[20]; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
@@ -279,11 +213,8 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
     begin
         if ItemNo = '' then exit;
 
-        //-NPR5.54 [391850] also cleaned green code
-        //POSSetup.GET ();
         POSSession.GetSetup(Setup);
         Setup.GetNamedActionSetup(POSSetup);
-        //+NPR5.54 [391850]
 
         if not POSSession.RetrieveSessionAction(POSSetup."Item Insert Action Code", POSAction) then
             POSAction.Get(POSSetup."Item Insert Action Code");
@@ -320,27 +251,10 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
         POSSetup: Codeunit "NPR POS Setup";
         POSStore: Record "NPR POS Store";
     begin
-
-        //-NPR5.41 [308522]
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSStore(POSStore);
 
         exit(POSStore."Location Code");
-        //+NPR5.41 [308522]
-    end;
-
-    local procedure GetRegisterLocation(POSSession: Codeunit "NPR POS Session"): Code[10]
-    var
-        POSSetup: Codeunit "NPR POS Setup";
-        Register: Record "NPR Register";
-    begin
-
-        //-NPR5.41 [308522]
-        POSSession.GetSetup(POSSetup);
-        POSSetup.GetRegisterRecord(Register);
-
-        exit(Register."Location Code");
-        //+NPR5.41 [308522]
     end;
 }
 

@@ -377,7 +377,7 @@ table 6014425 "NPR Retail Document Header"
         }
         field(43; "Rent Incl. VAT"; Decimal)
         {
-            CalcFormula = Sum ("NPR Retail Document Lines"."Total Rental Amount incl. VAT" WHERE("Document Type" = FIELD("Document Type"),
+            CalcFormula = Sum("NPR Retail Document Lines"."Total Rental Amount incl. VAT" WHERE("Document Type" = FIELD("Document Type"),
                                                                                              "Document No." = FIELD("No.")));
             Caption = 'Rent incl. VAT';
             Editable = false;
@@ -475,7 +475,7 @@ table 6014425 "NPR Retail Document Header"
         }
         field(60; "Total Price"; Decimal)
         {
-            CalcFormula = Sum ("NPR Retail Document Lines"."Amount Including VAT" WHERE("Document Type" = FIELD("Document Type"),
+            CalcFormula = Sum("NPR Retail Document Lines"."Amount Including VAT" WHERE("Document Type" = FIELD("Document Type"),
                                                                                     "Document No." = FIELD("No.")));
             Caption = 'Total Price';
             Editable = false;
@@ -620,7 +620,7 @@ table 6014425 "NPR Retail Document Header"
         }
         field(101; Comment; Boolean)
         {
-            CalcFormula = Exist ("NPR Retail Comment" WHERE("Table ID" = CONST(6014425),
+            CalcFormula = Exist("NPR Retail Comment" WHERE("Table ID" = CONST(6014425),
                                                         "No." = FIELD("No."),
                                                         Option = FIELD("Document Type")));
             Caption = 'Comment';
@@ -653,7 +653,8 @@ table 6014425 "NPR Retail Document Header"
                 TxtSms: Label 'Do you want to send the following SMS to the customer:\%1';
                 SMS: Codeunit "NPR SMS";
                 LocationHere: Record Location;
-                RegisterHere: Record "NPR Register";
+                POSUnit: Record "NPR POS Unit";
+                POSStore: Record "NPR POS Store";
                 LocationName: Text[30];
                 RetailFormCode2: Codeunit "NPR Retail Form Code";
             begin
@@ -665,10 +666,11 @@ table 6014425 "NPR Retail Document Header"
                 SMSMsg := '';
 
                 LocationName := '';
-                if RegisterHere.Get(RetailFormCode2.FetchRegisterNumber()) then
-                    if LocationHere.Get(RegisterHere."Location Code") then
+                if POSUnit.Get(RetailFormCode2.FetchRegisterNumber()) then begin
+                    POSStore.Get(POSUnit."POS Store Code");
+                    if LocationHere.Get(POSStore."Location Code") then
                         LocationName := LocationHere.Name;
-
+                end;
                 if Status = Status::Hjemkommet then begin
                     if ("Document Type" = "Document Type"::"Selection Contract") and RetailSetup."Rental Msg." and (Mobile <> '') then
                         SMSMsg := StrSubstNo(ICommHere."Rental Message", "No.", Format(Status), LocationName);
@@ -765,7 +767,7 @@ table 6014425 "NPR Retail Document Header"
         }
         field(115; Quantity; Decimal)
         {
-            CalcFormula = Sum ("NPR Retail Document Lines".Quantity WHERE("Document Type" = CONST("Retail Order"),
+            CalcFormula = Sum("NPR Retail Document Lines".Quantity WHERE("Document Type" = CONST("Retail Order"),
                                                                       "Document No." = FIELD("No.")));
             Caption = 'Quantity';
             Editable = false;
@@ -773,7 +775,7 @@ table 6014425 "NPR Retail Document Header"
         }
         field(116; "Quantity in Purchase Order"; Decimal)
         {
-            CalcFormula = Sum ("NPR Retail Document Lines"."Quantity in order" WHERE("Document Type" = CONST("Retail Order"),
+            CalcFormula = Sum("NPR Retail Document Lines"."Quantity in order" WHERE("Document Type" = CONST("Retail Order"),
                                                                                  "Document No." = FIELD("No.")));
             Caption = 'Quantity in Purchase Order';
             Editable = false;
@@ -781,7 +783,7 @@ table 6014425 "NPR Retail Document Header"
         }
         field(117; "Quantity Received"; Decimal)
         {
-            CalcFormula = Sum ("NPR Retail Document Lines"."Quantity received" WHERE("Document Type" = CONST("Retail Order"),
+            CalcFormula = Sum("NPR Retail Document Lines"."Quantity received" WHERE("Document Type" = CONST("Retail Order"),
                                                                                  "Document No." = FIELD("No.")));
             Caption = 'Quantity Received';
             Editable = false;
@@ -789,7 +791,7 @@ table 6014425 "NPR Retail Document Header"
         }
         field(118; "Quantity Handed Over"; Decimal)
         {
-            CalcFormula = Sum ("NPR Retail Document Lines"."Quantity Shipped" WHERE("Document Type" = CONST("Retail Order"),
+            CalcFormula = Sum("NPR Retail Document Lines"."Quantity Shipped" WHERE("Document Type" = CONST("Retail Order"),
                                                                                 "Document No." = FIELD("No.")));
             Caption = 'Quantity Handed Over';
             Editable = false;
@@ -797,7 +799,7 @@ table 6014425 "NPR Retail Document Header"
         }
         field(119; Amount; Decimal)
         {
-            CalcFormula = Sum ("NPR Retail Document Lines".Amount WHERE("Document Type" = FIELD("Document Type"),
+            CalcFormula = Sum("NPR Retail Document Lines".Amount WHERE("Document Type" = FIELD("Document Type"),
                                                                     "Document No." = FIELD("No.")));
             Caption = 'Total amount';
             FieldClass = FlowField;
@@ -943,7 +945,7 @@ table 6014425 "NPR Retail Document Header"
         }
         field(140; "VAT Amount"; Decimal)
         {
-            CalcFormula = Sum ("NPR Retail Document Lines"."VAT Amount" WHERE("Document Type" = FIELD("Document Type"),
+            CalcFormula = Sum("NPR Retail Document Lines"."VAT Amount" WHERE("Document Type" = FIELD("Document Type"),
                                                                           "Document No." = FIELD("No.")));
             Caption = 'Total VAT Amount';
             Editable = false;
@@ -1064,7 +1066,7 @@ table 6014425 "NPR Retail Document Header"
         {
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum ("NPR Retail Document Lines"."VAT Base Amount" WHERE("Document Type" = FIELD("Document Type"),
+            CalcFormula = Sum("NPR Retail Document Lines"."VAT Base Amount" WHERE("Document Type" = FIELD("Document Type"),
                                                                                "Document No." = FIELD("No.")));
             Caption = 'VAT Base Amount';
             Editable = false;
@@ -1220,7 +1222,7 @@ table 6014425 "NPR Retail Document Header"
         }
         field(1012; "Amount Incl. VAT"; Decimal)
         {
-            CalcFormula = Sum ("NPR Retail Document Lines"."Amount Including VAT" WHERE("Document Type" = FIELD("Document Type"),
+            CalcFormula = Sum("NPR Retail Document Lines"."Amount Including VAT" WHERE("Document Type" = FIELD("Document Type"),
                                                                                     "Document No." = FIELD("No.")));
             Caption = 'Amount Incl. VAT';
             Editable = false;

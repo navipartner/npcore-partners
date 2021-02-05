@@ -25,11 +25,6 @@ page 6014405 "NPR Register List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Location Code"; "Location Code")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Location Code field';
-                }
                 field("Opening Cash"; "Opening Cash")
                 {
                     ApplicationArea = All;

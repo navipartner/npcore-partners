@@ -153,8 +153,8 @@ codeunit 6151005 "NPR POS Action: Load POS Quote"
         POSQuoteEntry: Record "NPR POS Quote Entry";
         POSQuoteLine: Record "NPR POS Quote Line";
         SaleLinePOS: Record "NPR Sale Line POS";
-        Register: Record "NPR Register";
         SalePOS2: Record "NPR Sale POS";
+        POSStore: Record "NPR POS Store";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -168,11 +168,10 @@ codeunit 6151005 "NPR POS Action: Load POS Quote"
         SalePOS.Find;
 
         if LoadFromQuote(POSQuoteEntry, SalePOS) then begin
-            Register.Get(SalePOS."Register No.");
-            SalePOS."Location Code" := Register."Location Code";
-
             // reload proper dimensions
             POSSale.GetCurrentSale(SalePOS2);
+            POSStore.Get(SalePOS2."POS Store Code");
+            SalePOS."Location Code" := POSStore."Location Code";
             SalePOS.Validate("POS Store Code", SalePOS2."POS Store Code");
             SalePOS.Modify;
 

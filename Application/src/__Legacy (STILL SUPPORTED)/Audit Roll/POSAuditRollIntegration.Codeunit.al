@@ -267,8 +267,6 @@ codeunit 6150617 "NPR POS-Audit Roll Integration"
 
         Register.Init;
         Register."Register No." := Rec."No.";
-        POSStore.Get(Rec."POS Store Code");
-        Register."Location Code" := POSStore."Location Code";
         Register.Insert(true);
     end;
 

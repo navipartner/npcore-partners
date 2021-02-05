@@ -342,10 +342,12 @@ codeunit 6014435 "NPR Retail Form Code"
         GLSetup: Record "General Ledger Setup";
         SaleLinePOS: Record "NPR Sale Line POS";
         POSUnit: Record "NPR POS Unit";
+        POSStore: Record "NPR POS Store";
     begin
         //AfslutEkspedition()
         with Sale do begin
             RetailSetupGlobal.Get;
+            POSStore.Get("POS Store Code");
 
             // Accessory matrix clean-up
             bGaranti := false;
@@ -534,9 +536,9 @@ codeunit 6014435 "NPR Retail Form Code"
                     /* ASSURE: ALWAYS LOCATION CODE AND DEPT. CODE ETC. IN THE AUDIT ROLL */
                     /*---------------------------------------------------------------------------------------------*/
 
-                    if Ekspeditionslinie."Location Code" = '' then
-                        Ekspeditionslinie."Location Code" := Kasse."Location Code";
-
+                    if Ekspeditionslinie."Location Code" = '' then begin
+                        Ekspeditionslinie."Location Code" := POSStore."Location Code";
+                    end;
                     if Ekspeditionslinie."Shortcut Dimension 1 Code" = '' then
                         //Ekspeditionslinie."Shortcut Dimension 1 Code" := Kasse."Global Dimension 1 Code";  //NPR5.53 [371956]-revoked
                         Ekspeditionslinie.Validate("Shortcut Dimension 1 Code", POSUnit."Global Dimension 1 Code");  //NPR5.53 [371956]
@@ -1193,12 +1195,7 @@ codeunit 6014435 "NPR Retail Form Code"
                 LineNo := LineNo + 10000;
                 Revisionsrulle."Sale Type" := Revisionsrulle."Sale Type"::Payment;
                 Revisionsrulle."Sale Date" := Date;
-                Revisionsrulle.Lokationskode := Kasse."Location Code";
-                //-NPR5.53 [371956]-revoked
-                //! Redundant lines. Dimensions are copied from SalePOS later (function MoveSaleDim2AuditRoll() few lines down).
-                //Revisionsrulle."Shortcut Dimension 1 Code"    := Kasse."Global Dimension 1 Code";
-                //Revisionsrulle."Shortcut Dimension 2 Code"    := Kasse."Global Dimension 2 Code";
-                //+NPR5.53 [371956]-revoked
+                Revisionsrulle.Lokationskode := POSStore."Location Code";
                 Revisionsrulle."Closing Time" := Time;
                 Revisionsrulle."Retail Document Type" := Sale."Retail Document Type";
                 Revisionsrulle."Retail Document No." := Sale."Retail Document No.";
@@ -1303,7 +1300,7 @@ codeunit 6014435 "NPR Retail Form Code"
                 if Ekspeditionslinie."Sale Type" = Ekspeditionslinie."Sale Type"::Cancelled then
                     Revisionsrulle.Type := Revisionsrulle.Type::Cancelled;
                 //+NPR5.54 [382465]
-                Revisionsrulle.Lokationskode := Kasse."Location Code";
+                Revisionsrulle.Lokationskode := POSStore."Location Code";
                 //-NPR5.53 [371956]-revoked
                 //Revisionsrulle."Shortcut Dimension 1 Code" := Kasse."Global Dimension 1 Code";
                 //Revisionsrulle."Shortcut Dimension 2 Code" := Kasse."Global Dimension 2 Code";
@@ -1568,6 +1565,7 @@ codeunit 6014435 "NPR Retail Form Code"
         Register: Record "NPR Register";
         AuditRoll: Record "NPR Audit Roll";
         RetailSetup: Record "NPR Retail Setup";
+        POSStore: Record "NPR POS Store";
     begin
         //-NPR5.38 [302761]
         RetailSetup.Get;
@@ -1582,12 +1580,8 @@ codeunit 6014435 "NPR Retail Form Code"
                 AuditRoll.Init;
                 AuditRoll."Register No." := "Register No.";
                 AuditRoll."Sales Ticket No." := "Sales Ticket No.";
-                AuditRoll.Lokationskode := Register."Location Code";
-                //-NPR5.53 [371956]-revoked
-                //! Redundant lines. Dimensions are copied from SalePOS later (function MoveSaleDim2AuditRoll() few lines down).
-                //AuditRoll."Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
-                //AuditRoll."Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
-                //+NPR5.53 [371956]-revoked
+                POSStore.get(SalePOS."POS Store Code");
+                AuditRoll."Lock Code" := POSStore."Location Code";
                 AuditRoll."Sale Type" := AuditRoll."Sale Type"::"Out payment";
                 AuditRoll."Sale Date" := Date;
                 AuditRoll."Line No." := AuditRollLineNo;
@@ -2163,37 +2157,38 @@ codeunit 6014435 "NPR Retail Form Code"
 
     end;
 
-    procedure InsertGiftCrtDiscLine(var "Sale Line": Record "NPR Sale Line POS"; Linienummer: Integer; nRabat: Decimal): Integer
+    procedure InsertGiftCrtDiscLine(var SaleLine: Record "NPR Sale Line POS"; LineNo: Integer; Rabat: Decimal): Integer
     var
         DiscLine: Record "NPR Sale Line POS";
         Kasse: Record "NPR Register";
+        POSStore: Record "NPR POS Store";
+        POSSession: Codeunit "NPR POS Session";
+        POSFrontEnd: Codeunit "NPR POS Front End Management";
+        POSSetup: Codeunit "NPR POS Setup";
         txtDescr: Label 'Discount for Gift Voucher %1';
     begin
-        //InsertGiftCrtDiscLine
-        with "Sale Line" do begin
-            Kasse.Get("Register No.");
-            DiscLine."Register No." := "Register No.";
-            DiscLine."Sales Ticket No." := "Sales Ticket No.";
-            DiscLine."Line No." := Linienummer;
-            DiscLine."Sale Type" := "Sale Type"::"Out payment";
-            DiscLine.Date := Date;
-            DiscLine.Type := DiscLine.Type::"G/L Entry";
-            DiscLine."No." := Kasse."Gift Voucher Discount Account";
-            DiscLine."Location Code" := Kasse."Location Code";
-            //-NPR5.53 [371956]-revoked
-            //! Redundant lines. Dimensions are properly handled by CreateDim() function, not forgetting the Dimension Set ID field.
-            //DiscLine."Shortcut Dimension 1 Code" := Kasse."Global Dimension 1 Code";
-            //DiscLine."Shortcut Dimension 2 Code" := Kasse."Global Dimension 2 Code";
-            //+NPR5.53 [371956]-revoked
-            DiscLine.Validate(Quantity, 1);
-            DiscLine.Amount := nRabat;
-            DiscLine."Unit Price" := nRabat;
-            DiscLine."Amount Including VAT" := nRabat;
-            DiscLine.Insert;
-            DiscLine.Validate("No.");
-            DiscLine.Validate(Description, StrSubstNo(txtDescr, "Sale Line"."Gift Voucher Ref."));
-            DiscLine.Modify;
+        if POSSession.IsActiveSession(POSFrontEnd) then begin
+            POSFrontEnd.GetSession(POSSession);
+            POSSession.GetSetup(POSSetup);
+            POSSetup.GetPOSStore(POSStore);
         end;
+        Kasse.Get(SaleLine."Register No.");
+        DiscLine."Register No." := SaleLine."Register No.";
+        DiscLine."Sales Ticket No." := SaleLine."Sales Ticket No.";
+        DiscLine."Line No." := LineNo;
+        DiscLine."Sale Type" := SaleLine."Sale Type"::"Out payment";
+        DiscLine.Date := SaleLine.Date;
+        DiscLine.Type := DiscLine.Type::"G/L Entry";
+        DiscLine."No." := Kasse."Gift Voucher Discount Account";
+        DiscLine."Location Code" := POSStore."Location Code";
+        DiscLine.Validate(Quantity, 1);
+        DiscLine.Amount := Rabat;
+        DiscLine."Unit Price" := Rabat;
+        DiscLine."Amount Including VAT" := Rabat;
+        DiscLine.Insert();
+        DiscLine.Validate("No.");
+        DiscLine.Validate(Description, StrSubstNo(txtDescr, SaleLine."Gift Voucher Ref."));
+        DiscLine.Modify();
         exit(DiscLine."Line No.");
     end;
 

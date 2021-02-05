@@ -382,60 +382,40 @@ codeunit 6150800 "NPR POS Action: SaleGiftVouch."
 
     local procedure SetVoucherSaleInfo(var SaleLine: Record "NPR Sale Line POS"; PaymentTypePOS: Record "NPR Payment Type POS"; pAmount: Decimal)
     var
-        Register: Record "NPR Register";
+        POSStore: Record "NPR POS Store";
     begin
+        Setup.GetPOSStore(POSStore);
 
-        Register.Get(Setup.Register());
+        SaleLine.Type := SaleLine.Type::"G/L Entry";
+        SaleLine."Sale Type" := SaleLine."Sale Type"::Deposit;
+        SaleLine.Validate("No.", PaymentTypePOS."G/L Account No.");
+        SaleLine."Location Code" := POSStore."Location Code";
 
-        with SaleLine do begin
-            Type := SaleLine.Type::"G/L Entry";
-            "Sale Type" := "Sale Type"::Deposit;
-            Validate("No.", PaymentTypePOS."G/L Account No.");
-            "Location Code" := Register."Location Code";
-            //-NPR5.53 [371956]-revoked
-            //! Redundant lines. Dimensions should be properly handled by CreateDim() function, not forgetting the Dimension Set ID field.
-            //"Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
-            //"Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
-            //+NPR5.53 [371956]-revoked
-            Quantity := 1;
-            Amount := pAmount;
-        end;
+        SaleLine.Quantity := 1;
+        SaleLine.Amount := pAmount;
     end;
 
     local procedure SetVoucherDiscountInfo(var SaleLine: Record "NPR Sale Line POS"; pAmount: Decimal; pVoucherReference: Text)
     var
         Register: Record "NPR Register";
+        POSStore: Record "NPR POS Store";
     begin
-
+        Setup.GetPOSStore(POSStore);
         Register.Get(Setup.Register());
 
-        with SaleLine do begin
-            Type := SaleLine.Type::"G/L Entry";
-            "Sale Type" := "Sale Type"::"Out payment";
+        SaleLine.Type := SaleLine.Type::"G/L Entry";
+        SaleLine."Sale Type" := SaleLine."Sale Type"::"Out payment";
 
-            //-NPR5.48 [345292]
-            //"No." := Register."Gift Voucher Discount Account";
-            Validate("No.", Register."Gift Voucher Discount Account");
-            //+NPR5.48 [345292]
+        SaleLine.Validate("No.", Register."Gift Voucher Discount Account");
+        SaleLine."Location Code" := POSStore."Location Code";
 
-            "Location Code" := Register."Location Code";
-            //-NPR5.53 [371956]-revoked
-            //! Redundant lines. Dimensions should be properly handled by CreateDim() function, not forgetting the Dimension Set ID field.
-            //"Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
-            //"Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
-            //+NPR5.53 [371956]-revoked
-            Validate(Quantity, 1);
-            Amount := pAmount;
-            "Unit Price" := pAmount;
-            "Amount Including VAT" := pAmount;
-            Description := StrSubstNo(DiscountReference, pVoucherReference);
+        SaleLine.Validate(Quantity, 1);
+        SaleLine.Amount := pAmount;
+        SaleLine."Unit Price" := pAmount;
+        SaleLine."Amount Including VAT" := pAmount;
+        SaleLine.Description := StrSubstNo(DiscountReference, pVoucherReference);
 
-            //-NPR5.48 [345292]
-            SaleLine.UpdateAmounts(SaleLine);
-            //+NPR5.48 [345292]
-
-
-        end;
+        SaleLine.UpdateAmounts(SaleLine);
     end;
 
     procedure CreateGiftVoucher(var SaleLinePOS: Record "NPR Sale Line POS"; VoucherNo: Code[20]; GeneratedVoucherNo: Code[20]): Boolean

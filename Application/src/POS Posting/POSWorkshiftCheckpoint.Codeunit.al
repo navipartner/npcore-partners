@@ -1973,6 +1973,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         POSBinEntry: Record "NPR POS Bin Entry";
         PaymentTypePOS: Record "NPR Payment Type POS";
         POSWorkshiftTaxCheckpoint: Record "NPR POS Worksh. Tax Checkp.";
+        POSStore: Record "NPR POS Store";
     begin
 
         POSWorkshiftCheckpoint.Get(CheckpointEntryNo);
@@ -2068,7 +2069,10 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
 
         Kasseperiode."Shortcut Dimension 1 Code" := POSUnit."Global Dimension 1 Code";
         Kasseperiode."Shortcut Dimension 2 Code" := POSUnit."Global Dimension 2 Code";
-        Kasseperiode."Location Code" := Register."Location Code";
+
+        POSStore.get(POSUnit."POS Store Code");
+        Kasseperiode."Location Code" := POSStore."Location Code";
+
         Kasseperiode."Alternative Register No." := Sale."Alternative Register No.";
 
         Kasseperiode."Sales (Qty)" := POSWorkshiftCheckpoint."Direct Sales Count"; //"Sales (Qty)";

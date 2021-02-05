@@ -60,6 +60,7 @@ codeunit 6150825 "NPR POS Action - MPOS Native"
         MPOSAppSetup: Record "NPR MPOS App Setup";
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR Sale POS";
+        POSStore: Record "NPR POS Store";
         JSONString: Text;
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR Sale Line POS";
@@ -71,6 +72,9 @@ codeunit 6150825 "NPR POS Action - MPOS Native"
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
+        POSStore.get(SalePOS."POS Store Code");
+
+        //-NPR5.39
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         if not MPOSAppSetup.Get(SalePOS."Register No.") then
