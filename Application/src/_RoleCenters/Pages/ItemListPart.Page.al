@@ -1,12 +1,10 @@
-page 6014463 "NPR Item List"
+page 6014463 "NPR Item ListPart"
 {
-    AdditionalSearchTerms = 'product,finished good,component,raw material,assembly item';
     Caption = 'Items';
     CardPageID = "Item Card";
     Editable = false;
     PageType = ListPart;
     PromotedActionCategories = 'New,Process,Report,Item,History,Special Prices & Discounts,Request Approval,Periodic Activities,Inventory,Attributes';
-    QueryCategory = 'Item List';
     RefreshOnActivate = true;
     SourceTable = Item;
     UsageCategory = None;
