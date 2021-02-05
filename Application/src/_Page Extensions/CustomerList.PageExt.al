@@ -224,7 +224,8 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
                 Caption = 'Item Ledger Entries';
                 Image = ItemLedger;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Item Ledger Entries action';
             }
@@ -236,7 +237,8 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
                 Caption = 'New Customer';
                 Image = NewCustomer;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
                 RunObject = Page "Customer Card";
                 RunPageMode = Create;
                 ApplicationArea = All;

@@ -106,7 +106,8 @@ page 6151023 "NPR NpRv Arch. Voucher Entries"
                 Caption = 'Navi&gate';
                 Image = Navigate;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Navi&gate action';

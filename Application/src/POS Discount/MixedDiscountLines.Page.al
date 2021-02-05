@@ -145,7 +145,8 @@ page 6014451 "NPR Mixed Discount Lines"
             {
                 Image = NewItem;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
                 PromotedIsBig = true;
                 Visible = (MixType = 1);
                 ApplicationArea = All;
@@ -175,7 +176,8 @@ page 6014451 "NPR Mixed Discount Lines"
             {
                 Image = Item;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Mixed Discount";
                 RunPageLink = Code = FIELD("No.");
