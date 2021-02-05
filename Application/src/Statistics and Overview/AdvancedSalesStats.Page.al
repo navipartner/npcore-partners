@@ -361,7 +361,8 @@ page 6014585 "NPR Advanced Sales Stats"
                     Caption = 'Salesperson Statisticts';
                     Image = SalesPerson;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    PromotedOnly = true;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Salesperson Statisticts action';
 
@@ -385,7 +386,8 @@ page 6014585 "NPR Advanced Sales Stats"
                     Caption = 'Item Group';
                     Image = ItemGroup;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    PromotedOnly = true;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Item Group action';
 
@@ -414,7 +416,8 @@ page 6014585 "NPR Advanced Sales Stats"
                     Caption = 'Item Statistics';
                     Image = Item;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    PromotedOnly = true;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Item Statistics action';
 
@@ -440,7 +443,8 @@ page 6014585 "NPR Advanced Sales Stats"
                     Caption = 'Customer Statistics';
                     Image = Customer;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    PromotedOnly = true;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Customer Statistics action';
 
@@ -464,7 +468,8 @@ page 6014585 "NPR Advanced Sales Stats"
                     Caption = 'Vendor Statistics';
                     Image = Vendor;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    PromotedOnly = true;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Vendor Statistics action';
 
@@ -488,7 +493,8 @@ page 6014585 "NPR Advanced Sales Stats"
                     Caption = 'Item Category Code Statistics';
                     Image = ItemLines;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    PromotedOnly = true;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Item Category Code Statistics action';
 
@@ -512,7 +518,8 @@ page 6014585 "NPR Advanced Sales Stats"
                     Caption = 'Product Group Code Statistics';
                     Image = ProductionSetup;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    PromotedOnly = true;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Product Group Code Statistics action';
 

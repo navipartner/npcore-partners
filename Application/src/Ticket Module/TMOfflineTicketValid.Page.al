@@ -151,7 +151,8 @@ page 6060093 "NPR TM Offline Ticket Valid."
                 Caption = 'Process Entry';
                 Image = Post;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
                 PromotedIsBig = true;
 
 
@@ -169,7 +170,8 @@ page 6060093 "NPR TM Offline Ticket Valid."
                 Caption = 'Process Batch';
                 Image = PostBatch;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
                 PromotedIsBig = true;
 
 
@@ -190,7 +192,8 @@ page 6060093 "NPR TM Offline Ticket Valid."
                 Caption = 'Ticket';
                 Image = Navigate;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket List";
                 RunPageLink = "External Ticket No." = FIELD("Ticket Reference No.");

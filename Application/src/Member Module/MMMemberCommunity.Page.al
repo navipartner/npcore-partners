@@ -101,7 +101,8 @@ page 6060132 "NPR MM Member Community"
                 Caption = 'Loyalty Setup';
                 Image = SalesLineDisc;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
                 RunObject = Page "NPR MM Loyalty Setup";
                 ApplicationArea = All;
                 ToolTip = 'Executes the Loyalty Setup action';
@@ -178,7 +179,7 @@ page 6060132 "NPR MM Member Community"
                 Caption = 'Create Demo Data';
                 ApplicationArea = All;
                 ToolTip = 'Executes the Create Demo Data action';
-                Image = Action; 
+                Image = Action;
 
                 trigger OnAction()
                 var
