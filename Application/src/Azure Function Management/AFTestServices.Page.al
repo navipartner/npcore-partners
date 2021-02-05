@@ -107,6 +107,7 @@ page 6151572 "NPR AF Test Services"
                 {
                     Caption = 'Notifications';
                     Promoted = true;
+                    PromotedCategory = Process;
                     PromotedOnly = true;
                     PromotedIsBig = true;
                     RunObject = Page "NPR AF Notification Hub List";
@@ -123,6 +124,7 @@ page 6151572 "NPR AF Test Services"
                     Caption = 'Send SMS';
                     Image = SendConfirmation;
                     Promoted = true;
+                    PromotedCategory = Process;
                     PromotedOnly = true;
                     PromotedIsBig = true;
                     ApplicationArea = All;

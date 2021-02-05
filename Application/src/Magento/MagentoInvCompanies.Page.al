@@ -62,7 +62,8 @@ page 6151402 "NPR Magento Inv. Companies"
                 Caption = 'Test Api Url';
                 Image = TestFile;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Test Api Url action';

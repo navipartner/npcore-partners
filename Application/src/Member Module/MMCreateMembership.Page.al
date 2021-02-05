@@ -81,7 +81,8 @@ page 6060139 "NPR MM Create Membership"
                 Ellipsis = true;
                 Image = NewCustomer;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Create Membership action';

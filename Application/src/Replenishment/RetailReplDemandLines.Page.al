@@ -225,7 +225,8 @@ page 6151070 "NPR Retail Repl. Demand Lines"
                 Caption = 'Requisition Journal';
                 Image = CalculatePlan;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
                 RunObject = Page "Req. Worksheet";
                 ApplicationArea = All;
                 ToolTip = 'Executes the Requisition Journal action';
@@ -235,7 +236,8 @@ page 6151070 "NPR Retail Repl. Demand Lines"
                 Caption = 'Confirm All';
                 Image = Confirm;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Confirm All action';
 
@@ -250,7 +252,7 @@ page 6151070 "NPR Retail Repl. Demand Lines"
                 Caption = 'DeConfirm All';
                 ApplicationArea = All;
                 ToolTip = 'Executes the DeConfirm All action';
-                Image = Cancel; 
+                Image = Cancel;
 
                 trigger OnAction()
                 begin
@@ -263,7 +265,7 @@ page 6151070 "NPR Retail Repl. Demand Lines"
                 Caption = 'Create Retail Campaign Orders';
                 ApplicationArea = All;
                 ToolTip = 'Executes the Create Retail Campaign Orders action';
-                Image = Order; 
+                Image = Order;
 
                 trigger OnAction()
                 var

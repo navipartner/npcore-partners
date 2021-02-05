@@ -93,7 +93,8 @@ page 6014473 "NPR Retail Journal Print"
                     Caption = 'Invert Selection';
                     Image = Change;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    PromotedOnly = true;
                     PromotedIsBig = true;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Invert Selection action';
@@ -108,7 +109,8 @@ page 6014473 "NPR Retail Journal Print"
                     Caption = 'Price Label';
                     Image = BinLedger;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    PromotedOnly = true;
                     PromotedIsBig = true;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Price Label action';
@@ -125,7 +127,8 @@ page 6014473 "NPR Retail Journal Print"
                     Caption = 'Shelf Label';
                     Image = BinContent;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    PromotedOnly = true;
                     PromotedIsBig = true;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Shelf Label action';
@@ -142,7 +145,8 @@ page 6014473 "NPR Retail Journal Print"
                     Caption = 'Sign';
                     Image = Bin;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    PromotedOnly = true;
                     PromotedIsBig = true;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Sign action';

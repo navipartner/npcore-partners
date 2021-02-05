@@ -34,7 +34,8 @@ pageextension 6014450 "NPR Purchase Quote" extends "Purchase Quote"
                 Caption = 'Import from scanner';
                 Image = Import;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Import from scanner action';
 

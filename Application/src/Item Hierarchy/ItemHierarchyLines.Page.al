@@ -93,7 +93,8 @@ page 6151053 "NPR Item Hierarchy Lines"
                 Caption = 'Add Hierachy Item';
                 Image = NewItem;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Add Hierachy Item action';
 
