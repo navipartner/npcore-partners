@@ -294,13 +294,9 @@ codeunit 85002 "NPR Library - POS Master Data"
     end;
 
     procedure CreatePostingSetupForSaleItem(Item: Record Item; POSUnit: Record "NPR POS Unit"; POSStore: Record "NPR POS Store")
-    var
-        Register: Record "NPR Register";
     begin
         CreateVATPostingSetupForSaleItem(POSStore."VAT Bus. Posting Group", Item."VAT Prod. Posting Group");
-
-        Register.Get(POSUnit."No.");
-        CreateGeneralPostingSetupForSaleItem(POSStore."Gen. Bus. Posting Group", Item."Gen. Prod. Posting Group", Register."Location Code", Item."Inventory Posting Group");
+        CreateGeneralPostingSetupForSaleItem(POSStore."Gen. Bus. Posting Group", Item."Gen. Prod. Posting Group", POSStore."Location Code", Item."Inventory Posting Group");
     end;
 
     procedure CreateVATPostingSetupForSaleItem(VATBusPostGrp: Code[10]; VATProdPostGrp: Code[10])

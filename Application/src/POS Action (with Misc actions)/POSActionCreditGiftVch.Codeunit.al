@@ -120,6 +120,7 @@ codeunit 6150799 "NPR POSAction: CreditGift Vch."
         SaleLine: Record "NPR Sale Line POS";
         PaymentLine: Record "NPR Sale Line POS";
         DiscountLine: Record "NPR Sale Line POS";
+        POSStore: Record "NPR POS Store";
         SalesQuantity: Decimal;
         UnitAmount: Decimal;
         UnitDiscountAmount: Decimal;
@@ -137,6 +138,7 @@ codeunit 6150799 "NPR POSAction: CreditGift Vch."
         POSSession.GetSaleLine(POSSaleLine);
         POSSession.GetSale(POSSale);
         Register.Get(Setup.Register());
+        Setup.GetPOSStore(POSStore);
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
@@ -148,7 +150,7 @@ codeunit 6150799 "NPR POSAction: CreditGift Vch."
         UnitAmount := GetAmount(Context, FrontEnd);
 
         POSSaleLine.GetNewSaleLine(SaleLine);
-        SetVoucherSaleInfo(SaleLine, Register, Abs(UnitAmount));
+        SetVoucherSaleInfo(SaleLine, Register, Abs(UnitAmount), POSStore);
         SaleLine.Insert();
 
         CardActivated := CreateGiftVoucher(SaleLine);
@@ -182,24 +184,15 @@ codeunit 6150799 "NPR POSAction: CreditGift Vch."
         exit(JSON.GetDecimal('numpad', true));
     end;
 
-    local procedure SetVoucherSaleInfo(var SaleLine: Record "NPR Sale Line POS"; Register: Record "NPR Register"; pAmount: Decimal)
+    local procedure SetVoucherSaleInfo(var SaleLine: Record "NPR Sale Line POS"; Register: Record "NPR Register"; pAmount: Decimal; POSStore: Record "NPR POS Store")
     begin
-
-        with SaleLine do begin
-            Type := SaleLine.Type::"G/L Entry";
-            "Sale Type" := "Sale Type"::Deposit;
-            "Register No." := Register."Register No.";
-            Validate("No.", Register."Credit Voucher Account");
-            "Location Code" := Register."Location Code";
-            //-NPR5.53 [371956]-revoked
-            //! Redundant lines. Dimensions should be properly handled by CreateDim() function, not forgetting the Dimension Set ID field.
-            //"Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
-            //"Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
-            //+NPR5.53 [371956]-revoked
-            Quantity := 1;
-            Amount := pAmount;
-
-        end;
+        SaleLine.Type := SaleLine.Type::"G/L Entry";
+        SaleLine."Sale Type" := SaleLine."Sale Type"::Deposit;
+        SaleLine."Register No." := Register."Register No.";
+        SaleLine.Validate("No.", Register."Credit Voucher Account");
+        SaleLine."Location Code" := POSStore."Location Code";
+        SaleLine.Quantity := 1;
+        SaleLine.Amount := pAmount;
     end;
 
     local procedure CreateGiftVoucher(var SaleLine: Record "NPR Sale Line POS") Activated: Boolean

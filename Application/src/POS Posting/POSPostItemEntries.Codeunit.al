@@ -124,8 +124,6 @@ codeunit 6150616 "NPR POS Post Item Entries"
             ItemJnlLine."Shortcut Dimension 1 Code" := "Shortcut Dimension 1 Code";
             ItemJnlLine."Shortcut Dimension 2 Code" := "Shortcut Dimension 2 Code";
             ItemJnlLine."Dimension Set ID" := "Dimension Set ID";
-            if "Location Code" = '' then
-                "Location Code" := GetPOSUnitLocation(POSEntry."POS Unit No.");
             if "Location Code" = '' then begin
                 POSStore.Get(POSEntry."POS Store Code");
                 "Location Code" := POSStore."Location Code";
@@ -583,14 +581,6 @@ codeunit 6150616 "NPR POS Post Item Entries"
             until (POSSalesLine.Next() = 0);
 
         exit(true);
-    end;
-
-    local procedure GetPOSUnitLocation(POSUnitCode: Code[10]): Code[10]
-    var
-        CashRegister: Record "NPR Register";
-    begin
-        if CashRegister.Get(POSUnitCode) then
-            exit(CashRegister."Location Code");
     end;
 
     [IntegrationEvent(false, false)]

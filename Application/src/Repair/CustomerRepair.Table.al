@@ -959,7 +959,7 @@ table 6014504 "NPR Customer Repair"
         }
         field(108; Comment; Boolean)
         {
-            CalcFormula = Exist ("NPR Retail Comment" WHERE("Table ID" = CONST(6014504),
+            CalcFormula = Exist("NPR Retail Comment" WHERE("Table ID" = CONST(6014504),
                                                         "No." = FIELD("No.")));
             Caption = 'Comment';
             FieldClass = FlowField;
@@ -1137,14 +1137,6 @@ table 6014504 "NPR Customer Repair"
         RetailSetup.Get;
 
         "Handed In Date" := Today;
-        //-NPR5.29
-        // Register := RetailFormCode.FetchRegisterNumber;
-        // IF Register = '?' THEN
-        //  IF PAGE.RUNMODAL(6014405, RecRegister) = ACTION::LookupOK THEN
-        //    Register := RecRegister."Register No."
-        //  ELSE
-        //    ERROR(Text1060017);
-        //+NPR5.29
         "Prices Including VAT" := RetailSetup."Fixed Price of Mending";
         "Price when Not Accepted" := RetailSetup."Fixed Price of Denied Mending";
 
@@ -1154,24 +1146,15 @@ table 6014504 "NPR Customer Repair"
         end else begin
             NoSeriesMgt.TestManual(RetailSetup."Customer Repair Management");
         end;
-        //-NPR5.29
-        //RegisterNo := Register;
-        //RecRegister.GET(RegisterNo);
+
         if UserSetup.Get(UserId) then begin
             if RecRegister.Get(UserSetup."NPR Backoffice Register No.") then begin
-                Location := RecRegister."Location Code";
-                //-NPR5.53 [371956]-revoked
-                //"Global Dimension 1 Code" := RecRegister."Global Dimension 1 Code";
-                //"Global Dimension 2 Code" := RecRegister."Global Dimension 2 Code";
-                //+NPR5.53 [371956]-revoked
-                //-NPR5.53 [371956]
+                Location := GetStoreLocationCode();
                 POSUnit.Get(UserSetup."NPR Backoffice Register No.");
                 "Global Dimension 1 Code" := POSUnit."Global Dimension 1 Code";
                 "Global Dimension 2 Code" := POSUnit."Global Dimension 2 Code";
-                //+NPR5.53 [371956]
             end;
         end;
-        //+NPR5.29
     end;
 
     trigger OnModify()
@@ -1477,6 +1460,21 @@ table 6014504 "NPR Customer Repair"
                 SalesLine.Modify;
             until CustomerRepairJournal.Next = 0;
         //+NPR5.30 [262923]
+    end;
+
+    local procedure GetStoreLocationCode(): Code[10]
+    var
+        POSSession: Codeunit "NPR POS Session";
+        POSFrontEnd: Codeunit "NPR POS Front End Management";
+        POSSetup: Codeunit "NPR POS Setup";
+        POSStore: Record "NPR POS Store";
+    begin
+        if not POSSession.IsActiveSession(POSFrontEnd) then
+            exit('');
+        POSFrontEnd.GetSession(POSSession);
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetPOSStore(POSStore);
+        exit(POSStore."Location Code");
     end;
 }
 

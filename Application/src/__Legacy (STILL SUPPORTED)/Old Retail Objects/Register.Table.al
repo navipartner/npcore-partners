@@ -65,6 +65,9 @@ table 6014401 "NPR Register"
             Caption = 'Location Code';
             DataClassification = CustomerContent;
             TableRelation = Location.Code;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore';
+            ObsoleteTag = 'NPR Register -> NPR POS Store';
         }
         field(9; "Register Type"; Code[10])
         {

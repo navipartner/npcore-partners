@@ -86,7 +86,7 @@ table 6014405 "NPR Sale POS"
                 Register.Get("Register No.");
                 GetPOSUnit;
                 "POS Store Code" := POSUnit."POS Store Code";
-                GetPOSStore;
+                GetPOSStore();
 
                 "Customer Price Group" := Register."Customer Price Group";
                 "Customer Disc. Group" := Register."Customer Disc. Group";
@@ -742,10 +742,11 @@ table 6014405 "NPR Sale POS"
 
     trigger OnInsert()
     begin
-        RetailSetup.Get;
+        RetailSetup.Get();
+        GetPOSStore();
 
         Register.Get("Register No.");
-        "Location Code" := Register."Location Code";
+        "Location Code" := POSStore."Location Code";
         "Customer Disc. Group" := Register."Customer Disc. Group";
         "POS Sale ID" := 0;
         "Event No." := Register."Active Event No.";
