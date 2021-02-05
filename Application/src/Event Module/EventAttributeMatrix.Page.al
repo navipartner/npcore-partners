@@ -177,7 +177,8 @@ page 6060155 "NPR Event Attribute Matrix"
                     Caption = 'Show Events In Filter';
                     Image = ShowList;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    PromotedOnly = true;
                     Visible = FilterMode;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Show Events In Filter action';

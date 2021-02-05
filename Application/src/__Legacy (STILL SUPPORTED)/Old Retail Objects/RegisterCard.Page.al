@@ -218,6 +218,7 @@ page 6014406 "NPR Register Card"
                     Caption = 'Autofill';
                     Image = Interaction;
                     Promoted = true;
+                    PromotedCategory = Process;
                     PromotedOnly = true;
                     PromotedIsBig = true;
                     ApplicationArea = All;

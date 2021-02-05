@@ -43,7 +43,8 @@ page 6151055 "NPR Distrib. Group List"
                 Caption = 'Distribution Setup';
                 Image = SetupList;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
                 RunObject = Page "NPR Distribution Setup";
                 RunPageLink = "Distribution Group" = FIELD(Code);
                 ApplicationArea = All;
@@ -54,7 +55,8 @@ page 6151055 "NPR Distrib. Group List"
                 Caption = 'Distribution Group Members';
                 Image = Group;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
                 RunObject = Page "NPR Distrib. Group Member List";
                 RunPageLink = "Distribution Group" = FIELD(Code);
                 ApplicationArea = All;

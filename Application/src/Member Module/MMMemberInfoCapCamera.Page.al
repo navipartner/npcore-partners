@@ -55,7 +55,8 @@ page 6060145 "NPR MM Member Info Cap. Camera"
                 Image = Save;
                 InFooterBar = true;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Save Photo action';
 
@@ -70,7 +71,8 @@ page 6060145 "NPR MM Member Info Cap. Camera"
                 Image = Camera;
                 InFooterBar = true;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Snap Photo action';
 

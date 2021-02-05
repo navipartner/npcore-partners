@@ -63,7 +63,8 @@ page 6014529 "NPR Touch Screen: Balanc.Line"
                 Caption = 'Or set total';
                 Image = Totals;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Or set total action';
 
