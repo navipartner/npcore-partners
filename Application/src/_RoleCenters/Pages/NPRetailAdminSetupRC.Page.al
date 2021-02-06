@@ -7,7 +7,10 @@ page 6151245 "NPR NP Retail Admin Setup RC"
     {
         area(rolecenter)
         {
-
+            part(control1246;"NPR generic retail Headline")
+            {
+                ApplicationArea = All;
+            }
             part(Control1904484608; "NPR Retail Admin Act - POS")
             {
                 ApplicationArea = All;
