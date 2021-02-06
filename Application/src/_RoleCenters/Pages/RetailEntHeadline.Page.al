@@ -13,6 +13,7 @@ page 6151332 "NPR Retail Ent Headline"
             group(Control9)
             {
                 ShowCaption = false;
+                Visible = UserGreetingVisible;
 
                 field(GreetingText; GreetingText)
                 {
