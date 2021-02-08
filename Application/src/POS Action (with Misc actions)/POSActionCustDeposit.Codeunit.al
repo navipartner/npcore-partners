@@ -1,24 +1,15 @@
 codeunit 6150864 "NPR POS Action: Cust. Deposit"
 {
-    // NPR5.50/MMV /20181105 CASE 300557 New action, based on CU 6150806
-    // NPR5.51/MMV /20190617 CASE 352473 Added missing VAT recalculation.
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'Collect customer deposits, optionally applied directly to entries.';
         CAPTION_INVOICENOPROMPT: Label 'Enter document no.';
         CAPTION_AMOUNTPROMPT: Label 'Enter amount to deposit';
         TextDeposit: Label 'Deposit from: %1';
-        BalanceIsZero: Label 'Customer balance is 0, there is nothing to add.';
         CAPTION_DEPOSITTYPE: Label 'Deposit Type';
         CAPTION_CUSTOMERVIEW: Label 'Customer Entry View';
         DESC_DEPOSITTYPE: Label 'Select how deposit is entered';
         DESC_CUSTOMERVIEW: Label 'Pre-filtered customer entry view';
-        OPTION_DEPOSITTYPE: Label 'Apply To Customer Entries,Invoice No. Prompt,Amount Prompt,Match Amount To Customer Balance';
+        OPTION_DEPOSITTYPE: Label 'Apply To Customer Entries,Invoice No. Prompt,Amount Prompt,Match Amount To Customer Balance,Cr. Memo No. Prompt';
 
     local procedure ActionCode(): Text
     begin
@@ -27,45 +18,47 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.0');
+        exit('1.1');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do begin
-            if DiscoverAction(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion(),
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple) then begin
-                RegisterWorkflowStep('Prompt',
-                  '(param.DepositType == 1) && input(labels.InvoiceNoPrompt).cancel(abort);' +
-                  '(param.DepositType == 2) && numpad(labels.AmountPrompt).cancel(abort);');
-                RegisterWorkflowStep('CreateDeposit', 'respond();');
-                RegisterWorkflow(false);
+        if Sender.DiscoverAction(
+          ActionCode(),
+          ActionDescription,
+          ActionVersion(),
+          Sender.Type::Generic,
+          Sender."Subscriber Instances Allowed"::Multiple) then begin
 
-                RegisterOptionParameter('DepositType', 'ApplyCustomerEntries,InvoiceNoPrompt,AmountPrompt,MatchCustomerBalance', 'ApplyCustomerEntries');
-                RegisterTextParameter('CustomerEntryView', '');
-            end;
+
+            Sender.RegisterWorkflowStep('Prompt',
+              '(param.DepositType == 1) && input(labels.InvoiceNoPrompt).cancel(abort);' +
+              '(param.DepositType == 2) && numpad(labels.AmountPrompt).cancel(abort);' +
+              '(param.DepositType == 4) && input(labels.CrMemoNoPrompt).cancel(abort);');
+            Sender.RegisterWorkflowStep('CreateDeposit', 'respond();');
+            Sender.RegisterWorkflow(false);
+
+            Sender.RegisterOptionParameter('DepositType', 'ApplyCustomerEntries,InvoiceNoPrompt,AmountPrompt,MatchCustomerBalance,CrMemoNoPrompt', 'ApplyCustomerEntries');
+            Sender.RegisterTextParameter('CustomerEntryView', '');
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     var
         UI: Codeunit "NPR POS UI Management";
     begin
         Captions.AddActionCaption(ActionCode, 'InvoiceNoPrompt', CAPTION_INVOICENOPROMPT);
         Captions.AddActionCaption(ActionCode, 'AmountPrompt', CAPTION_AMOUNTPROMPT);
+        Captions.AddActionCaption(ActionCode, 'CrMemoNoPrompt', CAPTION_INVOICENOPROMPT);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
-        DepositType: Option ApplyCustomerEntries,InvoiceNoPrompt,AmountPrompt,MatchCustomerBalance;
+        DepositType: Option ApplyCustomerEntries,InvoiceNoPrompt,AmountPrompt,MatchCustomerBalance,CrMemoNoPrompt;
         CustomerEntryView: Text;
         SalePOS: Record "NPR Sale POS";
         POSSale: Codeunit "NPR POS Sale";
@@ -91,6 +84,8 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
                 MatchCustomerBalance(POSSession);
             DepositType::AmountPrompt:
                 AmountPrompt(POSSession, JSON);
+            DepositType::CrMemoNoPrompt:
+                CrMemoNoPrompt(POSSession, JSON);
         end;
         POSSession.RequestRefreshData();
     end;
@@ -141,6 +136,24 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
         POSApplyCustomerEntries.BalanceDocument(POSSession, CustLedgerEntry."Document Type"::Invoice, InvoiceNo, false);
     end;
 
+    local procedure CrMemoNoPrompt(POSSession: Codeunit "NPR POS Session"; JSON: Codeunit "NPR POS JSON Management")
+    var
+        POSSale: Codeunit "NPR POS Sale";
+        SalePOS: Record "NPR Sale POS";
+        POSApplyCustomerEntries: Codeunit "NPR POS Apply Customer Entries";
+        CrMemoNo: Text;
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        SaleLinePOS: Record "NPR Sale Line POS";
+        CustLedgerEntry: Record "Cust. Ledger Entry";
+    begin
+        CrMemoNo := GetInput(JSON, 'Prompt');
+
+        if (CrMemoNo = '') then
+            exit;
+
+        POSApplyCustomerEntries.BalanceDocument(POSSession, CustLedgerEntry."Document Type"::"Credit Memo", CrMemoNo, false);
+    end;
+
     local procedure MatchCustomerBalance(POSSession: Codeunit "NPR POS Session")
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -171,16 +184,12 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
         SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Deposit;
         SaleLinePOS.Type := SaleLinePOS.Type::Customer;
         SaleLinePOS.Validate("No.", SalePOS."Customer No.");
-        //-NPR5.51 [352473]
         SaleLinePOS.Quantity := 1;
-        //+NPR5.51 [352473]
         SaleLinePOS.Amount := Amount;
         SaleLinePOS."Amount Including VAT" := Amount;
         SaleLinePOS."Unit Price" := Amount;
         SaleLinePOS.Description := StrSubstNo(TextDeposit, SalePOS.Name);
-        //-NPR5.51 [352473]
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
-        //+NPR5.51 [352473]
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
     end;
 
@@ -204,7 +213,7 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
         SalePOS.Validate("Customer No.", Customer."No.");
         SalePOS.Modify(true);
         POSSale.RefreshCurrent();
-        Commit;
+        Commit();
         exit(true);
     end;
 
@@ -226,7 +235,7 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
         exit(JSON.GetDecimal('numpad', true));
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', false, false)]
     procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
         if POSParameterValue."Action Code" <> ActionCode then
@@ -240,7 +249,7 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', false, false)]
     procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
         if POSParameterValue."Action Code" <> ActionCode then
@@ -254,7 +263,7 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterOptionStringCaption', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterOptionStringCaption', '', false, false)]
     procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
         if POSParameterValue."Action Code" <> ActionCode then
@@ -266,7 +275,7 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', false, false)]
     local procedure OnLookupParameter(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean)
     var
         FilterPageBuilder: FilterPageBuilder;
@@ -289,7 +298,7 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnValidateValue', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnValidateValue', '', false, false)]
     local procedure OnValidateParameter(var POSParameterValue: Record "NPR POS Parameter Value")
     var
         CustLedgerEntry: Record "Cust. Ledger Entry";
