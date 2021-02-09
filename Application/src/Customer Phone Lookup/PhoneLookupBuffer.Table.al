@@ -1,10 +1,5 @@
 table 6014432 "NPR Phone Lookup Buffer"
 {
-    // NPR5.23/BHR/20160309 CASE 222711 Added fields 14..18
-    // NPR5.26/MHA /20160921  CASE 252881 Added field 30 Mobile Phone No. and deleted unused field 18 P and functions
-    // NPR5.27/TJ/20160926 CASE 248292 Removing unused variables and fields, renaming fields and variables to use standard naming procedures
-    // NPR5.40/LS  /20180226  CASE 305526 Adding Fields 40..41
-    // NPR5.40/JDH /20180330 CASE 309516 Removed unused functions
 
     Caption = 'TDC Names & Numbers Buffer';
     DataClassification = CustomerContent;
@@ -127,10 +122,6 @@ table 6014432 "NPR Phone Lookup Buffer"
         key(Key1; ID)
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

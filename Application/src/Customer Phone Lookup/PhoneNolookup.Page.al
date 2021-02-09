@@ -1,7 +1,5 @@
 page 6014412 "NPR Phone No lookup"
 {
-    // NPR5.41/TS  /20180105 CASE 300893 Change Name of Action LookupPhone to Lookup Phone
-
     Caption = 'Phone No lookup';
     PageType = Card;
     UsageCategory = Administration;
@@ -23,41 +21,41 @@ page 6014412 "NPR Phone No lookup"
 
                     trigger OnValidate()
                     begin
-                        DeleteAll;
-                        CheckifExist;
+                        Rec.DeleteAll();
+                        CheckifExist();
                     end;
                 }
-                field(ID; ID)
+                field(ID; Rec.ID)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the ID field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Post Code"; "Post Code")
+                field("Post Code"; Rec."Post Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Post Code field';
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the City field';
                 }
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Address field';
                 }
-                field("E-Mail"; "E-Mail")
+                field("E-Mail"; Rec."E-Mail")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the E-Mail field';
                 }
-                field("Home Page"; "Home Page")
+                field("Home Page"; Rec."Home Page")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Home Page field';
@@ -76,7 +74,7 @@ page 6014412 "NPR Phone No lookup"
 
                     trigger OnValidate()
                     begin
-                        CheckifExist;
+                        CheckifExist();
                     end;
                 }
                 field(NewCust; NewCust)
@@ -93,7 +91,7 @@ page 6014412 "NPR Phone No lookup"
 
                     trigger OnValidate()
                     begin
-                        CheckifExist;
+                        CheckifExist();
                     end;
                 }
                 field(NewVendor; NewVendor)
@@ -110,7 +108,7 @@ page 6014412 "NPR Phone No lookup"
 
                     trigger OnValidate()
                     begin
-                        CheckifExist;
+                        CheckifExist();
                     end;
                 }
             }
@@ -126,7 +124,7 @@ page 6014412 "NPR Phone No lookup"
                 Caption = 'Lookup Phone';
                 Image = GetEntries;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F6';
@@ -135,7 +133,7 @@ page 6014412 "NPR Phone No lookup"
 
                 trigger OnAction()
                 begin
-                    LookupPhone;
+                    LookupPhone();
                 end;
             }
             action(Create)
@@ -143,7 +141,7 @@ page 6014412 "NPR Phone No lookup"
                 Caption = 'Create';
                 Image = New;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F3';
@@ -152,16 +150,14 @@ page 6014412 "NPR Phone No lookup"
 
                 trigger OnAction()
                 begin
-                    CreateDetails;
+                    CreateDetails();
                 end;
             }
         }
     }
 
     var
-        ID: Code[10];
         PhoneNo: Text[100];
-        TDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary;
         NewCust: Boolean;
         NewVendor: Boolean;
         NewContact: Boolean;
@@ -172,61 +168,65 @@ page 6014412 "NPR Phone No lookup"
         NameandNumberslookup: Codeunit "NPR Phone Lookup";
 
     local procedure Initialize()
+    var
+        LookupLbl: Label 'LOOKUPPHONE', Locked = true;
     begin
-        DeleteAll;
-        "Phone No." := PhoneNo;
-        "No. Info Functions" := 'LOOKUPPHONE';
+        Rec.DeleteAll();
+        Rec."Phone No." := PhoneNo;
+        Rec."No. Info Functions" := LookupLbl;
     end;
 
     local procedure LookupPhone()
     begin
-        Initialize;
-        RunCodeunit;
+        Initialize();
+        RunCodeunit();
     end;
 
     local procedure CreateDetails()
+    var
+        CreateLbl: Label 'CREATE', Locked = true;
     begin
-        "Create Contact" := NewContact;
-        "Create Customer" := NewCust;
-        "Create Vendor" := NewVendor;
-        "No. Info Functions" := 'CREATE';
+        Rec."Create Contact" := NewContact;
+        Rec."Create Customer" := NewCust;
+        Rec."Create Vendor" := NewVendor;
+        Rec."No. Info Functions" := CreateLbl;
 
         NameandNumberslookup.Creation(Rec);
     end;
 
     local procedure RunCodeunit()
     begin
-        Icomm.Get;
+        Icomm.Get();
         CODEUNIT.Run(Icomm."Number Info Codeunit ID", Rec);
     end;
 
     local procedure CheckifExist()
     var
-        Text000: Label 'Contact already exists.';
-        Text001: Label 'Vendor already exists.';
-        Text002: Label 'Customer already exists.';
+        ContactExistMsg: Label 'Contact already exists.';
+        VendorExistMsg: Label 'Vendor already exists.';
+        CustomerExistMsg: Label 'Customer already exists.';
     begin
         if NewContact then begin
             if Contact.Get(PhoneNo) then begin
                 NewContact := false;
-                Message(Text000);
+                Message(ContactExistMsg);
             end;
         end;
 
         if NewCust then begin
             if Customer.Get(PhoneNo) then begin
                 NewCust := false;
-                Message(Text002);
+                Message(CustomerExistMsg);
             end;
         end;
 
         if NewVendor then begin
             if Vendor.Get(PhoneNo) then begin
                 NewVendor := false;
-                Message(Text001);
+                Message(VendorExistMsg);
             end;
         end;
-        CurrPage.Update;
+        CurrPage.Update();
     end;
 
     procedure Getrec(var "TDC Names & Numbers Buffer": Record "NPR Phone Lookup Buffer")
@@ -238,9 +238,9 @@ page 6014412 "NPR Phone No lookup"
     begin
         Rec := "TDC Names & Numbers Buffer";
 
-        NewContact := "Create Contact";
-        NewCust := "Create Customer";
-        NewVendor := "Create Vendor";
+        NewContact := Rec."Create Contact";
+        NewCust := Rec."Create Customer";
+        NewVendor := Rec."Create Vendor";
     end;
 }
 

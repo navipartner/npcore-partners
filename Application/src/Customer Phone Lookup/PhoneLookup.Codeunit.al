@@ -1,85 +1,46 @@
 codeunit 6014437 "NPR Phone Lookup"
 {
-    // NPR5.40/LS  /20180226  CASE 305526 Modified UpdateMemberInfoCapture() to allow saving of First Name and Last Name for membersNPR5.23/BHR /20160325  CASE 222711 Phone lookup
-    // NPR5.23/TSA /20160505  CASE 222711 Changed how subscriber interprets blank phone no. and added check on the functionen enabbled field
-    // NPR5.23/LS  /20160513  CASE 226819 Added functions ApplyConfigTemplate, UpdCustomerAfterInsert, UpdVendorAfterInsert. Commented function
-    // NPR5.25/BHR /20160727  CASE 247278 TDC functionality for Vendors.
-    // NPR5.26/MHA /20160921  CASE 252881 Subscriber funtions changed from Insert to OnValidateNo to avoid double invoke on Contact sync and Extended Lookup with Contact
-    // NPR5.27/BHR /20162010  CASE 255864 Set functions '--- BufferToRec',UpdateCont(),UpdateCust(),UpdateVend() to Global variables
-    // NPR5.27/LS  /20161025  CASE 251264 Separated TDC and Config Template, Modified ContactOnValidateNo,CustomerOnValidateNo,VendorOnValidateNo
-    //                                    Added functions CustomerOnAfterInsert(),CustomerOnAfterModify(),ContactOnAfterInsert(),ContactOnAfterModify(), VendorOnAfterInsert(),VendorOnAfterModify()
-    //                                    Modifed function ApplyConfigTemplate(), Replace param RecVariant by RecRef
-    // NPR5.28/MHA /20161104  CASE 257461 Added GUIALLOWED check to ApplyConfigTemplate() and RunPhoneLookup()
-    // NPR5.29/MHA /20170118  CASE 263883 Missing InitIcomm() added for when RunPhoneLookup is invoked Externally
-    // NPR5.29/TJ  /20170125  CASE 263507 New subscribers moved from PhoneLookup actions on pages
-    // NPR5.31/BHR /20170316  CASE 268879 Phone Lookup For members
-    // NPR5.38/MHA /20180105  CASE 301053 Added missing ; in CreateCustomer() and CreateVendor()
-    // NPR5.40/LS  /20180226  CASE 305526 Modified UpdateMemberInfoCapture() to allow saving of First Name and Last Name for members
-    // NPR5.48/JC  /20181217 CASE 313549 added subcriber function CustomerOnValidatePhoneNo
-    // NPR5.49/LS  /20190402  CASE 313549 Commented 5.48 codes due to wrong flow.
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         IComm: Record "NPR I-Comm";
         Initialized: Boolean;
-        Text000: Label 'Do you wish to apply Config. Template %1?';
-        Text001: Label 'Do you want to do TDC lookup?';
+        ApplyTemplateQst: Label 'Do you wish to apply Config. Template %1?', Comment= '%1 = Config. Template Header Code';
 
-    local procedure "--- Phone Lookup"()
-    begin
-    end;
 
-    procedure RunPhoneLookup(PhoneNo: Text[30]; var PhoneLookupBuffer: Record "NPR Phone Lookup Buffer" temporary): Boolean
+    procedure RunPhoneLookup(PhoneNo: Text[30]; var TempPhoneLookupBuffer: Record "NPR Phone Lookup Buffer" temporary): Boolean
     begin
-        //-NPR5.26 [252881]
-        if not PhoneLookupBuffer.IsTemporary then
+        if not TempPhoneLookupBuffer.IsTemporary() then
             exit(false);
 
-        //-NPR5.28 [257461]
         if not GuiAllowed then
             exit(false);
-        //+NPR5.28 [257461]
 
-        //-NPR5.29 [263883]
         if not InitIComm() then
             exit;
-        //+NPR5.29 [263883]
 
-        Clear(PhoneLookupBuffer);
-        PhoneLookupBuffer."Phone No." := PhoneNo;
+        Clear(TempPhoneLookupBuffer);
+        TempPhoneLookupBuffer."Phone No." := PhoneNo;
 
-        CODEUNIT.Run(IComm."Number Info Codeunit ID", PhoneLookupBuffer);
+        CODEUNIT.Run(IComm."Number Info Codeunit ID", TempPhoneLookupBuffer);
 
-        case PhoneLookupBuffer.Count of
+        case TempPhoneLookupBuffer.Count of
             0:
-                begin
-                    exit(false);
-                end;
+                exit(false);
             1:
                 begin
-                    PhoneLookupBuffer.FindFirst;
+                    TempPhoneLookupBuffer.FindFirst();
                     exit(true);
                 end;
         end;
 
-        exit(PAGE.RunModal(PAGE::"NPR Phone Number Lookup", PhoneLookupBuffer) = ACTION::LookupOK);
-        //+NPR5.26 [252881]
+        exit(PAGE.RunModal(PAGE::"NPR Phone Number Lookup", TempPhoneLookupBuffer) = ACTION::LookupOK);
     end;
 
-    local procedure "---- Subscribers"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Table, 5050, 'OnAfterValidateEvent', 'No.', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::Contact, 'OnAfterValidateEvent', 'No.', true, true)]
     local procedure ContactOnValidateNo(var Rec: Record Contact; var xRec: Record Contact; CurrFieldNo: Integer)
     var
-        Cont: Record Contact;
         ConfigTemplateHeader: Record "Config. Template Header";
-        PhoneLookupBuffer: Record "NPR Phone Lookup Buffer" temporary;
+        Cont: Record Contact;
+        TempPhoneLookupBuffer: Record "NPR Phone Lookup Buffer" temporary;
     begin
         if xRec."No." <> '' then
             exit;
@@ -90,18 +51,17 @@ codeunit 6014437 "NPR Phone Lookup"
         if not InitIComm() then
             exit;
 
-        if RunPhoneLookup(Rec."No.", PhoneLookupBuffer) then
-            UpdateCont(Rec, PhoneLookupBuffer);
+        if RunPhoneLookup(Rec."No.", TempPhoneLookupBuffer) then
+            UpdateCont(Rec, TempPhoneLookupBuffer);
     end;
 
-    [EventSubscriber(ObjectType::Table, 5050, 'OnAfterInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::Contact, 'OnAfterInsertEvent', '', true, true)]
     local procedure ContactOnAfterInsert(var Rec: Record Contact; RunTrigger: Boolean)
     var
-        Cont: Record Contact;
         ConfigTemplateHeader: Record "Config. Template Header";
+        Cont: Record Contact;
         RecRef: RecordRef;
     begin
-        //-NPR5.27 [251264]
         if not RunTrigger then
             exit;
 
@@ -118,42 +78,36 @@ codeunit 6014437 "NPR Phone Lookup"
         ApplyConfigTemplate(RecRef, ConfigTemplateHeader, IComm."Config Request (Contact)" = IComm."Config Request (Contact)"::Ask);
         RecRef.SetTable(Rec);
         Rec.Modify(false);
-        //+NPR5.27 [251264]
     end;
 
-    [EventSubscriber(ObjectType::Table, 5050, 'OnAfterModifyEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::Contact, 'OnAfterModifyEvent', '', true, true)]
     local procedure ContactOnAfterModify(var Rec: Record Contact; RunTrigger: Boolean)
     begin
-        //-NPR5.27 [251264]
         if not RunTrigger then
             exit;
 
         Rec."Last Date Modified" := Today;
         Rec.Modify(false);
-        //+NPR5.27 [251264]
     end;
 
-    [EventSubscriber(ObjectType::Page, 5052, 'OnAfterActionEvent', 'NPR PhoneLookup', false, false)]
+    [EventSubscriber(ObjectType::Page, Page::"Contact List", 'OnAfterActionEvent', 'NPR PhoneLookup', false, false)]
     local procedure ContactListOnAfterAction(var Rec: Record Contact)
     var
+        TempTDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary;
         PhoneNoLookup: Page "NPR Phone No lookup";
-        TDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary;
     begin
-        //-NPR5.29 [263507]
-        TDCNamesNumbersBuffer."Create Contact" := true;
-        PhoneNoLookup.Setrec(TDCNamesNumbersBuffer);
-        PhoneNoLookup.RunModal;
-        //+NPR5.29 [263507]
+        TempTDCNamesNumbersBuffer."Create Contact" := true;
+        PhoneNoLookup.Setrec(TempTDCNamesNumbersBuffer);
+        PhoneNoLookup.RunModal();
     end;
 
-    [EventSubscriber(ObjectType::Table, 18, 'OnAfterValidateEvent', 'No.', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterValidateEvent', 'No.', true, true)]
     local procedure CustomerOnValidateNo(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     var
-        Cust: Record Customer;
         ConfigTemplateHeader: Record "Config. Template Header";
-        PhoneLookupBuffer: Record "NPR Phone Lookup Buffer" temporary;
+        Cust: Record Customer;
+        TempPhoneLookupBuffer: Record "NPR Phone Lookup Buffer" temporary;
     begin
-        //-NPR5.26 [252881]
         if xRec."No." <> '' then
             exit;
         if (Rec."No." = '') then
@@ -163,44 +117,17 @@ codeunit 6014437 "NPR Phone Lookup"
         if not InitIComm() then
             exit;
 
-        if RunPhoneLookup(Rec."No.", PhoneLookupBuffer) then
-            UpdateCust(Rec, PhoneLookupBuffer);
-        //+NPR5.26 [252881]
+        if RunPhoneLookup(Rec."No.", TempPhoneLookupBuffer) then
+            UpdateCust(Rec, TempPhoneLookupBuffer);
     end;
 
-    [EventSubscriber(ObjectType::Table, 18, 'OnAfterValidateEvent', 'Phone No.', true, true)]
-    local procedure CustomerOnValidatePhoneNo(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
-    var
-        Cust: Record Customer;
-        ConfigTemplateHeader: Record "Config. Template Header";
-        PhoneLookupBuffer: Record "NPR Phone Lookup Buffer" temporary;
-    begin
-        //-NPR5.49 [313549]
-        //-NPR5.48 [313549]
-        // IF (Rec."No." = '') THEN
-        //  EXIT;
-        // IF NOT InitIComm() THEN
-        //  EXIT;
-        //
-        // IF GUIALLOWED THEN
-        //  IF Rec."Phone No." <> '' THEN
-        //    IF NOT CONFIRM(Text001) THEN
-        //      EXIT;
-        //
-        // IF RunPhoneLookup(Rec."Phone No.",PhoneLookupBuffer) THEN
-        //  UpdateCust(Rec,PhoneLookupBuffer);
-        //+NPR5.48 [313549]
-        //+NPR5.49 [313549]
-    end;
-
-    [EventSubscriber(ObjectType::Table, 18, 'OnAfterInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterInsertEvent', '', true, true)]
     local procedure CustomerOnAfterInsert(var Rec: Record Customer; RunTrigger: Boolean)
     var
-        Cust: Record Customer;
         ConfigTemplateHeader: Record "Config. Template Header";
+        Cust: Record Customer;
         RecRef: RecordRef;
     begin
-        //-NPR5.27 [251264]
         if not RunTrigger then
             exit;
 
@@ -217,42 +144,36 @@ codeunit 6014437 "NPR Phone Lookup"
         ApplyConfigTemplate(RecRef, ConfigTemplateHeader, IComm."Config Request (Customer)" = IComm."Config Request (Customer)"::Ask);
         RecRef.SetTable(Rec);
         Rec.Modify(false);
-        //+NPR5.27 [251264]
     end;
 
-    [EventSubscriber(ObjectType::Table, 18, 'OnAfterModifyEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterModifyEvent', '', true, true)]
     local procedure CustomerOnAfterModify(var Rec: Record Customer; RunTrigger: Boolean)
     begin
-        //-NPR5.27 [251264]
         if not RunTrigger then
             exit;
 
         Rec."Last Date Modified" := Today;
         Rec.Modify(false);
-        //+NPR5.27 [251264]
     end;
 
-    [EventSubscriber(ObjectType::Page, 22, 'OnAfterActionEvent', 'NPR PhoneLookup', false, false)]
+    [EventSubscriber(ObjectType::Page, Page::"Customer List", 'OnAfterActionEvent', 'NPR PhoneLookup', false, false)]
     local procedure CustomerListOnAfterAction(var Rec: Record Customer)
     var
+        TempTDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary;
         PhoneNoLookup: Page "NPR Phone No lookup";
-        TDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary;
     begin
-        //-NPR5.29 [263507]
-        TDCNamesNumbersBuffer."Create Customer" := true;
-        PhoneNoLookup.Setrec(TDCNamesNumbersBuffer);
-        PhoneNoLookup.RunModal;
-        //+NPR5.29 [263507]
+        TempTDCNamesNumbersBuffer."Create Customer" := true;
+        PhoneNoLookup.Setrec(TempTDCNamesNumbersBuffer);
+        PhoneNoLookup.RunModal();
     end;
 
-    [EventSubscriber(ObjectType::Table, 23, 'OnAfterValidateEvent', 'No.', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::Vendor, 'OnAfterValidateEvent', 'No.', true, true)]
     local procedure VendorOnValidateNo(var Rec: Record Vendor; var xRec: Record Vendor; CurrFieldNo: Integer)
     var
-        Vend: Record Vendor;
         ConfigTemplateHeader: Record "Config. Template Header";
-        PhoneLookupBuffer: Record "NPR Phone Lookup Buffer" temporary;
+        TempPhoneLookupBuffer: Record "NPR Phone Lookup Buffer" temporary;
+        Vend: Record Vendor;
     begin
-        //-NPR5.26 [252881]
         if xRec."No." <> '' then
             exit;
         if (Rec."No." = '') then
@@ -262,24 +183,21 @@ codeunit 6014437 "NPR Phone Lookup"
         if not InitIComm() then
             exit;
 
-        if RunPhoneLookup(Rec."No.", PhoneLookupBuffer) then
-            UpdateVend(Rec, PhoneLookupBuffer);
-        //+NPR5.26 [252881]
+        if RunPhoneLookup(Rec."No.", TempPhoneLookupBuffer) then
+            UpdateVend(Rec, TempPhoneLookupBuffer);
     end;
 
-    [EventSubscriber(ObjectType::Table, 23, 'OnAfterInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::Vendor, 'OnAfterInsertEvent', '', true, true)]
     local procedure VendorOnAfterInsert(var Rec: Record Vendor; RunTrigger: Boolean)
     var
-        Vend: Record Vendor;
         ConfigTemplateHeader: Record "Config. Template Header";
-        PhoneLookupBuffer: Record "NPR Phone Lookup Buffer" temporary;
+        Vend: Record Vendor;
         RecRef: RecordRef;
     begin
-        //-NPR5.27 [251264]
         if not RunTrigger then
             exit;
 
-        if not IComm.Get then
+        if not IComm.Get() then
             exit;
 
         if IComm."Config Request (Vendor)" = IComm."Config Request (Vendor)"::None then
@@ -292,40 +210,34 @@ codeunit 6014437 "NPR Phone Lookup"
         ApplyConfigTemplate(RecRef, ConfigTemplateHeader, IComm."Config Request (Vendor)" = IComm."Config Request (Vendor)"::Ask);
         RecRef.SetTable(Rec);
         Rec.Modify(false);
-        //+NPR5.27 [251264]
     end;
 
-    [EventSubscriber(ObjectType::Table, 23, 'OnAfterModifyEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::Vendor, 'OnAfterModifyEvent', '', true, true)]
     local procedure VendorOnAfterModify(var Rec: Record Vendor; RunTrigger: Boolean)
     begin
-        //-NPR5.27 [251264]
         if not RunTrigger then
             exit;
 
         Rec."Last Date Modified" := Today;
         Rec.Modify(false);
-        //+NPR5.27 [251264]
     end;
 
-    [EventSubscriber(ObjectType::Page, 27, 'OnAfterActionEvent', 'NPR PhoneLookup', false, false)]
+    [EventSubscriber(ObjectType::Page, Page::"Vendor List", 'OnAfterActionEvent', 'NPR PhoneLookup', false, false)]
     local procedure VendorListOnAfterAction(var Rec: Record Vendor)
     var
+        TempTDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary;
         PhoneNoLookup: Page "NPR Phone No lookup";
-        TDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary;
     begin
-        //-NPR5.29 [263507]
-        TDCNamesNumbersBuffer."Create Vendor" := true;
-        PhoneNoLookup.Setrec(TDCNamesNumbersBuffer);
-        PhoneNoLookup.RunModal;
-        //+NPR5.29 [263507]
+        TempTDCNamesNumbersBuffer."Create Vendor" := true;
+        PhoneNoLookup.Setrec(TempTDCNamesNumbersBuffer);
+        PhoneNoLookup.RunModal();
     end;
 
-    [EventSubscriber(ObjectType::Table, 6060134, 'OnAfterValidateEvent', 'Phone No.', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR MM Member Info Capture", 'OnAfterValidateEvent', 'Phone No.', true, true)]
     local procedure MemberInfoCapOnValidatePhone(var Rec: Record "NPR MM Member Info Capture"; var xRec: Record "NPR MM Member Info Capture"; CurrFieldNo: Integer)
     var
-        PhoneLookupBuffer: Record "NPR Phone Lookup Buffer" temporary;
+        TempPhoneLookupBuffer: Record "NPR Phone Lookup Buffer" temporary;
     begin
-        //-NPR5.31 [268879]
         if (Rec."Phone No." = '') then
             exit;
 
@@ -335,252 +247,187 @@ codeunit 6014437 "NPR Phone Lookup"
         if not InitIComm() then
             exit;
 
-        if RunPhoneLookup(Rec."Phone No.", PhoneLookupBuffer) then
-            UpdateMemberInfoCapture(Rec, PhoneLookupBuffer);
-        //+NPR5.31 [268879]
+        if RunPhoneLookup(Rec."Phone No.", TempPhoneLookupBuffer) then
+            UpdateMemberInfoCapture(Rec, TempPhoneLookupBuffer);
     end;
 
-    procedure "--- BufferToRec"()
+    procedure UpdateCont(var Cont: Record Contact; TempPhoneLookupBuf: Record "NPR Phone Lookup Buffer" temporary)
     begin
+        Cont.Validate(Name, CopyStr(TempPhoneLookupBuf.Name, 1, MaxStrLen(Cont.Name)));
+        Cont."Name 2" := CopyStr(TempPhoneLookupBuf.Name, MaxStrLen(Cont.Name) + 1, MaxStrLen(Cont."Name 2"));
+        Cont.Address := CopyStr(TempPhoneLookupBuf.Address, 1, MaxStrLen(Cont.Address));
+        Cont."Address 2" := CopyStr(TempPhoneLookupBuf.Address, MaxStrLen(Cont.Address) + 1, MaxStrLen(Cont."Address 2"));
+        Cont."Post Code" := CopyStr(TempPhoneLookupBuf."Post Code", 1, MaxStrLen(Cont."Post Code"));
+        Cont.City := CopyStr(TempPhoneLookupBuf.City, 1, MaxStrLen(Cont.City));
+        if (Cont."Post Code" <> '') and (Cont.City = '') then
+            Cont.Validate("Post Code");
+        if (Cont."Post Code" = '') and (Cont.City <> '') then
+            Cont.Validate(City);
+        Cont."E-Mail" := CopyStr(TempPhoneLookupBuf."E-Mail", 1, MaxStrLen(Cont."E-Mail"));
+        Cont."Home Page" := CopyStr(TempPhoneLookupBuf."Home Page", 1, MaxStrLen(Cont."Home Page"));
+        Cont."Phone No." := CopyStr(TempPhoneLookupBuf."Phone No.", 1, MaxStrLen(Cont."Phone No."));
+        Cont."VAT Registration No." := TempPhoneLookupBuf."VAT Registration No.";
+        Cont."Mobile Phone No." := TempPhoneLookupBuf."Mobile Phone No.";
     end;
 
-    procedure UpdateCont(var Cont: Record Contact; PhoneLookupBuf: Record "NPR Phone Lookup Buffer" temporary)
+    procedure UpdateCust(var Cust: Record Customer; TempPhoneLookupBuf: Record "NPR Phone Lookup Buffer" temporary)
     begin
-        //-NPR5.26 [252881]
-        with Cont do begin
-            Validate(Name, CopyStr(PhoneLookupBuf.Name, 1, MaxStrLen(Name)));
-            "Name 2" := CopyStr(PhoneLookupBuf.Name, MaxStrLen(Name) + 1, MaxStrLen("Name 2"));
-            Address := CopyStr(PhoneLookupBuf.Address, 1, MaxStrLen(Address));
-            "Address 2" := CopyStr(PhoneLookupBuf.Address, MaxStrLen(Address) + 1, MaxStrLen("Address 2"));
-            "Post Code" := CopyStr(PhoneLookupBuf."Post Code", 1, MaxStrLen("Post Code"));
-            City := CopyStr(PhoneLookupBuf.City, 1, MaxStrLen(City));
-            if ("Post Code" <> '') and (City = '') then
-                Validate("Post Code");
-            if ("Post Code" = '') and (City <> '') then
-                Validate(City);
-            "E-Mail" := CopyStr(PhoneLookupBuf."E-Mail", 1, MaxStrLen("E-Mail"));
-            "Home Page" := CopyStr(PhoneLookupBuf."Home Page", 1, MaxStrLen("Home Page"));
-            "Phone No." := CopyStr(PhoneLookupBuf."Phone No.", 1, MaxStrLen("Phone No."));
-            "VAT Registration No." := PhoneLookupBuf."VAT Registration No.";
-            "Mobile Phone No." := PhoneLookupBuf."Mobile Phone No.";
-        end;
-        //+NPR5.26 [252881]
+        Cust.Validate(Name, CopyStr(TempPhoneLookupBuf.Name, 1, MaxStrLen(Cust.Name)));
+        Cust."Name 2" := CopyStr(TempPhoneLookupBuf.Name, MaxStrLen(Cust.Name) + 1, MaxStrLen(Cust."Name 2"));
+        Cust.Address := CopyStr(TempPhoneLookupBuf.Address, 1, MaxStrLen(Cust.Address));
+        Cust."Address 2" := CopyStr(TempPhoneLookupBuf.Address, MaxStrLen(Cust.Address) + 1, MaxStrLen(Cust."Address 2"));
+        Cust."Post Code" := CopyStr(TempPhoneLookupBuf."Post Code", 1, MaxStrLen(Cust."Post Code"));
+        Cust.City := CopyStr(TempPhoneLookupBuf.City, 1, MaxStrLen(Cust.City));
+        if (Cust."Post Code" <> '') and (Cust.City = '') then
+            Cust.Validate("Post Code");
+        if (Cust."Post Code" = '') and (Cust.City <> '') then
+            Cust.Validate(City);
+        Cust."E-Mail" := CopyStr(TempPhoneLookupBuf."E-Mail", 1, MaxStrLen(Cust."E-Mail"));
+        Cust."Home Page" := CopyStr(TempPhoneLookupBuf."Home Page", 1, MaxStrLen(Cust."Home Page"));
+        Cust."Phone No." := CopyStr(TempPhoneLookupBuf."Phone No.", 1, MaxStrLen(Cust."Phone No."));
+        Cust."VAT Registration No." := TempPhoneLookupBuf."VAT Registration No.";
     end;
 
-    procedure UpdateCust(var Cust: Record Customer; PhoneLookupBuf: Record "NPR Phone Lookup Buffer" temporary)
+    procedure UpdateVend(var Vend: Record Vendor; TempPhoneLookupBuf: Record "NPR Phone Lookup Buffer" temporary)
     begin
-        //-NPR5.23
-        with Cust do begin
-            Validate(Name, CopyStr(PhoneLookupBuf.Name, 1, MaxStrLen(Name)));
-            "Name 2" := CopyStr(PhoneLookupBuf.Name, MaxStrLen(Name) + 1, MaxStrLen("Name 2"));
-            Address := CopyStr(PhoneLookupBuf.Address, 1, MaxStrLen(Address));
-            "Address 2" := CopyStr(PhoneLookupBuf.Address, MaxStrLen(Address) + 1, MaxStrLen("Address 2"));
-            "Post Code" := CopyStr(PhoneLookupBuf."Post Code", 1, MaxStrLen("Post Code"));
-            City := CopyStr(PhoneLookupBuf.City, 1, MaxStrLen(City));
-            //-NPR5.26 [252881]
-            //IF ("Post Code" <> '') AND (City <> '') THEN
-            //  VALIDATE(City);
-            if ("Post Code" <> '') and (City = '') then
-                Validate("Post Code");
-            if ("Post Code" = '') and (City <> '') then
-                Validate(City);
-            //+NPR5.26 [252881]
-            "E-Mail" := CopyStr(PhoneLookupBuf."E-Mail", 1, MaxStrLen("E-Mail"));
-            "Home Page" := CopyStr(PhoneLookupBuf."Home Page", 1, MaxStrLen("Home Page"));
-            "Phone No." := CopyStr(PhoneLookupBuf."Phone No.", 1, MaxStrLen("Phone No."));
-            "VAT Registration No." := PhoneLookupBuf."VAT Registration No.";
-        end;
-        //+NPR5.23
+        Vend.Validate(Name, CopyStr(TempPhoneLookupBuf.Name, 1, MaxStrLen(Vend.Name)));
+        Vend."Name 2" := CopyStr(TempPhoneLookupBuf.Name, MaxStrLen(Vend.Name) + 1, MaxStrLen(Vend."Name 2"));
+        Vend.Address := CopyStr(TempPhoneLookupBuf.Address, 1, MaxStrLen(Vend.Address));
+        Vend."Address 2" := CopyStr(TempPhoneLookupBuf.Address, MaxStrLen(Vend.Address) + 1, MaxStrLen(Vend."Address 2"));
+        Vend."Post Code" := CopyStr(TempPhoneLookupBuf."Post Code", 1, MaxStrLen(Vend."Post Code"));
+        Vend.City := CopyStr(TempPhoneLookupBuf.City, 1, MaxStrLen(Vend.City));
+        if (Vend."Post Code" <> '') and (Vend.City = '') then
+            Vend.Validate("Post Code");
+        if (Vend."Post Code" = '') and (Vend.City <> '') then
+            Vend.Validate(City);
+        Vend."E-Mail" := CopyStr(TempPhoneLookupBuf."E-Mail", 1, MaxStrLen(Vend."E-Mail"));
+        Vend."Home Page" := CopyStr(TempPhoneLookupBuf."Home Page", 1, MaxStrLen(Vend."Home Page"));
+        Vend."Phone No." := CopyStr(TempPhoneLookupBuf."Phone No.", 1, MaxStrLen(Vend."Phone No."));
+        Vend."VAT Registration No." := TempPhoneLookupBuf."VAT Registration No.";
     end;
 
-    procedure UpdateVend(var Vend: Record Vendor; PhoneLookupBuf: Record "NPR Phone Lookup Buffer" temporary)
+    procedure UpdateMemberInfoCapture(var MMMemberInfoCapture: Record "NPR MM Member Info Capture"; TempPhoneLookupBuf: Record "NPR Phone Lookup Buffer" temporary)
     begin
-        //-NPR5.25 [247278]
-        with Vend do begin
-            Validate(Name, CopyStr(PhoneLookupBuf.Name, 1, MaxStrLen(Name)));
-            "Name 2" := CopyStr(PhoneLookupBuf.Name, MaxStrLen(Name) + 1, MaxStrLen("Name 2"));
-            Address := CopyStr(PhoneLookupBuf.Address, 1, MaxStrLen(Address));
-            "Address 2" := CopyStr(PhoneLookupBuf.Address, MaxStrLen(Address) + 1, MaxStrLen("Address 2"));
-            "Post Code" := CopyStr(PhoneLookupBuf."Post Code", 1, MaxStrLen("Post Code"));
-            City := CopyStr(PhoneLookupBuf.City, 1, MaxStrLen(City));
-            //-NPR5.26 [252881]
-            //IF ("Post Code" <> '') AND (City <> '') THEN
-            //  VALIDATE(City);
-            if ("Post Code" <> '') and (City = '') then
-                Validate("Post Code");
-            if ("Post Code" = '') and (City <> '') then
-                Validate(City);
-            //+NPR5.26 [252881]
-            "E-Mail" := CopyStr(PhoneLookupBuf."E-Mail", 1, MaxStrLen("E-Mail"));
-            "Home Page" := CopyStr(PhoneLookupBuf."Home Page", 1, MaxStrLen("Home Page"));
-            "Phone No." := CopyStr(PhoneLookupBuf."Phone No.", 1, MaxStrLen("Phone No."));
-            "VAT Registration No." := PhoneLookupBuf."VAT Registration No.";
-        end;
-        //+NPR5.25 [247278]
+        MMMemberInfoCapture.Validate("First Name", TempPhoneLookupBuf."First Name");
+        MMMemberInfoCapture.Validate("Last Name", TempPhoneLookupBuf."Last Name");
+        MMMemberInfoCapture.Address := CopyStr(TempPhoneLookupBuf.Address, 1, MaxStrLen(MMMemberInfoCapture.Address));
+        MMMemberInfoCapture."Post Code Code" := CopyStr(TempPhoneLookupBuf."Post Code", 1, MaxStrLen(MMMemberInfoCapture."Post Code Code"));
+        MMMemberInfoCapture.City := CopyStr(TempPhoneLookupBuf.City, 1, MaxStrLen(MMMemberInfoCapture.City));
+        MMMemberInfoCapture."E-Mail Address" := CopyStr(TempPhoneLookupBuf."E-Mail", 1, MaxStrLen(MMMemberInfoCapture."E-Mail Address"));
     end;
 
-    procedure UpdateMemberInfoCapture(var MMMemberInfoCapture: Record "NPR MM Member Info Capture"; PhoneLookupBuf: Record "NPR Phone Lookup Buffer" temporary)
+    procedure Creation(var TempTDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary)
     begin
-        //-NPR5.31 [268879]
-        with MMMemberInfoCapture do begin
-            //-NPR5.40 [305526]
-            //VALIDATE("First Name", COPYSTR(PhoneLookupBuf.Name, 1, MAXSTRLEN("First Name")));
-            //"Last Name":= COPYSTR(PhoneLookupBuf.Name, MAXSTRLEN("First Name") + 1, MAXSTRLEN("Last Name"));
-            Validate("First Name", PhoneLookupBuf."First Name");
-            Validate("Last Name", PhoneLookupBuf."Last Name");
-            //+NPR5.40 [305526]
-            Address := CopyStr(PhoneLookupBuf.Address, 1, MaxStrLen(Address));
-            "Post Code Code" := CopyStr(PhoneLookupBuf."Post Code", 1, MaxStrLen("Post Code Code"));
-            City := CopyStr(PhoneLookupBuf.City, 1, MaxStrLen(City));
-            "E-Mail Address" := CopyStr(PhoneLookupBuf."E-Mail", 1, MaxStrLen("E-Mail Address"));
-            //"Phone No." := COPYSTR(PhoneLookupBuf."Phone No.", 1, MAXSTRLEN("Phone No."));
-        end;
-        //-NPR5.31 [268879]
+        if TempTDCNamesNumbersBuffer."Create Vendor" then
+            CreateVendor(TempTDCNamesNumbersBuffer);
+
+        if TempTDCNamesNumbersBuffer."Create Contact" then
+            CreateContact(TempTDCNamesNumbersBuffer);
+
+        if TempTDCNamesNumbersBuffer."Create Customer" then
+            CreateCustomer(TempTDCNamesNumbersBuffer);
+
+        if TempTDCNamesNumbersBuffer."Create Contact" and TempTDCNamesNumbersBuffer."Create Customer" then
+            CreateContactBusinessRel(TempTDCNamesNumbersBuffer, "Contact Business Relation Link To Table"::Customer);
+
+        if TempTDCNamesNumbersBuffer."Create Contact" and TempTDCNamesNumbersBuffer."Create Vendor" then
+            CreateContactBusinessRel(TempTDCNamesNumbersBuffer, "Contact Business Relation Link To Table"::Vendor);
     end;
 
-    local procedure "--- Page Create"()
-    begin
-    end;
-
-    procedure Creation(var TDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary)
-    begin
-        //-NPR5.23
-        if TDCNamesNumbersBuffer."Create Vendor" then
-            CreateVendor(TDCNamesNumbersBuffer);
-
-        if TDCNamesNumbersBuffer."Create Contact" then
-            CreateContact(TDCNamesNumbersBuffer);
-
-        if TDCNamesNumbersBuffer."Create Customer" then
-            CreateCustomer(TDCNamesNumbersBuffer);
-
-        if TDCNamesNumbersBuffer."Create Contact" and TDCNamesNumbersBuffer."Create Customer" then
-            CreateContactBusinessRel(TDCNamesNumbersBuffer, "Contact Business Relation Link To Table"::Customer);
-
-
-        if TDCNamesNumbersBuffer."Create Contact" and TDCNamesNumbersBuffer."Create Vendor" then
-            CreateContactBusinessRel(TDCNamesNumbersBuffer, "Contact Business Relation Link To Table"::Vendor);
-
-        //+NPR5.23
-    end;
-
-    local procedure CreateCustomer(var TDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary)
+    local procedure CreateCustomer(var TempTDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary)
     var
-        MarketingSetup: Record "Marketing Setup";
         Customer: Record Customer;
+        MarketingSetup: Record "Marketing Setup";
     begin
-        //-NPR5.23
-
-        if Customer.Get(TDCNamesNumbersBuffer."Phone No.") then
+        if Customer.Get(TempTDCNamesNumbersBuffer."Phone No.") then
             exit;
-        Customer.Init;
-        Customer."No." := CopyStr(TDCNamesNumbersBuffer."Phone No.", 1, MaxStrLen(Customer."No."));
-        Customer.Insert;
-        Customer.Validate(Name, CopyStr(TDCNamesNumbersBuffer.Name, 1, MaxStrLen(Customer.Name)));
-        Customer.Validate("Name 2", CopyStr(TDCNamesNumbersBuffer.Name, MaxStrLen(Customer.Name) + 1, MaxStrLen(Customer."Name 2")));
-        Customer.Validate(Address, CopyStr(TDCNamesNumbersBuffer.Address, 1, MaxStrLen(Customer.Address)));
-        Customer.Validate("Address 2", CopyStr(TDCNamesNumbersBuffer.Address, MaxStrLen(Customer.Address) + 1, MaxStrLen(Customer."Address 2")));
-        Customer.Validate("Post Code", CopyStr(TDCNamesNumbersBuffer."Post Code", 1, MaxStrLen(Customer."Post Code")));
-        Customer.Validate(City, CopyStr(TDCNamesNumbersBuffer.City, 1, MaxStrLen(Customer.City)));
-        Customer.Validate("E-Mail", CopyStr(TDCNamesNumbersBuffer."E-Mail", 1, MaxStrLen(Customer."E-Mail")));
-        Customer.Validate("Home Page", CopyStr(TDCNamesNumbersBuffer."Home Page", 1, MaxStrLen(Customer."Home Page")));
-        Customer.Validate("Phone No.", CopyStr(TDCNamesNumbersBuffer."Phone No.", 1, MaxStrLen(Customer."Phone No.")));
-        Customer.Modify;
-        Commit;
+        Customer.Init();
+        Customer."No." := CopyStr(TempTDCNamesNumbersBuffer."Phone No.", 1, MaxStrLen(Customer."No."));
+        Customer.Insert();
+        Customer.Validate(Name, CopyStr(TempTDCNamesNumbersBuffer.Name, 1, MaxStrLen(Customer.Name)));
+        Customer.Validate("Name 2", CopyStr(TempTDCNamesNumbersBuffer.Name, MaxStrLen(Customer.Name) + 1, MaxStrLen(Customer."Name 2")));
+        Customer.Validate(Address, CopyStr(TempTDCNamesNumbersBuffer.Address, 1, MaxStrLen(Customer.Address)));
+        Customer.Validate("Address 2", CopyStr(TempTDCNamesNumbersBuffer.Address, MaxStrLen(Customer.Address) + 1, MaxStrLen(Customer."Address 2")));
+        Customer.Validate("Post Code", CopyStr(TempTDCNamesNumbersBuffer."Post Code", 1, MaxStrLen(Customer."Post Code")));
+        Customer.Validate(City, CopyStr(TempTDCNamesNumbersBuffer.City, 1, MaxStrLen(Customer.City)));
+        Customer.Validate("E-Mail", CopyStr(TempTDCNamesNumbersBuffer."E-Mail", 1, MaxStrLen(Customer."E-Mail")));
+        Customer.Validate("Home Page", CopyStr(TempTDCNamesNumbersBuffer."Home Page", 1, MaxStrLen(Customer."Home Page")));
+        Customer.Validate("Phone No.", CopyStr(TempTDCNamesNumbersBuffer."Phone No.", 1, MaxStrLen(Customer."Phone No.")));
+        Customer.Modify();
+        Commit();
 
-
-        Customer.SetRecFilter;
-        //-NPR5.38 [301053]
-        //IF PAGE.RUNMODAL( PAGE::"Customer Card", Customer ) = ACTION::LookupOK THEN
+        Customer.SetRecFilter();
         if PAGE.RunModal(PAGE::"Customer Card", Customer) = ACTION::LookupOK then;
-        //+NPR5.38 [301053]
-        //+NPR5.23
     end;
 
-    local procedure CreateContact(TDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary)
+    local procedure CreateContact(TempTDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary)
     var
         Contact: Record Contact;
     begin
-        //-NPR5.23
-
-        if Contact.Get(TDCNamesNumbersBuffer."Phone No.") then
+        if Contact.Get(TempTDCNamesNumbersBuffer."Phone No.") then
             exit;
 
-        Contact.Init;
-        Contact."No." := CopyStr(TDCNamesNumbersBuffer."Phone No.", 1, MaxStrLen(Contact."No."));
+        Contact.Init();
+        Contact."No." := CopyStr(TempTDCNamesNumbersBuffer."Phone No.", 1, MaxStrLen(Contact."No."));
         Contact.Insert(true);
-        Contact.Validate(Name, CopyStr(TDCNamesNumbersBuffer.Name, 1, MaxStrLen(Contact.Name)));
-        Contact.Validate("Name 2", CopyStr(TDCNamesNumbersBuffer.Name, MaxStrLen(Contact.Name) + 1, MaxStrLen(Contact."Name 2")));
-        Contact.Validate(Address, CopyStr(TDCNamesNumbersBuffer.Address, 1, MaxStrLen(Contact.Address)));
-        Contact.Validate("Address 2", CopyStr(TDCNamesNumbersBuffer.Address, MaxStrLen(Contact.Address) + 1, MaxStrLen(Contact."Address 2")));
-        Contact.Validate("Post Code", CopyStr(TDCNamesNumbersBuffer."Post Code", 1, MaxStrLen(Contact."Post Code")));
-        Contact.Validate(City, CopyStr(TDCNamesNumbersBuffer.City, 1, MaxStrLen(Contact.City)));
-        Contact.Validate("E-Mail", CopyStr(TDCNamesNumbersBuffer."E-Mail", 1, MaxStrLen(Contact."E-Mail")));
-        Contact.Validate("Home Page", CopyStr(TDCNamesNumbersBuffer."Home Page", 1, MaxStrLen(Contact."Home Page")));
-        Contact.Validate("Phone No.", CopyStr(TDCNamesNumbersBuffer."Phone No.", 1, MaxStrLen(Contact."Phone No.")));
-        Contact.Modify;
-        Commit;
+        Contact.Validate(Name, CopyStr(TempTDCNamesNumbersBuffer.Name, 1, MaxStrLen(Contact.Name)));
+        Contact.Validate("Name 2", CopyStr(TempTDCNamesNumbersBuffer.Name, MaxStrLen(Contact.Name) + 1, MaxStrLen(Contact."Name 2")));
+        Contact.Validate(Address, CopyStr(TempTDCNamesNumbersBuffer.Address, 1, MaxStrLen(Contact.Address)));
+        Contact.Validate("Address 2", CopyStr(TempTDCNamesNumbersBuffer.Address, MaxStrLen(Contact.Address) + 1, MaxStrLen(Contact."Address 2")));
+        Contact.Validate("Post Code", CopyStr(TempTDCNamesNumbersBuffer."Post Code", 1, MaxStrLen(Contact."Post Code")));
+        Contact.Validate(City, CopyStr(TempTDCNamesNumbersBuffer.City, 1, MaxStrLen(Contact.City)));
+        Contact.Validate("E-Mail", CopyStr(TempTDCNamesNumbersBuffer."E-Mail", 1, MaxStrLen(Contact."E-Mail")));
+        Contact.Validate("Home Page", CopyStr(TempTDCNamesNumbersBuffer."Home Page", 1, MaxStrLen(Contact."Home Page")));
+        Contact.Validate("Phone No.", CopyStr(TempTDCNamesNumbersBuffer."Phone No.", 1, MaxStrLen(Contact."Phone No.")));
+        Contact.Modify();
+        Commit();
 
-        if (TDCNamesNumbersBuffer."Create Contact") and (not TDCNamesNumbersBuffer."Create Customer") then begin
+        if (TempTDCNamesNumbersBuffer."Create Contact") and (not TempTDCNamesNumbersBuffer."Create Customer") then begin
             Contact.SetRecFilter;
             if (PAGE.RunModal(PAGE::"Contact Card", Contact) = ACTION::OK) then;
         end;
-        //+NPR5.23
     end;
 
-    local procedure CreateContactBusinessRel(TDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary; LinkToTable: Enum "Contact Business Relation Link To Table")
+    local procedure CreateContactBusinessRel(TempTDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary; LinkToTable: Enum "Contact Business Relation Link To Table")
     var
-        ContactBusinessRelation: Record "Contact Business Relation";
         Contact: Record Contact;
+        ContactBusinessRelation: Record "Contact Business Relation";
     begin
-        //-NPR5.23
-
-        if ContactBusinessRelation.Get(TDCNamesNumbersBuffer."Phone No.", '') then
+        if ContactBusinessRelation.Get(TempTDCNamesNumbersBuffer."Phone No.", '') then
             exit;
 
-        ContactBusinessRelation.Init;
-        ContactBusinessRelation."Contact No." := TDCNamesNumbersBuffer."Phone No.";
+        ContactBusinessRelation.Init();
+        ContactBusinessRelation."Contact No." := TempTDCNamesNumbersBuffer."Phone No.";
         ContactBusinessRelation."Business Relation Code" := '';
         ContactBusinessRelation."Link to Table" := LinkToTable;
-        ContactBusinessRelation.Insert;
-        //+NPR5.23
+        ContactBusinessRelation.Insert();
     end;
 
-    local procedure CreateVendor(TDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary)
+    local procedure CreateVendor(TempTDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary)
     var
         Vendor: Record Vendor;
     begin
-        //-NPR5.23
-
-        if Vendor.Get(TDCNamesNumbersBuffer."Phone No.") then
+        if Vendor.Get(TempTDCNamesNumbersBuffer."Phone No.") then
             exit;
 
-        Vendor.Init;
-        Vendor."No." := CopyStr(TDCNamesNumbersBuffer."Phone No.", 1, MaxStrLen(Vendor."No."));
+        Vendor.Init();
+        Vendor."No." := CopyStr(TempTDCNamesNumbersBuffer."Phone No.", 1, MaxStrLen(Vendor."No."));
         Vendor.Insert(true);
-        Vendor.Validate(Name, CopyStr(TDCNamesNumbersBuffer.Name, 1, MaxStrLen(Vendor.Name)));
-        Vendor.Validate("Name 2", CopyStr(TDCNamesNumbersBuffer.Name, MaxStrLen(Vendor.Name) + 1, MaxStrLen(Vendor."Name 2")));
-        Vendor.Validate(Address, CopyStr(TDCNamesNumbersBuffer.Address, 1, MaxStrLen(Vendor.Address)));
-        Vendor.Validate("Address 2", CopyStr(TDCNamesNumbersBuffer.Address, MaxStrLen(Vendor.Address) + 1, MaxStrLen(Vendor."Address 2")));
-        Vendor."Post Code" := CopyStr(TDCNamesNumbersBuffer."Post Code", 1, MaxStrLen(Vendor."Post Code"));
-        Vendor.City := CopyStr(TDCNamesNumbersBuffer.City, 1, MaxStrLen(Vendor.City));
-        Vendor.Validate("E-Mail", CopyStr(TDCNamesNumbersBuffer."E-Mail", 1, MaxStrLen(Vendor."E-Mail")));
-        Vendor.Validate("Home Page", CopyStr(TDCNamesNumbersBuffer."Home Page", 1, MaxStrLen(Vendor."Home Page")));
-        Vendor.Validate("Phone No.", CopyStr(TDCNamesNumbersBuffer."Phone No.", 1, MaxStrLen(Vendor."Phone No.")));
-        Vendor.Modify;
-        Commit;
+        Vendor.Validate(Name, CopyStr(TempTDCNamesNumbersBuffer.Name, 1, MaxStrLen(Vendor.Name)));
+        Vendor.Validate("Name 2", CopyStr(TempTDCNamesNumbersBuffer.Name, MaxStrLen(Vendor.Name) + 1, MaxStrLen(Vendor."Name 2")));
+        Vendor.Validate(Address, CopyStr(TempTDCNamesNumbersBuffer.Address, 1, MaxStrLen(Vendor.Address)));
+        Vendor.Validate("Address 2", CopyStr(TempTDCNamesNumbersBuffer.Address, MaxStrLen(Vendor.Address) + 1, MaxStrLen(Vendor."Address 2")));
+        Vendor."Post Code" := CopyStr(TempTDCNamesNumbersBuffer."Post Code", 1, MaxStrLen(Vendor."Post Code"));
+        Vendor.City := CopyStr(TempTDCNamesNumbersBuffer.City, 1, MaxStrLen(Vendor.City));
+        Vendor.Validate("E-Mail", CopyStr(TempTDCNamesNumbersBuffer."E-Mail", 1, MaxStrLen(Vendor."E-Mail")));
+        Vendor.Validate("Home Page", CopyStr(TempTDCNamesNumbersBuffer."Home Page", 1, MaxStrLen(Vendor."Home Page")));
+        Vendor.Validate("Phone No.", CopyStr(TempTDCNamesNumbersBuffer."Phone No.", 1, MaxStrLen(Vendor."Phone No.")));
+        Vendor.Modify();
+        Commit();
 
 
         Vendor.SetRecFilter;
-        //-NPR5.38 [301053]
-        //IF (PAGE.RUNMODAL(PAGE::"Vendor Card", Vendor ) = ACTION::OK) THEN
         if (PAGE.RunModal(PAGE::"Vendor Card", Vendor) = ACTION::OK) then;
-        //+NPR5.38 [301053]
-        //+NPR5.23
-    end;
-
-    local procedure "--- Aux"()
-    begin
     end;
 
     local procedure ApplyConfigTemplate(var RecRef: RecordRef; ConfigTemplateHeader: Record "Config. Template Header"; QueryConfirm: Boolean)
@@ -590,13 +437,11 @@ codeunit 6014437 "NPR Phone Lookup"
         if ConfigTemplateHeader.Code = '' then
             exit;
 
-        //-NPR5.28 [257461]
         if QueryConfirm and not GuiAllowed then
             exit;
-        //+NPR5.28 [257461]
 
         if QueryConfirm then begin
-            if not Confirm(Text000, false, ConfigTemplateHeader.Code) then
+            if not Confirm(ApplyTemplateQst, false, ConfigTemplateHeader.Code) then
                 exit;
         end;
 
@@ -605,7 +450,6 @@ codeunit 6014437 "NPR Phone Lookup"
 
     local procedure InitIComm(): Boolean
     begin
-        //-NPR5.26 [252881]
         if not Initialized then begin
             Initialized := true;
             if not IComm.Get then
@@ -618,7 +462,6 @@ codeunit 6014437 "NPR Phone Lookup"
             exit(false);
 
         exit(true);
-        //+NPR5.26 [252881]
     end;
 }
 
