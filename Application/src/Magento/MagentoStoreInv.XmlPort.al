@@ -1,7 +1,5 @@
 xmlport 6151405 "NPR Magento Store Inv."
 {
-    // MAG2.26/MHA /20200527  CASE 406741 Object created - Collect in Store Inventory for Magento
-
     Caption = 'Collect Store Inventory';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/magento_collect_store_inventory';
     Encoding = UTF8;
@@ -231,18 +229,6 @@ xmlport 6151405 "NPR Magento Store Inv."
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     trigger OnPreXmlPort()
     begin
         if MagentoSetup.Get then;
@@ -348,4 +334,3 @@ xmlport 6151405 "NPR Magento Store Inv."
         exit(NpCsStoreInventoryBuffer.IsEmpty);
     end;
 }
-

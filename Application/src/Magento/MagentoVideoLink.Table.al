@@ -1,7 +1,5 @@
 table 6151439 "NPR Magento Video Link"
 {
-    // MAG2.15/TS  /20180531 CASE 311926 Table Created for Magento Video Link
-
     Caption = 'Magento Video Link';
     DataClassification = CustomerContent;
 
@@ -57,16 +55,6 @@ table 6151439 "NPR Magento Video Link"
         }
     }
 
-    fieldgroups
-    {
-    }
-
-    trigger OnDelete()
-    var
-        ErrorUsed: Label 'Error. You can not delete an image that is marked for listing.';
-    begin
-    end;
-
     trigger OnInsert()
     var
         Lineno: Integer;
@@ -78,13 +66,6 @@ table 6151439 "NPR Magento Video Link"
         Validate("Line No.", Lineno);
     end;
 
-    trigger OnRename()
-    var
-        noRename: Label 'No rename allowed. Delete and make a new';
-    begin
-    end;
-
     var
         MagentoVideoLink: Record "NPR Magento Video Link";
 }
-

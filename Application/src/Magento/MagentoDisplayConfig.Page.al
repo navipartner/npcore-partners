@@ -1,18 +1,9 @@
 page 6151443 "NPR Magento Display Config"
 {
-    // MAG1.05/TR/20150217 CASE 206395 Object created - controls visibility in Magento
-    // MAG1.06/MH/20150225  CASE 206395 Added (Hidden) Option to Field 40 Sales Type: Contact
-    // MAG1.21/TR/20151023  CASE 225294 ItemGroups local variabel changed from 6059855 Magento Item Groups to 6059854 "Magento Item Group List" page - NumberFilterCtrl-OnLookup()
-    // MAG1.21/TR/20151104  CASE 225601 GetRecFilters has been modified such that it is possible to run the page even if no records exist
-    // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
-    // MAG2.09/TS  /20180108  CASE 300893 Removed Caption on Control Container
-
     Caption = 'Display Config';
     DelayedInsert = true;
     PageType = List;
     SourceTable = "NPR Magento Display Config";
-    //SourceTableView = SORTING("No.",Type,"Sales Code","Sales Type","Starting Date","Starting Time","Ending Date","Ending Time")
-    //                  WHERE("Sales Type"=FILTER(<>));
     UsageCategory = Lists;
     ApplicationArea = All;
 
@@ -50,8 +41,8 @@ page 6151443 "NPR Magento Display Config"
                         ItemGroups: Page "NPR Magento Category List";
                         Brands: Page "NPR Magento Brands";
                     begin
-                        case Type of
-                            Type::Item:
+                        case Rec.Type of
+                            Rec.Type::Item:
                                 begin
                                     ItemList.LookupMode := true;
                                     if ItemList.RunModal = ACTION::LookupOK then
@@ -59,7 +50,7 @@ page 6151443 "NPR Magento Display Config"
                                     else
                                         exit(false);
                                 end;
-                            Type::"Item Group":
+                            Rec.Type::"Item Group":
                                 begin
                                     ItemGroups.LookupMode := true;
                                     if ItemGroups.RunModal = ACTION::LookupOK then
@@ -67,7 +58,7 @@ page 6151443 "NPR Magento Display Config"
                                     else
                                         exit(false);
                                 end;
-                            Type::Brand:
+                            Rec.Type::Brand:
                                 begin
                                     Brands.LookupMode := true;
                                     if Brands.RunModal = ACTION::LookupOK then
@@ -90,57 +81,53 @@ page 6151443 "NPR Magento Display Config"
             repeater(Control6150617)
             {
                 ShowCaption = false;
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Sales Type"; "Sales Type")
+                field("Sales Type"; Rec."Sales Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Type field';
                 }
-                field("Sales Code"; "Sales Code")
+                field("Sales Code"; Rec."Sales Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Code field';
                 }
-                field("Is Visible"; "Is Visible")
+                field("Is Visible"; Rec."Is Visible")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Is Visible field';
                 }
-                field("Starting Date"; "Starting Date")
+                field("Starting Date"; Rec."Starting Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Starting Date field';
                 }
-                field("Starting Time"; "Starting Time")
+                field("Starting Time"; Rec."Starting Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Starting Time field';
                 }
-                field("Ending Date"; "Ending Date")
+                field("Ending Date"; Rec."Ending Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ending Date field';
                 }
-                field("Ending Time"; "Ending Time")
+                field("Ending Time"; Rec."Ending Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ending Time field';
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 
     trigger OnOpenPage()
@@ -151,9 +138,8 @@ page 6151443 "NPR Magento Display Config"
 
     var
         ItemGroup: Record "NPR Magento Category";
-        Manufactur: Record "NPR Magento Brand";
         Item: Record Item;
-        ItemTypeFilter: Option Item,"Item Group",Brand,"None";
+        ItemTypeFilter: Enum "NPR Mag. Display Config Type";
         NumberFilter: Text[250];
         NumberFilterCtrlEnabled: Boolean;
         SalesCodeEnabled: Boolean;
@@ -162,18 +148,15 @@ page 6151443 "NPR Magento Display Config"
     var
         TempTypeFilter: Text;
     begin
-        if GetFilters <> '' then begin
-            //-MAG1.21
-            //IF GETFILTER("No.") <> '' THEN
-            TempTypeFilter := GetFilter(Type);
+        if Rec.GetFilters <> '' then begin
+            TempTypeFilter := Rec.GetFilter(Type);
             if TempTypeFilter <> '' then begin
-                Evaluate(Type, TempTypeFilter);
-                //+MAG1.21
-                ItemTypeFilter := Type;
+                Evaluate(Rec.Type, TempTypeFilter);
+                ItemTypeFilter := Rec.Type;
             end else
                 ItemTypeFilter := ItemTypeFilter::None;
 
-            NumberFilter := GetFilter("No.");
+            NumberFilter := Rec.GetFilter("No.");
         end;
     end;
 
@@ -181,28 +164,20 @@ page 6151443 "NPR Magento Display Config"
     begin
         NumberFilterCtrlEnabled := true;
 
-        SetRange(Type);
+        Rec.SetRange(Type);
         case ItemTypeFilter of
             ItemTypeFilter::Item:
-                SetRange(Type, Type::Item);
+                Rec.SetRange(Type, Rec.Type::Item);
             ItemTypeFilter::"Item Group":
-                SetRange(Type, Type::"Item Group");
+                Rec.SetRange(Type, Rec.Type::"Item Group");
             ItemTypeFilter::Brand:
-                SetRange(Type, Type::Brand);
+                Rec.SetRange(Type, Rec.Type::Brand);
         end;
 
         if ItemTypeFilter = ItemTypeFilter::None then begin
             NumberFilterCtrlEnabled := false;
             NumberFilter := '';
         end;
-
-        //-MAG1.21
-        //IF NumberFilter <> '' THEN BEGIN
-        //  SETFILTER(Type, NumberFilter);
-        //END;// ELSE
-        //  SETRANGE(Type);
-        //+MAG1.21
-
         CurrPage.Update(false);
     end;
 
@@ -215,7 +190,7 @@ page 6151443 "NPR Magento Display Config"
     begin
         GetRecFilters;
 
-        if "Sales Type" <> "Sales Type"::"All Customers" then
+        if Rec."Sales Type" <> Rec."Sales Type"::"All Customers" then
             SalesCodeEnabled := true
         else
             SalesCodeEnabled := false;
@@ -237,4 +212,3 @@ page 6151443 "NPR Magento Display Config"
         exit(StrSubstNo('%1 %2 %3 %4', SalesSrcTableName, Description, SourceTableName, NumberFilter));
     end;
 }
-

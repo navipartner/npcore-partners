@@ -15,14 +15,11 @@ table 6151401 "NPR Magento Setup"
             Caption = 'Magento Enabled';
             DataClassification = CustomerContent;
         }
-        field(15; "Magento Version"; Option)
+        field(15; "Magento Version"; Enum "NPR Magento Version")
         {
             Caption = 'Magento Version';
             DataClassification = CustomerContent;
-            Description = 'MAG2.20';
             InitValue = "2";
-            OptionCaption = '1,,,,,,,,,,2';
-            OptionMembers = "1",,,,,,,,,,"2";
 
             trigger OnValidate()
             begin
@@ -58,42 +55,31 @@ table 6151401 "NPR Magento Setup"
                 UpdateApi();
             end;
         }
-        field(30; "Variant System"; Option)
+        field(30; "Variant System"; Enum "NPR Magento Variant System")
         {
             Caption = 'Variant System';
             DataClassification = CustomerContent;
-            Description = 'MAG1.21,MAG2.00';
-            OptionCaption = 'None,,Variety';
-            OptionMembers = "None",,Variety;
         }
-        field(34; "Picture Variety Type"; Option)
+        field(34; "Picture Variety Type"; Enum "NPR Magento Pic. Variety Type")
         {
             Caption = 'Picture Variety Type';
             DataClassification = CustomerContent;
-            Description = 'MAG2.22';
-            OptionCaption = 'Fixed,Select on Item,Variety 1,Variety 2,Variety 3,Variety 4';
-            OptionMembers = "Fixed","Select on Item","Variety 1","Variety 2","Variety 3","Variety 4";
         }
         field(35; "Variant Picture Dimension"; Code[10])
         {
             Caption = 'Variant Picture Dimension';
             DataClassification = CustomerContent;
-            Description = 'MAG1.21,MAG2.22';
             TableRelation = "NPR Variety";
         }
-        field(37; "Miniature Picture"; Option)
+        field(37; "Miniature Picture"; Enum "NPR Magento Miniature Picture")
         {
             Caption = 'Miniature Picture';
             DataClassification = CustomerContent;
-            Description = 'MAG1.21';
-            OptionCaption = 'None,Single Picture,Line Picture,Single Picture + Line Picture';
-            OptionMembers = "None",SinglePicutre,LinePicture,"SinglePicture+LinePicture";
         }
         field(38; "Max. Picture Size"; Integer)
         {
             Caption = 'Max. Picture Size (kb)';
             DataClassification = CustomerContent;
-            Description = 'MAG1.22';
             InitValue = 512;
         }
         field(40; "Generic Setup"; BLOB)
@@ -105,7 +91,6 @@ table 6151401 "NPR Magento Setup"
         {
             Caption = 'Inventory Location Filter';
             DataClassification = CustomerContent;
-            Description = 'MAG1.22';
             TableRelation = Location;
             ValidateTableRelation = false;
 
@@ -118,7 +103,6 @@ table 6151401 "NPR Magento Setup"
         {
             Caption = 'Intercompany Inventory Enabled';
             DataClassification = CustomerContent;
-            Description = 'MAG1.22';
 
             trigger OnValidate()
             var
@@ -136,71 +120,73 @@ table 6151401 "NPR Magento Setup"
         {
             Caption = 'Api Url';
             DataClassification = CustomerContent;
-            Description = 'MAG2.00';
         }
-        field(65; "Api Username Type"; Option)
+        field(65; "Api Username Type"; Enum "NPR Magento Api Username Type")
         {
             Caption = 'Api Username Type';
             DataClassification = CustomerContent;
-            Description = 'MAG2.00';
-            OptionCaption = 'Automatic,Custom';
-            OptionMembers = Automatic,Custom;
         }
         field(70; "Api Username"; Text[250])
         {
             Caption = 'Api Username';
             DataClassification = CustomerContent;
-            Description = 'MAG2.00';
         }
         field(75; "Api Password"; Text[250])
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'IsolatedStorage is in use.';
             Caption = 'Api Password';
             DataClassification = CustomerContent;
-            Description = 'MAG2.00';
+        }
+        field(76; "Api Password Key"; Guid)
+        {
+            Caption = 'Api Password Key';
+            Editable = false;
+            DataClassification = CustomerContent;
         }
         field(77; "Api Authorization"; Text[100])
         {
             Caption = 'Api Authorization';
             DataClassification = CustomerContent;
-            Description = 'MAG2.05';
         }
         field(80; "Managed Nav Modules Enabled"; Boolean)
         {
             Caption = 'Managed Nav Modules Enabled';
             DataClassification = CustomerContent;
-            Description = 'MAG2.00';
         }
         field(85; "Managed Nav Api Url"; Text[250])
         {
             Caption = 'Managed Nav Api Url';
             DataClassification = CustomerContent;
-            Description = 'MAG2.00';
         }
         field(90; "Managed Nav Api Username"; Text[100])
         {
             Caption = 'Managed Nav api brugernavn';
             DataClassification = CustomerContent;
-            Description = 'MAG2.00';
         }
         field(95; "Managed Nav Api Password"; Text[100])
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'IsolatedStorage is in use.';
             Caption = 'Managed Nav Api Password';
             DataClassification = CustomerContent;
-            Description = 'MAG2.00';
             ExtendedDatatype = Masked;
+        }
+        field(96; "Managed Nav Api Password Key"; Guid)
+        {
+            Caption = 'Managed Nav Api Password Key';
+            DataClassification = CustomerContent;
         }
         field(98; "Version No."; Text[50])
         {
             Caption = 'Version No.';
             DataClassification = CustomerContent;
-            Description = 'MAG2.00';
             Editable = false;
         }
         field(99; "Version Coverage"; Text[50])
         {
             Caption = 'Version Coverage';
             DataClassification = CustomerContent;
-            Description = 'MAG2.00';
             Editable = false;
         }
         field(100; "Brands Enabled"; Boolean)
@@ -242,7 +228,6 @@ table 6151401 "NPR Magento Setup"
         {
             Caption = 'Custom Options Nos.';
             DataClassification = CustomerContent;
-            Description = 'MAG1.22';
             TableRelation = "No. Series";
         }
         field(135; "Bundled Products Enabled"; Boolean)
@@ -254,13 +239,11 @@ table 6151401 "NPR Magento Setup"
         {
             Caption = 'Multistore Enabled';
             DataClassification = CustomerContent;
-            Description = 'MAG1.21';
         }
         field(145; "Tickets Enabled"; Boolean)
         {
             Caption = 'Tickets Enabled';
             DataClassification = CustomerContent;
-            Description = 'MAG1.22';
         }
         field(200; "Customers Enabled"; Boolean)
         {
@@ -286,7 +269,6 @@ table 6151401 "NPR Magento Setup"
         {
             Caption = 'Collect in Store Enabled';
             DataClassification = CustomerContent;
-            Description = 'MAG2.22';
         }
         field(300; "Gift Voucher Enabled"; Boolean)
         {
@@ -359,102 +341,82 @@ table 6151401 "NPR Magento Setup"
             Caption = 'Exchange Web Code Pattern';
             DataClassification = CustomerContent;
         }
-        field(435; "Gift Voucher Activation"; Option)
+        field(435; "Gift Voucher Activation"; Enum "NPR Mag. Gift Voucher Activ.")
         {
             Caption = 'Activate Gift Voucher';
             DataClassification = CustomerContent;
-            Description = 'MAG1.20';
-            OptionCaption = 'On Posting,On Insert';
-            OptionMembers = OnPosting,OnInsert;
         }
         field(480; "Fixed Customer No."; Code[20])
         {
             Caption = 'Fixed Customer No.';
             DataClassification = CustomerContent;
-            Description = 'MAG2.26';
             TableRelation = Customer;
         }
-        field(490; "Customer Update Mode"; Option)
+        field(490; "Customer Update Mode"; Enum "NPR Magento Cust. Update Mode")
         {
             Caption = 'Customer Update Mode';
             DataClassification = CustomerContent;
-            Description = 'MAG2.22,MAG2.26';
-            OptionCaption = 'Create and Update,Create,Update,None,Fixed';
-            OptionMembers = "Create and Update",Create,Update,"None","Fixed";
         }
-        field(500; "Customer Mapping"; Option)
+        field(500; "Customer Mapping"; Enum "NPR Magento Customer Mapping")
         {
             Caption = 'Customer Mapping';
             DataClassification = CustomerContent;
-            Description = 'MAG2.00,MAG2.21,MAG2.22,MAG2.24';
-            OptionCaption = 'E-mail,Phone No.,E-mail AND Phone No.,E-mail OR Phone No.,Customer No.,Phone No. to Customer No.';
-            OptionMembers = "E-mail","Phone No.","E-mail AND Phone No.","E-mail OR Phone No.","Customer No.","Phone No. to Customer No.";
         }
         field(505; "Customer Posting Group"; Code[10])
         {
             Caption = 'Customer Posting Group';
             DataClassification = CustomerContent;
-            Description = 'MAG2.00';
             TableRelation = "Customer Posting Group";
         }
         field(515; "Customer Template Code"; Code[10])
         {
             Caption = 'Customer Template Code';
             DataClassification = CustomerContent;
-            Description = 'MAG2.00';
             TableRelation = "Customer Template";
         }
         field(517; "Customer Config. Template Code"; Code[10])
         {
             Caption = 'Customer Config. Template Code';
             DataClassification = CustomerContent;
-            Description = 'MAG2.02';
             TableRelation = "Config. Template Header".Code WHERE("Table ID" = CONST(18));
         }
         field(520; "Payment Terms Code"; Code[10])
         {
             Caption = 'Payment Terms Code';
             DataClassification = CustomerContent;
-            Description = 'MAG2.00';
             TableRelation = "Payment Terms";
         }
         field(525; "Payment Fee Account No."; Code[20])
         {
             Caption = 'Payment Fee Account No.';
             DataClassification = CustomerContent;
-            Description = 'MAG2.00';
             TableRelation = "G/L Account";
         }
         field(530; "Salesperson Code"; Code[10])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;
-            Description = 'MAG2.00';
             TableRelation = "Salesperson/Purchaser";
         }
         field(535; "Release Order on Import"; Boolean)
         {
             Caption = 'Release Order on Import';
             DataClassification = CustomerContent;
-            Description = 'MAG2.19';
         }
         field(540; "Use Blank Code for LCY"; Boolean)
         {
             Caption = 'Use Blank Code for LCY';
             DataClassification = CustomerContent;
-            Description = 'MAG2.22';
         }
         field(600; "Replicate to Sales Prices"; Boolean)
         {
             Caption = 'Replicate to Sales Prices';
             DataClassification = CustomerContent;
-            Description = 'MAG2.03';
         }
         field(605; "Replicate to Sales Type"; Enum "Sales Price Type")
         {
             Caption = 'Replicate to Sales Type';
             DataClassification = CustomerContent;
-            Description = 'MAG2.03';
 
             trigger OnValidate()
             begin
@@ -465,7 +427,6 @@ table 6151401 "NPR Magento Setup"
         {
             Caption = 'Replicate to Sales Code';
             DataClassification = CustomerContent;
-            Description = 'MAG2.03';
             TableRelation = IF ("Replicate to Sales Type" = CONST("Customer Price Group")) "Customer Price Group"
             ELSE
             IF ("Replicate to Sales Type" = CONST(Customer)) Customer
@@ -500,39 +461,31 @@ table 6151401 "NPR Magento Setup"
         {
             Caption = 'Auto Seo Link Disabled';
             DataClassification = CustomerContent;
-            Description = 'MAG2.03';
         }
         field(700; "Post Retail Vouchers on Import"; Boolean)
         {
             Caption = 'Post Retail Vouchers on Import';
             DataClassification = CustomerContent;
-            Description = 'MAG2.23';
         }
-        field(710; "E-mail Retail Vouchers to"; Option)
+        field(710; "E-mail Retail Vouchers to"; Enum "NPR E-mail Retail Vouchers to")
         {
             Caption = 'E-mail Retail Vouchers to';
             DataClassification = CustomerContent;
-            Description = 'MAG2.23';
-            OptionCaption = ' ,Bill-to Customer';
-            OptionMembers = " ","Bill-to Customer";
         }
         field(720; "Post Tickets on Import"; Boolean)
         {
             Caption = 'Post Tickets on Import';
             DataClassification = CustomerContent;
-            Description = 'MAG2.23';
         }
         field(730; "Post Memberships on Import"; Boolean)
         {
             Caption = 'Post Memberships on Import';
             DataClassification = CustomerContent;
-            Description = 'MAG2.23';
         }
         field(750; "Send Order Confirmation"; Boolean)
         {
             Caption = 'Send Order Confirmation';
             DataClassification = CustomerContent;
-            Description = 'MAG2.25';
 
             trigger OnValidate()
             begin
@@ -543,22 +496,17 @@ table 6151401 "NPR Magento Setup"
         {
             Caption = 'E-mail Template (Order Confirmation)';
             DataClassification = CustomerContent;
-            Description = 'MAG2.25';
             TableRelation = "NPR E-mail Template Header" WHERE("Table No." = CONST(36));
         }
-        field(800; "Stock Calculation Method"; Option)
+        field(800; "Stock Calculation Method"; Enum "NPR Stock Calculation Method")
         {
             Caption = 'Stock Calculation Method';
             DataClassification = CustomerContent;
-            Description = 'MAG2.26';
-            OptionCaption = 'Standard,Function';
-            OptionMembers = Standard,"Function";
         }
         field(810; "Stock NpXml Template"; Code[20])
         {
             Caption = 'Stock NpXml Template';
             DataClassification = CustomerContent;
-            Description = 'MAG2.26';
             TableRelation = "NPR NpXml Template" WHERE("Table No." = CONST(27),
                                                     "Xml Root Name" = CONST('stock_updates'));
         }
@@ -567,7 +515,6 @@ table 6151401 "NPR Magento Setup"
             BlankZero = true;
             Caption = 'Stock Codeunit Id';
             DataClassification = CustomerContent;
-            Description = 'MAG2.26';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
         }
         field(830; "Stock Codeunit Name"; Text[30])
@@ -575,7 +522,6 @@ table 6151401 "NPR Magento Setup"
             CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
                                                              "Object ID" = FIELD("Stock Codeunit Id")));
             Caption = 'Stock Codeunit Name';
-            Description = 'MAG2.26';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -583,7 +529,6 @@ table 6151401 "NPR Magento Setup"
         {
             Caption = 'Stock Function Name';
             DataClassification = CustomerContent;
-            Description = 'MAG2.26';
 
             trigger OnLookup()
             var
@@ -625,14 +570,12 @@ table 6151401 "NPR Magento Setup"
         {
             Caption = 'Collect in Store Workflow Code';
             DataClassification = CustomerContent;
-            Description = 'MAG2.26';
             TableRelation = "NPR NpCs Workflow";
         }
         field(860; "NpCs From Store Code"; Code[20])
         {
             Caption = 'From Collect Store Code';
             DataClassification = CustomerContent;
-            Description = 'MAG2.26';
             TableRelation = "NPR NpCs Store" WHERE("Local Store" = CONST(true));
 
             trigger OnLookup()
@@ -666,9 +609,61 @@ table 6151401 "NPR Magento Setup"
         }
     }
 
-    fieldgroups
-    {
-    }
+    [NonDebuggable]
+    procedure SetApiPassword(NewPassword: Text)
+    begin
+        if IsNullGuid("Api Password Key") then
+            "Api Password Key" := CreateGuid();
+        IsolatedStorage.Set("Api Password Key", NewPassword, DataScope::Company);
+    end;
+
+    [NonDebuggable]
+    procedure GetApiPassword(): Text
+    Var
+        PasswordValue: Text;
+    begin
+        IsolatedStorage.Get("Api Password Key", DataScope::Company, PasswordValue);
+    end;
+
+    [NonDebuggable]
+    procedure HasApiPassword(): Boolean
+    begin
+        exit(GetApiPassword() <> '');
+    end;
+
+    procedure RemoveApiPassword()
+    begin
+        IsolatedStorage.Delete("Api Password Key", DataScope::Company);
+        Clear("Api Password Key");
+    end;
+
+    [NonDebuggable]
+    procedure SetNavApiPassword(NewPassword: Text)
+    begin
+        if IsNullGuid("Managed Nav Api Password Key") then
+            "Managed Nav Api Password Key" := CreateGuid();
+        IsolatedStorage.Set("Managed Nav Api Password Key", NewPassword, DataScope::Company);
+    end;
+
+    [NonDebuggable]
+    procedure GetNavApiPassword(): Text
+    Var
+        PasswordValue: Text;
+    begin
+        IsolatedStorage.Get("Managed Nav Api Password Key", DataScope::Company, PasswordValue);
+    end;
+
+    [NonDebuggable]
+    procedure HasNavApiPassword(): Boolean
+    begin
+        exit(GetNavApiPassword() <> '');
+    end;
+
+    procedure RemoveNavApiPassword()
+    begin
+        IsolatedStorage.Delete("Managed Nav Api Password Key", DataScope::Company);
+        Clear("Managed Nav Api Password Key");
+    end;
 
     procedure GetApiUsername(): Text[250]
     var
@@ -686,7 +681,7 @@ table 6151401 "NPR Magento Setup"
 
     local procedure UpdateApi()
     var
-        FormsAuthentication: DotNet NPRNetFormsAuthentication;
+        CryptographyManagement: Codeunit "Cryptography Management";
     begin
         case "Magento Version" of
             "Magento Version"::"2":
@@ -696,23 +691,22 @@ table 6151401 "NPR Magento Setup"
                 end;
         end;
         "Api Url" := "Magento Url" + 'api/rest/naviconnect/';
-        if "Api Password" = '' then
-            "Api Password" := FormsAuthentication.HashPasswordForStoringInConfigFile(Format(CurrentDateTime, 0, 9), 'MD5');
+        if not HasApiPassword() then
+            SetApiPassword(CryptographyManagement.GenerateHash(Format(CurrentDateTime, 0, 9), 0));
     end;
 
     procedure GetBasicAuthInfo(): Text
     var
-        Convert: DotNet NPRNetConvert;
-        Encoding: DotNet NPRNetEncoding;
+        Base64: Codeunit "Base64 Convert";
     begin
-        exit(Convert.ToBase64String(Encoding.UTF8.GetBytes(GetApiUsername() + ':' + "Api Password")));
+        exit(Base64.ToBase64(GetApiUsername() + ':' + GetApiPassword(), TextEncoding::UTF8));
     end;
 
     procedure GetCredentialsHash(): Text
     var
-        FormsAuthentication: DotNet NPRNetFormsAuthentication;
+        CryptographyManagement: Codeunit "Cryptography Management";
     begin
-        exit(LowerCase(FormsAuthentication.HashPasswordForStoringInConfigFile(GetApiUsername() + "Api Password" + 'D3W7k5pd7Pn64ctn25ng91ZkSvyDnjo2', 'MD5')));
+        exit(LowerCase(CryptographyManagement.GenerateHash(GetApiUsername() + GetApiPassword() + 'D3W7k5pd7Pn64ctn25ng91ZkSvyDnjo2', 0)));
     end;
 
     local procedure GetStockPublisherCodeunitId(): Integer

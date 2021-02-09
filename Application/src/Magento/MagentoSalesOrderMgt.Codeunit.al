@@ -4,13 +4,13 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
 
     trigger OnRun()
     var
-        XmlDoc: DotNet "NPRNetXmlDocument";
+        XmlDoc: XmlDocument;
     begin
         CurrImportEntry := Rec;
         Clear(CurrImportType);
         if CurrImportType.Get(CurrImportEntry."Import Type") then;
 
-        if LoadXmlDoc(XmlDoc) then
+        if Rec.LoadXmlDoc(XmlDoc) then
             ImportSalesOrders(XmlDoc);
     end;
 
@@ -31,33 +31,32 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         CurrImportType: Record "NPR Nc Import Type";
         Text003: Label 'Voucher Payment Amount %1 exceeds Voucher Amount %2';
 
-    local procedure ImportSalesOrders(XmlDoc: DotNet "NPRNetXmlDocument")
+    local procedure ImportSalesOrders(XmlDoc: XmlDocument)
     var
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
+        XmlElement: XmlElement;
+        XNodeList: XmlNodeList;
+        XNode: XmlNode;
         i: Integer;
     begin
         Initialize;
-        if IsNull(XmlDoc) then
+        if not XmlDoc.GetRoot(XmlElement) then
             exit;
-        XmlElement := XmlDoc.DocumentElement;
-        if IsNull(XmlElement) then
+
+        if not XmlElement.SelectNodes('sales_order', XNodeList) then
             exit;
-        if not NpXmlDomMgt.FindNodes(XmlElement, 'sales_order', XmlNodeList) then
-            exit;
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-            ImportSalesOrder(XmlElement);
+        for i := 1 to XNodeList.Count do begin
+            XNodeList.Get(i, XNode);
+            ImportSalesOrder(XNode.AsXmlElement());
         end;
     end;
 
-    local procedure ImportSalesOrder(XmlElement: DotNet NPRNetXmlElement) Imported: Boolean
+    local procedure ImportSalesOrder(XmlElement: XmlElement) Imported: Boolean
     var
         SalesHeader: Record "Sales Header";
         ReleaseSalesDoc: Codeunit "Release Sales Document";
         MailErrorMessage: Text;
     begin
-        if IsNull(XmlElement) then
+        if XmlElement.IsEmpty then
             exit(false);
         if OrderExists(XmlElement) then
             exit(false);
@@ -91,11 +90,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         exit(true);
     end;
 
-    local procedure "--- Database"()
-    begin
-    end;
-
-    local procedure InsertCollectDocument(XmlElement: DotNet NPRNetXmlElement; var SalesHeader: Record "Sales Header")
+    local procedure InsertCollectDocument(XmlElement: XmlElement; var SalesHeader: Record "Sales Header")
     var
         NpCsWorkflow: Record "NPR NpCs Workflow";
         NpCsDocument: Record "NPR NpCs Document";
@@ -103,7 +98,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         NpCsStoreTo: Record "NPR NpCs Store";
         NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
-        XmlElementCollect: DotNet NPRNetXmlElement;
+        XmlElementCollect: XmlElement;
         StoreCode: Code[20];
     begin
         if not NpXmlDomMgt.FindElement(XmlElement, 'shipment/collect_in_store', false, XmlElementCollect) then
@@ -148,15 +143,13 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
     end;
 
-    local procedure InsertCommentLine(XmlElement: DotNet NPRNetXmlElement; var SalesHeader: Record "Sales Header")
+    local procedure InsertCommentLine(XmlElement: XmlElement; var SalesHeader: Record "Sales Header")
     var
         RecordLink: Record "Record Link";
         CommentLine: Text;
         CommentType: Text;
         OutStream: OutStream;
         LinkID: Integer;
-        BinaryWriter: DotNet NPRNetBinaryWriter;
-        Encoding: DotNet NPRNetEncoding;
     begin
         CommentType := NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'type', false);
         CommentLine := NpXmlDomMgt.GetXmlText(XmlElement, 'comment', 0, true);
@@ -167,33 +160,31 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
                 LinkID := SalesHeader.AddLink('', SalesHeader."No.");
             RecordLink.Get(LinkID);
             RecordLink.Type := RecordLink.Type::Note;
-            RecordLink.Note.CreateOutStream(OutStream);
+            RecordLink.Note.CreateOutStream(OutStream, TextEncoding::UTF8);
             RecordLink."User ID" := '';
-            Encoding := Encoding.UTF8;
-            BinaryWriter := BinaryWriter.BinaryWriter(OutStream, Encoding);
             if CommentType <> '' then
-                BinaryWriter.Write(CommentType + ': ' + CommentLine)
+                OutStream.Write(CommentType + ': ' + CommentLine)
             else
-                BinaryWriter.Write(CommentLine);
+                OutStream.Write(CommentLine);
             RecordLink.Modify(true);
             OnAfterInsertCommentLine(CurrImportType, CurrImportEntry, XmlElement, SalesHeader, RecordLink);
         end;
     end;
 
-    local procedure InsertComments(XmlElement: DotNet NPRNetXmlElement; var SalesHeader: Record "Sales Header")
+    local procedure InsertComments(XmlElement: XmlElement; var SalesHeader: Record "Sales Header")
     var
-        XmlElement2: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
+        XNode: XmlNode;
+        XNodeList: XmlNodeList;
         i: Integer;
     begin
-        NpXmlDomMgt.FindNodes(XmlElement, 'comment_line', XmlNodeList);
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement2 := XmlNodeList.ItemOf(i);
-            InsertCommentLine(XmlElement2, SalesHeader);
+        XmlElement.SelectNodes('comment_line', XNodeList);
+        for i := 1 to XNodeList.Count do begin
+            XNodeList.Get(i, XNode);
+            InsertCommentLine(XNode.AsXmlElement(), SalesHeader);
         end;
     end;
 
-    local procedure InsertCustomer(XmlElement: DotNet NPRNetXmlElement; IsContactCustomer: Boolean; var Customer: Record Customer): Boolean
+    local procedure InsertCustomer(XmlElement: XmlElement; IsContactCustomer: Boolean; var Customer: Record Customer): Boolean
     var
         ConfigTemplateHeader: Record "Config. Template Header";
         CustTemplate: Record "Customer Template";
@@ -320,7 +311,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
 
     end;
 
-    local procedure InsertPaymentLinePaymentMethod(XmlElement: DotNet NPRNetXmlElement; var SalesHeader: Record "Sales Header"; var LineNo: Integer)
+    local procedure InsertPaymentLinePaymentMethod(XmlElement: XmlElement; var SalesHeader: Record "Sales Header"; var LineNo: Integer)
     var
         PaymentLine: Record "NPR Magento Payment Line";
         PaymentMapping: Record "NPR Magento Payment Mapping";
@@ -370,7 +361,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         PaymentLine.Insert(true);
     end;
 
-    local procedure InsertPaymentLineVoucher(XmlElement: DotNet NPRNetXmlElement; var SalesHeader: Record "Sales Header"; var LineNo: Integer)
+    local procedure InsertPaymentLineVoucher(XmlElement: XmlElement; var SalesHeader: Record "Sales Header"; var LineNo: Integer)
     var
         CreditVoucher: Record "NPR Credit Voucher";
         GiftVoucher: Record "NPR Gift Voucher";
@@ -478,7 +469,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         end;
     end;
 
-    local procedure InsertRetailVoucherPayment(XmlElement: DotNet NPRNetXmlElement; var SalesHeader: Record "Sales Header"; var LineNo: Integer): Boolean
+    local procedure InsertRetailVoucherPayment(XmlElement: XmlElement; var SalesHeader: Record "Sales Header"; var LineNo: Integer): Boolean
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvVoucher: Record "NPR NpRv Voucher";
@@ -548,33 +539,31 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
 
     end;
 
-    local procedure InsertPaymentLines(XmlElement: DotNet NPRNetXmlElement; var SalesHeader: Record "Sales Header")
+    local procedure InsertPaymentLines(XmlElement: XmlElement; var SalesHeader: Record "Sales Header")
     var
-        XmlElement2: DotNet NPRNetXmlElement;
-        XmlElementLines: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
+        XNode: XmlNode;
+        XNodeList: XmlNodeList;
         LineNo: Integer;
         i: Integer;
     begin
-        XmlElementLines := XmlElement.SelectSingleNode('payments');
-        if not IsNull(XmlElementLines) then begin
-            NpXmlDomMgt.FindNodes(XmlElementLines, 'payment_method', XmlNodeList);
+        if XmlElement.SelectSingleNode('payments', XNode) then begin
+            XNode.SelectNodes('payment_method', XNodeList);
             LineNo := 0;
-            for i := 0 to XmlNodeList.Count - 1 do begin
-                XmlElement2 := XmlNodeList.ItemOf(i);
-                case LowerCase(NpXmlDomMgt.GetXmlAttributeText(XmlElement2, 'type', true)) of
+            for i := 1 to XNodeList.Count do begin
+                XNodeList.Get(i, XNode);
+                case LowerCase(NpXmlDomMgt.GetXmlAttributeText(XNode, 'type', true)) of
                     'payment_gateway', '':
-                        InsertPaymentLinePaymentMethod(XmlElement2, SalesHeader, LineNo);
+                        InsertPaymentLinePaymentMethod(XNode.AsXmlElement(), SalesHeader, LineNo);
                     'voucher':
-                        InsertPaymentLineVoucher(XmlElement2, SalesHeader, LineNo);
+                        InsertPaymentLineVoucher(XNode.AsXmlElement(), SalesHeader, LineNo);
                     'retail_voucher':
-                        InsertRetailVoucherPayment(XmlElement2, SalesHeader, LineNo);
+                        InsertRetailVoucherPayment(XNode.AsXmlElement(), SalesHeader, LineNo);
                 end;
             end;
         end;
     end;
 
-    local procedure InsertSalesHeader(XmlElement: DotNet NPRNetXmlElement; var SalesHeader: Record "Sales Header")
+    local procedure InsertSalesHeader(XmlElement: XmlElement; var SalesHeader: Record "Sales Header")
     var
         Customer: Record Customer;
         TempCustomer: Record Customer temporary;
@@ -583,17 +572,21 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         PaymentMapping: Record "NPR Magento Payment Mapping";
         MagentoMgt: Codeunit "NPR Magento Mgt.";
         NoSeriesMgt: Codeunit NoSeriesManagement;
-        XmlElement2: DotNet NPRNetXmlElement;
+        XmlElement2: XmlElement;
+        XNode: XmlNode;
+        XNodeList: XmlNodeList;
         RecRef: RecordRef;
         OrderNo: Code[20];
+        i: Integer;
     begin
         Initialize;
         Clear(SalesHeader);
         OrderNo := NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'order_no', true);
         if MagentoWebsite.Get(NpXmlDomMgt.GetAttributeCode(XmlElement, '', 'website_code', MaxStrLen(MagentoWebsite.Code), true)) then;
 
-        if not NpXmlDomMgt.FindNode(XmlElement, 'sell_to_customer', XmlElement2) then
+        if not XmlElement.SelectSingleNode('sell_to_customer', XNode) then
             Error(Error001);
+        XmlElement2 := XNode.AsXmlElement();
         InsertCustomer(XmlElement2, MagentoSetup."Customers Enabled", Customer);
         SalesHeader.Init;
         SalesHeader."Document Type" := SalesHeader."Document Type"::Order;
@@ -663,7 +656,8 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         if NpXmlDomMgt.GetElementBoolean(XmlElement, 'prices_excluding_vat', false) then
             SalesHeader."Prices Including VAT" := false;
 
-        if NpXmlDomMgt.FindNode(XmlElement, 'ship_to_customer', XmlElement2) then begin
+        if XmlElement.SelectSingleNode('ship_to_customer', XNode) then begin
+            XmlElement2 := XNode.AsXmlElement();
             SalesHeader."Ship-to Name" := NpXmlDomMgt.GetXmlText(XmlElement2, 'name', MaxStrLen(SalesHeader."Ship-to Name"), true);
             SalesHeader."Ship-to Name 2" := NpXmlDomMgt.GetXmlText(XmlElement2, 'name_2', MaxStrLen(SalesHeader."Ship-to Name 2"), false);
             SalesHeader."Ship-to Address" := NpXmlDomMgt.GetXmlText(XmlElement2, 'address', MaxStrLen(SalesHeader."Ship-to Address"), true);
@@ -681,7 +675,8 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         if NpXmlDomMgt.GetElementBoolean(XmlElement, 'use_customer_salesperson', false) and (Customer."Salesperson Code" <> '') then
             SalesHeader.Validate("Salesperson Code", Customer."Salesperson Code");
 
-        if NpXmlDomMgt.FindNode(XmlElement, 'shipment', XmlElement2) then begin
+        if XmlElement.SelectSingleNode('shipment', XNode) then begin
+            XmlElement2 := XNode.AsXmlElement();
             ShipmentMapping.SetRange("External Shipment Method Code", NpXmlDomMgt.GetXmlText(XmlElement2, 'shipment_method', MaxStrLen(ShipmentMapping."External Shipment Method Code"), true));
             ShipmentMapping.FindFirst;
             SalesHeader.Validate("Shipment Method Code", ShipmentMapping."Shipment Method Code");
@@ -692,9 +687,13 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
             RecRef.SetTable(SalesHeader);
         end;
 
-        if NpXmlDomMgt.FindNode(XmlElement, 'payments/payment_method', XmlElement2) then
-            repeat
-                if LowerCase(NpXmlDomMgt.GetXmlAttributeText(XmlElement2, 'type', true)) = 'payment_gateway' then begin
+        if XmlElement.SelectNodes('payments', XNodeList) then begin
+            for i := 1 to XNodeList.Count do begin
+                XNodeList.Get(i, XNode);
+                XmlElement2 := XNode.AsXmlElement();
+                if (LowerCase(NpXmlDomMgt.GetXmlAttributeText(XmlElement2, 'type', true)) = 'payment_gateway')
+                and (SalesHeader."Payment Method Code" = '')
+                and (LowerCase(XmlElement2.Name) = 'payment_method') then begin
                     PaymentMapping.SetRange("External Payment Method Code",
                       CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement2, 'code', true), 1, MaxStrLen(PaymentMapping."External Payment Method Code")));
                     PaymentMapping.SetRange("External Payment Type",
@@ -706,11 +705,8 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
                     if (SalesHeader."Payment Method Code" = '') and (PaymentMapping."Payment Method Code" <> '') then
                         SalesHeader.Validate("Payment Method Code", PaymentMapping."Payment Method Code");
                 end;
-                XmlElement2 := XmlElement2.NextSibling;
-                if not IsNull(XmlElement2) then
-                    if LowerCase(XmlElement2.Name) <> 'payment_method' then
-                        Clear(XmlElement2);
-            until IsNull(XmlElement2) or (SalesHeader."Payment Method Code" <> '');
+            end;
+        end;
 
         if (MagentoWebsite.Code <> '') and (MagentoWebsite."Global Dimension 1 Code" <> '') then begin
             SalesHeader.Validate(SalesHeader."Shortcut Dimension 1 Code", MagentoWebsite."Global Dimension 1 Code");
@@ -724,44 +720,41 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
 
     end;
 
-    local procedure InsertSalesLines(XmlElement: DotNet NPRNetXmlElement; SalesHeader: Record "Sales Header")
+    local procedure InsertSalesLines(XmlElement: XmlElement; SalesHeader: Record "Sales Header")
     var
         SalesLineTemp: Record "Sales Line" temporary;
-        XmlElementLine: DotNet NPRNetXmlElement;
-        XmlElementLines: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
+        XNodeList: XmlNodeList;
+        XNode: XmlNode;
         LineNo: Integer;
         i: Integer;
     begin
         LineNo := 0;
 
-        XmlElementLines := XmlElement.SelectSingleNode('sales_order_lines');
-        if not IsNull(XmlElementLines) then begin
-            NpXmlDomMgt.FindNodes(XmlElementLines, 'sales_order_line', XmlNodeList);
-            for i := 0 to XmlNodeList.Count - 1 do begin
-                XmlElementLine := XmlNodeList.ItemOf(i);
-                InsertSalesLine(XmlElementLine, SalesHeader, LineNo);
+        if XmlElement.SelectSingleNode('sales_order_lines', XNode) then begin
+            XNode.SelectNodes('sales_order_line', XNodeList);
+            for i := 1 to XNodeList.Count do begin
+                XNodeList.Get(i, XNode);
+                InsertSalesLine(XNode.AsXmlElement(), SalesHeader, LineNo);
             end;
         end;
 
-        XmlElementLines := XmlElement.SelectSingleNode('payments');
-        if not IsNull(XmlElementLines) then begin
-            NpXmlDomMgt.FindNodes(XmlElementLines, 'payment_method', XmlNodeList);
-            for i := 0 to XmlNodeList.Count - 1 do begin
-                XmlElementLine := XmlNodeList.ItemOf(i);
-                InsertSalesLinePaymentFee(XmlElementLine, SalesHeader, LineNo);
+        if XmlElement.SelectSingleNode('payments', XNode) then begin
+            XNode.SelectNodes('payment_method', XNodeList);
+            for i := 1 to XNodeList.Count do begin
+                XNodeList.Get(i, XNode);
+                InsertSalesLinePaymentFee(XNode.AsXmlElement(), SalesHeader, LineNo);
             end;
         end;
 
-        if NpXmlDomMgt.FindNode(XmlElement, 'shipment', XmlElementLine) then
-            InsertSalesLineShipmentFee(XmlElementLine, SalesHeader, LineNo);
+        if XmlElement.SelectSingleNode('shipment', XNode) then
+            InsertSalesLineShipmentFee(XNode.AsXmlElement(), SalesHeader, LineNo);
 
         SalesPost.GetSalesLines(SalesHeader, SalesLineTemp, 0);
         SalesLineTemp.CalcVATAmountLines(0, SalesHeader, SalesLineTemp, VATAmountLineTemp);
         SalesLineTemp.UpdateVATOnLines(0, SalesHeader, SalesLineTemp, VATAmountLineTemp);
     end;
 
-    local procedure InsertSalesLine(XmlElement: DotNet NPRNetXmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
+    local procedure InsertSalesLine(XmlElement: XmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
     var
         SalesLine: Record "Sales Line";
     begin
@@ -797,7 +790,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
             OnAfterInsertSalesLine(CurrImportType, CurrImportEntry, XmlElement, SalesHeader, SalesLine);
     end;
 
-    local procedure InsertSalesLineComment(XmlElement: DotNet NPRNetXmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
+    local procedure InsertSalesLineComment(XmlElement: XmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
     var
         SalesLine: Record "Sales Line";
     begin
@@ -814,7 +807,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
 
     end;
 
-    local procedure InsertSalesLineItem(XmlElement: DotNet NPRNetXmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
+    local procedure InsertSalesLineItem(XmlElement: XmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
@@ -890,14 +883,16 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         SalesLine.Modify(true);
     end;
 
-    local procedure InsertSalesLineGiftVoucher(XmlElement: DotNet NPRNetXmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
+    local procedure InsertSalesLineGiftVoucher(XmlElement: XmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
     var
-        XmlElementGiftVoucher: DotNet NPRNetXmlElement;
+        XNodeList: XmlNodeList;
+        XNode: XmlNode;
         SalesLine: Record "Sales Line";
         LineAmount: Decimal;
         Quantity: Decimal;
         UnitPrice: Decimal;
         VatPct: Decimal;
+        i: Integer;
     begin
         UnitPrice := NpXmlDomMgt.GetElementDec(XmlElement, 'unit_price_incl_vat', true);
         LineAmount := NpXmlDomMgt.GetElementDec(XmlElement, 'line_amount_incl_vat', true);
@@ -924,14 +919,15 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         SalesLine.Validate("Line Amount", LineAmount);
         SalesLine.Modify(true);
 
-        XmlElementGiftVoucher := XmlElement.SelectSingleNode('gift_vouchers/gift_voucher');
-        while not IsNull(XmlElementGiftVoucher) do begin
-            InsertGiftVoucher(XmlElementGiftVoucher, SalesHeader);
-            XmlElementGiftVoucher := XmlElementGiftVoucher.NextSibling;
+        XmlElement.SelectNodes('//gift_vouchers/gift_voucher', XNodeList);
+        for i := 1 to XNodeList.Count do begin
+            XNodeList.Get(i, XNode);
+            if not XNode.AsXmlElement().IsEmpty then
+                InsertGiftVoucher(XNode.AsXmlElement(), SalesHeader);
         end;
     end;
 
-    local procedure InsertSalesLineFee(XmlElement: DotNet NPRNetXmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
+    local procedure InsertSalesLineFee(XmlElement: XmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
     var
         SalesCommentLine: Record "Sales Comment Line";
         SalesLine: Record "Sales Line";
@@ -1003,7 +999,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         end;
     end;
 
-    local procedure InsertSalesLineRetailVoucher(XmlElement: DotNet NPRNetXmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
+    local procedure InsertSalesLineRetailVoucher(XmlElement: XmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvVoucher: Record "NPR NpRv Voucher";
@@ -1069,9 +1065,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
 
         SalesLine.Validate(Type, SalesLine.Type::"G/L Account");
         SalesLine.Validate("No.", NpRvVoucherType."Account No.");
-        //-MAG2.25 [372135]
         SalesLine.Description := NpRvSalesLine.Description;
-        //+MAG2.25 [372135]
         SalesLine.Validate(Quantity, Quantity);
         SalesLine.Validate("VAT %", VatPct);
         SalesLine.Validate("Unit Price", UnitPrice);
@@ -1090,7 +1084,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
             NpRvSalesLine.Modify(true);
     end;
 
-    local procedure InsertSalesLinePaymentFee(XmlElement: DotNet NPRNetXmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
+    local procedure InsertSalesLinePaymentFee(XmlElement: XmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
     var
         SalesLine: Record "Sales Line";
         PaymentFee: Decimal;
@@ -1117,7 +1111,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         SalesLine.Modify(true);
     end;
 
-    local procedure InsertSalesLineShipmentFee(XmlElement: DotNet NPRNetXmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
+    local procedure InsertSalesLineShipmentFee(XmlElement: XmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
     var
         SalesLine: Record "Sales Line";
         ShipmentMapping: Record "NPR Magento Shipment Mapping";
@@ -1167,7 +1161,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         SalesLine.Modify(true);
     end;
 
-    local procedure InsertGiftVoucher(XmlElement: DotNet NPRNetXmlElement; SalesHeader: Record "Sales Header")
+    local procedure InsertGiftVoucher(XmlElement: XmlElement; SalesHeader: Record "Sales Header")
     var
         GiftVoucher: Record "NPR Gift Voucher";
         Ostream: OutStream;
@@ -1188,7 +1182,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         GiftVoucher.Insert(true);
     end;
 
-    local procedure InsertSalesLineCustomOption(XmlElement: DotNet NPRNetXmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
+    local procedure InsertSalesLineCustomOption(XmlElement: XmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
     var
         MagentoCustomOption: Record "NPR Magento Custom Option";
         MagentoCustomOptionValue: Record "NPR Magento Custom Optn. Value";
@@ -1200,7 +1194,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         UnitPrice: Decimal;
         VatPct: Decimal;
         CustomOptionLineNo: Integer;
-        SalesType: Integer;
+        SalesType: Enum "Sales Line Type";
         CustomOptionNo: Code[20];
         SalesNo: Code[20];
         UnitofMeasure: Code[10];
@@ -1324,11 +1318,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
 
     end;
 
-    local procedure "--- Post On Import"()
-    begin
-    end;
-
-    local procedure SendOrderConfirmation(XmlElement: DotNet NPRNetXmlElement; SalesHeader: Record "Sales Header") MailErrorMessage: Text
+    local procedure SendOrderConfirmation(XmlElement: XmlElement; SalesHeader: Record "Sales Header") MailErrorMessage: Text
     var
         Customer: Record Customer;
         EmailTemplateHeader: Record "NPR E-mail Template Header";
@@ -1519,10 +1509,6 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         exit(false);
     end;
 
-    local procedure "--- Get/Check"()
-    begin
-    end;
-
     local procedure GetContactCustomer(ContactNo: Code[20]; var Customer: Record Customer): Boolean
     var
         Contact: Record Contact;
@@ -1543,7 +1529,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         exit(Customer.Get(ContBusRel."No."));
     end;
 
-    local procedure GetCustomer(ExternalCustomerNo: Code[20]; XmlElement: DotNet NPRNetXmlElement; var Customer: Record Customer) Found: Boolean
+    local procedure GetCustomer(ExternalCustomerNo: Code[20]; XmlElement: XmlElement; var Customer: Record Customer) Found: Boolean
     var
         CustNo: Code[20];
     begin
@@ -1616,7 +1602,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         exit(CurrencyCode);
     end;
 
-    local procedure OrderExists(XmlElement: DotNet NPRNetXmlElement): Boolean
+    local procedure OrderExists(XmlElement: XmlElement): Boolean
     var
         SalesHeader: Record "Sales Header";
         SalesInvHeader: Record "Sales Invoice Header";
@@ -1638,11 +1624,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         exit(false);
     end;
 
-    local procedure "--- Set"()
-    begin
-    end;
-
-    local procedure InitCustomer(XmlElement: DotNet NPRNetXmlElement; var Cust: Record Customer)
+    local procedure InitCustomer(XmlElement: XmlElement; var Cust: Record Customer)
     begin
 
         Initialize();
@@ -1682,34 +1664,12 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         FieldRef.Value := Value;
     end;
 
-    local procedure "--- Misc"()
-    begin
-    end;
-
     procedure Initialize()
     begin
         if not Initialized then begin
             MagentoSetup.Get;
             Initialized := true;
         end;
-    end;
-
-    local procedure LoadXmlDoc(NaviConnectImportEntry: Record "NPR Nc Import Entry"; var XmlDoc: DotNet "NPRNetXmlDocument"): Boolean
-    var
-        InStr: InStream;
-    begin
-        NaviConnectImportEntry.CalcFields("Document Source");
-        if not NaviConnectImportEntry."Document Source".HasValue then
-            exit(false);
-
-        NaviConnectImportEntry."Document Source".CreateInStream(InStr);
-        if not IsNull(XmlDoc) then
-            Clear(XmlDoc);
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.Load(InStr);
-        NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-        Clear(InStr);
-        exit(true);
     end;
 
     local procedure ActivateAndMailGiftVouchers(SalesHeader: Record "Sales Header")
@@ -1804,43 +1764,38 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         exit(WorkDate);
     end;
 
-    local procedure "--- OnAfterEvents"()
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetCustomer(ImportType: Record "NPR Nc Import Type"; ImportEntry: Record "NPR Nc Import Entry"; ExternalCustomerNo: Code[20]; Element: XmlElement; var Customer: Record Customer; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeGetCustomer(ImportType: Record "NPR Nc Import Type"; ImportEntry: Record "NPR Nc Import Entry"; ExternalCustomerNo: Code[20]; Element: DotNet NPRNetXmlElement; var Customer: Record Customer; var Handled: Boolean)
+    local procedure OnBeforeModifyCustomer(ImportType: Record "NPR Nc Import Type"; ImportEntry: Record "NPR Nc Import Entry"; Element: XmlElement; var Customer: Record Customer)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeModifyCustomer(ImportType: Record "NPR Nc Import Type"; ImportEntry: Record "NPR Nc Import Entry"; Element: DotNet NPRNetXmlElement; var Customer: Record Customer)
+    local procedure OnAfterInsertSalesHeader(ImportType: Record "NPR Nc Import Type"; ImportEntry: Record "NPR Nc Import Entry"; Element: XmlElement; var SalesHeader: Record "Sales Header")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterInsertSalesHeader(ImportType: Record "NPR Nc Import Type"; ImportEntry: Record "NPR Nc Import Entry"; Element: DotNet NPRNetXmlElement; var SalesHeader: Record "Sales Header")
+    local procedure OnAfterInsertSalesLine(ImportType: Record "NPR Nc Import Type"; ImportEntry: Record "NPR Nc Import Entry"; Element: XmlElement; var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterInsertSalesLine(ImportType: Record "NPR Nc Import Type"; ImportEntry: Record "NPR Nc Import Entry"; Element: DotNet NPRNetXmlElement; var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line")
+    local procedure OnAfterInsertCommentLine(ImportType: Record "NPR Nc Import Type"; ImportEntry: Record "NPR Nc Import Entry"; Element: XmlElement; var SalesHeader: Record "Sales Header"; var RecordLink: Record "Record Link")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterInsertCommentLine(ImportType: Record "NPR Nc Import Type"; ImportEntry: Record "NPR Nc Import Entry"; Element: DotNet NPRNetXmlElement; var SalesHeader: Record "Sales Header"; var RecordLink: Record "Record Link")
+    local procedure OnBeforeRelease(ImportType: Record "NPR Nc Import Type"; ImportEntry: Record "NPR Nc Import Entry"; Element: XmlElement; var SalesHeader: Record "Sales Header")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeRelease(ImportType: Record "NPR Nc Import Type"; ImportEntry: Record "NPR Nc Import Entry"; Element: DotNet NPRNetXmlElement; var SalesHeader: Record "Sales Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCommit(ImportType: Record "NPR Nc Import Type"; ImportEntry: Record "NPR Nc Import Entry"; Element: DotNet NPRNetXmlElement; var SalesHeader: Record "Sales Header")
+    local procedure OnBeforeCommit(ImportType: Record "NPR Nc Import Type"; ImportEntry: Record "NPR Nc Import Entry"; Element: XmlElement; var SalesHeader: Record "Sales Header")
     begin
     end;
 }
-

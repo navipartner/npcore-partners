@@ -1,10 +1,5 @@
 xmlport 6151403 "NPR Magento Ret. Order Import"
 {
-    // MAG2.12/MHA /20180425  CASE 309647 Object created - Sales Return Order Import
-    // MAG2.20/MHA /20190411  CASE 349994 Added <use_customer_salesperson>
-    // MAG2.24/MHA /20191120  CASE 319135 Added @type attribute to <payment_refund>
-    // MAG2.24/ZESO/20200131  CASE 384878 Set type attribute on payment_refund to optional
-
     Caption = 'Magento Sales Order Import';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/sales_return_order';
     Encoding = UTF8;
@@ -172,16 +167,12 @@ xmlport 6151403 "NPR Magento Ret. Order Import"
 
                             trigger OnBeforePassVariable()
                             begin
-                                //-MAG1.22
                                 PaymentMethodType := LowerCase(TempPaymentLine."Document No.");
-                                //+MAG1.22
                             end;
 
                             trigger OnAfterAssignVariable()
                             begin
-                                //-MAG1.22
                                 TempPaymentLine."Document No." := PaymentMethodType;
-                                //+MAG1.22
                             end;
                         }
                         fieldattribute(code; TempPaymentLine.Description)
@@ -375,18 +366,6 @@ xmlport 6151403 "NPR Magento Ret. Order Import"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     var
         LineNo: Integer;
 
@@ -400,4 +379,3 @@ xmlport 6151403 "NPR Magento Ret. Order Import"
         exit(website_code);
     end;
 }
-

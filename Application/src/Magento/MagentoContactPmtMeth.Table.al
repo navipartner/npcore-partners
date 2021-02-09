@@ -1,9 +1,5 @@
 table 6151433 "NPR Magento Contact Pmt.Meth."
 {
-    // MAG1.05/MH/20150223  CASE 206395 Object created
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object and field 1
-
     Caption = 'Magento Contact Payment Method';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Magento Cont.Pmt.Methods";
@@ -25,7 +21,7 @@ table 6151433 "NPR Magento Contact Pmt.Meth."
         }
         field(100; "Payment Method Code"; Code[10])
         {
-            CalcFormula = Lookup ("NPR Magento Payment Mapping"."Payment Method Code" WHERE("External Payment Method Code" = FIELD("External Payment Method Code"),
+            CalcFormula = Lookup("NPR Magento Payment Mapping"."Payment Method Code" WHERE("External Payment Method Code" = FIELD("External Payment Method Code"),
                                                                                         "External Payment Type" = FILTER(= '')));
             Caption = 'Payment Method Code';
             Editable = false;
@@ -40,8 +36,4 @@ table 6151433 "NPR Magento Contact Pmt.Meth."
         }
     }
 
-    fieldgroups
-    {
-    }
 }
-

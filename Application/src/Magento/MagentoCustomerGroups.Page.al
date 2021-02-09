@@ -1,10 +1,5 @@
 page 6151440 "NPR Magento Customer Groups"
 {
-    // MAG1.05/20150223  CASE 206395 Object created
-    // MAG1.17/MH/20150622  CASE 216851 Magento Setup functions moved to new codeunit
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.07/MHA /20170830  CASE 286943 Updated Magento Setup Actions to support Setup Event Subscription
-
     Caption = 'Customer Groups';
     PageType = List;
     UsageCategory = Administration;
@@ -17,12 +12,12 @@ page 6151440 "NPR Magento Customer Groups"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field("Magento Tax Class"; "Magento Tax Class")
+                field("Magento Tax Class"; Rec."Magento Tax Class")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Magento Tax Class field';
@@ -48,10 +43,7 @@ page 6151440 "NPR Magento Customer Groups"
 
                 trigger OnAction()
                 begin
-                    //-MAG2.07 [286943]
-                    //MagentoSetupMgt.SetupMagentoCustomerGroups();
                     MagentoSetupMgt.TriggerSetupMagentoCustomerGroups();
-                    //+MAG2.07 [286943]
                 end;
             }
         }
@@ -60,4 +52,3 @@ page 6151440 "NPR Magento Customer Groups"
     var
         MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
 }
-

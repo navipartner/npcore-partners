@@ -1,15 +1,5 @@
 table 6151431 "NPR Magento Item Attr. Value"
 {
-    // MAG1.01/MH/20150201  CASE 199932 Refactored Object from Web Integration
-    // MAG1.04/MH/20150206  CASE 199932 Tables changes:
-    //                                 - Added field 10 Attribute Set ID
-    //                                 - Added field 200 Configurable
-    //                                 - Added field 300 Enabled
-    //                                 - Added field 1000 Attribute Description
-    // MAG1.14/MH/20150429  CASE 212526 Changed parameters for LookupPicture() to PictureType, PictureName
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object and field 17
-
     Caption = 'Magento Item Attribute Value';
     DataClassification = CustomerContent;
 
@@ -21,13 +11,11 @@ table 6151431 "NPR Magento Item Attr. Value"
             DataClassification = CustomerContent;
             TableRelation = "NPR Magento Attribute";
         }
-        field(3; Type; Option)
+        field(3; Type; Enum "NPR Magento Item Attr. Value")
         {
             Caption = 'Type';
             DataClassification = CustomerContent;
             InitValue = Multiple;
-            OptionCaption = ',Single,Multiple,Text Area (single)';
-            OptionMembers = ,Single,Multiple,"Text Area (single)";
         }
         field(5; "Attribute Label Line No."; Integer)
         {
@@ -43,10 +31,7 @@ table 6151431 "NPR Magento Item Attr. Value"
             var
                 PictureName: Text;
             begin
-                //-MAG1.14
-                //PictureName := MagentoFunctions.LookupPicture(MagentoFunctions."PictureType.Attribute",MAXSTRLEN(Picture));
-                PictureName := MagentoFunctions.LookupPicture(MagentoFunctions."PictureType.Attribute", Picture);
-                //+MAG1.14
+                PictureName := MagentoFunctions.LookupPicture(Enum::"NPR Magento Picture Type"::Customer, Picture);
                 if PictureName <> '' then
                     Picture := PictureName;
             end;
@@ -55,7 +40,6 @@ table 6151431 "NPR Magento Item Attr. Value"
         {
             Caption = 'Attribute Set ID';
             DataClassification = CustomerContent;
-            Description = 'MAG1.04';
             TableRelation = "NPR Magento Attribute Set";
         }
         field(13; Selected; Boolean)
@@ -92,7 +76,7 @@ table 6151431 "NPR Magento Item Attr. Value"
         }
         field(110; Value; Text[100])
         {
-            CalcFormula = Lookup ("NPR Magento Attr. Label".Value WHERE("Attribute ID" = FIELD("Attribute ID"),
+            CalcFormula = Lookup("NPR Magento Attr. Label".Value WHERE("Attribute ID" = FIELD("Attribute ID"),
                                                                         "Line No." = FIELD("Attribute Label Line No.")));
             Caption = 'Value';
             Editable = false;
@@ -100,9 +84,8 @@ table 6151431 "NPR Magento Item Attr. Value"
         }
         field(1000; "Attribute Description"; Text[50])
         {
-            CalcFormula = Lookup ("NPR Magento Attribute".Description WHERE("Attribute ID" = FIELD("Attribute ID")));
+            CalcFormula = Lookup("NPR Magento Attribute".Description WHERE("Attribute ID" = FIELD("Attribute ID")));
             Caption = 'Attribute';
-            Description = 'MAG1.04';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -115,12 +98,6 @@ table 6151431 "NPR Magento Item Attr. Value"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     var
-        Description: Label 'Long Value';
         MagentoFunctions: Codeunit "NPR Magento Functions";
 }
-

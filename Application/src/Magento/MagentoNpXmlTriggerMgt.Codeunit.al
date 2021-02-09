@@ -1,13 +1,6 @@
 codeunit 6151447 "NPR Magento NpXml Trigger Mgt."
 {
-    // MAG2.26/MHA /20200527  CASE 406591 Object created - NpXml Trigger functions
-
-
-    trigger OnRun()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6151553, 'OnSetupGenericParentTable', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpXml Trigger Mgt.", 'OnSetupGenericParentTable', '', true, true)]
     local procedure MagentoStore(NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger"; ChildLinkRecRef: RecordRef; var ParentRecRef: RecordRef; var Handled: Boolean)
     var
         NpCsStore: Record "NPR NpCs Store";
@@ -41,7 +34,7 @@ codeunit 6151447 "NPR Magento NpXml Trigger Mgt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151553, 'OnSetupGenericParentTable', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpXml Trigger Mgt.", 'OnSetupGenericParentTable', '', true, true)]
     local procedure NonMagentoStore(NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger"; ChildLinkRecRef: RecordRef; var ParentRecRef: RecordRef; var Handled: Boolean)
     var
         NpCsStore: Record "NPR NpCs Store";
@@ -98,4 +91,3 @@ codeunit 6151447 "NPR Magento NpXml Trigger Mgt."
         exit(CODEUNIT::"NPR Magento NpXml Trigger Mgt.");
     end;
 }
-

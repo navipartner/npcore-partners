@@ -1,12 +1,5 @@
 table 6151435 "NPR Magento Display Config"
 {
-    // MAG1.05/TR/20150217  CASE 206395 Object created - controls visibility in Magento
-    // MAG1.06/MH/20150225  CASE 206395 Added (Hidden) Option to Field 40 Sales Type: Contact
-    // MAG1.07/MH/20150309  CASE 206395 Replace "Sales Type"::"Customer Group" with "Sales Type"::Display Group
-    // MAG1.08/MH/20150310  CASE 206395 Removed (Hidden) Option from Field 40 Sales Type: Contact
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object
-
     Caption = 'Magento Display Config';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Magento Display Config";
@@ -24,29 +17,23 @@ table 6151435 "NPR Magento Display Config"
             ELSE
             IF (Type = CONST(Brand)) "NPR Magento Brand";
         }
-        field(20; Type; Option)
+        field(20; Type; Enum "NPR Mag. Display Config Type")
         {
             Caption = 'Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Item,Item Group,Brand';
-            OptionMembers = Item,"Item Group",Brand;
         }
         field(30; "Sales Code"; Text[32])
         {
             Caption = 'Sales Code';
             DataClassification = CustomerContent;
-            Description = 'MAG1.06,MAG1.07,MAG1.08';
             TableRelation = IF ("Sales Type" = CONST(Customer)) Customer
             ELSE
             IF ("Sales Type" = CONST("Display Group")) "NPR Magento Display Group";
         }
-        field(40; "Sales Type"; Option)
+        field(40; "Sales Type"; Enum "NPR Mag. Dis. Conf. Sales Type")
         {
             Caption = 'Sales Type';
             DataClassification = CustomerContent;
-            Description = 'MAG1.06,MAG1.07,MAG1.08';
-            OptionCaption = 'Customer,Display Group,All Customers';
-            OptionMembers = Customer,"Display Group","All Customers";
         }
         field(50; "Is Visible"; Boolean)
         {
@@ -82,10 +69,6 @@ table 6151435 "NPR Magento Display Config"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnInsert()
     begin
         if "Sales Type" = "Sales Type"::"All Customers" then
@@ -103,14 +86,4 @@ table 6151435 "NPR Magento Display Config"
 
         TestField("No.");
     end;
-
-    var
-        CustPriceGr: Record "Customer Price Group";
-        Text000: Label '%1 cannot be after %2';
-        Cust: Record Customer;
-        Text001: Label '%1 must be blank.';
-        Campaign: Record Campaign;
-        Item: Record Item;
-        Text002: Label 'You can only change the %1 and %2 from the Campaign Card when %3 = %4';
 }
-

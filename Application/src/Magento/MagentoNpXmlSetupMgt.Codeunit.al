@@ -1,32 +1,9 @@
 codeunit 6151450 "NPR Magento NpXml Setup Mgt"
 {
-    // MAG1.17/MHA /20150617  CASE 215910 Object created - includes functions to Init, Edit and Read NpXml setup
-    // MAG1.18/MHA /20150710  CASE 218282 Updated Manufacturer setup
-    // MAG1.20/TS  /20150811  CASE 218524 SetSalesPriceEnabled
-    // MAG1.21/MHA /20151123  CASE 223835 Added Parameter FilterFieldNo to function SetItemFilterValue()
-    // MAG1.21/MHA /20151123  CASE 227354 Added item_store to Generic Setup and Renamed default template for item_inventory
-    // MAG1.22/MHA /20151203  CASE 224528 Downloaded New Templates are Archived
-    // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
-    // MAG2.02/TS  /20170208  CASE 265711 Added Template Ticket and Member
-    // MAG2.05/MHA /20170714  CASE 283777 Added "Api Authorization" in SetupTemplate()
-    // MAG2.22/MHA /20190625  CASE 359285 Adjusted SetupTemplate() to delete existing Template if Version Id belongs to Magento
-    // MAG2.22/MHA /20190708  CASE 352201 Added collect stores to InitNpXmlTemplateSetup()
-    // MAG2.22/MHA /20190709  CASE 355079 Content-Type and Accept are explicitly set in SetupTemplate()
-    // MAG2.26/MHA /20200501  CASE 402488 Stock NpXml Template is set on Magento Setup in SetupTemplateItemInventory()
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
 
-    procedure "--- Generic Setup"()
-    begin
-    end;
-
-    local procedure AddNpXmlTemplate(var XmlDoc: DotNet "NPRNetXmlDocument"; NodePath: Text; UpdateCode: Code[20]; DeleteCode: Code[20])
+    local procedure AddNpXmlTemplate(var XmlDoc: XmlDocument; NodePath: Text; UpdateCode: Code[20]; DeleteCode: Code[20])
     var
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
     begin
@@ -37,7 +14,7 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
     procedure InitNpXmlTemplateSetup(var TempBlob: Codeunit "Temp Blob")
     var
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
-        XmlDoc: DotNet "NPRNetXmlDocument";
+        XmlDoc: XmlDocument;
         OutStream: OutStream;
         NodePath: Text;
     begin
@@ -64,9 +41,7 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt.AddContainer(XmlDoc, NodePath, "ElementName.OrderStatus");
         MagentoGenericSetupMgt.AddContainer(XmlDoc, NodePath, "ElementName.Ticket");
         MagentoGenericSetupMgt.AddContainer(XmlDoc, NodePath, "ElementName.Membership");
-        //-MAG2.22 [352201]
         MagentoGenericSetupMgt.AddContainer(XmlDoc, NodePath, "ElementName.CollectStore");
-        //+MAG2.22 [352201]
 
         NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/ ' + "ElementName.Item";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_ITEM', 'DEL_ITEM');
@@ -90,16 +65,12 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_CREDIT_VOUCHER', '');
         NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.OrderStatus";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_ORDER_STATUS', '');
-        //-MAG2.02
         NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.Ticket";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_TICKET_ADMISSION', '');
         NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.Membership";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_MEMBERSHIP', '');
-        //+MAG2.02
-        //-MAG2.22 [352201]
         NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.CollectStore";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_COLLECT_STORE', 'DEL_COLLECT_STORE');
-        //+MAG2.22 [352201]
         NodePath := "ElementName.TemplateSetup";
         MagentoGenericSetupMgt.AddContainer(XmlDoc, NodePath, "ElementName.B2B");
 
@@ -123,11 +94,7 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
 
         Clear(TempBlob);
         TempBlob.CreateOutStream(OutStream);
-        XmlDoc.Save(OutStream);
-    end;
-
-    procedure "--- Magento Template Setup"()
-    begin
+        XmlDoc.WriteTo(OutStream);
     end;
 
     local procedure SetupTemplate(var TempBlob: Codeunit "Temp Blob"; TemplateCode: Code[20]; Enabled: Boolean)
@@ -143,11 +110,9 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         if (TemplateCode = '') or (not MagentoSetup.Get) then
             exit;
 
-        //-MAG2.22 [359285]
         MagentoSetupMgt.UpdateVersionNo(MagentoSetup);
         if NpXmlTemplate.Get(TemplateCode) and (CopyStr(NpXmlTemplate."Template Version", 1, StrLen(MagentoSetupMgt.MagentoVersionId())) = MagentoSetupMgt.MagentoVersionId()) then
             NpXmlTemplate.Delete(true);
-        //+MAG2.22 [359285]
 
         if not Enabled then begin
             if NpXmlTemplate.Get(TemplateCode) then
@@ -177,14 +142,10 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
                 NpXmlTemplate."API Username Type" := NpXmlTemplate."API Username Type"::Custom;
         end;
         NpXmlTemplate."API Username" := MagentoSetup."Api Username";
-        NpXmlTemplate."API Password" := MagentoSetup."Api Password";
-        //-MAG2.05 [283777]
+        NpXmlTemplate."API Password" := MagentoSetup.GetApiPassword();
         NpXmlTemplate."API Authorization" := MagentoSetup."Api Authorization";
-        //+MAG2.05 [283777]
-        //-MAG2.22 [355079]
         NpXmlTemplate."API Content-Type" := 'navision/xml';
         NpXmlTemplate."API Accept" := 'application/xml';
-        //+MAG2.22 [355079]
         NpXmlTemplate."API Response Path" := '';
         NpXmlTemplate."API Response Success Value" := '';
         NpXmlTemplate."API Type" := NpXmlTemplate."API Type"::"REST (Xml)";
@@ -278,11 +239,9 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        //-MAG1.21
         NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.ItemStore" + '/';
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
-        //+MAG1.21
     end;
 
     procedure SetupTemplateItemDiscountGroup(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
@@ -317,7 +276,6 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
 
-        //-MAG2.26 [402488]
         TemplateCode := MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update");
         MagentoSetup.Get;
         if TemplateCode <> MagentoSetup."Stock NpXml Template" then begin
@@ -325,7 +283,6 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
             MagentoSetup.Modify(true);
         end;
         MagentoItemMgt.UpsertStockTriggers();
-        //+MAG2.26 [402488]
     end;
 
     procedure SetupTemplateBrand(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
@@ -383,10 +340,8 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        //-MAG2.02
         NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.Ticket" + '/';
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
-        //+MAG2.02
     end;
 
     procedure SetupTemplateMember(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
@@ -394,10 +349,8 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        //-MAG2.02
         NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.Membership" + '/';
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
-        //+MAG2.02
     end;
 
     procedure "--- Template Element Setup"()
@@ -446,10 +399,6 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
         if TemplateCode = '' then
             exit;
         NpXmlTemplateMgt.SetNpXmlElementActive(TemplateCode, NodePath, CommentFilter, Enabled);
-    end;
-
-    procedure "--- Enum"()
-    begin
     end;
 
     local procedure "ElementName.B2B"(): Text
@@ -564,23 +513,16 @@ codeunit 6151450 "NPR Magento NpXml Setup Mgt"
 
     procedure "ElementName.Ticket"(): Text
     begin
-        //-MAG2.02
         exit('ticket');
-        //+MAG2.02
     end;
 
     procedure "ElementName.Membership"(): Text
     begin
-        //-MAG2.02
         exit('membership');
-        //+MAG2.02
     end;
 
     procedure "ElementName.CollectStore"(): Text
     begin
-        //-MAG2.22 [352201]
         exit('collect_store');
-        //+MAG2.22 [352201]
     end;
 }
-

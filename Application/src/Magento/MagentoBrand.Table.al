@@ -11,7 +11,6 @@ table 6151416 "NPR Magento Brand"
         {
             Caption = 'Id';
             DataClassification = CustomerContent;
-            Description = 'MAG2.26';
             NotBlank = true;
         }
         field(2; Name; Text[32])
@@ -34,7 +33,7 @@ table 6151416 "NPR Magento Brand"
             var
                 PictureName: Text;
             begin
-                PictureName := MagentoFunctions.LookupPicture(MagentoFunctions."PictureType.Brand", Picture);
+                PictureName := MagentoFunctions.LookupPicture(Enum::"NPR Magento Picture Type"::Brand, Picture);
                 if PictureName <> '' then
                     Picture := PictureName;
             end;
@@ -62,13 +61,12 @@ table 6151416 "NPR Magento Brand"
         {
             Caption = 'Logo';
             DataClassification = CustomerContent;
-            Description = 'MAG1.01';
 
             trigger OnLookup()
             var
                 PictureName: Text;
             begin
-                PictureName := MagentoFunctions.LookupPicture(MagentoFunctions."PictureType.Brand", "Logo Picture");
+                PictureName := MagentoFunctions.LookupPicture(Enum::"NPR Magento Picture Type"::Brand, "Logo Picture");
                 if PictureName <> '' then
                     "Logo Picture" := PictureName;
             end;
@@ -77,19 +75,16 @@ table 6151416 "NPR Magento Brand"
         {
             Caption = 'Sorting';
             DataClassification = CustomerContent;
-            Description = 'MAG1.20';
         }
         field(110; "Meta Title"; Text[100])
         {
             Caption = 'Meta Title';
             DataClassification = CustomerContent;
-            Description = 'MAG2.00,MAG2.22';
         }
         field(115; "Meta Description"; Text[250])
         {
             Caption = 'Meta Description';
             DataClassification = CustomerContent;
-            Description = 'MAG2.00';
         }
     }
 

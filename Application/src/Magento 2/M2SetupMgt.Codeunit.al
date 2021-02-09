@@ -305,7 +305,7 @@ codeunit 6151460 "NPR M2 Setup Mgt."
         PrevRec := Format(MagentoSetup);
         MagentoSetup."Api Username Type" := MagentoSetup."Api Username Type"::Custom;
         MagentoSetup."Api Username" := '';
-        MagentoSetup."Api Password" := '';
+        MagentoSetup.RemoveApiPassword();
         MagentoSetup."Api Authorization" := Authentication;
         if PrevRec <> Format(MagentoSetup) then
             MagentoSetup.Modify;

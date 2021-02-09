@@ -1,9 +1,5 @@
 codeunit 6151456 "NPR Magento NpXml Lastname"
 {
-    // MAG1.16/TS/20150507  CASE 213379 Object created - Custom Values for NpXml
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.09/MHA /20180105  CASE 301053 Removed redundant CASE 'boolean' in SetRecRefCalcFieldFilter()
-
     TableNo = "NPR NpXml Custom Val. Buffer";
 
     trigger OnRun()
@@ -14,11 +10,11 @@ codeunit 6151456 "NPR Magento NpXml Lastname"
         CustomValue: Text;
         OutStr: OutStream;
     begin
-        if not NpXmlElement.Get("Xml Template Code", "Xml Element Line No.") then
+        if not NpXmlElement.Get(Rec."Xml Template Code", Rec."Xml Element Line No.") then
             exit;
         Clear(RecRef);
-        RecRef.Open("Table No.");
-        RecRef.SetPosition("Record Position");
+        RecRef.Open(Rec."Table No.");
+        RecRef.SetPosition(Rec."Record Position");
         if not RecRef.Find then
             exit;
 
@@ -28,9 +24,9 @@ codeunit 6151456 "NPR Magento NpXml Lastname"
         RecRef2.Close;
         Clear(RecRef);
 
-        Value.CreateOutStream(OutStr);
+        Rec.Value.CreateOutStream(OutStr);
         OutStr.WriteText(CustomValue);
-        Modify;
+        Rec.Modify;
     end;
 
     procedure GetLastname(RecRef: RecordRef; FieldNo: Integer) Lastname: Text
@@ -77,10 +73,7 @@ codeunit 6151456 "NPR Magento NpXml Lastname"
                                 case LowerCase(Format(FieldRef2.Type)) of
                                     'boolean':
                                         FieldRef2.SetFilter('=%1', LowerCase(NpXmlFilter."Filter Value") in ['1', 'yes', 'ja', 'true']);
-                                    //-MAG2.09 [301053]
-                                    //'integer','option','boolean' :
                                     'integer', 'option':
-                                        //+MAG2.09 [301053]
                                         begin
                                             if Evaluate(BufferDecimal, NpXmlFilter."Filter Value") then
                                                 FieldRef2.SetFilter('=%1', BufferDecimal);
@@ -116,4 +109,3 @@ codeunit 6151456 "NPR Magento NpXml Lastname"
         end;
     end;
 }
-

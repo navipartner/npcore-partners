@@ -1,14 +1,9 @@
 page 6151402 "NPR Magento Inv. Companies"
 {
-    // MAG1.22/MHA/20160421 CASE 236917 Object created
-    // MAG1.22.01/MHA/20160511 CASE 236917 Field 25 Api Domain added
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-
     Caption = 'Inventory Companies';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "NPR Magento Inv. Company";
 
     layout
@@ -17,34 +12,41 @@ page 6151402 "NPR Magento Inv. Companies"
         {
             repeater(Group)
             {
-                field("Company Name"; "Company Name")
+                field("Company Name"; Rec."Company Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Company Name field';
                 }
-                field("Location Filter"; "Location Filter")
+                field("Location Filter"; Rec."Location Filter")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Location Filter field';
                 }
-                field("Api Username"; "Api Username")
+                field("Api Username"; Rec."Api Username")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Api Username field';
                 }
-                field("Api Password"; "Api Password")
+                field(Password; Password)
                 {
                     ApplicationArea = All;
+                    Caption = 'Api Password';
                     ExtendedDatatype = Masked;
                     ToolTip = 'Specifies the value of the Api Password field';
+
+                    trigger OnValidate()
+                    begin
+                        Rec.SetApiPassword(Password);
+                        Commit();
+                    end;
                 }
-                field("Api Url"; "Api Url")
+                field("Api Url"; Rec."Api Url")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Api Url field';
                 }
-                field("Api Domain"; "Api Domain")
+                field("Api Domain"; Rec."Api Domain")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Api Domain field';
@@ -76,7 +78,15 @@ page 6151402 "NPR Magento Inv. Companies"
         }
     }
 
+    trigger OnAfterGetRecord()
+    begin
+        Password := '';
+        if not IsNullGuid(Rec."Api Password Key") then
+            Password := '***';
+    end;
+
     var
+        Password: Text[250];
         Text000: Label 'Api Url OK';
 
     procedure TestApi()
@@ -84,10 +94,9 @@ page 6151402 "NPR Magento Inv. Companies"
         Item: Record Item;
         MagentoInventoryNpXmlValue: Codeunit "NPR Magento Inv. NpXml Value";
     begin
-        if Item.ChangeCompany("Company Name") then;
+        if Item.ChangeCompany(Rec."Company Name") then;
         Item.FindFirst;
         MagentoInventoryNpXmlValue.CalcMagentoInventoryCompany(Rec, Item."No.", '');
         Message(Text000);
     end;
 }
-

@@ -1,13 +1,8 @@
 page 6151425 "NPR Magento Custom Option Card"
 {
-    // MAG1.22/TR/20160414  CASE 238563 Magento Custom Options
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.21/BHR/20190508 CASE 338087 Field 100 Price Excl. VAT
-
     Caption = 'Custom Option Card';
     PageType = Card;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "NPR Magento Custom Option";
 
     layout
@@ -16,7 +11,7 @@ page 6151425 "NPR Magento Custom Option Card"
         {
             group(General)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
@@ -26,12 +21,12 @@ page 6151425 "NPR Magento Custom Option Card"
                         NoAssistEdit();
                     end;
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
@@ -41,53 +36,53 @@ page 6151425 "NPR Magento Custom Option Card"
                         CurrPage.Update(true);
                     end;
                 }
-                field(Required; Required)
+                field(Required; Rec.Required)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Required field';
                 }
-                field(Position; Position)
+                field(Position; Rec.Position)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Position field';
                 }
-                field("Max Length"; "Max Length")
+                field("Max Length"; Rec."Max Length")
                 {
                     ApplicationArea = All;
                     Editable = MaxLengthEditable;
                     ToolTip = 'Specifies the value of the Max Length field';
                 }
-                field(Price; Price)
+                field(Price; Rec.Price)
                 {
                     ApplicationArea = All;
                     Caption = 'Price';
                     Editable = PriceEditable;
                     ToolTip = 'Specifies the value of the Price field';
                 }
-                field("Price Type"; "Price Type")
+                field("Price Type"; Rec."Price Type")
                 {
                     ApplicationArea = All;
                     Editable = PriceTypeEditable;
                     ToolTip = 'Specifies the value of the Price Type field';
                 }
-                field("Sales Type"; "Sales Type")
+                field("Sales Type"; Rec."Sales Type")
                 {
                     ApplicationArea = All;
                     Editable = SalesTypeEditable;
                     ToolTip = 'Specifies the value of the Sales Type field';
                 }
-                field("Sales No."; "Sales No.")
+                field("Sales No."; Rec."Sales No.")
                 {
                     ApplicationArea = All;
                     Editable = SalesNoEditable;
                     ToolTip = 'Specifies the value of the Sales No. field';
                 }
-                field("Item Count"; "Item Count")
+                field("Item Count"; Rec."Item Count")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item Count field';
                 }
-                field("Price Includes VAT"; "Price Includes VAT")
+                field("Price Includes VAT"; Rec."Price Includes VAT")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Price Includes VAT field';
@@ -101,10 +96,6 @@ page 6151425 "NPR Magento Custom Option Card"
                 ApplicationArea = All;
             }
         }
-    }
-
-    actions
-    {
     }
 
     trigger OnAfterGetRecord()
@@ -138,12 +129,11 @@ page 6151425 "NPR Magento Custom Option Card"
 
     local procedure SetEditable()
     begin
-        PriceEditable := (Type in [Type::TextField, Type::TextArea, Type::File, Type::Date, Type::DateTime, Type::Time]);
-        PriceTypeEditable := (Type in [Type::TextField, Type::TextArea, Type::File, Type::Date, Type::DateTime, Type::Time]);
-        SalesTypeEditable := (Type in [Type::TextField, Type::TextArea, Type::File, Type::Date, Type::DateTime, Type::Time]);
-        SalesNoEditable := (Type in [Type::TextField, Type::TextArea, Type::File, Type::Date, Type::DateTime, Type::Time]);
-        MaxLengthEditable := (Type in [Type::TextField, Type::TextArea]);
-        CustomOptionValuesVisible := (Type in [Type::SelectDropDown, Type::SelectRadioButtons, Type::SelectCheckbox, Type::SelectMultiple]);
+        PriceEditable := (Rec.Type in [Rec.Type::TextField, Rec.Type::TextArea, Rec.Type::File, Rec.Type::Date, Rec.Type::DateTime, Rec.Type::Time]);
+        PriceTypeEditable := (Rec.Type in [Rec.Type::TextField, Rec.Type::TextArea, Rec.Type::File, Rec.Type::Date, Rec.Type::DateTime, Rec.Type::Time]);
+        SalesTypeEditable := (Rec.Type in [Rec.Type::TextField, Rec.Type::TextArea, Rec.Type::File, Rec.Type::Date, Rec.Type::DateTime, Rec.Type::Time]);
+        SalesNoEditable := (Rec.Type in [Rec.Type::TextField, Rec.Type::TextArea, Rec.Type::File, Rec.Type::Date, Rec.Type::DateTime, Rec.Type::Time]);
+        MaxLengthEditable := (Rec.Type in [Rec.Type::TextField, Rec.Type::TextArea]);
+        CustomOptionValuesVisible := (Rec.Type in [Rec.Type::SelectDropDown, Rec.Type::SelectRadioButtons, Rec.Type::SelectCheckbox, Rec.Type::SelectMultiple]);
     end;
 }
-

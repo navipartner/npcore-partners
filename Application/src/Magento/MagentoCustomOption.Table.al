@@ -1,9 +1,5 @@
 table 6151422 "NPR Magento Custom Option"
 {
-    // MAG1.22/TR/20160414  CASE 238563 Magento Custom Options
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.21/BHR/20190508 CASE 338087 Field 100 Price Excl. VAT
-
     Caption = 'Magento Custom Option';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Magento Custom Option List";
@@ -21,12 +17,10 @@ table 6151422 "NPR Magento Custom Option"
             Caption = 'Description';
             DataClassification = CustomerContent;
         }
-        field(20; Type; Option)
+        field(20; Type; Enum "NPR Magento Item Custom Type")
         {
             Caption = 'Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Text Field,,,Select Drop-Down,Select Radio Buttons,Select Checkbox,Select Multiple';
-            OptionMembers = TextField,TextArea,File,SelectDropDown,SelectRadioButtons,SelectCheckbox,SelectMultiple,Date,DateTime,Time;
         }
         field(30; Required; Boolean)
         {
@@ -51,19 +45,15 @@ table 6151422 "NPR Magento Custom Option"
             Caption = 'Price';
             DataClassification = CustomerContent;
         }
-        field(70; "Price Type"; Option)
+        field(70; "Price Type"; Enum "NPR Mag. Cust. Opt. Price Type")
         {
             Caption = 'Price Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Fixed,Percent';
-            OptionMembers = "Fixed",Percent;
         }
-        field(80; "Sales Type"; Option)
+        field(80; "Sales Type"; Enum "Sales Line Type")
         {
             Caption = 'Sales Type';
             DataClassification = CustomerContent;
-            OptionCaption = ' ,G/L Account,Item,Resource,Fixed Asset,Charge (Item)';
-            OptionMembers = " ","G/L Account",Item,Resource,"Fixed Asset","Charge (Item)";
         }
         field(90; "Sales No."; Code[20])
         {
@@ -86,13 +76,6 @@ table 6151422 "NPR Magento Custom Option"
             Caption = 'Price Includes VAT';
             DataClassification = CustomerContent;
             InitValue = true;
-
-            trigger OnValidate()
-            var
-                VATPostingSetup: Record "VAT Posting Setup";
-                SalesSetup: Record "Sales & Receivables Setup";
-            begin
-            end;
         }
         field(107; "No. Series"; Code[10])
         {
@@ -103,7 +86,7 @@ table 6151422 "NPR Magento Custom Option"
         }
         field(1100; "Item Count"; Integer)
         {
-            CalcFormula = Count ("NPR Magento Item Custom Option" WHERE("Custom Option No." = FIELD("No."),
+            CalcFormula = Count("NPR Magento Item Custom Option" WHERE("Custom Option No." = FIELD("No."),
                                                                     Enabled = CONST(true)));
             Caption = 'Item Count';
             Editable = false;
@@ -116,10 +99,6 @@ table 6151422 "NPR Magento Custom Option"
         key(Key1; "No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnDelete()
@@ -165,4 +144,3 @@ table 6151422 "NPR Magento Custom Option"
         "No. Series" := MagentoSetup."Custom Options No. Series";
     end;
 }
-

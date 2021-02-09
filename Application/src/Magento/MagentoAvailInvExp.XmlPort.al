@@ -1,10 +1,5 @@
 xmlport 6151400 "NPR Magento Avail. Inv. Exp."
 {
-    // MAG1.22/MHA /20160421  CASE 236917 Object created
-    // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
-    // MAG9.00.2.11/MHA /20180319  CASE 308406 Specific value removed from XmlVersionNo in order to be V2 extension compliant
-    // MAG2.26/MHA /20200430  CASE 402486 Updated Stock Calculation function
-
     Caption = 'Magento Avail. InventoryExport';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/item_inventory';
     Direction = Export;
@@ -37,25 +32,11 @@ xmlport 6151400 "NPR Magento Avail. Inv. Exp."
                     var
                         MagentoInventoryCompany: Record "NPR Magento Inv. Company";
                     begin
-                        //-MAG2.26 [402486]
                         MagentoInventoryCompany."Location Filter" := LocationFilter;
                         inventory := Format(MagentoItemMgt.GetStockQty3(TempItemVariant."Item No.", TempItemVariant.Code, MagentoInventoryCompany), 0, 9);
-                        //+MAG2.26 [402486]
                     end;
                 }
             }
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 
@@ -77,7 +58,6 @@ xmlport 6151400 "NPR Magento Avail. Inv. Exp."
     var
         Lf: Char;
         Space: Char;
-        EmptyString: Text;
     begin
         String := '';
         Lf := 10;
@@ -136,4 +116,3 @@ xmlport 6151400 "NPR Magento Avail. Inv. Exp."
         until Item.Next = 0;
     end;
 }
-

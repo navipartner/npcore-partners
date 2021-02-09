@@ -1,13 +1,5 @@
 codeunit 6151419 "NPR Magento Picture Mgt."
 {
-    // MAG2.05/MHA /20170714  CASE 283777 Object created
-    // MAG2.07/MHA /20170830  CASE 286943 Moved IsSubscriber() to CU6151401 "Magento Setup Mgt."
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         MagentoSetup: Record "NPR Magento Setup";
 
@@ -25,26 +17,21 @@ codeunit 6151419 "NPR Magento Picture Mgt."
     local procedure SendMagentoPicture(PictureName: Text; PictureType: Text; PictureDataUri: Text)
     var
         MagentoMgt: Codeunit "NPR Magento Mgt.";
-        XmlDoc: DotNet "NPRNetXmlDocument";
+        XmlDoc: XmlDocument;
     begin
         MagentoSetup.Get;
         MagentoSetup.TestField("Magento Url");
-        if not IsNull(XmlDoc) then
-            Clear(XmlDoc);
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml('<?xml version="1.0" encoding="UTF-8"?>' +
+        Clear(XmlDoc);
+
+        XmlDocument.ReadFrom('<?xml version="1.0" encoding="UTF-8"?>' +
                        '<images>' +
                          '<image image_name="' + PictureName + '" type="' + PictureType + '">' +
                            '<image_data>' +
                              '<![CDATA[' + PictureDataUri + ']]>' +
                            '</image_data>' +
                          '</image>' +
-                       '</images>');
+                       '</images>', XmlDoc);
         MagentoMgt.MagentoApiPost(MagentoSetup."Api Url", 'images', XmlDoc);
-    end;
-
-    local procedure "--- Publishers"()
-    begin
     end;
 
     [IntegrationEvent(false, false)]
@@ -52,22 +39,14 @@ codeunit 6151419 "NPR Magento Picture Mgt."
     begin
     end;
 
-    local procedure "--- Subscribers"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6151419, 'OnDragDropPicture', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Picture Mgt.", 'OnDragDropPicture', '', true, true)]
     local procedure UploadMagentoPicture(PictureName: Text; PictureType: Text; PictureDataUri: Text; var Handled: Boolean)
     var
         MagentoSetupEventSub: Record "NPR Magento Setup Event Sub.";
         MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
     begin
-        //-MAG2.07 [286943]
-        //IF NOT IsSubscriber(CurrCodeunitId(),'UploadMagentoPicture') THEN
-        //  EXIT;
-        if not MagentoSetupMgt.IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"DragDrop Picture", CurrCodeunitId(), 'UploadMagentoPicture') then
+        if not MagentoSetupMgt.IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"DragDrop Picture".AsInteger(), CurrCodeunitId(), 'UploadMagentoPicture') then
             exit;
-        //+MAG2.07 [286943]
 
         Handled := true;
         SendMagentoPicture(PictureName, PictureType, PictureDataUri);
@@ -78,4 +57,3 @@ codeunit 6151419 "NPR Magento Picture Mgt."
         exit(CODEUNIT::"NPR Magento Picture Mgt.");
     end;
 }
-

@@ -1,16 +1,10 @@
 page 6151485 "NPR Magento Top 10 S.Person"
 {
-    // MAG1.20/BHR/20150928 CASE 223709 Object created
-    // MAG1.22/JDH/20160202 CASE 233311 DK caption changed for page
-    // MAG1.22/BHR/20160107 CASE 227440 format of "Search E-Mail" to enable proper sorting.
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-
     Caption = 'Top 10 Sales Persons';
     CardPageID = "NPR Salesperson Card";
     Editable = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "Salesperson/Purchaser";
     SourceTableTemporary = true;
     SourceTableView = SORTING("Search E-Mail")
@@ -23,38 +17,35 @@ page 6151485 "NPR Magento Top 10 S.Person"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
 
                     trigger OnDrillDown()
                     begin
-                        //-MAG1.22
-                        //PAGE.RUN(6014428,REC);
-                        SalesPerson.Get(Code);
+                        SalesPerson.Get(Rec.Code);
                         PAGE.Run(PAGE::"NPR Salesperson Card", SalesPerson);
-                        //+MAG1.22
                     end;
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Sales (LCY)"; "NPR Sales (LCY)")
+                field("Sales (LCY)"; Rec."NPR Sales (LCY)")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
                     Caption = 'Sales Amount (Actual)';
                     ToolTip = 'Specifies the value of the Sales Amount (Actual) field';
                 }
-                field("Sales (Qty.)"; "NPR Sales (Qty.)")
+                field("Sales (Qty.)"; Rec."NPR Sales (Qty.)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Sales (Qty.) field';
                 }
-                field("Search E-Mail"; "Search E-Mail")
+                field("Search E-Mail"; Rec."Search E-Mail")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Search E-Mail field';
@@ -77,7 +68,7 @@ page 6151485 "NPR Magento Top 10 S.Person"
                     Caption = 'Day';
                     ApplicationArea = All;
                     ToolTip = 'Filters by day';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -90,7 +81,7 @@ page 6151485 "NPR Magento Top 10 S.Person"
                     Caption = 'Week';
                     ApplicationArea = All;
                     ToolTip = 'Filters by week';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -103,7 +94,7 @@ page 6151485 "NPR Magento Top 10 S.Person"
                     Caption = 'Month';
                     ApplicationArea = All;
                     ToolTip = 'Filters by month';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -116,7 +107,7 @@ page 6151485 "NPR Magento Top 10 S.Person"
                     Caption = 'Quarter';
                     ApplicationArea = All;
                     ToolTip = 'Filters by quarter';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -129,7 +120,7 @@ page 6151485 "NPR Magento Top 10 S.Person"
                     Caption = 'Year';
                     ApplicationArea = All;
                     ToolTip = 'Filters by year';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -153,39 +144,31 @@ page 6151485 "NPR Magento Top 10 S.Person"
         SalesPerson: Record "Salesperson/Purchaser";
         StartDate: Date;
         Enddate: Date;
-        Err000: Label 'End Date should be after Start Date';
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;
         CurrDate: Date;
 
     local procedure UpdateList()
     begin
-        DeleteAll;
+        Rec.DeleteAll;
         Setdate;
         Clear(Query1);
         Query1.SetFilter(Query1.Date_Filter, '%1..%2', StartDate, Enddate);
         Query1.Open;
         while Query1.Read do begin
             SalesPerson.Get(Query1.Code);
-            TransferFields(SalesPerson);
-            //-MAG1.22
-            if Insert then;
-            //+MAG1.22
-            SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
-            CalcFields("NPR Sales (Qty.)");
+            Rec.TransferFields(SalesPerson);
+            if Rec.Insert then;
+            Rec.SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
+            Rec.CalcFields("NPR Sales (Qty.)");
 
-            //-MAG1.22
-            //"Search E-Mail" := FORMAT(ROUND("Sales (Qty.)",0.01) * 100);
-            "Search E-Mail" := Format(Round(-"NPR Sales (Qty.)", 0.01) * 100, 20, 1);
-            "Search E-Mail" := PadStr('', 15 - StrLen("Search E-Mail"), '0') + "Search E-Mail";
-            Modify;
-            //+MAG1.22
+            Rec."Search E-Mail" := Format(Round(-Rec."NPR Sales (Qty.)", 0.01) * 100, 20, 1);
+            Rec."Search E-Mail" := PadStr('', 15 - StrLen(Rec."Search E-Mail"), '0') + Rec."Search E-Mail";
+            Rec.Modify;
         end;
         Query1.Close;
     end;
 
     local procedure Setdate()
-    var
-        DatePeriod: Record Date;
     begin
         case PeriodType of
             PeriodType::Day:
@@ -216,4 +199,3 @@ page 6151485 "NPR Magento Top 10 S.Person"
         end;
     end;
 }
-
