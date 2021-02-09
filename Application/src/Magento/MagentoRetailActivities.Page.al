@@ -1,20 +1,8 @@
 page 6151481 "NPR Magento Retail Activities"
 {
-    // MAG1.17/MH/20150423  CASE 212263 Created NaviConnect Role Center
-    // MAG1.17/BHR/20150428 CASE 212069 Added the following cues
-    //                                               "Sales Orders"
-    //                                               "Sales Quotes"
-    //                                               "Sales Return Orders"
-    //                                               "Internet orders"
-    // MAG1.17/MH/20150514  CASE 213393 Removed custom caption of "Dailey Sales Orders"
-    // MAG1.22/MHA/20160213 CASE 234030 Added wrapper groups around cuegroups in order to achieve three rows
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.01/MHA/20160907  CASE 242551 DrillDownPageID updated for "Import Pending" and "Tasks Unprocessed"
-
     Caption = 'NaviConnect Activities';
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "NPR Magento Cue";
 
     layout
@@ -62,20 +50,20 @@ page 6151481 "NPR Magento Retail Activities"
                     cuegroup(Control6150616)
                     {
                         ShowCaption = false;
-                        field("Sales Orders"; "Sales Orders")
+                        field("Sales Orders"; Rec."Sales Orders")
                         {
                             ApplicationArea = All;
                             DrillDownPageID = "Sales Order List";
                             ToolTip = 'Specifies the value of the Sales Orders field';
                         }
-                        field("Sales Quotes"; "Sales Quotes")
+                        field("Sales Quotes"; Rec."Sales Quotes")
                         {
                             ApplicationArea = All;
                             DrillDownPageID = "Sales Quotes";
                             Visible = false;
                             ToolTip = 'Specifies the value of the Sales Quotes field';
                         }
-                        field("Sales Return Orders"; "Sales Return Orders")
+                        field("Sales Return Orders"; Rec."Sales Return Orders")
                         {
                             ApplicationArea = All;
                             DrillDownPageID = "Sales Return Order List";
@@ -93,14 +81,14 @@ page 6151481 "NPR Magento Retail Activities"
                     cuegroup(Control6150622)
                     {
                         ShowCaption = false;
-                        field("Magento Orders"; "Magento Orders")
+                        field("Magento Orders"; Rec."Magento Orders")
                         {
                             ApplicationArea = All;
                             DrillDownPageID = "Sales Order List";
                             Visible = false;
                             ToolTip = 'Specifies the value of the Magento Orders field';
                         }
-                        field("Daily Sales Invoices"; "Daily Sales Invoices")
+                        field("Daily Sales Invoices"; Rec."Daily Sales Invoices")
                         {
                             ApplicationArea = All;
                             Caption = 'Daily Sales Invoices';
@@ -120,20 +108,20 @@ page 6151481 "NPR Magento Retail Activities"
                     cuegroup(Control6150620)
                     {
                         ShowCaption = false;
-                        field("Import Pending"; "Import Pending")
+                        field("Import Pending"; Rec."Import Pending")
                         {
                             ApplicationArea = All;
                             DrillDownPageID = "NPR Nc Import List";
                             ToolTip = 'Specifies the value of the Import Unprocessed field';
                         }
-                        field("Tasks Unprocessed"; "Tasks Unprocessed")
+                        field("Tasks Unprocessed"; Rec."Tasks Unprocessed")
                         {
                             ApplicationArea = All;
                             DrillDownPageID = "NPR Nc Task List";
                             Visible = false;
                             ToolTip = 'Specifies the value of the Tasks Unprocessed field';
                         }
-                        field("Daily Sales Orders"; "Daily Sales Orders")
+                        field("Daily Sales Orders"; Rec."Daily Sales Orders")
                         {
                             ApplicationArea = All;
                             DrillDownPageID = "Sales Order List";
@@ -147,12 +135,11 @@ page 6151481 "NPR Magento Retail Activities"
 
     trigger OnOpenPage()
     begin
-        Reset;
-        if not Get then begin
-            Init;
-            Insert;
+        Rec.Reset;
+        if not Rec.Get then begin
+            Rec.Init;
+            Rec.Insert;
         end;
-        SetFilter("Date Filter", '=%1', WorkDate);
+        Rec.SetFilter("Date Filter", '=%1', WorkDate);
     end;
 }
-

@@ -1,17 +1,6 @@
 codeunit 6151426 "NPR Magento Retail Cmn. Mgt."
 {
-    // MAG2.26/MHA /20200507  CASE 401235 Object created - functions for maintaining Magento Category Links from Retail Campaigns
-
-
-    trigger OnRun()
-    begin
-    end;
-
-    local procedure "--- Retail Campaign Line"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Table, 6014611, 'OnAfterInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Retail Campaign Line", 'OnAfterInsertEvent', '', true, true)]
     local procedure OnInsertRetailCampaignLine(var Rec: Record "NPR Retail Campaign Line"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary then
@@ -20,7 +9,7 @@ codeunit 6151426 "NPR Magento Retail Cmn. Mgt."
         InitMagentoCategoryLinks(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014611, 'OnAfterModifyEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Retail Campaign Line", 'OnAfterModifyEvent', '', true, true)]
     local procedure OnModifyRetailCampaignLine(var Rec: Record "NPR Retail Campaign Line"; var xRec: Record "NPR Retail Campaign Line"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary then
@@ -32,7 +21,7 @@ codeunit 6151426 "NPR Magento Retail Cmn. Mgt."
         InitMagentoCategoryLinks(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014611, 'OnAfterDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Retail Campaign Line", 'OnAfterDeleteEvent', '', true, true)]
     local procedure OnDeleteRetailCampaignLine(var Rec: Record "NPR Retail Campaign Line"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary then
@@ -55,11 +44,7 @@ codeunit 6151426 "NPR Magento Retail Cmn. Mgt."
         exit(MagentoCategory.Get(RetailCampaignHeader."Magento Category Id"));
     end;
 
-    local procedure "--- Period Discount Line"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Table, 6014414, 'OnAfterInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Period Discount Line", 'OnAfterInsertEvent', '', true, true)]
     local procedure OnInsertPeriodDiscountLine(var Rec: Record "NPR Period Discount Line"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary then
@@ -68,7 +53,7 @@ codeunit 6151426 "NPR Magento Retail Cmn. Mgt."
         InitMagentoCategoryLinks2(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014414, 'OnAfterDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Period Discount Line", 'OnAfterDeleteEvent', '', true, true)]
     local procedure OnDeletePeriodDiscountLine(var Rec: Record "NPR Period Discount Line"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary then
@@ -77,7 +62,7 @@ codeunit 6151426 "NPR Magento Retail Cmn. Mgt."
         RemoveMagentoCategoryLinks2(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014414, 'OnAfterRenameEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Period Discount Line", 'OnAfterRenameEvent', '', true, true)]
     local procedure OnRenamePeriodDiscountLine(var Rec: Record "NPR Period Discount Line"; var xRec: Record "NPR Period Discount Line"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary then
@@ -87,11 +72,7 @@ codeunit 6151426 "NPR Magento Retail Cmn. Mgt."
         InitMagentoCategoryLinks2(Rec);
     end;
 
-    local procedure "--- Mixed Discount Line"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Table, 6014412, 'OnAfterInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Mixed Discount Line", 'OnAfterInsertEvent', '', true, true)]
     local procedure OnInsertMixedDiscountLine(var Rec: Record "NPR Mixed Discount Line"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary then
@@ -100,7 +81,7 @@ codeunit 6151426 "NPR Magento Retail Cmn. Mgt."
         InitMagentoCategoryLinks3(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014412, 'OnAfterDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Mixed Discount Line", 'OnAfterDeleteEvent', '', true, true)]
     local procedure OnDeleteMixedDiscountLine(var Rec: Record "NPR Mixed Discount Line"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary then
@@ -109,7 +90,7 @@ codeunit 6151426 "NPR Magento Retail Cmn. Mgt."
         RemoveMagentoCategoryLinks3(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014412, 'OnAfterRenameEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Mixed Discount Line", 'OnAfterRenameEvent', '', true, true)]
     local procedure OnRenameMixedDiscountLine(var Rec: Record "NPR Mixed Discount Line"; var xRec: Record "NPR Mixed Discount Line"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary then
@@ -119,7 +100,7 @@ codeunit 6151426 "NPR Magento Retail Cmn. Mgt."
         InitMagentoCategoryLinks3(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014610, 'OnAfterInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Retail Campaign Header", 'OnAfterInsertEvent', '', true, true)]
     local procedure OnInsertRetailCampaignHeader(var Rec: Record "NPR Retail Campaign Header"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary then
@@ -128,11 +109,7 @@ codeunit 6151426 "NPR Magento Retail Cmn. Mgt."
         InitMagentoCategoryLinks4(Rec);
     end;
 
-    local procedure "--- Retail Campaign Header"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Table, 6014610, 'OnAfterModifyEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Retail Campaign Header", 'OnAfterModifyEvent', '', true, true)]
     local procedure OnModifyRetailCampaignHeader(var Rec: Record "NPR Retail Campaign Header"; var xRec: Record "NPR Retail Campaign Header"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary then
@@ -145,17 +122,13 @@ codeunit 6151426 "NPR Magento Retail Cmn. Mgt."
         InitMagentoCategoryLinks4(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014610, 'OnBeforeDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Retail Campaign Header", 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnDeleteRetailCampaignHeader(var Rec: Record "NPR Retail Campaign Header"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary then
             exit;
 
         RemoveMagentoCategoryLinks4(Rec);
-    end;
-
-    local procedure "--- Init"()
-    begin
     end;
 
     local procedure InitMagentoCategoryLinks(RetailCampaignLine: Record "NPR Retail Campaign Line")
@@ -276,10 +249,6 @@ codeunit 6151426 "NPR Magento Retail Cmn. Mgt."
         until TempItem.Next = 0;
     end;
 
-    local procedure "--- Remove"()
-    begin
-    end;
-
     local procedure RemoveMagentoCategoryLinks(RetailCampaignLine: Record "NPR Retail Campaign Line")
     var
         MagentoCategory: Record "NPR Magento Category";
@@ -312,7 +281,6 @@ codeunit 6151426 "NPR Magento Retail Cmn. Mgt."
         MagentoCategoryLink: Record "NPR Magento Category Link";
         RetailCampaignLine: Record "NPR Retail Campaign Line";
         TempItem: Record Item temporary;
-        TempItem2: Record Item temporary;
     begin
         if PeriodDiscountLine."Item No." = '' then
             exit;
@@ -388,16 +356,7 @@ codeunit 6151426 "NPR Magento Retail Cmn. Mgt."
         until TempItem.Next = 0;
     end;
 
-    local procedure "--- Find"()
-    begin
-    end;
-
     local procedure FindRetailCampaignItems(RetailCampaignCode: Code[20]; Type: Option " ","Period Discount","Mixed Discount"; DiscountCode: Code[20]; var TempItem: Record Item temporary)
-    var
-        RetailCampaignItemsPeriod: Query "NPR Campaign Items (Period)";
-        RetailCampaignItemsMix0: Query "NPR Retail Cmpgn.Items Mix 0";
-        RetailCampaignItemsMix1: Query "NPR Retail Cmpgn. Items Mix 1";
-        RetailCampaignItemsMix2: Query "NPR Retail Cmpgn Items Mix 2";
     begin
         if not TempItem.IsTemporary then
             exit;
@@ -495,11 +454,6 @@ codeunit 6151426 "NPR Magento Retail Cmn. Mgt."
     end;
 
     local procedure FindRetailDiscountItems(Type: Option " ","Period Discount","Mixed Discount"; DiscountCode: Code[20]; var TempItem: Record Item temporary)
-    var
-        RetailCampaignItemsPeriod: Query "NPR Campaign Items (Period)";
-        RetailCampaignItemsMix0: Query "NPR Retail Cmpgn.Items Mix 0";
-        RetailCampaignItemsMix1: Query "NPR Retail Cmpgn. Items Mix 1";
-        RetailCampaignItemsMix2: Query "NPR Retail Cmpgn Items Mix 2";
     begin
         if not TempItem.IsTemporary then
             exit;
@@ -637,4 +591,3 @@ codeunit 6151426 "NPR Magento Retail Cmn. Mgt."
         until Item.Next = 0;
     end;
 }
-

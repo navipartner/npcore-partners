@@ -1,13 +1,6 @@
 codeunit 6151448 "NPR Magento NpXml Gen.ChildMgt"
 {
-    // MAG2.25/MHA /20200416  CASE 395915 Object created
-
-
-    trigger OnRun()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6151551, 'OnSetupGenericChildTable', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpXml Mgt.", 'OnSetupGenericChildTable', '', true, true)]
     local procedure SetupVariantTranslation(NpXmlElement: Record "NPR NpXml Element"; ParentRecRef: RecordRef; var ChildRecRef: RecordRef; var Handled: Boolean)
     var
         MagentoStoreItem: Record "NPR Magento Store Item";
@@ -61,4 +54,3 @@ codeunit 6151448 "NPR Magento NpXml Gen.ChildMgt"
         exit(CODEUNIT::"NPR Magento NpXml Gen.ChildMgt");
     end;
 }
-

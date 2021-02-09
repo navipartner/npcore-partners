@@ -1,11 +1,5 @@
 table 6151438 "NPR Magento Shipment Mapping"
 {
-    // MAG1.01/MHA /20150121  CASE 199932 Refactored object from Web Integration
-    // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
-    // MAG2.03/MHA /20170503  CASE 274713 Length of field 150 "Shipment Fee Account No." increased from 10 to 20
-    // MAG2.17/JDH /20181112  CASE 334163 Added Caption to Object
-    // MAG2.22/MHA /20190610  CASE 357763 Added field 140 "Shipment Fee Type" and changed table relation of field 150
-
     Caption = 'Magento Shipment Mapping';
     DataClassification = CustomerContent;
 
@@ -34,19 +28,15 @@ table 6151438 "NPR Magento Shipment Mapping"
             DataClassification = CustomerContent;
             TableRelation = "Shipping Agent Services".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"));
         }
-        field(140; "Shipment Fee Type"; Option)
+        field(140; "Shipment Fee Type"; Enum "NPR Mag. Shipment Fee Type")
         {
             Caption = 'Shipment Fee Type';
             DataClassification = CustomerContent;
-            Description = 'MAG2.22';
-            OptionCaption = 'G/L Account,Item,Resource,Fixed Asset,Charge (Item)';
-            OptionMembers = "G/L Account",Item,Resource,"Fixed Asset","Charge (Item)";
         }
         field(150; "Shipment Fee No."; Code[20])
         {
             Caption = 'Shipment Fee No.';
             DataClassification = CustomerContent;
-            Description = 'MAG2.03,MAG2.22';
             TableRelation = IF ("Shipment Fee Type" = CONST("G/L Account")) "G/L Account" WHERE("Direct Posting" = CONST(true),
                                                                                                "Account Type" = CONST(Posting),
                                                                                                Blocked = CONST(false))
@@ -67,9 +57,4 @@ table 6151438 "NPR Magento Shipment Mapping"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

@@ -1,11 +1,5 @@
 codeunit 6151408 "NPR Magento Inv. NpXml Value"
 {
-    // MAG1.22/MHA/20160421 CASE 236917 Object created
-    // MAG1.22.01/MHA/20161005 CASE 236917 Added Invoke of SetTrustedCertificateValidation() in order to ignore SSL certificate validation and Credential Domain added
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.01/TS/20161108  CASE 257801 Added Location Filter if Intercompany is not enabled.
-    // MAG2.26/MHA /20200430  CASE 402486 Updated Stock Calculation function
-
     TableNo = "NPR NpXml Custom Val. Buffer";
 
     trigger OnRun()
@@ -17,11 +11,11 @@ codeunit 6151408 "NPR Magento Inv. NpXml Value"
         ItemNo: Code[20];
         VariantCode: Code[10];
     begin
-        if not NpXmlElement.Get("Xml Template Code", "Xml Element Line No.") then
+        if not NpXmlElement.Get(Rec."Xml Template Code", Rec."Xml Element Line No.") then
             exit;
         Clear(RecRef);
-        RecRef.Open("Table No.");
-        RecRef.SetPosition("Record Position");
+        RecRef.Open(Rec."Table No.");
+        RecRef.SetPosition(Rec."Record Position");
 
         if not RecRef.Find then
             exit;
@@ -32,9 +26,9 @@ codeunit 6151408 "NPR Magento Inv. NpXml Value"
 
         CustomValue := Format(CalcMagentoInventory(ItemNo, VariantCode), 0, 9);
 
-        Value.CreateOutStream(OutStr);
+        Rec.Value.CreateOutStream(OutStr);
         OutStr.WriteText(CustomValue);
-        Modify;
+        Rec.Modify;
     end;
 
     var
@@ -50,9 +44,7 @@ codeunit 6151408 "NPR Magento Inv. NpXml Value"
             exit(0);
 
         if not MagentoSetup."Intercompany Inventory Enabled" then begin
-            //-MAG2.26 [402486]
             Inventory := MagentoItemMgt.GetStockQty(ItemNo, VariantCode);
-            //+MAG2.26 [402486]
 
             exit(Inventory);
         end;
@@ -70,46 +62,34 @@ codeunit 6151408 "NPR Magento Inv. NpXml Value"
     var
         MagentoItemMgt: Codeunit "NPR Magento Item Mgt.";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        Credential: DotNet NPRNetNetworkCredential;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Stream: DotNet NPRNetStream;
-        StreamReader: DotNet NPRNetStreamReader;
-        WebException: DotNet NPRNetWebException;
-        XmlNamespaceManager: DotNet NPRNetXmlNamespaceManager;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlElement2: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
+        TempBlob: Codeunit "Temp Blob";
+        Base64Convert: Codeunit "Base64 Convert";
+        OutStream: OutStream;
+        InStr: InStream;
+        HttpWebRequest: HttpRequestMessage;
+        HttpWebResponse: HttpResponseMessage;
+        Client: HttpClient;
+        Content: HttpContent;
+        Headers: HttpHeaders;
+        HeadersReq: HttpHeaders;
+        XmlDoc: XmlDocument;
+        Node: XmlNode;
+        XmlNodeList: XmlNodeList;
+        Attributes: XmlAttributeCollection;
+        ItemAttribute: XmlAttribute;
+        VariantAttribute: XmlAttribute;
         Response: Text;
+        AuthText: Text;
+        XmlTxt: Text;
         i: Integer;
     begin
         if MagentoInventoryCompany."Company Name" = CompanyName then begin
-            //-MAG2.26 [402486]
             Inventory := MagentoItemMgt.GetStockQty3(ItemNo, VariantCode, MagentoInventoryCompany);
-            //+MAG2.26 [402486]
             exit(Inventory);
         end;
+        TempBlob.CreateOutStream(OutStream, TEXTENCODING::UTF8);
 
-        Clear(HttpWebRequest);
-        HttpWebRequest := HttpWebRequest.Create(MagentoInventoryCompany."Api Url");
-        HttpWebRequest.Timeout := 5 * 1000;
-        //-MAG1.22.01
-        NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
-        //+MAG1.22.01
-
-        if MagentoInventoryCompany."Api Username" = '' then
-            HttpWebRequest.UseDefaultCredentials(true)
-        else begin
-            HttpWebRequest.UseDefaultCredentials(false);
-            Credential := Credential.NetworkCredential(MagentoInventoryCompany."Api Username", MagentoInventoryCompany."Api Password");
-            HttpWebRequest.Credentials(Credential);
-        end;
-
-        Clear(XmlDoc);
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml('<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
+        XmlTxt := '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
                        '  <soapenv:Header />' +
                        '  <soapenv:Body>' +
                        '    <GetItemInventory xmlns="urn:microsoft-dynamics-schemas/codeunit/magento_services">' +
@@ -119,47 +99,57 @@ codeunit 6151408 "NPR Magento Inv. NpXml Value"
                        '       <items />' +
                        '    </GetItemInventory>' +
                        '  </soapenv:Body>' +
-                       '</soapenv:Envelope>');
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentType := 'text/xml; charset=utf-8';
-        HttpWebRequest.Headers.Add('SOAPAction', 'GetItemInventory');
-        XmlElement := XmlDoc.DocumentElement.LastChild.LastChild;
+                       '</soapenv:Envelope>';
+        XmlDocument.ReadFrom(XmlTxt, XmlDoc);
 
+        XmlDoc.SelectSingleNode('.//*[local-name()="itemFilter"]', Node);
+        Node.AsXmlElement().Add(ItemNo);
+        XmlDoc.SelectSingleNode('.//*[local-name()="variantFilter"]', Node);
+        Node.AsXmlElement().Add(VariantCode);
+        XmlDoc.SelectSingleNode('.//*[local-name()="locationFilter"]', Node);
+        Node.AsXmlElement().Add(MagentoInventoryCompany."Location Filter");
 
-        XmlNamespaceManager := XmlNamespaceManager.XmlNamespaceManager(XmlDoc.NameTable);
-        XmlNamespaceManager.AddNamespace('ms', 'urn:microsoft-dynamics-schemas/codeunit/magento_services');
+        XmlDoc.WriteTo(OutStream);
+        TempBlob.CreateInStream(InStr, TEXTENCODING::UTF8);
+        Content.WriteFrom(InStr);
 
-        XmlElement2 := XmlElement.SelectSingleNode('ms:itemFilter', XmlNamespaceManager);
-        XmlElement2.InnerText := ItemNo;
-        XmlElement2 := XmlElement.SelectSingleNode('ms:variantFilter', XmlNamespaceManager);
-        XmlElement2.InnerText := VariantCode;
-        XmlElement2 := XmlElement.SelectSingleNode('ms:locationFilter', XmlNamespaceManager);
-        XmlElement2.InnerText := MagentoInventoryCompany."Location Filter";
-        if not NpXmlDomMgt.SendWebRequest(XmlDoc, HttpWebRequest, HttpWebResponse, WebException) then begin
-            WebException := WebException.InnerException();
-            Error(Text000, WebException.Message);
+        Content.GetHeaders(Headers);
+        if Headers.Contains('Content-Type') then
+            Headers.Remove('Content-Type');
+        Headers.Add('Content-Type', 'text/xml; charset=utf-8');
+        Headers.Add('SOAPAction', 'GetItemInventory');
+
+        if MagentoInventoryCompany."Api Username" <> '' then begin
+            HttpWebRequest.GetHeaders(HeadersReq);
+            AuthText := StrSubstNo('%1:%2', MagentoInventoryCompany."Api Username", MagentoInventoryCompany.GetApiPassword());
+            HeadersReq.Add('Authorization', StrSubstNo('Basic %1', Base64Convert.ToBase64(AuthText)));
         end;
-        Stream := HttpWebResponse.GetResponseStream;
-        StreamReader := StreamReader.StreamReader(Stream);
-        Response := StreamReader.ReadToEnd;
-        Stream.Flush;
-        Stream.Close;
-        Clear(Stream);
-        HttpWebResponse.Close;
+
+        HttpWebRequest.Content(Content);
+        HttpWebRequest.SetRequestUri(MagentoInventoryCompany."Api Url");
+        HttpWebRequest.Method := 'POST';
+
+        Client.Timeout(5000);
+        Client.Send(HttpWebRequest, HttpWebResponse);
 
         Clear(XmlDoc);
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(Response);
-        NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-        if NpXmlDomMgt.FindNodes(XmlDoc.DocumentElement, 'item', XmlNodeList) then
-            for i := 0 to XmlNodeList.Count - 1 do begin
-                XmlElement := XmlNodeList.ItemOf(i);
-                if (XmlElement.GetAttribute('item_no') = ItemNo) and (XmlElement.GetAttribute('variant_code') = VariantCode) then begin
-                    Evaluate(Inventory, XmlElement.InnerText, 9);
-                    exit(Inventory);
-                end;
-            end;
+        HttpWebResponse.Content.ReadAs(Response);
+        XmlDocument.ReadFrom(Response, XmlDoc);
 
+        if not HttpWebResponse.IsSuccessStatusCode then
+            Error(StrSubstNo('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response));
+
+        XmlDoc.SelectNodes('.//*[local-name()="item"]', XmlNodeList);
+
+        for i := 1 to XmlNodeList.Count do begin
+            XmlNodeList.Get(i, Node);
+            if Node.AsXmlElement().Attributes().Get('item_no', ItemAttribute) then
+                if Node.AsXmlElement().Attributes().Get('variant_code', VariantAttribute) then
+                    if (ItemAttribute.Value = ItemNo) and (VariantAttribute.Value = VariantCode) then begin
+                        Evaluate(Inventory, Node.AsXmlElement().InnerText, 9);
+                        exit(Inventory);
+                    end;
+        end;
         exit(0);
     end;
 
@@ -188,4 +178,3 @@ codeunit 6151408 "NPR Magento Inv. NpXml Value"
         exit(false);
     end;
 }
-

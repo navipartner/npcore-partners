@@ -1,21 +1,5 @@
 xmlport 6151402 "NPR Magento Document Export"
 {
-    // MAG1.20/MHA/20151009  CASE 218525 Object created
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.03/TS  /20170124  CASE 256345 Added Document Order
-    // MAG2.12/MHA /20180425  CASE 309647 Added Document Lines
-    // MAG2.20/TSA /20190405 CASE 349134 Added more order details
-    // MAG2.20/TSA /20190408 CASE 345376 Added RelatedDocuments section
-    // MAG2.20/TSA /20190408 CASE 345376 Added Shipment Header and Lines section
-    // MAG2.20/TSA /20190408 CASE 345376 Added single document find
-    // MAG2.20/TSA /20190408 CASE 345376 Added hidelines
-    // MAG2.20/TSA /20190424 CASE 345376 Added currency_code element
-    // MAG2.22/TSA /20190531 CASE 345376 Added more information to the shipment section
-    // MAG2.22/TSA /20190531 CASE 345376 Added shipment method code on the related document section
-    // MAG2.25/TSA /20200210 CASE 390073 Added Sell-to Contact and Your Reference, Due Date and Remaining Amount
-    // MAG2.25/TSA /20200218 CASE 388058 Added Quotes to magento service
-    // MAG2.26/TSA /20200506 CASE 403511 Removed duplicate entry in case statement
-
     Caption = 'Magento Document Export';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/naviconnect/documents';
     Direction = Export;
@@ -79,9 +63,7 @@ xmlport 6151402 "NPR Magento Document Export"
                             var
                                 LineTypeFound: Boolean;
                             begin
-                                //-MAG2.12 [309647]
                                 LineTypeFound := LineTypeDict.Get(SalesInvLine.Type.AsInteger(), SalesInvLineType);
-                                //+MAG2.12 [309647]
                             end;
                         }
                         fieldelement(no; SalesInvLine."No.")
@@ -97,11 +79,9 @@ xmlport 6151402 "NPR Magento Document Export"
 
                             trigger OnBeforePassVariable()
                             begin
-                                //-MAG2.12 [309647]
                                 SalesInvLineExternalNo := SalesInvLine."No.";
                                 if SalesInvLine."Variant Code" <> '' then
                                     SalesInvLineExternalNo += '_' + SalesInvLine."Variant Code";
-                                //+MAG2.12 [309647]
                             end;
                         }
                         fieldelement(quantity; SalesInvLine.Quantity)
@@ -129,10 +109,8 @@ xmlport 6151402 "NPR Magento Document Export"
                         trigger OnPreXmlItem()
                         begin
 
-                            //+MAG2.20 [345376]
                             if (HideLines) then
                                 currXMLport.Break();
-                            //+MAG2.20 [345376]
                         end;
                     }
                 }
@@ -170,11 +148,9 @@ xmlport 6151402 "NPR Magento Document Export"
 
                             trigger OnBeforePassVariable()
                             begin
-                                //-MAG2.22 [345376]
                                 Invoice_ShipmentMethod := '';
                                 if (TmpDocumentSearchResultInvoice.Get(120, TmpDocumentSearchResultInvoice."Doc. No.", 0)) then
                                     Invoice_ShipmentMethod := TmpDocumentSearchResultInvoice.Description;
-                                //+MAG2.22 [345376]
                             end;
                         }
                     }
@@ -183,7 +159,6 @@ xmlport 6151402 "NPR Magento Document Export"
                 trigger OnAfterGetRecord()
                 begin
 
-                    //-MAG2.20 [345376]
                     if (TmpDocumentSearchResultInvoice.IsTemporary()) then
                         TmpDocumentSearchResultInvoice.DeleteAll();
 
@@ -191,7 +166,6 @@ xmlport 6151402 "NPR Magento Document Export"
 
                     if (SalesInvHeader."Currency Code" = '') then
                         SalesInvHeader."Currency Code" := GeneralLedgerSetup."LCY Code";
-                    //+MAG2.20 [345376]
                 end;
 
                 trigger OnPreXmlItem()
@@ -202,10 +176,8 @@ xmlport 6151402 "NPR Magento Document Export"
                     SalesInvHeader.SetRange("Bill-to Customer No.", CustomerNo);
                     SalesInvHeader.SetRange("Posting Date", StartDate, EndDate);
 
-                    //-MAG2.20 [345376]
                     if (DocumentNumber <> '') then
                         SalesInvHeader.SetRange("No.", DocumentNumber);
-                    //+MAG2.20 [345376]
                 end;
             }
             tableelement(salescrmemoheader; "Sales Cr.Memo Header")
@@ -252,9 +224,7 @@ xmlport 6151402 "NPR Magento Document Export"
                             var
                                 LineTypeFound: Boolean;
                             begin
-                                //-MAG2.12 [309647]
                                 LineTypeFound := LineTypeDict.Get(SalesCrMemoLine.Type.AsInteger(), SalesCrMemoLineType);
-                                //+MAG2.12 [309647]
                             end;
                         }
                         fieldelement(no; SalesCrMemoLine."No.")
@@ -270,11 +240,9 @@ xmlport 6151402 "NPR Magento Document Export"
 
                             trigger OnBeforePassVariable()
                             begin
-                                //-MAG2.12 [309647]
                                 SalesCrMemoLineExternalNo := SalesCrMemoLine."No.";
                                 if SalesCrMemoLine."Variant Code" <> '' then
                                     SalesCrMemoLineExternalNo += '_' + SalesCrMemoLine."Variant Code";
-                                //+MAG2.12 [309647]
                             end;
                         }
                         fieldelement(quantity; SalesCrMemoLine.Quantity)
@@ -301,11 +269,8 @@ xmlport 6151402 "NPR Magento Document Export"
 
                         trigger OnPreXmlItem()
                         begin
-
-                            //+MAG2.20 [345376]
                             if (HideLines) then
                                 currXMLport.Break();
-                            //+MAG2.20 [345376]
                         end;
                     }
                 }
@@ -343,11 +308,9 @@ xmlport 6151402 "NPR Magento Document Export"
 
                             trigger OnBeforePassVariable()
                             begin
-                                //-MAG2.22 [345376]
                                 CrMemo_ShipmentMethod := '';
                                 if (TmpDocumentSearchResultCrMemo.Get(120, TmpDocumentSearchResultCrMemo."Doc. No.", 0)) then
                                     CrMemo_ShipmentMethod := TmpDocumentSearchResultCrMemo.Description;
-                                //+MAG2.22 [345376]
                             end;
                         }
                     }
@@ -355,8 +318,6 @@ xmlport 6151402 "NPR Magento Document Export"
 
                 trigger OnAfterGetRecord()
                 begin
-
-                    //-MAG2.20 [345376]
                     if (TmpDocumentSearchResultCrMemo.IsTemporary()) then
                         TmpDocumentSearchResultCrMemo.DeleteAll();
 
@@ -364,7 +325,6 @@ xmlport 6151402 "NPR Magento Document Export"
 
                     if (SalesCrMemoHeader."Currency Code" = '') then
                         SalesCrMemoHeader."Currency Code" := GeneralLedgerSetup."LCY Code";
-                    //+MAG2.20 [345376]
                 end;
 
                 trigger OnPreXmlItem()
@@ -375,10 +335,8 @@ xmlport 6151402 "NPR Magento Document Export"
                     SalesCrMemoHeader.SetRange("Posting Date", StartDate, EndDate);
                     SalesCrMemoHeader.SetRange("Bill-to Customer No.", CustomerNo);
 
-                    //-MAG2.20 [345376]
                     if (DocumentNumber <> '') then
                         SalesCrMemoHeader.SetRange("No.", DocumentNumber);
-                    //+MAG2.20 [345376]
                 end;
             }
             tableelement(salesheader; "Sales Header")
@@ -449,9 +407,7 @@ xmlport 6151402 "NPR Magento Document Export"
                             var
                                 LineTypeFound: Boolean;
                             begin
-                                //-MAG2.12 [309647]
                                 LineTypeFound := LineTypeDict.Get(SalesLine.Type.AsInteger(), SalesLineType);
-                                //+MAG2.12 [309647]
                             end;
                         }
                         fieldelement(no; SalesLine."No.")
@@ -467,11 +423,9 @@ xmlport 6151402 "NPR Magento Document Export"
 
                             trigger OnBeforePassVariable()
                             begin
-                                //-MAG2.12 [309647]
                                 SalesLineExternalNo := SalesLine."No.";
                                 if SalesLine."Variant Code" <> '' then
                                     SalesLineExternalNo += '_' + SalesLine."Variant Code";
-                                //+MAG2.12 [309647]
                             end;
                         }
                         fieldelement(quantity; SalesLine.Quantity)
@@ -507,11 +461,8 @@ xmlport 6151402 "NPR Magento Document Export"
 
                         trigger OnPreXmlItem()
                         begin
-
-                            //+MAG2.20 [345376]
                             if (HideLines) then
                                 currXMLport.Break();
-                            //+MAG2.20 [345376]
                         end;
                     }
                 }
@@ -532,10 +483,7 @@ xmlport 6151402 "NPR Magento Document Export"
 
                             trigger OnBeforePassVariable()
                             begin
-
-                                //-MAG2.20 [345376]
                                 RelatedTypeOrder := GetRelatedDocTypeAsText(TmpDocumentSearchResultOrder."Doc. Type");
-                                //+MAG2.20 [345376]
                             end;
                         }
                         fieldattribute(number; TmpDocumentSearchResultOrder."Doc. No.")
@@ -552,11 +500,9 @@ xmlport 6151402 "NPR Magento Document Export"
 
                             trigger OnBeforePassVariable()
                             begin
-                                //-MAG2.22 [345376]
                                 Order_ShipmentMethod := '';
                                 if (TmpDocumentSearchResultOrder.Get(120, TmpDocumentSearchResultOrder."Doc. No.", 0)) then
                                     Order_ShipmentMethod := TmpDocumentSearchResultOrder.Description;
-                                //+MAG2.22 [345376]
                             end;
                         }
                     }
@@ -564,8 +510,6 @@ xmlport 6151402 "NPR Magento Document Export"
 
                 trigger OnAfterGetRecord()
                 begin
-
-                    //-MAG2.20 [345376]
                     if (TmpDocumentSearchResultOrder.IsTemporary()) then
                         TmpDocumentSearchResultOrder.DeleteAll();
 
@@ -573,24 +517,18 @@ xmlport 6151402 "NPR Magento Document Export"
 
                     if (SalesHeader."Currency Code" = '') then
                         SalesHeader."Currency Code" := GeneralLedgerSetup."LCY Code";
-                    //+MAG2.20 [345376]
                 end;
 
                 trigger OnPreXmlItem()
                 begin
-                    //-MAG2.03
                     if not ExportOrders then
                         SalesHeader.SetFilter("No.", '=%1&<>%1', '');
 
                     SalesHeader.SetRange("Bill-to Customer No.", CustomerNo);
                     SalesHeader.SetRange("Posting Date", StartDate, EndDate);
 
-                    //-MAG2.20 [345376]
                     if (DocumentNumber <> '') then
                         SalesHeader.SetRange("No.", DocumentNumber);
-                    //+MAG2.20 [345376]
-
-                    //+MAG2.03
                 end;
             }
             tableelement(salesshipmentheader; "Sales Shipment Header")
@@ -689,9 +627,7 @@ xmlport 6151402 "NPR Magento Document Export"
                             var
                                 LineTypeFound: Boolean;
                             begin
-                                //-MAG2.20 [345376]
                                 LineTypeFound := LineTypeDict.Get(SalesShipmentLine.Type.AsInteger(), ShipmentLineType);
-                                //+MAG2.20 [345376]
                             end;
                         }
                         fieldelement(no; SalesShipmentLine."No.")
@@ -712,11 +648,8 @@ xmlport 6151402 "NPR Magento Document Export"
 
                         trigger OnPreXmlItem()
                         begin
-
-                            //+MAG2.20 [345376]
                             if (HideLines) then
                                 currXMLport.Break();
-                            //+MAG2.20 [345376]
                         end;
                     }
                 }
@@ -735,9 +668,7 @@ xmlport 6151402 "NPR Magento Document Export"
 
                             trigger OnBeforePassVariable()
                             begin
-                                //-MAG2.20 [345376]
                                 RelatedTypeShipment := GetRelatedDocTypeAsText(TmpDocSearchResultShipment."Doc. Type");
-                                //+MAG2.20 [345376]
                             end;
                         }
                         fieldattribute(number; TmpDocSearchResultShipment."Doc. No.")
@@ -754,11 +685,9 @@ xmlport 6151402 "NPR Magento Document Export"
 
                             trigger OnBeforePassVariable()
                             begin
-                                //-MAG2.22 [345376]
                                 Shipment_ShipmentMethod := '';
                                 if (TmpDocSearchResultShipment.Get(120, TmpDocSearchResultShipment."Doc. No.", 0)) then
                                     Shipment_ShipmentMethod := TmpDocSearchResultShipment.Description;
-                                //+MAG2.22 [345376]
                             end;
                         }
                     }
@@ -766,8 +695,6 @@ xmlport 6151402 "NPR Magento Document Export"
 
                 trigger OnAfterGetRecord()
                 begin
-
-                    //-MAG2.20 [345376]
                     if (TmpDocSearchResultShipment.IsTemporary()) then
                         TmpDocSearchResultShipment.DeleteAll();
 
@@ -775,13 +702,10 @@ xmlport 6151402 "NPR Magento Document Export"
 
                     if (SalesShipmentHeader."Currency Code" = '') then
                         SalesShipmentHeader."Currency Code" := GeneralLedgerSetup."LCY Code";
-                    //+MAG2.20 [345376]
                 end;
 
                 trigger OnPreXmlItem()
                 begin
-
-                    //-MAG2.20 [345376]
                     if not ExportShipments then
                         SalesShipmentHeader.SetFilter("No.", '=%1&<>%1', '');
 
@@ -790,7 +714,6 @@ xmlport 6151402 "NPR Magento Document Export"
 
                     if (DocumentNumber <> '') then
                         SalesShipmentHeader.SetRange("No.", DocumentNumber);
-                    //+MAG2.20 [345376]
                 end;
             }
             tableelement(salesquote; "Sales Header")
@@ -959,31 +882,14 @@ xmlport 6151402 "NPR Magento Document Export"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     trigger OnInitXmlPort()
     begin
-        //-MAG2.12 [309647]
         InitLineTypeDict();
-        //+MAG2.12 [309647]
     end;
 
     trigger OnPreXmlPort()
     begin
-
-        //-MAG2.20 [345376]
         GeneralLedgerSetup.Get();
-        //+MAG2.20 [345376]
     end;
 
     var
@@ -1008,25 +914,17 @@ xmlport 6151402 "NPR Magento Document Export"
         StartDate := NewStartDate;
         ExportInvoices := NewExportInvoices;
         ExportCrMemos := NewExportCrMemos;
-        //-MAG2.03
         ExportOrders := NewExportOrders;
-        //+MAG2.03
 
-        //-MAG2.25 [388058]
         ExportQuotes := false;
-        //+MAG2.25 [388058]
 
-        //-MAG2.20 [345376]
         DocumentNumber := NewDocumentNo;
         ExportShipments := NewExportShipments;
         HideLines := NewHideLines;
-        //+MAG2.20 [345376]
     end;
 
     procedure SetQuoteFilter(NewCustomerNo: Code[20]; NewDocumentNo: Code[20]; NewStartDate: Date; NewEndDate: Date; NewHideLines: Boolean)
     begin
-
-        //-MAG2.25 [388058]
         CustomerNo := NewCustomerNo;
         EndDate := NewEndDate;
         StartDate := NewStartDate;
@@ -1040,7 +938,6 @@ xmlport 6151402 "NPR Magento Document Export"
         ExportInvoices := false;
         ExportOrders := false;
         ExportShipments := false;
-        //+MAG2.25 [388058]
     end;
 
     local procedure InitLineTypeDict()
@@ -1062,7 +959,6 @@ xmlport 6151402 "NPR Magento Document Export"
         LocalOrder: Record "Sales Header";
         LocalSalesInvoiceHeader: Record "Sales Invoice Header";
         LocalSalesCrMemoHeader: Record "Sales Cr.Memo Header";
-        ReturnReceiptHeader: Record "Return Receipt Header";
     begin
 
         if (DocumentNumber = '') then
@@ -1072,7 +968,7 @@ xmlport 6151402 "NPR Magento Document Export"
         if (LocalOrder.FindSet()) then begin
             repeat
                 TmpDocumentSearchResult.Init;
-                TmpDocumentSearchResult."Doc. Type" := 10; //LocalOrder."Document Type";
+                TmpDocumentSearchResult."Doc. Type" := 10;
                 TmpDocumentSearchResult."Doc. No." := LocalOrder."No.";
                 if (TmpDocumentSearchResult."Doc. No." <> LinkedFromDocNo) then
                     if (TmpDocumentSearchResult.Insert()) then;
@@ -1089,14 +985,12 @@ xmlport 6151402 "NPR Magento Document Export"
                 if (TmpDocumentSearchResult."Doc. No." <> LinkedFromDocNo) then
                     if (TmpDocumentSearchResult.Insert()) then;
 
-                //-MAG2.22 [345376]
                 TmpDocumentSearchResult.Init;
                 TmpDocumentSearchResult."Doc. Type" := 120;
                 TmpDocumentSearchResult."Doc. No." := LocalSalesShipmentHeader."No.";
                 TmpDocumentSearchResult.Description := CopyStr(LocalSalesShipmentHeader."Shipment Method Code", 1, MaxStrLen(TmpDocumentSearchResult.Description));
                 if (TmpDocumentSearchResult."Doc. No." <> LinkedFromDocNo) then
                     if (TmpDocumentSearchResult.Insert()) then;
-            //+MAG2.22 [345376]
 
             until (LocalSalesShipmentHeader.Next() = 0);
         end;
@@ -1125,8 +1019,6 @@ xmlport 6151402 "NPR Magento Document Export"
     end;
 
     local procedure GetRelatedDocTypeAsText(DocType: Integer): Text
-    var
-        LocalSalesHeader: Record "Sales Header";
     begin
 
         case DocType of
@@ -1157,12 +1049,6 @@ xmlport 6151402 "NPR Magento Document Export"
                 exit('Order');
             LocalSalesHeader."Document Type"::"Return Order":
                 exit('Return Order');
-        //-MAG2.26 [403511]
-        // //-MAG2.25 [388058]
-        //LocalSalesHeader."Document Type"::Quote           : EXIT ('Quote');
-        ////+MAG2.25 [388058]
-        //+MAG2.26 [403511]
-
         end;
     end;
 }

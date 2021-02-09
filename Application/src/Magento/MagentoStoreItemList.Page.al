@@ -1,10 +1,5 @@
 page 6151439 "NPR Magento Store Item List"
 {
-    // MAG1.21/MHA /20151118  CASE 227354 Object created
-    // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
-    // MAG9.00.2.11/TS  /20180301  CASE 305585 Added field Visibility.
-    // MAG2.26/MHA /20200601  CASE 404580 Magento "Item Group" renamed to "Category"
-
     Caption = 'Webshops';
     PageType = ListPlus;
     UsageCategory = Administration;
@@ -27,29 +22,29 @@ page 6151439 "NPR Magento Store Item List"
                         ShowCaption = false;
                         repeater(Group)
                         {
-                            field("Item No."; "Item No.")
+                            field("Item No."; Rec."Item No.")
                             {
                                 ApplicationArea = All;
                                 ToolTip = 'Specifies the value of the Item No. field';
                             }
-                            field(Webshop; Webshop)
+                            field(Webshop; Rec.Webshop)
                             {
                                 ApplicationArea = All;
                                 ToolTip = 'Specifies the value of the Webshop field';
                             }
-                            field("Store Code"; "Store Code")
+                            field("Store Code"; Rec."Store Code")
                             {
                                 ApplicationArea = All;
                                 Editable = false;
                                 ToolTip = 'Specifies the value of the Store Code field';
                             }
-                            field("Website Code"; "Website Code")
+                            field("Website Code"; Rec."Website Code")
                             {
                                 ApplicationArea = All;
                                 Editable = false;
                                 ToolTip = 'Specifies the value of the Website Code field';
                             }
-                            field(Enabled; Enabled)
+                            field(Enabled; Rec.Enabled)
                             {
                                 ApplicationArea = All;
                                 ToolTip = 'Specifies the value of the Enabled field';
@@ -59,7 +54,7 @@ page 6151439 "NPR Magento Store Item List"
                                     CurrPage.Update(true);
                                 end;
                             }
-                            field(GetEnabledFieldsCaption; GetEnabledFieldsCaption)
+                            field(GetEnabledFieldsCaption; Rec.GetEnabledFieldsCaption)
                             {
                                 ApplicationArea = All;
                                 Caption = 'Fields Enabled';
@@ -97,7 +92,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150689)
                                     {
                                         ShowCaption = false;
-                                        field("Unit Price"; "Unit Price")
+                                        field("Unit Price"; Rec."Unit Price")
                                         {
                                             ApplicationArea = All;
                                             ToolTip = 'Specifies the value of the Unit Price field';
@@ -106,7 +101,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150687)
                                     {
                                         ShowCaption = false;
-                                        field("Unit Price Enabled"; "Unit Price Enabled")
+                                        field("Unit Price Enabled"; Rec."Unit Price Enabled")
                                         {
                                             ApplicationArea = All;
                                             ShowCaption = false;
@@ -120,7 +115,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150686)
                                     {
                                         ShowCaption = false;
-                                        field("Product New From"; "Product New From")
+                                        field("Product New From"; Rec."Product New From")
                                         {
                                             ApplicationArea = All;
                                             ToolTip = 'Specifies the value of the Product New From field';
@@ -129,7 +124,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150684)
                                     {
                                         ShowCaption = false;
-                                        field("Product New From Enabled"; "Product New From Enabled")
+                                        field("Product New From Enabled"; Rec."Product New From Enabled")
                                         {
                                             ApplicationArea = All;
                                             ShowCaption = false;
@@ -143,7 +138,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150679)
                                     {
                                         ShowCaption = false;
-                                        field("Product New To"; "Product New To")
+                                        field("Product New To"; Rec."Product New To")
                                         {
                                             ApplicationArea = All;
                                             ToolTip = 'Specifies the value of the Product New To field';
@@ -152,7 +147,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150677)
                                     {
                                         ShowCaption = false;
-                                        field("Product New To Enabled"; "Product New To Enabled")
+                                        field("Product New To Enabled"; Rec."Product New To Enabled")
                                         {
                                             ApplicationArea = All;
                                             ShowCaption = false;
@@ -166,7 +161,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150676)
                                     {
                                         ShowCaption = false;
-                                        field("Special Price"; "Special Price")
+                                        field("Special Price"; Rec."Special Price")
                                         {
                                             ApplicationArea = All;
                                             ToolTip = 'Specifies the value of the Special Price field';
@@ -175,7 +170,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150674)
                                     {
                                         ShowCaption = false;
-                                        field("Special Price Enabled"; "Special Price Enabled")
+                                        field("Special Price Enabled"; Rec."Special Price Enabled")
                                         {
                                             ApplicationArea = All;
                                             ShowCaption = false;
@@ -189,7 +184,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150669)
                                     {
                                         ShowCaption = false;
-                                        field("Special Price From"; "Special Price From")
+                                        field("Special Price From"; Rec."Special Price From")
                                         {
                                             ApplicationArea = All;
                                             ToolTip = 'Specifies the value of the Special Price From field';
@@ -198,7 +193,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150667)
                                     {
                                         ShowCaption = false;
-                                        field("Special Price From Enabled"; "Special Price From Enabled")
+                                        field("Special Price From Enabled"; Rec."Special Price From Enabled")
                                         {
                                             ApplicationArea = All;
                                             ShowCaption = false;
@@ -212,7 +207,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150666)
                                     {
                                         ShowCaption = false;
-                                        field("Special Price To"; "Special Price To")
+                                        field("Special Price To"; Rec."Special Price To")
                                         {
                                             ApplicationArea = All;
                                             ToolTip = 'Specifies the value of the Special Price To field';
@@ -221,7 +216,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150664)
                                     {
                                         ShowCaption = false;
-                                        field("Special Price To Enabled"; "Special Price To Enabled")
+                                        field("Special Price To Enabled"; Rec."Special Price To Enabled")
                                         {
                                             ApplicationArea = All;
                                             ShowCaption = false;
@@ -243,7 +238,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150657)
                                     {
                                         ShowCaption = false;
-                                        field("Webshop Name"; "Webshop Name")
+                                        field("Webshop Name"; Rec."Webshop Name")
                                         {
                                             ApplicationArea = All;
                                             Caption = 'Name';
@@ -253,7 +248,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150655)
                                     {
                                         ShowCaption = false;
-                                        field("Webshop Name Enabled"; "Webshop Name Enabled")
+                                        field("Webshop Name Enabled"; Rec."Webshop Name Enabled")
                                         {
                                             ApplicationArea = All;
                                             ShowCaption = false;
@@ -267,7 +262,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150654)
                                     {
                                         ShowCaption = false;
-                                        field("FORMAT(""Webshop Description"".HASVALUE)"; Format("Webshop Description".HasValue))
+                                        field("FORMAT(""Webshop Description"".HASVALUE)"; Format(Rec."Webshop Description".HasValue))
                                         {
                                             ApplicationArea = All;
                                             Caption = 'Description';
@@ -280,10 +275,10 @@ page 6151439 "NPR Magento Store Item List"
                                                 MagentoFunctions: Codeunit "NPR Magento Functions";
                                             begin
                                                 RecRef.GetTable(Rec);
-                                                FieldRef := RecRef.Field(FieldNo("Webshop Description"));
+                                                FieldRef := RecRef.Field(Rec.FieldNo("Webshop Description"));
                                                 if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
                                                     RecRef.SetTable(Rec);
-                                                    Modify(true);
+                                                    Rec.Modify(true);
                                                 end;
                                             end;
                                         }
@@ -291,7 +286,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150650)
                                     {
                                         ShowCaption = false;
-                                        field("Webshop Description Enabled"; "Webshop Description Enabled")
+                                        field("Webshop Description Enabled"; Rec."Webshop Description Enabled")
                                         {
                                             ApplicationArea = All;
                                             ShowCaption = false;
@@ -305,7 +300,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150645)
                                     {
                                         ShowCaption = false;
-                                        field("FORMAT(""Webshop Short Desc."".HASVALUE)"; Format("Webshop Short Desc.".HasValue))
+                                        field("FORMAT(""Webshop Short Desc."".HASVALUE)"; Format(Rec."Webshop Short Desc.".HasValue))
                                         {
                                             ApplicationArea = All;
                                             Caption = 'Short Description';
@@ -318,10 +313,10 @@ page 6151439 "NPR Magento Store Item List"
                                                 MagentoFunctions: Codeunit "NPR Magento Functions";
                                             begin
                                                 RecRef.GetTable(Rec);
-                                                FieldRef := RecRef.Field(FieldNo("Webshop Short Desc."));
+                                                FieldRef := RecRef.Field(Rec.FieldNo("Webshop Short Desc."));
                                                 if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
                                                     RecRef.SetTable(Rec);
-                                                    Modify(true);
+                                                    Rec.Modify(true);
                                                 end;
                                             end;
                                         }
@@ -329,7 +324,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150643)
                                     {
                                         ShowCaption = false;
-                                        field("Webshop Short Desc. Enabled"; "Webshop Short Desc. Enabled")
+                                        field("Webshop Short Desc. Enabled"; Rec."Webshop Short Desc. Enabled")
                                         {
                                             ApplicationArea = All;
                                             ShowCaption = false;
@@ -343,7 +338,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6151400)
                                     {
                                         ShowCaption = false;
-                                        field(Visibility; Visibility)
+                                        field(Visibility; Rec.Visibility)
                                         {
                                             ApplicationArea = All;
                                             ToolTip = 'Specifies the value of the Visibility field';
@@ -356,7 +351,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150642)
                                     {
                                         ShowCaption = false;
-                                        field("Display Only"; "Display Only")
+                                        field("Display Only"; Rec."Display Only")
                                         {
                                             ApplicationArea = All;
                                             ToolTip = 'Specifies the value of the Display Only field';
@@ -365,7 +360,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150640)
                                     {
                                         ShowCaption = false;
-                                        field("Display Only Enabled"; "Display Only Enabled")
+                                        field("Display Only Enabled"; Rec."Display Only Enabled")
                                         {
                                             ApplicationArea = All;
                                             ShowCaption = false;
@@ -379,7 +374,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150635)
                                     {
                                         ShowCaption = false;
-                                        field("Seo Link"; "Seo Link")
+                                        field("Seo Link"; Rec."Seo Link")
                                         {
                                             ApplicationArea = All;
                                             ToolTip = 'Specifies the value of the Seo Link field';
@@ -388,7 +383,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150633)
                                     {
                                         ShowCaption = false;
-                                        field("Seo Link Enabled"; "Seo Link Enabled")
+                                        field("Seo Link Enabled"; Rec."Seo Link Enabled")
                                         {
                                             ApplicationArea = All;
                                             ShowCaption = false;
@@ -402,7 +397,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150632)
                                     {
                                         ShowCaption = false;
-                                        field("Meta Title"; "Meta Title")
+                                        field("Meta Title"; Rec."Meta Title")
                                         {
                                             ApplicationArea = All;
                                             ToolTip = 'Specifies the value of the Meta Title field';
@@ -411,7 +406,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150630)
                                     {
                                         ShowCaption = false;
-                                        field("Meta Title Enabled"; "Meta Title Enabled")
+                                        field("Meta Title Enabled"; Rec."Meta Title Enabled")
                                         {
                                             ApplicationArea = All;
                                             ShowCaption = false;
@@ -425,7 +420,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150619)
                                     {
                                         ShowCaption = false;
-                                        field("Meta Description"; "Meta Description")
+                                        field("Meta Description"; Rec."Meta Description")
                                         {
                                             ApplicationArea = All;
                                             ToolTip = 'Specifies the value of the Meta Description field';
@@ -434,7 +429,7 @@ page 6151439 "NPR Magento Store Item List"
                                     group(Control6150616)
                                     {
                                         ShowCaption = false;
-                                        field("Meta Description Enabled"; "Meta Description Enabled")
+                                        field("Meta Description Enabled"; Rec."Meta Description Enabled")
                                         {
                                             ApplicationArea = All;
                                             ShowCaption = false;
@@ -450,13 +445,8 @@ page 6151439 "NPR Magento Store Item List"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnAfterGetCurrRecord()
     begin
-        CurrPage.MagentoCategoryLinks.PAGE.SetRootNo("Root Item Group No.");
+        CurrPage.MagentoCategoryLinks.PAGE.SetRootNo(Rec."Root Item Group No.");
     end;
 }
-

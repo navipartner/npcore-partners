@@ -1,29 +1,8 @@
 codeunit 6151418 "NPR Magento Pmt. Dibs Mgt."
 {
-    // MAG1.22/TR/20160420  CASE 238567 Dibs payment implemented
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.01/MHA/20160929 CASE 250694 Added functions CapturePaymentSalesInvoice() and IsDibsPaymentLine()
-
-
-    trigger OnRun()
-    begin
-        //-MAG2.01 [250694]
-        //CASE "Document Table No." OF
-        //  DATABASE::"Sales Invoice Header": Capture(Rec);
-        //  DATABASE::"Sales Cr.Memo Header": Refund(Rec);
-        //  DATABASE::"Sales Header": Cancel(Rec);
-        //END;
-        //+MAG2.01 [250694]
-    end;
-
-    local procedure "--- Subscriber"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6151416, 'CapturePaymentEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'CapturePaymentEvent', '', false, false)]
     local procedure CapturePaymentSalesInvoice(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
     begin
-        //-MAG2.01 [250694]
         if not IsDibsPaymentLine(PaymentLine) then
             exit;
         if PaymentLine."Document Table No." <> DATABASE::"Sales Invoice Header" then
@@ -33,11 +12,6 @@ codeunit 6151418 "NPR Magento Pmt. Dibs Mgt."
 
         PaymentLine."Date Captured" := Today;
         PaymentLine.Modify(true);
-        //+MAG2.01 [250694]
-    end;
-
-    local procedure "--- Api"()
-    begin
     end;
 
     procedure Capture(PaymentLine: Record "NPR Magento Payment Line")
@@ -45,7 +19,7 @@ codeunit 6151418 "NPR Magento Pmt. Dibs Mgt."
         SalesHeader: Record "Sales Header";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         PaymentGateway: Record "NPR Magento Payment Gateway";
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
+        HttpWebRequest: HttpRequestMessage;
         CaptureString: Text;
         MD5Key: Text;
     begin
@@ -53,8 +27,6 @@ codeunit 6151418 "NPR Magento Pmt. Dibs Mgt."
             exit;
         if not SalesInvoiceHeader.Get(PaymentLine."Document No.") then
             exit;
-
-        SetupWebRequest(PaymentGateway."Api Url", HttpWebRequest, PaymentLine, "RequestMethod.Post");
 
         CaptureString += AppendText('merchant', PaymentGateway."Merchant ID");
         CaptureString += AppendText('orderid', SalesInvoiceHeader."External Document No.");
@@ -65,19 +37,8 @@ codeunit 6151418 "NPR Magento Pmt. Dibs Mgt."
         CaptureString += AppendText('splitpay', 'true');
         CaptureString += AppendText('close', 'false');
 
-        SendWebRequest(HttpWebRequest, CaptureString);
-    end;
-
-    procedure Refund(PaymentLine: Record "NPR Magento Payment Line")
-    begin
-    end;
-
-    procedure Cancel(PaymentLine: Record "NPR Magento Payment Line")
-    begin
-    end;
-
-    procedure "--- Support"()
-    begin
+        SetupWebRequest(PaymentGateway."Api Url", HttpWebRequest, PaymentLine, "RequestMethod.Post", CaptureString);
+        SendWebRequest(HttpWebRequest);
     end;
 
     procedure AppendText("Key": Text; Value: Text): Text
@@ -89,28 +50,9 @@ codeunit 6151418 "NPR Magento Pmt. Dibs Mgt."
 
     procedure CalcMD5Key(CaptureString: Text; PaymentGateway: Record "NPR Magento Payment Gateway"): Text
     var
-        Encoding: DotNet NPRNetEncoding;
-        MD5: DotNet NPRNetMD5CryptoServiceProvider;
+        Crypto: Codeunit "Cryptography Management";
     begin
-        MD5 := MD5.MD5CryptoServiceProvider();
-        exit(MD5.ComputeHash(Encoding.UTF8.GetBytes(PaymentGateway."Api Password" + MD5.ComputeHash(Encoding.UTF8.GetBytes(PaymentGateway."Api Username" + CaptureString)).ToString())).ToString());
-    end;
-
-    local procedure CatchErrorMessage(HttpWebRequest: DotNet NPRNetHttpWebRequest)
-    var
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        HttpWebException: DotNet NPRNetWebException;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        Text000: Label 'While trying to connect to DIBS an error appeared\%1';
-        StreamReader: DotNet NPRNetStreamReader;
-        Stream: DotNet NPRNetStream;
-    begin
-        XmlDoc := XmlDoc.XmlDocument;
-        if not NpXmlDomMgt.SendWebRequest(XmlDoc, HttpWebRequest, HttpWebResponse, HttpWebException) then begin
-            StreamReader := StreamReader.StreamReader(HttpWebResponse.GetResponseStream);
-            Error(StrSubstNo(Text000, GetErrorMessage(StreamReader.ReadToEnd)));
-        end;
+        exit(Crypto.GenerateHash(PaymentGateway.GetApiPassword() + Crypto.GenerateHash(PaymentGateway."Api Username" + CaptureString, 0), 0));
     end;
 
     local procedure ConvertToDIBSAmount(Amount: Decimal): Text
@@ -127,7 +69,6 @@ codeunit 6151418 "NPR Magento Pmt. Dibs Mgt."
     var
         PaymentGateway: Record "NPR Magento Payment Gateway";
     begin
-        //-MAG2.01 [250694]
         if PaymentLine."Payment Gateway Code" = '' then
             exit;
 
@@ -135,43 +76,39 @@ codeunit 6151418 "NPR Magento Pmt. Dibs Mgt."
             exit(false);
 
         exit(PaymentGateway."Capture Codeunit Id" = CODEUNIT::"NPR Magento Pmt. Dibs Mgt.");
-        //+MAG2.01 [250694]
     end;
 
-    local procedure SetupWebRequest(ApiUrl: Text; var HttpWebRequest: DotNet NPRNetHttpWebRequest; PaymentLine: Record "NPR Magento Payment Line"; RequestMethod: Code[10])
+    local procedure SetupWebRequest(ApiUrl: Text; var HttpWebRequest: HttpRequestMessage; PaymentLine: Record "NPR Magento Payment Line"; RequestMethod: Code[10]; RequestBody: Text)
+    var
+        Content: HttpContent;
+        Headers: HttpHeaders;
+        HeadersReq: HttpHeaders;
     begin
-        HttpWebRequest := HttpWebRequest.Create(ApiUrl);
-        HttpWebRequest.Timeout := 1000 * 60 * 5;
+        Content.GetHeaders(Headers);
+        Content.WriteFrom(RequestBody);
+        if Headers.Contains('Content-Type') then
+            Headers.Remove('Content-Type');
+
+        Headers.Add('Content-Type', 'application/x-www-form-urlencoded');
+
+        HttpWebRequest.Content(Content);
+        HttpWebRequest.SetRequestUri(ApiUrl);
         HttpWebRequest.Method := RequestMethod;
-        HttpWebRequest.ContentType := 'application/x-www-form-urlencoded';
     end;
 
-    local procedure SendWebRequest(HttpWebRequest: DotNet NPRNetHttpWebRequest; CaptureString: Text)
+    local procedure SendWebRequest(HttpWebRequest: HttpRequestMessage)
     var
-        DotNetArray: DotNet NPRNetArray;
+        Client: HttpClient;
+        HttpWebResponse: HttpResponseMessage;
+        Response: Text;
     begin
-        SerializeObject(CaptureString, DotNetArray);
-        HttpWebRequest.GetRequestStream().Write(DotNetArray, 0, DotNetArray.Length);
-        CatchErrorMessage(HttpWebRequest);
-    end;
+        Client.Timeout(300000);
+        Client.Send(HttpWebRequest, HttpWebResponse);
 
-    local procedure SerializeObject(CaptureString: Text; var DotNetArray: DotNet NPRNetArray)
-    var
-        Encoding: DotNet NPRNetEncoding;
-        Type: DotNet NPRNetType;
-    begin
-        Type := Type.GetType('System.Byte', false);
-        DotNetArray.CreateInstance(Type, 1);
-        Encoding := Encoding.UTF8;
-        DotNetArray := Encoding.GetBytes(CaptureString);
-    end;
+        HttpWebResponse.Content.ReadAs(Response);
 
-    local procedure CreateMD5(ApiUsername: Text; ApiPassword: Text; CaptureString: Text; MD5Hash: Text)
-    begin
-    end;
-
-    procedure "--- Enum"()
-    begin
+        if not HttpWebResponse.IsSuccessStatusCode then
+            Error(StrSubstNo('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response));
     end;
 
     local procedure "RequestMethod.Post"(): Text
@@ -179,4 +116,3 @@ codeunit 6151418 "NPR Magento Pmt. Dibs Mgt."
         exit('POST');
     end;
 }
-

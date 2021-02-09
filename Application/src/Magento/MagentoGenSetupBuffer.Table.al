@@ -1,8 +1,5 @@
 table 6151400 "NPR Magento Gen. Setup Buffer"
 {
-    // MAG1.17/MH/20150617  CASE 215910 Object created - Displays Generic Xml Setup stored in BLOB as Tree structure
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.17/JDH /20181112 CASE 334163 Added missing object caption and caption on field Line No.
 
     Caption = 'Magento Generic Setup Buffer';
     DataClassification = CustomerContent;
@@ -66,11 +63,6 @@ table 6151400 "NPR Magento Gen. Setup Buffer"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     var
         GenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
 }
-

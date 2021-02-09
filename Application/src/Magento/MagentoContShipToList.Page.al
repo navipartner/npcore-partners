@@ -1,7 +1,5 @@
 page 6151459 "NPR Magento Cont. ShipTo List"
 {
-    // MAG2.18/TSA /20181219 CASE 320424 Initial Version
-
     Caption = 'Magento Contact Ship-to List';
     DelayedInsert = true;
     InsertAllowed = false;
@@ -16,29 +14,29 @@ page 6151459 "NPR Magento Cont. ShipTo List"
         {
             repeater(Group)
             {
-                field("Customer No."; "Customer No.")
+                field("Customer No."; Rec."Customer No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Customer No. field';
                 }
-                field("Created By Contact No."; "Created By Contact No.")
+                field("Created By Contact No."; Rec."Created By Contact No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Created By Contact No. field';
                 }
-                field("Ship-to Code"; "Ship-to Code")
+                field("Ship-to Code"; Rec."Ship-to Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ship-to Code field';
                 }
-                field("Created At"; "Created At")
+                field("Created At"; Rec."Created At")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Created At field';
                 }
-                field(Visibility; Visibility)
+                field(Visibility; Rec.Visibility)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Visibility field';
@@ -46,9 +44,4 @@ page 6151459 "NPR Magento Cont. ShipTo List"
             }
         }
     }
-
-    actions
-    {
-    }
 }
-

@@ -1,21 +1,14 @@
 codeunit 6151409 "NPR Magento Barcode Library"
 {
-    // MAG2.00/MHA/20160513  CASE24005 Object created
-
-
-    trigger OnRun()
-    begin
-    end;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'BarcodeLibrary.Codeunit is in use';
 
     var
         BarCodeType: DotNet NPRNetBarCodeType;
         BarCodeSettings: DotNet NPRNetBarcodeSettings;
         BarCodeGenerator: DotNet NPRNetBarCodeGenerator;
         Image: DotNet NPRNetImage;
-        Text007: Label 'Import';
-        Text009: Label 'All Files (*.*)|*.*';
         ImageFormat: DotNet NPRNetImageFormat;
-        "-- Global": Integer;
         SizeX: Decimal;
         SizeY: Decimal;
         DpiX: Decimal;
@@ -29,22 +22,14 @@ codeunit 6151409 "NPR Magento Barcode Library"
         OutStream: OutStream;
     begin
         Init(BarCode);
-        //-NC
-        //Path := EnvironmentMgt.ClientEnvironment('TEMP') + 'Barcode.bmp';
-        //+NC
         BarCodeGenerator := BarCodeGenerator.BarCodeGenerator(BarCodeSettings);
         BarCodeSettings.ApplyKey('3YOZI-9N0S5-RD239-JN9R0-WCGL8');
         Image := BarCodeGenerator.GenerateImage();
-        //-NC
-        //Image.Save(Path);
-        //CLEAR(TempBlob);
-        //TempBlob.IMPORT(FileMgt.UploadFileSilent(Path));
         MemoryStream := MemoryStream.MemoryStream;
         Image.Save(MemoryStream, ImageFormat.Png);
         Clear(TempBlob);
         TempBlob.CreateOutStream(OutStream);
         CopyStream(OutStream, MemoryStream);
-        //+NC
     end;
 
     local procedure Init(BarCode: Code[20])
@@ -72,9 +57,7 @@ codeunit 6151409 "NPR Magento Barcode Library"
         end;
     end;
 
-    procedure "-- Properties"()
-    begin
-    end;
+    #region Properties
 
     procedure SetSizeX(Size: Decimal)
     begin
@@ -105,5 +88,6 @@ codeunit 6151409 "NPR Magento Barcode Library"
     begin
         BarcodeTypeText := BarcodeTypeTextIn;
     end;
-}
 
+    #endregion
+}

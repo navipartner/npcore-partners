@@ -1,19 +1,10 @@
 page 6151484 "NPR Magento Top10 Items by Qty"
 {
-    // MAG1.17/BHR/20150406 CASE 212983  TOP 10 ITEMS BY QTY SOLD
-    // MAG1.17/MH/20150619  CASE 216793 Changed pagename
-    // MAG1.17/BHR/20150619 CASE 216855 Left Padstr the salesQty and add sorting on Low-Level Code
-    // MAG1.19/BHR/20150720 CASE 218963 Change caption and blank property of sales(Qty)and Actions
-    // MAG1.20/BHR/20150805 CASE 218620 Applied datefilter and filter on sales(Qty) greater than 0
-    // MAG1.22/BHR/20160107 CASE 227440 format open proper drilldown page
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-
     Caption = 'Top 10 Items by Quantity';
     CardPageID = "Item Card";
     Editable = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = Item;
     SourceTableTemporary = true;
     SourceTableView = SORTING("Low-Level Code")
@@ -25,23 +16,23 @@ page 6151484 "NPR Magento Top10 Items by Qty"
         {
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
 
                     trigger OnDrillDown()
                     begin
-                        Item.Get("No.");
+                        Item.Get(Rec."No.");
                         PAGE.Run(PAGE::"Item Card", Item);
                     end;
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Sales (Qty.)"; "Sales (Qty.)")
+                field("Sales (Qty.)"; Rec."Sales (Qty.)")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
@@ -66,7 +57,7 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                     Caption = 'Day';
                     ApplicationArea = All;
                     ToolTip = 'Filters by day';
-                    Image = Filter; 
+                    Image = Filter;
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Day;
@@ -78,7 +69,7 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                     Caption = 'Week';
                     ApplicationArea = All;
                     ToolTip = 'Filters by week';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -91,7 +82,7 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                     Caption = 'Month';
                     ApplicationArea = All;
                     ToolTip = 'Filters by month';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -104,7 +95,7 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                     Caption = 'Quarter';
                     ApplicationArea = All;
                     ToolTip = 'Filters by quarter';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -117,7 +108,7 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                     Caption = 'Year';
                     ApplicationArea = All;
                     ToolTip = 'Filters by year';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -128,12 +119,6 @@ page 6151484 "NPR Magento Top10 Items by Qty"
             }
         }
     }
-
-    trigger OnAfterGetRecord()
-    var
-        Str: Text[11];
-    begin
-    end;
 
     trigger OnOpenPage()
     begin
@@ -147,34 +132,25 @@ page 6151484 "NPR Magento Top10 Items by Qty"
         Item: Record Item;
         StartDate: Date;
         Enddate: Date;
-        Err000: Label 'End Date should be after Start Date';
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;
         CurrDate: Date;
-        SalesQty: Text[30];
 
     local procedure UpdateList()
     begin
-        DeleteAll;
+        Rec.DeleteAll;
         Setdate;
         Query1.SetFilter(Posting_Date, '%1..%2', StartDate, Enddate);
         Query1.SetFilter(Item_Ledger_Entry_Type, 'Sale');
         Query1.Open;
         while Query1.Read do begin
             if Item.Get(Query1.Item_No) then begin
-                TransferFields(Item);
-                if Insert then
-                    //-MAG1.20
-                    SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
-                //+MAG1.20
-                //-MAG1.17
-                //-MAG1.20
-                //Item.CALCFIELDS("Sales (Qty.)");
-                //"Low-Level Code" := ROUND(Item."Sales (Qty.)",0.01) * 100;
-                CalcFields("Sales (Qty.)");
-                "Low-Level Code" := Round("Sales (Qty.)", 0.01) * 100;
-                //+MAG1.20
-                //+MAG1.17
-                Modify;
+                Rec.TransferFields(Item);
+                if Rec.Insert then
+                    Rec.SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
+
+                Rec.CalcFields("Sales (Qty.)");
+                Rec."Low-Level Code" := Round(Rec."Sales (Qty.)", 0.01) * 100;
+                Rec.Modify;
             end;
 
         end;
@@ -182,8 +158,6 @@ page 6151484 "NPR Magento Top10 Items by Qty"
     end;
 
     local procedure Setdate()
-    var
-        DatePeriod: Record Date;
     begin
         case PeriodType of
             PeriodType::Day:
@@ -214,4 +188,3 @@ page 6151484 "NPR Magento Top10 Items by Qty"
         end;
     end;
 }
-

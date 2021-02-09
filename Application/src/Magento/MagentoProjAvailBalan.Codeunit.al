@@ -1,17 +1,6 @@
 codeunit 6151425 "NPR Magento Proj.Avail.Balan."
 {
-    // MAG2.26/MHA /20200505  CASE 402487 Object created - returns Project Available Balance for Magento
-
-
-    trigger OnRun()
-    begin
-    end;
-
-    local procedure "--- Calc Stock Qty"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6151407, 'OnCalcStockQty', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Item Mgt.", 'OnCalcStockQty', '', true, true)]
     local procedure CalcProjectedAvailableInventory(MagentoSetup: Record "NPR Magento Setup"; ItemNo: Code[20]; VariantFilter: Text; LocationFilter: Text; var StockQty: Decimal; var Handled: Boolean)
     var
         Item: Record Item;
@@ -302,11 +291,7 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
         exit(true);
     end;
 
-    local procedure "--- NpXml Template Trigger"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6151407, 'OnUpsertStockTriggers', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Item Mgt.", 'OnUpsertStockTriggers', '', true, true)]
     procedure UpsertStockTriggers(MagentoSetup: Record "NPR Magento Setup"; NpXmlTemplate: Record "NPR NpXml Template"; var Handled: Boolean)
     var
         Item: Record Item;
@@ -347,7 +332,7 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
         MagentoItemMgt.UpsertStockTrigger(NpXmlTemplate, Item.FieldNo("No."), DATABASE::"Planning Component", PlanningComponent.FieldNo("Item No."), true, true, true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151407, 'OnTrigger2Item', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Item Mgt.", 'OnTrigger2Item', '', true, true)]
     local procedure TriggerToItem(MagentoSetup: Record "NPR Magento Setup"; RecRef: RecordRef; var TempItem: Record Item temporary; var Handled: Boolean)
     var
         Item: Record Item;
@@ -577,10 +562,6 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
         TempItem.Insert;
     end;
 
-    local procedure "--- Aux"()
-    begin
-    end;
-
     local procedure CurrCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR Magento Proj.Avail.Balan.");
@@ -602,4 +583,3 @@ codeunit 6151425 "NPR Magento Proj.Avail.Balan."
         exit(MagentoSetup."Stock Function Name" = GetFunctionName());
     end;
 }
-

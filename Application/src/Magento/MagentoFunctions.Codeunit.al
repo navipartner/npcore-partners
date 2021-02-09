@@ -1,21 +1,10 @@
 codeunit 6151404 "NPR Magento Functions"
 {
-    trigger OnRun()
-    begin
-    end;
+    #region UI
 
-    procedure "--- UI"()
-    begin
-    end;
-
-    procedure LookupPicture(PictureType: Option Item,Brand,"Item Group",Attribute; PictureName: Text[250]): Text
+    procedure LookupPicture(PictureType: Enum "NPR Magento Picture Type"; PictureName: Text[250]): Text
     var
         MagentoPicture: Record "NPR Magento Picture";
-        TempBlob: Codeunit "Temp Blob";
-        FileMgt: Codeunit "File Management";
-        InStr: InStream;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Size: Integer;
     begin
         MagentoPicture.FilterGroup(2);
         MagentoPicture.SetRange(Type, PictureType);
@@ -30,8 +19,6 @@ codeunit 6151404 "NPR Magento Functions"
     var
         TempBlob: Codeunit "Temp Blob";
         TextEditorDialog: Page "NPR Text Editor Dialog";
-        Encoding: DotNet NPRNetEncoding;
-        StreamReader: DotNet NPRNetStreamReader;
         InStr: InStream;
         OutStr: OutStream;
         HtmlText: Text;
@@ -62,9 +49,9 @@ codeunit 6151404 "NPR Magento Functions"
         exit(false);
     end;
 
-    procedure "--- Format Text"()
-    begin
-    end;
+    #endregion
+
+    #region Format Text
 
     local procedure ReplaceSpecialChar(Input: Text) Output: Text
     var
@@ -120,29 +107,5 @@ codeunit 6151404 "NPR Magento Functions"
 
         exit(LowerCase(Output));
     end;
-
-    procedure "--- Enum"()
-    begin
-    end;
-
-    procedure "PictureType.Item"(): Integer
-    begin
-        exit(0);
-    end;
-
-    procedure "PictureType.Brand"(): Integer
-    begin
-        exit(1);
-    end;
-
-    procedure "PictureType.ItemGroup"(): Integer
-    begin
-        exit(2);
-    end;
-
-    procedure "PictureType.Attribute"(): Integer
-    begin
-        exit(3);
-    end;
+    #endregion
 }
-

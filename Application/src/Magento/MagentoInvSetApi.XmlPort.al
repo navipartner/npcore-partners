@@ -1,11 +1,5 @@
 xmlport 6151404 "NPR Magento Inv. Set Api"
 {
-    // MAG2.15/MHA /20180807  CASE 322939 Object created
-    // MAG2.15/JKL /20180828  CASE 322939 changed structure + namespaces to better suit mageno integration
-    // MAG2.17/MHA /20181012  CASE 331949 Changed UseDefaultNamespace from No to Yes and removed Namespaces
-    // MAG2.18/MHA /20181122  CASE 322939 Changed <set_code> and <sku> in <retail_inventory_request> from Element to Attribute
-    // MAG2.22/MHA /20190618  CASE 358265 Bumped version list
-
     Caption = 'Magento Avail. InventoryExport';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/inventory_set';
     Encoding = UTF8;
@@ -120,12 +114,6 @@ xmlport 6151404 "NPR Magento Inv. Set Api"
                                     if TempItemVariant2.Code <> '' then
                                         sku2 += '_' + TempItemVariant2.Code;
                                 end;
-
-                                trigger OnAfterAssignVariable()
-                                var
-                                    Position: Integer;
-                                begin
-                                end;
                             }
                             textelement(inventory)
                             {
@@ -158,24 +146,7 @@ xmlport 6151404 "NPR Magento Inv. Set Api"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     var
         RetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer" temporary;
-        MagentoItemMgt: Codeunit "NPR Magento Item Mgt.";
-        ItemFilter: Text;
-        VariantFilter: Text;
-        LocationFilter: Text;
         LineNo: Integer;
 }
-

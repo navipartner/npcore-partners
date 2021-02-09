@@ -1,11 +1,5 @@
 table 6151429 "NPR Magento Attr. Set Value"
 {
-    // MAG1.00/MH  /20150113  CASE 199932 Refactored Object from Web Integration
-    // MAG1.04/MH  /20150206  CASE 199932 Changed Editable to Yes for field 11 Position
-    // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
-    // MAG2.17/JDH /20181112  CASE 334163 Added Caption to Object
-    // MAG2.18/TS  /20180910  CASE 323934 Added field Attribute Group ID
-
     Caption = 'Magento Attribute Set Value';
     DataClassification = CustomerContent;
     LookupPageID = "NPR Magento Attr. Set Values";
@@ -44,21 +38,18 @@ table 6151429 "NPR Magento Attr. Set Value"
         {
             Caption = 'Position';
             DataClassification = CustomerContent;
-            Description = 'MAG1.04';
         }
         field(15; "Attribute Group ID"; Integer)
         {
             Caption = 'Attribute Group ID';
             DataClassification = CustomerContent;
-            Description = 'MAG2.18';
             TableRelation = "NPR Magento Attribute Group";
         }
         field(1000; "Used by Items"; Integer)
         {
-            CalcFormula = Count ("NPR Magento Item Attr. Value" WHERE("Attribute ID" = FIELD("Attribute ID"),
+            CalcFormula = Count("NPR Magento Item Attr. Value" WHERE("Attribute ID" = FIELD("Attribute ID"),
                                                                       Selected = CONST(true)));
             Caption = 'Used by Items';
-            Description = 'MAG2.00';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -76,18 +67,11 @@ table 6151429 "NPR Magento Attr. Set Value"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     var
         MagentoItemAttribute: Record "NPR Magento Item Attr.";
     begin
-        //-MAG2.00
-        //IF "Used by Item" <>  0 THEN
         if "Used by Items" <> 0 then
-            //+MAG2.00
             if not Confirm(Text001, false) then Error('');
 
         MagentoItemAttribute.SetRange("Attribute Set ID", "Attribute Set ID");
@@ -98,4 +82,3 @@ table 6151429 "NPR Magento Attr. Set Value"
     var
         Text001: Label 'Warning. This property is used by products. Do you wish to delete alle occurences of the property?';
 }
-

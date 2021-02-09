@@ -1,8 +1,5 @@
 page 6151444 "NPR Magento Display Groups"
 {
-    // MAG1.07/MH/20150309  CASE 206395 Object created
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-
     Caption = 'Display Groups';
     PageType = List;
     SourceTable = "NPR Magento Display Group";
@@ -15,12 +12,12 @@ page 6151444 "NPR Magento Display Groups"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
@@ -28,9 +25,4 @@ page 6151444 "NPR Magento Display Groups"
             }
         }
     }
-
-    actions
-    {
-    }
 }
-

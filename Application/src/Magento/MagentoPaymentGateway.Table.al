@@ -15,7 +15,6 @@ table 6151413 "NPR Magento Payment Gateway"
         {
             Caption = 'Api Url';
             DataClassification = CustomerContent;
-            Description = 'MAG2.01';
         }
         field(6; "Api Username"; Text[100])
         {
@@ -24,15 +23,22 @@ table 6151413 "NPR Magento Payment Gateway"
         }
         field(7; "Api Password"; Text[250])
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'IsolatedStorage is in use.';
             Caption = 'Api Password';
             DataClassification = CustomerContent;
-            Description = 'MAG2.24';
         }
-        field(8; "Token"; Text[250])
+        field(8; Token; Text[250])
         {
             Caption = 'Token';
             DataClassification = CustomerContent;
             Description = 'MAG3.00';
+        }
+        field(9; "Api Password Key"; Guid)
+        {
+            Caption = 'Api Password Key';
+            Editable = false;
+            DataClassification = CustomerContent;
         }
         field(10; "Merchant ID"; Code[20])
         {
@@ -43,7 +49,6 @@ table 6151413 "NPR Magento Payment Gateway"
         {
             Caption = 'Merchant Name';
             DataClassification = CustomerContent;
-            Description = 'MAG2.20';
         }
         field(20; "Currency Code"; Code[10])
         {
@@ -69,7 +74,6 @@ table 6151413 "NPR Magento Payment Gateway"
                     exit;
 
                 Validate("Capture Codeunit Id", EventSubscription."Subscriber Codeunit ID");
-
             end;
         }
         field(30; "Refund Codeunit Id"; Integer)
@@ -77,14 +81,12 @@ table 6151413 "NPR Magento Payment Gateway"
             BlankZero = true;
             Caption = 'Refund codeunit-id';
             DataClassification = CustomerContent;
-            Description = 'MAG2.01';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
 
             trigger OnLookup()
             var
                 EventSubscription: Record "Event Subscription";
             begin
-
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
                 EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR Magento Pmt. Mgt.");
                 EventSubscription.SetRange("Published Function", 'RefundPaymentEvent');
@@ -92,7 +94,6 @@ table 6151413 "NPR Magento Payment Gateway"
                     exit;
 
                 Validate("Refund Codeunit Id", EventSubscription."Subscriber Codeunit ID");
-
             end;
         }
         field(35; "Cancel Codeunit Id"; Integer)
@@ -100,14 +101,12 @@ table 6151413 "NPR Magento Payment Gateway"
             BlankZero = true;
             Caption = 'Cancel Codeunit Id';
             DataClassification = CustomerContent;
-            Description = 'MAG2.01';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
 
             trigger OnLookup()
             var
                 EventSubscription: Record "Event Subscription";
             begin
-
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
                 EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR Magento Pmt. Mgt.");
                 EventSubscription.SetRange("Published Function", 'CancelPaymentEvent');
@@ -115,7 +114,6 @@ table 6151413 "NPR Magento Payment Gateway"
                     exit;
 
                 Validate("Cancel Codeunit Id", EventSubscription."Subscriber Codeunit ID");
-
             end;
         }
     }
@@ -127,8 +125,31 @@ table 6151413 "NPR Magento Payment Gateway"
         }
     }
 
-    fieldgroups
-    {
-    }
-}
+    [NonDebuggable]
+    procedure SetApiPassword(NewPassword: Text)
+    begin
+        if IsNullGuid("Api Password Key") then
+            "Api Password Key" := CreateGuid();
+        IsolatedStorage.Set("Api Password Key", NewPassword, DataScope::Company);
+    end;
 
+    [NonDebuggable]
+    procedure GetApiPassword(): Text
+    Var
+        PasswordValue: Text;
+    begin
+        IsolatedStorage.Get("Api Password Key", DataScope::Company, PasswordValue);
+    end;
+
+    [NonDebuggable]
+    procedure HasApiPassword(): Boolean
+    begin
+        exit(GetApiPassword() <> '');
+    end;
+
+    procedure RemoveApiPassword()
+    begin
+        IsolatedStorage.Delete("Api Password Key", DataScope::Company);
+        Clear("Api Password Key");
+    end;
+}

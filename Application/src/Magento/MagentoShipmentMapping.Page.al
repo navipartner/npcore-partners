@@ -1,11 +1,5 @@
 page 6151449 "NPR Magento Shipment Mapping"
 {
-    // MAG1.01/MH/20150121  CASE 199932 Refactored object from Web Integration
-    // MAG1.17/MH/20150622  CASE 216851 Magento Setup functions moved to new codeunit
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.07/MHA /20170830  CASE 286943 Updated Magento Setup Actions to support Setup Event Subscription
-    // MAG2.22/MHA /20190610  CASE 357763 Added field 140 "Shipment Fee Type" and changed table relation of field 150
-
     Caption = 'Shipment Method Mapping';
     PageType = List;
     SourceTable = "NPR Magento Shipment Mapping";
@@ -18,32 +12,32 @@ page 6151449 "NPR Magento Shipment Mapping"
         {
             repeater(Group)
             {
-                field("External Shipment Method Code"; "External Shipment Method Code")
+                field("External Shipment Method Code"; Rec."External Shipment Method Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Shipment Method Code field';
                 }
-                field("Shipment Method Code"; "Shipment Method Code")
+                field("Shipment Method Code"; Rec."Shipment Method Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Shipment Method Code field';
                 }
-                field("Shipping Agent Code"; "Shipping Agent Code")
+                field("Shipping Agent Code"; Rec."Shipping Agent Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Shipping Agent Code field';
                 }
-                field("Shipping Agent Service Code"; "Shipping Agent Service Code")
+                field("Shipping Agent Service Code"; Rec."Shipping Agent Service Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Shipping Agent Service Code field';
                 }
-                field("Shipment Fee Type"; "Shipment Fee Type")
+                field("Shipment Fee Type"; Rec."Shipment Fee Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Shipment Fee Type field';
                 }
-                field("Shipment Fee No."; "Shipment Fee No.")
+                field("Shipment Fee No."; Rec."Shipment Fee No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Shipment Fee No. field';
@@ -69,10 +63,7 @@ page 6151449 "NPR Magento Shipment Mapping"
 
                 trigger OnAction()
                 begin
-                    //-MAG2.07 [286943]
-                    //MagentoSetupMgt.SetupNaviConnectShipmentMethods();
                     MagentoSetupMgt.TriggerSetupShipmentMethodMapping();
-                    //+MAG2.07 [286943]
                 end;
             }
         }
@@ -81,4 +72,3 @@ page 6151449 "NPR Magento Shipment Mapping"
     var
         MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
 }
-

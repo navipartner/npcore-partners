@@ -1,6 +1,5 @@
 table 6151409 "NPR Magento Payment Line"
 {
-
     Caption = 'Payment Line';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Magento Payment Line List";
@@ -28,14 +27,11 @@ table 6151409 "NPR Magento Payment Line"
             Caption = 'Line No.';
             DataClassification = CustomerContent;
         }
-        field(16; "Payment Type"; Option)
+        field(16; "Payment Type"; enum "NPR Magento Payment Type")
         {
             Caption = 'Payment Type';
             DataClassification = CustomerContent;
-            Description = 'MAG1.05,MAG2.01';
             InitValue = "Payment Method";
-            OptionCaption = ' ,,,,,Voucher,Payment Method';
-            OptionMembers = " ",,,,,Voucher,"Payment Method";
         }
         field(20; Description; Text[50])
         {
@@ -59,7 +55,6 @@ table 6151409 "NPR Magento Payment Line"
         {
             Caption = 'No.';
             DataClassification = CustomerContent;
-            Description = 'MAG2.01';
         }
         field(35; Amount; Decimal)
         {
@@ -70,7 +65,6 @@ table 6151409 "NPR Magento Payment Line"
         {
             Caption = 'Allow Adjust Amount';
             DataClassification = CustomerContent;
-            Description = 'MAG2.05';
         }
         field(40; "Posting Date"; Date)
         {
@@ -91,13 +85,11 @@ table 6151409 "NPR Magento Payment Line"
         {
             Caption = 'Posted';
             DataClassification = CustomerContent;
-            Description = 'MAG2.00';
         }
         field(70; "External Reference No."; Code[50])
         {
             Caption = 'External Reference No.';
             DataClassification = CustomerContent;
-            Description = 'MAG2.01';
         }
         field(80; "Payment Gateway Shopper Ref."; Text[50])
         {
@@ -108,32 +100,27 @@ table 6151409 "NPR Magento Payment Line"
         {
             Caption = 'Payment Gateway Code';
             DataClassification = CustomerContent;
-            Description = 'MAG1.20';
             TableRelation = "NPR Magento Payment Gateway";
         }
         field(105; "Date Captured"; Date)
         {
             Caption = 'Date Captured';
             DataClassification = CustomerContent;
-            Description = 'MAG1.20';
         }
         field(110; "Date Refunded"; Date)
         {
             Caption = 'Date Refunded';
             DataClassification = CustomerContent;
-            Description = 'MAG2.01';
         }
         field(200; "Last Amount"; Decimal)
         {
             Caption = 'Last Amount';
             DataClassification = CustomerContent;
-            Description = 'MAG2.02';
         }
         field(205; "Last Posting No."; Code[20])
         {
             Caption = 'Last Posting No.';
             DataClassification = CustomerContent;
-            Description = 'MAG2.02';
         }
         field(210; "Charge ID"; Code[20])
         {
@@ -155,10 +142,6 @@ table 6151409 "NPR Magento Payment Line"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     begin
         if "Payment Type" = "Payment Type"::Voucher then begin
@@ -176,4 +159,3 @@ table 6151409 "NPR Magento Payment Line"
         CreditVoucher: Record "NPR Credit Voucher";
         GiftVoucher: Record "NPR Gift Voucher";
 }
-

@@ -1,15 +1,10 @@
 page 6151429 "NPR Magento Itm Cstm Opt.Value"
 {
-    // MAG1.22/TR/20160414  CASE 238563 Magento Custom Options
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object
-
     Caption = 'Magento Item Custom Option Value';
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "NPR Magento Itm Cstm Opt.Value";
     SourceTableTemporary = true;
 
@@ -19,47 +14,43 @@ page 6151429 "NPR Magento Itm Cstm Opt.Value"
         {
             repeater(Group)
             {
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item No. field';
                 }
-                field("Custom Option No."; "Custom Option No.")
+                field("Custom Option No."; Rec."Custom Option No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Custom Option No. field';
                 }
-                field("Custom Option Value Line No."; "Custom Option Value Line No.")
+                field("Custom Option Value Line No."; Rec."Custom Option Value Line No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Custom Option Value Line No. field';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Enabled field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Price; Price)
+                field(Price; Rec.Price)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Price field';
                 }
-                field("Price Type"; "Price Type")
+                field("Price Type"; Rec."Price Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Price Type field';
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 
     trigger OnModifyRecord(): Boolean
@@ -71,13 +62,13 @@ page 6151429 "NPR Magento Itm Cstm Opt.Value"
     var
         ItemCustomOptValue: Record "NPR Magento Itm Cstm Opt.Value";
     begin
-        if not Enabled then begin
-            if ItemCustomOptValue.Get("Item No.", "Custom Option No.", "Custom Option Value Line No.") then
+        if not Rec.Enabled then begin
+            if ItemCustomOptValue.Get(Rec."Item No.", Rec."Custom Option No.", Rec."Custom Option Value Line No.") then
                 ItemCustomOptValue.Delete(true);
             exit;
         end;
 
-        if ItemCustomOptValue.Get("Item No.", "Custom Option No.", "Custom Option Value Line No.") then begin
+        if ItemCustomOptValue.Get(Rec."Item No.", Rec."Custom Option No.", Rec."Custom Option Value Line No.") then begin
             ItemCustomOptValue.TransferFields(Rec);
             ItemCustomOptValue.Modify(true);
             exit;
@@ -94,7 +85,7 @@ page 6151429 "NPR Magento Itm Cstm Opt.Value"
         CustomOptionValue: Record "NPR Magento Custom Optn. Value";
         ItemCustomOptValue: Record "NPR Magento Itm Cstm Opt.Value";
     begin
-        DeleteAll;
+        Rec.DeleteAll;
         if (not CustomOption.Get(CustomOptionNo)) or
            not (CustomOption.Type in [CustomOption.Type::SelectDropDown, CustomOption.Type::SelectRadioButtons,
                                             CustomOption.Type::SelectCheckbox, CustomOption.Type::SelectMultiple]) then begin
@@ -105,20 +96,19 @@ page 6151429 "NPR Magento Itm Cstm Opt.Value"
         CustomOptionValue.SetRange("Custom Option No.", CustomOptionNo);
         if CustomOptionValue.FindSet then
             repeat
-                Init;
+                Rec.Init;
                 if ItemCustomOptValue.Get(ItemNo, CustomOptionValue."Custom Option No.", CustomOptionValue."Line No.") then
                     Rec := ItemCustomOptValue
                 else begin
-                    Init;
-                    "Item No." := ItemNo;
-                    "Custom Option No." := CustomOptionValue."Custom Option No.";
-                    "Custom Option Value Line No." := CustomOptionValue."Line No.";
-                    Enabled := false;
+                    Rec.Init;
+                    Rec."Item No." := ItemNo;
+                    Rec."Custom Option No." := CustomOptionValue."Custom Option No.";
+                    Rec."Custom Option Value Line No." := CustomOptionValue."Line No.";
+                    Rec.Enabled := false;
                 end;
-                Insert;
+                Rec.Insert;
             until CustomOptionValue.Next = 0;
 
         CurrPage.Update(false);
     end;
 }
-

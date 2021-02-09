@@ -1,9 +1,5 @@
 page 6151428 "NPR Magento Item Cstm Options"
 {
-    // MAG1.22/TR/20160414  CASE 238563 Magento Custom Options
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object
-
     Caption = 'Magento Item Custom Options';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -17,7 +13,7 @@ page 6151428 "NPR Magento Item Cstm Options"
     {
         area(content)
         {
-            field("Item No."; "Item No.")
+            field("Item No."; Rec."Item No.")
             {
                 ApplicationArea = All;
                 Caption = 'Item No.';
@@ -29,47 +25,47 @@ page 6151428 "NPR Magento Item Cstm Options"
                 repeater(Control6150615)
                 {
                     ShowCaption = false;
-                    field(Enabled; Enabled)
+                    field(Enabled; Rec.Enabled)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Enabled field';
                     }
-                    field("Custom Option No."; "Custom Option No.")
+                    field("Custom Option No."; Rec."Custom Option No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Custom Option No. field';
                     }
-                    field(Description; Description)
+                    field(Description; Rec.Description)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Description field';
                     }
-                    field(Type; Type)
+                    field(Type; Rec.Type)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Type field';
                     }
-                    field(Required; Required)
+                    field(Required; Rec.Required)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Required field';
                     }
-                    field("Max Length"; "Max Length")
+                    field("Max Length"; Rec."Max Length")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Max Length field';
                     }
-                    field(Position; Position)
+                    field(Position; Rec.Position)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Position field';
                     }
-                    field(Price; Price)
+                    field(Price; Rec.Price)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Price field';
                     }
-                    field("Price Type"; "Price Type")
+                    field("Price Type"; Rec."Price Type")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Price Type field';
@@ -86,13 +82,9 @@ page 6151428 "NPR Magento Item Cstm Options"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnAfterGetCurrRecord()
     begin
-        CurrPage.OptionValues.PAGE.SetSourceTable("Item No.", "Custom Option No.");
+        CurrPage.OptionValues.PAGE.SetSourceTable(Rec."Item No.", Rec."Custom Option No.");
     end;
 
     trigger OnAfterGetRecord()
@@ -119,13 +111,13 @@ page 6151428 "NPR Magento Item Cstm Options"
     var
         ItemCustomOption: Record "NPR Magento Item Custom Option";
     begin
-        if not Enabled then begin
-            if ItemCustomOption.Get("Item No.", "Custom Option No.") then
+        if not Rec.Enabled then begin
+            if ItemCustomOption.Get(Rec."Item No.", Rec."Custom Option No.") then
                 ItemCustomOption.Delete(true);
             exit;
         end;
 
-        if ItemCustomOption.Get("Item No.", "Custom Option No.") then begin
+        if ItemCustomOption.Get(Rec."Item No.", Rec."Custom Option No.") then begin
             ItemCustomOption.TransferFields(Rec);
             ItemCustomOption.Modify(true);
             exit;
@@ -143,7 +135,7 @@ page 6151428 "NPR Magento Item Cstm Options"
 
     procedure SetEnabledFilter()
     begin
-        SetRange(Enabled, true);
+        Rec.SetRange(Enabled, true);
     end;
 
     procedure SetSourceTable()
@@ -161,7 +153,7 @@ page 6151428 "NPR Magento Item Cstm Options"
             exit;
         RecRef.Close;
 
-        DeleteAll;
+        Rec.DeleteAll;
 
         if not Item.Get(ItemNo) then
             exit;
@@ -171,18 +163,18 @@ page 6151428 "NPR Magento Item Cstm Options"
 
 
         repeat
-            Init;
+            Rec.Init;
             if ItemCustomOption.Get(ItemNo, CustomOption."No.") then
                 Rec := ItemCustomOption
             else begin
-                "Item No." := ItemNo;
-                "Custom Option No." := CustomOption."No.";
-                Enabled := false;
+                Rec."Item No." := ItemNo;
+                Rec."Custom Option No." := CustomOption."No.";
+                Rec.Enabled := false;
             end;
-            Insert;
+            Rec.Insert;
         until CustomOption.Next = 0;
 
-        FindFirst;
+        Rec.FindFirst;
 
         CurrPage.Update(false);
     end;
@@ -192,14 +184,13 @@ page 6151428 "NPR Magento Item Cstm Options"
         EnabledForeColor := 0;
         PriceForeColor := 0;
 
-        if not (Type in [Type::SelectDropDown, Type::SelectRadioButtons, Type::SelectCheckbox, Type::SelectMultiple]) then
+        if not (Rec.Type in [Rec.Type::SelectDropDown, Rec.Type::SelectRadioButtons, Rec.Type::SelectCheckbox, Rec.Type::SelectMultiple]) then
             exit;
 
-        CalcFields("Enabled Option Values");
+        Rec.CalcFields("Enabled Option Values");
 
         PriceForeColor := 10061943; //Light Slate Gray 119-136-153
-        if Enabled and ("Enabled Option Values" <= 0) then
+        if Rec.Enabled and (Rec."Enabled Option Values" <= 0) then
             EnabledForeColor := 17919;  //Orange Red 255-69-0
     end;
 }
-

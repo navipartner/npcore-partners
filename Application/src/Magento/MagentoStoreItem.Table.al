@@ -1,19 +1,5 @@
 table 6151420 "NPR Magento Store Item"
 {
-    // MAG1.16/MHA /20150401  CASE 210548 Object created
-    // MAG1.17/TR  /20150522  CASE 210548 Object modified for use
-    // MAG1.21/MHA /20151118  CASE 227354 Additional Item and Enabled fields added
-    //                                    Field 20 Root Item Group No. added
-    //                                    Field 1020 Webshop: Flowfield to MagentoStore.Name added
-    //                                    Deleted field 305 Meta Keywords
-    // MAG1.22/MHA /20151202  CASE 227354 Updated caption for field 131 Define Webshop Name
-    // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
-    // MAG2.07/MHA /20170912  CASE 289369 Increased length of field 300 "Meta Title" from 50 to 70
-    // MAG9.00.2.11/TS  /20180301  CASE 305585 Added field Visibility.
-    // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Field 1025
-    // MAG2.22/MHA /20190614  CASE 358258 Extended field 300 "Meta Title" from 70 to 100
-    // MAG2.25/MHA /20200416  CASE 395915 Added FlowField 1030 "Language Codee"
-
     Caption = 'Magento Store Item';
     DataClassification = CustomerContent;
 
@@ -40,55 +26,41 @@ table 6151420 "NPR Magento Store Item"
         {
             Caption = 'Enabled';
             DataClassification = CustomerContent;
-            Description = 'MAG1.21';
         }
         field(20; "Root Item Group No."; Code[20])
         {
             Caption = 'Root Item Group No.';
             DataClassification = CustomerContent;
-            Description = 'MAG1.21';
         }
         field(100; "Webshop Name"; Text[250])
         {
             Caption = 'Webshop name';
             DataClassification = CustomerContent;
-            Description = 'StoreView';
         }
         field(101; "Webshop Name Enabled"; Boolean)
         {
             Caption = 'Webshop Name Enabled';
             DataClassification = CustomerContent;
-            Description = 'MAG1.21';
         }
         field(105; "Webshop Description"; BLOB)
         {
             Caption = 'Webshop Description';
             DataClassification = CustomerContent;
-            Description = 'StoreView';
         }
         field(106; "Webshop Description Enabled"; Boolean)
         {
             Caption = 'Webshop Description Enabled';
             DataClassification = CustomerContent;
-            Description = 'MAG1.21';
         }
         field(110; "Webshop Short Desc."; BLOB)
         {
             Caption = 'Webshop Short Description';
             DataClassification = CustomerContent;
-            Description = 'StoreView';
-
-            trigger OnLookup()
-            var
-                RecRef: RecordRef;
-            begin
-            end;
         }
         field(111; "Webshop Short Desc. Enabled"; Boolean)
         {
             Caption = 'Webshop Short Description Enabled';
             DataClassification = CustomerContent;
-            Description = 'MAG1.21';
         }
         field(130; "Seo Link"; Text[250])
         {
@@ -107,7 +79,6 @@ table 6151420 "NPR Magento Store Item"
         {
             Caption = 'Seo Link Enabled';
             DataClassification = CustomerContent;
-            Description = 'MAG1.21';
         }
         field(145; "Display Only"; Boolean)
         {
@@ -119,7 +90,6 @@ table 6151420 "NPR Magento Store Item"
         {
             Caption = 'Display Only Enabled';
             DataClassification = CustomerContent;
-            Description = 'MAG1.21';
         }
         field(200; "Unit Price"; Decimal)
         {
@@ -133,7 +103,6 @@ table 6151420 "NPR Magento Store Item"
         {
             Caption = 'Unit Price Enabled';
             DataClassification = CustomerContent;
-            Description = 'MAG1.21';
         }
         field(205; "Product New From"; Date)
         {
@@ -145,7 +114,6 @@ table 6151420 "NPR Magento Store Item"
         {
             Caption = 'Product New From Enabled';
             DataClassification = CustomerContent;
-            Description = 'MAG1.21';
         }
         field(210; "Product New To"; Date)
         {
@@ -157,7 +125,6 @@ table 6151420 "NPR Magento Store Item"
         {
             Caption = 'Product New To Enabled';
             DataClassification = CustomerContent;
-            Description = 'MAG1.21';
         }
         field(225; "Special Price"; Decimal)
         {
@@ -169,7 +136,6 @@ table 6151420 "NPR Magento Store Item"
         {
             Caption = 'Special Price Enabled';
             DataClassification = CustomerContent;
-            Description = 'MAG1.21';
         }
         field(230; "Special Price From"; Date)
         {
@@ -181,7 +147,6 @@ table 6151420 "NPR Magento Store Item"
         {
             Caption = 'Special Price From Enabled';
             DataClassification = CustomerContent;
-            Description = 'MAG1.21';
         }
         field(240; "Special Price To"; Date)
         {
@@ -193,7 +158,6 @@ table 6151420 "NPR Magento Store Item"
         {
             Caption = 'Special Price To Enabled';
             DataClassification = CustomerContent;
-            Description = 'MAG1.21';
         }
         field(300; "Meta Title"; Text[100])
         {
@@ -205,7 +169,6 @@ table 6151420 "NPR Magento Store Item"
         {
             Caption = 'Meta Title Enabled';
             DataClassification = CustomerContent;
-            Description = 'MAG1.21';
         }
         field(310; "Meta Description"; Text[250])
         {
@@ -217,18 +180,17 @@ table 6151420 "NPR Magento Store Item"
         {
             Caption = 'Meta Description Enabled';
             DataClassification = CustomerContent;
-            Description = 'MAG1.21';
         }
         field(1000; "Internet Item"; Boolean)
         {
-            CalcFormula = Lookup (Item."NPR Magento Item" WHERE("No." = FIELD("Item No.")));
+            CalcFormula = Lookup(Item."NPR Magento Item" WHERE("No." = FIELD("Item No.")));
             Caption = 'Internet Item';
             Editable = false;
             FieldClass = FlowField;
         }
         field(1010; "Website Item"; Boolean)
         {
-            CalcFormula = Exist ("NPR Magento Website Link" WHERE("Item No." = FIELD("Item No."),
+            CalcFormula = Exist("NPR Magento Website Link" WHERE("Item No." = FIELD("Item No."),
                                                               "Website Code" = FIELD("Website Code")));
             Caption = 'Website Item';
             Editable = false;
@@ -236,25 +198,20 @@ table 6151420 "NPR Magento Store Item"
         }
         field(1020; Webshop; Text[64])
         {
-            CalcFormula = Lookup ("NPR Magento Store".Name WHERE(Code = FIELD("Store Code")));
+            CalcFormula = Lookup("NPR Magento Store".Name WHERE(Code = FIELD("Store Code")));
             Caption = 'Webshop';
-            Description = 'MAG1.21';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(1025; Visibility; Option)
+        field(1025; Visibility; Enum "NPR Mag. Store Item Visibility")
         {
             Caption = 'Visibility';
             DataClassification = CustomerContent;
-            Description = 'MAG9.00.2.11';
-            OptionCaption = 'Visible,Hidden';
-            OptionMembers = Visible,Hidden;
         }
         field(1030; "Language Code"; Code[10])
         {
-            CalcFormula = Lookup ("NPR Magento Store"."Language Code" WHERE(Code = FIELD("Store Code")));
+            CalcFormula = Lookup("NPR Magento Store"."Language Code" WHERE(Code = FIELD("Store Code")));
             Caption = 'Language Code';
-            Description = 'MAG2.25';
             FieldClass = FlowField;
         }
     }
@@ -266,15 +223,9 @@ table 6151420 "NPR Magento Store Item"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     begin
-        //-MAG1.21
         UpdateWebsiteLink(true);
-        //+MAG1.21
     end;
 
     trigger OnInsert()
@@ -283,19 +234,14 @@ table 6151420 "NPR Magento Store Item"
     begin
         if MagentoStore.Get("Store Code") then
             "Website Code" := MagentoStore."Website Code";
-        //-MAG1.21
-        //TransferFromItem();
         UpdateWebsiteLink(false);
         UpdateWebsiteFields();
-        //+MAG1.21
     end;
 
     trigger OnModify()
     begin
-        //-MAG1.21
         UpdateWebsiteLink(false);
         UpdateWebsiteFields();
-        //+MAG1.21
     end;
 
     trigger OnRename()
@@ -308,7 +254,6 @@ table 6151420 "NPR Magento Store Item"
 
     procedure GetEnabledFieldsCaption() EnabledFieldsCaption: Text
     begin
-        //-MAG1.21
         EnabledFieldsCaption := '';
         if "Unit Price Enabled" then
             EnabledFieldsCaption += ',' + FieldCaption("Unit Price");
@@ -353,7 +298,6 @@ table 6151420 "NPR Magento Store Item"
             EnabledFieldsCaption := CopyStr(EnabledFieldsCaption, 2);
 
         exit(EnabledFieldsCaption);
-        //+MAG1.21
     end;
 
     local procedure UpdateWebsiteField(FieldRef: FieldRef)
@@ -362,7 +306,6 @@ table 6151420 "NPR Magento Store Item"
         RecRef: RecordRef;
         FieldRef2: FieldRef;
     begin
-        //-MAG1.21
         MagentoStoreItem.SetRange("Item No.", "Item No.");
         MagentoStoreItem.SetFilter("Store Code", '<>%1', "Store Code");
         MagentoStoreItem.SetRange("Website Code", "Website Code");
@@ -380,7 +323,6 @@ table 6151420 "NPR Magento Store Item"
             FieldRef2.Value := FieldRef.Value;
             RecRef.Modify;
         until RecRef.Next = 0;
-        //+MAG1.21
     end;
 
     local procedure UpdateWebsiteFields()
@@ -389,7 +331,6 @@ table 6151420 "NPR Magento Store Item"
         RecRef: RecordRef;
         FieldRef: FieldRef;
     begin
-        //-MAG1.21
         MagentoStoreItem.SetRange("Item No.", "Item No.");
         MagentoStoreItem.SetFilter("Store Code", '<>%1', "Store Code");
         MagentoStoreItem.SetRange("Website Code", "Website Code");
@@ -415,7 +356,6 @@ table 6151420 "NPR Magento Store Item"
 
         FieldRef := RecRef.Field(FieldNo("Special Price To"));
         UpdateWebsiteField(FieldRef);
-        //+MAG1.21
     end;
 
     local procedure UpdateWebsiteLink(DeleteTrigger: Boolean)
@@ -424,7 +364,6 @@ table 6151420 "NPR Magento Store Item"
         MagentoWebsite: Record "NPR Magento Website";
         MagentoWebsiteLink: Record "NPR Magento Website Link";
     begin
-        //-MAG1.21
         if not MagentoWebsite.Get("Website Code") then
             exit;
 
@@ -450,7 +389,5 @@ table 6151420 "NPR Magento Store Item"
         MagentoWebsiteLink."Item No." := "Item No.";
         MagentoWebsiteLink."Variant Code" := '';
         MagentoWebsiteLink.Insert;
-        //+MAG1.21
     end;
 }
-

@@ -1,10 +1,5 @@
 codeunit 6151455 "NPR Magento NpXml Firstname"
 {
-    // MAG1.16/TS/20150507  CASE 213379 Object created - Custom Values for NpXml
-    // MAG1.22/MHA/20160217 CASE 234806 Added exception for name ending with #Space#
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.09/MHA /20180105  CASE 301053 Removed redundant CASE 'boolean' in SetRecRefCalcFieldFilter()
-
     TableNo = "NPR NpXml Custom Val. Buffer";
 
     trigger OnRun()
@@ -15,11 +10,11 @@ codeunit 6151455 "NPR Magento NpXml Firstname"
         CustomValue: Text;
         OutStr: OutStream;
     begin
-        if not NpXmlElement.Get("Xml Template Code", "Xml Element Line No.") then
+        if not NpXmlElement.Get(Rec."Xml Template Code", Rec."Xml Element Line No.") then
             exit;
         Clear(RecRef);
-        RecRef.Open("Table No.");
-        RecRef.SetPosition("Record Position");
+        RecRef.Open(Rec."Table No.");
+        RecRef.SetPosition(Rec."Record Position");
         if not RecRef.Find then
             exit;
 
@@ -29,9 +24,9 @@ codeunit 6151455 "NPR Magento NpXml Firstname"
 
         Clear(RecRef);
 
-        Value.CreateOutStream(OutStr);
+        Rec.Value.CreateOutStream(OutStr);
         OutStr.WriteText(CustomValue);
-        Modify;
+        Rec.Modify;
     end;
 
     procedure GetFirstname(RecRef: RecordRef; FieldNo: Integer) Firstname: Text
@@ -48,10 +43,7 @@ codeunit 6151455 "NPR Magento NpXml Firstname"
             exit(Name);
 
         Firstname := '';
-        //-MAG1.22
-        //WHILE (Position > 0) AND (Position < STRLEN(Name)) DO BEGIN
         while (Position > 0) and (Position <= StrLen(Name)) do begin
-            //+MAG1.22
             if Position = 1 then
                 Name := DelStr(Name, 1, 1)
             else begin
@@ -63,14 +55,12 @@ codeunit 6151455 "NPR Magento NpXml Firstname"
 
             Position := StrPos(Name, ' ');
         end;
-
         exit(Firstname);
     end;
 
     local procedure SetRecRefCalcFieldFilter(NpXmlElement: Record "NPR NpXml Element"; RecRef: RecordRef; var RecRef2: RecordRef)
     var
         NpXmlFilter: Record "NPR NpXml Filter";
-        FieldRef: FieldRef;
         FieldRef2: FieldRef;
         BufferDecimal: Decimal;
         BufferInteger: Integer;
@@ -88,14 +78,10 @@ codeunit 6151455 "NPR Magento NpXml Firstname"
                     NpXmlFilter."Filter Type"::Constant:
                         begin
                             if NpXmlFilter."Filter Value" <> '' then begin
-                                //-NX1.11
                                 case LowerCase(Format(FieldRef2.Type)) of
                                     'boolean':
                                         FieldRef2.SetFilter('=%1', LowerCase(NpXmlFilter."Filter Value") in ['1', 'yes', 'ja', 'true']);
-                                    //-MAG2.09 [301053]
-                                    //'integer','option','boolean' :
                                     'integer', 'option':
-                                        //+MAG2.09 [301053]
                                         begin
                                             if Evaluate(BufferDecimal, NpXmlFilter."Filter Value") then
                                                 FieldRef2.SetFilter('=%1', BufferDecimal);
@@ -108,7 +94,6 @@ codeunit 6151455 "NPR Magento NpXml Firstname"
                                     else
                                         FieldRef2.SetFilter('=%1', NpXmlFilter."Filter Value");
                                 end;
-                                //+NX1.11
                             end;
                         end;
                     NpXmlFilter."Filter Type"::Filter:
@@ -132,4 +117,3 @@ codeunit 6151455 "NPR Magento NpXml Firstname"
         end;
     end;
 }
-
