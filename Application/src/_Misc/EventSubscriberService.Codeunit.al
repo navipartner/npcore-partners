@@ -5,27 +5,11 @@ codeunit 6014457 "NPR Event Subscriber (Service)"
     begin
         ServiceConnection.Status := ServiceConnection.Status::Enabled;
 
-        RegisterAFSetup(ServiceConnection);
         RegisterMagentoSetup(ServiceConnection);
         RegisterRaptorSetup(ServiceConnection);
         RegisterDependencyMgtSetup(ServiceConnection);
     end;
 
-    local procedure RegisterAFSetup(var ServiceConnection: Record "Service Connection")
-    var
-        AFSetup: Record "NPR AF Setup";
-        ServiceNameAFLbl: Label 'AF Setup';
-        HostName: Text;
-    begin
-        HostName := '';
-        if not AFSetup.Get() then begin
-            AFSetup.Init();
-            AFSetup.Insert();
-        end;
-        ServiceConnection.InsertServiceConnection(
-            ServiceConnection, AFSetup.RecordId,
-            ServiceNameAFLbl, HostName, PAGE::"NPR AF Setup");
-    end;
 
     local procedure RegisterMagentoSetup(var ServiceConnection: Record "Service Connection")
     var

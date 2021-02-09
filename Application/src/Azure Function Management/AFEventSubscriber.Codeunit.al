@@ -1,8 +1,5 @@
 codeunit 6151575 "NPR AF Event Subscriber"
 {
-    // NPR5.36/CLVA/20170911 CASE 269792 AF Event Subscriber
-
-
     trigger OnRun()
     begin
     end;
@@ -34,7 +31,7 @@ codeunit 6151575 "NPR AF Event Subscriber"
         AFArgumentsNotificationHub.Platform := Rec.Platform;
         AFArgumentsNotificationHub.Location := Rec.Location;
 
-        Rec."Notification Delivered to Hub" := AFAPINotificationHub.SendPushNotification(AFArgumentsNotificationHub);
+        Rec."Notification Delivered to Hub" := false;
 
         Rec."Request Data" := AFArgumentsNotificationHub."Request Data";
         Rec."Response Data" := AFArgumentsNotificationHub."Response Data";

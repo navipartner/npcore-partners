@@ -2,8 +2,9 @@ table 6151570 "NPR AF Setup"
 {
     Caption = 'AF Setup';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR AF Setup";
-    LookupPageID = "NPR AF Setup";
+
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Cleanup AF Setup';
 
     fields
     {

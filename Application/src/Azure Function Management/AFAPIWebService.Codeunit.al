@@ -24,70 +24,6 @@ codeunit 6151572 "NPR AF API WebService"
         TaskCompleted: Label 'Task is completed by %1';
         TaskIsCompleted: Label 'Task was completed by %1';
 
-    procedure SendDefaultPushNotification(Title: Text[30]; Body: Text[250]; Location: Code[10]): Integer
-    var
-        AFNotificationHub: Record "NPR AF Notification Hub";
-    begin
-        if Title = '' then
-            exit;
-
-        GetCustomerTag();
-
-        AFNotificationHub.Init;
-        AFNotificationHub.Title := Title;
-        AFNotificationHub.Body := Body;
-        AFNotificationHub.Location := Location;
-        AFNotificationHub.Insert(true);
-        exit(AFNotificationHub.Id);
-    end;
-
-    procedure SendAlertPushNotification(Title: Text[30]; Body: Text[250]; Location: Code[10]): Integer
-    var
-        AFNotificationHub: Record "NPR AF Notification Hub";
-    begin
-        if Title = '' then
-            exit;
-
-        GetCustomerTag();
-
-        AFNotificationHub.Init;
-        AFNotificationHub.Title := Title;
-        AFNotificationHub.Body := Body;
-        AFNotificationHub.Location := Location;
-
-        AFNotificationHub."Notification Color" := AFNotificationHub."Notification Color"::Red;
-
-        AFNotificationHub.Insert(true);
-        exit(AFNotificationHub.Id);
-    end;
-
-    procedure GetCustomerTag(): Text
-    var
-        AFSetup: Record "NPR AF Setup";
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
-    begin
-        if AFSetup.Get then begin
-            if AFSetup."Customer Tag" = '' then begin
-                AFSetup."Enable Azure Functions" := true;
-                AFSetup."Notification - API Routing" := AzureKeyVaultMgt.GetSecret('NpAFSetupDefaultApiRouting');
-                AFSetup."Notification - Base Url" := AzureKeyVaultMgt.GetSecret('NpAFSetupDefaultBaseUrl');
-                AFSetup."Notification - Conn. String" := AzureKeyVaultMgt.GetSecret('NpAFSetupDefaultConnString');
-                AFSetup."Notification - Hub Path" := AzureKeyVaultMgt.GetSecret('NpAFSetupDefaultHubPath');
-                AFSetup.Modify(true);
-            end;
-            AFSetup.TestField("Customer Tag");
-            exit(AFSetup."Customer Tag");
-        end else begin
-            AFSetup.Init;
-            AFSetup."Enable Azure Functions" := true;
-            AFSetup."Notification - API Routing" := AzureKeyVaultMgt.GetSecret('NpAFSetupDefaultApiRouting');
-            AFSetup."Notification - Base Url" := AzureKeyVaultMgt.GetSecret('NpAFSetupDefaultBaseUrl');
-            AFSetup."Notification - Conn. String" := AzureKeyVaultMgt.GetSecret('NpAFSetupDefaultConnString');
-            AFSetup."Notification - Hub Path" := AzureKeyVaultMgt.GetSecret('NpAFSetupDefaultHubPath');
-            AFSetup.Insert(true);
-            exit(AFSetup."Customer Tag");
-        end;
-    end;
 
     procedure SetNotificationFlag(CurrentUser: Code[50]; RegisterId: Code[10]; "Key": Code[10]): Text
     var
@@ -536,15 +472,6 @@ codeunit 6151572 "NPR AF API WebService"
         end;
     end;
 
-    local procedure IsAFEnabled(): Boolean
-    var
-        AFSetup: Record "NPR AF Setup";
-    begin
-        if AFSetup.Get() then
-            exit(AFSetup."Enable Azure Functions");
-
-        exit(false);
-    end;
 
     local procedure BuildNotificationStatusResponse(AFNotificationHub: Record "NPR AF Notification Hub"; RequestStatus: Boolean; RequestMessages: Text): Text
     var
