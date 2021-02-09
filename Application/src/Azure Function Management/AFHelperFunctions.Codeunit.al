@@ -1,11 +1,5 @@
 codeunit 6151571 "NPR AF Helper Functions"
 {
-    // NPR5.36/CLVA/20170710 CASE 269792 AF Helper Functions
-    // NPR5.38/CLVA/20170710 CASE 289636 Added GetMagentoItemImage, GetWebServiceUrl,
-    // NPR5.43/CLVA/20180528 CASE 279861 Added ConvertValueFromBase64 and ConvertValueToBase64
-    // NPR5.44/CLVA/20180710 CASE 279861 Added GUI check
-
-
     trigger OnRun()
     begin
     end;
@@ -89,26 +83,6 @@ codeunit 6151571 "NPR AF Helper Functions"
         exit(DotNetDateTime.ToString('yyyy-MM-dd hh:mm:ss'));
     end;
 
-    procedure GetWebServiceUrl(var AFSetup: Record "NPR AF Setup") SOAPUrl: Text
-    var
-        WebService: Record "Web Service";
-    begin
-        if AFSetup."Web Service Url" <> '' then
-            exit(AFSetup."Web Service Url");
-
-        if not WebService.Get(WebService."Object Type"::Codeunit, 'azurefunction_service') then begin
-            WebService.Init;
-            WebService."Object Type" := WebService."Object Type"::Codeunit;
-            WebService."Service Name" := 'azurefunction_service';
-            WebService."Object ID" := 6151572;
-            WebService.Published := true;
-            WebService.Insert;
-        end;
-
-        AFSetup."Web Service Url" := GetUrl(CLIENTTYPE::SOAP, CompanyName, OBJECTTYPE::Codeunit, 6151572);
-        AFSetup.Modify(true);
-        exit(AFSetup."Web Service Url");
-    end;
 
     procedure RemoveLastIndexOf(TextToTrim: Text; CharToTrim: Text): Text
     var
@@ -189,17 +163,6 @@ codeunit 6151571 "NPR AF Helper Functions"
         exit(Base64String);
     end;
 
-    procedure ClearCustomerTag(var AFSetup: Record "NPR AF Setup")
-    begin
-        //-NPR5.44 [279861]
-        if GuiAllowed then
-            //+NPR5.44 [279861]
-            if not Confirm(TXT001, true) then
-                exit;
-
-        AFSetup."Customer Tag" := '';
-        AFSetup.Modify(false);
-    end;
 
     procedure ConvertValueFromBase64(base64Value: Text) stringValue: Text
     var

@@ -513,7 +513,6 @@ codeunit 6059940 "NPR SMS Management"
             Match := RegEx.Match(TextLine, StrSubstNo(AFReportLinkTag, '.*?'));
             if Match.Success then begin
                 ResultText += CopyStr(TextLine, 1, Match.Index);
-                ResultText += GetAFLink(RecRef, ReportID);
                 TextLine := CopyStr(TextLine, Match.Index + Match.Length + 1);
             end;
         until not Match.Success;
@@ -793,26 +792,10 @@ codeunit 6059940 "NPR SMS Management"
 
     #region Report Links Azure Functions
     procedure AFReportLink(ReportId: Integer): Text
-    var
-        AFSetup: Record "NPR AF Setup";
     begin
-        while not (AFSetup.Get and AFSetup."Msg Service - Site Created") do begin
-            if not Confirm(AFSetupMissingTxt) then
-                exit('');
-            PAGE.RunModal(0, AFSetup);
-        end;
         if ReportId = 0 then
             exit('');
         exit(AFReportLinkTag);
-    end;
-
-    local procedure GetAFLink(RecRef: RecordRef; ReportID: Integer): Text
-    var
-        RegEx: DotNet NPRNetRegex;
-        Match: DotNet NPRNetMatch;
-        AFAPIMsgService: Codeunit "NPR AF API - Msg Service";
-    begin
-        exit(AFAPIMsgService.CreateSMSBody(RecRef.RecordId, ReportID, ''));
     end;
 
     local procedure AFReportLinkTag(): Text

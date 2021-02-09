@@ -1,9 +1,5 @@
 page 6151572 "NPR AF Test Services"
 {
-    // NPR5.36/NPKNAV/20171003  CASE 269792 Transport NPR5.36 - 3 October 2017
-    // NPR5.38/CLVA/20171024 CASE 289636 Changed object name and added Messages Service test functionality
-    // NPR5.40/THRO/20180315 CASE 307195 Change SMS Test function to use CreateSMSBody
-
     Caption = 'AF Test Services';
     PageType = Card;
     UsageCategory = Administration;
@@ -116,49 +112,12 @@ page 6151572 "NPR AF Test Services"
                     Image = View;
                 }
             }
-            group(ActionGroup6014415)
-            {
-                Caption = 'MSG Service';
-                action(SendSMS)
-                {
-                    Caption = 'Send SMS';
-                    Image = SendConfirmation;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    PromotedOnly = true;
-                    PromotedIsBig = true;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Send SMS action';
-
-                    trigger OnAction()
-                    var
-                        SMSManagement: Codeunit "NPR SMS Management";
-                        SMSBody: Text;
-                        AFAPIMsgService: Codeunit "NPR AF API - Msg Service";
-                        SalesInvoiceHeader: Record "Sales Invoice Header";
-                        AFSetup: Record "NPR AF Setup";
-                    begin
-                        if (MSGPhoneNumber <> '') and (MSGSender <> '') and (MSGInvoiceNo <> '') then begin
-                            SalesInvoiceHeader.Get(MSGInvoiceNo);
-                            //-NPR5.40 [307195]
-                            AFSetup.Get;
-                            AFSetup.TestField("Msg Service - Report ID");
-                            SMSBody := AFAPIMsgService.CreateSMSBody(SalesInvoiceHeader.RecordId, AFSetup."Msg Service - Report ID", '');
-                            //+NPR5.40 [307195]
-                            SMSManagement.SendSMS(MSGPhoneNumber, MSGSender, SMSBody);
-                            Message(SMSSentTxt);
-                        end;
-                    end;
-                }
-            }
         }
     }
 
     var
-        TempBlob: Codeunit "Temp Blob";
         MSGSender: Text;
         MSGPhoneNumber: Text;
         MSGInvoiceNo: Code[20];
-        SMSSentTxt: Label 'Message sent.';
 }
 
