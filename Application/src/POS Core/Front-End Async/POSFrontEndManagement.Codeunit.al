@@ -843,6 +843,7 @@ codeunit 6150704 "NPR POS Front End Management"
         Css: Text;
         Script: Text;
     begin
+        ModelID := CreateGuid();
         Html := Model.ToString().Trim();
         Css := Model.GetStyles().Trim();
         Script := Model.GetScripts().Trim();
