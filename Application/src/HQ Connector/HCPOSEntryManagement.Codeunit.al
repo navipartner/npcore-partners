@@ -493,7 +493,6 @@ codeunit 6150915 "NPR HC POS Entry Management"
             foreach Node in NodeList do
                 BuildDimensionBuffer(Node.AsXmlElement(), TempDimensionBuffer);
         if not TempDimensionBuffer.IsEmpty then begin
-            //Dimensions always overrule shortcuts etc.
             TempPOSBalancingLine."Dimension Set ID" := DimensionManagement.CreateDimSetIDFromDimBuf(TempDimensionBuffer);
             DimensionManagement.UpdateGlobalDimFromDimSetID(
               TempPOSBalancingLine."Dimension Set ID",

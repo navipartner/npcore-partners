@@ -73,12 +73,12 @@ xmlport 6151199 "NPR NpCs Local Inventory"
 
     local procedure Sku2ItemVariant(Sku: Text; var ItemVariant: Record "Item Variant")
     var
-        ItemCrossReference: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
         NpCsDocumentMapping: Record "NPR NpCs Document Mapping";
         ItemNo: Text;
         VariantCode: Text;
         Position: Integer;
-        CrossRefNo: Text;
+        ItemRefNo: Text;
     begin
         ItemNo := UpperCase(Sku);
         Position := StrPos(ItemNo, '_');
@@ -92,22 +92,22 @@ xmlport 6151199 "NPR NpCs Local Inventory"
         if ItemVariant.Find then
             exit;
 
-        CrossRefNo := Sku;
+        ItemRefNo := Sku;
         if StrLen(Sku) <= MaxStrLen(NpCsDocumentMapping."From No.") then begin
             NpCsDocumentMapping.SetRange("From No.", Sku);
             NpCsDocumentMapping.SetRange(Type, NpCsDocumentMapping.Type::"Item Cross Reference No.");
             NpCsDocumentMapping.SetFilter("To No.", '<>%1', '');
             if NpCsDocumentMapping.FindFirst then
-                CrossRefNo := NpCsDocumentMapping."To No.";
+                ItemRefNo := NpCsDocumentMapping."To No.";
         end;
 
-        if StrLen(CrossRefNo) <= MaxStrLen(ItemCrossReference."Cross-Reference No.") then begin
-            ItemCrossReference.SetRange("Cross-Reference No.", CrossRefNo);
-            ItemCrossReference.SetRange("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::"Bar Code");
-            ItemCrossReference.SetRange("Discontinue Bar Code", false);
-            if ItemCrossReference.FindFirst then begin
-                ItemVariant."Item No." := ItemCrossReference."Item No.";
-                ItemVariant.Code := ItemCrossReference."Variant Code";
+        if StrLen(ItemRefNo) <= MaxStrLen(ItemReference."Reference No.") then begin
+            ItemReference.SetRange("Reference No.", ItemRefNo);
+            ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
+            ItemReference.SetRange("Discontinue Bar Code", false);
+            if ItemReference.FindFirst then begin
+                ItemVariant."Item No." := ItemReference."Item No.";
+                ItemVariant.Code := ItemReference."Variant Code";
                 exit;
             end;
         end;

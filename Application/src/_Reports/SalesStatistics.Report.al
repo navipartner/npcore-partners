@@ -1,8 +1,8 @@
 report 6060065 "NPR Sales Statistics"
 {
     Caption = 'Sales Statistic';
-    ProcessingOnly = true; 
-    UsageCategory = ReportsAndAnalysis; 
+    ProcessingOnly = true;
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     dataset
     {
@@ -103,52 +103,53 @@ report 6060065 "NPR Sales Statistics"
 
     local procedure GetBarcode(ItemNo: Code[20]; VariantCode: Code[10]): Text
     var
-        ItemCrossReference: Record "Item Cross Reference";
-        NonstockItem: Record "Nonstock Item";
         AlternativeNo: Record "NPR Alternative No.";
+        ItemReference: Record "Item Reference";
+        NonstockItem: Record "Nonstock Item";
         EANPrefixByCountry: Record "NPR EAN Prefix per Country";
         Vendor: Record Vendor;
     begin
-        AlternativeNo.SetRange(Type, AlternativeNo.Type::Item);
-        AlternativeNo.SetRange(Code, ItemNo);
-        AlternativeNo.SetRange("Variant Code", VariantCode);
-        AlternativeNo.SetRange("Blocked Reason Code", '');
-        if AlternativeNo.FindFirst() then
-            if StrLen(AlternativeNo."Alt. No.") = 13 then
-                exit(AlternativeNo."Alt. No.");
+        with AlternativeNo do begin
+            SetRange(Type, Type::Item);
+            SetRange(Code, ItemNo);
+            SetRange("Variant Code", VariantCode);
+            SetRange("Blocked Reason Code", '');
+            if FindFirst then
+                if StrLen(AlternativeNo."Alt. No.") = 13 then
+                    exit("Alt. No.");
+        end;
 
-        ItemCrossReference.SetRange("Item No.", ItemNo);
-        ItemCrossReference.SetRange("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::"Bar Code");
-        ItemCrossReference.SetRange("Variant Code", VariantCode);
-        ItemCrossReference.SetRange("Discontinue Bar Code", false);
+        ItemReference.SetRange("Item No.", ItemNo);
+        ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
+        ItemReference.SetRange("Variant Code", VariantCode);
+        ItemReference.SetRange("Discontinue Bar Code", false);
         case true of
-            (ItemCrossReference.Count = 1):
+            (ItemReference.Count() = 1):
                 begin
-                    ItemCrossReference.FindFirst();
-                    exit(ItemCrossReference."Cross-Reference No.");
+                    ItemReference.FindFirst();
+                    exit(ItemReference."Reference No.");
                 end;
-            (ItemCrossReference.Count > 1):
+            (ItemReference.Count() > 1):
                 begin
-                    ItemCrossReference.FindSet();
+                    ItemReference.FindSet();
                     repeat
-                        NonstockItem.SetRange("Bar Code", ItemCrossReference."Cross-Reference No.");
-                        if not NonstockItem.IsEmpty() then
-                            exit(ItemCrossReference."Cross-Reference No.");
-                    until ItemCrossReference.Next() = 0;
-                    //if not in Nonstock Item, pick barcode based on country prefix setup
+                        NonstockItem.SetRange("Bar Code", ItemReference."Reference No.");
+                        if not NonstockItem.IsEmpty then
+                            exit(ItemReference."Reference No.");
+                    until ItemReference.Next = 0;
                     if Vendor.Get("Catalog Supplier"."Vendor No.") and (Vendor."Country/Region Code" <> '') then begin
                         EANPrefixByCountry.SetRange("Country Code", Vendor."Country/Region Code");
-                        if EANPrefixByCountry.FindSet() then
+                        if EANPrefixByCountry.FindSet then
                             repeat
-                                ItemCrossReference.SetFilter("Cross-Reference No.", StrSubstNo('%1*', EANPrefixByCountry.Prefix));
-                                if ItemCrossReference.FindFirst() then
-                                    exit(ItemCrossReference."Cross-Reference No.");
-                            until EANPrefixByCountry.Next() = 0;
-                        ItemCrossReference.SetRange("Cross-Reference No.");
+                                ItemReference.SetFilter("Reference No.", StrSubstNo('%1*', EANPrefixByCountry.Prefix));
+                                if ItemReference.FindFirst then
+                                    exit(ItemReference."Reference No.");
+                            until EANPrefixByCountry.Next = 0;
+                        ItemReference.SetRange("Reference No.");
                     end;
                     //if not in country prefix setup, fallback to original solution
-                    ItemCrossReference.FindFirst();
-                    exit(ItemCrossReference."Cross-Reference No.");
+                    ItemReference.FindFirst;
+                    exit(ItemReference."Reference No.");
                 end;
         end;
 

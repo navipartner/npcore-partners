@@ -358,19 +358,15 @@ codeunit 6059971 "NPR Variety Matrix Management"
 
     procedure GetIntFunc(VRTFieldSetup: Record "NPR Variety Field Setup"; LocationFilter: Code[10]; GD1: Code[10]; GD2: Code[10]): Text[250]
     var
-        ItemCrossRef: Record "Item Cross Reference";
+        ItemRef: Record "Item Reference";
         AlternativeNo: Record "NPR Alternative No.";
         ItemVar: Record "Item Variant";
     begin
         case VRTFieldSetup."Field No." of
             1: //Inventory
                 begin
-                    //NPR4.15
-                    //IF Item."No." <> VRTFieldSetup."Item No. (TMPParm)" THEN
-                    //  Item.GET(VRTFieldSetup."Item No. (TMPParm)");
                     if Item."No." <> TMPVRTBuffer."Item No." then
                         Item.Get(TMPVRTBuffer."Item No.");
-                    //NPR4.15
 
                     Item.SetRange("Variant Filter", TMPVRTBuffer."Variant Code");
                     if VRTFieldSetup."Use Location Filter" then begin
@@ -386,13 +382,13 @@ codeunit 6059971 "NPR Variety Matrix Management"
                 begin
                     exit(Format(TMPVRTBuffer."Variant Code" <> ''));
                 end;
-            3: //Barcode (ItemCrossRef)
+            3: //Barcode (ItemRef)
                 begin
-                    ItemCrossRef.SetRange("Item No.", TMPVRTBuffer."Item No.");
-                    ItemCrossRef.SetRange("Variant Code", TMPVRTBuffer."Variant Code");
-                    ItemCrossRef.SetRange("Discontinue Bar Code", false);
-                    if ItemCrossRef.FindFirst then
-                        exit(ItemCrossRef."Cross-Reference No.");
+                    ItemRef.SetRange("Item No.", TMPVRTBuffer."Item No.");
+                    ItemRef.SetRange("Variant Code", TMPVRTBuffer."Variant Code");
+                    ItemRef.SetRange("Discontinue Bar Code", false);
+                    if ItemRef.FindFirst then
+                        exit(ItemRef."Reference No.");
                 end;
             4: //Barcode (Alternative No.)
                 begin
@@ -425,7 +421,7 @@ codeunit 6059971 "NPR Variety Matrix Management"
     var
         VRTCloneData: Codeunit "NPR Variety Clone Data";
         AlternativeNo: Record "NPR Alternative No.";
-        ItemCrossRef: Record "Item Cross Reference";
+        ItemRef: Record "Item Reference";
         ItemVariant: Record "Item Variant";
     begin
         case VRTFieldSetup."Field No." of
@@ -435,9 +431,6 @@ codeunit 6059971 "NPR Variety Matrix Management"
                 end;
             2: //Variant Create
                 begin
-                    //-NPR5.32 [274170]
-                    //TMPVRTBuffer.TESTFIELD("Variant Code", '');
-                    //VRTCloneData.SetupNewLine(MRecref,Item,TMPVRTBuffer, NewValue);
                     if (TMPVRTBuffer."Variant Code" <> '') and (VRTFieldSetup."Table No." = 5401) then begin
                         //delete Variant
                         ItemVariant.Get(TMPVRTBuffer."Item No.", TMPVRTBuffer."Variant Code");
@@ -452,21 +445,21 @@ codeunit 6059971 "NPR Variety Matrix Management"
                     end;
                     //+NPR5.32 [274170]
                 end;
-            3: //Barcode (ItemCrossRef)
+            3: //Barcode (ItemRef)
                 begin
-                    ItemCrossRef.SetCurrentKey("Cross-Reference No.");
-                    ItemCrossRef.SetRange("Cross-Reference No.", NewValue);
-                    if ItemCrossRef.FindFirst then
-                        Error(Text003, ItemCrossRef."Item No.");
+                    ItemRef.SetCurrentKey("Reference No.");
+                    ItemRef.SetRange("Reference No.", NewValue);
+                    if ItemRef.FindFirst then
+                        Error(Text003, ItemRef."Item No.");
 
                     Item.Get(TMPVRTBuffer."Item No.");
-                    ItemCrossRef.Init;
-                    ItemCrossRef."Item No." := TMPVRTBuffer."Item No.";
-                    ItemCrossRef."Variant Code" := TMPVRTBuffer."Variant Code";
-                    ItemCrossRef."Unit of Measure" := '';
-                    ItemCrossRef."Cross-Reference No." := NewValue;
-                    ItemCrossRef.Description := Item.Description;
-                    ItemCrossRef.Insert;
+                    ItemRef.Init;
+                    ItemRef."Item No." := TMPVRTBuffer."Item No.";
+                    ItemRef."Variant Code" := TMPVRTBuffer."Variant Code";
+                    ItemRef."Unit of Measure" := '';
+                    ItemRef."Reference No." := NewValue;
+                    ItemRef.Description := Item.Description;
+                    ItemRef.Insert;
                 end;
             4: //Barcode (Alternative No.)
                 begin

@@ -79,7 +79,6 @@ table 6060042 "NPR Item Worksheet Line"
 
             trigger OnValidate()
             var
-                ItemCrossReference: Record "Item Cross Reference";
                 AlternativeNo: Record "NPR Alternative No.";
                 ItemWorksheetTemplate2: Record "NPR Item Worksh. Template";
             begin
@@ -1913,20 +1912,19 @@ table 6060042 "NPR Item Worksheet Line"
         end;
     end;
 
-    procedure FindItemNo(ItemCrossRefNo: Code[20]; AltNo: Code[20]; VendorsItemNo: Code[20]; OurVendorNo: Code[20]; var OurItemNo: Code[20]; var OurVariantCode: Code[20]) found: Boolean
+    procedure FindItemNo(ItemRefNo: Code[50]; AltNo: Code[50]; VendorsItemNo: Code[20]; OurVendorNo: Code[20]; var OurItemNo: Code[20]; var OurVariantCode: Code[20]) found: Boolean
     var
-        ItemCrossRef: Record "Item Cross Reference";
+        ItemRef: Record "Item Reference";
         AlternativeNo: Record "NPR Alternative No.";
     begin
-        //first item cross reference
-        if ItemCrossRefNo <> '' then begin
-            ItemCrossRef.SetRange("Cross-Reference Type", ItemCrossRef."Cross-Reference Type"::Vendor);
+        if ItemRefNo <> '' then begin
+            ItemRef.SetRange("Reference Type", ItemRef."Reference Type"::Vendor);
             if OurVendorNo <> '' then
-                ItemCrossRef.SetRange("Cross-Reference Type No.", OurVendorNo);
-            ItemCrossRef.SetRange("Cross-Reference No.", ItemCrossRefNo);
-            if ItemCrossRef.FindFirst() then begin
-                OurItemNo := ItemCrossRef."Item No.";
-                OurVariantCode := ItemCrossRef."Variant Code";
+                ItemRef.SetRange("Reference Type No.", OurVendorNo);
+            ItemRef.SetRange("Reference No.", ItemRefNo);
+            if ItemRef.FindFirst then begin
+                OurItemNo := ItemRef."Item No.";
+                OurVariantCode := ItemRef."Variant Code";
                 exit(true);
             end;
         end;

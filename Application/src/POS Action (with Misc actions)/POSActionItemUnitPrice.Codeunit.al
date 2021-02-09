@@ -57,9 +57,9 @@ codeunit 6150857 "NPR POS Action: Item UnitPrice"
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     var
-        ItemCrossReference: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
     begin
-        Captions.AddActionCaption(ActionCode, 'Barcode', Format(ItemCrossReference."Cross-Reference Type"::"Bar Code"));
+        Captions.AddActionCaption(ActionCode, 'Barcode', Format(ItemReference."Reference Type"::"Bar Code"));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -178,16 +178,13 @@ codeunit 6150857 "NPR POS Action: Item UnitPrice"
     local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
     var
         Item: Record Item;
-        ItemCrossReference: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
     begin
         if not EanBoxEvent.Get(EventCodeItemUnitPrice()) then begin
             EanBoxEvent.Init;
             EanBoxEvent.Code := EventCodeItemUnitPrice();
             EanBoxEvent."Module Name" := Item.TableCaption;
-            //-NPR5.49 [350374]
-            //EanBoxEvent.Description := Text000;
             EanBoxEvent.Description := CopyStr(Text000, 1, MaxStrLen(EanBoxEvent.Description));
-            //+NPR5.49 [350374]
             EanBoxEvent."Action Code" := ActionCode();
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
             EanBoxEvent."Event Codeunit" := CurrCodeunitId();

@@ -40,7 +40,7 @@ codeunit 6151201 "NPR NpCs Lookup Sales Document"
         Node: XmlNode;
         NodeList: XmlNodeList;
         FromStore: Code[20];
-        FromNo: Code[20];
+        FromNo: Code[50];
     begin
         if Element.IsEmpty() then
             exit;
@@ -59,7 +59,7 @@ codeunit 6151201 "NPR NpCs Lookup Sales Document"
         end;
     end;
 
-    local procedure MarkOrderMapping(Type: Integer; FromStore: Code[20]; FromNo: Code[20]; var NpCsDocumentMapping: Record "NPR NpCs Document Mapping")
+    local procedure MarkOrderMapping(Type: Integer; FromStore: Code[20]; FromNo: Code[50]; var NpCsDocumentMapping: Record "NPR NpCs Document Mapping")
     begin
         if FromStore = '' then
             exit;

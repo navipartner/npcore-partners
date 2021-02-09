@@ -214,7 +214,7 @@ page 6060124 "NPR MM Membership Setup"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Card Expire Date Calculation field';
                 }
-                field("Ticket Item Barcode"; "Ticket Item Barcode")
+                field("Ticket Item Barcode"; Rec."Ticket Item Barcode")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ticket Item Barcode field';

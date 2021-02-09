@@ -1,28 +1,5 @@
 codeunit 6014467 "NPR Retail Journal Code"
 {
-    // VRT1.00/JDH/20150305  CASE 201022 discontinue of price updates for variants
-    // NPR4.21/MMV/20160215  CASE 232628 Added function CreateItemLines()
-    // NPR5.23/JDH /20160513 CASE 240916 Removed old VariaX code
-    // NPR5.31/JLK /20170331  CASE 268274 Changed ENU Caption
-    // NPR5.46/JDH /20180926 CASE 294354 Function Export To Items Deleted, added new functions to structure Retail Journal line creation
-    // NPR5.46.04/THRO/20181101 CASE 334681 Set "Quantity to Print" to Quantity in CopyTransferShipment2RetailJnlLines, CopyTransferReceipt2RetailJnlLines,
-    //                                   CopyTransferOrder2RetailJnlLines and CopyPurchaseOrder2RetailJnlLines
-    //                                   Also checking that the Item Cross Reference is of Type Barcode. Else its transferred blank
-    // NPR5.49/MMV /20190314 CASE 347537 Marking object without modification to trigger re-release of 5.46.04
-    // NPR5.49/ZESO/20190214 CASE 334538 Reworked Function for Sales Return
-    // NPR5.50/ZESO/20190513 CASE 353996 Read Unit Price from Purchase Line instead of from Item Card.
-    // NPR5.51/BHR /20190614 CASE 358287  Add retail print and Price label for Posted Purchase Invoice
-    // NPR5.51/BHR /20190722 CASE 348731  Add selection for Purchase lines Quantity
-    // NPR5.53/TJ  /20191118 CASE 375557 New function to print report from Retail Journal which is not part of the Report Selection Retail
-    // NPR5.54/ALPO/20200310 CASE 385913 Do not overwrite "Unite Price" (field 29) in Retail Journal by field's "Unit Price (LCY)" value from Purchase Invoice Line
-    //                                   Added publishers to alter this behaviour in customer specific solutions
-    // NPR5.55/BHR /202020713 CASE 414268 Add retail print and Price label for warehouse activity line
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text002: Label 'Update of Variant prices not supported from here. Please update them from the item card';
         RetailJnlHeader: Record "NPR Retail Journal Header";
@@ -289,7 +266,6 @@ codeunit 6014467 "NPR Retail Journal Code"
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
     begin
-        //-NPR5.46 [294354]
         if not SetRetailJnl(RetailJnlCode) then
             exit;
 
@@ -306,7 +282,6 @@ codeunit 6014467 "NPR Retail Journal Code"
                 until Next = 0;
         end;
         RetailJnlLine.CloseGUI;
-        //+NPR5.46 [294354]
     end;
 
     procedure Mix2RetailJnl(MixCode: Code[20]; RetailJnlCode: Code[40])
@@ -314,7 +289,6 @@ codeunit 6014467 "NPR Retail Journal Code"
         MixedDiscount: Record "NPR Mixed Discount";
         MixedDiscountLine: Record "NPR Mixed Discount Line";
     begin
-        //-NPR5.46 [294354]
         if MixCode = '' then begin
             if not (PAGE.RunModal(0, MixedDiscount) = ACTION::LookupOK) then
                 exit;
@@ -323,14 +297,12 @@ codeunit 6014467 "NPR Retail Journal Code"
 
         MixedDiscountLine.SetRange(Code, MixedDiscount.Code);
         CopyMix2RetailJnlLines(MixedDiscountLine, RetailJnlCode);
-        //+NPR5.46 [294354]
     end;
 
     procedure CopyMix2RetailJnlLines(var MixedDiscountLine: Record "NPR Mixed Discount Line"; RetailJnlCode: Code[40])
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
     begin
-        //-NPR5.46 [294354]
         if not SetRetailJnl(RetailJnlCode) then
             exit;
 
@@ -347,7 +319,6 @@ codeunit 6014467 "NPR Retail Journal Code"
                 until Next = 0;
         end;
         RetailJnlLine.CloseGUI;
-        //+NPR5.46 [294354]
     end;
 
     procedure Quantity2RetailJnl(ItemNo: Code[20]; MainItemNo: Code[20]; RetailJnlCode: Code[40])
@@ -355,7 +326,6 @@ codeunit 6014467 "NPR Retail Journal Code"
         QuantityDiscountHeader: Record "NPR Quantity Discount Header";
         QuantityDiscountLine: Record "NPR Quantity Discount Line";
     begin
-        //-NPR5.46 [294354]
         if ItemNo = '' then begin
             if not (PAGE.RunModal(0, QuantityDiscountHeader) = ACTION::LookupOK) then
                 exit;
@@ -365,14 +335,12 @@ codeunit 6014467 "NPR Retail Journal Code"
         QuantityDiscountLine.SetRange("Item No.", QuantityDiscountHeader."Item No.");
         QuantityDiscountLine.SetRange("Main no.", QuantityDiscountHeader."Main No.");
         CopyQuantity2RetailJnlLines(QuantityDiscountLine, RetailJnlCode);
-        //+NPR5.46 [294354]
     end;
 
     procedure CopyQuantity2RetailJnlLines(var QuantityDiscountLine: Record "NPR Quantity Discount Line"; RetailJnlCode: Code[40])
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
     begin
-        //-NPR5.46 [294354]
         if not SetRetailJnl(RetailJnlCode) then
             exit;
 
@@ -389,7 +357,6 @@ codeunit 6014467 "NPR Retail Journal Code"
                 until Next = 0;
         end;
         RetailJnlLine.CloseGUI;
-        //+NPR5.46 [294354]
     end;
 
     procedure TransferShipment2RetailJnl(TransferShipmentNo: Code[20]; RetailJnlCode: Code[40])
@@ -397,7 +364,6 @@ codeunit 6014467 "NPR Retail Journal Code"
         TransferShipmentHeader: Record "Transfer Shipment Header";
         TransferShipmentLine: Record "Transfer Shipment Line";
     begin
-        //-NPR5.46 [294354]
         if TransferShipmentNo = '' then begin
             if not (PAGE.RunModal(0, TransferShipmentHeader) = ACTION::LookupOK) then
                 exit;
@@ -406,14 +372,12 @@ codeunit 6014467 "NPR Retail Journal Code"
 
         TransferShipmentLine.SetRange("Document No.", TransferShipmentHeader."No.");
         CopyTransferShipment2RetailJnlLines(TransferShipmentLine, RetailJnlCode);
-        //+NPR5.46 [294354]
     end;
 
     procedure CopyTransferShipment2RetailJnlLines(var TransferShipmentLine: Record "Transfer Shipment Line"; RetailJnlCode: Code[40])
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
     begin
-        //-NPR5.46 [294354]
         if not SetRetailJnl(RetailJnlCode) then
             exit;
 
@@ -424,15 +388,12 @@ codeunit 6014467 "NPR Retail Journal Code"
                 repeat
                     RetailJnlLine.InitLine;
                     RetailJnlLine.SetItem("Item No.", "Variant Code", '');
-                    //-NPR5.46.04 [334681]
                     RetailJnlLine."Quantity to Print" := Quantity;
-                    //+NPR5.46.04 [334681]
 
                     RetailJnlLine.Insert();
                 until Next = 0;
         end;
         RetailJnlLine.CloseGUI;
-        //+NPR5.46 [294354]
     end;
 
     procedure TransferReceipt2RetailJnl(TransferReceiptNo: Code[20]; RetailJnlCode: Code[40])
@@ -440,7 +401,6 @@ codeunit 6014467 "NPR Retail Journal Code"
         TransferReceiptHeader: Record "Transfer Receipt Header";
         TransferReceiptLine: Record "Transfer Receipt Line";
     begin
-        //-NPR5.46 [294354]
         if TransferReceiptNo = '' then begin
             if not (PAGE.RunModal(0, TransferReceiptHeader) = ACTION::LookupOK) then
                 exit;
@@ -449,14 +409,12 @@ codeunit 6014467 "NPR Retail Journal Code"
 
         TransferReceiptLine.SetRange("Document No.", TransferReceiptHeader."No.");
         CopyTransferReceipt2RetailJnlLines(TransferReceiptLine, RetailJnlCode);
-        //+NPR5.46 [294354]
     end;
 
     procedure CopyTransferReceipt2RetailJnlLines(var TransferReceiptLine: Record "Transfer Receipt Line"; RetailJnlCode: Code[40])
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
     begin
-        //-NPR5.46 [294354]
         if not SetRetailJnl(RetailJnlCode) then
             exit;
 
@@ -467,15 +425,12 @@ codeunit 6014467 "NPR Retail Journal Code"
                 repeat
                     RetailJnlLine.InitLine;
                     RetailJnlLine.SetItem("Item No.", "Variant Code", '');
-                    //-NPR5.46.04 [334681]
                     RetailJnlLine."Quantity to Print" := Quantity;
-                    //+NPR5.46.04 [334681]
 
                     RetailJnlLine.Insert();
                 until Next = 0;
         end;
         RetailJnlLine.CloseGUI;
-        //+NPR5.46 [294354]
     end;
 
     procedure TransferOrder2RetailJnl(TransferOrderNo: Code[20]; RetailJnlCode: Code[40])
@@ -483,7 +438,6 @@ codeunit 6014467 "NPR Retail Journal Code"
         TransferHeader: Record "Transfer Header";
         TransferLine: Record "Transfer Line";
     begin
-        //-NPR5.46 [294354]
         if TransferOrderNo = '' then begin
             if not (PAGE.RunModal(0, TransferHeader) = ACTION::LookupOK) then
                 exit;
@@ -493,14 +447,12 @@ codeunit 6014467 "NPR Retail Journal Code"
         TransferLine.SetRange("Document No.", TransferHeader."No.");
         TransferLine.SetRange("Derived From Line No.", 0);
         CopyTransferOrder2RetailJnlLines(TransferLine, RetailJnlCode);
-        //+NPR5.46 [294354]
     end;
 
     procedure CopyTransferOrder2RetailJnlLines(var TransferLine: Record "Transfer Line"; RetailJnlCode: Code[40])
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
     begin
-        //-NPR5.46 [294354]
         if not SetRetailJnl(RetailJnlCode) then
             exit;
 
@@ -511,15 +463,12 @@ codeunit 6014467 "NPR Retail Journal Code"
                 repeat
                     RetailJnlLine.InitLine;
                     RetailJnlLine.SetItem("Item No.", "Variant Code", '');
-                    //-NPR5.46.04 [334681]
                     RetailJnlLine."Quantity to Print" := Quantity;
-                    //+NPR5.46.04 [334681]
 
                     RetailJnlLine.Insert();
                 until Next = 0;
         end;
         RetailJnlLine.CloseGUI;
-        //+NPR5.46 [294354]
     end;
 
     procedure PurchaseOrder2RetailJnl(DocumentType: Enum "Purchase Document Type"; PurchaseOrderNo: Code[20]; RetailJnlCode: Code[40])
@@ -527,7 +476,6 @@ codeunit 6014467 "NPR Retail Journal Code"
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
     begin
-        //-NPR5.46 [294354]
         if PurchaseOrderNo = '' then begin
             PurchaseHeader.SetRange("Document Type", DocumentType);
             if not (PAGE.RunModal(0, PurchaseHeader) = ACTION::LookupOK) then
@@ -538,21 +486,17 @@ codeunit 6014467 "NPR Retail Journal Code"
         PurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
         PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
         CopyPurchaseOrder2RetailJnlLines(PurchaseLine, RetailJnlCode);
-        //+NPR5.46 [294354]
     end;
 
     procedure CopyPurchaseOrder2RetailJnlLines(var PurchaseLine: Record "Purchase Line"; RetailJnlCode: Code[40])
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
     begin
-        //-NPR5.46 [294354]
         if not SetRetailJnl(RetailJnlCode) then
             exit;
-        //-NPR5.51 [348731]
         Selection := StrMenu(Text004, 1);
         if Selection = 0 then
             exit;
-        //+NPR5.51 [348731]
         with PurchaseLine do begin
             SetRange(Type, Type::Item);
             RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
@@ -560,14 +504,10 @@ codeunit 6014467 "NPR Retail Journal Code"
             if FindSet then
                 repeat
                     RetailJnlLine.InitLine;
-                    //-NPR5.46.04 [334681]
-                    //RetailJnlLine.SetItem("No.", "Variant Code", "Cross-Reference No.");
-                    if "Cross-Reference Type" = "Cross-Reference Type"::"Bar Code" then
-                        RetailJnlLine.SetItem("No.", "Variant Code", "Cross-Reference No.")
+                    if "Item Reference Type" = "Item Reference Type"::"Bar Code" then
+                        RetailJnlLine.SetItem("No.", "Variant Code", "Item Reference No.")
                     else
                         RetailJnlLine.SetItem("No.", "Variant Code", '');
-                    //-NPR5.51 [348731]
-                    //RetailJnlLine."Quantity to Print" := Quantity;
                     case Selection of
                         1:
                             RetailJnlLine."Quantity to Print" := Quantity;
@@ -576,21 +516,13 @@ codeunit 6014467 "NPR Retail Journal Code"
                         3:
                             RetailJnlLine."Quantity to Print" := "Quantity Received";
                     end;
-                    //+NPR5.51 [348731]
-                    //+NPR5.46.04 [334681]
-
-
-                    //-NPR5.50 [353996]
-                    //RetailJnlLine."Unit Price" := PurchaseLine."Unit Price (LCY)";  //NPR5.54 [385913]-revoked
                     RetailJnlLine."Last Direct Cost" := PurchaseLine."Direct Unit Cost";
-                    //-NPR5.50 [353996]
 
-                    OnBeforeRetJnlLineInsertFromPurchLine(PurchaseLine, RetailJnlLine);  //NPR5.54 [385913]
+                    OnBeforeRetJnlLineInsertFromPurchLine(PurchaseLine, RetailJnlLine);
                     RetailJnlLine.Insert();
                 until Next = 0;
         end;
         RetailJnlLine.CloseGUI;
-        //+NPR5.46 [294354]
     end;
 
     procedure PostedPurchaseInvoice2RetailJnl(PurchaseInvoiceNo: Code[20]; RetailJnlCode: Code[40])
@@ -598,7 +530,6 @@ codeunit 6014467 "NPR Retail Journal Code"
         PurchInvHeader: Record "Purch. Inv. Header";
         PurchInvLine: Record "Purch. Inv. Line";
     begin
-        //-NPR5.51 [358287]
         if PurchaseInvoiceNo = '' then begin
             if not (PAGE.RunModal(0, PurchInvHeader) = ACTION::LookupOK) then
                 exit;
@@ -607,14 +538,12 @@ codeunit 6014467 "NPR Retail Journal Code"
 
         PurchInvLine.SetRange("Document No.", PurchInvHeader."No.");
         CopyPostedPurchaseInv2RetailJnlLines(PurchInvLine, RetailJnlCode);
-        //+NPR5.51 [358287]
     end;
 
     procedure CopyPostedPurchaseInv2RetailJnlLines(var PurchInvLine: Record "Purch. Inv. Line"; RetailJnlCode: Code[40])
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
     begin
-        //-NPR5.51 [358287]
         if not SetRetailJnl(RetailJnlCode) then
             exit;
 
@@ -626,21 +555,19 @@ codeunit 6014467 "NPR Retail Journal Code"
                 repeat
                     RetailJnlLine.InitLine;
 
-                    if "Cross-Reference Type" = "Cross-Reference Type"::"Bar Code" then
-                        RetailJnlLine.SetItem("No.", "Variant Code", "Cross-Reference No.")
+                    if "Item Reference Type" = "Item Reference Type"::"Bar Code" then
+                        RetailJnlLine.SetItem("No.", "Variant Code", "Item Reference No.")
                     else
                         RetailJnlLine.SetItem("No.", "Variant Code", '');
                     RetailJnlLine."Quantity to Print" := Quantity;
 
-                    //RetailJnlLine."Unit Price" := PurchInvLine."Unit Price (LCY)";  //NPR5.54 [385913]-revoked
                     RetailJnlLine."Last Direct Cost" := PurchInvLine."Direct Unit Cost";
 
-                    OnBeforeRetJnlLineInsertFromPurchInvLine(PurchInvLine, RetailJnlLine);  //NPR5.54 [385913]
+                    OnBeforeRetJnlLineInsertFromPurchInvLine(PurchInvLine, RetailJnlLine);
                     RetailJnlLine.Insert();
                 until Next = 0;
         end;
         RetailJnlLine.CloseGUI;
-        //+NPR5.51 [358287]
     end;
 
     procedure InventoryPutAway2RetailJnl(DocumentType: Integer; DocumentNo: Code[20]; RetailJnlCode: Code[40])
@@ -648,7 +575,6 @@ codeunit 6014467 "NPR Retail Journal Code"
         WarehouseActivityHeader: Record "Warehouse Activity Header";
         WarehouseActivityLine: Record "Warehouse Activity Line";
     begin
-        //-NPR5.55 [414268]
         if DocumentNo = '' then begin
             WarehouseActivityHeader.SetRange(Type, DocumentType);
             if not (PAGE.RunModal(0, WarehouseActivityHeader) = ACTION::LookupOK) then
@@ -659,14 +585,12 @@ codeunit 6014467 "NPR Retail Journal Code"
         WarehouseActivityLine.SetRange("Activity Type", DocumentType);
         WarehouseActivityLine.SetRange("No.", DocumentNo);
         CopyInventoryPutAway2RetailJnlLines(WarehouseActivityLine, RetailJnlCode);
-        //+NPR5.55 [414268]
     end;
 
     procedure CopyInventoryPutAway2RetailJnlLines(var WarehouseActivityLine: Record "Warehouse Activity Line"; RetailJnlCode: Code[40])
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
     begin
-        //-NPR5.55 [414268]
         if not SetRetailJnl(RetailJnlCode) then
             exit;
 
@@ -684,14 +608,12 @@ codeunit 6014467 "NPR Retail Journal Code"
                 until Next = 0;
         end;
         RetailJnlLine.CloseGUI;
-        //+NPR5.55 [414268]
     end;
 
     procedure SetRetailJnl(var RetailJnlCode: Code[40]) Selected: Boolean
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
     begin
-        //-NPR5.46 [294354]
         if RetailJnlCode <> '' then begin
             if RetailJnlHeader."No." <> RetailJnlCode then
                 RetailJnlHeader.Get(RetailJnlCode)
@@ -707,20 +629,17 @@ codeunit 6014467 "NPR Retail Journal Code"
         else
             LineNo := 10000;
         exit(true);
-        //+NPR5.46 [294354]
     end;
 
     procedure SetRetailJnlTemp(RetailJnlCode: Code[40])
     var
         RetailFormCode: Codeunit "NPR Retail Form Code";
     begin
-        //-NPR5.46 [294354]
         RetailJnlHeader.Init;
         RetailJnlHeader."No." := RetailJnlCode;
         RetailJnlHeader."Register No." := RetailFormCode.FetchRegisterNumber;
 
         LineNo := 10000;
-        //+NPR5.46 [294354]
     end;
 
     procedure SalesReturn2RetailJnl(RetailJnlCode: Code[40])
@@ -733,7 +652,6 @@ codeunit 6014467 "NPR Retail Journal Code"
         Filters: Text;
         RecRef: RecordRef;
     begin
-        //-NPR5.49 [334538]
         if not RunDynamicRequestPage(Filters, '') then
             exit;
 
@@ -747,7 +665,6 @@ codeunit 6014467 "NPR Retail Journal Code"
         AuditRoll.SetRange(Type, AuditRoll.Type::Item);
         AuditRoll.SetFilter(Quantity, '<%1', 0);
         CopySalesReturn2RetailJnlLines(AuditRoll, RetailJnlCode);
-        //+NPR5.49 [334538]
     end;
 
     procedure CopySalesReturn2RetailJnlLines(var AuditRoll: Record "NPR Audit Roll"; RetailJnlCode: Code[40])
@@ -756,7 +673,6 @@ codeunit 6014467 "NPR Retail Journal Code"
         Register: Record "NPR Register";
         LocationCode: Code[10];
     begin
-        //-NPR5.49 [334538]
         if not SetRetailJnl(RetailJnlCode) then
             exit;
 
@@ -794,7 +710,6 @@ codeunit 6014467 "NPR Retail Journal Code"
         DynamicRequestPageField: Record "Dynamic Request Page Field";
         DynamicRequestPageField1: Record "Dynamic Request Page Field";
     begin
-        //-NPR5.49 [334538]
         if not TableMetadata.Get(6014407) then
             exit(false);
 
@@ -832,9 +747,7 @@ codeunit 6014467 "NPR Retail Journal Code"
         ReturnFilters :=
           RequestPageParametersHelper.GetViewFromDynamicRequestPage(FilterPageBuilder, CopyStr('Audit Roll', 1, 20), 6014407);
 
-
         exit(true);
-        //-NPR5.49 [334538]
     end;
 
     local procedure SetFiltersOnTable(Filters: Text; var RecRef: RecordRef): Boolean
@@ -843,7 +756,6 @@ codeunit 6014467 "NPR Retail Journal Code"
         RequestPageParametersHelper: Codeunit "Request Page Parameters Helper";
         OutStream: OutStream;
     begin
-        //-NPR5.49 [334538]
         RecRef.Open(6014407);
 
         if Filters = '' then
@@ -857,7 +769,6 @@ codeunit 6014467 "NPR Retail Journal Code"
             exit(false);
 
         exit(RecRef.FindSet);
-        //-NPR5.49 [334538]
     end;
 
     local procedure GetStoreLocationCode(): Code[10]
@@ -890,24 +801,20 @@ codeunit 6014467 "NPR Retail Journal Code"
     [EventSubscriber(ObjectType::Codeunit, 6014413, 'OnBeforePrintRetailJournal', '', true, true)]
     local procedure PrintRetailJournalList(var JournalLine: Record "NPR Retail Journal Line"; ReportType: Integer; var Skip: Boolean)
     begin
-        //-NPR5.53 [375557]
         if ReportType <> REPORT::"NPR Retail Journal List" then
             exit;
         REPORT.Run(ReportType, true, false, JournalLine);
         Skip := true;
-        //+NPR5.53 [375557]
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeRetJnlLineInsertFromPurchLine(PurchaseLine: Record "Purchase Line"; var RetailJnlLine: Record "NPR Retail Journal Line")
     begin
-        //NPR5.54 [385913]
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeRetJnlLineInsertFromPurchInvLine(PurchInvLine: Record "Purch. Inv. Line"; var RetailJnlLine: Record "NPR Retail Journal Line")
     begin
-        //NPR5.54 [385913]
     end;
 }
 

@@ -88,7 +88,7 @@ xmlport 6014418 "NPR Import from ScannerFileSO"
         if Item.Get(scanned_item_code) then begin
             SalesLine.Validate("No.", Item."No.");
         end else
-            SalesLine.Validate("Cross-Reference No.", scanned_item_code);
+            SalesLine.Validate("Item Reference No.", scanned_item_code);
         Evaluate(Qty, quantity);
         SalesLine.Validate(Quantity, Qty);
 
