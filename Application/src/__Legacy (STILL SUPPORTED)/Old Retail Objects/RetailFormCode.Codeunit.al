@@ -484,8 +484,6 @@ codeunit 6014435 "NPR Retail Form Code"
                                         Error(ErrMinExceeded, Ekspeditionslinie."No.", Betalingsvalg."Minimum Amount");
                                 end;
                                 Revisionsrulle.Type := Revisionsrulle.Type::Payment;
-                                if Betalingsvalg."On Sale End Codeunit" <> 0 then
-                                    CODEUNIT.Run(Betalingsvalg."On Sale End Codeunit", Ekspeditionslinie);
                             end;
                         Ekspeditionslinie.Type::"BOM List":
                             Revisionsrulle.Type := Revisionsrulle."Sale Type"::Comment;

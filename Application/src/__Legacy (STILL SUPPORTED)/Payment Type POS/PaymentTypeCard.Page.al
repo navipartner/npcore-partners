@@ -258,29 +258,7 @@ page 6014433 "NPR Payment Type - Card"
                     ToolTip = 'Specifies the value of the Tip Service Item No. field';
                 }
             }
-            group(Integration)
-            {
-                Caption = 'Integration';
-                group(Specialization)
-                {
-                    Caption = 'Specialization';
-                    field("Validation Codeunit"; "Validation Codeunit")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Validation Codeunit field';
-                    }
-                    field("On Sale End Codeunit"; "On Sale End Codeunit")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the On Sale End Codeunit field';
-                    }
-                    field("Post Processing Codeunit"; "Post Processing Codeunit")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Post Processing Codeunit field';
-                    }
-                }
-            }
+
             group(Balancing)
             {
                 field("To be Balanced"; "To be Balanced")
