@@ -1,8 +1,5 @@
 table 6151445 "NPR Magento Customer Mapping"
 {
-    // MAG2.22/MHA /20190710  CASE 360098 Object created
-    // MAG2.26/MHA /20200429  CASE 402247 Added field 30 "Fixed Customer No."
-
     Caption = 'Magento Customer Mapping';
     DataClassification = CustomerContent;
 
@@ -22,7 +19,6 @@ table 6151445 "NPR Magento Customer Mapping"
             ELSE
             IF ("Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Country/Region Code"));
             //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(10; "Customer Template Code"; Code[10])
@@ -41,19 +37,18 @@ table 6151445 "NPR Magento Customer Mapping"
         {
             Caption = 'Fixed Customer No.';
             DataClassification = CustomerContent;
-            Description = 'MAG2.26';
             TableRelation = Customer;
         }
         field(95; "Country/Region Name"; Text[50])
         {
-            CalcFormula = Lookup ("Country/Region".Name WHERE(Code = FIELD("Country/Region Code")));
+            CalcFormula = Lookup("Country/Region".Name WHERE(Code = FIELD("Country/Region Code")));
             Caption = 'Country/Region Code';
             Editable = false;
             FieldClass = FlowField;
         }
         field(100; City; Text[30])
         {
-            CalcFormula = Min ("Post Code".City WHERE(Code = FIELD("Post Code")));
+            CalcFormula = Min("Post Code".City WHERE(Code = FIELD("Post Code")));
             Caption = 'City';
             Editable = false;
             FieldClass = FlowField;
@@ -66,9 +61,4 @@ table 6151445 "NPR Magento Customer Mapping"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

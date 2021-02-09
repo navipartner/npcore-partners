@@ -1,10 +1,5 @@
 codeunit 6151452 "NPR Magento NpXml Stock Status"
 {
-    // MAG1.16/TS/20150507  CASE 213379 Object created - Custom Values for NpXml
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.09/MHA /20180105  CASE 301053 Removed redundant CASE 'boolean' in SetRecRefCalcFieldFilter()
-    // MAG2.26/MHA /20200430  CASE 402486 Updated Stock Calculation function
-
     TableNo = "NPR NpXml Custom Val. Buffer";
 
     trigger OnRun()
@@ -15,20 +10,17 @@ codeunit 6151452 "NPR Magento NpXml Stock Status"
         CustomValue: Text;
         OutStr: OutStream;
     begin
-        if not NpXmlElement.Get("Xml Template Code", "Xml Element Line No.") then
+        if not NpXmlElement.Get(Rec."Xml Template Code", Rec."Xml Element Line No.") then
             exit;
         Clear(RecRef);
-        RecRef.Open("Table No.");
-        RecRef.SetPosition("Record Position");
-        //-MAG2.26 [402486]
+        RecRef.Open(Rec."Table No.");
+        RecRef.SetPosition(Rec."Record Position");
         CustomValue := '0';
         if MagentoItemMgt.GetStockQty2(RecRef) > 0 then
             CustomValue := '1';
-        //+MAG2.26 [402486]
 
-        Value.CreateOutStream(OutStr);
+        Rec.Value.CreateOutStream(OutStr);
         OutStr.WriteText(CustomValue);
-        Modify;
+        Rec.Modify;
     end;
 }
-

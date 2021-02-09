@@ -1,7 +1,5 @@
 table 6151440 "NPR Magento Attribute Group"
 {
-    // MAG2.18/TS  /20180910  CASE 323934 Attribute Group Created
-
     Caption = 'Magento Attribute Group';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Magento Attr. Group List";
@@ -49,4 +47,3 @@ table 6151440 "NPR Magento Attribute Group"
         }
     }
 }
-

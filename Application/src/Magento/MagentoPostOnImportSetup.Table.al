@@ -1,20 +1,16 @@
 table 6151462 "NPR Magento PostOnImport Setup"
 {
-    // MAG2.23/MHA /20191017  CASE 373262 Object created - defines entities to Post on Import
-
     Caption = 'Magento Post on Import Setup';
     DataClassification = CustomerContent;
 
     fields
     {
-        field(1; Type; Option)
+        field(1; Type; enum "Sales Line Type")
         {
             Caption = 'Type';
             DataClassification = CustomerContent;
             InitValue = Item;
             NotBlank = true;
-            OptionCaption = ',G/L Account,Item,Resource,Fixed Asset,Charge (Item)';
-            OptionMembers = ,"G/L Account",Item,Resource,"Fixed Asset","Charge (Item)";
         }
         field(10; "No."; Code[20])
         {
@@ -88,9 +84,4 @@ table 6151462 "NPR Magento PostOnImport Setup"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

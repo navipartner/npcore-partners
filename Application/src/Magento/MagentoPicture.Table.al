@@ -8,13 +8,10 @@ table 6151411 "NPR Magento Picture"
 
     fields
     {
-        field(1; Type; Option)
+        field(1; Type; Enum "NPR Magento Picture Type")
         {
             Caption = 'Type';
             DataClassification = CustomerContent;
-            Description = 'MAG1.04,MAG1.16';
-            OptionCaption = 'Item,Brand,Item Group,Customer';
-            OptionMembers = Item,Brand,"Item Group",Customer;
         }
         field(90; Name; Text[250])
         {
@@ -26,14 +23,13 @@ table 6151411 "NPR Magento Picture"
         {
             Caption = 'Picture';
             DataClassification = CustomerContent;
-            Description = 'MAG1.09';
             SubType = Bitmap;
+
         }
         field(101; "Size (kb)"; Decimal)
         {
             Caption = 'Size (kb)';
             DataClassification = CustomerContent;
-            Description = 'MAG1.01';
             Editable = false;
         }
         field(102; "Mime Type"; Text[30])
@@ -120,7 +116,6 @@ table 6151411 "NPR Magento Picture"
 
     var
         MagentoSetup: Record "NPR Magento Setup";
-        MagentoFunctions: Codeunit "NPR Magento Functions";
         Text000: Label 'Picture Size exceeds max.';
         ErrorCannotAccesUrl: Label 'Cannot access URL %1.\\Failed with HTTP status code %2';
 

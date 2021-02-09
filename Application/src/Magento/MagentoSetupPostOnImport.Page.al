@@ -1,12 +1,9 @@
 page 6151462 "NPR Magento Setup PostOnImport"
 {
-    // MAG2.23/MHA /20191017  CASE 373262 Object created - defines entities to Post on Import
-
     Caption = 'Post on Import Setup';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "NPR Magento PostOnImport Setup";
 
     layout
@@ -15,17 +12,17 @@ page 6151462 "NPR Magento Setup PostOnImport"
         {
             repeater(Group)
             {
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -34,9 +31,4 @@ page 6151462 "NPR Magento Setup PostOnImport"
             }
         }
     }
-
-    actions
-    {
-    }
 }
-

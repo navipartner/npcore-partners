@@ -1,13 +1,6 @@
 codeunit 6151415 "NPR Magento Nc Task Card Mgt."
 {
-    // MAG2.26/MHA /20200601  CASE 404580 Magento Categories cases in GetRelatedRecRef()
-
-
-    trigger OnRun()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6151501, 'RunSourceCardEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Task Mgt.", 'RunSourceCardEvent', '', true, true)]
     local procedure RunSourceCardEvent(var RecRef: RecordRef; var RunCardExecuted: Boolean)
     var
         PageMgt: Codeunit "Page Management";
@@ -144,4 +137,3 @@ codeunit 6151415 "NPR Magento Nc Task Card Mgt."
         exit(false);
     end;
 }
-

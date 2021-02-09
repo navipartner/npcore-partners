@@ -22,76 +22,76 @@ page 6151454 "NPR Magento Payment Line List"
         {
             repeater(Group)
             {
-                field("Document Table No."; "Document Table No.")
+                field("Document Table No."; Rec."Document Table No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Document Table No. field';
                 }
-                field("Document No."; "Document No.")
+                field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document No. field';
                 }
-                field("Payment Type"; "Payment Type")
+                field("Payment Type"; Rec."Payment Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Payment Type field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Account Type"; "Account Type")
+                field("Account Type"; Rec."Account Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Account Type field';
                 }
-                field("Account No."; "Account No.")
+                field("Account No."; Rec."Account No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Account No. field';
                 }
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Amount; Amount)
+                field(Amount; Rec.Amount)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount field';
                 }
-                field("Allow Adjust Amount"; "Allow Adjust Amount")
+                field("Allow Adjust Amount"; Rec."Allow Adjust Amount")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Allow Adjust Amount field';
                 }
-                field("Posting Date"; "Posting Date")
+                field("Posting Date"; Rec."Posting Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Posting Date field';
                 }
-                field(Posted; Posted)
+                field(Posted; Rec.Posted)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Posted field';
                 }
-                field("Payment Gateway Code"; "Payment Gateway Code")
+                field("Payment Gateway Code"; Rec."Payment Gateway Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Payment Gateway Code field';
                 }
-                field("External Reference No."; "External Reference No.")
+                field("External Reference No."; Rec."External Reference No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the External Reference No. field';
                 }
-                field("Date Captured"; "Date Captured")
+                field("Date Captured"; Rec."Date Captured")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Date Captured field';
@@ -145,7 +145,7 @@ page 6151454 "NPR Magento Payment Line List"
                         //+MAG2.01 [242561]
                     end;
 
-                    MagentoPaymentGateway.Get("Payment Gateway Code");
+                    MagentoPaymentGateway.Get(Rec."Payment Gateway Code");
                     MagentoPaymentGateway.TestField("Capture Codeunit Id");
 
                     MagentoPmtMgt.CapturePaymentLine(Rec);
@@ -181,7 +181,7 @@ page 6151454 "NPR Magento Payment Line List"
                         CurrPage.Update(true);
                     end;
 
-                    MagentoPaymentGateway.Get("Payment Gateway Code");
+                    MagentoPaymentGateway.Get(Rec."Payment Gateway Code");
                     MagentoPaymentGateway.TestField("Capture Codeunit Id");
 
                     MagentoPmtMgt.RefundPaymentLine(Rec);
@@ -198,7 +198,7 @@ page 6151454 "NPR Magento Payment Line List"
 				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                Visible = ("Document Table No." = 112) AND ("Account No." <> '') AND (NOT Posted);
+                Visible = (Rec."Document Table No." = 112) AND (Rec."Account No." <> '') AND (NOT Rec.Posted);
                 ApplicationArea = All;
                 ToolTip = 'Executes the Post Payment action';
 
@@ -224,7 +224,7 @@ page 6151454 "NPR Magento Payment Line List"
 				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                Visible = ("Document Table No." = 112) OR ("Document Table No." = 114);
+                Visible = (Rec."Document Table No." = 112) OR (Rec."Document Table No." = 114);
                 ApplicationArea = All;
                 ToolTip = 'Executes the &Navigate action';
 
@@ -232,7 +232,7 @@ page 6151454 "NPR Magento Payment Line List"
                 var
                     NavigateForm: Page Navigate;
                 begin
-                    NavigateForm.SetDoc("Posting Date", "Document No.");
+                    NavigateForm.SetDoc(Rec."Posting Date", Rec."Document No.");
                     NavigateForm.Run;
                 end;
             }
@@ -282,13 +282,12 @@ page 6151454 "NPR Magento Payment Line List"
         //-MAG2.01 [250694]
         CaptureEnabled := false;
         RefundEnabled := false;
-        if "Payment Gateway Code" = '' then
+        if Rec."Payment Gateway Code" = '' then
             exit;
-        if not PaymentGateway.Get("Payment Gateway Code") then
+        if not PaymentGateway.Get(Rec."Payment Gateway Code") then
             exit;
         CaptureEnabled := PaymentGateway."Capture Codeunit Id" <> 0;
         RefundEnabled := PaymentGateway."Refund Codeunit Id" <> 0;
         //+MAG2.01 [250694]
     end;
 }
-

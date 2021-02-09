@@ -1,43 +1,13 @@
 codeunit 6151410 "NPR Magento Gift Voucher Mgt."
 {
-    // MAG1.03/TS  /20150202  CASE 201682 Refactored Object
-    // MAG1.04/TS  /20150206  CASE 201682 Adding Gift Voucher Functions
-    // MAG1.17/MHA /20150615  CASE 216142 Magento related setup moved to Magento Setup and Added Print functions
-    // MAG1.19/TR  /20150721  CASE 218821 Currency Code added to both Credit Voucher and Gift Voucher.
-    // MAG1.19/MHA /20150804  CASE 219761 Gift Voucher functions should only be executed if Magento Gift Voucher is enabled
-    // MAG1.20/TR  /20150805  CASE 219911 Function call corrected from CreditVoucherReport to GiftVoucherReport
-    // MAG1.20/TR  /20150813  CASE 218819 Function ActivateAndMailGiftVouchersSalesOrder added.
-    //   - Parameters changed in ActivateGiftVouchers,ActivateCreditVouchers,EmailGiftVouchers and EmailCreditVouchers from Sales Invoice Header to "Order No." (code value).
-    //   - All Activate functions use the variable code instead of SalesInvoiceHeader."Order No."
-    //   - ActivateAndMailGiftVouchers call the activate and email functions with order no. instead of sales invoice header.
-    // MAG1.21/MHA /20150722  CASE 227150 Embedded String functions
-    // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
-    // MAG2.01/MHA /20170106  CASE 257315 Corrected TempBlob reference for DrawBarcode in GiftVoucherToTempBlob() and CreditVoucherToTempBlob()
-    // MAG2.09/MHA /20171211  CASE 292576 Added "Voucher Number Format" in GiftVoucherToTempBlob() and CreditVoucherToTempBlob()
-    // MAG2.17/MHA /20181122  CASE 302179 Magento Integration
-    // MAG2.22/MHA /20190617  CASE 357825 Resolution should be preserved after resize
-    // MAG2.22/MHA /20190716  CASE 361598 Added function OnCancelMagentoOrder()
-    // MAG14.00.2.22/MHA/20190717  CASE 362262 Removed DotNet Print functions GiftVoucherToTempBlob(), CreditvoucherToTempBlob()
-    // MAG2.25/MHA /20200123  CASE 386613 Amount on Gift- and Credit Vouchers must remain unchanged when posting Payment via Sales Order
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Gift Voucher Bitmap is missing in Magento Setup';
-        Text001: Label 'Error in code pattern %1';
         Text002: Label 'Gift Voucher %1 has already been cashed on date %2';
         Text003: Label 'The Payment Amount exceeds the amount on Gift Voucher %1\  - Payment Amount: %3\ - Gift Voucher Amount: %2';
         Text004: Label 'Credit Voucher %1 has already been cashed on date %2';
         Text005: Label 'The Payment Amount exceeds the amount on Credit Voucher %1\  - Payment Amount: %3\ - Credit Voucher Amount: %2';
         Text006: Label 'Invalid Web Code!\No Giftvoucher or Creditvoucher with Web Code %1';
         Text007: Label 'Orders paid with Gift Voucher and/or Credit Voucher may not be partially invoiced nor adjusted.';
-
-    local procedure "--- Activation"()
-    begin
-    end;
 
     local procedure ActivateGiftVoucher(var GiftVoucher: Record "NPR Gift Voucher")
     var
@@ -65,7 +35,6 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
         MagentoSetup: Record "NPR Magento Setup";
         GiftVoucher: Record "NPR Gift Voucher";
     begin
-        //-MAG2.00
         if not (MagentoSetup.Get and MagentoSetup."Gift Voucher Enabled") then
             exit;
 
@@ -75,7 +44,6 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
             GiftVoucher.Status := GiftVoucher.Status::Cashed;
             GiftVoucher.Modify(true);
         end;
-        //+MAG2.00
     end;
 
     procedure ActivateAndMailGiftVouchers(ExternalOrderNo: Code[20]; EMail: Text[250])
@@ -126,9 +94,7 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
         SalesHeader.SetRange("NPR External Order No.", ExternalOrderNo);
         if SalesHeader.FindSet then
             repeat
-                //-MAG2.00
                 GiftVoucher.SetRange("Sales Order No.", SalesHeader."No.");
-                //+MAG2.00
                 GiftVoucher.SetRange(Status, GiftVoucher.Status::Cancelled);
                 GiftVoucher.SetFilter(Amount, '>%1', 0);
                 if GiftVoucher.FindSet then
@@ -145,9 +111,7 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
         SalesInvHeader.SetFilter("Order No.", '<>%1', '');
         if SalesInvHeader.FindSet then
             repeat
-                //-MAG2.00
                 GiftVoucher.SetRange("Sales Order No.", SalesInvHeader."Order No.");
-                //+MAG2.00
                 GiftVoucher.SetRange(Status, GiftVoucher.Status::Cancelled);
                 GiftVoucher.SetFilter(Amount, '>%1', 0);
                 if GiftVoucher.FindSet then
@@ -178,9 +142,7 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
         SalesHeader.SetRange("NPR External Order No.", ExternalOrderNo);
         if SalesHeader.FindSet then
             repeat
-                //-MAG2.00
                 CreditVoucher.SetRange("Sales Order No.", SalesHeader."No.");
-                //+MAG2.00
                 CreditVoucher.SetRange(Status, CreditVoucher.Status::Cancelled);
                 CreditVoucher.SetFilter(Amount, '>%1', 0);
                 if CreditVoucher.FindSet then
@@ -197,9 +159,7 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
         SalesInvHeader.SetFilter("Order No.", '<>%1', '');
         if SalesInvHeader.FindSet then
             repeat
-                //-MAG2.00
                 CreditVoucher.SetRange("Sales Order No.", SalesInvHeader."Order No.");
-                //+MAG2.00
                 CreditVoucher.SetRange(Status, CreditVoucher.Status::Cancelled);
                 CreditVoucher.SetFilter(Amount, '>%1', 0);
                 if CreditVoucher.FindSet then
@@ -214,19 +174,15 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
         exit(TempCreditVoucher.FindSet);
     end;
 
-    procedure "--- Posting"()
-    begin
-    end;
+    #region Posting
 
-    [EventSubscriber(ObjectType::Codeunit, 6151416, 'OnCheckPayment', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'OnCheckPayment', '', true, true)]
     local procedure OnCheckPayment(SalesHeader: Record "Sales Header")
     begin
-        //-MAG2.17 [302179]
         if SalesHeader.IsTemporary then
             exit;
 
         CheckVoucherPayment(SalesHeader);
-        //+MAG2.17 [302179]
     end;
 
     local procedure CheckCreditVoucherPayment(PaymentLine: Record "NPR Magento Payment Line"): Boolean
@@ -275,15 +231,12 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
         PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
         PaymentLine.SetRange("Document No.", SalesHeader."No.");
         PaymentLine.SetRange("Payment Type", PaymentLine."Payment Type"::Voucher);
-        //-MAG2.17 [302179]
         PaymentLine.SetFilter("Source Table No.", '%1|%2', DATABASE::"NPR Credit Voucher", DATABASE::"NPR Gift Voucher");
-        //+MAG2.17 [302179]
         PaymentLine.SetFilter(Amount, '>%1', 0);
         if not PaymentLine.FindSet then
             exit;
 
         repeat
-            //-MAG2.17 [302179]
             case PaymentLine."Source Table No." of
                 DATABASE::"NPR Credit Voucher":
                     VoucherFound := CheckCreditVoucherPayment(PaymentLine);
@@ -292,12 +245,10 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
                 else
                     VoucherFound := false;
             end;
-            //+MAG2.17 [302179]
             if not VoucherFound then
                 Error(StrSubstNo(Text006, PaymentLine."No."));
         until PaymentLine.Next = 0;
 
-        //-MAG2.17 [302179]
         PaymentLine.Reset;
         PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
         PaymentLine.SetRange("Document No.", SalesHeader."No.");
@@ -306,7 +257,6 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
         PaymentLine.SetRange("Payment Type", PaymentLine."Payment Type"::Voucher);
         if PaymentLine.FindFirst and (SalesHeader."NPR Magento Payment Amount" <> GetTotalAmountInclVat(SalesHeader)) then
             Error(Text007);
-        //+MAG2.17 [302179]
     end;
 
     local procedure GetTotalAmountInclVat(var SalesHeader: Record "Sales Header") TotalAmountInclVAT: Decimal
@@ -315,7 +265,6 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
         TempVATAmountLine: Record "VAT Amount Line" temporary;
         SalesPost: Codeunit "Sales-Post";
     begin
-        //-MAG2.17 [302179]
         Clear(TempSalesLine);
         Clear(SalesPost);
         TempVATAmountLine.DeleteAll;
@@ -325,15 +274,13 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
         TempSalesLine.UpdateVATOnLines(1, SalesHeader, TempSalesLine, TempVATAmountLine);
         TotalAmountInclVAT := TempVATAmountLine.GetTotalAmountInclVAT();
         exit(TotalAmountInclVAT);
-        //+MAG2.17 [302179]
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151416, 'OnBeforePostPaymentLine', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'OnBeforePostPaymentLine', '', true, true)]
     local procedure OnBeforePostPaymentLine(var PaymentLine: Record "NPR Magento Payment Line")
     var
         SalesInvHeader: Record "Sales Invoice Header";
     begin
-        //-MAG2.17 [302179]
         if PaymentLine.IsTemporary then
             exit;
 
@@ -345,7 +292,6 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
             exit;
 
         PostVoucherPayment(PaymentLine, SalesInvHeader);
-        //+MAG2.17 [302179]
     end;
 
     procedure PostVoucherPayment(PaymentLine: Record "NPR Magento Payment Line"; SalesInvoiceHeader: Record "Sales Invoice Header")
@@ -368,10 +314,6 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
         GiftVoucher.LockTable;
         GiftVoucher.SetRange("External Reference No.", PaymentLine."No.");
         if GiftVoucher.FindFirst then begin
-            //-MAG2.25 [386613]
-            //VoucherAmount := GiftVoucher.Amount;
-            //GiftVoucher.Amount := 0;
-            //+MAG2.25 [386613]
             GiftVoucher.Status := GiftVoucher.Status::Cashed;
             GiftVoucher."Cashed Date" := SalesInvoiceHeader."Posting Date";
             GiftVoucher."Cashed Salesperson" := SalesInvoiceHeader."Salesperson Code";
@@ -386,10 +328,6 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
         CreditVoucher.LockTable;
         CreditVoucher.SetRange("External Reference No.", PaymentLine."No.");
         if CreditVoucher.FindFirst then begin
-            //-MAG2.25 [386613]
-            //VoucherAmount := CreditVoucher.Amount;
-            //CreditVoucher.Amount := 0;
-            //+MAG2.25 [386613]
             CreditVoucher.Status := CreditVoucher.Status::Cashed;
             CreditVoucher."Cashed Date" := SalesInvoiceHeader."Posting Date";
             CreditVoucher."Cashed Salesperson" := SalesInvoiceHeader."Salesperson Code";
@@ -402,14 +340,12 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151416, 'OnAfterPostMagentoPayment', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'OnAfterPostMagentoPayment', '', true, true)]
     local procedure OnAfterPostMagentoPayment(SalesInvHeader: Record "Sales Invoice Header")
     var
         Customer: Record Customer;
         MagentoSetup: Record "NPR Magento Setup";
-        MagentoGiftVoucherMgt: Codeunit "NPR Magento Gift Voucher Mgt.";
     begin
-        //-MAG2.17 [302179]
         if SalesInvHeader.IsTemporary then
             exit;
         if SalesInvHeader."NPR External Order No." = '' then
@@ -423,10 +359,9 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
 
         if Customer.Get(SalesInvHeader."Sell-to Customer No.") then;
         ActivateAndMailGiftVouchers(SalesInvHeader."NPR External Order No.", Customer."E-Mail");
-        //+MAG2.17 [302179]
     end;
 
-    [EventSubscriber(ObjectType::Table, 36, 'OnBeforeDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnCancelMagentoOrder(var Rec: Record "Sales Header"; RunTrigger: Boolean)
     var
         CreditVoucher: Record "NPR Credit Voucher";
@@ -435,7 +370,6 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
         DataLogMgt: Codeunit "NPR Data Log Management";
         RecRef: RecordRef;
     begin
-        //-MAG2.22 [361598]
         if not RunTrigger then
             exit;
         if Rec.IsTemporary then
@@ -486,12 +420,10 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
                         end;
                 end;
             until PaymentLine.Next = 0;
-        //+MAG2.22 [361598]
     end;
+    #endregion
 
-    procedure "--- ExternalReferenceNo"()
-    begin
-    end;
+    #region ExternalReferenceNo
 
     procedure GenerateExternalReferenceNo(GeneratePattern: Text[30]; VoucherNo: Code[20]) ExternalReferenceNo: Code[30]
     var
@@ -586,10 +518,7 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
     begin
         exit(Random(9999));
     end;
-
-    procedure "--- E-mail"()
-    begin
-    end;
+    #endregion
 
     procedure EmailGiftVoucher(var GiftVoucher: Record "NPR Gift Voucher"; EMail: Text[250])
     var
@@ -616,16 +545,11 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
         EmailManagement.SendReport(MagentoSetup."Credit Voucher Report", RecRef, EMail, true);
     end;
 
-    local procedure "--- Event Subscribers"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Table, 6014408, 'OnBeforeInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Credit Voucher", 'OnBeforeInsertEvent', '', true, true)]
     local procedure CreditVoucherOnInsert(var Rec: Record "NPR Credit Voucher"; RunTrigger: Boolean)
     var
         MagentoSetup: Record "NPR Magento Setup";
     begin
-        //-MAG2.00
         if not RunTrigger then
             exit;
         if IsTemporary(Rec) then
@@ -637,15 +561,13 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
             Rec."Expire Date" := CalcDate(MagentoSetup."Credit Voucher Valid Period", Today);
         if (Rec."External Reference No." = '') and (MagentoSetup.Get) and (MagentoSetup."Credit Voucher Code Pattern" <> '') then
             Rec."External Reference No." := GenerateExternalReferenceNo(MagentoSetup."Credit Voucher Code Pattern", Rec."Voucher No.");
-        //+MAG2.00
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014408, 'OnBeforeModifyEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Credit Voucher", 'OnBeforeModifyEvent', '', true, true)]
     local procedure CreditVoucherOnModify(var Rec: Record "NPR Credit Voucher"; var xRec: Record "NPR Credit Voucher"; RunTrigger: Boolean)
     var
         MagentoSetup: Record "NPR Magento Setup";
     begin
-        //-MAG2.00
         if not RunTrigger then
             exit;
         if IsTemporary(Rec) then
@@ -657,15 +579,13 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
             Rec."Expire Date" := CalcDate(MagentoSetup."Credit Voucher Valid Period", Today);
         if (Rec."External Reference No." = '') and (MagentoSetup.Get) and (MagentoSetup."Credit Voucher Code Pattern" <> '') then
             Rec."External Reference No." := GenerateExternalReferenceNo(MagentoSetup."Credit Voucher Code Pattern", Rec."Voucher No.");
-        //+MAG2.00
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014409, 'OnBeforeInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Gift Voucher", 'OnBeforeInsertEvent', '', true, true)]
     local procedure GiftVoucherOnInsert(var Rec: Record "NPR Gift Voucher"; RunTrigger: Boolean)
     var
         MagentoSetup: Record "NPR Magento Setup";
     begin
-        //-MAG2.00
         if not RunTrigger then
             exit;
         if IsTemporary(Rec) then
@@ -679,15 +599,13 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
         end;
         if (Rec."External Reference No." = '') and (MagentoSetup.Get) and (MagentoSetup."Gift Voucher Code Pattern" <> '') then
             Rec."External Reference No." := GenerateExternalReferenceNo(MagentoSetup."Gift Voucher Code Pattern", Rec."Voucher No.");
-        //+MAG2.00
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014409, 'OnBeforeModifyEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Gift Voucher", 'OnBeforeModifyEvent', '', true, true)]
     local procedure GiftVoucherOnModify(var Rec: Record "NPR Gift Voucher"; var xRec: Record "NPR Gift Voucher"; RunTrigger: Boolean)
     var
         MagentoSetup: Record "NPR Magento Setup";
     begin
-        //-MAG2.00
         if not RunTrigger then
             exit;
         if IsTemporary(Rec) then
@@ -701,17 +619,13 @@ codeunit 6151410 "NPR Magento Gift Voucher Mgt."
         end;
         if (Rec."External Reference No." = '') and (MagentoSetup.Get) and (MagentoSetup."Gift Voucher Code Pattern" <> '') then
             Rec."External Reference No." := GenerateExternalReferenceNo(MagentoSetup."Gift Voucher Code Pattern", Rec."Voucher No.");
-        //+MAG2.00
     end;
 
     local procedure IsTemporary(VariantRec: Variant): Boolean
     var
         RecRef: RecordRef;
     begin
-        //-MAG2.00
         RecRef.GetTable(VariantRec);
         exit(RecRef.IsTemporary);
-        //+MAG2.00
     end;
 }
-

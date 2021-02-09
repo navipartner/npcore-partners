@@ -1,8 +1,5 @@
 codeunit 6151459 "NPR Magento NpXml Qty. Incr."
 {
-    // MAG2.19/ZESO/20190214 CASE 345371 Object Created
-    // MAG2.22/BHR /20190610 CASE 349129 Correct bug
-
     TableNo = "NPR NpXml Custom Val. Buffer";
 
     trigger OnRun()
@@ -12,13 +9,12 @@ codeunit 6151459 "NPR Magento NpXml Qty. Incr."
         OutStr: OutStream;
         CustomValue: Text;
         ItemNo: Code[20];
-        VariantCode: Code[10];
     begin
-        if not NpXmlElement.Get("Xml Template Code", "Xml Element Line No.") then
+        if not NpXmlElement.Get(Rec."Xml Template Code", Rec."Xml Element Line No.") then
             exit;
         Clear(RecRef);
-        RecRef.Open("Table No.");
-        RecRef.SetPosition("Record Position");
+        RecRef.Open(Rec."Table No.");
+        RecRef.SetPosition(Rec."Record Position");
 
         if not RecRef.Find then
             exit;
@@ -29,13 +25,10 @@ codeunit 6151459 "NPR Magento NpXml Qty. Incr."
 
         CustomValue := Format(CalcQtyIncrement(ItemNo), 0, 9);
 
-        Value.CreateOutStream(OutStr);
+        Rec.Value.CreateOutStream(OutStr);
         OutStr.WriteText(CustomValue);
-        Modify;
+        Rec.Modify;
     end;
-
-    var
-        Text000: Label 'Magento Intercompany Inventory NpXml Error:\%1';
 
     local procedure CalcQtyIncrement(ItemNo: Code[20]) QtyIncrement: Decimal
     var
@@ -51,18 +44,12 @@ codeunit 6151459 "NPR Magento NpXml Qty. Incr."
         if not Item.Get(ItemNo) then
             exit(0);
 
-        //-MAG2.22 [349129]
-        //IF NOT ItemUOM.GET(Item."Sales Unit of Measure",ItemNo) THEN
         if not ItemUOM.Get(ItemNo, Item."Sales Unit of Measure") then
-            //+MAG2.22 [349129]
             exit(0);
 
         SalesUOMQty := ItemUOM."Qty. per Unit of Measure";
 
-        //-MAG2.22 [349129]
-        //IF NOT ItemUOM.GET(Item."Base Unit of Measure",ItemNo) THEN
         if not ItemUOM.Get(ItemNo, Item."Base Unit of Measure") then
-            //+MAG2.22 [349129]
             exit(0);
 
         BaseUOMQty := ItemUOM."Qty. per Unit of Measure";
@@ -88,4 +75,3 @@ codeunit 6151459 "NPR Magento NpXml Qty. Incr."
         exit(false);
     end;
 }
-

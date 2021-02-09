@@ -1,23 +1,19 @@
 codeunit 6151453 "NPR Magento NpXml FIK"
 {
-    // MAG1.16/TS/20150507  CASE 213379 Object created - Custom Values for NpXml
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-
     TableNo = "NPR NpXml Custom Val. Buffer";
 
     trigger OnRun()
     var
         NpXmlElement: Record "NPR NpXml Element";
         RecRef: RecordRef;
-        RecRef2: RecordRef;
         CustomValue: Text;
         OutStr: OutStream;
     begin
-        if not NpXmlElement.Get("Xml Template Code", "Xml Element Line No.") then
+        if not NpXmlElement.Get(Rec."Xml Template Code", Rec."Xml Element Line No.") then
             exit;
         Clear(RecRef);
-        RecRef.Open("Table No.");
-        RecRef.SetPosition("Record Position");
+        RecRef.Open(Rec."Table No.");
+        RecRef.SetPosition(Rec."Record Position");
         if not RecRef.Find then
             exit;
 
@@ -26,9 +22,9 @@ codeunit 6151453 "NPR Magento NpXml FIK"
 
         Clear(RecRef);
 
-        Value.CreateOutStream(OutStr);
+        Rec.Value.CreateOutStream(OutStr);
         OutStr.WriteText(CustomValue);
-        Modify;
+        Rec.Modify;
     end;
 
     local procedure GetFIK(FIKType: Code[2]; RecRef: RecordRef) FIKNo: Text
@@ -95,4 +91,3 @@ codeunit 6151453 "NPR Magento NpXml FIK"
         exit(FIKNo);
     end;
 }
-

@@ -1,16 +1,9 @@
 page 6151417 "NPR Magento Child Categories"
 {
-    // MAG1.00/MH/20150113  CASE 199932 Refactored Object from Web Integration
-    // MAG1.04/MH/20150217  CASE 199932 Added function SetParentCategory() which is used when for defining parent on Insert
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.09/TS  /20180108  CASE 300893 Removed Caption on Control Container
-    // MAG2.26/MHA /20200601  CASE 404580 Magento "Item Group" renamed to "Category"
-
     Caption = 'Magento Child Categories';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "NPR Magento Category";
 
     layout
@@ -20,27 +13,27 @@ page 6151417 "NPR Magento Child Categories"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field(Id; Id)
+                field(Id; Rec.Id)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Id field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field(Picture; Picture)
+                field(Picture; Rec.Picture)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Picture field';
                 }
-                field("Sorting"; Sorting)
+                field("Sorting"; Rec.Sorting)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sorting field';
                 }
-                field("Item Count"; "Item Count")
+                field("Item Count"; Rec."Item Count")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item Count field';
@@ -60,9 +53,9 @@ page 6151417 "NPR Magento Child Categories"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        Id := ParentMagentoCategory.GetNewChildGroupNo();
-        "Parent Category Id" := ParentMagentoCategory.Id;
-        Level := ParentMagentoCategory.Level + 1;
+        Rec.Id := ParentMagentoCategory.GetNewChildGroupNo();
+        Rec."Parent Category Id" := ParentMagentoCategory.Id;
+        Rec.Level := ParentMagentoCategory.Level + 1;
     end;
 
     var
@@ -74,4 +67,3 @@ page 6151417 "NPR Magento Child Categories"
         ParentMagentoCategory := NewParentMagentoCategory;
     end;
 }
-
