@@ -8,10 +8,10 @@ codeunit 6150616 "NPR POS Post Item Entries"
         POSEntry: Record "NPR POS Entry";
         POSSalesLine: Record "NPR POS Sales Line";
         TempItemToAdjust: Record Item temporary;
-        GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
         AdjustCostItemEntries: Report "Adjust Cost - Item Entries";
         PostInventoryCosttoGL: Report "Post Inventory Cost to G/L";
         FileManagement: Codeunit "File Management";
+        GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
     begin
         OnBeforePostPOSEntry(Rec);
 
@@ -150,7 +150,7 @@ codeunit 6150616 "NPR POS Post Item Entries"
                 ItemJnlLine."Entry Type" := ItemJnlLine."Entry Type"::Sale;
             ItemJnlLine."Unit of Measure Code" := "Unit of Measure Code";
             ItemJnlLine."Qty. per Unit of Measure" := "Qty. per Unit of Measure";
-            ItemJnlLine."Cross-Reference No." := "Cross-Reference No.";
+            ItemJnlLine."Item Reference No." := "Cross-Reference No.";
             ItemJnlLine."Originally Ordered No." := "Originally Ordered No.";
             ItemJnlLine."Originally Ordered Var. Code" := "Originally Ordered Var. Code";
             ItemJnlLine."Out-of-Stock Substitution" := "Out-of-Stock Substitution";
@@ -546,18 +546,18 @@ codeunit 6150616 "NPR POS Post Item Entries"
 
     local procedure HandleRetailSerialNo(POSSalesLine: Record "NPR POS Sales Line")
     var
-        ItemCrossReference: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
     begin
         if (POSSalesLine."Retail Serial No." = '') then
             exit;
 
-        ItemCrossReference.SetCurrentKey("Cross-Reference No.");
-        ItemCrossReference.SetFilter("Cross-Reference No.", '=%1', POSSalesLine."Retail Serial No.");
-        ItemCrossReference.SetFilter("NPR Is Retail Serial No.", '=%1', true);
-        ItemCrossReference.SetFilter("Discontinue Bar Code", '=%1', false);
-        if (ItemCrossReference.FindFirst()) then begin
-            ItemCrossReference."Discontinue Bar Code" := true;
-            ItemCrossReference.Modify();
+        ItemReference.SetCurrentKey("Reference No.");
+        ItemReference.SetFilter("Reference No.", '=%1', POSSalesLine."Retail Serial No.");
+        ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Retail Serial No.");
+        ItemReference.SetFilter("Discontinue Bar Code", '=%1', false);
+        if (ItemReference.FindFirst()) then begin
+            ItemReference."Discontinue Bar Code" := true;
+            ItemReference.Modify();
         end;
     end;
 

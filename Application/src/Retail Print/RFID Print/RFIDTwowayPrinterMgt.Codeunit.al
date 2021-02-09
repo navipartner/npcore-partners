@@ -1,20 +1,6 @@
 codeunit 6059830 "NPR RFID Two-way Printer Mgt."
 {
-    // NPR5.48/MMV /20181128 CASE 327107 Created object
-    // 
-    // Codeunit hooks onto normal label flow and collects the jobs into a buffer that is send to an RFID handler.
-    // This handler can be set by invoking OnSetRFIDHandlerCodeunit() at any moment during the print, ie. from inside a print codeunit or via "Pre Processing Codeunit" if using a template.
-    // 
-    // When OnHandleRFIDBuffer() is invoked the handler should take it from there, either pre-generating EPC/Serial Number values and imprinting tags with them or reading
-    // existing unique EPCs and creating them as item cross reference.
-    // 
-    // Note: This manual event approach is only relevant if an RFID use-case does not fit into 1-way printer communication approach. If it does, RFID print commands in the template module should be used.
-
     EventSubscriberInstance = Manual;
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         HandlerCodeunit: Integer;

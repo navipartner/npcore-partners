@@ -116,7 +116,7 @@ table 6014519 "NPR Warranty Line"
             Caption = 'Insurance';
             DataClassification = CustomerContent;
         }
-        field(15; "Serial No. not Created"; Code[30])
+        field(15; "Serial No. not Created"; Code[50])
         {
             Caption = 'Serial No. not Created';
             DataClassification = CustomerContent;

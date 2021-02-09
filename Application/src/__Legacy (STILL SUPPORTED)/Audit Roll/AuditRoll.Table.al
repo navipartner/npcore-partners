@@ -701,7 +701,7 @@ table 6014407 "NPR Audit Roll"
             Caption = 'Size';
             DataClassification = CustomerContent;
         }
-        field(5004; "Serial No. not Created"; Code[30])
+        field(5004; "Serial No. not Created"; Code[50])
         {
             Caption = 'Serial No. not Created';
             DataClassification = CustomerContent;

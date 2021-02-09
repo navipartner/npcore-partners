@@ -1,9 +1,5 @@
 table 6059970 "NPR Variety Setup"
 {
-    // VRT1.11/MHA/20160412  CASE 236840 Added field 40 Hide Inactive Variants
-    // VRT1.11/JDH /20160601 CASE 242940 Added new fields for new functionalities + Captions
-    // NPR5.43/JDH /20180628 CASE 317108 Added "Create Variant Code From"
-
     Caption = 'Variety Setup';
     DataClassification = CustomerContent;
 
@@ -59,32 +55,32 @@ table 6059970 "NPR Variety Setup"
         }
         field(31; "Item Cross Ref. No. Series (I)"; Code[10])
         {
-            Caption = 'Item Cross Ref. No. Series (Item)';
+            Caption = 'Item Reference No. Series (Item)';
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
         }
         field(32; "Create Item Cross Ref. auto."; Boolean)
         {
-            Caption = 'Create Item Cross Ref. auto.';
+            Caption = 'Create Item Reference Automatically';
             DataClassification = CustomerContent;
             InitValue = true;
         }
         field(33; "Item Cross Ref. No. Series (V)"; Code[10])
         {
-            Caption = 'Item Cross Ref. No. Series (Variant)';
+            Caption = 'Item Reference No. Series (Variant)';
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
         }
         field(34; "Item Cross Ref. Description(I)"; Option)
         {
-            Caption = 'Item Cross Ref. Description (Item)';
+            Caption = 'Item Reference Description (Item)';
             DataClassification = CustomerContent;
             OptionCaption = 'Item Description 1,Item Description 2';
             OptionMembers = ItemDescription1,ItemDescription2;
         }
         field(35; "Item Cross Ref. Description(V)"; Option)
         {
-            Caption = 'Item Cross Ref. Description (Variant)';
+            Caption = 'Item Reference Description (Variant)';
             DataClassification = CustomerContent;
             OptionCaption = 'Item Description 1,Item Description 2,Variant Description 1,Variant Description 2';
             OptionMembers = ItemDescription1,ItemDescription2,VariantDescription1,VariantDescription2;

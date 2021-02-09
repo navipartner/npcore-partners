@@ -99,7 +99,7 @@ codeunit 6151530 "NPR Nc Collector NpXml Value"
             exit;
 
         case NcCollectionLine."Table No." of
-            DATABASE::Item, DATABASE::"Item Variant", DATABASE::"Item Cross Reference", DATABASE::"Item Unit of Measure":
+            DATABASE::Item, DATABASE::"Item Variant", DATABASE::"Item Reference", DATABASE::"Item Unit of Measure":
                 begin
                     if Item.Get(NcCollectionLine."PK Code 1") then begin
                         TempItem.Init;
@@ -107,16 +107,6 @@ codeunit 6151530 "NPR Nc Collector NpXml Value"
                         TempItem.Insert;
                     end;
                 end;
-            //-NC2.14 [312958]
-            // DATABASE::"NPR Attribute Key",DATABASE::"NPR Attribute Value Set":
-            //  BEGIN
-            //
-            //    IF NPRAttributeKey.GET(NcCollectionLine."PK Line 1") AND (NPRAttributeKey."Table ID" = DATABASE::Item) AND Item.GET(NPRAttributeKey."MDR Code PK") THEN BEGIN
-            //      TempItem.INIT;
-            //      TempItem := Item;
-            //      TempItem.INSERT;
-            //    END;
-            //  END;
             6014555, 6014556:
                 begin
                     RecRef.Open(6014556);

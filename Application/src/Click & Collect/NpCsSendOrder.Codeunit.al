@@ -1,6 +1,5 @@
 codeunit 6151197 "NPR NpCs Send Order"
 {
-
     var
         Text000: Label 'Create Collect Sales Order in Store';
         Text001: Label 'Order %1 sent to Store %2';
@@ -155,7 +154,7 @@ codeunit 6151197 "NPR NpCs Send Order"
                             '<type>' + Format(SalesLine.Type, 0, 2) + '</type>' +
                             '<no>' + SalesLine."No." + '</no>' +
                             '<variant_code>' + SalesLine."Variant Code" + '</variant_code>' +
-                            '<cross_reference_no>' + GetCrossRefNo(SalesLine) + '</cross_reference_no>' +
+                            '<cross_reference_no>' + GetItemRefNo(SalesLine) + '</cross_reference_no>' +
                             '<unit_of_measure_code>' + SalesLine."Unit of Measure Code" + '</unit_of_measure_code>' +
                             '<description>' + SalesLine.Description + '</description>' +
                             '<description_2>' + SalesLine."Description 2" + '</description_2>' +
@@ -241,24 +240,24 @@ codeunit 6151197 "NPR NpCs Send Order"
         exit(CODEUNIT::"NPR NpCs Send Order");
     end;
 
-    local procedure GetCrossRefNo(SalesLine: Record "Sales Line") CrossRefNo: Code[20]
+    local procedure GetItemRefNo(SalesLine: Record "Sales Line") ItemRefNo: Code[50]
     var
-        ItemCrossRef: Record "Item Cross Reference";
+        ItemRef: Record "Item Reference";
     begin
-        if SalesLine."Cross-Reference No." <> '' then
-            exit(SalesLine."Cross-Reference No.");
+        if SalesLine."Item Reference No." <> '' then
+            exit(SalesLine."Item Reference No.");
         if SalesLine.Type <> SalesLine.Type::Item then
             exit('');
 
-        ItemCrossRef.SetRange("Item No.", SalesLine."No.");
-        ItemCrossRef.SetRange("Variant Code", SalesLine."Variant Code");
-        ItemCrossRef.SetRange("Cross-Reference Type", ItemCrossRef."Cross-Reference Type"::"Bar Code");
-        ItemCrossRef.SetFilter("Cross-Reference No.", '<>%1', '');
-        ItemCrossRef.SetRange("Discontinue Bar Code", false);
-        if not ItemCrossRef.FindFirst then
-            ItemCrossRef.SetRange("Discontinue Bar Code");
-        if ItemCrossRef.FindFirst then
-            exit(ItemCrossRef."Cross-Reference No.");
+        ItemRef.SetRange("Item No.", SalesLine."No.");
+        ItemRef.SetRange("Variant Code", SalesLine."Variant Code");
+        ItemRef.SetRange("Reference Type", ItemRef."Reference Type"::"Bar Code");
+        ItemRef.SetFilter("Reference No.", '<>%1', '');
+        ItemRef.SetRange("Discontinue Bar Code", false);
+        if not ItemRef.FindFirst then
+            ItemRef.SetRange("Discontinue Bar Code");
+        if ItemRef.FindFirst then
+            exit(ItemRef."Reference No.");
 
         exit('');
     end;

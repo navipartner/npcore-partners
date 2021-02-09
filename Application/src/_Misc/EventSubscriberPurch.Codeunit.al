@@ -1,20 +1,5 @@
 codeunit 6014444 "NPR Event Subscriber (Purch)"
 {
-    // --Table 39 Purchase Line--
-    // NPR4.14/RMT/20150730 CASE 219456 Added code to resolve item information from "Vendor Item No."
-    // NPR4.15/JDH/20150929 CASE 223643 only validate vendors item no, if its actually entered from that field
-    // NPR5.22/TJ/20160406 CASE 236840 New subscriber added for Variant Code field
-    // NPR5.00.01/TJ/20160517 CASE 241673 Rearranged code and added new events
-    // NPR5.29/NPKNAV/20170127  CASE 260472 Transport NPR5.29 - 27 januar 2017
-    // NPR5.32/BR /20170503  CASE 274473 Hook into Item worksheet
-    // NPR5.51/ZESO/20190702 CASE 360630 Added Parameter %1 to enable filtering of Special Characters.
-    // NPR5.51/ZESO/20190723 CASE 360083 Enable Case Insensitive Filtering
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         RetailSetup: Record "NPR Retail Setup";
         RetailSetupFetched: Boolean;
@@ -25,68 +10,38 @@ codeunit 6014444 "NPR Event Subscriber (Purch)"
         Item: Record Item;
         PurchLine: Record "Purchase Line";
         PurchHeader: Record "Purchase Header";
-        Text001: Label 'Vendor Item No. %1 was not created on vendor.';
         ItemWorksheetPurchIntegr: Codeunit "NPR Item Works. Purch. Integr.";
+        VendorItemNoNotCreatedErr: Label 'Vendor Item No. %1 was not created on vendor.', Comment = '%1=PurchLine."Vendor Item No."';
         CreatedItemNo: Code[20];
         CreatedVariantCode: Code[10];
     begin
-        //-NPR5.22.01
-        /*
-        //-NPR4.15
-        IF CurrFieldNo = Rec.FIELDNO("Vendor Item No.") THEN
-        //+NPR4.15
-          //-NPR4.14
-          RetailCode.KLLevVNOV(Rec);
-          //+NPR4.14
-        */
-        //-NPR4.15
         if CurrFieldNo = Rec.FieldNo("Vendor Item No.") then begin
-            //+NPR4.15
-            GetRetailSetup;
-            with Rec do begin
-                PurchHeader.Get("Document Type", "Document No.");
-                Item.SetCurrentKey("Vendor No.", "Vendor Item No.");
-                if RetailSetup."Check Purchase Lines if vendor" then
-                    Item.SetFilter("Vendor No.", PurchHeader."Buy-from Vendor No.");
-                if "Vendor Item No." <> '' then begin
-                    //-NPR5.51 [360630]
-                    //Item.SETFILTER("Vendor Item No.","Vendor Item No.");
-                    //-NPR5.51 [360803]
-                    //Item.SETFILTER("Vendor Item No.",'%1',"Vendor Item No.");
-                    Item.SetFilter("Vendor Item No.", '%1', '@' + "Vendor Item No.");
-                    //+NPR5.51 [360803]
-                    //-NPR5.51 [360630]
-                    if Item.FindFirst then begin
-                        //-NPR4.14
-                        //Type := Type::Item;
-                        //+NPR4.14
-                        if "No." <> Item."No." then begin
-                            PurchLine := Rec;
-                            PurchLine.Validate("No.", Item."No.");
-                            PurchLine."Vendor Item No." := Item."Vendor Item No.";
-                            Rec := PurchLine;
-                        end;
-                        //      IF "No." <> Vare."No." THEN
-                        //        VALIDATE("No.",Vare."No.");
-                        //-NPR4.14
-                        //      "Vendor Item No." := Vare."Vendor Item No.";
-                        //+NPR4.14
+            GetRetailSetup();
+            PurchHeader.Get(Rec."Document Type", Rec."Document No.");
+            Item.SetCurrentKey("Vendor No.", "Vendor Item No.");
+            if RetailSetup."Check Purchase Lines if vendor" then
+                Item.SetFilter("Vendor No.", PurchHeader."Buy-from Vendor No.");
+            if Rec."Vendor Item No." <> '' then begin
+                Item.SetFilter("Vendor Item No.", '%1', '@' + Rec."Vendor Item No.");
+                if Item.FindFirst() then begin
+                    if Rec."No." <> Item."No." then begin
+                        PurchLine := Rec;
+                        PurchLine.Validate("No.", Item."No.");
+                        PurchLine."Vendor Item No." := Item."Vendor Item No.";
+                        Rec := PurchLine;
+                    end;
+                end else
+                    if ItemWorksheetPurchIntegr.CreateItemFromWorksheet(PurchHeader."Buy-from Vendor No.", Rec."Vendor Item No.", CreatedItemNo, CreatedVariantCode) then begin
+                        PurchLine := Rec;
+                        PurchLine.Validate("No.", CreatedItemNo);
+                        PurchLine.Validate("Variant Code", CreatedVariantCode);
+                        PurchLine."Vendor Item No." := Rec."Vendor Item No.";
+                        Rec := PurchLine;
                     end else
-                        //-NPR5.32 [274473]
-                        if ItemWorksheetPurchIntegr.CreateItemFromWorksheet(PurchHeader."Buy-from Vendor No.", "Vendor Item No.", CreatedItemNo, CreatedVariantCode) then begin
-                            PurchLine := Rec;
-                            PurchLine.Validate("No.", CreatedItemNo);
-                            PurchLine.Validate("Variant Code", CreatedVariantCode);
-                            PurchLine."Vendor Item No." := "Vendor Item No.";
-                            Rec := PurchLine;
-                        end else
-                            //+NPR5.32 [274473]
-                            Error(Text001, "Vendor Item No.");
-                end;
+                        Error(VendorItemNoNotCreatedErr, Rec."Vendor Item No.");
             end;
-        end;
-        //+NPR5.22.01
 
+        end;
     end;
 
     [EventSubscriber(ObjectType::Table, 39, 'OnBeforeValidateEvent', 'Vendor Item No.', false, false)]
@@ -95,102 +50,62 @@ codeunit 6014444 "NPR Event Subscriber (Purch)"
         Item: Record Item;
         ItemVend: Record "Item Vendor";
     begin
-        //ToCheck
-        //-NPR5.22.01
-        /*
-        IF CurrFieldNo IN [Rec.FIELDNO("Cross-Reference No."),Rec.FIELDNO("No."),Rec.FIELDNO("Variant Code"),Rec.FIELDNO("Location Code")] THEN BEGIN
-          Rec.TESTFIELD("No.");
-          Item.GET(Rec."No.");
-          ItemVend.INIT;
-          ItemVend."Vendor No." := Rec."Buy-from Vendor No.";
-          ItemVend."Variant Code" := Rec."Variant Code";
-          Item.FindItemVend(ItemVend,Rec."Location Code");
-          //-NPR4.14
-          IF (ItemVend."Vendor Item No."='') AND (Item."Vendor Item No."<>'') THEN
-            Rec."Vendor Item No." := Item."Vendor Item No.";
-          //+NPR4.14
-        END;
-        */
-        with Rec do begin
-            if CurrFieldNo in [FieldNo("Cross-Reference No."), FieldNo("No."), FieldNo("Variant Code"), FieldNo("Location Code")] then begin
-                TestField("No.");
-                Item.Get("No.");
-                ItemVend.Init;
-                ItemVend."Vendor No." := "Buy-from Vendor No.";
-                ItemVend."Variant Code" := "Variant Code";
-                Item.FindItemVend(ItemVend, "Location Code");
-                //-NPR4.14
-                if (ItemVend."Vendor Item No." = '') and (Item."Vendor Item No." <> '') then
-                    "Vendor Item No." := Item."Vendor Item No.";
-                //+NPR4.14
-            end;
+        if CurrFieldNo in [Rec.FieldNo("Item Reference No."), Rec.FieldNo("No."), Rec.FieldNo("Variant Code"), Rec.FieldNo("Location Code")] then begin
+            Rec.TestField("No.");
+            Item.Get(Rec."No.");
+            ItemVend.Init();
+            ItemVend."Vendor No." := Rec."Buy-from Vendor No.";
+            ItemVend."Variant Code" := Rec."Variant Code";
+            Item.FindItemVend(ItemVend, Rec."Location Code");
+            if (ItemVend."Vendor Item No." = '') and (Item."Vendor Item No." <> '') then
+                Rec."Vendor Item No." := Item."Vendor Item No.";
         end;
-        //+NPR5.22.01
-
     end;
 
     [EventSubscriber(ObjectType::Table, 39, 'OnAfterValidateEvent', 'NPR Gift Voucher', true, false)]
     local procedure OnAfterValidateEventGiftVoucher(var Rec: Record "Purchase Line"; var xRec: Record "Purchase Line"; CurrFieldNo: Integer)
     var
         GiftVoucher: Record "NPR Gift Voucher";
-        Text001: Label '%1 on %2 is %3. Do You want to update %4 on %5 with %3?';
+        UpdateDirectUnitCostQst: Label '%1 on %2 is %3. Do You want to update %4 on %5 with %3?',
+                               Comment = '%1=GiftVoucher.FieldCaption(Amount);%2=GiftVoucher.TableCaption();%3=GiftVoucher.Amount;%4=PurchLine.FieldCaption("Amount Including VAT");%5=PurchLine.TableCaption()';
     begin
-        //-NPR5.22.01
-        /*
-        //-NPR-3.0
-        StdTableCode.K¢bsLinjeValidateGavekort(Rec);
-        //+NPR-3.0
-        */
-        with Rec do begin
-            if "NPR Gift Voucher" <> '' then begin
-                TestField(Type, Type::"G/L Account");
-                "NPR Credit Note" := '';
-                GiftVoucher.Get("NPR Gift Voucher");
-                GiftVoucher.TestField(Status, GiftVoucher.Status::Open);
-                if GiftVoucher.Amount <> "Amount Including VAT" then
-                    if Confirm(StrSubstNo(Text001,
-                      GiftVoucher.FieldCaption(Amount), GiftVoucher.TableCaption,
-                      GiftVoucher.Amount, FieldCaption("Amount Including VAT"), TableCaption)) then begin
-                        "Direct Unit Cost" := GiftVoucher.Amount;
-                        "Direct Unit Cost" := "Direct Unit Cost" / 1 + ("VAT %" / 100);
-                        Validate("Direct Unit Cost", Round("Direct Unit Cost"));
-                    end;
-            end;
+        if Rec."NPR Gift Voucher" <> '' then begin
+            Rec.TestField(Type, Rec.Type::"G/L Account");
+            Rec."NPR Credit Note" := '';
+            GiftVoucher.Get(Rec."NPR Gift Voucher");
+            GiftVoucher.TestField(Status, GiftVoucher.Status::Open);
+            if GiftVoucher.Amount <> Rec."Amount Including VAT" then
+                if Confirm(StrSubstNo(UpdateDirectUnitCostQst,
+                  GiftVoucher.FieldCaption(Amount), GiftVoucher.TableCaption(),
+                  GiftVoucher.Amount, Rec.FieldCaption("Amount Including VAT"), Rec.TableCaption())) then begin
+                    Rec."Direct Unit Cost" := GiftVoucher.Amount;
+                    Rec."Direct Unit Cost" := Rec."Direct Unit Cost" / 1 + (Rec."VAT %" / 100);
+                    Rec.Validate("Direct Unit Cost", Round(Rec."Direct Unit Cost"));
+                end;
         end;
-        //+NPR5.22.01
-
     end;
 
     [EventSubscriber(ObjectType::Table, 39, 'OnAfterValidateEvent', 'NPR Credit Note', true, false)]
     local procedure OnAfterValidateEventCreditNote(var Rec: Record "Purchase Line"; var xRec: Record "Purchase Line"; CurrFieldNo: Integer)
     var
         CreditVoucher: Record "NPR Credit Voucher";
-        Text001: Label '%1 on %2 is %3. Do You want to update %4 on %5 with %3?';
+        UpdateDirectUnitCostQst: Label '%1 on %2 is %3. Do You want to update %4 on %5 with %3?',
+        Comment = '%1=CreditVoucher.FieldCaption(Amount);%2=CreditVoucher.TableCaption();%3=CreditVoucher.Amount;%4=PurchLine.FieldCaption("Amount Including VAT");%5=PurchLine.TableCaption()';
     begin
-        //-NPR5.22.01
-        /*
-        //-NPR-3.0
-        StdTableCode.K¢bsLinjeValidateTilgbevis(Rec)
-        //+NPR-3.0
-        */
-        with Rec do begin
-            if "NPR Credit Note" <> '' then begin
-                TestField(Type, Type::"G/L Account");
-                "NPR Gift Voucher" := '';
-                CreditVoucher.Get("NPR Credit Note");
-                CreditVoucher.TestField(Status, CreditVoucher.Status::Open);
-                if CreditVoucher.Amount <> "Amount Including VAT" then
-                    if Confirm(StrSubstNo(Text001,
-                      CreditVoucher.FieldCaption(Amount), CreditVoucher.TableCaption,
-                      CreditVoucher.Amount, FieldCaption("Amount Including VAT"), TableCaption)) then begin
-                        "Direct Unit Cost" := CreditVoucher.Amount;
-                        "Direct Unit Cost" := "Direct Unit Cost" / 1 + ("VAT %" / 100);
-                        Validate("Direct Unit Cost", Round("Direct Unit Cost"));
-                    end;
-            end;
+        if Rec."NPR Credit Note" <> '' then begin
+            Rec.TestField(Type, Rec.Type::"G/L Account");
+            Rec."NPR Gift Voucher" := '';
+            CreditVoucher.Get(Rec."NPR Credit Note");
+            CreditVoucher.TestField(Status, CreditVoucher.Status::Open);
+            if CreditVoucher.Amount <> Rec."Amount Including VAT" then
+                if Confirm(StrSubstNo(UpdateDirectUnitCostQst,
+                  CreditVoucher.FieldCaption(Amount), CreditVoucher.TableCaption(),
+                  CreditVoucher.Amount, Rec.FieldCaption("Amount Including VAT"), Rec.TableCaption())) then begin
+                    Rec."Direct Unit Cost" := CreditVoucher.Amount;
+                    Rec."Direct Unit Cost" := Rec."Direct Unit Cost" / 1 + (Rec."VAT %" / 100);
+                    Rec.Validate("Direct Unit Cost", Round(Rec."Direct Unit Cost"));
+                end;
         end;
-        //+NPR5.22.01
-
     end;
 
     local procedure GetRetailSetup(): Boolean
@@ -198,7 +113,7 @@ codeunit 6014444 "NPR Event Subscriber (Purch)"
         if RetailSetupFetched then
             exit(true);
 
-        if not RetailSetup.Get then
+        if not RetailSetup.Get() then
             exit(false);
         RetailSetupFetched := true;
         exit(true);

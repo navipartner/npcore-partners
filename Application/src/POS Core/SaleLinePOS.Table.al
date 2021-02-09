@@ -1396,7 +1396,7 @@ table 6014406 "NPR Sale Line POS"
             DataClassification = CustomerContent;
             InitValue = false;
         }
-        field(6015; "Serial No. not Created"; Code[30])
+        field(6015; "Serial No. not Created"; Code[50])
         {
             Caption = 'Serial No. not Created';
             DataClassification = CustomerContent;

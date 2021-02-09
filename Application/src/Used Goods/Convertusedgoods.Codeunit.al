@@ -1,11 +1,10 @@
 codeunit 6014501 "NPR Convert used goods"
 {
-
     TableNo = "NPR Used Goods Registration";
 
     trigger OnRun()
     var
-        ItemCrossReference: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
     begin
         if "Item No. Created" <> '' then
             Error(t001, "Item No. Created");
@@ -33,15 +32,14 @@ codeunit 6014501 "NPR Convert used goods"
             Vare.Validate("NPR Item Group", "Item Group No.");
             Vare.Validate("Unit Price", "Salgspris inkl. Moms");
             Vare.Validate("Unit Cost", "Unit Cost");
-            ItemCrossReference.Init;
-            ItemCrossReference."Item No." := Vare."No.";
-            ItemCrossReference."Unit of Measure" := Vare."Base Unit of Measure";
-            ItemCrossReference."Cross-Reference Type" := ItemCrossReference."Cross-Reference Type"::"Bar Code";
-            ItemCrossReference."Cross-Reference No." := Vare."No.";
-            ItemCrossReference.Description := Vare.Description;
-            ItemCrossReference.Insert();
-            
 
+            ItemReference.Init;
+            ItemReference."Item No." := Vare."No.";
+            ItemReference."Unit of Measure" := Vare."Base Unit of Measure";
+            ItemReference."Reference Type" := ItemReference."Reference Type"::"Bar Code";
+            ItemReference."Reference No." := Vare."No.";
+            ItemReference.Description := Vare.Description;
+            ItemReference.Insert();
 
             if FotoOps."Used Goods Serial No. Mgt." then begin
                 if Serienummer <> '' then begin
@@ -72,7 +70,7 @@ codeunit 6014501 "NPR Convert used goods"
         end;
         Kosterreg := Rec;
         CreateItemJournal(Vare, Kosterreg);
-        
+
     end;
 
     var
@@ -157,7 +155,7 @@ codeunit 6014501 "NPR Convert used goods"
             until UsedGoodsRegistrationRec.Next = 0;
 
         Message(Txt001, SalesHeader."No.");
-        
+
     end;
 
     procedure CreateItemJournal(Item: Record Item; var UsedGoodsRegistration: Record "NPR Used Goods Registration")

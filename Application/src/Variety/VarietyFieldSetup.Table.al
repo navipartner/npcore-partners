@@ -1,15 +1,5 @@
 table 6059975 "NPR Variety Field Setup"
 {
-    // VRT1.01/MMV/20150528 CASE 213635 Added RJL handling to default initialization
-    // VRT1.10/JDH/20160105 CASE 201022 Added extra fields to default initialization
-    // VRT1.11/JDH /20160601 CASE 242940 Changed default page to new lookuppage + Captions + changed a few fieldnames
-    // NPR5.28/JDH /20161024 CASE 255961 Added Field "OnDrillDown Codeunit ID"
-    // NPR5.31/JDH /20170502 CASE 271133 Added Purchase Prices
-    // NPR5.32/JDH /20170510 CASE 274170 Variable Cleanup
-    // NPR5.36/JDH /20170922 CASE 285733 Added Fields for Item Journal Line
-    // NPR5.47/JDH /20180917 CASE 324997 Added Subscriber on every possible lookup
-    // NPR5.47/NPKNAV/20181026  CASE 327541-01 Transport NPR5.47 - 26 October 2018
-
     Caption = 'Variety Field Setup';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Variety Fields Lookup";
@@ -125,7 +115,7 @@ table 6059975 "NPR Variety Field Setup"
         }
         field(40; "Field Type Name"; Text[30])
         {
-            CalcFormula = Lookup (Field."Type Name" WHERE(TableNo = FIELD("Table No."),
+            CalcFormula = Lookup(Field."Type Name" WHERE(TableNo = FIELD("Table No."),
                                                           "No." = FIELD("Field No.")));
             Caption = 'Field Type Name';
             Editable = false;
@@ -340,7 +330,6 @@ table 6059975 "NPR Variety Field Setup"
     var
         Text001: Label 'Inventory';
         CreateVariantDesc: Label 'Create Variants';
-        ItemCrossRef: Label 'Item Cross References';
 
     procedure InitVarietyFields()
     var
@@ -440,7 +429,6 @@ table 6059975 "NPR Variety Field Setup"
         InsertVarietyFields(0, 125, 41, true, false, false, 3, 0, 0, '', 'GetQuantityAvailableToPromise', '', false, '', false);
         InsertVarietyFields(0, 125, 5402, true, false, false, 3, 0, 0, '', 'GetQuantityAvailableToPromise', '', false, '', false);
 
-        //Item Variant
         InsertVarietyFields(0, 5401, 1, true, false, false, 3, 0, 0, '', 'GetQuantityAvailableToPromise', '', false, '', false);
         InsertVarietyFields(0, 5401, 6059982, true, true, false, 3, 0, 0, '', 'GetQuantityAvailableToPromise', '', false, '', false);
 
@@ -450,25 +438,18 @@ table 6059975 "NPR Variety Field Setup"
         InsertVarietyFields(1, 5401, 2, false, false, true, 0, 0, 0, '', '', '', false, '', false);
         SetDescription(1, 5401, 2, CreateVariantDesc);
 
-        //-NPR5.47 [327541]
-        //InsertVarietyFields(1,5401,3,FALSE,FALSE,FALSE, 3, 0, 0, '', 'GetQuantityAvailableToPromise', '', FALSE, '', FALSE);
-        //SetDescription(1,5401,3, ItemCrossRef);
         if VRTFieldsSetup.Get(1, 5401, 3) then
             VRTFieldsSetup.Delete;
         InsertVarietyFields(3, 5401, 100000, false, true, false, 0, 0, 0, 'GetItemCrossReference', '', 'LookupItemCrossReference', true, '', false);
 
         InsertVarietyFields(3, 5401, 100001, false, false, false, 3, 0, 0, 'GetExpectedInventory', 'GetPlannedOrderRcpt', 'LookupAvailabilityByEvent', false, 'LookupAvailabilityByLocation', false);
-        //+NPR5.47 [327541]
 
-        //Transfer Line
         InsertVarietyFields(0, 5741, 4, true, true, true, 3, 0, 0, '', 'GetQuantityAvailableToPromise', 'LookupAvailabilityByLocation', false, '', false);
         InsertVarietyFields(0, 5741, 6, true, true, false, 0, 5741, 4, '', '', '', false, '', false);
         InsertVarietyFields(0, 5741, 7, true, true, false, 0, 5741, 4, '', '', '', false, '', false);
 
-        //Sales Price
         InsertVarietyFields(0, 7002, 5, true, true, false, 3, 0, 0, '', 'GetQuantityAvailableToPromise', '', false, '', false);
 
-        //Retail Journal Line
         InsertVarietyFields(0, 6014422, 3, true, true, false, 3, 0, 0, '', 'GetQuantityAvailableToPromise', '', false, '', false);
         InsertVarietyFields(0, 6014422, 7, true, true, false, 3, 0, 0, '', 'GetQuantityAvailableToPromise', '', false, '', false);
         InsertVarietyFields(0, 6014422, 8, true, true, false, 3, 0, 0, '', 'GetQuantityAvailableToPromise', '', false, '', false);
@@ -476,17 +457,12 @@ table 6059975 "NPR Variety Field Setup"
         InsertVarietyFields(0, 6014422, 18, true, false, false, 3, 0, 0, '', 'GetQuantityAvailableToPromise', '', false, '', false);
         InsertVarietyFields(0, 6014422, 47, true, false, false, 3, 0, 0, '', 'GetQuantityAvailableToPromise', '', false, '', false);
 
-        //-NPR5.31 [271133]
-        //Purchase Price
         InsertVarietyFields(0, 7012, 5, true, true, true, 3, 0, 0, '', 'GetQuantityAvailableToPromise', '', false, '', false);
-        //+NPR5.31 [271133]
 
-        //-NPR5.36 [285733]
         InsertVarietyFields(0, 83, 9, true, true, false, 3, 0, 0, '', 'GetQuantityAvailableToPromise', '', false, '', false);
         InsertVarietyFields(0, 83, 13, true, true, true, 3, 0, 0, '', 'GetQuantityAvailableToPromise', '', false, '', false);
         InsertVarietyFields(0, 83, 15, true, true, false, 3, 0, 0, '', 'GetQuantityAvailableToPromise', '', false, '', false);
         InsertVarietyFields(0, 83, 50, true, true, false, 3, 0, 0, '', 'GetQuantityAvailableToPromise', '', false, '', false);
-        //+NPR5.36 [285733]
 
         Commit;
     end;
@@ -495,11 +471,7 @@ table 6059975 "NPR Variety Field Setup"
     var
         VRTFieldsSetup: Record "NPR Variety Field Setup";
     begin
-        //-VRT1.20
-        if VRTFieldsSetup.Get(Type, TableNo, FieldNo) then
-        //-NPR5.47 [327541]
-        //EXIT;
-        begin
+        if VRTFieldsSetup.Get(Type, TableNo, FieldNo) then begin
             if (VRTFieldsSetup."Secondary Type" = 1) and
                (VRTFieldsSetup."Secondary Table No." = 1) and
                (VRTFieldsSetup."Secondary Field No." = 1) then begin
@@ -517,7 +489,6 @@ table 6059975 "NPR Variety Field Setup"
 
             exit;
         end;
-        //+VRT1.20
 
         VRTFieldsSetup.Init;
         VRTFieldsSetup.Type := Type;

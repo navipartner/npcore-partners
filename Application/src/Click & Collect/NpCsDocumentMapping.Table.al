@@ -37,20 +37,20 @@ table 6151201 "NPR NpCs Document Mapping"
             Caption = 'From Description 2';
             DataClassification = CustomerContent;
         }
-        field(100; "To No."; Code[20])
+        field(100; "To No."; Code[50])
         {
             Caption = 'To No.';
             DataClassification = CustomerContent;
             TableRelation = IF (Type = CONST("Customer No.")) Customer
             ELSE
-            IF (Type = CONST("Item Cross Reference No.")) "Item Cross Reference"."Cross-Reference No." WHERE("Cross-Reference Type" = CONST("Bar Code"));
+            IF (Type = CONST("Item Cross Reference No.")) "Item Reference"."Reference No." WHERE("Reference Type" = CONST("Bar Code"));
 
             trigger OnValidate()
             var
                 Customer: Record Customer;
                 Item: Record Item;
                 ItemVariant: Record "Item Variant";
-                ItemCrossRef: Record "Item Cross Reference";
+                ItemReference: Record "Item Reference";
             begin
                 if "To No." = '' then begin
                     "To Description" := '';
@@ -67,13 +67,13 @@ table 6151201 "NPR NpCs Document Mapping"
                         end;
                     Type::"Item Cross Reference No.":
                         begin
-                            ItemCrossRef.SetRange("Cross-Reference No.", "To No.");
-                            ItemCrossRef.SetRange("Discontinue Bar Code", false);
-                            if not ItemCrossRef.FindFirst then
-                                ItemCrossRef.SetRange("Discontinue Bar Code");
-                            ItemCrossRef.FindFirst;
-                            Item.Get(ItemCrossRef."Item No.");
-                            if ItemVariant.Get(ItemCrossRef."Item No.", ItemCrossRef."Variant Code") then;
+                            ItemReference.SetRange("Reference No.", "To No.");
+                            ItemReference.SetRange("Discontinue Bar Code", false);
+                            if not ItemReference.FindFirst then
+                                ItemReference.SetRange("Discontinue Bar Code");
+                            ItemReference.FindFirst;
+                            Item.Get(ItemReference."Item No.");
+                            if ItemVariant.Get(ItemReference."Item No.", ItemReference."Variant Code") then;
                             "To Description" := Item.Description;
                             "To Description 2" := ItemVariant.Description;
                         end;

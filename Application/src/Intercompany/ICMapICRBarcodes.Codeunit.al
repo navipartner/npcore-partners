@@ -1,13 +1,5 @@
 codeunit 6014486 "NPR IC - Map ICR Barcodes"
 {
-    // NPR5.46/JDH /2011101 CASE 324997 Codeunit to get the item cross reference and send it to the IC Partner
-    // NPR5.51/BHR /20190718 CASE 361679 Change publisher on subscriber OnICOutboxTransactionCreated from ICOutboxTransactionCreated to OnInsertICOutboxSalesDocTransaction
-
-
-    trigger OnRun()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 427, 'OnInsertICOutboxSalesDocTransaction', '', false, false)]
     local procedure OnICOutboxTransactionCreated(var ICOutboxTransaction: Record "IC Outbox Transaction")
     begin
@@ -115,17 +107,17 @@ codeunit 6014486 "NPR IC - Map ICR Barcodes"
 
     local procedure GetICR(ItemNo: Code[20]; VariantCode: Code[10]): Code[20]
     var
-        ItemCrossReference: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
     begin
-        ItemCrossReference.SetRange("Item No.", ItemNo);
-        ItemCrossReference.SetRange("Variant Code", VariantCode);
-        ItemCrossReference.SetRange("Discontinue Bar Code", false);
-        if ItemCrossReference.FindFirst then
-            exit(ItemCrossReference."Cross-Reference No.");
+        ItemReference.SetRange("Item No.", ItemNo);
+        ItemReference.SetRange("Variant Code", VariantCode);
+        ItemReference.SetRange("Discontinue Bar Code", false);
+        if ItemReference.FindFirst then
+            exit(ItemReference."Reference No.");
 
-        ItemCrossReference.SetRange("Discontinue Bar Code");
-        if ItemCrossReference.FindFirst then
-            exit(ItemCrossReference."Cross-Reference No.");
+        ItemReference.SetRange("Discontinue Bar Code");
+        if ItemReference.FindFirst then
+            exit(ItemReference."Reference No.");
     end;
 }
 

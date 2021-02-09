@@ -84,7 +84,7 @@ xmlport 6151147 "NPR M2 Item Availab. By Period"
                 {
                     MaxOccurs = Once;
                     XmlName = 'Items';
-                    tableelement(tmpitemrequest; "Item Cross Reference")
+                    tableelement(tmpitemrequest; "Item Reference")
                     {
                         XmlName = 'Item';
                         UseTemporary = true;
@@ -127,7 +127,7 @@ xmlport 6151147 "NPR M2 Item Availab. By Period"
                         MaxOccurs = Once;
                         MinOccurs = Zero;
                         XmlName = 'Items';
-                        tableelement(tmpitemresponse; "Item Cross Reference")
+                        tableelement(tmpitemresponse; "Item Reference")
                         {
                             MinOccurs = Zero;
                             XmlName = 'Item';

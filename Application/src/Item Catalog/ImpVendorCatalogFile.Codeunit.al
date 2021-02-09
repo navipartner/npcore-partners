@@ -294,24 +294,18 @@ codeunit 6060061 "NPR Imp. Vendor Catalog File"
 
     local procedure IdentifyItem(VendorNo: Code[20]; var FieldArray: array[200] of Text; var Item: Record Item): Boolean
     var
-        ItemCrossReference: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
     begin
         if VendorNo <> '' then
             Item.SetRange("Vendor No.", VendorNo);
-        //-NPR5.42
-        //Item.SETFILTER("Vendor Item No.",'=%1',FieldArray[6]);
         Item.SetFilter("Vendor Item No.", '=%1', FieldArray[4]);
-        //+NPR5.42
         if Item.FindFirst then
             exit(true);
-        ItemCrossReference.Reset;
-        ItemCrossReference.SetRange("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::"Bar Code");
-        //-NPR5.42
-        //ItemCrossReference.SETRANGE("Cross-Reference No.",FieldArray[7]);
-        ItemCrossReference.SetRange("Cross-Reference No.", FieldArray[5]);
-        //+NPR5.42
-        if ItemCrossReference.FindFirst then begin
-            Item.Get(ItemCrossReference."Item No.");
+        ItemReference.Reset;
+        ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
+        ItemReference.SetRange("Reference No.", FieldArray[5]);
+        if ItemReference.FindFirst then begin
+            Item.Get(ItemReference."Item No.");
             exit(true);
         end;
         exit(false);
@@ -319,33 +313,24 @@ codeunit 6060061 "NPR Imp. Vendor Catalog File"
 
     local procedure FindVendor(var FieldArray: array[200] of Text; SkipUnmappedVendors: Boolean): Code[20]
     var
-        ItemCrossReference: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
         CatalogSupplier: Record "NPR Catalog Supplier";
     begin
         if SkipUnmappedVendors then begin
-            //-NPR5.42
-            //IF NOT CatalogSupplier.GET(UPPERCASE(FieldArray[5])) THEN
             if not CatalogSupplier.Get(UpperCase(FieldArray[3])) then
-                //+NPR5.42
                 exit('');
         end else
-            //-NPR5.42
-            //CatalogSupplier.GET(UPPERCASE(FieldArray[5]));
             CatalogSupplier.Get(UpperCase(FieldArray[3]));
-        //+NPR5.42
         exit(CatalogSupplier."Vendor No.");
     end;
 
     local procedure IdentifyNonStockItem(VendorNo: Code[20]; var FieldArray: array[200] of Text; var NonstockItem: Record "Nonstock Item"): Boolean
     var
-        ItemCrossReference: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
     begin
         if VendorNo <> '' then
             NonstockItem.SetRange("Vendor No.", VendorNo);
-        //-NPR5.42
-        //NonstockItem.SETFILTER("Vendor Item No.",'=%1',FieldArray[6]);
         NonstockItem.SetFilter("Vendor Item No.", '=%1', FieldArray[4]);
-        //+NPR5.42
         if NonstockItem.FindFirst then
             exit(true);
     end;
@@ -353,12 +338,8 @@ codeunit 6060061 "NPR Imp. Vendor Catalog File"
     local procedure CheckMandatoryFields(FieldArray: array[200] of Text)
     begin
         CheckMandatoryField(FieldArray, 5);
-        //-NPR5.42
-        //CheckMandatoryField(FieldArray,6);
-        //CheckMandatoryField(FieldArray,7);
         CheckMandatoryField(FieldArray, 3);
         CheckMandatoryField(FieldArray, 4);
-        //+NPR5.42
     end;
 
     local procedure CheckMandatoryField(FieldArray: array[200] of Text; FieldNumber: Integer)

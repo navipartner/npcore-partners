@@ -87,7 +87,7 @@ page 6014402 "NPR Retail Item Journal"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Cross-Reference No."; "Cross-Reference No.")
+                field("Cross-Reference No."; "Item Reference No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Cross-Reference No. field';

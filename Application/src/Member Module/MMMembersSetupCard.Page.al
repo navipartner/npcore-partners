@@ -286,7 +286,7 @@ page 6060076 "NPR MM Members.Setup Card"
             }
             group("On Membercard Swipe")
             {
-                field("Ticket Item Barcode"; "Ticket Item Barcode")
+                field("Ticket Item Barcode"; Rec."Ticket Item Barcode")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ticket Item Barcode field';

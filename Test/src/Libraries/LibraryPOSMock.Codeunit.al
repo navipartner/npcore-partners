@@ -35,7 +35,7 @@ codeunit 85003 "NPR Library - POS Mock"
     var
         POSActionInsertItem: Codeunit "NPR POS Action: Insert Item";
         Item: Record Item;
-        ItemCrossReference: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR Sale POS";
@@ -44,7 +44,7 @@ codeunit 85003 "NPR Library - POS Mock"
         POSSession.GetFrontEnd(FrontEnd, true);
         Item.Get(ItemNo);
 
-        POSActionInsertItem.AddItemLine(Item, ItemCrossReference, 0, Quantity, 0, false, '', '', false, '', POSSession, FrontEnd); //Insert step of item action
+        POSActionInsertItem.AddItemLine(Item, ItemReference, 0, Quantity, 0, false, '', '', false, '', POSSession, FrontEnd); //Insert step of item action
     end;
 
     procedure EndSale(POSSession: Codeunit "NPR POS Session"): Boolean

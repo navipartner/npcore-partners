@@ -83,7 +83,7 @@ xmlport 6014414 "NPR Import from ScannerFilePO"
         PurchaseLine.Type := PurchaseLine.Type::Item;
         PurchaseLine."No." := '';
 
-        PurchaseLine.Validate("Cross-Reference No.", scanned_item_code);
+        PurchaseLine.Validate("Item Reference No.", scanned_item_code);
         Evaluate(PurchaseLine.Quantity, quantity);
         PurchaseLine.Validate(Quantity);
         PurchaseLine.Insert;

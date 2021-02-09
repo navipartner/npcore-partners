@@ -1,9 +1,5 @@
 codeunit 6014438 "NPR Scanner - Functions"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         SH: Record "Sales Header";
         SL: Record "Sales Line";
@@ -772,7 +768,7 @@ codeunit 6014438 "NPR Scanner - Functions"
     local procedure getItem(var vnr: Code[30]; var beskr: Text[30]; var beskr2: Text[30]; var Varkode: Code[20]): Integer
     var
         vnr_orig: Text[30];
-        ItemCrossReference: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
         BarcodeLibrary: Codeunit "NPR Barcode Library";
         ResTable: Integer;
         Item2: Record Item;
@@ -792,7 +788,7 @@ codeunit 6014438 "NPR Scanner - Functions"
                 begin
                     beskr := CopyStr('---> ' + ItemNo + ' ' + t002, 1, MaxStrLen(beskr));
                     beskr2 := vnr;
-                    vnr := ''; //dont want to use this item, as its blocked
+                    vnr := '';
                     exit;
                 end;
             ((Item2."Vendor No." <> '') and (not Vend.Get(Item2."Vendor No."))):
@@ -818,8 +814,6 @@ codeunit 6014438 "NPR Scanner - Functions"
         i: Integer;
         t002: Label 'No scanner selected. Scanning stopped!';
     begin
-        //askScanner
-
         askStr := '';
         i := 0;
 

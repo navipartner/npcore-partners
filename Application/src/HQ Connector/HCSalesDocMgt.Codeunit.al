@@ -94,10 +94,6 @@ codeunit 6150906 "NPR HC Sales Doc. Mgt."
         exit(true);
     end;
 
-    local procedure "--- Database"()
-    begin
-    end;
-
     local procedure InsertSalesHeader(Element: XmlElement; var SalesHeader: Record "Sales Header")
     var
         TempSalesHeader: Record "Sales Header" temporary;
@@ -385,10 +381,10 @@ codeunit 6150906 "NPR HC Sales Doc. Mgt."
         Evaluate(TempSalesLine."Out-of-Stock Substitution", NpXmlDomMgt.GetXmlText(Element, 'outofstocksubstitution', 0, false), 9);
         TempSalesLine."Originally Ordered No." := NpXmlDomMgt.GetXmlText(Element, 'originallyorderedno', 0, false);
         TempSalesLine."Originally Ordered Var. Code" := NpXmlDomMgt.GetXmlText(Element, 'originallyorderedvarcode', 0, false);
-        TempSalesLine."Cross-Reference No." := NpXmlDomMgt.GetXmlText(Element, 'crossreferenceno', 0, false);
-        TempSalesLine."Unit of Measure (Cross Ref.)" := NpXmlDomMgt.GetXmlText(Element, 'unitofmeasurecrossref', 0, false);
-        Evaluate(TempSalesLine."Cross-Reference Type", NpXmlDomMgt.GetXmlText(Element, 'crossreferencetype', 0, false), 9);
-        TempSalesLine."Cross-Reference Type No." := NpXmlDomMgt.GetXmlText(Element, 'crossreferencetypeno', 0, false);
+        TempSalesLine."Item Reference No." := NpXmlDomMgt.GetXmlText(Element, 'crossreferenceno', 0, false);
+        TempSalesLine."Item Reference Unit of Measure" := NpXmlDomMgt.GetXmlText(Element, 'unitofmeasurecrossref', 0, false);
+        Evaluate(TempSalesLine."Item Reference Type", NpXmlDomMgt.GetXmlText(Element, 'crossreferencetype', 0, false), 9);
+        TempSalesLine."Item Reference Type No." := NpXmlDomMgt.GetXmlText(Element, 'crossreferencetypeno', 0, false);
         TempSalesLine."Item Category Code" := NpXmlDomMgt.GetXmlText(Element, 'itemcategorycode', 0, false);
         Evaluate(TempSalesLine.Nonstock, NpXmlDomMgt.GetXmlText(Element, 'nonstock', 0, false), 9);
         TempSalesLine."Purchasing Code" := NpXmlDomMgt.GetXmlText(Element, 'purchasingcode', 0, false);

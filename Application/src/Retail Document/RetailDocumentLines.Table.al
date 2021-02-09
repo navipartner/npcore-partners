@@ -611,7 +611,7 @@ table 6014426 "NPR Retail Document Lines"
             Caption = 'Belongs to Item';
             DataClassification = CustomerContent;
         }
-        field(202; "Serial No. not Created"; Code[30])
+        field(202; "Serial No. not Created"; Code[50])
         {
             Caption = 'Serial No. not Created';
             DataClassification = CustomerContent;

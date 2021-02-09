@@ -1,8 +1,8 @@
 report 6060110 "NPR Add EAN barcode to items"
 {
     Caption = 'Add EAN barcode to all items';
-    ProcessingOnly = true; 
-    UsageCategory = ReportsAndAnalysis; 
+    ProcessingOnly = true;
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     UseRequestPage = false;
 
@@ -80,7 +80,7 @@ report 6060110 "NPR Add EAN barcode to items"
         ExportItemsQst: Label 'Do you want to export all item barcodes and associated alternative numbers first?';
         CreateBarcodeErr: Label 'Error when creating new barcode';
 
-    local procedure CheckBarcodeValid(barcode: Code[20]): Boolean
+    local procedure CheckBarcodeValid(barcode: Code[50]): Boolean
     var
         Vare: Record Item;
         "alt.varenummer": Record "NPR Alternative No.";

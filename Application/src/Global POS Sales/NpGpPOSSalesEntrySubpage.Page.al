@@ -13,7 +13,7 @@ page 6151168 "NPR NpGp POSSalesEntry Subpage"
         {
             repeater(Group)
             {
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
@@ -23,127 +23,127 @@ page 6151168 "NPR NpGp POSSalesEntry Subpage"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field("Cross-Reference No."; "Cross-Reference No.")
+                field("Item Reference No."; Rec."Cross-Reference No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Cross-Reference No. field';
                 }
-                field("BOM Item No."; "BOM Item No.")
+                field("BOM Item No."; Rec."BOM Item No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the BOM Item No. field';
                 }
-                field("Location Code"; "Location Code")
+                field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Location Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Description 2"; "Description 2")
+                field("Description 2"; Rec."Description 2")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description 2 field';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field("Unit of Measure Code"; "Unit of Measure Code")
+                field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit of Measure Code field';
                 }
-                field("Qty. per Unit of Measure"; "Qty. per Unit of Measure")
+                field("Qty. per Unit of Measure"; Rec."Qty. per Unit of Measure")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Qty. per Unit of Measure field';
                 }
-                field("Quantity (Base)"; "Quantity (Base)")
+                field("Quantity (Base)"; Rec."Quantity (Base)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Quantity (Base) field';
                 }
-                field("Unit Price"; "Unit Price")
+                field("Unit Price"; Rec."Unit Price")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit Price field';
                 }
-                field("Currency Code"; "Currency Code")
+                field("Currency Code"; Rec."Currency Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Currency Code field';
                 }
-                field("VAT %"; "VAT %")
+                field("VAT %"; Rec."VAT %")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the VAT % field';
                 }
-                field("Line Discount %"; "Line Discount %")
+                field("Line Discount %"; Rec."Line Discount %")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Line Discount % field';
                 }
-                field("Line Discount Amount Excl. VAT"; "Line Discount Amount Excl. VAT")
+                field("Line Discount Amount Excl. VAT"; Rec."Line Discount Amount Excl. VAT")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Line Discount Amount Excl. VAT field';
                 }
-                field("Line Discount Amount Incl. VAT"; "Line Discount Amount Incl. VAT")
+                field("Line Discount Amount Incl. VAT"; Rec."Line Discount Amount Incl. VAT")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Line Discount Amount field';
                 }
-                field("Line Amount"; "Line Amount")
+                field("Line Amount"; Rec."Line Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Line Amount field';
                 }
-                field("Amount Excl. VAT"; "Amount Excl. VAT")
+                field("Amount Excl. VAT"; Rec."Amount Excl. VAT")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount Excl. VAT field';
                 }
-                field("Amount Incl. VAT"; "Amount Incl. VAT")
+                field("Amount Incl. VAT"; Rec."Amount Incl. VAT")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount Incl. VAT field';
                 }
-                field("Line Dsc. Amt. Excl. VAT (LCY)"; "Line Dsc. Amt. Excl. VAT (LCY)")
+                field("Line Dsc. Amt. Excl. VAT (LCY)"; Rec."Line Dsc. Amt. Excl. VAT (LCY)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Line Dsc. Amt. Excl. VAT (LCY) field';
                 }
-                field("Line Dsc. Amt. Incl. VAT (LCY)"; "Line Dsc. Amt. Incl. VAT (LCY)")
+                field("Line Dsc. Amt. Incl. VAT (LCY)"; Rec."Line Dsc. Amt. Incl. VAT (LCY)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Line Dsc. Amt. Incl. VAT (LCY) field';
                 }
-                field("Amount Excl. VAT (LCY)"; "Amount Excl. VAT (LCY)")
+                field("Amount Excl. VAT (LCY)"; Rec."Amount Excl. VAT (LCY)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount Excl. VAT (LCY) field';
                 }
-                field("Amount Incl. VAT (LCY)"; "Amount Incl. VAT (LCY)")
+                field("Amount Incl. VAT (LCY)"; Rec."Amount Incl. VAT (LCY)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount Incl. VAT (LCY) field';
                 }
-                field("Line No."; "Line No.")
+                field("Line No."; Rec."Line No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Line No. field';
                 }
-                field("Retail ID"; "Retail ID")
+                field("Retail ID"; Rec."Retail ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Retail ID field';
@@ -173,8 +173,6 @@ page 6151168 "NPR NpGp POSSalesEntry Subpage"
                 RunObject = Page "NPR NpGp POS Info POS Entry";
                 ApplicationArea = All;
                 ToolTip = 'Executes the POS Info action';
-                //RunPageLink = "POS Entry No."=FIELD("POS Entry No."),
-                //              "Sales Line No."=FIELD("Line No.");
             }
         }
     }

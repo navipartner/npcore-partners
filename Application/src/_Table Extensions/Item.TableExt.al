@@ -32,14 +32,14 @@ tableextension 6014427 "NPR Item" extends Item
             Editable = false;
             FieldClass = FlowField;
         }
-        field(6014410; "NPR Label Barcode"; Code[20])
+        field(6014410; "NPR Label Barcode"; Code[50])
         {
             Caption = 'Label barcode';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
-            TableRelation = IF ("NPR Create Alt. No. Automatic" = CONST(false)) "Item Cross Reference"."Cross-Reference No." WHERE("Cross-Reference Type" = CONST("Bar Code"),
+            TableRelation = IF ("NPR Create Alt. No. Automatic" = CONST(false)) "Item Reference"."Reference No." WHERE("Reference Type" = CONST("Bar Code"),
                                                                                                                               "Item No." = FIELD("No."),
-                                                                                                                              "Cross-Reference No." = FILTER(<> ''),
+                                                                                                                              "Reference No." = FILTER(<> ''),
                                                                                                                               "Variant Code" = CONST(''))
             ELSE
             IF ("NPR Create Alt. No. Automatic" = CONST(true)) "NPR Alternative No."."Alt. No." WHERE(Type = CONST(Item),

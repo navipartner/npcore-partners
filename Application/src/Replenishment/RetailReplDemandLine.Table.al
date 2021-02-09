@@ -600,7 +600,6 @@ table 6151061 "NPR Retail Repl. Demand Line"
     local procedure UpdateDescription()
     var
         ItemVend: Record "Item Vendor";
-        ItemCrossRef: Record "Item Cross Reference";
         ItemTranslation: Record "Item Translation";
         Vend: Record Vendor;
     begin
