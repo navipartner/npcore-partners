@@ -1,20 +1,6 @@
 codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
 {
-    // MAG2.23/MHA /20190813  CASE 355841 Object created for Magento 2 Payment Capture/Cancel/Refund
-
-
-    trigger OnRun()
-    begin
-    end;
-
-    var
-        Text000: Label 'Quickpay error:\%1';
-
-    local procedure "--- Subscriber"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6151416, 'CapturePaymentEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'CapturePaymentEvent', '', true, true)]
     local procedure OnCapturePayment(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
     begin
         if not IsM2PaymentLine(PaymentLine) then
@@ -28,7 +14,7 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
         PaymentLine.Modify(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151416, 'CancelPaymentEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'CancelPaymentEvent', '', true, true)]
     local procedure OnCancelPayment(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
     begin
         if not IsM2PaymentLine(PaymentLine) then
@@ -39,7 +25,7 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
         Cancel(PaymentLine);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151416, 'RefundPaymentEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'RefundPaymentEvent', '', true, true)]
     local procedure OnRefundPayment(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
     begin
         if not IsM2RefundLine(PaymentLine) then
@@ -53,7 +39,7 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
         PaymentLine.Modify(true);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151413, 'OnAfterValidateEvent', 'Capture Codeunit Id', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Payment Gateway", 'OnAfterValidateEvent', 'Capture Codeunit Id', true, true)]
     local procedure OnValidateCaptureCodeunitId(var Rec: Record "NPR Magento Payment Gateway")
     begin
         if Rec."Capture Codeunit Id" <> CurrCodeunitId then
@@ -62,7 +48,7 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
         SetApiInfo(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151413, 'OnAfterValidateEvent', 'Refund Codeunit Id', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Payment Gateway", 'OnAfterValidateEvent', 'Refund Codeunit Id', true, true)]
     local procedure OnValidateRefundCodeunitId(var Rec: Record "NPR Magento Payment Gateway")
     begin
         if Rec."Refund Codeunit Id" <> CurrCodeunitId then
@@ -71,7 +57,7 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
         SetApiInfo(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151413, 'OnAfterValidateEvent', 'Cancel Codeunit Id', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Payment Gateway", 'OnAfterValidateEvent', 'Cancel Codeunit Id', true, true)]
     local procedure OnValidateCancelCodeunitId(var Rec: Record "NPR Magento Payment Gateway")
     begin
         if Rec."Cancel Codeunit Id" <> CurrCodeunitId then
@@ -80,9 +66,7 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
         SetApiInfo(Rec);
     end;
 
-    procedure "--- Payment Integration"()
-    begin
-    end;
+    #region Payment Integration
 
     local procedure Capture(PaymentLine: Record "NPR Magento Payment Line")
     var
@@ -92,10 +76,8 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
         SalesInvLine: Record "Sales Invoice Line";
         PaymentGateway: Record "NPR Magento Payment Gateway";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        JToken: DotNet NPRNetJToken;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        WebException: DotNet NPRNetWebException;
+        JToken: JsonToken;
+        HttpWebRequest: HttpRequestMessage;
         Url: Text;
         Request: Text;
         OrderId: Text;
@@ -107,7 +89,6 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
         PaymentGateway.Get(PaymentLine."Payment Gateway Code");
         PaymentGateway.TestField("Api Url");
         Url := PaymentGateway."Api Url" + '/invoice';
-        InitWebRequest(Url, PaymentGateway."Api Password", HttpWebRequest);
 
         case PaymentLine."Document Table No." of
             DATABASE::"Sales Header":
@@ -175,21 +156,10 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
             '}' +
           '}';
 
-        if not NpXmlDomMgt.SendWebRequestText(Request, HttpWebRequest, HttpWebResponse, WebException) then begin
-            ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-            if ParseJson(ErrorMessage, JToken) then begin
-                Response := GetJsonText(JToken, 'messages.error[0].message', 0);
-                if Response = '' then
-                    Response := GetJsonText(JToken, 'message', 0);
+        InitWebRequest(Url, PaymentGateway.GetApiPassword(), HttpWebRequest, Request);
 
-                if Response <> '' then
-                    Error(Response);
-            end;
-            Error(CopyStr(ErrorMessage, 1, 1020));
-        end;
-
-        ResponseJson := NpXmlDomMgt.GetWebResponseText(HttpWebResponse);
-        if not ParseJson(ResponseJson, JToken) then
+        ResponseJson := SendWebRequest(HttpWebRequest);
+        if not JToken.ReadFrom(ResponseJson) then
             Error(ResponseJson);
 
         Response := GetJsonText(JToken, 'messages.success', 0);
@@ -204,10 +174,8 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
         MagentoOrderStatus: Record "NPR Magento Order Status";
         PaymentGateway: Record "NPR Magento Payment Gateway";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        JToken: DotNet NPRNetJToken;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        WebException: DotNet NPRNetWebException;
+        JToken: JsonToken;
+        HttpWebRequest: HttpRequestMessage;
         Url: Text;
         Request: Text;
         ErrorMessage: Text;
@@ -225,7 +193,6 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
         PaymentGateway.Get(PaymentLine."Payment Gateway Code");
         PaymentGateway.TestField("Api Url");
         Url := PaymentGateway."Api Url" + '/cancelorder';
-        InitWebRequest(Url, PaymentGateway."Api Password", HttpWebRequest);
 
         Request :=
           '{' +
@@ -234,21 +201,10 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
             '}' +
           '}';
 
-        if not NpXmlDomMgt.SendWebRequestText(Request, HttpWebRequest, HttpWebResponse, WebException) then begin
-            ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-            if ParseJson(ErrorMessage, JToken) then begin
-                Response := GetJsonText(JToken, 'messages.error[0].message', 0);
-                if Response = '' then
-                    Response := GetJsonText(JToken, 'message', 0);
+        InitWebRequest(Url, PaymentGateway.GetApiPassword(), HttpWebRequest, Request);
 
-                if Response <> '' then
-                    Error(Response);
-            end;
-            Error(CopyStr(ErrorMessage, 1, 1020));
-        end;
-
-        ResponseJson := NpXmlDomMgt.GetWebResponseText(HttpWebResponse);
-        if not ParseJson(ResponseJson, JToken) then
+        ResponseJson := SendWebRequest(HttpWebRequest);
+        if not JToken.ReadFrom(ResponseJson) then
             Error(ResponseJson);
 
         Response := GetJsonText(JToken, 'messages.success', 0);
@@ -266,10 +222,8 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         PaymentGateway: Record "NPR Magento Payment Gateway";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        JToken: DotNet NPRNetJToken;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        WebException: DotNet NPRNetWebException;
+        JToken: JsonToken;
+        HttpWebRequest: HttpRequestMessage;
         Url: Text;
         Request: Text;
         OrderId: Text;
@@ -281,7 +235,6 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
         PaymentGateway.Get(PaymentLine."Payment Gateway Code");
         PaymentGateway.TestField("Api Url");
         Url := PaymentGateway."Api Url" + '/refundorder';
-        InitWebRequest(Url, PaymentGateway."Api Password", HttpWebRequest);
 
         case PaymentLine."Document Table No." of
             DATABASE::"Sales Header":
@@ -353,21 +306,10 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
             '}' +
           '}';
 
-        if not NpXmlDomMgt.SendWebRequestText(Request, HttpWebRequest, HttpWebResponse, WebException) then begin
-            ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-            if ParseJson(ErrorMessage, JToken) then begin
-                Response := GetJsonText(JToken, 'messages.error[0].message', 0);
-                if Response = '' then
-                    Response := GetJsonText(JToken, 'message', 0);
+        InitWebRequest(Url, PaymentGateway.GetApiPassword(), HttpWebRequest, Request);
 
-                if Response <> '' then
-                    Error(Response);
-            end;
-            Error(CopyStr(ErrorMessage, 1, 1020));
-        end;
-
-        ResponseJson := NpXmlDomMgt.GetWebResponseText(HttpWebResponse);
-        if not ParseJson(ResponseJson, JToken) then
+        ResponseJson := SendWebRequest(HttpWebRequest);
+        if not JToken.ReadFrom(ResponseJson) then
             Error(ResponseJson);
 
         Response := GetJsonText(JToken, 'messages.success', 0);
@@ -377,9 +319,9 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
         Error('%1', JToken);
     end;
 
-    procedure "--- Aux"()
-    begin
-    end;
+    #endregion
+
+    #region Aux
 
     local procedure SetApiInfo(var MagentoPaymentGateway: Record "NPR Magento Payment Gateway")
     var
@@ -390,21 +332,45 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
 
         if MagentoPaymentGateway."Api Url" = '' then
             MagentoPaymentGateway."Api Url" := CopyStr(MagentoSetup."Api Url" + 'paymentprocessor', 1, MaxStrLen(MagentoPaymentGateway."Api Url"));
-        if MagentoPaymentGateway."Api Password" = '' then
-            MagentoPaymentGateway."Api Password" := MagentoSetup."Api Authorization";
+        if MagentoPaymentGateway.GetApiPassword() = '' then
+            MagentoPaymentGateway.SetApiPassword(MagentoSetup."Api Authorization");
     end;
 
-    local procedure InitWebRequest(Url: Text; Authorization: Text; var HttpWebRequest: DotNet NPRNetHttpWebRequest)
+    local procedure InitWebRequest(Url: Text; Authorization: Text; var HttpWebRequest: HttpRequestMessage; RequestBody: Text)
     var
-        Credential: DotNet NPRNetNetworkCredential;
-        Uri: DotNet NPRNetUri;
+        Content: HttpContent;
+        Headers: HttpHeaders;
+        HeadersReq: HttpHeaders;
     begin
-        HttpWebRequest := HttpWebRequest.Create(Uri.Uri(Url));
+        HttpWebRequest.GetHeaders(HeadersReq);
+        Content.GetHeaders(Headers);
+        Content.WriteFrom(RequestBody);
+        if Headers.Contains('Content-Type') then
+            Headers.Remove('Content-Type');
+
+        Headers.Add('Content-Type', 'naviconnect/json');
+        Headers.Add('Accept', 'application/json');
+        HeadersReq.Add('Authorization', 'bearer ' + Authorization);
+
+        HttpWebRequest.Content(Content);
+        HttpWebRequest.SetRequestUri(Url);
         HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentType := 'naviconnect/json';
-        HttpWebRequest.Accept := 'application/json';
-        HttpWebRequest.UseDefaultCredentials(false);
-        HttpWebRequest.Headers.Add('Authorization', Authorization);
+    end;
+
+    local procedure SendWebRequest(HttpWebRequest: HttpRequestMessage): Text
+    var
+        Client: HttpClient;
+        HttpWebResponse: HttpResponseMessage;
+        Response: Text;
+    begin
+        Client.Timeout(300000);
+        Client.Send(HttpWebRequest, HttpWebResponse);
+
+        HttpWebResponse.Content.ReadAs(Response);
+
+        if not HttpWebResponse.IsSuccessStatusCode then
+            Error(StrSubstNo('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response));
+        exit(Response);
     end;
 
     local procedure CurrCodeunitId(): Integer
@@ -438,24 +404,17 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
         exit(PaymentGateway."Refund Codeunit Id" = CurrCodeunitId());
     end;
 
-    local procedure GetJsonText(JToken: DotNet NPRNetJToken; JPath: Text; MaxLen: Integer) Value: Text
+    local procedure GetJsonText(JToken: JsonToken; JPath: Text; MaxLen: Integer) Value: Text
     var
-        JToken2: DotNet NPRNetJToken;
+        JToken2: JsonToken;
     begin
-        JToken2 := JToken.SelectToken(JPath);
-        if IsNull(JToken2) then
+        if not JToken.SelectToken('$..' + JPath, JToken2) then
             exit('');
 
         Value := Format(JToken2);
         if MaxLen > 0 then
             Value := CopyStr(Value, 1, MaxLen);
         exit(Value);
-    end;
-
-    [TryFunction]
-    local procedure ParseJson(Json: Text; var JToken: DotNet NPRNetJToken)
-    begin
-        JToken := JToken.Parse(Json);
     end;
 
     local procedure ItemNo2Sku(ItemNo: Text; VariantCode: Code[10]) Sku: Text
@@ -466,5 +425,6 @@ codeunit 6151423 "NPR Magento Pmt. M2 Mgt."
 
         exit(Sku);
     end;
-}
 
+    #endregion
+}

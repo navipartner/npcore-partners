@@ -1,10 +1,5 @@
 page 6151434 "NPR Magento Attribute Sets"
 {
-    // MAG1.00/MH  /20150113  CASE 199932 Refactored Object from Web Integration
-    // MAG1.02/MH  /20150204  CASE 199932 Added UsedByItemDrillDown() and changed layout by adding Blank Text Field to control width of the Repeater Group
-    // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
-    // MAG2.18/TS  /20180910  CASE 323934 Added Page Part Attribute Group
-
     AutoSplitKey = true;
     Caption = 'Attribute Sets';
     MultipleNewLines = false;
@@ -26,21 +21,19 @@ page 6151434 "NPR Magento Attribute Sets"
                     repeater(Control6150613)
                     {
                         ShowCaption = false;
-                        field(Description; Description)
+                        field(Description; Rec.Description)
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Description field';
                         }
-                        field("Used by Items"; "Used by Items")
+                        field("Used by Items"; Rec."Used by Items")
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Used by Items field';
 
                             trigger OnDrillDown()
                             begin
-                                //-MAG1.02
                                 UsedByItemDrillDown();
-                                //+MAG1.02
                             end;
                         }
                     }
@@ -76,24 +69,13 @@ page 6151434 "NPR Magento Attribute Sets"
         }
     }
 
-    actions
-    {
-    }
-
-    trigger OnClosePage()
-    var
-        MagentoAttributeGroups: Page "NPR Magento Attribute Group";
-    begin
-    end;
-
     procedure UsedByItemDrillDown()
     var
         Item: Record Item;
         TempItem: Record Item temporary;
     begin
-        //-MAG1.02
         TempItem.DeleteAll;
-        Item.SetRange("NPR Attribute Set ID", "Attribute Set ID");
+        Item.SetRange("NPR Attribute Set ID", Rec."Attribute Set ID");
         if Item.FindSet then
             repeat
                 TempItem.Init;
@@ -101,7 +83,5 @@ page 6151434 "NPR Magento Attribute Sets"
                 TempItem.Insert;
             until Item.Next = 0;
         PAGE.Run(PAGE::"Item List", TempItem);
-        //+MAG1.02
     end;
 }
-

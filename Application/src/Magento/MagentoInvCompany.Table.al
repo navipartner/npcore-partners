@@ -1,10 +1,5 @@
 table 6151410 "NPR Magento Inv. Company"
 {
-    // MAG1.22/MHA/20160421 CASE 236917 Object created
-    // MAG1.22.01/MHA/20160511 CASE 236917 Field 25 Api Domain added and special SSL case removed in SetApiUrl()
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object and field 1
-
     Caption = 'Magento Inventory Company';
     DataClassification = CustomerContent;
 
@@ -53,14 +48,21 @@ table 6151410 "NPR Magento Inv. Company"
         }
         field(20; "Api Password"; Text[100])
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'IsolatedStorage is in use.';
             Caption = 'Api Password';
+            DataClassification = CustomerContent;
+        }
+        field(21; "Api Password Key"; Guid)
+        {
+            Caption = 'Api Password Key';
+            Editable = false;
             DataClassification = CustomerContent;
         }
         field(25; "Api Domain"; Text[100])
         {
             Caption = 'Api Domain';
             DataClassification = CustomerContent;
-            Description = 'MAG1.22.01';
         }
     }
 
@@ -69,10 +71,6 @@ table 6151410 "NPR Magento Inv. Company"
         key(Key1; "Company Name")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnInsert()
@@ -87,7 +85,6 @@ table 6151410 "NPR Magento Inv. Company"
 
     procedure SetApiUrl()
     var
-        MagentoWebservice: Codeunit "NPR Magento Webservice";
         Position: Integer;
     begin
         if "Api Url" = '' then begin
@@ -98,5 +95,32 @@ table 6151410 "NPR Magento Inv. Company"
             end;
         end;
     end;
-}
 
+    [NonDebuggable]
+    procedure SetApiPassword(NewPassword: Text)
+    begin
+        if IsNullGuid("Api Password Key") then
+            "Api Password Key" := CreateGuid();
+        IsolatedStorage.Set("Api Password Key", NewPassword, DataScope::Company);
+    end;
+
+    [NonDebuggable]
+    procedure GetApiPassword(): Text
+    Var
+        PasswordValue: Text;
+    begin
+        IsolatedStorage.Get("Api Password Key", DataScope::Company, PasswordValue);
+    end;
+
+    [NonDebuggable]
+    procedure HasApiPassword(): Boolean
+    begin
+        exit(GetApiPassword() <> '');
+    end;
+
+    procedure RemoveApiPassword()
+    begin
+        IsolatedStorage.Delete("Api Password Key", DataScope::Company);
+        Clear("Api Password Key");
+    end;
+}

@@ -1,9 +1,5 @@
 table 6151432 "NPR Magento Customer Group"
 {
-    // MAG1.05/MH/20150220  CASE 206395 Object created
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object and field 1
-
     Caption = 'Magento Customer Group';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Magento Customer Groups";
@@ -31,9 +27,4 @@ table 6151432 "NPR Magento Customer Group"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

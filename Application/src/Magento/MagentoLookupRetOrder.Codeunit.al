@@ -1,8 +1,5 @@
 codeunit 6151421 "NPR Magento Lookup Ret.Order"
 {
-    // MAG2.12/MHA /20180425  CASE 309647 Object created - Sales Return Order Import
-    // MAG2.23/MHA /20191018  CASE 369170 Removed unused Global Variables
-
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
@@ -25,9 +22,10 @@ codeunit 6151421 "NPR Magento Lookup Ret.Order"
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         RecRef: RecordRef;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
+        XmlDoc: XmlDocument;
+        Node: XmlNode;
+        ReturnOrderNoAttribute: XmlAttribute;
+        XmlNodeList: XmlNodeList;
         ReturnOrderNo: Code[20];
         i: Integer;
     begin
@@ -45,13 +43,13 @@ codeunit 6151421 "NPR Magento Lookup Ret.Order"
         if not ImportEntry.LoadXmlDoc(XmlDoc) then
             exit(false);
 
-        XmlElement := XmlDoc.DocumentElement;
-        if not NpXmlDomMgt.FindNodes(XmlElement, 'sales_return_order', XmlNodeList) then
+        if not XmlDoc.SelectNodes('.//*[local-name()="sales_return_order"]', XmlNodeList) then
             exit(false);
 
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-            ReturnOrderNo := NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'return_order_no', false);
+        for i := 1 to XmlNodeList.Count do begin
+            XmlNodeList.Get(i, Node);
+            if Node.AsXmlElement().Attributes().Get('return_order_no', ReturnOrderNoAttribute) then
+                ReturnOrderNo := ReturnOrderNoAttribute.Value;
             if (ReturnOrderNo <> '') and (StrLen(ReturnOrderNo) <= MaxStrLen(SalesHeader."NPR External Order No.")) then begin
                 SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::"Return Order");
                 SalesHeader.SetRange("NPR External Order No.", ReturnOrderNo);
@@ -118,4 +116,3 @@ codeunit 6151421 "NPR Magento Lookup Ret.Order"
         exit(true);
     end;
 }
-

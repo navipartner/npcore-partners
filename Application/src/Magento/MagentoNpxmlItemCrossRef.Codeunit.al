@@ -7,15 +7,14 @@ codeunit 6151458 "NPR Magento Npxml ItemCrossRef"
     trigger OnRun()
     var
         RecRef: RecordRef;
-        RecRef2: RecordRef;
         CustomValue: Text;
         OutStr: OutStream;
     begin
-        if not NpXmlElement.Get("Xml Template Code", "Xml Element Line No.") then
+        if not NpXmlElement.Get(Rec."Xml Template Code", Rec."Xml Element Line No.") then
             exit;
         Clear(RecRef);
-        RecRef.Open("Table No.");
-        RecRef.SetPosition("Record Position");
+        RecRef.Open(Rec."Table No.");
+        RecRef.SetPosition(Rec."Record Position");
         if not RecRef.Find then
             exit;
 
@@ -24,9 +23,9 @@ codeunit 6151458 "NPR Magento Npxml ItemCrossRef"
 
         Clear(RecRef);
 
-        Value.CreateOutStream(OutStr);
+        Rec.Value.CreateOutStream(OutStr);
         OutStr.WriteText(CustomValue);
-        Modify;
+        Rec.Modify;
     end;
 
     var
@@ -37,28 +36,23 @@ codeunit 6151458 "NPR Magento Npxml ItemCrossRef"
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
-        MagentoItemCustomOption: Record "NPR Magento Item Custom Option";
-        MagentoItemCustomOptValue: Record "NPR Magento Itm Cstm Opt.Value";
-        SalesPrice: Record "Sales Price";
-        SalesLineDiscount: Record "Sales Line Discount";
-        FieldRef: FieldRef;
-        ItemCrossReference: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
     begin
         case RecRef.Number of
             DATABASE::"Item Variant":
                 begin
                     RecRef.SetTable(ItemVariant);
-                    ItemCrossReference.SetRange("Item No.", ItemVariant."Item No.");
-                    ItemCrossReference.SetRange("Variant Code", ItemVariant.Code);
-                    if ItemCrossReference.FindFirst then
-                        exit(ItemCrossReference."Cross-Reference No.")
+                    ItemReference.SetRange("Item No.", ItemVariant."Item No.");
+                    ItemReference.SetRange("Variant Code", ItemVariant.Code);
+                    if ItemReference.FindFirst then
+                        exit(ItemReference."Reference No.")
                     else
                         exit(ItemVariant."Item No." + '_' + ItemVariant.Code);
                 end;
+
 
         end;
 
         Error(Text000, RecRef.Number, RecRef.Caption, NpXmlElement."Xml Template Code", NpXmlElement."Element Name");
     end;
 }
-

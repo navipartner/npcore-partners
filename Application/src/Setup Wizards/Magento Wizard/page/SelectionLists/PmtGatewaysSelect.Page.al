@@ -28,10 +28,18 @@ page 6014624 "NPR Pmt. Gateways Select"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Api Username field';
                 }
-                field("Api Password"; "Api Password")
+                field(Password; Password)
                 {
                     ApplicationArea = All;
+                    Caption = 'Api Password';
+                    ExtendedDatatype = Masked;
                     ToolTip = 'Specifies the value of the Api Password field';
+
+                    trigger OnValidate()
+                    begin
+                        Rec.SetApiPassword(Password);
+                        Commit();
+                    end;
                 }
                 field("Merchant ID"; "Merchant ID")
                 {
@@ -66,6 +74,16 @@ page 6014624 "NPR Pmt. Gateways Select"
             }
         }
     }
+
+    trigger OnAfterGetRecord()
+    begin
+        Password := '';
+        if not IsNullGuid(Rec."Api Password Key") then
+            Password := '***';
+    end;
+
+    var
+        Password: Text;
 
     procedure SetRec(var TempPaymentGateway: Record "NPR Magento Payment Gateway")
     begin

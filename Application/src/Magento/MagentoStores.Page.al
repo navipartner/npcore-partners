@@ -1,9 +1,5 @@
 page 6151406 "NPR Magento Stores"
 {
-    // MAG1.01/MH/20150201  CASE 199932 Object created
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.07/TS  /20170830  CASE 262530  Added Field 1024 Language Code
-
     Caption = 'Stores';
     Editable = false;
     PageType = List;
@@ -17,17 +13,17 @@ page 6151406 "NPR Magento Stores"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Language Code"; "Language Code")
+                field("Language Code"; Rec."Language Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Language Code field';
@@ -35,9 +31,4 @@ page 6151406 "NPR Magento Stores"
             }
         }
     }
-
-    actions
-    {
-    }
 }
-

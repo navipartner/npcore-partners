@@ -1,15 +1,10 @@
 codeunit 6151414 "NPR Magento Lookup SalesOrder"
 {
-    // MAG1.21/TTH /20151118  CASE 227358 Replacing Type option field with Import type. Code moved here from page 6059808 "Naviconnect Import List"
-    // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
-    // MAG2.23/MHA /20191018  CASE 369170 Removed unused Global Variables
-
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
     var
         TempSalesHeader: Record "Sales Header" temporary;
-        TempSalesCrMemoHeader: Record "Sales Cr.Memo Header" temporary;
         TempSalesInvHeader: Record "Sales Invoice Header" temporary;
     begin
         if not GetOrderDocuments(Rec, TempSalesHeader, TempSalesInvHeader) then
@@ -27,9 +22,10 @@ codeunit 6151414 "NPR Magento Lookup SalesOrder"
         SalesInvHeader: Record "Sales Invoice Header";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         RecRef: RecordRef;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
+        XmlDoc: XmlDocument;
+        XmlNodeList: XmlNodeList;
+        Node: XmlNode;
+        OrderNoAttribute: XmlAttribute;
         OrderNo: Code[20];
         i: Integer;
     begin
@@ -47,13 +43,13 @@ codeunit 6151414 "NPR Magento Lookup SalesOrder"
         if not ImportEntry.LoadXmlDoc(XmlDoc) then
             exit(false);
 
-        XmlElement := XmlDoc.DocumentElement;
-        if not NpXmlDomMgt.FindNodes(XmlElement, 'sales_order', XmlNodeList) then
+        if not XmlDoc.SelectNodes('.//*[local-name()="sales_order"]', XmlNodeList) then
             exit(false);
 
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-            OrderNo := NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'order_no', false);
+        for i := 1 to XmlNodeList.Count do begin
+            XmlNodeList.Get(i, Node);
+            if Node.AsXmlElement().Attributes().Get('order_no', OrderNoAttribute) then
+                OrderNo := OrderNoAttribute.Value;
             if (OrderNo <> '') and (StrLen(OrderNo) <= MaxStrLen(SalesHeader."NPR External Order No.")) then begin
                 SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
                 SalesHeader.SetRange("NPR External Order No.", OrderNo);
@@ -120,4 +116,3 @@ codeunit 6151414 "NPR Magento Lookup SalesOrder"
         exit(true);
     end;
 }
-

@@ -1,7 +1,5 @@
 table 6151442 "NPR Magento Contact ShipToAdr."
 {
-    // MAG2.18/TSA /20181219 CASE 320424 Initial Version
-
     Caption = 'Magento Contact Ship-to Adrs.';
     DataClassification = CustomerContent;
 
@@ -31,12 +29,10 @@ table 6151442 "NPR Magento Contact ShipToAdr."
             Caption = 'Created At';
             DataClassification = CustomerContent;
         }
-        field(15; Visibility; Option)
+        field(15; Visibility; Enum "NPR Mag. Contact ShToAdr. Vis.")
         {
             Caption = 'Visibility';
             DataClassification = CustomerContent;
-            OptionCaption = 'Private,Public';
-            OptionMembers = PRIVATE,PUBLIC;
         }
     }
 
@@ -49,9 +45,4 @@ table 6151442 "NPR Magento Contact ShipToAdr."
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

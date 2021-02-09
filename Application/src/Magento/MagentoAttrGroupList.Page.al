@@ -1,7 +1,5 @@
 page 6151458 "NPR Magento Attr. Group List"
 {
-    // MAG2.18/TS  /20180910  CASE 323934 Attribute Group Created
-
     Caption = 'Attribute Groups';
     Editable = true;
     PageType = List;
@@ -17,22 +15,22 @@ page 6151458 "NPR Magento Attr. Group List"
         {
             repeater(Group)
             {
-                field("Attribute Group ID"; "Attribute Group ID")
+                field("Attribute Group ID"; Rec."Attribute Group ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Attribute Group ID field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Attribute Set ID"; "Attribute Set ID")
+                field("Attribute Set ID"; Rec."Attribute Set ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Attribute Set ID field';
                 }
-                field("Sort Order"; "Sort Order")
+                field("Sort Order"; Rec."Sort Order")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sort Order field';
@@ -40,9 +38,4 @@ page 6151458 "NPR Magento Attr. Group List"
             }
         }
     }
-
-    actions
-    {
-    }
 }
-

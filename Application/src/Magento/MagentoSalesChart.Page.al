@@ -1,15 +1,8 @@
 page 6151482 "NPR Magento Sales Chart"
 {
-    // MAG1.17/BHR/20150406 CASE 212983  CHART REVENUE-TURNOVER BY PERIOD
-    // MAG1.17/MH/20150619  CASE 216793 Changed pagename and caption from Revenue to Margin
-    // MAG1.19/BHR/20150720 CASE 218963 Updated captions
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // NPR5.50/JAVA/20190619 CASE 359388 Update addins references to point to the correct version (13.0.0.0 => 14.0.0.0).
-
     Caption = 'Margin/Turnover by Period';
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "Business Chart Buffer";
 
     layout
@@ -31,10 +24,6 @@ page 6151482 "NPR Magento Sales Chart"
                 begin
                     ChartIsReady := true;
                     UpdateChart;
-                end;
-
-                trigger Refresh()
-                begin
                 end;
             }
         }
@@ -155,8 +144,6 @@ page 6151482 "NPR Magento Sales Chart"
         StatusText: Text[250];
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;
         Period: Option " ",Next,Previous;
-        SalesByPeriod: array[5] of Decimal;
-        OrderCount: array[5] of Decimal;
 
     local procedure UpdateChart()
     begin
@@ -168,4 +155,3 @@ page 6151482 "NPR Magento Sales Chart"
         StatusText := StrSubstNo('%1 to %2', BusChartBuf."Period Filter Start Date", BusChartBuf."Period Filter End Date");
     end;
 }
-

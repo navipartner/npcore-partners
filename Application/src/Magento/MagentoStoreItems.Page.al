@@ -54,16 +54,11 @@ page 6151445 "NPR Magento Store Items"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnAfterGetRecord()
     begin
-        Storecode := "Store Code";
+        Storecode := Rec."Store Code";
     end;
 
     var
         Storecode: Code[32];
 }
-

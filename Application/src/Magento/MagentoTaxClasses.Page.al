@@ -1,11 +1,5 @@
 page 6151407 "NPR Magento Tax Classes"
 {
-    // MAG1.05/20150223  CASE 206395 Object created
-    // MAG1.17/MH/20150622  CASE 216851 Magento Setup functions moved to new codeunit
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.03/MHA /20170324  CASE 266871 Added field 517 "Customer Config. Template Code"
-    // MAG2.07/MHA /20170830  CASE 286943 Updated Magento Setup Actions to support Setup Event Subscription
-
     Caption = 'Tax Classes';
     PageType = List;
     SourceTable = "NPR Magento Tax Class";
@@ -18,20 +12,20 @@ page 6151407 "NPR Magento Tax Classes"
         {
             repeater(Group)
             {
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Customer Config. Template Code"; "Customer Config. Template Code")
+                field("Customer Config. Template Code"; Rec."Customer Config. Template Code")
                 {
                     ApplicationArea = All;
-                    Enabled = "Type" = 1;
+                    Enabled = Rec."Type" = Rec."Type"::Customer;
                     ToolTip = 'Specifies the value of the Customer Config. Template Code field';
                 }
             }
@@ -55,10 +49,7 @@ page 6151407 "NPR Magento Tax Classes"
 
                 trigger OnAction()
                 begin
-                    //-MAG2.07 [286943]
-                    //MagentoSetupMgt.SetupMagentoTaxClasses();
                     MagentoSetupMgt.TriggerSetupMagentoTaxClasses();
-                    //+MAG2.07 [286943]
                 end;
             }
         }
@@ -67,4 +58,3 @@ page 6151407 "NPR Magento Tax Classes"
     var
         MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
 }
-
