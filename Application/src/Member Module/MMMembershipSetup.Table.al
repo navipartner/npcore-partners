@@ -183,11 +183,11 @@ table 6060124 "NPR MM Membership Setup"
             ELSE
             IF ("Card Print Object Type" = CONST(REPORT)) AllObj."Object ID" WHERE("Object Type" = CONST(Report));
         }
-        field(40; "Ticket Item Barcode"; Code[20])
+        field(40; "Ticket Item Barcode"; Code[50])
         {
             Caption = 'Ticket Item Barcode';
             DataClassification = CustomerContent;
-            TableRelation = "Item Cross Reference"."Cross-Reference No." WHERE("Cross-Reference Type" = CONST("Bar Code"));
+            TableRelation = "Item Reference"."Reference No." WHERE("Reference Type" = CONST("Bar Code"));
         }
         field(41; "Ticket Print Model"; Option)
         {

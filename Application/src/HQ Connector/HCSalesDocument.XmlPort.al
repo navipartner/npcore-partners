@@ -689,16 +689,16 @@ xmlport 6150902 "NPR HC Sales Document"
                         fieldelement(originallyorderedvarcode; "Sales Line"."Originally Ordered Var. Code")
                         {
                         }
-                        fieldelement(crossreferenceno; "Sales Line"."Cross-Reference No.")
+                        fieldelement(crossreferenceno; "Sales Line"."Item Reference No.")
                         {
                         }
-                        fieldelement(unitofmeasurecrossref; "Sales Line"."Unit of Measure (Cross Ref.)")
+                        fieldelement(unitofmeasurecrossref; "Sales Line"."Item Reference Unit of Measure")
                         {
                         }
-                        fieldelement(crossreferencetype; "Sales Line"."Cross-Reference Type")
+                        fieldelement(crossreferencetype; "Sales Line"."Item Reference Type")
                         {
                         }
-                        fieldelement(crossreferencetypeno; "Sales Line"."Cross-Reference Type No.")
+                        fieldelement(crossreferencetypeno; "Sales Line"."Item Reference Type No.")
                         {
                         }
                         fieldelement(itemcategorycode; "Sales Line"."Item Category Code")

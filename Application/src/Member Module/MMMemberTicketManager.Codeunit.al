@@ -16,7 +16,7 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         NOT_SAME_MEMBER: Label 'All request lines need to have the same member number.';
         ErrorReason: Text;
         MEMBERGUEST_TICKET: Label 'Setup for %1 has an invalid entry for membership code %2, admission code %3, item %4. Setup does not match setup in %5.';
-        MISSING_CROSSREF: Label 'The external number %1 does not translate to an item. Check Item Cross Reference for setup.';
+        MISSING_CROSSREF: Label 'The external number %1 does not translate to an item. Check Item Reference for setup.';
         WELCOME: Label 'Welcome %1.';
         ILLEGAL_VALUE: Label 'Value %1 is not a valid %2.';
 
@@ -145,7 +145,6 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary;
         Admission: Record "NPR TM Admission";
-        ItemCrossReference: Record "Item Cross Reference";
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
         Ticket: Record "NPR TM Ticket";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
@@ -362,7 +361,7 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
             VariantCode := '';
             if (MembershipAdmissionSetup."Ticket No. Type" = MembershipAdmissionSetup."Ticket No. Type"::ITEM_CROSS_REF) then
                 if (not TicketRequestManager.TranslateBarcodeToItemVariant(MembershipAdmissionSetup."Ticket No.", ItemNo, VariantCode, ResolvingTable)) then
-                    Error('Invalid Item Cross Reference barcode %1, it does not translate to an item / variant.', ItemNo);
+                    Error('Invalid Item Reference barcode %1, it does not translate to an item / variant.', ItemNo);
 
             PrefillTicketRequest(MemberEntryNo, MembershipEntryNo, ItemNo, VariantCode, MembershipAdmissionSetup."Admission Code", TmpTicketReservationRequest);
 

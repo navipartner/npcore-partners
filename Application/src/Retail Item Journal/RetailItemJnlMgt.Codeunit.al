@@ -44,14 +44,14 @@ codeunit 6014421 "NPR Retail Item Jnl. Mgt."
     procedure GetItem(ItemNo: Code[20]; var ItemDescription: Text[50])
     var
         Item: Record Item;
-        ItemCrossReference: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
     begin
         if ItemNo <> OldItemNo then begin
             ItemDescription := '';
             if ItemNo <> '' then begin
-                ItemCrossReference.SetRange("Cross-Reference No.", ItemNo);
-                if ItemCrossReference.FindFirst then
-                    ItemNo := ItemCrossReference."Item No.";
+                ItemReference.SetRange("Reference No.", ItemNo);
+                if ItemReference.FindFirst then
+                    ItemNo := ItemReference."Item No.";
                 if Item.Get(ItemNo) then
                     ItemDescription := Item.Description;
             end;

@@ -320,7 +320,7 @@ xmlport 6151195 "NPR NpCs Sales Document"
                         fieldelement(variant_code; TempSalesLine."Variant Code")
                         {
                         }
-                        fieldelement(cross_reference_no; TempSalesLine."Cross-Reference No.")
+                        fieldelement(cross_reference_no; TempSalesLine."Item Reference No.")
                         {
                         }
                         fieldelement(unit_of_measure_code; TempSalesLine."Unit of Measure Code")

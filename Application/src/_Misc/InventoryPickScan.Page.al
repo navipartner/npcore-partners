@@ -123,22 +123,22 @@ page 6014460 "NPR Inventory Pick Scan"
 
                     trigger OnValidate()
                     var
-                        ItemCrossReference: Record "Item Cross Reference";
+                        ItemReference: Record "Item Reference";
                         WhseActivityLine: Record "Warehouse Activity Line";
                         LastErrorText: Text;
                     begin
                         if Barcode = '' then
                             exit;
-                        if not GetItemCrossReference(ItemCrossReference) then
+                        if not GetItemReference(ItemReference) then
                             Error(NoItemWithBarcodeErr, Barcode);
-                        if not CheckIfLineExists(ItemCrossReference) then
-                            Error(LineDoesntExistErr, WhseActivityLine.FieldCaption("Item No."), ItemCrossReference."Item No.",
-                                                  WhseActivityLine.FieldCaption("Variant Code"), ItemCrossReference."Variant Code",
-                                                  WhseActivityLine.FieldCaption("Unit of Measure Code"), ItemCrossReference."Unit of Measure");
-                        HasItemTracking(ItemCrossReference."Item No."); //potential split, if same Lot/Serial No from same Bin is used then no need for splitting
-                        CheckQtyIsAvailable(ItemCrossReference);
-                        AssignQtyToHandle(ItemCrossReference);
-                        CurrPage.Update();
+                        if not CheckIfLineExists(ItemReference) then
+                            Error(LineDoesntExist, WhseActivityLine.FieldCaption("Item No."), ItemReference."Item No.",
+                                                  WhseActivityLine.FieldCaption("Variant Code"), ItemReference."Variant Code",
+                                                  WhseActivityLine.FieldCaption("Unit of Measure Code"), ItemReference."Unit of Measure");
+                        HasItemTracking(ItemReference."Item No.");
+                        CheckQtyIsAvailable(ItemReference);
+                        AssignQtyToHandle(ItemReference);
+                        CurrPage.Update;
 
                     end;
                 }
@@ -430,8 +430,8 @@ page 6014460 "NPR Inventory Pick Scan"
     var
         WhseActPrint: Codeunit "Warehouse Document-Print";
         WMSMgt: Codeunit "WMS Management";
-        FromLotNo: Boolean;
-        FromSerialNo: Boolean;
+        NoItemWithBarcodeErr: Label 'There are no items with reference: %1';
+        LineDoesntExist: Label 'Line with %1: %2, %3: %4 and %5: %6 doesn''t exist.';
         LNRequired: Boolean;
         SNRequired: Boolean;
         Barcode: Code[20];
@@ -444,7 +444,8 @@ page 6014460 "NPR Inventory Pick Scan"
         LotNoCaption: Label 'Lot No.';
         QtyToHandleCaption: Label 'Qty. to Handle';
         SerialNoCaption: Label 'Serial No.';
-        NoItemWithBarcodeErr: Label 'There are no items with cross reference: %1';
+        FromLotNo: Boolean;
+        FromSerialNo: Boolean;
 
     local procedure AutofillQtyToHandle()
     begin
@@ -472,22 +473,22 @@ page 6014460 "NPR Inventory Pick Scan"
         CurrPage.WhseActivityLines.PAGE.UpdateForm;
     end;
 
-    local procedure GetItemCrossReference(var ItemCrossReference: Record "Item Cross Reference"): Boolean
+    local procedure GetItemReference(var ItemReference: Record "Item Reference"): Boolean
     begin
-        Clear(ItemCrossReference);
-        ItemCrossReference.SetCurrentKey("Cross-Reference No.", "Cross-Reference Type", "Cross-Reference Type No.", "Discontinue Bar Code");
-        ItemCrossReference.SetRange("Cross-Reference No.", Barcode);
-        ItemCrossReference.SetRange("Discontinue Bar Code", false);
-        ItemCrossReference.SetFilter("Cross-Reference Type No.", '%1', '');
-        ItemCrossReference.SetRange("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::"Bar Code");
-        exit(ItemCrossReference.FindFirst());
+        Clear(ItemReference);
+        ItemReference.SetCurrentKey("Reference No.", "Reference Type", "Reference Type No.", "Discontinue Bar Code");
+        ItemReference.SetRange("Reference No.", Barcode);
+        ItemReference.SetRange("Discontinue Bar Code", false);
+        ItemReference.SetFilter("Reference Type No.", '%1', '');
+        ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
+        exit(ItemReference.FindFirst());
     end;
 
-    local procedure CheckIfLineExists(ItemCrossReference: Record "Item Cross Reference"): Boolean
+    local procedure CheckIfLineExists(ItemReference: Record "Item Reference"): Boolean
     var
         WhseActivityLine: Record "Warehouse Activity Line";
     begin
-        SetWhseActivityLineFilterFromItemCrossReference(WhseActivityLine, ItemCrossReference);
+        SetWhseActivityLineFilterFromItemReference(WhseActivityLine, ItemReference);
         exit(not WhseActivityLine.IsEmpty);
     end;
 
@@ -516,7 +517,7 @@ page 6014460 "NPR Inventory Pick Scan"
         exit(SNRequired or LNRequired);
     end;
 
-    local procedure CheckQtyIsAvailable(ItemCrossReference: Record "Item Cross Reference")
+    local procedure CheckQtyIsAvailable(ItemReference: Record "Item Reference")
     var
         WhseActivityLine: Record "Warehouse Activity Line";
         TotalQty: Decimal;
@@ -524,53 +525,53 @@ page 6014460 "NPR Inventory Pick Scan"
     begin
         if QtyToHandleGlobal = 0 then
             Error(QtyToHandleErr, QtyToHandleCaption);
-        SetWhseActivityLineFilterFromItemCrossReference(WhseActivityLine, ItemCrossReference);
-        if WhseActivityLine.FindSet() then
-            repeat
-                TotalQty += WhseActivityLine."Qty. (Base)" - WhseActivityLine."Qty. to Handle (Base)";
-            until WhseActivityLine.Next() = 0;
+        SetWhseActivityLineFilterFromItemReference(WhseActivityLine, ItemReference);
+        with WhseActivityLine do
+            if FindSet then
+                repeat
+                    TotalQty += "Qty. (Base)" - "Qty. to Handle (Base)";
+                until Next = 0;
         if QtyToHandleGlobal > TotalQty then
             Error(CantDistributeQtyErr, TotalQty, QtyToHandleGlobal, QtyToHandleCaption);
     end;
 
-    local procedure SetWhseActivityLineFilterFromItemCrossReference(var WhseActivityLine: Record "Warehouse Activity Line"; ItemCrossReference: Record "Item Cross Reference")
+    local procedure SetWhseActivityLineFilterFromItemReference(var WhseActivityLine: Record "Warehouse Activity Line"; ItemReference: Record "Item Reference")
     begin
-        WhseActivityLine.Reset();
+        WhseActivityLine.Reset;
         WhseActivityLine.SetRange("Activity Type", Rec.Type);
         WhseActivityLine.SetRange("No.", Rec."No.");
-        WhseActivityLine.SetRange("Item No.", ItemCrossReference."Item No.");
-        if ItemCrossReference."Variant Code" <> '' then
-            WhseActivityLine.SetRange("Variant Code", ItemCrossReference."Variant Code");
-        if ItemCrossReference."Unit of Measure" <> '' then
-            WhseActivityLine.SetRange("Unit of Measure Code", ItemCrossReference."Unit of Measure");
+        WhseActivityLine.SetRange("Item No.", ItemReference."Item No.");
+        if ItemReference."Variant Code" <> '' then
+            WhseActivityLine.SetRange("Variant Code", ItemReference."Variant Code");
+        if ItemReference."Unit of Measure" <> '' then
+            WhseActivityLine.SetRange("Unit of Measure Code", ItemReference."Unit of Measure");
     end;
 
-    local procedure AssignQtyToHandle(ItemCrossReference: Record "Item Cross Reference")
+    local procedure AssignQtyToHandle(ItemReference: Record "Item Reference")
     var
         WhseActivityLine: Record "Warehouse Activity Line";
         OutstandingQty: Decimal;
         TotalQtyToHandle: Decimal;
     begin
-        SetWhseActivityLineFilterFromItemCrossReference(WhseActivityLine, ItemCrossReference);
+        SetWhseActivityLineFilterFromItemReference(WhseActivityLine, ItemReference);
         TotalQtyToHandle := QtyToHandleGlobal;
         OutstandingQty := TotalQtyToHandle;
-        WhseActivityLine.SetFilter("Qty. Outstanding (Base)", '<>0');
-        //if there are predefined Lot/Serial No. we first use those
-        if SNRequired then
-            WhseActivityLine.SetRange("Serial No.", SerialNo);
-        if LNRequired then
-            WhseActivityLine.SetRange("Lot No.", LotNo);
-        DistributeQty(WhseActivityLine, OutstandingQty, false);
-        if (OutstandingQty > 0) and (SNRequired or LNRequired) then begin
-            //next, other lines and we assign Lot/No. if set
-            WhseActivityLine.SetRange("Serial No.", '');
-            WhseActivityLine.SetRange("Lot No.", '');
-            DistributeQty(WhseActivityLine, OutstandingQty, SNRequired or LNRequired);
-            //if still missing lines , we start splitting
-            while OutstandingQty > 0 do begin
-                WhseActivityLine.SetRange("Serial No.");
-                WhseActivityLine.SetRange("Lot No.");
-                SplitLineAndAssignValue(WhseActivityLine, OutstandingQty);
+        with WhseActivityLine do begin
+            SetFilter("Qty. Outstanding (Base)", '<>0');
+            if SNRequired then
+                SetRange("Serial No.", SerialNo);
+            if LNRequired then
+                SetRange("Lot No.", LotNo);
+            DistributeQty(WhseActivityLine, OutstandingQty, false);
+            if (OutstandingQty > 0) and (SNRequired or LNRequired) then begin
+                SetRange("Serial No.", '');
+                SetRange("Lot No.", '');
+                DistributeQty(WhseActivityLine, OutstandingQty, SNRequired or LNRequired);
+                while OutstandingQty > 0 do begin
+                    SetRange("Serial No.");
+                    SetRange("Lot No.");
+                    SplitLineAndAssignValue(WhseActivityLine, OutstandingQty);
+                end;
             end;
         end;
     end;
@@ -610,54 +611,52 @@ page 6014460 "NPR Inventory Pick Scan"
         QtyToWork: Decimal;
         NoLinesToHandle: Label 'There aren''t any more available lines to be handled.';
     begin
-        //since we've no idea what is the line that will be created in SplitLine, we first remember every line before splitting
-        if WhseActivityLine.FindSet() then begin
-            repeat
-                TempWhseActivLine := WhseActivityLine;
-                TempWhseActivLine.Insert;
-            until WhseActivityLine.Next() = 0;
-        end;
-        //splitting occurs here. first we remember old values and reset tracking and assign new quantity for splitting
-        if WhseActivityLine.FindSet() then
-            repeat
-                Splitted := (WhseActivityLine."Qty. (Base)" > WhseActivityLine."Qty. to Handle (Base)")
-                    and (WhseActivityLine."Qty. (Base)" > 1) and (WhseActivityLine."Qty. Outstanding (Base)" > 0);
-                if Splitted then begin
-                    SourceWhseActivityLine.Copy(WhseActivityLine);
-                    WhseActivityLine.Validate("Serial No.", '');
-                    WhseActivityLine.Validate("Lot No.", '');
-                    QtyToWork := QtyToHandle;
-                    if QtyToHandle > WhseActivityLine."Qty. (Base)" - WhseActivityLine."Qty. to Handle (Base)" then
-                        QtyToWork := WhseActivityLine."Qty. (Base)" - WhseActivityLine."Qty. to Handle (Base)";
-                    WhseActivityLine.Validate("Qty. to Handle (Base)", QtyToWork);
-                    WhseActivityLine."NPR Rem. Qty. to Pick (Base)" := WhseActivityLine."Qty. (Base)" - WhseActivityLine."Qty. to Handle (Base)";
-                    QtyToHandle -= QtyToWork;
-                    WhseActivityLine.Modify(true);
-                    WhseActivityLine.SplitLine(WhseActivityLine);
-                    //WhseActivityLine has now become "new" line with good quantity and need to apply new tracking
-                    if SNRequired then
-                        WhseActivityLine.Validate("Serial No.", SerialNo);
-                    if LNRequired then
-                        WhseActivityLine.Validate("Lot No.", LotNo);
-                    WhseActivityLine.Modify(true);
-                end;
-            until (WhseActivityLine.Next() = 0) or Splitted;
-        if not Splitted then
-            Error(NoLinesToHandle);
-        //now we search for new line, which is in fact "old" with values we backed-up earlier
-        if WhseActivityLine.FindSet() then
-            repeat
-                FoundNewLine := not TempWhseActivLine.Get(WhseActivityLine."Activity Type", WhseActivityLine."No.", WhseActivityLine."Line No.");
-                if FoundNewLine then
+        with WhseActivityLine do begin
+            if FindSet then begin
+                repeat
                     TempWhseActivLine := WhseActivityLine;
-            until (WhseActivityLine.Next() = 0) or FoundNewLine;
-        // and update it
-        NewWhseActivityLine.Get(TempWhseActivLine."Activity Type", TempWhseActivLine."No.", TempWhseActivLine."Line No.");
-        NewWhseActivityLine.Validate("Qty. to Handle (Base)", SourceWhseActivityLine."Qty. to Handle (Base)");
-        NewWhseActivityLine."NPR Rem. Qty. to Pick (Base)" := NewWhseActivityLine."Qty. (Base)" - NewWhseActivityLine."Qty. to Handle (Base)";
-        NewWhseActivityLine.Validate("Serial No.", SourceWhseActivityLine."Serial No.");
-        NewWhseActivityLine.Validate("Lot No.", SourceWhseActivityLine."Lot No.");
-        NewWhseActivityLine.Modify(true);
+                    TempWhseActivLine.Insert;
+                until Next = 0;
+            end;
+            if FindSet then
+                repeat
+                    Splitted := ("Qty. (Base)" > "Qty. to Handle (Base)") and ("Qty. (Base)" > 1) and ("Qty. Outstanding (Base)" > 0);
+                    if Splitted then begin
+                        SourceWhseActivityLine.Copy(WhseActivityLine);
+                        Validate("Serial No.", '');
+                        Validate("Lot No.", '');
+                        QtyToWork := QtyToHandle;
+                        if QtyToHandle > "Qty. (Base)" - "Qty. to Handle (Base)" then
+                            QtyToWork := "Qty. (Base)" - "Qty. to Handle (Base)";
+                        Validate("Qty. to Handle (Base)", QtyToWork);
+                        "NPR Rem. Qty. to Pick (Base)" := "Qty. (Base)" - "Qty. to Handle (Base)";
+                        QtyToHandle -= QtyToWork;
+                        Modify(true);
+                        SplitLine(WhseActivityLine);
+                        if SNRequired then
+                            Validate("Serial No.", SerialNo);
+                        if LNRequired then
+                            Validate("Lot No.", LotNo);
+                        Modify(true);
+                    end;
+                until (Next = 0) or Splitted;
+            if not Splitted then
+                Error(NoLinesToHandle);
+            if FindSet then
+                repeat
+                    FoundNewLine := not TempWhseActivLine.Get("Activity Type", "No.", "Line No.");
+                    if FoundNewLine then
+                        TempWhseActivLine := WhseActivityLine;
+                until (Next = 0) or FoundNewLine;
+        end;
+        with NewWhseActivityLine do begin
+            Get(TempWhseActivLine."Activity Type", TempWhseActivLine."No.", TempWhseActivLine."Line No.");
+            Validate("Qty. to Handle (Base)", SourceWhseActivityLine."Qty. to Handle (Base)");
+            "NPR Rem. Qty. to Pick (Base)" := "Qty. (Base)" - "Qty. to Handle (Base)";
+            Validate("Serial No.", SourceWhseActivityLine."Serial No.");
+            Validate("Lot No.", SourceWhseActivityLine."Lot No.");
+            Modify(true);
+        end;
     end;
 
     procedure UpdateRemQtyToPick(WhseActivityHeader: Record "Warehouse Activity Header")

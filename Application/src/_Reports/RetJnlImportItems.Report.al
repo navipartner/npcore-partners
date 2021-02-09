@@ -1,8 +1,8 @@
 report 6014424 "NPR Ret. Jnl. - Import Items"
 {
     Caption = 'Import Items';
-    ProcessingOnly = true; 
-    UsageCategory = ReportsAndAnalysis; 
+    ProcessingOnly = true;
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     dataset
     {
@@ -74,12 +74,13 @@ report 6014424 "NPR Ret. Jnl. - Import Items"
                                     RetailJournalLine.Validate("Last Direct Cost", Item."Last Direct Cost");
                             end;
 
-                            CrossReference.Reset();
-                            CrossReference.SetRange("Cross-Reference Type", CrossReference."Cross-Reference Type"::"Bar Code");
-                            CrossReference.SetRange("Item No.", Item."No.");
-                            CrossReference.SetRange("Variant Code", ItemVariants.Code);
-                            if CrossReference.FindFirst then
-                                RetailJournalLine.Validate(Barcode, CrossReference."Cross-Reference No.");
+
+                            ItemReference.Reset;
+                            ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
+                            ItemReference.SetRange("Item No.", Item."No.");
+                            ItemReference.SetRange("Variant Code", ItemVariants.Code);
+                            if ItemReference.FindFirst then
+                                RetailJournalLine.Validate(Barcode, ItemReference."Reference No.");
 
                             RetailJournalLine.Modify();
                             SetFilter(Item."Variant Filter", '');
@@ -107,13 +108,13 @@ report 6014424 "NPR Ret. Jnl. - Import Items"
     }
 
     var
-        CrossReference: Record "Item Cross Reference";
-        ItemVariants: Record "Item Variant";
         RetailJournalHeader: Record "NPR Retail Journal Header";
         RetailJournalLine: Record "NPR Retail Journal Line";
         OnlyInventory: Boolean;
         RetailJournalCode: Code[20];
         LastLineNo: Integer;
+        ItemVariants: Record "Item Variant";
+        ItemReference: Record "Item Reference";
         ImportUnitCost: Option "Standard Cost","Unit Cost","Last direct cost";
 
     procedure SetJournal(RetailJournalCodeIn: Code[20])

@@ -13,7 +13,7 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
     end;
 
     var
-        ServicePasswordErr: Label 'Please check there is a password set up in %1';
+        ServicePasswordErr: Label 'Please check there is a password set up in %1', Comment = '%1=POSSalesSetupCard.Caption()';
 
     procedure ExportPOSEntry(var NcTask: Record "NPR Nc Task")
     var
@@ -66,7 +66,7 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
         Commit;
 
         if not IsolatedStorage.Get(NpGpGlobalSalesSetup."Service Password", DataScope::Company, ServicePassword) then
-            Error(ServicePasswordErr, NpGpPOSSalesSetupCard.Caption);
+            Error(ServicePasswordErr, NpGpPOSSalesSetupCard.Caption());
 
         WebRequest.SetRequestUri(NpGpGlobalSalesSetup."Service Url");
         WebRequest.Method := 'POST';

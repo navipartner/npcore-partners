@@ -933,7 +933,7 @@ codeunit 6151301 "NPR NpEc Sales Doc. Imp. Mgt."
     local procedure FindItemVariant(ReferenceNo: Text; var ItemVariant: Record "Item Variant"): Boolean
     var
         Item: Record Item;
-        ItemCrossRef: Record "Item Cross Reference";
+        ItemRef: Record "Item Reference";
         Position: Integer;
         ItemNo: Text;
         VariantCode: Text;
@@ -943,13 +943,13 @@ codeunit 6151301 "NPR NpEc Sales Doc. Imp. Mgt."
         if ReferenceNo = '' then
             exit(false);
 
-        if StrLen(ReferenceNo) <= MaxStrLen(ItemCrossRef."Cross-Reference No.") then begin
-            ItemCrossRef.SetRange("Cross-Reference Type", ItemCrossRef."Cross-Reference Type"::"Bar Code");
-            ItemCrossRef.SetRange("Cross-Reference No.", UpperCase(ReferenceNo));
-            ItemCrossRef.SetRange("Discontinue Bar Code", false);
-            if ItemCrossRef.FindFirst then begin
-                ItemVariant."Item No." := ItemCrossRef."Item No.";
-                ItemVariant.Code := ItemCrossRef."Variant Code";
+        if StrLen(ReferenceNo) <= MaxStrLen(ItemRef."Reference No.") then begin
+            ItemRef.SetRange("Reference Type", ItemRef."Reference Type"::"Bar Code");
+            ItemRef.SetRange("Reference No.", UpperCase(ReferenceNo));
+            ItemRef.SetRange("Discontinue Bar Code", false);
+            if ItemRef.FindFirst then begin
+                ItemVariant."Item No." := ItemRef."Item No.";
+                ItemVariant.Code := ItemRef."Variant Code";
                 exit(true);
             end;
         end;

@@ -1,29 +1,5 @@
 codeunit 6059972 "NPR Variety Clone Data"
 {
-    // 
-    // VRT1.01/MH/20150527  CASE 214916 Added Return Value to GetVRTSetup()
-    // VRT1.01/MMV/20150513 CASE 213635 Added handling of RJL
-    // NPR4.16/TJ/20151103 CASE 222281 Added handling of Item Replenishment by Store
-    // VRT1.10/JDH/20151202 CASE 201022 Added function CreateTableCopy
-    // NPR4.18/BR/20160202  CASE 182391 Insert Item Cross References of Type Barcode
-    // VRT1.11/JDH /20160530 CASE 242940 reworked barcode creation
-    // VRT1.20/JDH /20161221 CASE 261631 New barcode lookup and custom create functions
-    // NPR5.29/JDH /20170103 CASE 260516 Added Transfer Lines
-    // NPR5.29/TJ  /20170119 CASE 263917 Copied function GetFromVariety from table 5401 and added extra parameter
-    //                                   Recoded functions SetupNewLine and SetupVariant to use it
-    // NPR5.30/TJ  /20170207 CASE 263917 Fixed a bug in LookupBarcodes function
-    // NPR5.31/JDH /20170502 CASE 271133 Added Purchase Prices
-    // NPR5.32/JDH /20170510 CASE 274170 Variable Cleanup
-    // NPR5.36/JDH /20170921 CASE 288696 Item Journal line added to Variety Matrix
-    // NPR5.42/JDH /20180524 CASE 315499 Created new Publisher, so its possible to skip creating default barcodes.
-    // NPR5.43/JDH /20180628 CASE 317108 Possible to use publisher function to assign Variant Code
-    // NPR5.44/JKL /20180716 CASE 321665 Variant Description 2::VarietyTableSetupFirst50 and Variant Description"::VarietyTableSetupNext50 to desc test
-    // NPR5.47/NPKNAV/20181026  CASE 327541-01 Transport NPR5.47 - 26 October 2018
-    // NPR5.48/JDH /20181214 CASE 338542 Moved codesection about Description for Item Cross reference to CU Description Control
-    // NPR5.53/SARA/20191023 CASE 345108 Insert Unit of Measure in Item Cross Reference
-    // NPR5.55/BHR /20200219 CASE 361515 Change Key as it's not supported in extension
-
-
     trigger OnRun()
     begin
         Message(CreateBarcodeEAN13('571234500012'));
@@ -522,9 +498,9 @@ codeunit 6059972 "NPR Variety Clone Data"
 
         if (VRTSetup."Create Item Cross Ref. auto.") or (not CalledFromInsert) then begin
             if (VariantCode = '') and (VRTSetup."Item Cross Ref. No. Series (I)" <> '') then
-                AddItemCrossRef(ItemNo, '');
+                AddItemRef(ItemNo, '');
             if (VariantCode <> '') and (VRTSetup."Item Cross Ref. No. Series (V)" <> '') then
-                AddItemCrossRef(ItemNo, VariantCode);
+                AddItemRef(ItemNo, VariantCode);
 
         end;
     end;
@@ -576,7 +552,7 @@ codeunit 6059972 "NPR Variety Clone Data"
         AltNo.Insert(true);
     end;
 
-    procedure AddItemCrossRef(ItemNo: Code[20]; VariantCode: Code[20])
+    procedure AddItemRef(ItemNo: Code[20]; VariantCode: Code[20])
     var
         NextCode: Code[20];
         NoSeriesMgt: Codeunit NoSeriesManagement;
@@ -595,60 +571,38 @@ codeunit 6059972 "NPR Variety Clone Data"
 
         case VRTSetup."Barcode Type (Item Cross Ref.)" of
             VRTSetup."Barcode Type (Item Cross Ref.)"::EAN8:
-                InsertItemCrossRef(ItemNo, VariantCode, CreateBarcodeEAN8(NextCode), 3, '');
+                InsertItemRef(ItemNo, VariantCode, CreateBarcodeEAN8(NextCode), 3, '');
             VRTSetup."Barcode Type (Item Cross Ref.)"::EAN13:
-                InsertItemCrossRef(ItemNo, VariantCode, CreateBarcodeEAN13(NextCode), 3, '');
+                InsertItemRef(ItemNo, VariantCode, CreateBarcodeEAN13(NextCode), 3, '');
         end;
         //+VRT1.11
     end;
 
-    procedure InsertItemCrossRef(ItemNo: Code[20]; VariantCode: Code[20]; Barcode: Code[20]; CrossRefType: Option " ",Customer,Vendor,"Bar Code"; CrossRefTypeNo: Code[20])
+    procedure InsertItemRef(ItemNo: Code[20]; VariantCode: Code[20]; Barcode: Code[20]; CrossRefType: Option " ",Customer,Vendor,"Bar Code"; CrossRefTypeNo: Code[20])
     var
         Item: Record Item;
-        ItemCrossRef: Record "Item Cross Reference";
+        ItemRef: Record "Item Reference";
         ItemVar: Record "Item Variant";
         DescriptionControl: Codeunit "NPR Description Control";
     begin
         if Item.Get(Barcode) then
             Error(Text002);
 
-        ItemCrossRef.SetCurrentKey("Cross-Reference No.");
-        ItemCrossRef.SetRange("Cross-Reference No.", Barcode);
-        if ItemCrossRef.FindFirst then
-            Error(Text003, ItemCrossRef.TableCaption, Barcode, ItemCrossRef."Item No.");
+        ItemRef.SetCurrentKey("Reference No.");
+        ItemRef.SetRange("Reference No.", Barcode);
+        if ItemRef.FindFirst then
+            Error(Text003, ItemRef.TableCaption, Barcode, ItemRef."Item No.");
 
-        ItemCrossRef.Init;
-        ItemCrossRef."Item No." := ItemNo;
-        ItemCrossRef."Variant Code" := VariantCode;
-        ItemCrossRef.Validate("Cross-Reference Type", CrossRefType);
-        ItemCrossRef.Validate("Cross-Reference Type No.", CrossRefTypeNo);
-        ItemCrossRef."Cross-Reference No." := Barcode;
-        //-VRT1.11
-        //ItemCrossRef.Description := Item.Description;
-        //-NPR5.48 [338542]
-        // Item.GET(ItemNo);
-        // IF VariantCode = '' THEN BEGIN
-        //  CASE VRTSetup."Item Cross Ref. Description(I)" OF
-        //    VRTSetup."Item Cross Ref. Description(I)"::ItemDescription1: ItemCrossRef.Description := Item.Description;
-        //    VRTSetup."Item Cross Ref. Description(I)"::ItemDescription2: ItemCrossRef.Description := Item."Description 2";
-        //  END;
-        // END ELSE BEGIN
-        //  ItemVar.GET(ItemNo, VariantCode);
-        //  CASE VRTSetup."Item Cross Ref. Description(V)" OF
-        //    VRTSetup."Item Cross Ref. Description(V)"::ItemDescription1: ItemCrossRef.Description := Item.Description;
-        //    VRTSetup."Item Cross Ref. Description(V)"::ItemDescription2: ItemCrossRef.Description := Item."Description 2";
-        //    VRTSetup."Item Cross Ref. Description(V)"::VariantDescription1: ItemCrossRef.Description := ItemVar.Description;
-        //    VRTSetup."Item Cross Ref. Description(V)"::VariantDescription2: ItemCrossRef.Description := ItemVar."Description 2";
-        //  END;
-        // END;
-        ItemCrossRef.Description := DescriptionControl.GetItemCrossRefDescription(ItemNo, VariantCode);
-        //+NPR5.48 [338542]
-        //+VRT1.11
+        ItemRef.Init;
+        ItemRef."Item No." := ItemNo;
+        ItemRef."Variant Code" := VariantCode;
+        ItemRef.Validate("Reference Type", CrossRefType);
+        ItemRef.Validate("Reference Type No.", CrossRefTypeNo);
+        ItemRef."Reference No." := Barcode;
+        ItemRef.Description := DescriptionControl.GetItemRefDescription(ItemNo, VariantCode);
+        ItemRef."Unit of Measure" := GetUnitOfMeasure(ItemNo, 1);
 
-        //-NPR5.53 [345108]
-        ItemCrossRef."Unit of Measure" := GetUnitOfMeasure(ItemNo, 1);
-        //+NPR5.53 [345108]
-        ItemCrossRef.Insert;
+        ItemRef.Insert;
     end;
 
     procedure CreateBarcodeEAN13(RefNo: Code[20]) Barcode: Code[13]
@@ -851,9 +805,9 @@ codeunit 6059972 "NPR Variety Clone Data"
         RetailSetup: Record "NPR Retail Setup";
         NoSeriesMgt: Codeunit NoSeriesManagement;
         AlternativeNo1: Record "NPR Alternative No.";
-        ItemCrossRef1: Record "Item Cross Reference";
+        ItemRef1: Record "Item Reference";
         AlternativeNo2: Record "NPR Alternative No.";
-        ItemCrossRef2: Record "Item Cross Reference";
+        ItemRef2: Record "Item Reference";
         Filler: array[3] of Text;
         NextNo: array[3] of Text;
     begin
@@ -864,10 +818,10 @@ codeunit 6059972 "NPR Variety Clone Data"
             AlternativeNo1.SetRange(Type, AlternativeNo1.Type::Item);
             AlternativeNo1.SetFilter("Alt. No.", '%1', Format(RetailSetup."EAN-Internal") + '*');
             if AlternativeNo1.FindLast then;
-            ItemCrossRef1.SetCurrentKey("Cross-Reference Type", "Cross-Reference No.");
-            ItemCrossRef1.SetRange("Cross-Reference Type", ItemCrossRef1."Cross-Reference Type"::"Bar Code");
-            ItemCrossRef1.SetFilter("Cross-Reference No.", '%1', Format(RetailSetup."EAN-Internal") + '*');
-            if ItemCrossRef1.FindLast then;
+            ItemRef1.SetCurrentKey("Reference Type", "Reference No.");
+            ItemRef1.SetRange("Reference Type", ItemRef1."Reference Type"::"Bar Code");
+            ItemRef1.SetFilter("Reference No.", '%1', Format(RetailSetup."EAN-Internal") + '*');
+            if ItemRef1.FindLast then;
             NextNo[1] := NoSeriesMgt.TryGetNextNo(RetailSetup."Internal EAN No. Management", Today);
             Filler[1] := PadStr('', 12 - StrLen(Format(RetailSetup."EAN-Internal")) - StrLen(NextNo[1]), '0')
         end;
@@ -876,10 +830,10 @@ codeunit 6059972 "NPR Variety Clone Data"
             AlternativeNo2.SetRange(Type, AlternativeNo2.Type::Item);
             AlternativeNo2.SetFilter("Alt. No.", '%1', Format(RetailSetup."EAN-External") + '*');
             if AlternativeNo2.FindLast then;
-            ItemCrossRef2.SetCurrentKey("Cross-Reference Type", "Cross-Reference No.");
-            ItemCrossRef2.SetRange("Cross-Reference Type", ItemCrossRef2."Cross-Reference Type"::"Bar Code");
-            ItemCrossRef2.SetFilter("Cross-Reference No.", '%1', Format(RetailSetup."EAN-External") + '*');
-            if ItemCrossRef2.FindLast then;
+            ItemRef2.SetCurrentKey("Reference Type", "Reference No.");
+            ItemRef2.SetRange("Reference Type", ItemRef2."Reference Type"::"Bar Code");
+            ItemRef2.SetFilter("Reference No.", '%1', Format(RetailSetup."EAN-External") + '*');
+            if ItemRef2.FindLast then;
             NextNo[2] := NoSeriesMgt.TryGetNextNo(RetailSetup."External EAN-No. Management", Today);
             Filler[2] := PadStr('', 12 - StrLen(Format(RetailSetup."EAN-External")) - StrLen(NextNo[2]), '0')
         end;
@@ -889,13 +843,13 @@ codeunit 6059972 "NPR Variety Clone Data"
                 '   ' + RetailSetup.FieldCaption("EAN-Internal") + ' : ' + Format(RetailSetup."EAN-Internal") + '\' +
                 '   ' + Format(RetailSetup."EAN-Internal") + '-' + Filler[1] + '-' + NextNo[1] + '-x\' +
                 '    Last Alternative number found  : ' + AlternativeNo1."Alt. No." + '\' +
-                '    Last Item Cross reference found: ' + ItemCrossRef1."Cross-Reference No." + '\' +
+                '    Last Item reference found: ' + ItemRef1."Reference No." + '\' +
                 RetailSetup.FieldCaption("EAN-External") + '\' +
                 '   ' + RetailSetup.FieldCaption("External EAN-No. Management") + ' : ' + RetailSetup."External EAN-No. Management" + '\' +
                 '   ' + RetailSetup.FieldCaption("EAN-External") + ' : ' + Format(RetailSetup."EAN-External") + '\' +
                 '   ' + Format(RetailSetup."EAN-External") + '-' + Filler[2] + '-' + NextNo[2] + '-x\' +
                 '    Last Alternative number found  : ' + AlternativeNo2."Alt. No." + '\' +
-                '    Last Item Cross reference found: ' + ItemCrossRef2."Cross-Reference No." + '\' +
+                '    Last Item reference found: ' + ItemRef2."Reference No." + '\' +
                 'Retail Setup Enabled Fields:\' +
                 '   ' + RetailSetup.FieldCaption("ISBN Bookland EAN") + ' : ' + Format(RetailSetup."ISBN Bookland EAN") + '\' +
                 '   ' + RetailSetup.FieldCaption("Autocreate EAN-Number") + ' : ' + Format(RetailSetup."Autocreate EAN-Number") + '\' +
@@ -924,7 +878,7 @@ codeunit 6059972 "NPR Variety Clone Data"
     var
         ItemVar: Record "Item Variant";
         AltNo: Record "NPR Alternative No.";
-        ItemCrossRef: Record "Item Cross Reference";
+        ItemRef: Record "Item Reference";
     begin
         //-VRT1.11
         if not GetVRTSetup() then
@@ -940,12 +894,11 @@ codeunit 6059972 "NPR Variety Clone Data"
         end;
 
         if (VRTSetup."Item Cross Ref. No. Series (I)" <> '') then begin
-            //check for item cross reference item
-            ItemCrossRef.SetRange("Item No.", Item."No.");
-            ItemCrossRef.SetRange("Variant Code", '');
-            ItemCrossRef.SetRange("Cross-Reference Type", ItemCrossRef."Cross-Reference Type"::"Bar Code");
-            if ItemCrossRef.IsEmpty then
-                AddItemCrossRef(Item."No.", '');
+            ItemRef.SetRange("Item No.", Item."No.");
+            ItemRef.SetRange("Variant Code", '');
+            ItemRef.SetRange("Reference Type", ItemRef."Reference Type"::"Bar Code");
+            if ItemRef.IsEmpty then
+                AddItemRef(Item."No.", '');
         end;
 
         ItemVar.SetRange("Item No.", Item."No.");
@@ -961,12 +914,11 @@ codeunit 6059972 "NPR Variety Clone Data"
                 end;
 
                 if (VRTSetup."Item Cross Ref. No. Series (V)" <> '') then begin
-                    //check for item cross reference on variant
-                    ItemCrossRef.SetRange("Item No.", Item."No.");
-                    ItemCrossRef.SetRange("Variant Code", ItemVar.Code);
-                    ItemCrossRef.SetRange("Cross-Reference Type", ItemCrossRef."Cross-Reference Type"::"Bar Code");
-                    if ItemCrossRef.IsEmpty then
-                        AddItemCrossRef(Item."No.", ItemVar.Code);
+                    ItemRef.SetRange("Item No.", Item."No.");
+                    ItemRef.SetRange("Variant Code", ItemVar.Code);
+                    ItemRef.SetRange("Reference Type", ItemRef."Reference Type"::"Bar Code");
+                    if ItemRef.IsEmpty then
+                        AddItemRef(Item."No.", ItemVar.Code);
                 end;
             until ItemVar.Next = 0;
         //+VRT1.11
@@ -1008,9 +960,9 @@ codeunit 6059972 "NPR Variety Clone Data"
         //+VRT1.11
     end;
 
-    procedure UpdateItemCrossRefDescription()
+    procedure UpdateItemRefDescription()
     var
-        ItemCrossRef: Record "Item Cross Reference";
+        ItemRef: Record "Item Reference";
         NoOfRecords: Integer;
         LineCount: Integer;
         Item: Record Item;
@@ -1018,48 +970,48 @@ codeunit 6059972 "NPR Variety Clone Data"
         Dia: Dialog;
     begin
         //-VRT1.11
-        if not Confirm(Text009, false, ItemCrossRef.TableCaption) then
+        if not Confirm(Text009, false, ItemRef.TableCaption) then
             exit;
         GetVRTSetup;
 
-        NoOfRecords := ItemCrossRef.Count;
+        NoOfRecords := ItemRef.Count;
 
         if GuiAllowed then begin
             Dia.Open(Text010);
-            Dia.Update(1, ItemCrossRef.TableCaption);
+            Dia.Update(1, ItemRef.TableCaption);
         end;
 
-        if ItemCrossRef.FindSet(true, false) then
+        if ItemRef.FindSet(true, false) then
             repeat
                 LineCount += 1;
                 if GuiAllowed then
                     Dia.Update(2, Round(LineCount / NoOfRecords * 10000, 1));
-                if Item."No." <> ItemCrossRef."Item No." then
-                    if not Item.Get(ItemCrossRef."Item No.") then
+                if Item."No." <> ItemRef."Item No." then
+                    if not Item.Get(ItemRef."Item No.") then
                         Clear(Item);
-                if ItemCrossRef."Variant Code" = '' then begin
+                if ItemRef."Variant Code" = '' then begin
                     case VRTSetup."Item Cross Ref. Description(I)" of
                         VRTSetup."Item Cross Ref. Description(I)"::ItemDescription1:
-                            ItemCrossRef.Description := Item.Description;
+                            ItemRef.Description := Item.Description;
                         VRTSetup."Item Cross Ref. Description(I)"::ItemDescription2:
-                            ItemCrossRef.Description := Item."Description 2";
+                            ItemRef.Description := Item."Description 2";
                     end;
                 end else begin
-                    if not ItemVar.Get(ItemCrossRef."Item No.", ItemCrossRef."Variant Code") then
+                    if not ItemVar.Get(ItemRef."Item No.", ItemRef."Variant Code") then
                         Clear(ItemVar);
                     case VRTSetup."Item Cross Ref. Description(V)" of
                         VRTSetup."Item Cross Ref. Description(V)"::ItemDescription1:
-                            ItemCrossRef.Description := Item.Description;
+                            ItemRef.Description := Item.Description;
                         VRTSetup."Item Cross Ref. Description(V)"::ItemDescription2:
-                            ItemCrossRef.Description := Item."Description 2";
+                            ItemRef.Description := Item."Description 2";
                         VRTSetup."Item Cross Ref. Description(V)"::VariantDescription1:
-                            ItemCrossRef.Description := ItemVar.Description;
+                            ItemRef.Description := ItemVar.Description;
                         VRTSetup."Item Cross Ref. Description(V)"::VariantDescription2:
-                            ItemCrossRef.Description := ItemVar."Description 2";
+                            ItemRef.Description := ItemVar."Description 2";
                     end;
                 end;
-                ItemCrossRef.Modify;
-            until ItemCrossRef.Next = 0;
+                ItemRef.Modify;
+            until ItemRef.Next = 0;
 
         if GuiAllowed then
             Dia.Close;
@@ -1069,7 +1021,7 @@ codeunit 6059972 "NPR Variety Clone Data"
     procedure LookupBarcodes(ItemNo: Code[20]; VariantCode: Code[10]): Code[20]
     var
         AlternativeNo: Record "NPR Alternative No.";
-        ItemCrossRef: Record "Item Cross Reference";
+        ItemRef: Record "Item Reference";
     begin
         //-VRT1.20 [261631]
         case GetPrimaryBarcodeTableNo of
@@ -1085,14 +1037,14 @@ codeunit 6059972 "NPR Variety Clone Data"
                         exit(AlternativeNo."Alt. No.");
                     //+NPR5.30 [263917]
                 end;
-            DATABASE::"Item Cross Reference":
+            DATABASE::"Item Reference":
                 begin
-                    ItemCrossRef.SetRange("Item No.", ItemNo);
-                    ItemCrossRef.SetRange("Cross-Reference Type", ItemCrossRef."Cross-Reference Type"::"Bar Code");
+                    ItemRef.SetRange("Item No.", ItemNo);
+                    ItemRef.SetRange("Reference Type", ItemRef."Reference Type"::"Bar Code");
                     if VariantCode <> '' then
-                        ItemCrossRef.SetRange("Variant Code", VariantCode);
-                    if PAGE.RunModal(0, ItemCrossRef) = ACTION::LookupOK then
-                        exit(ItemCrossRef."Cross-Reference No.");
+                        ItemRef.SetRange("Variant Code", VariantCode);
+                    if PAGE.RunModal(0, ItemRef) = ACTION::LookupOK then
+                        exit(ItemRef."Reference No.");
                 end;
         end;
         //+VRT1.20 [261631]
@@ -1114,8 +1066,8 @@ codeunit 6059972 "NPR Variety Clone Data"
         case GetPrimaryBarcodeTableNo of
             DATABASE::"NPR Alternative No.":
                 InsertAltNo(ItemNo, VariantCode, Barcode);
-            DATABASE::"Item Cross Reference":
-                InsertItemCrossRef(ItemNo, VariantCode, Barcode, 3, '')
+            DATABASE::"Item Reference":
+                InsertItemRef(ItemNo, VariantCode, Barcode, 3, '')
         end;
         //+VRT1.20 [261631]
     end;
@@ -1127,7 +1079,7 @@ codeunit 6059972 "NPR Variety Clone Data"
             if VRTSetup."Create Alt. No. automatic" then
                 exit(DATABASE::"NPR Alternative No.")
             else
-                exit(DATABASE::"Item Cross Reference");
+                exit(DATABASE::"Item Reference");
         end;
         exit(DATABASE::"NPR Alternative No.");
         //+VRT1.20 [261631]

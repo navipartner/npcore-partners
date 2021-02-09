@@ -1,9 +1,5 @@
 page 6014403 "NPR Retail ItemReclass.Journal"
 {
-    // NPR5.23/THRO/20160509 CASE 240777 "Cross-Reference No." inserted
-    // NPR5.30/TJ  /20170222 CASE 266258 Creating template for new page ID if it doesn't allready exist
-    // NPR5.30/TJ  /20170227 CASE 267424 Using GetItem function from RetailItemJnlMgt
-
     AutoSplitKey = true;
     Caption = 'Item Reclass. Journal';
     DataCaptionFields = "Journal Batch Name";
@@ -64,10 +60,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.30 [267424]
-                        //ItemJnlMgt.GetItem("Item No.",ItemDescription);
                         RetailItemJnlMgt.GetItem("Item No.", ItemDescription);
-                        //+NPR5.30 [267424]
                         ShowShortcutDimCode(ShortcutDimCode);
                         ShowNewShortcutDimCode(NewShortcutDimCode);
                     end;
@@ -78,7 +71,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     Visible = false;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field("Cross-Reference No."; "Cross-Reference No.")
+                field("Cross-Reference No."; "Item Reference No.")
                 {
                     ApplicationArea = All;
                     Visible = false;

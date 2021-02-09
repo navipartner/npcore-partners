@@ -1,25 +1,27 @@
 report 6014603 "NPR ICR to Alt. No. barcodes"
 {
     Caption = 'Item Cross Reference to Alt. No. barcodes';
-    ProcessingOnly = true; 
-    UsageCategory = ReportsAndAnalysis; 
+    ProcessingOnly = true;
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     dataset
     {
-        dataitem("Item Cross Reference"; "Item Cross Reference")
+        dataitem("Item Reference"; "Item Reference")
         {
-            DataItemTableView = WHERE("Cross-Reference No." = FILTER(<> ''), "Cross-Reference Type" = CONST("Bar Code"));
+            DataItemTableView = WHERE("Reference No." = FILTER(<> ''), "Reference Type" = CONST("Bar Code"));
 
             trigger OnAfterGetRecord()
             var
                 AltNo: Record "NPR Alternative No.";
             begin
                 AltNo.SetRange(Type, AltNo.Type::Item);
-                AltNo.SetRange("Alt. No.", "Cross-Reference No.");
+                AltNo.SetRange("Alt. No.", "Reference No.");
                 AltNo.SetFilter(Code, '<>%1', "Item No.");
                 AltNo.SetFilter("Variant Code", '<>%1', "Variant Code");
                 if not AltNo.IsEmpty then
-                    Error(ClashErr, "Cross-Reference No.", "Item No.");
+                    Error(ClashErr, "Reference No.", "Item No.");
+
+                AltNo.Reset;
 
                 AltNo.Reset();
                 AltNo.Init();
@@ -27,7 +29,7 @@ report 6014603 "NPR ICR to Alt. No. barcodes"
                 AltNo."Variant Code" := "Variant Code";
                 AltNo."Base Unit of Measure" := "Unit of Measure";
                 AltNo.Type := AltNo.Type::Item;
-                AltNo."Alt. No." := "Cross-Reference No.";
+                AltNo."Alt. No." := "Reference No.";
                 AltNo.Discontinue := "Discontinue Bar Code";
                 if AltNo.Insert then //Don't fail on barcodes that have already been moved.
                     AddCounter += 1;
@@ -46,8 +48,8 @@ report 6014603 "NPR ICR to Alt. No. barcodes"
             trigger OnPreDataItem()
             begin
                 OpenDialog();
-                UpdateDialog(1, DATABASE::"Item Cross Reference");
-                Total := "Item Cross Reference".Count;
+                UpdateDialog(1, DATABASE::"Item Reference");
+                Total := "Item Reference".Count;
             end;
         }
     }

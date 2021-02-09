@@ -23,7 +23,6 @@ table 6014422 "NPR Retail Journal Line"
                 Item: Record Item;
                 Vendor: Record Vendor;
                 BarcodeLibrary: Codeunit "NPR Barcode Library";
-                ItemCrossReference: Record "Item Cross Reference";
                 BarcodeValue: Text;
                 ResolvingTable: Integer;
             begin

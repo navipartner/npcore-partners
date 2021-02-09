@@ -39,27 +39,26 @@ codeunit 6059831 "NPR RFID Mgt."
         exit(RFIDSetup."RFID Hex Value Prefix" + PadLeft(HexValue, '0', RFIDSetup."RFID Hex Value Length"));
     end;
 
-    procedure CheckItemCrossReference(TagValue: Text)
+    procedure CheckItemReference(TagValue: Text)
     var
-        ItemCrossReference: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
     begin
-        ItemCrossReference.SetCurrentKey("Cross-Reference No.");
-        ItemCrossReference.SetRange("Cross-Reference No.", TagValue);
-        if not ItemCrossReference.IsEmpty() then
-            ItemCrossReference.FieldError("Cross-Reference No.", ERR_RFID_CLASH);
+        ItemReference.SetCurrentKey("Reference No.");
+        ItemReference.SetRange("Reference No.", TagValue);
+        if not ItemReference.IsEmpty() then
+            ItemReference.FieldError("Reference No.", ERR_RFID_CLASH);
     end;
 
-    procedure InsertItemCrossReference(ItemNo: Text; VariantCode: Text; TagValue: Text)
+    procedure InsertItemReference(ItemNo: Text; VariantCode: Text; TagValue: Text)
     var
-        ItemCrossReference: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
     begin
-        ItemCrossReference.Init();
-        ItemCrossReference.Validate("Item No.", ItemNo);
-        ItemCrossReference.Validate("Variant Code", VariantCode);
-        ItemCrossReference.Validate("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::"Bar Code");
-        ItemCrossReference.Validate("Cross-Reference No.", TagValue);
-        ItemCrossReference.Validate("NPR Is Retail Serial No.", true);
-        ItemCrossReference.Insert(true);
+        ItemReference.Init();
+        ItemReference.Validate("Item No.", ItemNo);
+        ItemReference.Validate("Variant Code", VariantCode);
+        ItemReference.Validate("Reference Type", ItemReference."Reference Type"::"Retail Serial No.");
+        ItemReference.Validate("Reference No.", TagValue);
+        ItemReference.Insert(true);
     end;
 
     local procedure IntToHex(BigInt: BigInteger): Text
@@ -176,7 +175,7 @@ codeunit 6059831 "NPR RFID Mgt."
 
 
     [IntegrationEvent(false, false)]
-    procedure OnBeforeSaveItemCrossReferenceValue(var RetailJournalLine: Record "NPR Retail Journal Line")
+    procedure OnBeforeSaveItemReferenceValue(var RetailJournalLine: Record "NPR Retail Journal Line")
     begin
     end;
 }

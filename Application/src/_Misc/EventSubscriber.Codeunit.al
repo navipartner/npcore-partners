@@ -28,8 +28,8 @@ codeunit 6014404 "NPR Event Subscriber"
             Error(RegisterCodeAlreadyUsedErr, Rec."NPR Register Password");
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Item Journal Line", 'OnAfterValidateEvent', 'Cross-Reference No.', false, false)]
-    local procedure ItemJournalLineOnAfterValidateEventCrossReferenceNo(var Rec: Record "Item Journal Line"; var xRec: Record "Item Journal Line"; CurrFieldNo: Integer)
+    [EventSubscriber(ObjectType::Table, Database::"Item Journal Line", 'OnAfterValidateEvent', 'Item Reference No.', false, false)]
+    local procedure T83OnAfterValidateEventItemReferenceNo(var Rec: Record "Item Journal Line"; var xRec: Record "Item Journal Line"; CurrFieldNo: Integer)
     var
         StdTableCode: Codeunit "NPR Std. Table Code";
     begin
@@ -93,7 +93,7 @@ codeunit 6014404 "NPR Event Subscriber"
         NewItemLedgerEntry."NPR Register Number" := OldItemLedgerEntry."NPR Register Number";
         NewItemLedgerEntry."NPR Salesperson Code" := OldItemLedgerEntry."NPR Salesperson Code";
         if RetailSetup."Transfer SeO Item Entry" then
-            NewItemLedgerEntry."Cross-Reference No." := OldItemLedgerEntry."Cross-Reference No.";
+            NewItemLedgerEntry."Item Reference No." := OldItemLedgerEntry."Item Reference No.";
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnBeforePostItemJnlLine', '', false, false)]

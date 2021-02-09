@@ -79,17 +79,11 @@ table 6151168 "NPR NpGp POS Sales Line"
             DataClassification = CustomerContent;
             TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE(Code = FIELD("No."));
         }
-        field(215; "Cross-Reference No."; Code[20])
+        field(215; "Cross-Reference No."; Code[50])
         {
-            AccessByPermission = TableData "Item Cross Reference" = R;
-            Caption = 'Cross-Reference No.';
+            AccessByPermission = TableData "Item Reference" = R;
+            Caption = 'Reference No.';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                ReturnedCrossRef: Record "Item Cross Reference";
-            begin
-            end;
         }
         field(220; "BOM Item No."; Code[20])
         {

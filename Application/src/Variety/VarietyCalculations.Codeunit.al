@@ -79,22 +79,22 @@ codeunit 6059979 "NPR Variety Calculations"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6059971, 'OnDrillDownVarietyMatrix', '', true, false)]
-    local procedure LookupItemCrossReference(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; CalledFrom: Option OnDrillDown,OnLookup; var ItemFilters: Record Item)
+    local procedure LookupItemReference(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; CalledFrom: Option OnDrillDown,OnLookup; var ItemFilters: Record Item)
     var
-        ItemCrossReference: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
     begin
-        if not CheckIsMe(CalledFrom, VrtFieldSetup, 'LookupItemCrossReference') then
+        if not CheckIsMe(CalledFrom, VrtFieldSetup, 'LookupItemReference') then
             exit;
 
-        ItemCrossReference.SetRange("Cross-Reference No.", FieldValue);
-        if ItemCrossReference.FindFirst then;
-        ItemCrossReference.SetRange("Cross-Reference No.");
+        ItemReference.SetRange("Reference No.", FieldValue);
+        if ItemReference.FindFirst then;
+        ItemReference.SetRange("Reference No.");
 
         if UseReturnValue(CalledFrom, VrtFieldSetup) then begin
-            if PAGE.RunModal(0, ItemCrossReference) = ACTION::LookupOK then
-                FieldValue := ItemCrossReference."Cross-Reference No.";
+            if PAGE.RunModal(0, ItemReference) = ACTION::LookupOK then
+                FieldValue := ItemReference."Reference No.";
         end else
-            PAGE.RunModal(0, ItemCrossReference);
+            PAGE.RunModal(0, ItemReference);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6059971, 'OnDrillDownVarietyMatrix', '', true, false)]
@@ -175,18 +175,18 @@ codeunit 6059979 "NPR Variety Calculations"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6059971, 'GetVarietyMatrixFieldValue', '', true, false)]
-    local procedure GetItemCrossReference(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
+    local procedure GetItemReference(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
     var
-        ItemCrossRef: Record "Item Cross Reference";
+        ItemRef: Record "Item Reference";
     begin
-        if not CheckIsMe2(CalledFrom, VrtFieldSetup, 'GetItemCrossReference') then
+        if not CheckIsMe2(CalledFrom, VrtFieldSetup, 'GetItemReference') then
             exit;
 
-        ItemCrossRef.SetRange("Item No.", TMPVrtBuffer."Item No.");
-        ItemCrossRef.SetRange("Variant Code", TMPVrtBuffer."Variant Code");
-        ItemCrossRef.SetRange("Discontinue Bar Code", false);
-        if ItemCrossRef.FindFirst then
-            FieldValue := ItemCrossRef."Cross-Reference No.";
+        ItemRef.SetRange("Item No.", TMPVrtBuffer."Item No.");
+        ItemRef.SetRange("Variant Code", TMPVrtBuffer."Variant Code");
+        ItemRef.SetRange("Discontinue Bar Code", false);
+        if ItemRef.FindFirst then
+            FieldValue := ItemRef."Reference No.";
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6059971, 'GetVarietyMatrixFieldValue', '', true, false)]

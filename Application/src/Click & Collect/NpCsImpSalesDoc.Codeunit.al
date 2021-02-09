@@ -556,11 +556,11 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
     local procedure FindItemVariant(Element: XmlElement; var ItemVariant: Record "Item Variant")
     var
         Item: Record Item;
-        ItemCrossRef: Record "Item Cross Reference";
+        ItemRef: Record "Item Reference";
         NpCsDocumentMapping: Record "NPR NpCs Document Mapping";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         StoreCode: Code[20];
-        FromCrossRefNo: Code[20];
+        FromItemRefNo: Code[50];
         FromItemNo: Code[20];
         FromVariantCode: Code[10];
         Found: Boolean;
@@ -573,16 +573,16 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         Clear(ItemVariant);
 
         StoreCode := GetFromStoreCode(Element);
-        FromCrossRefNo := NpXmlDomMgt.GetElementCode(Element, 'cross_reference_no', MaxStrLen(ItemVariant."Item No."), false);
-        if NpCsDocumentMapping.Get(NpCsDocumentMapping.Type::"Item Cross Reference No.", StoreCode, FromCrossRefNo) and (NpCsDocumentMapping."To No." <> '') then begin
-            ItemCrossRef.SetRange("Cross-Reference No.", NpCsDocumentMapping."To No.");
-            ItemCrossRef.SetRange("Discontinue Bar Code", false);
-            if not ItemCrossRef.FindFirst then
-                ItemCrossRef.SetRange("Discontinue Bar Code");
+        FromItemRefNo := NpXmlDomMgt.GetElementCode(Element, 'cross_reference_no', MaxStrLen(ItemVariant."Item No."), false);
+        if NpCsDocumentMapping.Get(NpCsDocumentMapping.Type::"Item Cross Reference No.", StoreCode, FromItemRefNo) and (NpCsDocumentMapping."To No." <> '') then begin
+            ItemRef.SetRange("Reference No.", NpCsDocumentMapping."To No.");
+            ItemRef.SetRange("Discontinue Bar Code", false);
+            if not ItemRef.FindFirst then
+                ItemRef.SetRange("Discontinue Bar Code");
 
-            if ItemCrossRef.FindFirst then begin
-                ItemVariant."Item No." := ItemCrossRef."Item No.";
-                ItemVariant.Code := ItemCrossRef."Variant Code";
+            if ItemRef.FindFirst then begin
+                ItemVariant."Item No." := ItemRef."Item No.";
+                ItemVariant.Code := ItemRef."Variant Code";
                 exit;
             end;
         end;
@@ -594,7 +594,7 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         FromVariantCode := NpXmlDomMgt.GetElementCode(Element, 'variant_code', MaxStrLen(ItemVariant.Code), false);
         if (FromVariantCode <> '') and ItemVariant.Get(FromItemNo, FromVariantCode) then begin
             if NpCsDocumentMapping."From No." <> '' then begin
-                NpCsDocumentMapping.Validate("To No.", GetCrossRefNo(ItemVariant));
+                NpCsDocumentMapping.Validate("To No.", GetItemRefNo(ItemVariant));
                 NpCsDocumentMapping.Modify(true);
             end;
 
@@ -608,24 +608,23 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
             ItemVariant.Code := '';
 
             if NpCsDocumentMapping."From No." <> '' then begin
-                NpCsDocumentMapping.Validate("To No.", GetCrossRefNo(ItemVariant));
+                NpCsDocumentMapping.Validate("To No.", GetItemRefNo(ItemVariant));
                 NpCsDocumentMapping.Modify(true);
             end;
             exit;
         end;
 
-        Clear(ItemCrossRef);
-        ItemCrossRef.SetRange("Cross-Reference No.", FromItemNo);
-        ItemCrossRef.SetRange("Discontinue Bar Code", false);
-        if not ItemCrossRef.FindFirst then
-            ItemCrossRef.SetRange("Discontinue Bar Code");
+        ItemRef.SetRange("Reference No.", FromItemNo);
+        ItemRef.SetRange("Discontinue Bar Code", false);
+        if not ItemRef.FindFirst then
+            ItemRef.SetRange("Discontinue Bar Code");
 
-        if ItemCrossRef.FindFirst then begin
-            ItemVariant."Item No." := ItemCrossRef."Item No.";
-            ItemVariant.Code := ItemCrossRef."Variant Code";
+        if ItemRef.FindFirst then begin
+            ItemVariant."Item No." := ItemRef."Item No.";
+            ItemVariant.Code := ItemRef."Variant Code";
 
             if NpCsDocumentMapping."From No." <> '' then begin
-                NpCsDocumentMapping.Validate("To No.", ItemCrossRef."Cross-Reference No.");
+                NpCsDocumentMapping.Validate("To No.", ItemRef."Reference No.");
                 NpCsDocumentMapping.Modify(true);
             end;
 
@@ -638,19 +637,19 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
     begin
     end;
 
-    local procedure GetCrossRefNo(ItemVariant: Record "Item Variant") CrossRefNo: Code[20]
+    local procedure GetItemRefNo(ItemVariant: Record "Item Variant") ItemRefNo: Code[50]
     var
-        ItemCrossRef: Record "Item Cross Reference";
+        ItemRef: Record "Item Reference";
     begin
-        ItemCrossRef.SetRange("Item No.", ItemVariant."Item No.");
-        ItemCrossRef.SetRange("Variant Code", ItemVariant.Code);
-        ItemCrossRef.SetRange("Cross-Reference Type", ItemCrossRef."Cross-Reference Type"::"Bar Code");
-        ItemCrossRef.SetFilter("Cross-Reference No.", '<>%1', '');
-        ItemCrossRef.SetRange("Discontinue Bar Code", false);
-        if not ItemCrossRef.FindFirst then
-            ItemCrossRef.SetRange("Discontinue Bar Code");
-        if ItemCrossRef.FindFirst then
-            exit(ItemCrossRef."Cross-Reference No.");
+        ItemRef.SetRange("Item No.", ItemVariant."Item No.");
+        ItemRef.SetRange("Variant Code", ItemVariant.Code);
+        ItemRef.SetRange("Reference Type", ItemRef."Reference Type"::"Bar Code");
+        ItemRef.SetFilter("Reference No.", '<>%1', '');
+        ItemRef.SetRange("Discontinue Bar Code", false);
+        if not ItemRef.FindFirst then
+            ItemRef.SetRange("Discontinue Bar Code");
+        if ItemRef.FindFirst then
+            exit(ItemRef."Reference No.");
 
         exit('');
     end;

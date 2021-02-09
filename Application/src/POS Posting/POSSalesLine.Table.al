@@ -369,10 +369,10 @@ table 6150622 "NPR POS Sales Line"
             Editable = false;
             InitValue = 1;
         }
-        field(202; "Cross-Reference No."; Code[20])
+        field(202; "Cross-Reference No."; Code[50])
         {
-            AccessByPermission = TableData "Item Cross Reference" = R;
-            Caption = 'Cross-Reference No.';
+            AccessByPermission = TableData "Item Reference" = R;
+            Caption = 'Reference No.';
             DataClassification = CustomerContent;
             Description = 'NPR5.32.10';
         }
@@ -533,7 +533,7 @@ table 6150622 "NPR POS Sales Line"
             DataClassification = CustomerContent;
             TableRelation = Item;
         }
-        field(6015; "Retail Serial No."; Code[30])
+        field(6015; "Retail Serial No."; Code[50])
         {
             Caption = 'Retail Serial No.';
             DataClassification = CustomerContent;

@@ -1,19 +1,5 @@
 codeunit 6059969 "NPR Description Control"
 {
-    // NPR5.29/JDH /20161213 CASE 260472 Moved all description Control to this CU
-    // NPR5.29/KENU/20170106 CASE 262474 Added OnValidateEventLocationCode Event Subscriber to stop flipping values between Description and "Description 2"
-    // NPR5.36/MMV /20170724 CASE 284550 Moved initialization routine from CompanyOpen to a "IF NOT SETUP.GET()" pattern.
-    // NPR5.36/KENU/20170912 CASE 289660 Added EventSubscriber: T39OnAfterValidateEventCrossReferenceNo, T37OnAfterValidateEventCrossReferenceNo, T5741OnAfterValidateEventCrossReferenceNo
-    // NPR5.47/MMV /20181019 CASE 332824 Fixed case 284550 approach
-    // NPR5.48/JDH /20181214 CASE 338542 Created a function to get the description for Item Cross references, and 2 subscribers to update description on ICR table
-    // NPR5.51/ALST/20190731 CASE 351999 POS will now try to find a description in the current user's language, when creating the sales line, and using it
-    // NPR5.55/ALST/20200624 CASE 370006 modifications to description variables
-
-
-    trigger OnRun()
-    begin
-    end;
-
     procedure GetDescriptionPOS(var Rec: Record "NPR Sale Line POS"; XRec: Record "NPR Sale Line POS"; Item: Record Item)
     var
         RetailSetup: Record "NPR Retail Setup";
@@ -26,9 +12,7 @@ codeunit 6059969 "NPR Description Control"
             if Type <> Type::Item then
                 exit;
 
-            //-NPR5.47 [332824]
             InitDescriptionControl();
-            //+NPR5.47 [332824]
 
             if RetailSetup.Get then begin
                 if RetailSetup."POS Line Description Code" = '' then begin
@@ -285,7 +269,7 @@ codeunit 6059969 "NPR Description Control"
         exit(true);
     end;
 
-    procedure GetItemCrossRefDescription(ItemNo: Code[20]; VariantCode: Code[10]): Text[50]
+    procedure GetItemRefDescription(ItemNo: Code[20]; VariantCode: Code[10]): Text[50]
     var
         VRTSetup: Record "NPR Variety Setup";
         Item: Record Item;
@@ -734,8 +718,8 @@ codeunit 6059969 "NPR Description Control"
         GetDescriptionSale(SalesHeader, Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 39, 'OnAfterValidateEvent', 'Cross-Reference No.', true, true)]
-    local procedure T39OnAfterValidateEventCrossReferenceNo(var Rec: Record "Purchase Line"; var xRec: Record "Purchase Line"; CurrFieldNo: Integer)
+    [EventSubscriber(ObjectType::Table, 39, 'OnAfterValidateEvent', 'Item Reference No.', true, true)]
+    local procedure T39OnAfterValidateEventItemReferenceNo(var Rec: Record "Purchase Line"; var xRec: Record "Purchase Line"; CurrFieldNo: Integer)
     var
         PurchaseHeader: Record "Purchase Header";
     begin
@@ -745,8 +729,8 @@ codeunit 6059969 "NPR Description Control"
         //-NPR5.36
     end;
 
-    [EventSubscriber(ObjectType::Table, 37, 'OnAfterValidateEvent', 'Cross-Reference No.', true, true)]
-    local procedure T37OnAfterValidateEventCrossReferenceNo(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
+    [EventSubscriber(ObjectType::Table, 37, 'OnAfterValidateEvent', 'Item Reference No.', true, true)]
+    local procedure T37OnAfterValidateEventItemReferenceNo(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
     var
         SalesHeader: Record "Sales Header";
     begin
@@ -757,7 +741,7 @@ codeunit 6059969 "NPR Description Control"
     end;
 
     [EventSubscriber(ObjectType::Table, 5741, 'OnAfterValidateEvent', 'NPR Cross-Reference No.', true, true)]
-    local procedure T5741OnAfterValidateEventCrossReferenceNo(var Rec: Record "Transfer Line"; var xRec: Record "Transfer Line"; CurrFieldNo: Integer)
+    local procedure T5741OnAfterValidateEventItemReferenceNo(var Rec: Record "Transfer Line"; var xRec: Record "Transfer Line"; CurrFieldNo: Integer)
     var
         TransferHeader: Record "Transfer Header";
     begin
@@ -767,21 +751,21 @@ codeunit 6059969 "NPR Description Control"
         //-NPR5.36
     end;
 
-    [EventSubscriber(ObjectType::Table, 5717, 'OnAfterValidateEvent', 'Item No.', true, true)]
-    local procedure T5717OnAfterValidateEventItemNo(var Rec: Record "Item Cross Reference"; var xRec: Record "Item Cross Reference"; CurrFieldNo: Integer)
+    [EventSubscriber(ObjectType::Table, 5777, 'OnAfterValidateEvent', 'Item No.', true, true)]
+    local procedure T5777OnAfterValidateEventItemNo(var Rec: Record "Item Reference"; var xRec: Record "Item Reference"; CurrFieldNo: Integer)
     begin
         //-NPR5.48 [338542]
         if (Rec."Item No." <> xRec."Item No.") or (Rec.Description = '') then
-            Rec.Description := GetItemCrossRefDescription(Rec."Item No.", Rec."Variant Code");
+            Rec.Description := GetItemRefDescription(Rec."Item No.", Rec."Variant Code");
         //+NPR5.48 [338542]
     end;
 
-    [EventSubscriber(ObjectType::Table, 5717, 'OnAfterValidateEvent', 'Variant Code', true, true)]
-    local procedure T5717OnAfterValidateEventVariantCode(var Rec: Record "Item Cross Reference"; var xRec: Record "Item Cross Reference"; CurrFieldNo: Integer)
+    [EventSubscriber(ObjectType::Table, 5777, 'OnAfterValidateEvent', 'Variant Code', true, true)]
+    local procedure T5777OnAfterValidateEventVariantCode(var Rec: Record "Item Reference"; var xRec: Record "Item Reference"; CurrFieldNo: Integer)
     begin
         //-NPR5.48 [338542]
         if (Rec."Variant Code" <> xRec."Variant Code") or (Rec.Description = '') then
-            Rec.Description := GetItemCrossRefDescription(Rec."Item No.", Rec."Variant Code");
+            Rec.Description := GetItemRefDescription(Rec."Item No.", Rec."Variant Code");
         //+NPR5.48 [338542]
     end;
 }

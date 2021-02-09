@@ -1,12 +1,5 @@
 page 6059970 "NPR Variety Setup"
 {
-    // VRT1.11/MHA/20160412  CASE 236840 Added field 40 Hide Inactive Variants
-    // VRT1.11/JDH /20160602 CASE 242940 Added multible new fields for Description and Barcode creation mainly
-    // NPR5.27/MMV /20161021 CASE 254486 Added actions for new convert reports.
-    // NPR5.33/JDH /20170623 CASE 281812 Added Pages Variety, Variety Groups and Variety Field setup to action ribbon
-    // NPR5.36/JDH /20170922 CASE 288696 Setup Wizard created
-    // NPR5.43/JDH /20180628 CASE 317108 Added "Create Variant Code From"
-
     Caption = 'Variety Setup';
     PageType = Card;
     PromotedActionCategories = 'New,Process,Report,View,Update';
@@ -20,27 +13,27 @@ page 6059970 "NPR Variety Setup"
         {
             group(General)
             {
-                field("Variety Enabled"; "Variety Enabled")
+                field("Variety Enabled"; Rec."Variety Enabled")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Variety Enabled field';
                 }
-                field("Item Journal Blocking"; "Item Journal Blocking")
+                field("Item Journal Blocking"; Rec."Item Journal Blocking")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item Journal Blocking field';
                 }
-                field("Variant Description"; "Variant Description")
+                field("Variant Description"; Rec."Variant Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Variant Description field';
                 }
-                field("Variant Description 2"; "Variant Description 2")
+                field("Variant Description 2"; Rec."Variant Description 2")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Variant Description 2 field';
                 }
-                field("Create Variant Code From"; "Create Variant Code From")
+                field("Create Variant Code From"; Rec."Create Variant Code From")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Create Variant Code From field';
@@ -49,18 +42,18 @@ page 6059970 "NPR Variety Setup"
             group("Barcode (Alternative No.)")
             {
                 Caption = 'Barcode (Alternative No.)';
-                field("Create Alt. No. automatic"; "Create Alt. No. automatic")
+                field("Create Alt. No. automatic"; Rec."Create Alt. No. automatic")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Create Alt. No. automatic field';
                 }
-                field("Barcode Type (Alt. No.)"; "Barcode Type (Alt. No.)")
+                field("Barcode Type (Alt. No.)"; Rec."Barcode Type (Alt. No.)")
                 {
                     ApplicationArea = All;
                     Editable = "Create Alt. No. automatic";
                     ToolTip = 'Specifies the value of the Barcode Type (Alt. No.) field';
                 }
-                field("Alt. No. No. Series (I)"; "Alt. No. No. Series (I)")
+                field("Alt. No. No. Series (I)"; Rec."Alt. No. No. Series (I)")
                 {
                     ApplicationArea = All;
                     Editable = "Create Alt. No. automatic";
@@ -68,59 +61,55 @@ page 6059970 "NPR Variety Setup"
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.33 [242105]
-                        if "Alt. No. No. Series (V)" = '' then
-                            "Alt. No. No. Series (V)" := "Alt. No. No. Series (I)";
-                        //+NPR5.33 [242105]
+                        if Rec."Alt. No. No. Series (V)" = '' then
+                            Rec."Alt. No. No. Series (V)" := Rec."Alt. No. No. Series (I)";
                     end;
                 }
-                field("Alt. No. No. Series (V)"; "Alt. No. No. Series (V)")
+                field("Alt. No. No. Series (V)"; Rec."Alt. No. No. Series (V)")
                 {
                     ApplicationArea = All;
-                    Editable = "Create Alt. No. automatic";
+                    Editable = Rec."Create Alt. No. automatic";
                     ToolTip = 'Specifies the value of the Alt. No. No. Series (Variant) field';
                 }
             }
             group("Barcode (Item Cross Ref.)")
             {
                 Caption = 'Barcode (Item Cross Ref.)';
-                field("Create Item Cross Ref. auto."; "Create Item Cross Ref. auto.")
+                field("Create Item Cross Ref. auto."; Rec."Create Item Cross Ref. auto.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Create Item Cross Ref. auto. field';
                 }
-                field("Barcode Type (Item Cross Ref.)"; "Barcode Type (Item Cross Ref.)")
+                field("Barcode Type (Item Cross Ref.)"; Rec."Barcode Type (Item Cross Ref.)")
                 {
                     ApplicationArea = All;
                     Editable = "Create Item Cross Ref. auto.";
                     ToolTip = 'Specifies the value of the Barcode Type (Item Cross Ref.) field';
                 }
-                field("Item Cross Ref. No. Series (I)"; "Item Cross Ref. No. Series (I)")
+                field("Item Cross Ref. No. Series (I)"; Rec."Item Cross Ref. No. Series (I)")
                 {
                     ApplicationArea = All;
-                    Editable = "Create Item Cross Ref. auto.";
+                    Editable = Rec."Create Item Cross Ref. auto.";
                     ToolTip = 'Specifies the value of the Item Cross Ref. No. Series (Item) field';
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.33 [242105]
-                        if "Item Cross Ref. No. Series (V)" = '' then
-                            "Item Cross Ref. No. Series (V)" := "Item Cross Ref. No. Series (I)";
-                        //+NPR5.33 [242105]
+                        if Rec."Item Cross Ref. No. Series (V)" = '' then
+                            Rec."Item Cross Ref. No. Series (V)" := Rec."Item Cross Ref. No. Series (I)";
                     end;
                 }
-                field("Item Cross Ref. No. Series (V)"; "Item Cross Ref. No. Series (V)")
+                field("Item Cross Ref. No. Series (V)"; Rec."Item Cross Ref. No. Series (V)")
                 {
                     ApplicationArea = All;
-                    Editable = "Create Item Cross Ref. auto.";
+                    Editable = Rec."Create Item Cross Ref. auto.";
                     ToolTip = 'Specifies the value of the Item Cross Ref. No. Series (Variant) field';
                 }
-                field("Item Cross Ref. Description(I)"; "Item Cross Ref. Description(I)")
+                field("Item Cross Ref. Description(I)"; Rec."Item Cross Ref. Description(I)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item Cross Ref. Description (Item) field';
                 }
-                field("Item Cross Ref. Description(V)"; "Item Cross Ref. Description(V)")
+                field("Item Cross Ref. Description(V)"; Rec."Item Cross Ref. Description(V)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item Cross Ref. Description (Variant) field';
@@ -196,9 +185,7 @@ page 6059970 "NPR Variety Setup"
                     var
                         VRTCloneData: Codeunit "NPR Variety Clone Data";
                     begin
-                        //-VRT1.11
-                        VRTCloneData.ShowEAN13BarcodeNoSetup;
-                        //+VRT1.11
+                        VRTCloneData.ShowEAN13BarcodeNoSetup();
                     end;
                 }
                 action("Disable Original Setup")
@@ -212,9 +199,7 @@ page 6059970 "NPR Variety Setup"
                     var
                         VRTCloneData: Codeunit "NPR Variety Clone Data";
                     begin
-                        //-VRT1.11
-                        VRTCloneData.DisableOldBarcodeSetup;
-                        //+VRT1.11
+                        VRTCloneData.DisableOldBarcodeSetup();
                     end;
                 }
                 action("Alternative No.")
@@ -229,15 +214,15 @@ page 6059970 "NPR Variety Setup"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Alternative No. action';
                 }
-                action("Item Cross Reference")
+                action("Item Reference")
                 {
-                    Caption = 'Item Cross Reference';
+                    Caption = 'Item Reference';
                     Image = BarCode;
                     Promoted = true;
 				    PromotedOnly = true;
                     PromotedCategory = Category4;
-                    RunObject = Page "Item Cross Reference Entries";
-                    RunPageView = SORTING("Cross-Reference Type", "Cross-Reference No.");
+                    RunObject = Page "Item Reference Entries";
+                    RunPageView = SORTING("Reference Type", "Reference No.");
                     ApplicationArea = All;
                     ToolTip = 'Executes the Item Cross Reference action';
                 }
@@ -260,14 +245,12 @@ page 6059970 "NPR Variety Setup"
                     var
                         VrtCloneData: Codeunit "NPR Variety Clone Data";
                     begin
-                        //-VRT1.11
-                        VrtCloneData.UpdateVariantDescriptions;
-                        //+VRT1.11
+                        VrtCloneData.UpdateVariantDescriptions();
                     end;
                 }
-                action("Item Cross Reference Descriptions")
+                action("Item Reference Descriptions")
                 {
-                    Caption = 'Item Cross Reference Descriptions';
+                    Caption = 'Item Reference Descriptions';
                     Image = UpdateDescription;
                     Promoted = true;
 				    PromotedOnly = true;
@@ -280,9 +263,7 @@ page 6059970 "NPR Variety Setup"
                     var
                         VrtCloneData: Codeunit "NPR Variety Clone Data";
                     begin
-                        //-VRT1.11
-                        VrtCloneData.UpdateItemCrossRefDescription;
-                        //+VRT1.11
+                        VrtCloneData.UpdateItemRefDescription();
                     end;
                 }
                 action(Barcodes)
@@ -301,9 +282,9 @@ page 6059970 "NPR Variety Setup"
             group(Convert)
             {
                 Caption = 'Convert';
-                action("Alt. No. to Item Cross Reference")
+                action("Alt. No. to Item Reference")
                 {
-                    Caption = 'Alt. No. to Item Cross Reference';
+                    Caption = 'Alt. No. to Item Reference';
                     Image = BarCode;
                     Promoted = true;
 				    PromotedOnly = true;
@@ -313,9 +294,9 @@ page 6059970 "NPR Variety Setup"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Alt. No. to Item Cross Reference action';
                 }
-                action("Item Cross Reference to Alt. No.")
+                action("Item Reference to Alt. No.")
                 {
-                    Caption = 'Item Cross Reference to Alt. No.';
+                    Caption = 'Item Reference to Alt. No.';
                     Image = BarCode;
                     Promoted = true;
 				    PromotedOnly = true;
@@ -380,9 +361,7 @@ page 6059970 "NPR Variety Setup"
                     var
                         VarietySetupWizard: Codeunit "NPR Variety Setup Wizard";
                     begin
-                        //-NPR5.36 [288696]
-                        VarietySetupWizard.Run;
-                        //+NPR5.36 [288696]
+                        VarietySetupWizard.Run();
                     end;
                 }
             }
@@ -391,10 +370,10 @@ page 6059970 "NPR Variety Setup"
 
     trigger OnOpenPage()
     begin
-        Reset;
-        if not Get then begin
-            Init;
-            Insert;
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 }

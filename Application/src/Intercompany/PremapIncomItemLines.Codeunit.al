@@ -1,12 +1,5 @@
 codeunit 6060070 "NPR Premap Incom. Item Lines"
 {
-    // NPR5.27/BR  /20160926  CASE 252817 Created based on Codeunit 1214
-    // NPR5.27/BR  /20161027  CASE 252817 Added support for pre-filled in Vendor No.
-    // NPR5.29/BR  /20161209  CASE 260693 Removed AskShowImport function
-    // NPR5.29/BR  /20170106  CASE 262851 Fix for matching Vendor No., Cross References
-    // NPR5.29/BR  /20170120  CASE 264077 Fix issue matching Color and Size
-    // NPR5.38/MHA /20180105  CASE 301053 Changed type of variable, DocumentType, from Option to Integer in GetDocumentType() to prepare for V2
-
     TableNo = "Data Exch.";
 
     trigger OnRun()
@@ -16,34 +9,31 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
         ParentRecNo: Integer;
         CurrRecNo: Integer;
     begin
-        //-NPR5.29 [260693]
-        //AskShowImport := TRUE;//TEST
-        //+NPR5.29 [260693]
         ParentRecNo := 0;
-        FindDistinctRecordNos(TempIntegerHeaderRecords, "Entry No.", DATABASE::"Purchase Header", ParentRecNo);
+        FindDistinctRecordNos(TempIntegerHeaderRecords, Rec."Entry No.", DATABASE::"Purchase Header", ParentRecNo);
         if not TempIntegerHeaderRecords.FindSet then
             exit;
 
-        //REPEAT //Don't Loop
         CurrRecNo := TempIntegerHeaderRecords.Number;
 
-        ValidateCompanyInfo("Entry No.", CurrRecNo);
-        ValidateCurrency("Entry No.", CurrRecNo);
-        SetDocumentType("Entry No.", ParentRecNo, CurrRecNo);
+        ValidateCompanyInfo(Rec."Entry No.", CurrRecNo);
+        ValidateCurrency(Rec."Entry No.", CurrRecNo);
+        SetDocumentType(Rec."Entry No.", ParentRecNo, CurrRecNo);
 
-        CorrectHeaderData("Entry No.", CurrRecNo);
-        BuyFromVendorNo := FindBuyFromVendor("Entry No.", CurrRecNo);
-        PayToVendorNo := FindPayToVendor("Entry No.", CurrRecNo);
-        FindInvoiceToApplyTo("Entry No.", CurrRecNo);
+        CorrectHeaderData(Rec."Entry No.", CurrRecNo);
+        BuyFromVendorNo := FindBuyFromVendor(Rec."Entry No.", CurrRecNo);
+        PayToVendorNo := FindPayToVendor(Rec."Entry No.", CurrRecNo);
+        FindInvoiceToApplyTo(Rec."Entry No.", CurrRecNo);
 
-        PersistHeaderData("Entry No.", CurrRecNo, BuyFromVendorNo, PayToVendorNo);
+        PersistHeaderData(Rec."Entry No.", CurrRecNo, BuyFromVendorNo, PayToVendorNo);
 
-        CurrRecNo := 0; //Don't Loop
-        ProcessLines("Entry No.", CurrRecNo, BuyFromVendorNo);
-        //UNTIL TempIntegerHeaderRecords.NEXT = 0;
+        CurrRecNo := 0;
+        ProcessLines(Rec."Entry No.", CurrRecNo, BuyFromVendorNo);
     end;
 
     var
+        TempIntegerHeaderRecords: Record "Integer" temporary;
+        TempIntegerLineRecords: Record "Integer" temporary;
         InvalidCompanyInfoGLNErr: Label 'The customer''s GLN %1 on the incoming document does not match the GLN in the Company Information window.', Comment = '%1 = GLN (13 digit number)';
         InvalidCompanyInfoVATRegNoErr: Label 'The customer''s VAT registration number %1 on the incoming document does not match the VAT Registration No. in the Company Information window.', Comment = '%1 VAT Registration Number (format could be AB###### or ###### or AB##-##-###)';
         CurrencyCodeMissingErr: Label 'The currency code is missing on the incoming document.';
@@ -51,17 +41,15 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
         ItemCurrencyCodeDifferentErr: Label 'Currency code %1 on invoice line %2 must not be different from currency code %3 on the incoming document.', Comment = '%1 Invoice line currency code (e.g. GBP), %2 invoice line no. (e.g. 2), %3 document currency code (e.g. DKK)';
         BuyFromVendorNotFoundErr: Label 'Cannot find buy-from vendor ''%1'' based on the vendor''s GLN %2 or VAT registration number %3 on the incoming document. Make sure that a card for the vendor exists with the corresponding GLN or VAT Registration No.', Comment = '%1 Vendor name (e.g. London Postmaster), %2 Vendor''s GLN (13 digit number), %3 Vendor''s VAT Registration Number';
         PayToVendorNotFoundErr: Label 'Cannot find pay-to vendor ''%1'' based on the vendor''s GLN %2 or VAT registration number %3 on the incoming document. Make sure that a card for the vendor exists with the corresponding GLN or VAT Registration No.', Comment = '%1 Vendor name (e.g. London Postmaster), %2 Vendor''s GLN (13 digit number), %3 Vendor''s VAT Registration Number';
-        ItemNotFoundErr: Label 'Cannot find item ''%1'' based on the vendor %2 item number %3 or GTIN %4 on the incoming document. Make sure that a card for the item exists with the corresponding item cross reference or GTIN.', Comment = '%1 Vendor item name (e.g. Bicycle - may be another language),%2 Vendor''''s number,%3 Vendor''''s item number, %4 item bar code (GTIN)';
+        ItemNotFoundErr: Label 'Cannot find item ''%1'' based on the vendor %2 item number %3 or GTIN %4 on the incoming document. Make sure that a card for the item exists with the corresponding item reference or GTIN.', Comment = '%1 Vendor item name (e.g. Bicycle - may be another language),%2 Vendor''''s number,%3 Vendor''''s item number, %4 item bar code (GTIN)';
         ItemNotFoundByGTINErr: Label 'Cannot find item ''%1'' based on GTIN %2 on the incoming document. Make sure that a card for the item exists with the corresponding GTIN.', Comment = '%1 Vendor item name (e.g. Bicycle - may be another language),%2 item bar code (GTIN)';
-        ItemNotFoundByVendorItemNoErr: Label 'Cannot find item ''%1'' based on the vendor %2 item number %3 on the incoming document. Make sure that a card for the item exists with the corresponding item cross reference.', Comment = '%1 Vendor item name (e.g. Bicycle - may be another language),%2 Vendor''''s number,%3 Vendor''''s item number';
+        ItemNotFoundByVendorItemNoErr: Label 'Cannot find item ''%1'' based on the vendor %2 item number %3 on the incoming document. Make sure that a card for the item exists with the corresponding item reference.', Comment = '%1 Vendor item name (e.g. Bicycle - may be another language),%2 Vendor''''s number,%3 Vendor''''s item number';
         UOMNotFoundErr: Label 'Cannot find a unit of measure with International Standard Code %1. Make sure that a unit of measure code exists with International Standard Code %1.', Comment = '%1 International Standard Code for Unit of Measure (e.g. H12)';
         UOMMissingErr: Label 'Cannot find a unit of measure code on the incoming document line %1.', Comment = '%1 document line number (e.g. 2)';
         MissingCompanyInfoSetupErr: Label 'You must fill either GLN or VAT Registration No. in the Company Information window.';
         VendorNotFoundByNameAndAddressErr: Label 'Cannot find vendor based on the vendor''s name ''%1'' and street name ''%2'' on the incoming document. Make sure that a card for the vendor exists with the corresponding name.';
         InvalidCompanyInfoNameErr: Label 'The customer''s name ''%1'' on the incoming document does not match the Name in the Company Information window.', Comment = '%1 = customer name';
         InvalidCompanyInfoAddressErr: Label 'The customer''s address ''%1'' on the incoming document does not match the Address in the Company Information window.', Comment = '%1 = customer address, street name';
-        TempIntegerHeaderRecords: Record "Integer" temporary;
-        TempIntegerLineRecords: Record "Integer" temporary;
         FieldMustHaveAValueErr: Label 'You must specify a value for field ''%1''.', Comment = '%1 - field caption';
         DocumentTypeUnknownErr: Label 'You must make a new entry in the %1 of the %2 window, and enter ''%3'' or ''%4'' in the %5 field. Then, you must map it to the %6 field in the %7 table.', Comment = '%1 - Column Definitions (page caption),%2 - Data Exchange Definition (page caption),%3 - invoice (option caption),%4 - credit memo (option caption),%5 - Constant (field name),%6 - Document Type (field caption),%7 - Purchase Header (table caption)';
         YouMustFirstPostTheRelatedInvoiceErr: Label 'The incoming document references invoice %1 from the vendor. You must post related purchase invoice %2 before you create a new purchase document from this incoming document.', Comment = '%1 - vendor invoice no.,%2 posted purchase invoice no.';
@@ -81,17 +69,11 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
         Vendor: Record Vendor;
         PurchaseHeader: Record "Purchase Header";
     begin
-        // for OCRed invoices, we don't check the buyer's information
         DataExch.Get(EntryNo);
         IncomingDocument.Get(DataExch."Incoming Entry No.");
         if IncomingDocument.GetGeneratedFromOCRAttachment(IncomingDocumentAttachment) then
             exit;
 
-        //-NPR5.29 [252817]
-        //-NPR5.27 [252817]
-        //IF IncomingDocument."Vendor No." <> '' THEN
-        //  EXIT;
-        //+NPR5.27 [252817]
         if IncomingDocument."Vendor No." <> '' then begin
             Vendor.Get(IncomingDocument."Vendor No.");
             IntermediateDataImport.InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Header", PurchaseHeader.FieldNo("Buy-from Vendor No."), 0, RecordNo, Format(IncomingDocument."Vendor No."));
@@ -101,7 +83,6 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
                 IntermediateDataImport.InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Header", PurchaseHeader.FieldNo("Pay-to Vendor No."), 0, RecordNo, Format(Vendor."No."));
             exit;
         end;
-        //+NPR5.29 [252817]
 
         CompanyInformation.Get;
         with IntermediateDataImport do begin
@@ -197,24 +178,19 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
             end;
 
             IsLCY := DocumentCurrency = GLSetup."LCY Code";
-            // If LCY Currency wont be in Currency table
             if IsLCY then begin
-                // Update Document Currency
                 Value := '';
                 Modify;
             end;
 
-            // Ensure the currencies all match the same document currency
             SetRange("Field ID", PurchaseHeader.FieldNo("Tax Area Code"));
             SetFilter(Value, '<>%1', DocumentCurrency);
             if FindFirst then
                 LogSimpleErrorMessage(EntryNo, StrSubstNo(CurrencyCodeDifferentErr, Value, DocumentCurrency));
 
-            // Clear the additional currency values on header
             SetRange(Value);
             DeleteAll;
 
-            // check currency on the lines
             SetRange("Table ID", DATABASE::"Purchase Line");
             SetRange("Field ID", PurchaseLine.FieldNo("Currency Code"));
             SetRange("Record No.");
@@ -223,7 +199,6 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
             if FindFirst then
                 LogSimpleErrorMessage(EntryNo, StrSubstNo(ItemCurrencyCodeDifferentErr, Value, "Record No.", DocumentCurrency));
 
-            // Clear the additional currency values on lines
             SetRange(Value);
             DeleteAll;
         end;
@@ -302,7 +277,6 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
         CorrectedValue: Text[250];
     begin
         ExistingValue := IntermediateDataImport.GetEntryValue(EntryNo, TableID, FieldID, 0, RecordNo);
-        //CorrectedValue := COPYSTR(FORMAT(IncomingDocumentValue,0,9),1,MAXSTRLEN(CorrectedValue));
         CorrectedValue := CopyStr(Format(IncomingDocumentValue), 1, MaxStrLen(CorrectedValue));
         if CorrectedValue <> ExistingValue then
             IntermediateDataImport.InsertOrUpdateEntry(EntryNo, TableID, FieldID, 0, RecordNo, CorrectedValue);
@@ -439,7 +413,6 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
             if FindFirst then
                 BuyFromAddress := Value;
 
-            // Lookup GLN
             SetRange("Field ID", PurchaseHeader.FieldNo("Buy-from Vendor No."));
             if FindFirst then
                 if Value <> '' then begin
@@ -455,7 +428,6 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
             Vendor.Reset;
             VatRegNo := '';
 
-            // Lookup VAT Reg No
             SetRange("Table ID", DATABASE::Vendor);
             SetRange("Field ID", Vendor.FieldNo("VAT Registration No."));
 
@@ -502,10 +474,8 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
             DataExch.Get(EntryNo);
             IncomingDocument.Get(DataExch."Incoming Entry No.");
 
-            //-NPR5.27 [252817]
             if IncomingDocument."Vendor No." <> '' then
                 exit(IncomingDocument."Vendor No.");
-            //+NPR5.27 [252817]
 
             if IncomingDocument."Document Type" <> IncomingDocument."Document Type"::Journal then
                 LogErrorMessage(EntryNo, EmptyVendor, EmptyVendor.FieldNo(Name),
@@ -546,8 +516,6 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
 
             if (VatRegNo = '') and (GLN = '') then begin
                 if PayToName <> '' then
-                    //-NPR5.29 [262851]
-                    //EXIT(FindVendorByNameAndAddress(EntryNo,RecordNo,PayToName,PayToAddress,PurchaseHeader.FIELDNO("Pay-to Vendor No.")));
                     PayToVendorNo := FindVendorByNameAndAddress(EntryNo, RecordNo, PayToName, PayToAddress, PurchaseHeader.FieldNo("Pay-to Vendor No."));
                 if PayToVendorNo <> '' then
                     exit(PayToVendorNo);
@@ -555,11 +523,9 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
                 IncomingDocument.Get(DataExch."Incoming Entry No.");
                 if IncomingDocument."Vendor No." <> '' then
                     exit(IncomingDocument."Vendor No.");
-                //+NPR5.29 [262851]
                 exit;
             end;
 
-            // Lookup GLN
             if GLN <> '' then begin
                 Vendor.SetRange(GLN, GLN);
                 if Vendor.FindFirst then begin
@@ -572,10 +538,8 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
 
             Vendor.Reset;
 
-            // Lookup VAT Reg No
-            //-NPR5.29 [262851]
+
             if VatRegNo <> '' then begin
-                //+NPR5.29 [262851]
                 Vendor.SetFilter("VAT Registration No.", StrSubstNo('*%1', CopyStr(VatRegNo, StrLen(VatRegNo))));
                 if Vendor.FindSet then
                     repeat
@@ -588,17 +552,13 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
                             exit(Vendor."No.");
                         end;
                     until Vendor.Next = 0;
-                //-NPR5.29 [262851]
             end;
-            //+NPR5.29 [262851]
 
             DataExch.Get(EntryNo);
             IncomingDocument.Get(DataExch."Incoming Entry No.");
 
-            //-NPR5.27 [252817]
             if IncomingDocument."Vendor No." <> '' then
                 exit(IncomingDocument."Vendor No.");
-            //+NPR5.27 [252817]
 
             if IncomingDocument."Document Type" <> IncomingDocument."Document Type"::Journal then
                 LogErrorMessage(EntryNo, EmptyVendor, EmptyVendor.FieldNo(Name),
@@ -722,7 +682,6 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
             if VendorInvoiceNo = '' then
                 exit;
 
-            // Find a posted purchase invoice that has the specified Vendor Invoice No.
             PurchInvHeader.SetRange("Vendor Invoice No.", VendorInvoiceNo);
             if PurchInvHeader.FindFirst then begin
                 AppliesToDocTypeAsInteger := PurchaseHeader."Applies-to Doc. Type"::Invoice.AsInteger();
@@ -733,9 +692,6 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
                 exit;
             end;
 
-            // No posted purchase invoice has the specified Vendor Invoice No.
-            // This is an error - the user first needs to post the related invoice before importing this document.
-            // If we can find an unposted invoice with this Vendor Invoice No. we will link to it in the error message.
             PurchaseHeader.SetRange("Vendor Invoice No.", VendorInvoiceNo);
             if PurchaseHeader.FindFirst then begin
                 LogErrorMessage(EntryNo, PurchaseHeader, PurchaseHeader.FieldNo("No."),
@@ -743,8 +699,6 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
                 exit;
             end;
 
-            // No purchase invoice (posted or not) has the specified Vendor Invoice No.
-            // This is an error - the user needs to create and post the related invoice before importing this document.
             LogErrorMessage(
               EntryNo, PurchInvHeader, PurchInvHeader.FieldNo("No."), StrSubstNo(UnableToFindRelatedInvoiceErr, VendorInvoiceNo));
         end;
@@ -755,25 +709,19 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
         IntermediateDataImport: Record "Intermediate Data Import";
         PurchaseLine: Record "Purchase Line";
     begin
-        // Lines with 0 quantity are "empty/description only" lines
         if IsDescriptionOnlyLine(EntryNo, HeaderRecordNo, RecordNo) then
             CleanDescriptionOnlyLine(EntryNo, HeaderRecordNo, RecordNo)
         else begin
-            // Lookup GTIN/Bar Code - else set as G/L Account
-            if not FindItemCrossReferenceFromGTIN(EntryNo, HeaderRecordNo, RecordNo) then
-                if not FindItemCrossReferenceFromVendor(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
-                    //-NPR5.25 [244303]
-                    if not FindItemCrossReferenceFromVendorItemNo(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
-                        if not FindItemCrossReferenceFromAltNo(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
-                            if not FindItemCrossReferenceFromItemNo(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
-                                //+NPR5.25 [244303]
-                                //-NPR5.25 [246088]
+            if not FindItemReferenceFromGTIN(EntryNo, HeaderRecordNo, RecordNo) then
+                if not FindItemReferenceFromVendor(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
+                    if not FindItemReferenceFromVendorItemNo(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
+                        if not FindItemReferenceFromAltNo(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
+                            if not FindItemReferenceFromItemNo(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
                                 if not CreateItemWorksheetLine(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
-                                    //+NPR5.25 [246088]
                                     if not FindGLAccountForLine(EntryNo, HeaderRecordNo, RecordNo) then
                                         LogErrorIfItemNotFound(EntryNo, HeaderRecordNo, RecordNo, VendorNo);
 
-            FindVariantFromSizeAndColor(EntryNo, HeaderRecordNo, RecordNo); //New
+            FindVariantFromSizeAndColor(EntryNo, HeaderRecordNo, RecordNo);
 
             ResolveUnitOfMeasure(EntryNo, HeaderRecordNo, RecordNo);
             ValidateLineDiscount(EntryNo, HeaderRecordNo, RecordNo);
@@ -816,7 +764,7 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
         end;
     end;
 
-    local procedure FindItemCrossReferenceFromGTIN(EntryNo: Integer; HeaderNo: Integer; RecordNo: Integer): Boolean
+    local procedure FindItemReferenceFromGTIN(EntryNo: Integer; HeaderNo: Integer; RecordNo: Integer): Boolean
     var
         IntermediateDataImport: Record "Intermediate Data Import";
         PurchaseLine: Record "Purchase Line";
@@ -831,7 +779,6 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
             if GTIN = '' then
                 exit(false);
 
-            //Item.SETRANGE(GTIN,GTIN);
             Item.SetRange(GTIN, CopyStr(GTIN, 1, MaxStrLen(Item.GTIN)));
             if not Item.FindFirst then
                 exit(false);
@@ -845,11 +792,11 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
         end;
     end;
 
-    local procedure FindItemCrossReferenceFromVendor(EntryNo: Integer; HeaderRecordNo: Integer; RecordNo: Integer; VendorNo: Code[20]): Boolean
+    local procedure FindItemReferenceFromVendor(EntryNo: Integer; HeaderRecordNo: Integer; RecordNo: Integer; VendorNo: Code[20]): Boolean
     var
         IntermediateDataImport: Record "Intermediate Data Import";
         PurchaseLine: Record "Purchase Line";
-        ItemCrossReference: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
         Vendor: Record Vendor;
         ItemVariant: Record "Item Variant";
     begin
@@ -857,22 +804,20 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
             exit(false);
 
         with IntermediateDataImport do begin
-            if FindEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Cross-Reference No."), HeaderRecordNo, RecordNo) then begin
-                ItemCrossReference.SetRange("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::Vendor);
-                ItemCrossReference.SetRange("Cross-Reference Type No.", VendorNo);
-                ItemCrossReference.SetRange("Cross-Reference No.", Value);
-                if ItemCrossReference.FindFirst then begin
+            if FindEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Item Reference No."), HeaderRecordNo, RecordNo) then begin
+                ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::Vendor);
+                ItemReference.SetRange("Reference Type No.", VendorNo);
+                ItemReference.SetRange("Reference No.", Value);
+                if ItemReference.FindFirst then begin
                     InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("No."),
-                      HeaderRecordNo, RecordNo, Format(ItemCrossReference."Item No.", 0, 9));
+                      HeaderRecordNo, RecordNo, Format(ItemReference."Item No.", 0, 9));
                     InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo(Type),
                       HeaderRecordNo, RecordNo, Format(PurchaseLine.Type::Item, 0, 9));
-                    //-NPR5.25 [244303]
-                    if ItemCrossReference."Variant Code" <> '' then
-                        if ItemVariant.Get(ItemCrossReference."Item No.", ItemCrossReference."Variant Code") then
+                    if ItemReference."Variant Code" <> '' then
+                        if ItemVariant.Get(ItemReference."Item No.", ItemReference."Variant Code") then
                             if not ItemVariant."NPR Blocked" then
                                 InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Variant Code"),
                                   HeaderRecordNo, RecordNo, Format(ItemVariant.Code, 0, 9));
-                    //+NPR5.25 [244303]
                     exit(true);
                 end;
             end;
@@ -881,18 +826,17 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
         end;
     end;
 
-    local procedure FindItemCrossReferenceFromVendorItemNo(EntryNo: Integer; HeaderRecordNo: Integer; RecordNo: Integer; VendorNo: Code[20]): Boolean
+    local procedure FindItemReferenceFromVendorItemNo(EntryNo: Integer; HeaderRecordNo: Integer; RecordNo: Integer; VendorNo: Code[20]): Boolean
     var
         IntermediateDataImport: Record "Intermediate Data Import";
         PurchaseLine: Record "Purchase Line";
         Vendor: Record Vendor;
         Item: Record Item;
     begin
-        //-NPR5.25 [244303]
         if not Vendor.Get(VendorNo) then
             exit(false);
         with IntermediateDataImport do begin
-            if FindEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Cross-Reference No."), HeaderRecordNo, RecordNo) then begin
+            if FindEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Item Reference No."), HeaderRecordNo, RecordNo) then begin
                 Item.SetRange("Vendor No.", Vendor."No.");
                 Item.SetRange("Vendor Item No.", Value);
                 if Item.FindFirst then begin
@@ -900,22 +844,19 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
                       HeaderRecordNo, RecordNo, Format(Item."No.", 0, 9));
                     InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo(Type),
                       HeaderRecordNo, RecordNo, Format(PurchaseLine.Type::Item, 0, 9));
-                    InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Cross-Reference No."),
+                    InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Item Reference No."),
                       HeaderRecordNo, RecordNo, '');
-                    //-NPR5.29 [262851]
-                    InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Cross-Reference No."),
+                    InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Item Reference No."),
                             HeaderRecordNo, RecordNo, '');
-                    //+NPR5.29 [262851]
                     exit(true);
                 end;
             end;
 
             exit(false);
         end;
-        //+NPR5.25 [244303]
     end;
 
-    local procedure FindItemCrossReferenceFromAltNo(EntryNo: Integer; HeaderRecordNo: Integer; RecordNo: Integer; VendorNo: Code[20]): Boolean
+    local procedure FindItemReferenceFromAltNo(EntryNo: Integer; HeaderRecordNo: Integer; RecordNo: Integer; VendorNo: Code[20]): Boolean
     var
         IntermediateDataImport: Record "Intermediate Data Import";
         PurchaseLine: Record "Purchase Line";
@@ -923,12 +864,11 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
         Vendor: Record Vendor;
         ItemVariant: Record "Item Variant";
     begin
-        //-NPR5.25 [244303]
         if not Vendor.Get(VendorNo) then
             exit(false);
 
         with IntermediateDataImport do begin
-            if FindEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Cross-Reference No."), HeaderRecordNo, RecordNo) then begin
+            if FindEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Item Reference No."), HeaderRecordNo, RecordNo) then begin
                 AltNo.SetRange(Type, AltNo.Type::Item);
                 AltNo.SetRange("Alt. No.", Value);
                 AltNo.SetFilter("Blocked Reason Code", '');
@@ -942,32 +882,28 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
                             if not ItemVariant."NPR Blocked" then
                                 InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Variant Code"),
                                   HeaderRecordNo, RecordNo, Format(ItemVariant.Code, 0, 9));
-                    //-NPR5.29 [262851]
-                    InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Cross-Reference No."),
+                    InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Item Reference No."),
                             HeaderRecordNo, RecordNo, '');
-                    //+NPR5.29 [262851]
                     exit(true);
                 end;
             end;
 
             exit(false);
         end;
-        //+NPR5.25 [244303]
     end;
 
-    local procedure FindItemCrossReferenceFromItemNo(EntryNo: Integer; HeaderRecordNo: Integer; RecordNo: Integer; VendorNo: Code[20]): Boolean
+    local procedure FindItemReferenceFromItemNo(EntryNo: Integer; HeaderRecordNo: Integer; RecordNo: Integer; VendorNo: Code[20]): Boolean
     var
         IntermediateDataImport: Record "Intermediate Data Import";
         PurchaseLine: Record "Purchase Line";
         Item: Record Item;
         Vendor: Record Vendor;
     begin
-        //-NPR5.25 [244303]
         if not Vendor.Get(VendorNo) then
             exit(false);
 
         with IntermediateDataImport do begin
-            if FindEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Cross-Reference No."), HeaderRecordNo, RecordNo) then begin
+            if FindEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Item Reference No."), HeaderRecordNo, RecordNo) then begin
                 Item.SetRange("Vendor No.", VendorNo);
                 Item.SetRange("No.", Value);
                 if Item.FindFirst then begin
@@ -975,17 +911,14 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
                       HeaderRecordNo, RecordNo, Format(Item."No.", 0, 9));
                     InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo(Type),
                       HeaderRecordNo, RecordNo, Format(PurchaseLine.Type::Item, 0, 9));
-                    //-NPR5.29 [262851]
-                    InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Cross-Reference No."),
+                    InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Item Reference No."),
                             HeaderRecordNo, RecordNo, '');
-                    //+NPR5.29 [262851]
                     exit(true);
                 end;
             end;
 
             exit(false);
         end;
-        //+NPR5.25 [244303]
     end;
 
     local procedure FindVariantFromSizeAndColor(EntryNo: Integer; HeaderNo: Integer; RecordNo: Integer): Boolean
@@ -1001,22 +934,14 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
         with IntermediateDataImport do begin
             if FindEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Variant Code"), HeaderNo, RecordNo) then
                 exit(Value <> '');
-            //-NPR5.29 [264077]
-            //IF FindEntry(EntryNo,DATABASE::"Purchase Line",PurchaseLine.FIELDNO(Type),HeaderNo,RecordNo) THEN
-            //  EXIT(Value <> FORMAT(PurchaseLine.Type::Item,0,9));
-            //IF NOT FindEntry(EntryNo,DATABASE::"Purchase Line",PurchaseLine.FIELDNO("No."),HeaderNo,RecordNo) THEN
-            //  EXIT(FALSE);
-            //+NPR5.29 [264077]
             if FindEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("NPR Size"), HeaderNo, RecordNo) then
                 Size := Value;
             if FindEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("NPR Color"), HeaderNo, RecordNo) then
                 Color := Value;
             if (Size = '') and (Color = '') then
                 exit(false);
-            //-NPR5.29 [264077]
             if not FindEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("No."), HeaderNo, RecordNo) then
                 exit(false);
-            //+NPR5.29 [264077]
             if not Item.Get(Value) then
                 exit(false);
 
@@ -1072,16 +997,14 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
         DummyBool: Boolean;
         IntermediateDataImport2: Record "Intermediate Data Import";
     begin
-        //-NPR5.25 [246088]
         if not Vendor.Get(VendorNo) then
             exit(false);
         with IntermediateDataImport do begin
-            if FindEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Cross-Reference No."), HeaderRecordNo, RecordNo) then begin
-                //Insert item worksheet lines
+            if FindEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Item Reference No."), HeaderRecordNo, RecordNo) then begin
                 ItemGroupText := GetEntryValue(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Description 2"), HeaderRecordNo, RecordNo);
                 if not Evaluate(DirectUnitCost, GetEntryValue(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Direct Unit Cost"), HeaderRecordNo, RecordNo), 9) then
                     DirectUnitCost := 0;
-                VendorItemNo := GetEntryValue(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Cross-Reference No."), HeaderRecordNo, RecordNo);
+                VendorItemNo := GetEntryValue(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Item Reference No."), HeaderRecordNo, RecordNo);
                 VendorItemDescription := GetEntryValue(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo(Description), HeaderRecordNo, RecordNo);
                 ItemWkshtDocExchange.InsertItemWorksheetLine(ItemWorksheet, ItemWorksheetLine, VendorNo, VendorItemNo, VendorItemDescription, ItemGroupText, DirectUnitCost);
                 LogErrorMessage(EntryNo, ItemWorksheetLine, ItemWorksheetLine.FieldNo("Vendor Item No."), VendorItemNo);
@@ -1089,7 +1012,6 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
                 LogErrorMessage(EntryNo, ItemWorksheetLine, ItemWorksheetLine.FieldNo("Direct Unit Cost"), Format(DirectUnitCost, 0, 9));
                 LogErrorMessage(EntryNo, ItemWorksheetLine, ItemWorksheetLine.FieldNo(Description), VendorItemDescription);
                 LogErrorMessage(EntryNo, ItemWorksheetLine, ItemWorksheetLine.FieldNo("Vendor No."), VendorNo);
-                //Support any field in Item Worksheet Line
                 IntermediateDataImport2.Reset;
                 IntermediateDataImport2.SetRange("Data Exch. No.", EntryNo);
                 IntermediateDataImport2.SetRange("Table ID", DATABASE::"NPR Item Worksheet Line");
@@ -1105,7 +1027,6 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
 
             exit(false);
         end;
-        //-NPR5.25 [246088]
     end;
 
     local procedure CreateVariantFromSizeAndColor(EntryNo: Integer; HeaderNo: Integer; RecordNo: Integer; ItemWorksheetLine: Record "NPR Item Worksheet Line"): Boolean
@@ -1213,7 +1134,7 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
             GTIN := GetEntryValue(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("No."),
                 HeaderRecordNo, RecordNo);
 
-            VendorItemNo := GetEntryValue(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Cross-Reference No."),
+            VendorItemNo := GetEntryValue(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Item Reference No."),
                 HeaderRecordNo, RecordNo);
 
             ItemName := GetEntryValue(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo(Description),
@@ -1282,16 +1203,12 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
 
             UnitOfMeasure.SetRange("International Standard Code", Value);
             if not UnitOfMeasure.FindFirst then
-                //LogErrorMessage(EntryNo,UnitOfMeasure,UnitOfMeasure.FIELDNO(Code),
-                //  STRSUBSTNO(UOMNotFoundErr,Value));
                 if not UnitOfMeasure.Get(Value) then begin
                     UnitOfMeasure.Init;
                     UnitOfMeasure.Validate(Code, Value);
                     UnitOfMeasure.Validate(Description, Value);
                     UnitOfMeasure.Insert(true);
                 end;
-
-
 
             Value := UnitOfMeasure.Code;
             Modify;
@@ -1317,7 +1234,6 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
             then
                 exit;
 
-            // if no discount amount has been specified, calculate it based on quantity, direct unit cost and line extension amount
             LineDirectUnitCostTxt :=
               GetEntryValue(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Direct Unit Cost"), HeaderRecordNo, RecordNo);
             if LineDirectUnitCostTxt <> '' then
@@ -1328,15 +1244,13 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
                 Evaluate(LineQuantity, LineQuantityTxt, 9);
             LineAmountTxt :=
               GetEntryValue(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo(Amount), HeaderRecordNo, RecordNo);
-            //IF LineAmountTxt <> '' THEN
             if LineAmountTxt <> '' then begin
                 Evaluate(LineAmount, LineAmountTxt, 9);
                 LineDiscountAmount := (LineQuantity * LineDirectUnitCost) - LineAmount;
 
                 InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Line Discount Amount"),
                   HeaderRecordNo, RecordNo, Format(LineDiscountAmount, 0, 9));
-            end else begin//
-                          //New: support for Line discount %
+            end else begin
                 LineDiscountPercTxt :=
                   GetEntryValue(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Line Discount %"), HeaderRecordNo, RecordNo);
                 if LineDiscountPercTxt <> '' then begin
@@ -1378,18 +1292,6 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
 
         with IntermediateDataImport do begin
             SetRange("Data Exch. No.", DataExchEntryNo);
-            //-NPR5.29 [260693]
-            //TEST BEGIN
-            //IF AskShowImport THEN BEGIN
-            //  IF CONFIRM('Look at imported values?') THEN BEGIN
-            //    PAGE.RUN(PAGE::"TEMP Intermediate DR",IntermediateDataImport);
-            //    IF CONFIRM('Done?') THEN;
-            //    ERROR('Okay');
-            //  END;
-            //  AskShowImport := FALSE;
-            //END;
-            //TEST END
-            //+NPR5.29 [260693]
             SetRange("Table ID", TableID);
             SetRange("Parent Record No.", ParentRecNo);
             SetCurrentKey("Record No.");
@@ -1524,7 +1426,6 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
     begin
         DocumentType := GetDocumentType(EntryNo, HeaderRecordNo);
 
-        // first look in the Text-to-Account Mapping table
         if TextToAccountMapping.FindSet then
             repeat
                 if UpperCase(TextToAccountMapping."Mapping Text") = UpperCase(LineDescription) then
@@ -1546,7 +1447,6 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
                     end
             until TextToAccountMapping.Next = 0;
 
-        // if you don't find any suggestion in Text-to-Account Mapping, then look in the Purchases & Payables table
         PurchasesPayablesSetup.Get;
         case DocumentType of
             PurchaseHeader."Document Type"::Invoice:

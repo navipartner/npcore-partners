@@ -1,10 +1,5 @@
 table 6014416 "NPR Alternative No."
 {
-    // NPR3.0r, NPK, DL, 21-04-08, Changed minor error in the replication code
-    // NPR5.23/MMV /20160610 CASE 242522 Added field 12 - Discontinue : Boolean
-    //                                   Removed deprecated field 11.
-    // NPR5.48/TS  /20181128 CASE 337806 Increase length of Variant Description to 50
-
     Caption = 'Alternative No.';
     LookupPageID = "NPR Alternative Number";
     DataClassification = CustomerContent;
@@ -36,8 +31,6 @@ table 6014416 "NPR Alternative No."
             IF (Type = CONST(SalesPerson)) "Salesperson/Purchaser"
             ELSE
             IF (Type = CONST("CRM Customer")) Contact;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
             DataClassification = CustomerContent;
         }
@@ -182,10 +175,8 @@ table 6014416 "NPR Alternative No."
 
     var
         Item: Record Item;
-        "//-SyncProfiles": Integer;
         syncCU: Codeunit "NPR CompanySyncManagement";
         recRef: RecordRef;
-        "//+SyncProfiles": Integer;
 
     procedure GetItem()
     begin

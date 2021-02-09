@@ -197,14 +197,14 @@ xmlport 6060112 "NPR TM List Ticket Items"
                                 variant_description := ItemVariant.Description;
                             end;
 
-                            ItemCrossReference.SetFilter("Item No.", '=%1', TmpItemVariant."Item No.");
-                            ItemCrossReference.SetFilter("Variant Code", '=%1', variant_code);
-                            ItemCrossReference.SetFilter("Unit of Measure", '=%1|=%2|=%3', '', ItemResponse."Sales Unit of Measure", ItemResponse."Base Unit of Measure");
-                            ItemCrossReference.SetFilter("Cross-Reference Type", '=%1', ItemCrossReference."Cross-Reference Type"::"Bar Code");
+                            ItemReference.SetFilter("Item No.", '=%1', TmpItemVariant."Item No.");
+                            ItemReference.SetFilter("Variant Code", '=%1', variant_code);
+                            ItemReference.SetFilter("Unit of Measure", '=%1|=%2|=%3', '', ItemResponse."Sales Unit of Measure", ItemResponse."Base Unit of Measure");
+                            ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Bar Code");
 
                             external_item_number := TmpItemVariant."Item No.";
-                            if (ItemCrossReference.FindFirst()) then
-                                external_item_number := ItemCrossReference."Cross-Reference No.";
+                            if ItemReference.FindFirst() then
+                                external_item_number := ItemReference."Reference No.";
                         end;
                     }
                 }
@@ -226,7 +226,7 @@ xmlport 6060112 "NPR TM List Ticket Items"
 
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
-        ItemCrossReference: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
         ItemVariant: Record "Item Variant";
         TMAdmission: Record "NPR TM Admission";
         ItemResponse: Record Item;

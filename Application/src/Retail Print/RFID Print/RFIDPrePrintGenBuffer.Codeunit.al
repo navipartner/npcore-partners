@@ -48,23 +48,19 @@ codeunit 6059832 "NPR RFID PrePrint Gen. Buffer"
                 tmpRetailJournalLine."Line No." := LineNo;
                 tmpRetailJournalLine."Quantity to Print" := 1;
                 tmpRetailJournalLine."RFID Tag Value" := RFIDMgt.GetNextRFIDValue();
-                //-NPR5.55 [407265]
-                RFIDMgt.CheckItemCrossReference(tmpRetailJournalLine."RFID Tag Value");
-                //+NPR5.55 [407265]
+                RFIDMgt.CheckItemReference(tmpRetailJournalLine."RFID Tag Value");
                 tmpRetailJournalLine.Insert;
             end;
         until RetailJournalLine.Next = 0;
 
-        //-NPR5.55 [407265]
         if tmpRetailJournalLine.FindSet then begin
             GlobalPrintBatchID := CreateGuid();
             repeat
-                RFIDMgt.OnBeforeSaveItemCrossReferenceValue(tmpRetailJournalLine);
-                RFIDMgt.InsertItemCrossReference(tmpRetailJournalLine."Item No.", tmpRetailJournalLine."Variant Code", tmpRetailJournalLine."RFID Tag Value");
+                RFIDMgt.OnBeforeSaveItemReferenceValue(tmpRetailJournalLine);
+                RFIDMgt.InsertItemReference(tmpRetailJournalLine."Item No.", tmpRetailJournalLine."Variant Code", tmpRetailJournalLine."RFID Tag Value");
                 RFIDMgt.LogRFIDPrint(tmpRetailJournalLine, GlobalPrintBatchID);
             until tmpRetailJournalLine.Next = 0;
         end;
-        //+NPR5.55 [407265]
 
         RecRef.Close;
         RecRef.GetTable(tmpRetailJournalLine);

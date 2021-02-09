@@ -13,7 +13,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         TOKEN_INCORRECT_STATE: Label 'The ticket-token %1 can''t be changed when in the %1 state.';
         MISSING_CASE: Label 'No handler for %1 [%2].';
         MISSING_SCHEDULE_ENTRY: Label 'Admission Code %1 requires a valid schedule entry.';
-        "XREF-NOT-FOUND": Label 'The Item and Variant %1 %2 requires a valid cross reference or alternative no.';
+        "XREF-NOT-FOUND": Label 'The Item and Variant %1 %2 requires a valid item reference or alternative no.';
         EXTERNAL_ITEM_CHANGE: Label 'Changing the sales item when there is an active ticket reservation, is not supported. Please delete the POS line and start over.';
         REVOKE_UNUSED_ERROR: Label 'Ticket %1 has been used for entry to %2 at %3 and can''t be revoked due to the revoke policy set on item %4 for admission %5.';
         TICKET_CANCELLED: Label 'Ticket %1 has already been revoked at %2 and can''t be revoked again.';
@@ -734,18 +734,16 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
     procedure TranslateBarcodeToItemVariant(Barcode: Text[50]; var ItemNo: Code[20]; var VariantCode: Code[10]; var ResolvingTable: Integer) Found: Boolean
     var
         Item: Record Item;
-        ItemCrossReference: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
         AlternativeNo: Record "NPR Alternative No.";
         ItemVariant: Record "Item Variant";
     begin
 
-        // stolen from CU 6014662 Stock-Take
         ResolvingTable := 0;
         ItemNo := '';
         VariantCode := '';
         if (Barcode = '') then exit(false);
 
-        // Try Item Table
         if (StrLen(Barcode) <= MaxStrLen(Item."No.")) then begin
             if (Item.Get(UpperCase(Barcode))) then begin
                 ResolvingTable := DATABASE::Item;
@@ -754,19 +752,16 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
             end;
         end;
 
-        // Try Item Cross Reference
-        with ItemCrossReference do begin
-            if (StrLen(Barcode) <= MaxStrLen("Cross-Reference No.")) then begin
-                SetCurrentKey("Cross-Reference Type", "Cross-Reference No.");
-                SetFilter("Cross-Reference Type", '=%1', "Cross-Reference Type"::"Bar Code");
-                SetFilter("Cross-Reference No.", '=%1', UpperCase(Barcode));
-                SetFilter("Discontinue Bar Code", '=%1', false);
-                if (FindFirst()) then begin
-                    ResolvingTable := DATABASE::"Item Cross Reference";
-                    ItemNo := "Item No.";
-                    VariantCode := "Variant Code";
-                    exit(true);
-                end;
+        if (StrLen(Barcode) <= MaxStrLen(ItemReference."Reference No.")) then begin
+            ItemReference.SetCurrentKey("Reference Type", "Reference No.");
+            ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Bar Code");
+            ItemReference.SetFilter("Reference No.", '=%1', UpperCase(Barcode));
+            ItemReference.SetFilter("Discontinue Bar Code", '=%1', false);
+            if ItemReference.FindFirst() then begin
+                ResolvingTable := DATABASE::"Item Reference";
+                ItemNo := ItemReference."Item No.";
+                VariantCode := ItemReference."Variant Code";
+                exit(true);
             end;
         end;
 
@@ -1330,16 +1325,16 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
 
     procedure GetExternalNo(ItemNo: Code[20]; VariantCode: Code[10]) ExternalNo: Code[50]
     var
-        ItemCrossReference: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
     begin
         ExternalNo := ItemNo;
 
-        ItemCrossReference.SetFilter("Item No.", '=%1', ItemNo);
-        ItemCrossReference.SetFilter("Variant Code", '=%1', VariantCode);
-        ItemCrossReference.SetFilter("Discontinue Bar Code", '=%1', false);
-        ItemCrossReference.SetFilter("Cross-Reference Type", '=%1', ItemCrossReference."Cross-Reference Type"::"Bar Code");
-        if (ItemCrossReference.FindFirst()) then
-            ExternalNo := ItemCrossReference."Cross-Reference No.";
+        ItemReference.SetFilter("Item No.", '=%1', ItemNo);
+        ItemReference.SetFilter("Variant Code", '=%1', VariantCode);
+        ItemReference.SetFilter("Discontinue Bar Code", '=%1', false);
+        ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Bar Code");
+        if (ItemReference.FindFirst()) then
+            ExternalNo := ItemReference."Reference No.";
 
         exit(ExternalNo);
     end;

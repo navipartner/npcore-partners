@@ -1727,7 +1727,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
     local procedure TranslateBarcodeToItemVariant(Barcode: Text[50]; var ItemNo: Code[20]; var VariantCode: Code[10]; var ResolvingTable: Integer) Found: Boolean
     var
         Item: Record Item;
-        ItemCrossReference: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
         ItemVariant: Record "Item Variant";
         GenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         RecRef: RecordRef;
@@ -1747,21 +1747,19 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
             end;
         end;
 
-        // Try Item Cross Reference
-        with ItemCrossReference do begin
-            if (StrLen(Barcode) <= MaxStrLen("Cross-Reference No.")) then begin
-                SetCurrentKey("Cross-Reference Type", "Cross-Reference No.");
-                SetFilter("Cross-Reference Type", '=%1', "Cross-Reference Type"::"Bar Code");
-                SetFilter("Cross-Reference No.", '=%1', UpperCase(Barcode));
-                SetFilter("Discontinue Bar Code", '=%1', false);
-                if (FindFirst()) then begin
-                    ResolvingTable := DATABASE::"Item Cross Reference";
-                    ItemNo := "Item No.";
-                    VariantCode := "Variant Code";
-                    exit(true);
-                end;
+        if (StrLen(Barcode) <= MaxStrLen(ItemReference."Reference No.")) then begin
+            ItemReference.SetCurrentKey("Reference Type", "Reference No.");
+            ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Bar Code");
+            ItemReference.SetFilter("Reference No.", '=%1', UpperCase(Barcode));
+            ItemReference.SetFilter("Discontinue Bar Code", '=%1', false);
+            if ItemReference.FindFirst() then begin
+                ResolvingTable := DATABASE::"Item Reference";
+                ItemNo := ItemReference."Item No.";
+                VariantCode := ItemReference."Variant Code";
+                exit(true);
             end;
         end;
+
 
         // Try Alternative No
         if not GenericSetupMgt.OpenRecRef(6014416, RecRef) then

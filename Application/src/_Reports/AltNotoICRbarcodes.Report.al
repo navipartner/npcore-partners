@@ -12,12 +12,12 @@ report 6014602 "NPR Alt. No. to ICR barcodes"
 
             trigger OnAfterGetRecord()
             var
+                ICR: Record "Item Reference";
                 Item: Record Item;
-                ICR: Record "Item Cross Reference";
                 ItemVariant: Record "Item Variant";
             begin
-                ICR.SetRange("Cross-Reference Type", ICR."Cross-Reference Type"::"Bar Code");
-                ICR.SetRange("Cross-Reference No.", "Alt. No.");
+                ICR.SetRange("Reference Type", ICR."Reference Type"::"Bar Code");
+                ICR.SetRange("Reference No.", "Alt. No.");
                 ICR.SetFilter("Item No.", '<>%1', Code);
                 ICR.SetFilter("Variant Code", '<>%1', "Variant Code");
                 if not ICR.IsEmpty() then
@@ -28,8 +28,8 @@ report 6014602 "NPR Alt. No. to ICR barcodes"
                 ICR."Item No." := Code;
                 ICR."Variant Code" := "Variant Code";
                 ICR."Unit of Measure" := "Base Unit of Measure";
-                ICR."Cross-Reference Type" := ICR."Cross-Reference Type"::"Bar Code";
-                ICR."Cross-Reference No." := "Alt. No.";
+                ICR."Reference Type" := ICR."Reference Type"::"Bar Code";
+                ICR."Reference No." := "Alt. No.";
                 ICR."Discontinue Bar Code" := Discontinue;
 
                 if Item."No." <> Code then

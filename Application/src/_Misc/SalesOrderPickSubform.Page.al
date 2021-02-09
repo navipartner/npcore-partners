@@ -51,22 +51,26 @@ page 6014519 "NPR Sales Order Pick Subform"
                             RedistributeTotalsOnAfterValidate();
                     end;
                 }
-                field("Cross-Reference No."; Rec."Cross-Reference No.")
+                field("Item Reference No."; Rec."Item Reference No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Cross-Reference No. field';
+                    ToolTip = 'Specifies the referenced item number.';
 
                     trigger OnLookup(var Text: Text): Boolean
+                    var
+                        SalesHeader: Record "Sales Header";
+                        ItemReferenceMgt: Codeunit "Item Reference Management";
                     begin
-                        CrossReferenceNoLookUp();
+                        SalesHeader.Get(Rec."Document Type", Rec."Document No.");
+                        ItemReferenceMgt.SalesReferenceNoLookup(Rec, SalesHeader);
                         InsertExtendedText(false);
                         NoOnAfterValidate();
                     end;
 
                     trigger OnValidate()
                     begin
-                        CrossReferenceNoOnAfterValidat();
+                        ItemReferenceNoOnAfterValidat();
                         NoOnAfterValidate();
                     end;
                 }
@@ -1355,7 +1359,7 @@ page 6014519 "NPR Sales Order Pick Subform"
         end;
     end;
 
-    local procedure CrossReferenceNoOnAfterValidat()
+    local procedure ItemReferenceNoOnAfterValidat()
     begin
         InsertExtendedText(false);
     end;

@@ -1,34 +1,5 @@
 codeunit 6014426 "NPR Std. Table Code"
 {
-    // VRT1.00/JDH/20150304 CASE 201022 Variety group is transferred to Item when creating new items
-    // NPR5.23/BHR/20160421 CASE 238541 Correct bug and incorporate translation to code
-    // NPR5.23/THRO/20160509 CASE 240777 Added function ItemJnlLineCrossReferenceOV
-    // NPR5.23/JDH /20160512 CASE 240916 Delete many unused functions (not documented) and references to VariaX and color size solution
-    // NPR5.23/BR/20160519 CASE 241965  Prevent Error caused by Validating Item No. through RapidStart
-    // NPR5.23/LS  /20160608 CASE 226819 Modified function DebitorOnInsert by commenting assignment of retail Setup fields
-    // NPR5.26/MHA /20160810 CASE 248288 Function deleted: KLOpretVare() and reference removed to deleted Item Field: 6014417 "NPK Created"
-    // NPR5.26/MHA /20160922 CASE 252881 Unused functions deleted
-    // NPR5.27/BR  /20160928 CASE 253578 Fix problem with '*' function
-    // NPR5.29/JDH /20170105 CASE 260472 Removed the functions to set Descriptions, and merged functionality to Description Control
-    // NPR5.29/BHR /20170123 CASE 264081 Add conditions to Validate Inventory Posting Group in function VareTVGOVAfter
-    // NPR5.30/JC  /20170221 CASE 265277 Item group validate Gen. Prod Posting group as it overides VAT. Prod Posting group
-    // NPR5.30/TJ  /20170222 CASE 266874 Removed functions FinkldlinieValidateGavekort and FinkldlinieValidateTilgbevis
-    // NPR5.31/MHA /20170110 CASE 262904 Moved function TestMiksStatus() to Table 6014411 "Mixed Discount"
-    // NPR5.33/JDH /20170612 CASE 280329 Removed unused functions
-    // NPR5.38/MHA /20171211 CASE 297973 Variety Group should only be validated with Value in VareTVGOVAfter()
-    // NPR5.38/BR  /20180125 CASE 302803 Added Tax Group Code to Item Group support
-    // NPR5.39/TJ  /20180212 CASE 302634 Removed unused variables
-    // NPR5.43/JKL /20180531 CASE 317359 Added function to automatically apply item group master template if defined.
-    // NPR5.48/BHR /20190108 CASE 334217 Validate "Inventory Posting Group" only wheb type <> service on Item group
-    // NPR5.50/RA  /20190403 CASE 350418 NPR5.48 is giving problems for "Politikens Boghal"
-    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
-    // NPR5.53/ALPO/20191210 CASE 380609 Dimensions: NPRE Seating integration
-    // NPR5.54/ALPO/20200310 CASE 394528 Legacy global dim fields on cash register would not be updated, had the dimensions been changed on POS unit
-
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         RetailSetup: Record "NPR Retail Setup";
@@ -43,44 +14,24 @@ codeunit 6014426 "NPR Std. Table Code"
         ConfigTemplateManagement: Codeunit "Config. Template Management";
         RecRef: RecordRef;
     begin
-        //VareTVGOVAfter()
-
         with VItem do begin
             GetRetailSetup;
 
             ItemGroup.TestField("VAT Bus. Posting Group");
             ItemGroup.TestField("Gen. Prod. Posting Group");
             ItemGroup.TestField("VAT Prod. Posting Group");
-            //-NPR5.50
             if Type <> ItemGroup.Type then begin
-                //+NPR5.50
-                //-NPR5.48 [334217]
                 Validate(Type, ItemGroup.Type);
-                //-NPR5.29 [264081]
-                //-NPR5.50
             end;
-            //+NPR5.50
-
-
-
-            //IF VItem.Type <> VItem.Type::Service THEN
             if ItemGroup.Type <> ItemGroup.Type::Service then
-                //+NPR5.29 [264081]
-                //+NPR5.48 [334217]
                 ItemGroup.TestField("Inventory Posting Group");
             ItemGroup.TestField(Blocked, false);
             ItemGroup.TestField("Main Item Group", false);
-            //-NPR5.30 [265277]
             Validate("Gen. Prod. Posting Group", ItemGroup."Gen. Prod. Posting Group");
-            //+265277
             "VAT Prod. Posting Group" := ItemGroup."VAT Prod. Posting Group";
             "VAT Bus. Posting Gr. (Price)" := ItemGroup."VAT Bus. Posting Group";
-            //-265277 [265277]
-            //-NPR5.38 [302803]
             "Tax Group Code" := ItemGroup."Tax Group Code";
-            //+NPR5.38 [302803]
-            //VALIDATE("Gen. Prod. Posting Group",ItemGroup."Gen. Prod. Posting Group");
-            //+265277
+
             Validate("Inventory Posting Group", ItemGroup."Inventory Posting Group");
 
             Validate("Reordering Policy", ItemGroup."Reordering Policy");
@@ -92,7 +43,6 @@ codeunit 6014426 "NPR Std. Table Code"
             "Costing Method" := ItemGroup."Costing Method";
             "NPR Insurrance category" := ItemGroup."Insurance Category";
 
-            // Transfer Default Dimensions from Item Group
             DefaultDimension2.SetRange("Table ID", DATABASE::Item);
             DefaultDimension2.SetRange("No.", "No.");
             DefaultDimension2.DeleteAll;
@@ -130,22 +80,15 @@ codeunit 6014426 "NPR Std. Table Code"
                 if ItemUnitofMeasure.Insert then;
             end;
 
-            /* Validate unit from item group on new item */
             if "Base Unit of Measure" <> ItemGroup."Base Unit of Measure" then begin
                 Validate("Base Unit of Measure", ItemGroup."Base Unit of Measure");
                 Validate("Sales Unit of Measure", ItemGroup."Sales Unit of Measure");
                 Validate("Sales Unit of Measure", ItemGroup."Purch. Unit of Measure");
             end;
 
-            //-VRT1.00
-            //-NPR5.38 [297973]
-            //VALIDATE("Variety Group", ItemGroup."Variety Group");
             if ItemGroup."Variety Group" <> '' then
                 Validate("NPR Variety Group", ItemGroup."Variety Group");
-            //+NPR5.38 [297973]
-            //+VRT1.00
 
-            //-NPR5.43 [317359]
             if ItemGroup."Config. Template Header" <> '' then begin
                 if ConfigTemplateHeader.Get(ItemGroup."Config. Template Header") then begin
                     RecRef.GetTable(VItem);
@@ -153,65 +96,59 @@ codeunit 6014426 "NPR Std. Table Code"
                     VItem.Get(VItem."No.");
                 end;
             end;
-            //+NPR5.43 [317359]
-
-
         end;
 
     end;
 
     procedure ItemJnlLineCrossReferenceOV(var ItemJournalLine: Record "Item Journal Line"; var xItemJournalLine: Record "Item Journal Line")
     var
-        ItemCrossReference: Record "Item Cross Reference";
-        Text000: Label 'There are no items with cross reference: %1';
+        ItemReference: Record "Item Reference";
+        ItemReferenceNotFoundErr: Label 'There are no items with reference: %1', Comment = '%1=ItemJournalLine."Item Reference No."';
     begin
-        //-NPR5.23
-        ItemCrossReference.Init;
-        if ItemJournalLine."Cross-Reference No." <> '' then begin
-            //DistIntegration.ICRLookupSalesItem(Rec,ReturnedCrossRef);
-            ItemCrossReference.Reset;
-            ItemCrossReference.SetCurrentKey(
-                "Cross-Reference No.", "Cross-Reference Type", "Cross-Reference Type No.", "Discontinue Bar Code");
-            ItemCrossReference.SetRange("Cross-Reference No.", ItemJournalLine."Cross-Reference No.");
-            ItemCrossReference.SetRange("Discontinue Bar Code", false);
-            ItemCrossReference.SetRange("Item No.", ItemJournalLine."Item No.");
-            if not ItemCrossReference.Find('-') then begin
-                ItemCrossReference.SetRange("Item No.");
-                if not ItemCrossReference.Find('-') then
-                    Error(Text000, ItemJournalLine."Cross-Reference No.");
-                if GuiAllowed and (ItemCrossReference.Next <> 0) then begin
-                    ItemCrossReference.SetRange("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::"Bar Code");  // Bar Code have highest priority
-                    if ItemCrossReference.Find('-') then begin
-                        if ItemCrossReference.Next <> 0 then begin
-                            if PAGE.RunModal(PAGE::"Cross Reference List", ItemCrossReference) <> ACTION::LookupOK
+        ItemReference.Init;
+        if ItemJournalLine."Item Reference No." <> '' then begin
+            ItemReference.Reset;
+            ItemReference.SetCurrentKey(
+                "Reference No.", "Reference Type", "Reference Type No.", "Discontinue Bar Code");
+            ItemReference.SetRange("Reference No.", ItemJournalLine."Item Reference No.");
+            ItemReference.SetRange("Discontinue Bar Code", false);
+            ItemReference.SetRange("Item No.", ItemJournalLine."Item No.");
+            if not ItemReference.Find('-') then begin
+                ItemReference.SetRange("Item No.");
+                if not ItemReference.Find('-') then
+                    Error(ItemReferenceNotFoundErr, ItemJournalLine."Item Reference No.");
+                if GuiAllowed and (ItemReference.Next <> 0) then begin
+                    ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");  // Bar Code have highest priority
+                    if ItemReference.Find('-') then begin
+                        if ItemReference.Next <> 0 then begin
+                            if PAGE.RunModal(PAGE::"Item Reference List", ItemReference) <> ACTION::LookupOK
                             then
-                                Error(Text000, ItemJournalLine."Cross-Reference No.");
+                                Error(ItemReferenceNotFoundErr, ItemJournalLine."Item Reference No.");
                         end;
                     end else begin
-                        ItemCrossReference.SetRange("Cross-Reference Type");
-                        if ItemCrossReference.Find('-') then
-                            if ItemCrossReference.Next <> 0 then begin
-                                if PAGE.RunModal(PAGE::"Cross Reference List", ItemCrossReference) <> ACTION::LookupOK
+                        ItemReference.SetRange("Reference Type");
+                        if ItemReference.Find('-') then
+                            if ItemReference.Next <> 0 then begin
+                                if PAGE.RunModal(PAGE::"Item Reference List", ItemReference) <> ACTION::LookupOK
                                 then
-                                    Error(Text000, ItemJournalLine."Cross-Reference No.");
+                                    Error(ItemReferenceNotFoundErr, ItemJournalLine."Item Reference No.");
                             end;
                     end;
                 end;
             end;
-            if ItemJournalLine."Item No." <> ItemCrossReference."Item No." then
-                ItemJournalLine.Validate("Item No.", ItemCrossReference."Item No.");
-            if ItemCrossReference."Variant Code" <> '' then
-                ItemJournalLine.Validate("Variant Code", ItemCrossReference."Variant Code");
+            if ItemJournalLine."Item No." <> ItemReference."Item No." then
+                ItemJournalLine.Validate("Item No.", ItemReference."Item No.");
+            if ItemReference."Variant Code" <> '' then
+                ItemJournalLine.Validate("Variant Code", ItemReference."Variant Code");
 
-            if ItemCrossReference."Unit of Measure" <> '' then
-                ItemJournalLine.Validate("Unit of Measure Code", ItemCrossReference."Unit of Measure");
+            if ItemReference."Unit of Measure" <> '' then
+                ItemJournalLine.Validate("Unit of Measure Code", ItemReference."Unit of Measure");
         end;
 
-        ItemJournalLine."Cross-Reference No." := ItemCrossReference."Cross-Reference No.";
+        ItemJournalLine."Item Reference No." := ItemReference."Reference No.";
 
-        if ItemCrossReference.Description <> '' then
-            ItemJournalLine.Description := ItemCrossReference.Description;
-        //+NPR5.23
+        if ItemReference.Description <> '' then
+            ItemJournalLine.Description := ItemReference.Description;
     end;
 
     procedure GetRetailSetup(): Boolean

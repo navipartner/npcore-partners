@@ -330,16 +330,16 @@ table 6014414 "NPR Period Discount Line"
                 end;
             end;
         }
-        field(210; "Cross-Reference No."; Code[20])
+        field(210; "Cross-Reference No."; Code[50])
         {
-            Caption = 'Cross-Reference No.';
+            Caption = 'Reference No.';
             DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
                 BarcodeLibrary: Codeunit "NPR Barcode Library";
             begin
-                BarcodeLibrary.CallCrossRefNoLookupPeriodicDiscount(Rec);
+                BarcodeLibrary.CallItemRefNoLookupPeriodicDiscount(Rec);
             end;
         }
         field(215; "Page no. in advert"; Integer)

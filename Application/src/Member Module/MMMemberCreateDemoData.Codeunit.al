@@ -690,7 +690,6 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
     var
         TicketItem: Record "Item";
         ItemVariant: Record "Item Variant";
-        ItemCrossReference: Record "Item Cross Reference";
     begin
         TicketItem.INIT();
         if (not (TicketItem.Get(No))) then begin

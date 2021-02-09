@@ -7,12 +7,11 @@ codeunit 6060042 "NPR Item Number Mgt."
     procedure FindItemInfo(ExternalItemNo: Text[50]; ExternalType: Option All,VendorItemNo,Barcode,CrossReference,AlternativeNo; SkipBlocked: Boolean; var UnitOfMeasure: Code[10]; var VendorNo: Code[20]; var ItemNo: Code[20]; var VariantCode: Code[20]) Found: Boolean
     var
         Item: Record Item;
-        ItemCrossReference: Record "Item Cross Reference";
-        ItemUOM: Record "Item Unit of Measure";
+        SKU: Record "Stockkeeping Unit";
         ItemVariant: Record "Item Variant";
+        ItemUOM: Record "Item Unit of Measure";
         ItemVendor: Record "Item Vendor";
         AlternativeNo: Record "NPR Alternative No.";
-        SKU: Record "Stockkeeping Unit";
         UOMCodeSpecified: Boolean;
         VendorNoSpecified: Boolean;
     begin
@@ -39,13 +38,13 @@ codeunit 6060042 "NPR Item Number Mgt."
     local procedure FindItemInfoBlocked(ExternalItemNo: Text[50]; ExternalType: Option All,VendorItemNo,Barcode,CrossReference,AlternativeNo; Blocked: Boolean; var UnitOfMeasure: Code[10]; var VendorNo: Code[20]; var ItemNo: Code[20]; var VariantCode: Code[20]) Found: Boolean
     var
         Item: Record Item;
-        ItemCrossReference: Record "Item Cross Reference";
-        ItemUOM: Record "Item Unit of Measure";
+        SKU: Record "Stockkeeping Unit";
         ItemVariant: Record "Item Variant";
+        ItemUOM: Record "Item Unit of Measure";
+        ItemReference: Record "Item Reference";
         ItemVendor: Record "Item Vendor";
         NonstockItem: Record "Nonstock Item";
         AlternativeNo: Record "NPR Alternative No.";
-        SKU: Record "Stockkeeping Unit";
         UOMCodeSpecified: Boolean;
         VendorNoSpecified: Boolean;
     begin
@@ -56,59 +55,58 @@ codeunit 6060042 "NPR Item Number Mgt."
 
         if ExternalType in [ExternalType::All, ExternalType::CrossReference, ExternalType::Barcode] then begin
             if VendorNoSpecified then begin
-                //Search Vendor Specific Cross Reference
-                ItemCrossReference.SetCurrentKey("Cross-Reference No.");
-                ItemCrossReference.SetRange("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::Vendor);
-                ItemCrossReference.SetRange("Cross-Reference Type No.", VendorNo);
+                ItemReference.Reset;
+                ItemReference.SetCurrentKey("Reference No.");
+                ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::Vendor);
+                ItemReference.SetRange("Reference Type No.", VendorNo);
                 if UOMCodeSpecified then
-                    ItemCrossReference.SetFilter("Unit of Measure", '%1|%2', UnitOfMeasure, '');
-                ItemCrossReference.SetRange("Cross-Reference No.", ExternalItemNo);
-                if ItemCrossReference.FindSet() then
+                    ItemReference.SetFilter("Unit of Measure", '%1|%2', UnitOfMeasure, '');
+                ItemReference.SetRange("Reference No.", ExternalItemNo);
+                if ItemReference.FindSet() then
                     repeat
-                        if Item.Get(ItemCrossReference."Item No.") then begin
+                        if Item.Get(ItemReference."Item No.") then begin
                             if Item.Blocked = Blocked then begin
-                                ItemNo := ItemCrossReference."Item No.";
-                                VariantCode := ItemCrossReference."Variant Code";
+                                ItemNo := ItemReference."Item No.";
+                                VariantCode := ItemReference."Variant Code";
                                 if not VendorNoSpecified then begin
-                                    if ItemCrossReference."Cross-Reference Type" = ItemCrossReference."Cross-Reference Type"::Vendor then begin
-                                        VendorNo := ItemCrossReference."Cross-Reference Type No.";
+                                    if ItemReference."Reference Type" = ItemReference."Reference Type"::Vendor then begin
+                                        VendorNo := ItemReference."Reference Type No.";
                                     end else begin
                                         VendorNo := Item."Vendor No.";
                                     end;
                                 end;
                                 if not UOMCodeSpecified then
-                                    UnitOfMeasure := ItemCrossReference."Unit of Measure";
+                                    UnitOfMeasure := ItemReference."Unit of Measure";
                                 exit(true);
                             end;
                         end;
-                    until ItemCrossReference.Next() = 0;
+                    until ItemReference.Next() = 0;
             end;
-            //Search Cross Reference
-            ItemCrossReference.Reset();
-            ItemCrossReference.SetCurrentKey("Cross-Reference No.");
-            ItemCrossReference.SetRange("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::"Bar Code");
+            ItemReference.Reset;
+            ItemReference.SetCurrentKey("Reference No.");
+            ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
             if UOMCodeSpecified then
-                ItemCrossReference.SetFilter("Unit of Measure", '%1|%2', UnitOfMeasure, '');
-            ItemCrossReference.SetRange("Cross-Reference No.", ExternalItemNo);
-            if ItemCrossReference.FindSet() then
+                ItemReference.SetFilter("Unit of Measure", '%1|%2', UnitOfMeasure, '');
+            ItemReference.SetRange("Reference No.", ExternalItemNo);
+            if ItemReference.FindSet then
                 repeat
-                    if Item.Get(ItemCrossReference."Item No.") then begin
+                    if Item.Get(ItemReference."Item No.") then begin
                         if Item.Blocked = Blocked then begin
-                            ItemNo := ItemCrossReference."Item No.";
-                            VariantCode := ItemCrossReference."Variant Code";
+                            ItemNo := ItemReference."Item No.";
+                            VariantCode := ItemReference."Variant Code";
                             if not VendorNoSpecified then begin
-                                if ItemCrossReference."Cross-Reference Type" = ItemCrossReference."Cross-Reference Type"::Vendor then begin
-                                    VendorNo := ItemCrossReference."Cross-Reference Type No.";
+                                if ItemReference."Reference Type" = ItemReference."Reference Type"::Vendor then begin
+                                    VendorNo := ItemReference."Reference Type No.";
                                 end else begin
                                     VendorNo := Item."Vendor No.";
                                 end;
                             end;
                             if not UOMCodeSpecified then
-                                UnitOfMeasure := ItemCrossReference."Unit of Measure";
+                                UnitOfMeasure := ItemReference."Unit of Measure";
                             exit(true);
                         end;
                     end;
-                until ItemCrossReference.Next() = 0;
+                until ItemReference.Next = 0;
         end;
 
         if ExternalType in [ExternalType::All, ExternalType::AlternativeNo, ExternalType::Barcode] then begin
@@ -129,7 +127,7 @@ codeunit 6060042 "NPR Item Number Mgt."
                             exit(true);
                         end;
                     end;
-                until ItemCrossReference.Next() = 0;
+                until ItemReference.Next = 0;
         end;
 
         if ExternalType in [ExternalType::All, ExternalType::VendorItemNo] then begin
@@ -203,36 +201,36 @@ codeunit 6060042 "NPR Item Number Mgt."
     procedure GetItemBarcode(ItemNo: Code[20]; VariantCode: Code[20]; UnitOfMeasure: Code[10]; VendorNo: Code[20]) BarCode: Code[20]
     var
         Item: Record Item;
-        ItemCrossReference: Record "Item Cross Reference";
-        ItemVendor: Record "Item Vendor";
         AlternativeNo: Record "NPR Alternative No.";
+        ItemReference: Record "Item Reference";
         SKU: Record "Stockkeeping Unit";
+        ItemVendor: Record "Item Vendor";
     begin
         if not Item.Get(ItemNo) then
             exit('');
         //Barcode: Vendor Specific
         if VendorNo <> '' then begin
-            ItemCrossReference.Reset();
-            ItemCrossReference.SetRange("Item No.", ItemNo);
-            ItemCrossReference.SetRange("Variant Code", VariantCode);
-            ItemCrossReference.SetRange("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::Vendor);
-            ItemCrossReference.SetRange("Cross-Reference Type No.", VendorNo);
+            ItemReference.Reset;
+            ItemReference.SetRange("Item No.", ItemNo);
+            ItemReference.SetRange("Variant Code", VariantCode);
+            ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::Vendor);
+            ItemReference.SetRange("Reference Type No.", VendorNo);
             if UnitOfMeasure <> '' then
-                ItemCrossReference.SetFilter("Unit of Measure", '%1|%2', Item."Base Unit of Measure", '');
-            if ItemCrossReference.FindFirst() then begin
-                exit(ItemCrossReference."Cross-Reference No.");
+                ItemReference.SetFilter("Unit of Measure", '%1|%2', Item."Base Unit of Measure", '');
+            if ItemReference.FindFirst then begin
+                exit(ItemReference."Reference No.");
             end;
         end;
         //Barcode: General
         if BarCode = '' then begin
-            ItemCrossReference.Reset();
-            ItemCrossReference.SetRange("Item No.", ItemNo);
-            ItemCrossReference.SetRange("Variant Code", VariantCode);
-            ItemCrossReference.SetRange("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::"Bar Code");
+            ItemReference.Reset;
+            ItemReference.SetRange("Item No.", ItemNo);
+            ItemReference.SetRange("Variant Code", VariantCode);
+            ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
             if UnitOfMeasure <> '' then
-                ItemCrossReference.SetFilter("Unit of Measure", '%1|%2', Item."Base Unit of Measure", '');
-            if ItemCrossReference.FindFirst() then begin
-                exit(ItemCrossReference."Cross-Reference No.");
+                ItemReference.SetFilter("Unit of Measure", '%1|%2', Item."Base Unit of Measure", '');
+            if ItemReference.FindFirst then begin
+                exit(ItemReference."Reference No.");
             end else begin
                 AlternativeNo.SetRange(Type, AlternativeNo.Type::Item);
                 AlternativeNo.SetRange(Code, ItemNo);
@@ -247,27 +245,27 @@ codeunit 6060042 "NPR Item Number Mgt."
     procedure GetItemItemVendorNo(ItemNo: Code[20]; VariantCode: Code[20]; VendorNo: Code[20]) VendorItemNo: Text[30]
     var
         Item: Record Item;
-        ItemCrossReference: Record "Item Cross Reference";
-        ItemVendor: Record "Item Vendor";
         AlternativeNo: Record "NPR Alternative No.";
         SKU: Record "Stockkeeping Unit";
+        ItemVendor: Record "Item Vendor";
     begin
         if not Item.Get(ItemNo) then
             exit('');
 
-        ItemVendor.Reset();
+        ItemVendor.Reset;
         ItemVendor.SetRange("Item No.", ItemNo);
         ItemVendor.SetRange("Variant Code", VariantCode);
         ItemVendor.SetRange("Vendor No.", VendorNo);
         if ItemVendor.FindFirst() then
             if ItemVendor."Vendor Item No." <> '' then
                 exit(ItemVendor."Vendor Item No.");
-        SKU.Reset();
+
+        SKU.Reset;
         SKU.SetRange("Item No.", ItemNo);
         SKU.SetFilter("Variant Code", VariantCode);
         SKU.SetFilter("Vendor No.", '%1|%2', VendorNo, '');
         SKU.SetFilter("Vendor Item No.", '<>%1', '');
-        if SKU.FindFirst() then
+        if SKU.FindFirst then
             exit(SKU."Vendor Item No.");
 
         exit(Item."Vendor Item No.");
@@ -275,10 +273,10 @@ codeunit 6060042 "NPR Item Number Mgt."
 
     procedure UpdateBarcode(ItemNo: Code[20]; VariantCode: Code[20]; BarCode: Code[20]; BarCodeType: Option AltNo,CrossReference)
     var
-        Item: Record Item;
-        ItemCrossReference: Record "Item Cross Reference";
-        ItemVariant: Record "Item Variant";
         AlternativeNo: Record "NPR Alternative No.";
+        ItemReference: Record "Item Reference";
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
     begin
         if BarCode = '' then
             exit;
@@ -314,35 +312,34 @@ codeunit 6060042 "NPR Item Number Mgt."
                 end;
             BarCodeType::CrossReference:
                 begin
-                    //Search for Cross Reference based on existing Bar Codes
-                    ItemCrossReference.Reset();
-                    ItemCrossReference.SetCurrentKey("Cross-Reference Type", "Cross-Reference No.");
-                    ItemCrossReference.SetRange("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::"Bar Code");
-                    ItemCrossReference.SetRange("Cross-Reference No.", BarCode);
-                    ItemCrossReference.SetRange("Item No.", ItemNo);
-                    ItemCrossReference.SetRange("Variant Code", VariantCode);
-                    if not ItemCrossReference.FindFirst() then begin
-                        ItemCrossReference.SetRange("Item No.");
-                        ItemCrossReference.SetRange("Variant Code");
-                        if ItemCrossReference.FindFirst() then begin
-                            //Delete cross reference Linked to another Item/Variant
-                            ItemCrossReference.Delete(true);
+                    ItemReference.Reset;
+                    ItemReference.SetCurrentKey("Reference Type", "Reference No.");
+                    ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
+                    ItemReference.SetRange("Reference No.", BarCode);
+                    ItemReference.SetRange("Item No.", ItemNo);
+                    ItemReference.SetRange("Variant Code", VariantCode);
+
+                    if not ItemReference.FindFirst() then begin
+                        ItemReference.SetRange("Item No.");
+                        ItemReference.SetRange("Variant Code");
+                        if ItemReference.FindFirst() then begin
+                            ItemReference.Delete(true);
                         end;
-                        ItemCrossReference.Init();
-                        ItemCrossReference.Validate("Item No.", ItemNo);
-                        ItemCrossReference.Validate("Variant Code", VariantCode);
-                        ItemCrossReference.Validate("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::"Bar Code");
-                        ItemCrossReference.Validate("Cross-Reference No.", BarCode);
-                        if ItemCrossReference."Variant Code" <> '' then begin
+                        ItemReference.Init();
+                        ItemReference.Validate("Item No.", ItemNo);
+                        ItemReference.Validate("Variant Code", VariantCode);
+                        ItemReference.Validate("Reference Type", ItemReference."Reference Type"::"Bar Code");
+                        ItemReference.Validate("Reference No.", BarCode);
+                        if ItemReference."Variant Code" <> '' then begin
                             if ItemVariant.Get(ItemNo, VariantCode) then begin
-                                ItemCrossReference.Description := ItemVariant.Description;
+                                ItemReference.Description := ItemVariant.Description;
                             end;
                         end else begin
                             if Item.Get(ItemNo) then begin
-                                ItemCrossReference.Description := Item.Description;
+                                ItemReference.Description := Item.Description;
                             end;
                         end;
-                        ItemCrossReference.Insert(true);
+                        ItemReference.Insert(true);
                     end;
                 end;
         end;

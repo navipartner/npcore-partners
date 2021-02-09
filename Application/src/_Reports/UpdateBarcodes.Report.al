@@ -1,8 +1,8 @@
 report 6014601 "NPR Update Barcodes"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Update Barcodes.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Update Barcodes.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Update Barcodes';
     PreviewMode = PrintLayout;
@@ -82,22 +82,22 @@ report 6014601 "NPR Update Barcodes"
     }
 
     var
-        ItemCrossReference: Record "Item Cross Reference";
-        AlternativeNo: Record "NPR Alternative No.";
-        VarietyCloneData: Codeunit "NPR Variety Clone Data";
-        IgnoreAltNo: Boolean;
         InsertMissingBarcode: Boolean;
-        CrossReferenceNo: Code[20];
+        VarietyCloneData: Codeunit "NPR Variety Clone Data";
+        ItemReference: Record "Item Reference";
+        CrossReferenceNo: Code[50];
+        AlternativeNo: Record "NPR Alternative No.";
+        IgnoreAltNo: Boolean;
         AddPrefix: Text;
 
     local procedure InsertBarcode(ItemNo: Code[20]; VariantCode: Code[20]): Text
     begin
-        ItemCrossReference.SetRange("Item No.", ItemNo);
-        ItemCrossReference.SetRange("Variant Code", VariantCode);
-        ItemCrossReference.SetRange("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::"Bar Code");
-        if ItemCrossReference.FindFirst() then
-            if (CheckBarcodeValidEAN13(ItemCrossReference."Cross-Reference No.") or CheckBarcodeValidEAN8(ItemCrossReference."Cross-Reference No.")) then begin
-                exit(ItemCrossReference."Cross-Reference No.");
+        ItemReference.SetRange("Item No.", ItemNo);
+        ItemReference.SetRange("Variant Code", VariantCode);
+        ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
+        if ItemReference.FindFirst then
+            if (CheckBarcodeValidEAN13(ItemReference."Reference No.") or CheckBarcodeValidEAN8(ItemReference."Reference No.")) then begin
+                exit(ItemReference."Reference No.");
             end;
 
         AlternativeNo.SetRange(Code, ItemNo);
@@ -112,18 +112,18 @@ report 6014601 "NPR Update Barcodes"
 
         VarietyCloneData.InsertDefaultBarcode(ItemNo, VariantCode, false);
 
-        Clear(ItemCrossReference);
-        ItemCrossReference.SetRange("Item No.", ItemNo);
-        ItemCrossReference.SetRange("Variant Code", VariantCode);
-        ItemCrossReference.SetRange("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::"Bar Code");
-        if ItemCrossReference.FindFirst() then
-            exit(ItemCrossReference."Cross-Reference No.");
+        Clear(ItemReference);
+        ItemReference.SetRange("Item No.", ItemNo);
+        ItemReference.SetRange("Variant Code", VariantCode);
+        ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
+        if ItemReference.FindFirst then
+            exit(ItemReference."Reference No.");
 
-        if AlternativeNo.FindFirst() and (not IgnoreAltNo) then
+        if AlternativeNo.FindFirst and (not IgnoreAltNo) then
             exit(AlternativeNo."Alt. No.");
     end;
 
-    local procedure CheckBarcodeValidEAN13(barcode: Code[20]): Boolean
+    local procedure CheckBarcodeValidEAN13(barcode: Code[50]): Boolean
     var
         RegEx: Codeunit DotNet_Regex;
     begin
@@ -133,7 +133,7 @@ report 6014601 "NPR Update Barcodes"
             exit(not (StrCheckSum(barcode, '1313131313131') <> 0))
     end;
 
-    local procedure CheckBarcodeValidEAN8(barcode: Code[20]): Boolean
+    local procedure CheckBarcodeValidEAN8(barcode: Code[50]): Boolean
     var
         RegEx: Codeunit DotNet_Regex;
     begin

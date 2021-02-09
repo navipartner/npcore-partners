@@ -1,18 +1,8 @@
 page 6014451 "NPR Mixed Discount Lines"
 {
-    // NPR5.26/BHR /20160712  CASE 246594 Display field Cross reference
-    //                                     Set property 'Delayed on insert'= true
-    // NPR5.31/MHA /20170110  CASE 262904 Added functions for enabling view: MixedDiscount."Mix Type"::::Combination
-    //                                    Deleted unused functions and variables
-    // NPR5.54/YAHA/20200303  CASE 393386 Added Mix Discount Price
-    // NPR5.55/YAHA/20200513  CASE 393386 Code review Mix Discount Price
-    // NPR5.55/ALPO/20200714  CASE 412946 Set Visible property of Mix Discount Price to "(DiscountType <> 4)"
-
     Caption = 'Mix Discount Lines';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR Mixed Discount Line";
 
     layout
@@ -23,64 +13,64 @@ page 6014451 "NPR Mixed Discount Lines"
             {
                 ShowCaption = false;
                 Visible = (MixType <> 1);
-                field("Disc. Grouping Type"; "Disc. Grouping Type")
+                field("Disc. Grouping Type"; Rec."Disc. Grouping Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Disc. Grouping Type field';
                 }
-                field("Cross-Reference No."; "Cross-Reference No.")
+                field("Cross-Reference No."; Rec."Cross-Reference No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the referenced item number.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Cross-Reference No. field';
                 }
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
                     Enabled = ("Disc. Grouping Type" = "Disc. Grouping Type"::Item);
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Description 2"; "Description 2")
+                field("Description 2"; Rec."Description 2")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description 2 field';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     Enabled = Lot;
                     Visible = Lot;
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field("Unit cost"; "Unit cost")
+                field("Unit cost"; Rec."Unit cost")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit Cost field';
                 }
-                field("Unit price"; "Unit price")
+                field("Unit price"; Rec."Unit price")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unit Price field';
                 }
-                field("Unit price incl. VAT"; "Unit price incl. VAT")
+                field("Unit price incl. VAT"; Rec."Unit price incl. VAT")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Price Includes VAT field';
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Priority field';
@@ -96,7 +86,7 @@ page 6014451 "NPR Mixed Discount Lines"
             repeater(MixLines)
             {
                 Visible = (MixType = 1);
-                field(NoCom; "No.")
+                field(NoCom; Rec."No.")
                 {
                     ApplicationArea = All;
                     Caption = 'Part Code';
@@ -156,20 +146,18 @@ page 6014451 "NPR Mixed Discount Lines"
                 var
                     MixedDiscount: Record "NPR Mixed Discount";
                 begin
-                    //-NPR5.31 [262904]
                     MixedDiscount.Init;
                     MixedDiscount.Code := '';
                     MixedDiscount."Mix Type" := MixedDiscount."Mix Type"::"Combination Part";
                     MixedDiscount.Insert(true);
 
-                    Init;
-                    "Disc. Grouping Type" := "Disc. Grouping Type"::"Mix Discount";
-                    Validate("No.", MixedDiscount.Code);
-                    Insert(true);
+                    Rec.Init();
+                    Rec."Disc. Grouping Type" := Rec."Disc. Grouping Type"::"Mix Discount";
+                    Rec.Validate("No.", MixedDiscount.Code);
+                    Rec.Insert(true);
 
-                    Commit;
+                    Commit();
                     PAGE.Run(PAGE::"NPR Mixed Discount", MixedDiscount);
-                    //+NPR5.31 [262904]
                 end;
             }
             action("Part Card")
@@ -190,34 +178,10 @@ page 6014451 "NPR Mixed Discount Lines"
 
     trigger OnAfterGetRecord()
     begin
-        //-NPR5.31 [262904]
-        //BeregnBesparelse;
-        //OnAfterGetCurrRecord;
-        //+NPR5.31 [262904]
-        //-NPR5.55 [393386]
         TotalAmount := GetTotalAmount;
-        //+NPR5.55 [393386]
-    end;
-
-    trigger OnInit()
-    begin
-        //-NPR5.31 [262904]
-        //QuantityEnabled := TRUE;
-        //+NPR5.31 [262904]
-    end;
-
-    trigger OnNewRecord(BelowxRec: Boolean)
-    begin
-        //-NPR5.31 [262904]
-        //OnAfterGetCurrRecord;
-        //+NPR5.31 [262904]
     end;
 
     var
-        Text10600000: Label 'Enter Belongs to Item Group No. on item %1';
-        Text10600001: Label 'An error has occured in the VAT settings. Check style sheet posting on the item card!';
-        Text10600002: Label 'Saving %1';
-        Text10600003: Label 'Saving %1 %2 %3';
         Lot: Boolean;
         DiscountType: Enum "NPR Mixed Discount Type";
         MixType: Integer;
@@ -229,75 +193,65 @@ page 6014451 "NPR Mixed Discount Lines"
         TempPriorityBuffer: Record "NPR Mixed Disc. Prio. Buffer" temporary;
         MixedDiscountMgt: Codeunit "NPR Mixed Discount Management";
     begin
-        //-NPR5.31 [262904]
-        if "Disc. Grouping Type" <> "Disc. Grouping Type"::"Mix Discount" then
+        if Rec."Disc. Grouping Type" <> Rec."Disc. Grouping Type"::"Mix Discount" then
             exit(0);
 
-        if not MixedDiscount.Get("No.") then
+        if not MixedDiscount.Get(Rec."No.") then
             exit(0);
 
         exit(MixedDiscountMgt.CalcExpectedAmountPerBatch(MixedDiscount, FindMaxDisc, TempPriorityBuffer));
-        //+NPR5.31 [262904]
     end;
 
     local procedure CalcMinQty(): Decimal
     var
         MixedDiscount: Record "NPR Mixed Discount";
     begin
-        //-NPR5.31 [262904]
-        if "Disc. Grouping Type" <> "Disc. Grouping Type"::"Mix Discount" then
+        if Rec."Disc. Grouping Type" <> Rec."Disc. Grouping Type"::"Mix Discount" then
             exit(0);
-        if not MixedDiscount.Get("No.") then
+        if not MixedDiscount.Get(Rec."No.") then
             exit(0);
 
         exit(MixedDiscount.CalcMinQty());
-        //+NPR5.31 [262904]
     end;
 
     local procedure GetDescription(): Text
     var
         MixedDiscount: Record "NPR Mixed Discount";
     begin
-        //+NPR5.31 [262904]
-        if "Disc. Grouping Type" <> "Disc. Grouping Type"::"Mix Discount" then
+        if Rec."Disc. Grouping Type" <> Rec."Disc. Grouping Type"::"Mix Discount" then
             exit('');
-        if not MixedDiscount.Get("No.") then
+        if not MixedDiscount.Get(Rec."No.") then
             exit('');
 
         exit(MixedDiscount.Description);
-        //+NPR5.31 [262904]
     end;
 
     procedure UpdateMixedDiscountView(MixedDiscount: Record "NPR Mixed Discount")
     begin
-        //-NPR5.31 [262904]
         Lot := MixedDiscount.Lot;
         MixType := MixedDiscount."Mix Type";
-        DiscountType := MixedDiscount."Discount Type";  //NPR5.55 [412946]
+        DiscountType := MixedDiscount."Discount Type";
 
-        FilterGroup(2);
+        Rec.FilterGroup(2);
         case MixType of
             MixedDiscount."Mix Type"::Combination:
-                SetRange("Disc. Grouping Type", "Disc. Grouping Type"::"Mix Discount");
+                Rec.SetRange("Disc. Grouping Type", Rec."Disc. Grouping Type"::"Mix Discount");
             else
-                SetRange("Disc. Grouping Type", "Disc. Grouping Type"::Item, "Disc. Grouping Type"::"Item Disc. Group");
+                Rec.SetRange("Disc. Grouping Type", Rec."Disc. Grouping Type"::Item, Rec."Disc. Grouping Type"::"Item Disc. Group");
         end;
-        FilterGroup(0);
+        Rec.FilterGroup(0);
 
         CurrPage.Update(false);
-        //+NPR5.31 [262904]
     end;
 
     procedure GetTotalAmount(): Decimal
     var
         MixedDiscount: Record "NPR Mixed Discount";
     begin
-        //-NPR5.55 [393386]
-        if not MixedDiscount.Get(Code) then
+        if not MixedDiscount.Get(Rec.Code) then
             exit;
 
         exit(MixedDiscount."Total Amount");
-        //+NPR5.55 [393386]
     end;
 }
 
