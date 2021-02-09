@@ -1,14 +1,5 @@
 table 6151409 "NPR Magento Payment Line"
 {
-    // MAG1.03/MHA /20150113  CASE 199932 Renamed table from Payment Line to be inluded in NaviConnect
-    // MAG1.05/TS  /20150223  CASE 201682 Renamed caption for payment type WebVoucher to Voucher
-    // MAG1.20/TR  /20150828  CASE 219645 Edited fields Payment Gateway Code and Date Captured
-    // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
-    // MAG2.01/MHA /20160928  CASE 250694 Added field 110 "Date Refunded" and 70 "External Reference No."
-    // MAG2.02/MHA /20170222  CASE 264711 Added fields 200 "Last Amount" and 205 "Last Posting No."
-    // MAG2.05/MHA /20170712  CASE 283588 Added field 37 "Allow Adjust Amount"
-    // MAG2.17/JDH /20181112 CASE 334163 Added Caption to fields 70 and 205
-    // MAG2.19/MMV /20190314 CASE 347687 Added field 80
 
     Caption = 'Payment Line';
     DataClassification = CustomerContent;
@@ -144,6 +135,12 @@ table 6151409 "NPR Magento Payment Line"
             DataClassification = CustomerContent;
             Description = 'MAG2.02';
         }
+        field(210; "Charge ID"; Code[20])
+        {
+            Caption = 'Charge ID';
+            DataClassification = CustomerContent;
+            Description = 'MAG3.00';
+        }
     }
 
     keys
@@ -166,17 +163,11 @@ table 6151409 "NPR Magento Payment Line"
     begin
         if "Payment Type" = "Payment Type"::Voucher then begin
             CreditVoucher.SetRange(Status, CreditVoucher.Status::Cancelled);
-            //-MAG2.00
-            //CreditVoucher.SETRANGE("Certificate Number","No.");
             CreditVoucher.SetRange("External Reference No.", "No.");
-            //+MAG2.00
             CreditVoucher.DeleteAll(true);
 
             GiftVoucher.SetRange(Status, GiftVoucher.Status::Cancelled);
-            //-MAG2.00
-            //GiftVoucher.SETRANGE("Certificate Number","No.");
             GiftVoucher.SetRange("External Reference No.", "No.");
-            //+MAG2.00
             GiftVoucher.DeleteAll(true);
         end;
     end;

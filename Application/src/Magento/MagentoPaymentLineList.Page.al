@@ -1,14 +1,5 @@
 page 6151454 "NPR Magento Payment Line List"
 {
-    // MAG1.03/MHA /20150113  CASE 199932 Object created
-    // MAG1.20/TR  /20150828  CASE  219645 Date Captured field updated
-    // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
-    // MAG2.01/MHA /20160928  CASE 242561 Action Capture Payment changed from Visible if Table = 112 to always
-    // MAG2.01/MHA /20160928  CASE 250694 Added field 110 "Date Refunded" and Action Refund Payment
-    // MAG2.01/MHA /20161031  CASE 256733 Added Actions "Post Payment" and "Document Card"
-    // MAG2.05/MHA /20170712  CASE 283588 Added field 90 "Allow Adjust Payment Amount"
-    // MAG2.07/MHA /20170912  CASE 289527 "Posted" made editable and added AutoSplitKey
-
     AutoSplitKey = true;
     Caption = 'Payment Line List';
     PageType = List;
@@ -96,6 +87,11 @@ page 6151454 "NPR Magento Payment Line List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Date Captured field';
                 }
+                field("Charge ID"; "Charge ID")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Charge ID';
+                }
                 field("Date Refunded"; "Date Refunded")
                 {
                     ApplicationArea = All;
@@ -122,7 +118,7 @@ page 6151454 "NPR Magento Payment Line List"
                 Caption = 'Capture Payment';
                 Image = Payment;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = CaptureEnabled;
@@ -135,25 +131,18 @@ page 6151454 "NPR Magento Payment Line List"
                     MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
                 begin
                     if "Date Captured" <> 0D then begin
-                        //-MAG2.01 [242561]
-                        //MESSAGE(Text002);
-                        //EXIT;
                         if not Confirm(Text002, false) then
                             exit;
                         Rec."Date Captured" := 0D;
                         CurrPage.Update(true);
-                        //+MAG2.01 [242561]
                     end;
 
                     MagentoPaymentGateway.Get("Payment Gateway Code");
                     MagentoPaymentGateway.TestField("Capture Codeunit Id");
 
                     MagentoPmtMgt.CapturePaymentLine(Rec);
-                    //-MAG2.01 [242561]
-                    //MESSAGE(Text001,"Payment Gateway Code","No.");
                     if "Date Captured" <> 0D then
                         Message(Text001, "Payment Gateway Code", "No.");
-                    //+MAG2.01 [242561]
                 end;
             }
             action("Refund Payment")
@@ -161,7 +150,7 @@ page 6151454 "NPR Magento Payment Line List"
                 Caption = 'Refund Payment';
                 Image = Payment;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = RefundEnabled;
@@ -173,7 +162,6 @@ page 6151454 "NPR Magento Payment Line List"
                     MagentoPaymentGateway: Record "NPR Magento Payment Gateway";
                     MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
                 begin
-                    //-MAG2.01 [242561]
                     if "Date Refunded" <> 0D then begin
                         if not Confirm(Text003, false) then
                             exit;
@@ -187,7 +175,6 @@ page 6151454 "NPR Magento Payment Line List"
                     MagentoPmtMgt.RefundPaymentLine(Rec);
                     if "Date Refunded" <> 0D then
                         Message(Text000, "Payment Gateway Code", "No.");
-                    //+MAG2.01 [242561]
                 end;
             }
             action("Post Payment")
@@ -195,7 +182,7 @@ page 6151454 "NPR Magento Payment Line List"
                 Caption = 'Post Payment';
                 Image = Post;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = ("Document Table No." = 112) AND ("Account No." <> '') AND (NOT Posted);
@@ -207,10 +194,8 @@ page 6151454 "NPR Magento Payment Line List"
                     GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
                     MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
                 begin
-                    //-MAG2.01 [256733]
                     MagentoPmtMgt.PostPaymentLine(Rec, GenJnlPostLine);
                     Message(Text004);
-                    //+MAG2.01 [256733]
                 end;
             }
         }
@@ -221,7 +206,7 @@ page 6151454 "NPR Magento Payment Line List"
                 Caption = '&Navigate';
                 Image = Navigate;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = ("Document Table No." = 112) OR ("Document Table No." = 114);
@@ -241,7 +226,7 @@ page 6151454 "NPR Magento Payment Line List"
                 Caption = 'Document Card';
                 Image = Document;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -251,9 +236,7 @@ page 6151454 "NPR Magento Payment Line List"
                 var
                     MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
                 begin
-                    //-MAG2.01 [256733]
                     MagentoPmtMgt.ShowDocumentCard(Rec);
-                    //-MAG2.01 [256733]
                 end;
             }
         }
@@ -261,9 +244,7 @@ page 6151454 "NPR Magento Payment Line List"
 
     trigger OnAfterGetCurrRecord()
     begin
-        //-MAG2.01 [250694]
         SetGatewayEnabled();
-        //+MAG2.01 [250694]
     end;
 
     var
@@ -279,7 +260,6 @@ page 6151454 "NPR Magento Payment Line List"
     var
         PaymentGateway: Record "NPR Magento Payment Gateway";
     begin
-        //-MAG2.01 [250694]
         CaptureEnabled := false;
         RefundEnabled := false;
         if "Payment Gateway Code" = '' then
@@ -288,7 +268,6 @@ page 6151454 "NPR Magento Payment Line List"
             exit;
         CaptureEnabled := PaymentGateway."Capture Codeunit Id" <> 0;
         RefundEnabled := PaymentGateway."Refund Codeunit Id" <> 0;
-        //+MAG2.01 [250694]
     end;
 }
 
