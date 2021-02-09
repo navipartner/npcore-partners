@@ -733,6 +733,8 @@ table 6014402 "NPR Payment Type POS"
             DataClassification = CustomerContent;
             Description = 'Invokes this codeunit when a Sale Line POS with type payment is being inserted.';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Payment Type - Integration cleanup';
         }
         field(351; "On Sale End Codeunit"; Integer)
         {
@@ -740,6 +742,8 @@ table 6014402 "NPR Payment Type POS"
             DataClassification = CustomerContent;
             Description = 'Invokes this codeunit before a sale is finished. Can interrupt the end of a sale.';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Payment Type - Integration cleanup';
         }
         field(352; "Post Processing Codeunit"; Integer)
         {
@@ -747,6 +751,8 @@ table 6014402 "NPR Payment Type POS"
             DataClassification = CustomerContent;
             Description = 'Invokes this codeunit when a sale is finished eg. transferred to the auditroll.';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Payment Type - Integration cleanup';
         }
         field(501; "Payment Card Type"; Option)
         {
