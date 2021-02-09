@@ -7,7 +7,7 @@ page 6151245 "NPR NP Retail Admin Setup RC"
     {
         area(rolecenter)
         {
-            part(control1246;"NPR generic retail Headline")
+            part(control1246; "NPR generic retail Headline")
             {
                 ApplicationArea = All;
             }
@@ -705,36 +705,27 @@ page 6151245 "NPR NP Retail Admin Setup RC"
 
                 action("NP Retail Setup")
                 {
-                Caption = 'NP Retail Setup';
-                RunObject = Page "NPR NP Retail Setup";
-                ApplicationArea = All;
-                ToolTip = 'Executes the NP Retail Setup action';
-                 }
+                    Caption = 'NP Retail Setup';
+                    RunObject = Page "NPR NP Retail Setup";
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the NP Retail Setup action';
+                }
                 action("Retail Setup")
                 {
-                Caption = 'Retail Setup';
-                RunObject = page "NPR Retail Setup";
-                ApplicationArea = All;
-                ToolTip = 'Executes the Retail Setup action';
+                    Caption = 'Retail Setup';
+                    RunObject = page "NPR Retail Setup";
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the Retail Setup action';
                 }
                 action("MPOS App Setup")
                 {
-                Caption = 'MPOS App Setup';
-                RunObject = Page "NPR MPOS App Setup Card";
-                ApplicationArea = All;
-                ToolTip = 'Executes the MPOS App Setup action';
+                    Caption = 'MPOS App Setup';
+                    RunObject = Page "NPR MPOS App Setup Card";
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the MPOS App Setup action';
                 }
-                
-                    
-                action("AF Setup")
-                {
-                Caption = 'Azure Setup';
-                RunObject = page "NPR AF Setup";
-                Image = Setup;
-                ApplicationArea = All;
-                ToolTip = 'Executes the AF Setup action';
-                }
-                
+
+
             }
             group("Posting Setup")
             {
