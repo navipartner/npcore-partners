@@ -76,10 +76,18 @@ page 6151242 "NPR Retail Magento Setup List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Api Username field';
                 }
-                field("Api Password"; Rec."Api Password")
+                field(Password; Password)
                 {
                     ApplicationArea = All;
+                    Caption = 'Api Password';
+                    ExtendedDatatype = Masked;
                     ToolTip = 'Specifies the value of the Api Password field';
+
+                    trigger OnValidate()
+                    begin
+                        Rec.SetApiPassword(Password);
+                        Commit();
+                    end;
                 }
                 field("Api Authorization"; Rec."Api Authorization")
                 {
@@ -101,10 +109,18 @@ page 6151242 "NPR Retail Magento Setup List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Managed Nav api brugernavn field';
                 }
-                field("Managed Nav Api Password"; Rec."Managed Nav Api Password")
+                field(NavPassword; NavPassword)
                 {
                     ApplicationArea = All;
+                    Caption = 'Managed Nav Api Password';
+                    ExtendedDatatype = Masked;
                     ToolTip = 'Specifies the value of the Managed Nav Api Password field';
+
+                    trigger OnValidate()
+                    begin
+                        Rec.SetNavApiPassword(NavPassword);
+                        Commit();
+                    end;
                 }
                 field("Version No."; Rec."Version No.")
                 {
@@ -325,5 +341,17 @@ page 6151242 "NPR Retail Magento Setup List"
             }
         }
     }
-}
+    trigger OnAfterGetRecord()
+    begin
+        Password := '';
+        NavPassword := '';
+        if not IsNullGuid(Rec."Api Password Key") then
+            Password := '***';
+        if not IsNullGuid(Rec."Managed Nav Api Password Key") then
+            NavPassword := '***';
+    end;
 
+    var
+        Password: Text;
+        NavPassword: Text;
+}

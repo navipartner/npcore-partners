@@ -1,14 +1,6 @@
 codeunit 6151449 "NPR Magento NpXml Value Mgt."
 {
-    // MAG2.22/MHA /20190614  CASE 355993 Object created
-    // MAG2.26/MHA /20200430  CASE 402486 Added function GetStockQty(), GetStockStatus()
-
-
-    trigger OnRun()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6151555, 'OnGetXmlValue', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpXml Value Mgt.", 'OnGetXmlValue', '', true, true)]
     local procedure ConvertSpecialChars(RecRef: RecordRef; NpXmlElement: Record "NPR NpXml Element"; FieldNo: Integer; var XmlValue: Text; var Handled: Boolean)
     var
         FRef: FieldRef;
@@ -60,12 +52,11 @@ codeunit 6151449 "NPR Magento NpXml Value Mgt."
         exit(Output);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151555, 'OnGetXmlValue', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpXml Value Mgt.", 'OnGetXmlValue', '', true, true)]
     local procedure GetStockQty(RecRef: RecordRef; NpXmlElement: Record "NPR NpXml Element"; FieldNo: Integer; var XmlValue: Text; var Handled: Boolean)
     var
         MagentoItemMgt: Codeunit "NPR Magento Item Mgt.";
     begin
-        //-MAG2.26 [402486]
         if Handled then
             exit;
         if not IsSubscriber(NpXmlElement, 'GetStockQty') then
@@ -74,15 +65,13 @@ codeunit 6151449 "NPR Magento NpXml Value Mgt."
         Handled := true;
 
         XmlValue := Format(MagentoItemMgt.GetStockQty2(RecRef), 0, 9);
-        //+MAG2.26 [402486]
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151555, 'OnGetXmlValue', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpXml Value Mgt.", 'OnGetXmlValue', '', true, true)]
     local procedure GetStockStatus(RecRef: RecordRef; NpXmlElement: Record "NPR NpXml Element"; FieldNo: Integer; var XmlValue: Text; var Handled: Boolean)
     var
         MagentoItemMgt: Codeunit "NPR Magento Item Mgt.";
     begin
-        //-MAG2.26 [402486]
         if Handled then
             exit;
         if not IsSubscriber(NpXmlElement, 'GetStockStatus') then
@@ -93,7 +82,6 @@ codeunit 6151449 "NPR Magento NpXml Value Mgt."
         XmlValue := '0';
         if MagentoItemMgt.GetStockQty2(RecRef) > 0 then
             XmlValue := '1';
-        //+MAG2.26 [402486]
     end;
 
     local procedure IsSubscriber(NpXmlElement: Record "NPR NpXml Element"; XmlValueFunction: Text): Boolean
@@ -111,4 +99,3 @@ codeunit 6151449 "NPR Magento NpXml Value Mgt."
         exit(CODEUNIT::"NPR Magento NpXml Value Mgt.");
     end;
 }
-

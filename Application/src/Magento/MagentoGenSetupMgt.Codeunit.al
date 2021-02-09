@@ -1,27 +1,10 @@
 codeunit 6151400 "NPR Magento Gen. Setup Mgt."
 {
-    // MAG1.17/MHA /20150617  CASE 215910 Object created - includes functions to Init, Edit and Read Xml setup stored in BLOB field (Generic Setup)
-    // MAG1.21/MHA /20151104  CASE 223835 Added Lookup functions
-    //                                    LookupGenericSetup()
-    //                                    LoadGenericSetupBuffer()
-    // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
-    // MAG2.01/TR  /20161102  CASE 257315 Removed ':' in the DrawText Function
-    // MAG2.02/TS  /20170125  CASE 262261 Fitlers was not appplied correctly when having & in value
-    // MAG2.16/BHR /20180824  CASE 322752 Replace record Object to Allobj
-    // MAG14.00.2.22/MHA/20190715  CASE 361942 Removed DotNet Graphics functionality
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
 
-    procedure "--- Init"()
-    begin
-    end;
-
+    #region Init
+    [Obsolete('Use native Business Central objects instead of dotnet.')]
     local procedure AddElement(var XmlDoc: DotNet "NPRNetXmlDocument"; NodePath: Text; Name: Text[250]; var XmlElement: DotNet NPRNetXmlElement): Boolean
     var
         XmlElementParent: DotNet NPRNetXmlElement;
@@ -46,6 +29,33 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         exit(not IsNull(XmlElement));
     end;
 
+    local procedure AddElement(var XmlDoc: XmlDocument; NodePath: Text; Name: Text[250]; var XDataElement: XmlElement): Boolean
+    var
+        XRootElement: XmlElement;
+        XNodeParent: XmlNode;
+        XNode: XmlNode;
+    begin
+        XmlDoc.GetRoot(XRootElement);
+        if XRootElement.IsEmpty then
+            exit(false);
+
+        if NodePath <> '' then begin
+            NodePath := LowerCase(NodePath);
+            if not XRootElement.SelectSingleNode(NodePath, XNodeParent) then
+                exit(false)
+            else
+                XRootElement := XNodeParent.AsXmlElement();
+        end;
+
+        if XRootElement.SelectSingleNode(Name, XNodeParent) then
+            exit(false);
+
+        XDataElement := XmlElement.Create(Name);
+        XRootElement.Add(XDataElement);
+        exit(not XDataElement.IsEmpty);
+    end;
+
+    [Obsolete('Use native Business Central objects instead of dotnet.')]
     procedure AddContainer(var XmlDoc: DotNet "NPRNetXmlDocument"; NodePath: Text; Name: Text[250])
     var
         XmlElement: DotNet NPRNetXmlElement;
@@ -56,30 +66,43 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         NpXmlDomMgt.AddAttribute(XmlElement, "AttributeName.ElementType", "ElementType.Container");
     end;
 
-    procedure AddFieldInteger(var XmlDoc: DotNet "NPRNetXmlDocument"; NodePath: Text; Name: Text[250]; Value: Integer)
+    procedure AddContainer(var XmlDoc: XmlDocument; NodePath: Text; Name: Text[250])
     var
-        XmlElement: DotNet NPRNetXmlElement;
+        XElement: XmlElement;
     begin
-        if not AddElement(XmlDoc, NodePath, Name, XmlElement) then
+        if not AddElement(XmlDoc, NodePath, Name, XElement) then
             exit;
 
-        NpXmlDomMgt.AddAttribute(XmlElement, "AttributeName.ElementType", "ElementType.Field");
-        NpXmlDomMgt.AddAttribute(XmlElement, "AttributeName.FieldType", Format(GetDotNetType(Value)));
-        XmlElement.InnerText := Format(Value, 0, 9);
+        XElement.SetAttribute("AttributeName.ElementType"(), "ElementType.Container"());
     end;
 
-    procedure AddFieldDecimal(var XmlDoc: DotNet "NPRNetXmlDocument"; NodePath: Text; Name: Text[250]; Value: Decimal)
+    procedure AddFieldInteger(var XmlDoc: XmlDocument; NodePath: Text; Name: Text[250]; Value: Integer)
     var
-        XmlElement: DotNet NPRNetXmlElement;
+        XElement: XmlElement;
     begin
-        if not AddElement(XmlDoc, NodePath, Name, XmlElement) then
+        if not AddElement(XmlDoc, NodePath, Name, XElement) then
             exit;
 
-        NpXmlDomMgt.AddAttribute(XmlElement, "AttributeName.ElementType", "ElementType.Field");
-        NpXmlDomMgt.AddAttribute(XmlElement, "AttributeName.FieldType", Format(GetDotNetType(Value)));
-        XmlElement.InnerText := Format(Value, 0, 9);
+        XElement.SetAttribute("AttributeName.ElementType"(), "ElementType.Field"());
+        XElement.SetAttribute("AttributeName.FieldType"(), 'System.Int32');
+
+        XElement.Add(Format(Value, 0, 9));
     end;
 
+    procedure AddFieldDecimal(var XmlDoc: XmlDocument; NodePath: Text; Name: Text[250]; Value: Decimal)
+    var
+        XElement: XmlElement;
+    begin
+        if not AddElement(XmlDoc, NodePath, Name, XElement) then
+            exit;
+
+        XElement.SetAttribute("AttributeName.ElementType"(), "ElementType.Field"());
+        XElement.SetAttribute("AttributeName.FieldType"(), 'System.Decimal');
+
+        XElement.Add(Format(Value, 0, 9));
+    end;
+
+    [Obsolete('Use native Business Central objects instead of dotnet.')]
     procedure AddFieldText(var XmlDoc: DotNet "NPRNetXmlDocument"; NodePath: Text; Name: Text[250]; Value: Text[250])
     var
         XmlElement: DotNet NPRNetXmlElement;
@@ -90,6 +113,19 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         NpXmlDomMgt.AddAttribute(XmlElement, "AttributeName.ElementType", "ElementType.Field");
         NpXmlDomMgt.AddAttribute(XmlElement, "AttributeName.FieldType", Format(GetDotNetType(Value)));
         XmlElement.InnerText := Format(Value, 0, 9);
+    end;
+
+    procedure AddFieldText(var XmlDoc: XmlDocument; NodePath: Text; Name: Text[250]; Value: Text[250])
+    var
+        XElement: XmlElement;
+    begin
+        if not AddElement(XmlDoc, NodePath, Name, XElement) then
+            exit;
+
+        XElement.SetAttribute("AttributeName.ElementType"(), "ElementType.Field"());
+        XElement.SetAttribute("AttributeName.FieldType"(), 'System.String');
+
+        XElement.Add(Format(Value, 0, 9));
     end;
 
     procedure InitGenericMagentoSetup(var MagentoSetup: Record "NPR Magento Setup")
@@ -104,9 +140,7 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
 
         TempBlob.FromRecord(MagentoSetup, MagentoSetup.FieldNo("Generic Setup"));
         InitGenericSetup(TempBlob);
-        //-MAG2.00
         MagentoNpXmlSetupMgt.InitNpXmlTemplateSetup(TempBlob);
-        //+MAG2.00
 
         RecRef.GetTable(MagentoSetup);
         TempBlob.ToRecordRef(RecRef, MagentoSetup.FieldNo("Generic Setup"));
@@ -117,27 +151,26 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
 
     local procedure InitGenericSetup(var TempBlob: Codeunit "Temp Blob")
     var
-        XmlDoc: DotNet "NPRNetXmlDocument";
+        XmlDoc: XmlDocument;
         OutStream: OutStream;
     begin
         if TempBlob.HasValue then
             exit;
 
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml('<?xml version="1.0" encoding="UTF-8"?>' +
-                        '<generic_setup />');
+        XmlDocument.ReadFrom('<?xml version="1.0" encoding="UTF-8"?>' +
+                        '<generic_setup />', XmlDoc);
+
         TempBlob.CreateOutStream(OutStream);
-        XmlDoc.Save(OutStream);
+        XmlDoc.WriteTo(OutStream);
     end;
+    #endregion
 
-    procedure "--- Edit"()
-    begin
-    end;
-
-    local procedure AddGenericBufferElement(var XmlElement: DotNet NPRNetXmlElement; var LineNo: Integer; Level: Integer; ParentNodePath: Text[250]; var TempGenericSetupBuffer: Record "NPR Magento Gen. Setup Buffer" temporary)
+    #region Edit
+    local procedure AddGenericBufferElement(var XmlElement: XmlElement; var LineNo: Integer; Level: Integer; ParentNodePath: Text[250]; var TempGenericSetupBuffer: Record "NPR Magento Gen. Setup Buffer" temporary)
     var
-        XmlElement2: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
+        XElement2: XmlElement;
+        XNodeList: XmlNodeList;
+        XNode: XmlNode;
         i: Integer;
     begin
         LineNo += 10000;
@@ -158,11 +191,12 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
 
         ParentNodePath := TempGenericSetupBuffer."Node Path";
         if TempGenericSetupBuffer.Container then begin
-            XmlNodeList := XmlElement.ChildNodes;
-            for i := 0 to XmlNodeList.Count - 1 do begin
-                XmlElement2 := XmlNodeList.ItemOf(i);
-                if XmlElement2.Name <> '#text' then
-                    AddGenericBufferElement(XmlElement2, LineNo, Level + 1, ParentNodePath, TempGenericSetupBuffer);
+            XmlElement.SelectNodes('child::*', XNodeList);
+            for i := 1 to XNodeList.Count do begin
+                XNodeList.Get(i, XNode);
+                XElement2 := XNode.AsXmlElement();
+                if XElement2.Name <> '#text' then
+                    AddGenericBufferElement(XElement2, LineNo, Level + 1, ParentNodePath, TempGenericSetupBuffer);
             end;
         end;
     end;
@@ -170,10 +204,11 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
     local procedure EditGenericSetup(var TempBlob: Codeunit "Temp Blob"; NodePath: Text)
     var
         TempGenericSetupBuffer: Record "NPR Magento Gen. Setup Buffer" temporary;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlElement2: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
+        XmlDoc: XmlDocument;
+        XNodeRoot: XmlNode;
+        XNode: XmlNode;
+        XNodeList: XmlNodeList;
+        XElement: XmlElement;
         InStream: InStream;
         OutStream: OutStream;
         LineNo: Integer;
@@ -184,29 +219,29 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
             exit;
 
         LineNo := 10000;
-        XmlElement := XmlDoc.DocumentElement;
         if NodePath <> '' then
-            XmlElement := XmlElement.SelectSingleNode(NodePath);
-        if not NpXmlDomMgt.IsLeafNode(XmlElement) then begin
-            XmlNodeList := XmlElement.ChildNodes;
-            for i := 0 to XmlNodeList.Count - 1 do begin
-                XmlElement2 := XmlNodeList.ItemOf(i);
-                AddGenericBufferElement(XmlElement2, LineNo, 1, '', TempGenericSetupBuffer);
+            XmlDoc.SelectSingleNode(NodePath, XNodeRoot);
+        if not IsLeafNode(XNodeRoot) then begin
+            XNodeRoot.SelectNodes('child::*', XNodeList);
+            for i := 1 to XNodeList.Count do begin
+                XNodeList.Get(i, XNode);
+                XElement := XNode.AsXmlElement();
+                AddGenericBufferElement(XElement, LineNo, 1, '', TempGenericSetupBuffer);
             end;
         end;
-        TempGenericSetupBuffer.ModifyAll("Root Element", XmlElement.Name);
+        TempGenericSetupBuffer.ModifyAll("Root Element", XNodeRoot.AsXmlElement().Name);
 
         PAGE.RunModal(PAGE::"NPR Magento Gen. Setup Buffer", TempGenericSetupBuffer);
 
         TempGenericSetupBuffer.SetRange(Container, false);
         if TempGenericSetupBuffer.FindSet then
             repeat
-                XmlElement2 := XmlElement.SelectSingleNode(TempGenericSetupBuffer."Node Path");
-                XmlElement2.InnerText := TempGenericSetupBuffer.Value;
+                XNodeRoot.SelectSingleNode(TempGenericSetupBuffer."Node Path", XNode); //xPath must be used.
+                XNode.AsXmlElement().Add(TempGenericSetupBuffer.Value);
             until TempGenericSetupBuffer.Next = 0;
         Clear(TempBlob);
         TempBlob.CreateOutStream(OutStream);
-        XmlDoc.Save(OutStream);
+        XmlDoc.WriteTo(OutStream);
     end;
 
     procedure EditGenericMagentoSetup(NodePath: Text)
@@ -226,49 +261,31 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
 
         MagentoSetup.Modify(true);
     end;
-
-    procedure "--- Lookup"()
-    begin
-    end;
+    #endregion
 
     procedure LookupGenericSetup(var TempBlob: Codeunit "Temp Blob"; RootNodePath: Text): Text
     var
         TempGenericSetupBuffer: Record "NPR Magento Gen. Setup Buffer" temporary;
         GenericSetupBuffer: Page "NPR Magento Gen. Setup Buffer";
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlElement2: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        InStream: InStream;
-        OutStream: OutStream;
-        LineNo: Integer;
-        i: Integer;
     begin
-        //-MAG1.21
         LoadGenericSetupBuffer(TempBlob, RootNodePath, TempGenericSetupBuffer);
         if PAGE.RunModal(PAGE::"NPR Magento Gen. Setup Buffer", TempGenericSetupBuffer) <> ACTION::LookupOK then
             exit('');
 
         exit(TempGenericSetupBuffer.Value);
-        //+MAG1.21
-    end;
-
-    procedure "--- Get"()
-    begin
     end;
 
     procedure GetValueInteger(var TempBlob: Codeunit "Temp Blob"; NodePath: Text) Value: Integer
     var
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
+        XmlDoc: XmlDocument;
+        XElement: XmlElement;
         InStream: InStream;
     begin
         TempBlob.CreateInStream(InStream);
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.Load(InStream);
+        XmlDocument.ReadFrom(InStream, XmlDoc);
 
-        XmlElement := XmlDoc.DocumentElement;
-        Evaluate(Value, NpXmlDomMgt.GetXmlText(XmlElement, NodePath, 250, true), 9);
+        XmlDoc.GetRoot(XElement);
+        Evaluate(Value, NpXmlDomMgt.GetXmlText(XElement, NodePath, 250, true), 9);
         exit(Value);
 
         exit(0);
@@ -276,16 +293,15 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
 
     procedure GetValueDecimal(var TempBlob: Codeunit "Temp Blob"; NodePath: Text) Value: Decimal
     var
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
+        XmlDoc: XmlDocument;
+        XElement: XmlElement;
         InStream: InStream;
     begin
         TempBlob.CreateInStream(InStream);
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.Load(InStream);
+        XmlDocument.ReadFrom(InStream, XmlDoc);
 
-        XmlElement := XmlDoc.DocumentElement;
-        Evaluate(Value, NpXmlDomMgt.GetXmlText(XmlElement, NodePath, 250, true), 9);
+        XmlDoc.GetRoot(XElement);
+        Evaluate(Value, NpXmlDomMgt.GetXmlText(XElement, NodePath, 250, true), 9);
         exit(Value);
 
         exit(0);
@@ -293,24 +309,20 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
 
     procedure GetValueText(var TempBlob: Codeunit "Temp Blob"; NodePath: Text): Text[250]
     var
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
+        XmlDoc: XmlDocument;
+        XElement: XmlElement;
         InStream: InStream;
     begin
         TempBlob.CreateInStream(InStream);
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.Load(InStream);
+        XmlDocument.ReadFrom(InStream, XmlDoc);
 
-        XmlElement := XmlDoc.DocumentElement;
-        exit(Format(NpXmlDomMgt.GetXmlText(XmlElement, NodePath, 250, true), 0, 9));
+        XmlDoc.GetRoot(XElement);
+        exit(Format(NpXmlDomMgt.GetXmlText(XElement, NodePath, 250, true), 0, 9));
 
         exit('');
     end;
 
-    procedure "--- Load"()
-    begin
-    end;
-
+    [Obsolete('Use native Business Central objects instead of dotnet.')]
     procedure LoadGenericSetup(var TempBlob: Codeunit "Temp Blob"; var XmlDoc: DotNet "NPRNetXmlDocument"): Boolean
     var
         InStream: InStream;
@@ -324,38 +336,45 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         exit(true);
     end;
 
+    procedure LoadGenericSetup(var TempBlob: Codeunit "Temp Blob"; var XmlDoc: XmlDocument): Boolean
+    var
+        InStream: InStream;
+    begin
+        if not TempBlob.HasValue then
+            exit(false);
+
+        TempBlob.CreateInStream(InStream);
+        XmlDocument.ReadFrom(InStream, XmlDoc);
+        exit(true);
+    end;
+
     procedure LoadGenericSetupBuffer(var TempBlob: Codeunit "Temp Blob"; RootNodePath: Text; var TempGenericSetupBuffer: Record "NPR Magento Gen. Setup Buffer" temporary)
     var
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlElement2: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
+        XmlDoc: XmlDocument;
+        XNodeRoot: XmlNode;
+        XNode: XmlNode;
+        XNodeList: XmlNodeList;
+        XElement: XmlElement;
         i: Integer;
         LineNo: Integer;
     begin
-        //-MAG1.21
         TempGenericSetupBuffer.DeleteAll;
         InitGenericSetup(TempBlob);
         if not LoadGenericSetup(TempBlob, XmlDoc) then
             exit;
 
         LineNo := 10000;
-        XmlElement := XmlDoc.DocumentElement;
         if RootNodePath <> '' then
-            XmlElement := XmlElement.SelectSingleNode(RootNodePath);
-        if not NpXmlDomMgt.IsLeafNode(XmlElement) then begin
-            XmlNodeList := XmlElement.ChildNodes;
-            for i := 0 to XmlNodeList.Count - 1 do begin
-                XmlElement2 := XmlNodeList.ItemOf(i);
-                AddGenericBufferElement(XmlElement2, LineNo, 1, '', TempGenericSetupBuffer);
+            XmlDoc.SelectSingleNode(RootNodePath, XNodeRoot);
+        if not IsLeafNode(XNodeRoot) then begin
+            XNodeRoot.SelectNodes('child::*', XNodeList);
+            for i := 1 to XNodeList.Count do begin
+                XNodeList.Get(i, XNode);
+                XElement := XNode.AsXmlElement();
+                AddGenericBufferElement(XElement, LineNo, 1, '', TempGenericSetupBuffer);
             end;
         end;
-        TempGenericSetupBuffer.ModifyAll("Root Element", XmlElement.Name);
-        //+MAG1.21
-    end;
-
-    procedure "--- Validate"()
-    begin
+        TempGenericSetupBuffer.ModifyAll("Root Element", XNodeRoot.AsXmlElement().Name);
     end;
 
     procedure ValidateValue(DataType: Text[50]; NewValue: Text[250]) Value: Text[250]
@@ -367,12 +386,12 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
             exit('');
 
         case DataType of
-            Format(GetDotNetType(Integer)):
+            'System.Int32':
                 begin
                     Evaluate(Integer, NewValue, 9);
                     exit(Format(Integer, 0, 9));
                 end;
-            Format(GetDotNetType(Decimal)):
+            'System.Decimal':
                 begin
                     Evaluate(Decimal, NewValue, 9);
                     exit(Format(Decimal, 0, 9));
@@ -382,15 +401,10 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         exit(Format(NewValue, 0, 9));
     end;
 
-    procedure "--- FieldRef Mgt"()
-    begin
-    end;
-
     procedure GetFieldRefValue(var RecRef: RecordRef; FieldNo: Integer): Text
     var
         FieldRef: FieldRef;
     begin
-        //-MAG1.21
         if not OpenFieldRef(RecRef, FieldNo, FieldRef) then
             exit('');
 
@@ -398,33 +412,25 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
             FieldRef.CalcField;
 
         exit(Format(FieldRef.Value));
-        //+MAG1.21
     end;
 
     procedure OpenRecRef(TableNo: Integer; var RecRef: RecordRef) TableExists: Boolean
     var
-        "Object": Record "Object";
         AllObj: Record AllObj;
     begin
-        //-MAG1.21
-        //-MAG2.16 [322752]
-        //IF NOT Object.GET(Object.Type::Table,'',TableNo) THEN
         if not AllObj.Get(AllObj."Object Type"::Table, TableNo) then
-            //+MAG2.16 [322752]
             exit(false);
 
         Clear(RecRef);
         RecRef.Open(TableNo);
 
         exit(true);
-        //+MAG1.21
     end;
 
     procedure OpenFieldRef(var RecRef: RecordRef; FieldNo: Integer; var FieldRef: FieldRef) FieldExists: Boolean
     var
         "Field": Record "Field";
     begin
-        //-MAG1.21
         if RecRef.Number <= 0 then
             exit(false);
 
@@ -434,36 +440,44 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         FieldRef := RecRef.Field(FieldNo);
 
         exit(true);
-        //+MAG1.21
     end;
 
     procedure SetFieldRefFilter(var RecRef: RecordRef; FieldNo: Integer; FilterValue: Text) FieldExists: Boolean
     var
         FieldRef: FieldRef;
     begin
-        //-MAG1.21
         if not OpenFieldRef(RecRef, FieldNo, FieldRef) then
             exit(false);
-        //-MAG2.02
-        // FieldRef.SETFILTER(FilterValue);
         FieldRef.SetFilter('=%1', FilterValue);
-        //+MAG2.02
         exit(true);
-        //+MAG1.21
     end;
 
-    procedure "--- Variant Mgt."()
+    procedure IsLeafNode(XNode: XmlNode): Boolean
+    var
+        XElement: XmlElement;
+        XNodeList: XmlNodeList;
+        i: Integer;
     begin
+        if not XNode.SelectNodes('child::*', XNodeList) then
+            exit(true);
+
+        for i := 1 to XNodeList.Count do begin
+            XNodeList.Get(i, XNode);
+            XElement := XNode.AsXmlElement();
+            if XElement.Name <> '#text' then
+                exit(false);
+        end;
+        exit(true);
     end;
 
+    #region Variant Mgt.
     procedure LookupVariantPictureDimension(): Text
     var
         MagentoSetup: Record "NPR Magento Setup";
         TempBlob: Codeunit "Temp Blob";
-        XmlDoc: DotNet "NPRNetXmlDocument";
+        XmlDoc: XmlDocument;
         OutStream: OutStream;
     begin
-        //-MAG2.00
         if not (MagentoSetup.Get and (MagentoSetup."Variant System" in [MagentoSetup."Variant System"::Variety])) then
             exit('');
 
@@ -477,23 +491,20 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         end;
 
         TempBlob.CreateOutStream(OutStream);
-        XmlDoc.Save(OutStream);
+        XmlDoc.WriteTo(OutStream);
         exit(LookupGenericSetup(TempBlob, "ElementName.VariantDimension"));
-        //+MAG2.00
     end;
 
-    local procedure SetupDimensionBuffer(var XmlDoc: DotNet "NPRNetXmlDocument"): Boolean
+    local procedure SetupDimensionBuffer(var XmlDoc: XmlDocument): Boolean
     var
         TempBlob: Codeunit "Temp Blob";
     begin
-        //-MAG2.00
         InitGenericSetup(TempBlob);
         LoadGenericSetup(TempBlob, XmlDoc);
         AddContainer(XmlDoc, '', "ElementName.VariantDimension");
-        //+MAG2.00
     end;
 
-    local procedure SetupDimensionBufferVariety(var XmlDoc: DotNet "NPRNetXmlDocument"): Boolean
+    local procedure SetupDimensionBufferVariety(var XmlDoc: XmlDocument): Boolean
     var
         RecRef: RecordRef;
         VarietyTableNo: Integer;
@@ -502,7 +513,6 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         FieldRef: FieldRef;
         FieldRef2: FieldRef;
     begin
-        //-MAG2.00
         VarietyTableNo := 6059971;
         if not OpenRecRef(VarietyTableNo, RecRef) then
             exit(false);
@@ -519,13 +529,10 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         until RecRef.Next = 0;
 
         exit(true);
-        //+MAG2.00
     end;
+    #endregion
 
-    local procedure "--- Enum"()
-    begin
-    end;
-
+    #region Enum
     local procedure "AttributeName.ElementType"(): Text
     begin
         exit('element_type');
@@ -544,10 +551,6 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
     local procedure "ElementType.Field"(): Text
     begin
         exit('field');
-    end;
-
-    local procedure "--- Enum Voucher"()
-    begin
     end;
 
     procedure "ElementName.Amount"(): Text
@@ -627,9 +630,7 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
 
     procedure "ElementName.VariantDimension"(): Text
     begin
-        //-MAG1.21
         exit('variant_dimension');
-        //+MAG1.21
     end;
 
     procedure "ElementName.WebCode"(): Text
@@ -651,5 +652,5 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
     begin
         exit('y_position');
     end;
+    #endregion
 }
-

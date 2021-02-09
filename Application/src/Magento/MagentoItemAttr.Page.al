@@ -1,11 +1,5 @@
 page 6151436 "NPR Magento Item Attr."
 {
-    // MAG1.00/MH/20150113  CASE 199932 Refactored Object from Web Integration
-    // MAG1.01/MH/20150201  CASE 199932 Changed GetValue()
-    // MAG1.04/MH/20150206  CASE 199932 Added View for setting up WebVariant Configurable Products
-    // MAG1.21/MHA/20151120  CASE 227734 Field 300 Enabled deleted and function SetVisible() deleted [MAG1.04]
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-
     UsageCategory = None;
     AutoSplitKey = true;
     Caption = 'Item Attributes';
@@ -20,7 +14,7 @@ page 6151436 "NPR Magento Item Attr."
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Attribute Description"; "Attribute Description")
+                field("Attribute Description"; Rec."Attribute Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Attribute field';
@@ -42,18 +36,14 @@ page 6151436 "NPR Magento Item Attr."
         }
     }
 
-    actions
-    {
-    }
-
     procedure GetValue() Value: Text
     var
         MagentoItemAttributeValue: Record "NPR Magento Item Attr. Value";
     begin
         Value := '';
-        MagentoItemAttributeValue.SetRange("Attribute ID", "Attribute ID");
-        MagentoItemAttributeValue.SetRange("Item No.", "Item No.");
-        MagentoItemAttributeValue.SetRange("Variant Code", "Variant Code");
+        MagentoItemAttributeValue.SetRange("Attribute ID", Rec."Attribute ID");
+        MagentoItemAttributeValue.SetRange("Item No.", Rec."Item No.");
+        MagentoItemAttributeValue.SetRange("Variant Code", Rec."Variant Code");
         MagentoItemAttributeValue.SetRange(Selected, true);
         if MagentoItemAttributeValue.FindSet then
             repeat
@@ -66,4 +56,3 @@ page 6151436 "NPR Magento Item Attr."
         exit(Value);
     end;
 }
-

@@ -1,20 +1,10 @@
 page 6151483 "NPR Magento Top 10 Customers"
 {
-    // MAG1.17/BHR/20150406 CASE 212983  TOP 10 CUSTOMERS
-    // MAG1.17/MH/20150619  CASE 216793 Changed pagename
-    // MAG1.17/BHR/20150619 CASE 216856 Sort the top 10 cust
-    // MAG1.19/BHR/20150720 CASE 218963 Change caption of Actions and property of Sales(LCY)
-    // MAG1.20/BHR/20150805 CASE 218620 Applied datefilter
-    // MAG1.22/JLK/20151215 CASE 229520 Phone No. moved 1 field up
-    // MAG1.22/BHR/20160107 CASE 227440 format "search name" to enable prober sorting of code.
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-
     Caption = 'Top 10 Customers';
     CardPageID = "Customer Card";
     Editable = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = Customer;
     SourceTableTemporary = true;
     SourceTableView = SORTING("Search Name")
@@ -26,30 +16,28 @@ page 6151483 "NPR Magento Top 10 Customers"
         {
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
 
                     trigger OnDrillDown()
                     begin
-                        //-MAG1.22
-                        Cust.Get("No.");
+                        Cust.Get(Rec."No.");
                         PAGE.Run(PAGE::"Customer Card", Cust);
-                        //+MAG1.22
                     end;
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Phone No."; "Phone No.")
+                field("Phone No."; Rec."Phone No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Phone No. field';
                 }
-                field("Sales (LCY)"; "Sales (LCY)")
+                field("Sales (LCY)"; Rec."Sales (LCY)")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
@@ -74,7 +62,7 @@ page 6151483 "NPR Magento Top 10 Customers"
                     Caption = 'Day';
                     ApplicationArea = All;
                     ToolTip = 'Filters by day';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -87,7 +75,7 @@ page 6151483 "NPR Magento Top 10 Customers"
                     Caption = 'Week';
                     ApplicationArea = All;
                     ToolTip = 'Filters by week';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -100,7 +88,7 @@ page 6151483 "NPR Magento Top 10 Customers"
                     Caption = 'Month';
                     ApplicationArea = All;
                     ToolTip = 'Filters by month';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -113,7 +101,7 @@ page 6151483 "NPR Magento Top 10 Customers"
                     Caption = 'Quarter';
                     ApplicationArea = All;
                     ToolTip = 'Filters by quarter';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -126,7 +114,7 @@ page 6151483 "NPR Magento Top 10 Customers"
                     Caption = 'Year';
                     ApplicationArea = All;
                     ToolTip = 'Filters by year';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -150,50 +138,30 @@ page 6151483 "NPR Magento Top 10 Customers"
         Cust: Record Customer;
         StartDate: Date;
         Enddate: Date;
-        Err000: Label 'End Date should be after Start Date';
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;
         CurrDate: Date;
-        sales: Decimal;
 
     local procedure UpdateList()
     begin
-        DeleteAll;
+        Rec.DeleteAll;
         Setdate;
         Query1.SetFilter(Posting_Date, '%1..%2', StartDate, Enddate);
         Query1.Open;
         while Query1.Read do begin
             Cust.Get(Query1.Source_No);
-            TransferFields(Cust);
-            if not Insert then;
-            //-MAG1.20
-            SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
-            //+MAG1.20
-            //-MAG1.17
-            //-MAG1.20
-            //  Cust.CALCFIELDS("Sales (LCY)");
-            //  "Search Name" := FORMAT(Cust."Sales (LCY)");
-            //  "Search Name" := PADSTR('',15 - STRLEN("Search Name"),'0') + "Search Name";
+            Rec.TransferFields(Cust);
+            if not Rec.Insert then;
+            Rec.SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
 
-            CalcFields("Sales (LCY)");
-            //-MAG1.22
-            //"Search Name" := FORMAT("Sales (LCY)");
-            "Search Name" := Format(-"Sales (LCY)" * 100, 20, 1);
-            //+MAG1.22
-            //  "Search Name" := FORMAT("Sales (LCY)");
-            "Search Name" := PadStr('', 15 - StrLen("Search Name"), '0') + "Search Name";
-            Modify;
-            //+MAG1.20
-            //+MAG1.17
-
-
-
+            Rec.CalcFields("Sales (LCY)");
+            Rec."Search Name" := Format(-Rec."Sales (LCY)" * 100, 20, 1);
+            Rec."Search Name" := PadStr('', 15 - StrLen(Rec."Search Name"), '0') + Rec."Search Name";
+            Rec.Modify;
         end;
         Query1.Close;
     end;
 
     local procedure Setdate()
-    var
-        DatePeriod: Record Date;
     begin
         case PeriodType of
             PeriodType::Day:
@@ -224,4 +192,3 @@ page 6151483 "NPR Magento Top 10 Customers"
         end;
     end;
 }
-

@@ -4,8 +4,7 @@ page 6151451 "NPR Magento DragDropPic. Addin"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     ShowFilter = false;
     SourceTable = "NPR Magento Picture";
 
@@ -91,7 +90,6 @@ page 6151451 "NPR Magento DragDropPic. Addin"
         PictureType: Integer;
         Text00101: Label '\  - %1';
         Text00102: Label '\\Overwrite?';
-        Text002: Label 'Clear Picture';
         Text003: Label 'DragAndDrop Picture';
         Text004: Label '&Item,&Brand,Item &Group,&Customer';
         PictureSize: Decimal;
@@ -166,7 +164,7 @@ page 6151451 "NPR Magento DragDropPic. Addin"
         end else begin
             MagentoPicture.Init;
             MagentoPicture := TempMagentoPicture2;
-            MagentoPicture.Type := PictureType;
+            MagentoPicture.Type := "NPR Magento Picture Type".FromInteger(PictureType);
             Clear(MagentoPicture.Picture);
             MagentoPicture.Insert(true);
         end;
@@ -194,7 +192,7 @@ page 6151451 "NPR Magento DragDropPic. Addin"
             exit;
 
         case PictureType of
-            TempMagentoPicture2.Type::Brand:
+            TempMagentoPicture2.Type::Brand.AsInteger():
                 begin
                     Brand.Get(PictureLinkNo);
                     if IsLogoPicture then
@@ -204,7 +202,7 @@ page 6151451 "NPR Magento DragDropPic. Addin"
                     Brand.Modify(true);
                     exit;
                 end;
-            TempMagentoPicture2.Type::"Item Group":
+            TempMagentoPicture2.Type::"Item Group".AsInteger():
                 begin
                     ItemGroup.Get(PictureLinkNo);
                     if IsIconPicture then
@@ -215,7 +213,7 @@ page 6151451 "NPR Magento DragDropPic. Addin"
                     exit;
                 end;
             else
-                if PictureType <> TempMagentoPicture2.Type::Item then
+                if PictureType <> TempMagentoPicture2.Type::Item.AsInteger() then
                     exit;
         end;
 
@@ -256,61 +254,28 @@ page 6151451 "NPR Magento DragDropPic. Addin"
             exit;
         end;
 
-        if Picture.HasValue then begin
+        if Rec.Picture.HasValue then begin
             CurrPage.DragDropAddin.DisplayData(GetDataUri());
             exit;
         end;
 
-        CurrPage.DragDropAddin.DisplayData(GetMagentoUrl());
+        CurrPage.DragDropAddin.DisplayData(Rec.GetMagentoUrl());
     end;
 
     procedure GetDataUri() DataUri: Text
     var
         Convert: Codeunit "Base64 Convert";
+        ImageHelpers: Codeunit "Image Helpers";
         InStream: InStream;
     begin
-        if not Picture.HasValue then
+        if not Rec.Picture.HasValue then
             exit;
 
-        CalcFields(Picture);
-        Picture.CreateInStream(InStream);
-
-        DataUri := 'data:image/' + GetMimeType(InStream);
+        Rec.CalcFields(Picture);
+        Rec.Picture.CreateInStream(InStream);
+        DataUri := 'data:image/' + ImageHelpers.GetImageType(InStream);
         DataUri += ';base64,' + Convert.ToBase64(InStream);
         exit(DataUri);
-    end;
-
-    local procedure GetMimeType(Stream: InStream): Text;
-    var
-        Image: DotNet NPRNetImage;
-        ImageFormat: DotNet NPRNetImageFormat;
-        MemoryStream: DotNet NPRNetMemoryStream;
-    begin
-        if StrLen("Mime Type".Trim()) > 0 then
-            exit("Mime Type");
-
-        // TODO: This has to be refactored using DotNet_Image and DotNet_ImageFormat standard codeunits - however, they are not currently allowing full access to their functionality in non-OnPrem scenarios
-        //       I have started a suggestion process to add the missing functionality.
-        //       Whoever gets to refactor this part of DotNet - please contact me (Vjeko) about it before making any changes to this. Thanks a bunch!
-        MemoryStream := MemoryStream.MemoryStream;
-        CopyStream(MemoryStream, Stream);
-        Image := Image.FromStream(MemoryStream);
-        ImageFormat := Image.RawFormat;
-        case true of
-            ImageFormat.Equals(ImageFormat.Gif):
-                exit('gif');
-            ImageFormat.Equals(ImageFormat.Jpeg):
-                exit('jpg');
-            ImageFormat.Equals(ImageFormat.Png):
-                exit('png');
-        end;
-    end;
-
-    procedure ReplacePicture(): Boolean
-    var
-        MagentoPicture: Record "NPR Magento Picture";
-        MagentoPictureLink: Record "NPR Magento Picture Link";
-    begin
     end;
 
     local procedure IsWebClient(): Boolean
@@ -339,20 +304,20 @@ page 6151451 "NPR Magento DragDropPic. Addin"
 
     procedure SetItemNo(ItemNo: Code[20])
     begin
-        PictureType := Type::Item;
+        PictureType := Rec.Type::Item.AsInteger();
         PictureLinkNo := ItemNo;
     end;
 
     procedure SetItemGroupNo(ItemGroupNo: Code[20]; NewIsIconPicture: Boolean)
     begin
-        PictureType := Type::"Item Group";
+        PictureType := Rec.Type::"Item Group".AsInteger();
         PictureLinkNo := ItemGroupNo;
         IsIconPicture := NewIsIconPicture;
     end;
 
     procedure SetBrandCode(BrandCode: Code[20]; NewIsLogoPicture: Boolean)
     begin
-        PictureType := Type::Brand;
+        PictureType := Rec.Type::Brand.AsInteger();
         PictureLinkNo := BrandCode;
         IsLogoPicture := NewIsLogoPicture;
     end;
@@ -364,7 +329,7 @@ page 6151451 "NPR Magento DragDropPic. Addin"
 
     procedure SetRecordPosition(PictureType: Integer; PictureName: Text)
     begin
-        if Get(PictureType, PictureName) then;
+        if Rec.Get(PictureType, PictureName) then;
     end;
 
     procedure SetVariantValueCode(NewVariantValueCode: Code[20])
@@ -440,7 +405,7 @@ page 6151451 "NPR Magento DragDropPic. Addin"
             Groups.Item(1, Group1);
             Groups.Item(2, Group2);
             TempMagentoPicture.Init;
-            TempMagentoPicture.Type := PictureType;
+            TempMagentoPicture.Type := "NPR Magento Picture Type".FromInteger(PictureType);
             TempMagentoPicture.Name := PictureName;
             TempMagentoPicture."Size (kb)" := Round(PictureSize / 1000, 1);
             TempMagentoPicture."Mime Type" := Group1.Value;

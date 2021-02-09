@@ -1,13 +1,5 @@
 page 6151420 "NPR Magento Brands"
 {
-    // MAG1.01/MH/20150201  CASE 199932 Refactored Object from Web Integration
-    // MAG1.05/TR/20150217  CASE 206156 Added function GetSelectionFilter
-    // MAG1.20/TS/20151005 CASE 224193  Added field Sorting
-    // MAG1.21/TR/20151028  CASE 225601 Shortcut to Display Config added
-    // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
-    // MAG2.09/TS  /20180108  CASE 300893 Removed Caption on Action Container
-    // MAG2.26/MHA /20200601  CASE 404580 Magento Brands can now be managed externally
-
     Caption = 'Brands';
     CardPageID = "NPR Magento Brand Card";
     Editable = false;
@@ -23,22 +15,22 @@ page 6151420 "NPR Magento Brands"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field(Id; Id)
+                field(Id; Rec.Id)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Id field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field(Picture; Picture)
+                field(Picture; Rec.Picture)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Picture field';
                 }
-                field("Sorting"; Sorting)
+                field("Sorting"; Rec.Sorting)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sorting field';
@@ -67,10 +59,8 @@ page 6151420 "NPR Magento Brands"
                 var
                     MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
                 begin
-                    //-MAG2.26 [404580]
                     MagentoSetupMgt.TriggerSetupBrands();
                     Message(Text000);
-                    //+MAG2.26 [404580]
                 end;
             }
         }
@@ -98,11 +88,9 @@ page 6151420 "NPR Magento Brands"
                     MagentoDisplayConfigPage: Page "NPR Magento Display Config";
                     MagentoDisplayConfig: Record "NPR Magento Display Config";
                 begin
-                    //-MAG1.21
                     MagentoDisplayConfig.SetRange(Type, MagentoDisplayConfig.Type::Brand);
                     MagentoDisplayConfigPage.SetTableView(MagentoDisplayConfig);
                     MagentoDisplayConfigPage.Run;
-                    //+MAG1.21
                 end;
             }
         }
@@ -112,13 +100,9 @@ page 6151420 "NPR Magento Brands"
     var
         MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
     begin
-        //-MAG2.26 [404580]
         HasSetupBrands := MagentoSetupMgt.HasSetupBrands();
-        //+MAG2.26 [404580]
 
-        //-MAG1.21
         SetDisplayConfigVisible;
-        //+MAG1.21
     end;
 
     var
@@ -132,10 +116,7 @@ page 6151420 "NPR Magento Brands"
         MagentoSelectionFilterMgt: Codeunit "NPR Magento Select. Filt. Mgt.";
     begin
         CurrPage.SetSelectionFilter(Brand);
-        //-MAG2.00
-        //EXIT(MagentoFunctions.GetSelectionFilterForManufacturer(Manufacturer));
         exit(MagentoSelectionFilterMgt.GetSelectionFilterForBrand(Brand));
-        //+MAG2.00
     end;
 
     local procedure SetDisplayConfigVisible()
@@ -143,9 +124,6 @@ page 6151420 "NPR Magento Brands"
         MagentoSetup: Record "NPR Magento Setup";
         MagentoWebsite: Record "NPR Magento Website";
     begin
-        //-MAG1.21
         DisplayConfigVisible := MagentoSetup.Get and MagentoSetup."Magento Enabled" and MagentoSetup."Customers Enabled";
-        //+MAG1.21
     end;
 }
-

@@ -1,12 +1,5 @@
 codeunit 6151411 "NPR Magento Select. Filt. Mgt."
 {
-    // MAG2.00/MHA/20160513 CASE 240005 Magento module refactored to new object area
-
-
-    trigger OnRun()
-    begin
-    end;
-
     local procedure AddQuotes(inString: Text[1024]): Text
     begin
         exit('''' + inString + '''');
@@ -81,4 +74,3 @@ codeunit 6151411 "NPR Magento Select. Filt. Mgt."
         exit(GetSelectionFilter(RecRef, MagentoBrand.FieldNo(Id)));
     end;
 }
-

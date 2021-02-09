@@ -1,20 +1,10 @@
 codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
 {
-    // MAG2.24/MHA /20191108  CASE 376322 Object created - Integration with Netaxept Payment gateway
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
 
-    local procedure "--- Subscriber"()
-    begin
-    end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151416, 'CancelPaymentEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'CancelPaymentEvent', '', false, false)]
     local procedure CancelPaymentSalesOrder(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
     begin
         if not IsNetAxeptPaymentLine(PaymentLine) then
@@ -30,7 +20,7 @@ codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
             Message(GetLastErrorText);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151416, 'CapturePaymentEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'CapturePaymentEvent', '', false, false)]
     local procedure CapturePaymentSalesInvoice(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
     begin
         if not IsNetAxeptPaymentLine(PaymentLine) then
@@ -49,7 +39,7 @@ codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
         PaymentLine.Modify(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151416, 'RefundPaymentEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'RefundPaymentEvent', '', false, false)]
     local procedure RefundPaymentSalesReturn(PaymentGateway: Record "NPR Magento Payment Gateway"; var PaymentLine: Record "NPR Magento Payment Line")
     begin
         if not IsNetAxeptPaymentLine(PaymentLine) then
@@ -68,7 +58,7 @@ codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
         PaymentLine.Modify(true);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151413, 'OnAfterValidateEvent', 'Capture Codeunit Id', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Payment Gateway", 'OnAfterValidateEvent', 'Capture Codeunit Id', true, true)]
     local procedure OnValidateCaptureCodeunitId(var Rec: Record "NPR Magento Payment Gateway")
     begin
         if Rec."Capture Codeunit Id" <> CurrCodeunitId() then
@@ -77,7 +67,7 @@ codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
         SetApiInfo(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151413, 'OnAfterValidateEvent', 'Refund Codeunit Id', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Payment Gateway", 'OnAfterValidateEvent', 'Refund Codeunit Id', true, true)]
     local procedure OnValidateRefundCodeunitId(var Rec: Record "NPR Magento Payment Gateway")
     begin
         if Rec."Refund Codeunit Id" <> CurrCodeunitId() then
@@ -86,7 +76,7 @@ codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
         SetApiInfo(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151413, 'OnAfterValidateEvent', 'Cancel Codeunit Id', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Payment Gateway", 'OnAfterValidateEvent', 'Cancel Codeunit Id', true, true)]
     local procedure OnValidateCancelCodeunitId(var Rec: Record "NPR Magento Payment Gateway")
     begin
         if Rec."Cancel Codeunit Id" <> CurrCodeunitId() then
@@ -95,166 +85,77 @@ codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
         SetApiInfo(Rec);
     end;
 
-    procedure "--- Api"()
-    begin
-    end;
+    #region Api
 
     [TryFunction]
     local procedure Cancel(PaymentLine: Record "NPR Magento Payment Line")
     var
         PaymentGateway: Record "NPR Magento Payment Gateway";
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        Response: Text;
+        HttpClientVar: HttpClient;
+        HttpWebResponse: HttpResponseMessage;
     begin
         PaymentGateway.Get(PaymentLine."Payment Gateway Code");
-        InitHttpWebRequest(PaymentGateway, PaymentLine, "ServiceName.Cancel", HttpWebRequest);
 
-        if not SendWebRequest(HttpWebRequest, HttpWebResponse) then
-            Error(CopyStr('NetAxept: ' + GetLastError(), 1, 1024));
+        HttpClientVar.Timeout := 5000;
+        if not HttpClientVar.Get(GetApiUrl(PaymentGateway, PaymentLine, "ServiceName.Cancel"), HttpWebResponse) then
+            Error(CopyStr('NetAxept: ' + GetLastErrorText, 1, 1024));
 
-        Response := GetResponseText(HttpWebResponse);
-        if not LoadXml(Response, XmlDoc) then
-            Error(CopyStr('NetAxept: ' + Response, 1, 1024));
-
-        Message(XmlDoc.InnerXml);
-
-        if ResponseCodeIsOk(XmlDoc) then
-            exit;
-
-        if GetNetaxeptMessage(XmlDoc, Response) then
-            Error(CopyStr('NetAxept: ' + Response, 1, 1024));
-
-        Error(CopyStr('NetAxept: ' + XmlDoc.DocumentElement.InnerXml, 1, 1024));
+        RequestProcessing(HttpWebResponse);
     end;
 
     [TryFunction]
     local procedure Capture(PaymentLine: Record "NPR Magento Payment Line")
     var
         PaymentGateway: Record "NPR Magento Payment Gateway";
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        Response: Text;
+        HttpClientVar: HttpClient;
+        HttpWebResponse: HttpResponseMessage;
     begin
         PaymentGateway.Get(PaymentLine."Payment Gateway Code");
-        InitHttpWebRequest(PaymentGateway, PaymentLine, "ServiceName.Capture", HttpWebRequest);
 
-        if not SendWebRequest(HttpWebRequest, HttpWebResponse) then
-            Error(CopyStr('NetAxept: ' + GetLastError(), 1, 1024));
+        HttpClientVar.Timeout := 5000;
+        if not HttpClientVar.Get(GetApiUrl(PaymentGateway, PaymentLine, "ServiceName.Capture"), HttpWebResponse) then
+            Error(CopyStr('NetAxept: ' + GetLastErrorText, 1, 1024));
 
-        Response := GetResponseText(HttpWebResponse);
-        if not LoadXml(Response, XmlDoc) then
-            Error(CopyStr('NetAxept: ' + Response, 1, 1024));
-
-        if ResponseCodeIsOk(XmlDoc) then
-            exit;
-
-        if GetNetaxeptMessage(XmlDoc, Response) then
-            Error(CopyStr('NetAxept: ' + Response, 1, 1024));
-
-        Error(CopyStr('NetAxept: ' + XmlDoc.DocumentElement.InnerXml, 1, 1024));
+        RequestProcessing(HttpWebResponse);
     end;
 
     [TryFunction]
     local procedure Refund(PaymentLine: Record "NPR Magento Payment Line")
     var
         PaymentGateway: Record "NPR Magento Payment Gateway";
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        Response: Text;
+        HttpClientVar: HttpClient;
+        HttpWebResponse: HttpResponseMessage;
     begin
         PaymentGateway.Get(PaymentLine."Payment Gateway Code");
-        InitHttpWebRequest(PaymentGateway, PaymentLine, "ServiceName.Refund", HttpWebRequest);
 
-        if not SendWebRequest(HttpWebRequest, HttpWebResponse) then
-            Error(CopyStr('NetAxept: ' + GetLastError(), 1, 1024));
+        HttpClientVar.Timeout := 5000;
+        if not HttpClientVar.Get(GetApiUrl(PaymentGateway, PaymentLine, "ServiceName.Refund"), HttpWebResponse) then
+            Error(CopyStr('NetAxept: ' + GetLastErrorText, 1, 1024));
 
-        Response := GetResponseText(HttpWebResponse);
-        if not LoadXml(Response, XmlDoc) then
-            Error(CopyStr('NetAxept: ' + Response, 1, 1024));
-
-        if ResponseCodeIsOk(XmlDoc) then
-            exit;
-
-        if GetNetaxeptMessage(XmlDoc, Response) then
-            Error(CopyStr('NetAxept: ' + Response, 1, 1024));
-
-        Error(CopyStr('NetAxept: ' + XmlDoc.DocumentElement.InnerXml, 1, 1024));
+        RequestProcessing(HttpWebResponse);
     end;
 
-    local procedure "--- Api Response"()
-    begin
-    end;
-
-    procedure GetLastError() LastError: Text
+    local procedure RequestProcessing(HttpWebResponse: HttpResponseMessage)
     var
-        ExceptionError: Text;
-    begin
-        LastError := GetLastErrorText;
-        if GetLastExceptionError(ExceptionError) then
-            exit(ExceptionError);
-
-        exit(LastError);
-    end;
-
-    [TryFunction]
-    local procedure GetLastExceptionError(var ExceptionError: Text)
-    var
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        WebException: DotNet NPRNetWebException;
+        XmlDomMng: Codeunit "XML DOM Management";
+        XmlDoc: XmlDocument;
+        XNode: XmlNode;
         Response: Text;
     begin
-        WebException := GetLastErrorObject;
-        ExceptionError := WebException.Message;
+        Clear(XmlDoc);
+        HttpWebResponse.Content.ReadAs(Response);
+        if not XmlDocument.ReadFrom(XmlDomMng.RemoveNamespaces(Response), XmlDoc) then
+            Error(CopyStr('NetAxept: ' + Response, 1, 1024));
 
-        WebException := WebException.InnerException;
-        ExceptionError := WebException.Message;
+        Message(Response);
+
+        if not HttpWebResponse.IsSuccessStatusCode then
+            Error(StrSubstNo('NetAxept: %1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response));
     end;
 
-    [TryFunction]
-    local procedure GetNetaxeptMessage(var XmlDoc: DotNet "NPRNetXmlDocument"; var ResponseExceptionText: Text)
-    begin
-        ResponseExceptionText := NpXmlDomMgt.GetXmlText(XmlDoc.DocumentElement, 'Message', 1000, true)
-    end;
+    #endregion
 
-    procedure GetResponseText(var HttpWebResponse: DotNet NPRNetHttpWebResponse) ResponseText: Text
-    var
-        HttpWebException: DotNet NPRNetWebException;
-        BinaryReader: DotNet NPRNetBinaryReader;
-        Stream: DotNet NPRNetStream;
-        StreamReader: DotNet NPRNetStreamReader;
-        APIUsername: Text;
-        ElementName: Text;
-        Response: Text;
-    begin
-        Stream := HttpWebResponse.GetResponseStream;
-        StreamReader := StreamReader.StreamReader(Stream);
-        ResponseText := StreamReader.ReadToEnd;
-        Stream.Flush;
-        Stream.Close;
-        Clear(Stream);
-
-        exit(ResponseText);
-    end;
-
-    [TryFunction]
-    local procedure ResponseCodeIsOk(var XmlDoc: DotNet "NPRNetXmlDocument")
-    var
-        ResponseCode: Text;
-    begin
-        ResponseCode := LowerCase(NpXmlDomMgt.GetXmlText(XmlDoc.DocumentElement, 'ResponseCode', 0, true));
-        if ResponseCode = 'ok' then
-            exit;
-
-        Error('');
-    end;
-
-    local procedure "--- Aux"()
-    begin
-    end;
+    #region Aux
 
     local procedure SetApiInfo(var MagentoPaymentGateway: Record "NPR Magento Payment Gateway")
     var
@@ -301,18 +202,10 @@ codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
         exit(PaymentGateway."Api Url" +
              Method + '.aspx' +
              '?merchantId=' + PaymentGateway."Merchant ID" +
-             '&token=' + PaymentGateway."Api Password" +
+             '&token=' + PaymentGateway.GetApiPassword() +
              '&transactionId=' + LowerCase(PaymentLine."No.") +
              '&transactionreconref=' + '' +
              '&transactionamount=' + DelChr(Format(PaymentLine.Amount, 0, '<SIGN><INTEGER><DECIMALS,3>'), '=', '.,'));
-    end;
-
-    procedure InitHttpWebRequest(PaymentGateway: Record "NPR Magento Payment Gateway"; PaymentLine: Record "NPR Magento Payment Line"; Method: Text; var HttpWebRequest: DotNet NPRNetHttpWebRequest)
-    begin
-        Clear(HttpWebRequest);
-        HttpWebRequest := HttpWebRequest.Create(GetApiUrl(PaymentGateway, PaymentLine, Method));
-        HttpWebRequest.Timeout := 1000 * 5;
-        HttpWebRequest.Method := 'GET';
     end;
 
     procedure IsNetAxeptPaymentLine(PaymentLine: Record "NPR Magento Payment Line"): Boolean
@@ -326,14 +219,6 @@ codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
             exit(false);
 
         exit(PaymentGateway."Capture Codeunit Id" = CurrCodeunitId());
-    end;
-
-    [TryFunction]
-    local procedure LoadXml(Content: Text; var XmlDoc: DotNet "NPRNetXmlDocument")
-    begin
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(Content);
-        NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
     end;
 
     local procedure PostedDocumentExists(PaymentLine: Record "NPR Magento Payment Line"): Boolean
@@ -361,15 +246,7 @@ codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
         exit(false);
     end;
 
-    [TryFunction]
-    procedure SendWebRequest(HttpWebRequest: DotNet NPRNetHttpWebRequest; var HttpWebResponse: DotNet NPRNetHttpWebResponse)
-    begin
-        HttpWebResponse := HttpWebRequest.GetResponse;
-    end;
-
-    procedure "--- Enum"()
-    begin
-    end;
+    #endregion
 
     local procedure "ServiceName.Cancel"(): Text
     begin
@@ -386,4 +263,3 @@ codeunit 6151424 "NPR Magento Pmt. Netaxept Mgt."
         exit('credit');
     end;
 }
-

@@ -1,15 +1,10 @@
 page 6151432 "NPR Magento Attr. Labels"
 {
-    // MAG1.01/MH/20150201  CASE 199932 Refactored Object from Web Integration
-    // MAG1.04/MH/20150206  CASE 199932 Removed Image
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-
     AutoSplitKey = true;
     Caption = 'Attribute Labels';
     DelayedInsert = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     ShowFilter = false;
     SourceTable = "NPR Magento Attr. Label";
 
@@ -20,12 +15,12 @@ page 6151432 "NPR Magento Attr. Labels"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Value field';
                 }
-                field("FORMAT(""Text Field"".HASVALUE)"; Format("Text Field".HasValue))
+                field("FORMAT(""Text Field"".HASVALUE)"; Format(Rec."Text Field".HasValue))
                 {
                     ApplicationArea = All;
                     AssistEdit = true;
@@ -39,24 +34,20 @@ page 6151432 "NPR Magento Attr. Labels"
                         FieldRef: FieldRef;
                     begin
                         RecRef.GetTable(Rec);
-                        FieldRef := RecRef.Field(FieldNo("Text Field"));
+                        FieldRef := RecRef.Field(Rec.FieldNo("Text Field"));
                         if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
                             RecRef.SetTable(Rec);
-                            Modify(true);
+                            Rec.Modify(true);
                         end;
                     end;
                 }
-                field("Sorting"; Sorting)
+                field("Sorting"; Rec.Sorting)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sorting field';
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 
     var
@@ -68,4 +59,3 @@ page 6151432 "NPR Magento Attr. Labels"
         TextFieldVisible := NewTextFieldVisible;
     end;
 }
-
