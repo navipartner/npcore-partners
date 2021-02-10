@@ -101,11 +101,6 @@ table 6059950 "NPR Display Setup"
             var
                 Register: Record "NPR Register";
             begin
-                TestField("Register No.");
-                if Register.Get("Register No.") then
-                    if Register."Customer Display" then
-                        Error(TXT001, Register."Register No.");
-
                 if (xRec.Activate) and (not Activate) then
                     "Media Downloaded" := false;
             end;
@@ -139,8 +134,5 @@ table 6059950 "NPR Display Setup"
     fieldgroups
     {
     }
-
-    var
-        TXT001: Label 'Matrix Display(Customer Display) is already activated on register %1. \Deactivate Customer Display before activating 2nd Display';
 }
 

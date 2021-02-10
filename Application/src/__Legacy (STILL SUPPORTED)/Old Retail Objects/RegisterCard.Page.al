@@ -17,12 +17,6 @@ page 6014406 "NPR Register Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Description; Rec.Description)
-                {
-                    ApplicationArea = All;
-                    Importance = Promoted;
-                    ToolTip = 'Specifies the value of the Description field';
-                }
                 field("Logon-User Name"; Rec."Logon-User Name")
                 {
                     ApplicationArea = All;
@@ -59,33 +53,6 @@ page 6014406 "NPR Register Card"
                     ToolTip = 'Specifies the value of the Return Payment Type field';
                 }
             }
-            group(Accessories)
-            {
-                Caption = 'Accessories';
-                group(Control6150627)
-                {
-                    ShowCaption = false;
-                    field("Customer Display"; Rec."Customer Display")
-                    {
-                        ApplicationArea = All;
-                        Importance = Promoted;
-                        ToolTip = 'Specifies the value of the Customer Display field';
-
-                        trigger OnValidate()
-                        begin
-                            if Rec."Customer Display" then begin
-                                FieldDisplay1 := true;
-                                FieldDisplay2 := true;
-                                FieldDisplayMetode := true;
-                            end else begin
-                                FieldDisplay1 := false;
-                                FieldDisplay2 := false;
-                                FieldDisplayMetode := false;
-                            end;
-                        end;
-                    }
-                }
-            }
             group(Posting)
             {
                 Caption = 'Posting';
@@ -114,26 +81,6 @@ page 6014406 "NPR Register Card"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Credit Voucher Account field';
                     }
-                    field("Difference Account"; Rec."Difference Account")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Difference Account field';
-                    }
-                    field("Difference Account - Neg."; Rec."Difference Account - Neg.")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Difference Account - Neg. field';
-                    }
-                    field("Register Change Account"; Rec."Register Change Account")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Register Change Account field';
-                    }
-                    field("VAT Customer No."; Rec."VAT Customer No.")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the VAT Customer No. field';
-                    }
                 }
                 group(Control6150716)
                 {
@@ -146,11 +93,6 @@ page 6014406 "NPR Register Card"
                         Style = Strong;
                         StyleExpr = TRUE;
                         ToolTip = 'Specifies the value of the End of Day Balancing field';
-                    }
-                    field("Balancing every"; Rec."Balancing every")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Registerstatement field';
                     }
                     field("Balanced Type"; Rec."Balanced Type")
                     {
@@ -183,19 +125,6 @@ page 6014406 "NPR Register Card"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Active Event No. field';
-                }
-            }
-            group(Integration)
-            {
-                Caption = 'Integration';
-                group(mPos)
-                {
-                    Caption = 'mPos';
-                    field("mPos Payment Type"; Rec."mPos Payment Type")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the mPos Payment Type field';
-                    }
                 }
             }
         }
@@ -269,31 +198,6 @@ page 6014406 "NPR Register Card"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Show Register Periods action';
                 }
-                action("Set Saldo Inicial ")
-                {
-                    Caption = 'Set Saldo Inicial';
-                    Image = AmountByPeriod;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Set Saldo Inicial action';
-
-                    trigger OnAction()
-                    var
-                        InputDialog: Page "NPR Input Dialog";
-                        Amount: Decimal;
-                        ID: Integer;
-                    begin
-                        InputDialog.LookupMode := true;
-                        InputDialog.SetInput(1, Amount, Text10600007);
-                        repeat
-                            if InputDialog.RunModal = ACTION::LookupOK then
-                                ID := InputDialog.InputDecimal(1, Amount);
-                        until (Amount >= 0) or (ID = 0);
-
-                        "Opening Cash" := Amount;
-                        "Closing Cash" := Amount;
-                        Modify;
-                    end;
-                }
             }
             group(Dimensions)
             {
@@ -317,13 +221,8 @@ page 6014406 "NPR Register Card"
 
     trigger OnAfterGetCurrRecord()
     begin
-        if Rec."Customer Display" then begin
-            FieldDisplay1 := true;
-            FieldDisplay2 := true;
-        end else begin
-            FieldDisplay1 := false;
-            FieldDisplay2 := false;
-        end;
+        FieldDisplay1 := false;
+        FieldDisplay2 := false;
     end;
 
     trigger OnOpenPage()

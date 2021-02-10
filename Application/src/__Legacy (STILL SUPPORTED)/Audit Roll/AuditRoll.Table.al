@@ -1072,20 +1072,18 @@ table 6014407 "NPR Audit Roll"
     trigger OnInsert()
     var
         Register2: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         InsertAllowed: Boolean;
     begin
         if Register2.Get("Register No.") then begin
             InsertAllowed := false;
-            case Register2.Status of
-                Register2.Status::" ":
+            POSUnit.get(Register2."Register No.");
+            case POSUnit.Status of
+                POSUnit.Status::OPEN:
                     begin
                         InsertAllowed := true;
                     end;
-                Register2.Status::Ekspedition:
-                    begin
-                        InsertAllowed := true;
-                    end;
-                Register2.Status::Afsluttet:
+                POSUnit.Status::CLOSED:
                     begin
                         if Type = Type::"Open/Close" then
                             if not Balancing then
@@ -1094,19 +1092,19 @@ table 6014407 "NPR Audit Roll"
                             if Register2."Status Set By Sales Ticket" = "Sales Ticket No." then
                                 InsertAllowed := true
                             else
-                                Error(Text1060002, "Sales Ticket No.", Register2."Status Set By Sales Ticket", Register2.Status);
+                                Error(Text1060002, "Sales Ticket No.", Register2."Status Set By Sales Ticket", POSUnit.Status);
 
                         if Type = Type::Cancelled then
                             InsertAllowed := true;
                     end;
-                Register2.Status::"Under afslutning":
+                POSUnit.Status::EOD:
                     begin
                         if Type = Type::"Open/Close" then
                             if Balancing then
                                 if Register2."Status Set By Sales Ticket" = "Sales Ticket No." then
                                     InsertAllowed := true
                                 else
-                                    Error(Text1060002, "Sales Ticket No.", Register2."Status Set By Sales Ticket", Register2.Status);
+                                    Error(Text1060002, "Sales Ticket No.", Register2."Status Set By Sales Ticket", POSUnit.Status);
                         if Type = Type::Cancelled then
                             InsertAllowed := true;
                     end;
@@ -1118,8 +1116,8 @@ table 6014407 "NPR Audit Roll"
                     Text1060001,
                     Register2.FieldCaption("Register No."),
                     Register2."Register No.",
-                    Register2.FieldCaption(Status),
-                    Register2.Status,
+                    POSUnit.FieldCaption(Status),
+                    POSUnit.Status,
                     TableCaption,
                     FieldCaption(Type),
                     Type));

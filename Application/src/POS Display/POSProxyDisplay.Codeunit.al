@@ -1242,7 +1242,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
 
     local procedure CustomerDisplayIsActivated(Register: Record "NPR Register"; var MatrixIsActivated: Boolean; var DisplayIsActivated: Boolean)
     begin
-        MatrixIsActivated := Register."Customer Display";
+        MatrixIsActivated := false;
         if not MatrixIsActivated then
             if DisplaySetup.Get(Register."Register No.") then begin
                 DisplayIsActivated := DisplaySetup.Activate;

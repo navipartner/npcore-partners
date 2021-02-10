@@ -8,12 +8,7 @@ codeunit 6150721 "NPR POS Action - Login"
         ActionDescription: Label 'This is a built-in action for completing the loign request passed on from the front end.';
         Text001: Label 'Unknown login type requested by JavaScript: %1.';
         InvalidStatus: Label 'The register status states that the register cannot be opened at this time.';
-        CashRegisterOpenStatus: Option DoOpenRegister,DoNotOpenRegister,BalanceRegister,FirstOpenAfterBalancing;
-        t002: Label 'Do you want to open register %1 with opening total of %2?';
         t004: Label 'The register has not been balanced since %1 and must be balanced before selling. Do you want to balance the register now?';
-        t005: Label 'Register balancing';
-        t006: Label 'Notice IMPORTANT, the Date "Posting Allowed to" has been crossed.\Contact your superuser who can correct this date.\If you reply OK, the date will be corrected\ so the register will open today.';
-        MustBalanceRegister: Label 'The register has not been balanced since %1 and must be balanced before selling. The balancing function is available from the function menu below the pinpad.';
         IsEoD: Label 'The %1 %2 indicates that this %1 is being balanced and it can''t be opened at this time.';
         ContinueEoD: Label 'The %1 %2 is marked as being in balancing. Do you want to continue with balancing now?';
         ManagedPos: Label 'This POS is managed by POS Unit %1 [%2] and it is therefore required that %1 is opened prior to opening this POS.';
@@ -93,8 +88,6 @@ codeunit 6150721 "NPR POS Action - Login"
                         Setup.SetSalesperson(SalespersonPurchaser);
 
                         if (NPRetailSetup.Get()) then;
-                        if (not NPRetailSetup."Advanced Posting Activated") then
-                            OpenRegisterLegacy(FrontEnd, Setup, POSSession);
 
                         if (NPRetailSetup."Advanced Posting Activated") then
                             OpenPosUnit(FrontEnd, Setup, POSSession);
@@ -157,15 +150,6 @@ codeunit 6150721 "NPR POS Action - Login"
                         exit;
                     end;
 
-                    if ((Register."Balancing every" = Register."Balancing every"::Day) and (BalanceAge > 0)) then begin // Forced balancing
-                        if (not Confirm(t004, true, (Today - BalanceAge))) then
-                            Error(InvalidStatus);
-
-                        // Z-Report or Close Worksift
-                        StartEODWorkflow(FrontEnd, POSSession, 'BALANCE_V3', IsManagedPOS);
-                        exit;
-                    end;
-
                     POSPeriodRegister.SetFilter("POS Unit No.", '=%1', POSUnit."No.");
                     MissingPeriodRegister := not POSPeriodRegister.FindLast();
                     if (MissingPeriodRegister) or ((not MissingPeriodRegister) and (POSPeriodRegister.Status <> POSPeriodRegister.Status::OPEN)) then begin
@@ -178,16 +162,14 @@ codeunit 6150721 "NPR POS Action - Login"
 
             POSUnit.Status::CLOSED:
                 begin
-                    if ((Register."Balancing every" = Register."Balancing every"::Day) and (BalanceAge > 0)) then begin // Forced balancing
-                        if (IsManagedPOS) then
-                            Error(ManagedPos, ManagedByPOSUnit."No.", ManagedByPOSUnit.Name);
+                    if (IsManagedPOS) then
+                        Error(ManagedPos, ManagedByPOSUnit."No.", ManagedByPOSUnit.Name);
 
-                        if (not Confirm(t004, true, Format(Today - BalanceAge))) then
-                            Error(InvalidStatus);
+                    if (not Confirm(t004, true, Format(Today - BalanceAge))) then
+                        Error(InvalidStatus);
 
-                        StartEODWorkflow(FrontEnd, POSSession, 'BALANCE_V3', IsManagedPOS);
-                        exit;
-                    end;
+                    StartEODWorkflow(FrontEnd, POSSession, 'BALANCE_V3', IsManagedPOS);
+                    exit;
 
                     StartWorkflow(FrontEnd, POSSession, 'START_POS');
                 end;
@@ -285,122 +267,6 @@ codeunit 6150721 "NPR POS Action - Login"
 
         exit(Today - DT2Date(POSWorkshiftCheckpoint."Created At"));
     end;
-
-    #region Legacy
-
-    local procedure OpenRegisterLegacy(FrontEnd: Codeunit "NPR POS Front End Management"; Setup: Codeunit "NPR POS Setup"; POSSession: Codeunit "NPR POS Session")
-    var
-        SalePOS: Record "NPR Sale POS";
-        POSAction: Record "NPR POS Action";
-        POSSale: Codeunit "NPR POS Sale";
-        POSCreateEntry: Codeunit "NPR POS Create Entry";
-    begin
-
-        case RegisterTestOpen(Setup.Register()) of
-            CashRegisterOpenStatus::DoNotOpenRegister:
-                Error(InvalidStatus);
-
-            CashRegisterOpenStatus::FirstOpenAfterBalancing: // After confirm on first open after balancing
-                begin
-                    POSSession.StartTransaction();
-                    POSSession.GetSale(POSSale);
-                    POSSale.GetCurrentSale(SalePOS);
-                    if RegisterOpen(SalePOS) then begin
-                        // RegisterOpen consumes the current sales ticket when opening the register on first open after balancing
-                        POSSession.StartTransaction();
-                        POSSale.GetCurrentSale(SalePOS);
-                    end;
-                    POSSession.ChangeViewSale();
-                end;
-
-            CashRegisterOpenStatus::BalanceRegister:
-                begin
-                    POSSession.StartTransaction();
-                    if not POSSession.RetrieveSessionAction('BALANCE_V1', POSAction) then
-                        POSAction.Get('BALANCE_V1');
-                    FrontEnd.InvokeWorkflow(POSAction);
-                end;
-
-            CashRegisterOpenStatus::DoOpenRegister:
-                begin
-                    POSSession.StartTransaction();
-                    POSSession.GetSale(POSSale);
-                    POSSale.GetCurrentSale(SalePOS);
-                    POSCreateEntry.InsertUnitLoginEntry(SalePOS."Register No.", SalePOS."Salesperson Code");
-                    POSSession.ChangeViewSale();
-                end;
-            else
-                Error('Illegal Register Cash TerminalStatus');
-        end;
-    end;
-
-    procedure RegisterTestOpen(CashRegisterNo: Code[10]): Integer
-    var
-        CashRegister: Record "NPR Register";
-        RetailSalesCode: Codeunit "NPR Retail Sales Code";
-    begin
-        CashRegister.Get(CashRegisterNo);
-
-        case CashRegister.Status of
-            CashRegister.Status::" ":
-                ;
-            CashRegister.Status::Afsluttet:
-                begin
-                    if (not RetailSalesCode.CheckPostingDateAllowed(WorkDate)) then
-                        if (not Confirm(t006)) then
-                            exit(CashRegisterOpenStatus::DoNotOpenRegister);
-
-                    if not Confirm(StrSubstNo(t002, CashRegister."Register No.", CashRegister."Closing Cash"), true) then
-                        exit(CashRegisterOpenStatus::DoNotOpenRegister);
-
-                    exit(CashRegisterOpenStatus::FirstOpenAfterBalancing);
-                end;
-
-            CashRegister.Status::Ekspedition:
-                begin
-                    if CashRegister."Opened Date" = Today then
-                        exit(CashRegisterOpenStatus::DoOpenRegister);
-
-                    case CashRegister."Balancing every" of
-                        CashRegister."Balancing every"::Day:
-                            begin
-                                if Confirm(t004, true, CashRegister."Opened Date") then
-                                    exit(CashRegisterOpenStatus::BalanceRegister);
-                                exit(CashRegisterOpenStatus::DoNotOpenRegister);
-                            end;
-
-                        CashRegister."Balancing every"::Manual:
-                            exit(CashRegisterOpenStatus::DoOpenRegister);
-
-                        else
-                            exit(CashRegisterOpenStatus::DoNotOpenRegister);
-                    end;
-                end;
-        end;
-
-        exit(CashRegisterOpenStatus::DoOpenRegister);
-    end;
-
-    local procedure RegisterOpen(SalePOS: Record "NPR Sale POS"): Boolean
-    var
-        CashRegister: Record "NPR Register";
-        RetailSalesCode: Codeunit "NPR Retail Sales Code";
-        TouchScreenFunctions: Codeunit "NPR Touch Screen - Func.";
-    begin
-        if (not RetailSalesCode.CheckPostingDateAllowed(WorkDate)) then
-            RetailSalesCode.EditPostingDateAllowed(UserId, WorkDate);
-
-        CashRegister.LockTable;
-        CashRegister.Get(SalePOS."Register No.");
-        if CashRegister.Status <> CashRegister.Status::Afsluttet then
-            exit(false);
-
-        TouchScreenFunctions.RegisterOpen(SalePOS);
-
-        exit(true);
-    end;
-
-    #endregion
 
     [EventSubscriber(ObjectType::Codeunit, 6014505, 'OnBeforeRegisterOpen', '', true, true)]
     local procedure OnRegisterOpen_LegacySubscriber(Register: Record "NPR Register")
