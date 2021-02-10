@@ -93,6 +93,12 @@ table 6150653 "NPR POS Posting Profile"
             OptionCaption = 'Nearest,Up,Down';
             OptionMembers = Nearest,Up,Down;
         }
+        field(130; "Source Code"; Code[10])
+        {
+            Caption = 'Source Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Source Code";
+        }
     }
 
     keys

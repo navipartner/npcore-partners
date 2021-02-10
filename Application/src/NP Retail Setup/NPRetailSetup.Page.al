@@ -10,15 +10,7 @@ page 6150613 "NPR NP Retail Setup"
     {
         area(content)
         {
-            group(General)
-            {
-                Caption = 'General';
-                field("Source Code"; "Source Code")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Source Code field';
-                }
-            }
+
             group("System")
             {
                 Caption = 'System';
