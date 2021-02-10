@@ -38,6 +38,11 @@ page 6150639 "NPR POS Post. Profile Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Automatic Posting Method field';
                 }
+                field("Source Code"; "Source Code")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Source Code field';
+                }
                 group("Posting Difference")
                 {
                     Caption = 'Posting Difference';

@@ -88,7 +88,7 @@ codeunit 6150616 "NPR POS Post Item Entries"
     var
         POSUnit: Record "NPR POS Unit";
         POSStore: Record "NPR POS Store";
-        NPRetailSetup: Record "NPR NP Retail Setup";
+        NPRPOSPostingProfile: Record "NPR POS Posting Profile";
         ItemJnlLine: Record "Item Journal Line";
         MoveToLocation: Record Location;
         Item: Record Item;
@@ -104,7 +104,7 @@ codeunit 6150616 "NPR POS Post Item Entries"
 
         POSPeriodRegister.Get(POSEntry."POS Period Register No.");
 
-        NPRetailSetup.Get;
+        POSUnit.GetPostingProfile(POSEntry."POS Unit No.", NPRPOSPostingProfile);
         with POSSalesLine do begin
             ItemJnlLine.Init;
             ItemJnlLine."Posting Date" := POSEntry."Posting Date";
@@ -182,7 +182,7 @@ codeunit 6150616 "NPR POS Post Item Entries"
             ItemJnlLine."Source Type" := ItemJnlLine."Source Type"::Customer;
             ItemJnlLine."Source No." := "Customer No.";
             ItemJnlLine."Invoice-to Source No." := "Customer No.";
-            ItemJnlLine."Source Code" := NPRetailSetup."Source Code";
+            ItemJnlLine."Source Code" := NPRPOSPostingProfile."Source Code";
             InsertTrackingLine(ItemJnlLine);
             ItemJnlLine."Serial No." := '';
             ItemJnlLine."Lot No." := '';

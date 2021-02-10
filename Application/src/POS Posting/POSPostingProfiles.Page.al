@@ -60,6 +60,11 @@ page 6150638 "NPR POS Posting Profiles"
                     Visible = false;
                     ToolTip = 'Specifies the value of the Differences Account field';
                 }
+                field("Source Code"; "Source Code")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Source Code field';
+                }
             }
         }
     }

@@ -4,11 +4,13 @@ codeunit 6014422 "NPR NP Retail Setup Upgrade"
 
     var
         RemoveDefaultPostingProfileLbl: Label 'NPRetailSetup_RemoveDefaultPostingProfile', Locked = true;
+        RemoveSourceCodeLbl: Label 'NPRetailSetup_RemoveSourceCodeLbl', Locked = true;
 
 
     trigger OnUpgradePerCompany()
     begin
         RemoveDefaultPostingProfile();
+        RemoveSourceCode();
     end;
 
     local procedure DoRemoveDefaultPostingProfile()
@@ -41,6 +43,45 @@ codeunit 6014422 "NPR NP Retail Setup Upgrade"
         DoRemoveDefaultPostingProfile();
 
         UpgradeTag.SetUpgradeTag(RemoveDefaultPostingProfileLbl);
+    end;
+
+    local procedure RemoveSourceCode()
+    var
+        UpgradeTag: Codeunit "Upgrade Tag";
+    begin
+        if UpgradeTag.HasUpgradeTag(RemoveSourceCodeLbl) then
+            exit;
+
+        DoRemoveSourceCode();
+
+        UpgradeTag.SetUpgradeTag(RemoveSourceCodeLbl);
+    end;
+
+    local procedure DoRemoveSourceCode()
+    var
+        NPRNPRetailSetup: Record "NPR NP Retail Setup";
+        NPRPOSPostingProfile: Record "NPR POS Posting Profile";
+    begin
+        if not NPRNPRetailSetup.Get() then
+            exit;
+
+        if not NPRPOSPostingProfile.FindSet() then
+            CreatePosPostingProfile(NPRPOSPostingProfile);
+        repeat
+            if NPRPOSPostingProfile."Source Code" <> NPRNPRetailSetup."Source Code" then begin
+                NPRPOSPostingProfile."Source Code" := NPRNPRetailSetup."Source Code";
+                NPRPOSPostingProfile.Modify();
+            end;
+        until NPRPOSPostingProfile.Next() = 0;
+
+    end;
+
+    local procedure CreatePosPostingProfile(var NPRPOSPostingProfile: Record "NPR POS Posting Profile")
+    begin
+        NPRPOSPostingProfile.Init();
+        NPRPOSPostingProfile.Code := 'DEFAULT';
+        NPRPOSPostingProfile.Description := 'Default POS Posting Profile';
+        NPRPOSPostingProfile.Insert();
     end;
 
 

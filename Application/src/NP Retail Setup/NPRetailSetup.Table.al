@@ -16,6 +16,9 @@ table 6150613 "NPR NP Retail Setup"
             Caption = 'Source Code';
             DataClassification = CustomerContent;
             TableRelation = "Source Code";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore.';
+            ObsoleteTag = 'Moved to POS Posting Profile';
         }
         field(150; "Sale Fiscal No. Series"; Code[10])
         {

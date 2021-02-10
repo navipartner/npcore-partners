@@ -1,6 +1,7 @@
 codeunit 6150699 "NPR Retail Data Model Upg Mgt."
 {
-
+    //this codeunit is changed to Upgrade to handle Obsolete fields and it needs to be called from Powershell when upgrade from older databases is runned
+    Subtype = Upgrade;
 
     trigger OnRun()
     var
@@ -204,6 +205,7 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
         HasRegistersWithLocationCode: Boolean;
         HasRegistersWithoutLocationCode: Boolean;
     begin
+
         if TryOpenTable(RecRef, 6014400, 'Retail Setup') then begin
             if RecRef.FindFirst then begin
                 if TryGetField(RecRef, FieldRef, 20, 'Posting Source Code') then
@@ -215,7 +217,7 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
             if not RecRef.FindSet then
                 CreateLogEntry(StrSubstNo('No existing cash registers found!', POSUnit.TableCaption, POSUnit."No."), 1, 1, 1)
             else
-                repeat 
+                repeat
                     if TryGetField(RecRef, FieldRef, 8, 'Location Code') then begin
                         if Format(FieldRef.Value) = '' then
                             HasRegistersWithoutLocationCode := true
