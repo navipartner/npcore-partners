@@ -4,12 +4,14 @@ codeunit 6014431 "NPR Assisted Setup Subs"
     local procedure RegisterWizard_OnRegisterAssistedSetup()
     begin
         AddMagentoWizard();
+        AddRetailWizard();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Assisted Setup", 'OnAfterRun', '', false, false)]
     procedure UpdateSetupStatus_OnUpdateAssistedSetupStatusp(PageID: Integer)
     begin
         UpdateMagentoWizardStatus();
+        UpdateRetailWizardStatus();
     end;
 
     /* MAGENTO WIZARD */
@@ -33,5 +35,28 @@ codeunit 6014431 "NPR Assisted Setup Subs"
     begin
         if not MagentoSetup.IsEmpty then
             AssistedSetup.Complete(Page::"NPR Magento Wizard");
+    end;
+
+    /* RETAIL WIZARD */
+    local procedure AddRetailWizard()
+    var
+        AssistedSetup: Codeunit "Assisted Setup";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        RetailWizardName: Label 'NP Retail Setup Wizard';
+    begin
+        if not AssistedSetup.Exists(Page::"NPR Retail Wizard") then
+            AssistedSetup.Add(CreateGuid(),
+                              Page::"NPR Retail Wizard",
+                              RetailWizardName,
+                              AssistedSetupGroup::GettingStarted);
+    end;
+
+    local procedure UpdateRetailWizardStatus()
+    var
+        AssistedSetup: Codeunit "Assisted Setup";
+        RetailSetup: Record "NPR Retail Setup";
+    begin
+        if not RetailSetup.IsEmpty then
+            AssistedSetup.Complete(Page::"NPR Retail Wizard");
     end;
 }
