@@ -241,8 +241,6 @@ codeunit 6014564 "NPR Report: Balancing Ticket"
         GlobalPeriod.SetRange("Sales Ticket No.", AuditRoll."Sales Ticket No.");
         GlobalPeriod.Find('+');
 
-        HeaderText := Register.Description;
-
         AuditRoll1.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Type", Type);
         AuditRoll1.SetRange("Register No.", AuditRoll."Register No.");
         AuditRoll1.SetRange("Sales Ticket No.", AuditRoll."Sales Ticket No.");

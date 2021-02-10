@@ -2114,6 +2114,7 @@ codeunit 85004 "NPR EFT Tests"
         _POSSession.GetSale(POSSale);
         POSSale.GetTotals(SalesAmount, PaymentAmount, ChangeAmount, RoundingAmount);
         NPRLibraryPOSMasterData.CreatePOSPaymentMethod(POSPaymentMethod, POSPaymentMethod."Processing Type"::CASH, '', false);
+        NPRLibraryPOSMasterData.OpenPOSUnit(_POSUnit);
         NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, POSPaymentMethod.Code, SalesAmount, '');
 
         // [Given] EFT mock integration set to simulate external result
@@ -2227,6 +2228,7 @@ codeunit 85004 "NPR EFT Tests"
         OriginalEFTTransactionRequest.Get(_LastTrxEntryNo);
         _POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
+        NPRLibraryPOSMasterData.OpenPOSUnit(_POSUnit);
         POSActionCancelSale.CancelSale(_POSSession);
 
         // [Given] Fresh sale
@@ -2408,6 +2410,7 @@ codeunit 85004 "NPR EFT Tests"
 
         // [When] Sale ends
         _POSSession.GetSale(POSSale);
+        NPRLibraryPOSMasterData.OpenPOSUnit(_POSUnit);
         SaleEnded := NPRLibraryPOSMock.EndSale(_POSSession);
         Assert.AreEqual(true, SaleEnded, 'Sale should be able to end when amount is fully paid via EFT');
 

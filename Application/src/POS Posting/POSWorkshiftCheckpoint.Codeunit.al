@@ -641,7 +641,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         POSWorkshiftCheckpoint."Entry No." := 0;
         POSWorkshiftCheckpoint.Insert();
 
-        BalanceRegister_AR(POSUnit, POSWorkshiftCheckpoint);
+        BalanceRegister_AR(POSUnit, POSWorkshiftCheckpoint, 0);
         POSWorkshiftCheckpoint.Modify();
         exit(POSWorkshiftCheckpoint."Entry No.");
         // End Legacy
@@ -1520,7 +1520,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
 
     #region ***************** Original AuditRoll Balancing Functions 
 
-    local procedure BalanceRegister_AR(RegNo: Code[20]; var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
+    local procedure BalanceRegister_AR(RegNo: Code[20]; var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; OpeningCash: Decimal)
     var
         FirstReceiptNo: Code[20];
         AuditRoll: Record "NPR Audit Roll";
@@ -1564,16 +1564,24 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         RetailSetup: Record "NPR Retail Setup";
         CashRegister: Record "NPR Register";
         G_ReceiptFilter: Text;
+        RecRef: RecordRef;
+        FieldReference: FieldRef;
+        DataTypeMgt: Codeunit "Data Type Management";
     begin
         RetailSetup.Get();
         CashRegister.Get(RegNo);
+        if OpeningCash = 0 then begin
+            DataTypeMgt.GetRecordRef(CashRegister, RecRef);
+            if DataTypeMgt.FindFieldByName(RecRef, FieldReference, 'Opening Cash') then
+                Evaluate(OpeningCash, Format(FieldReference.Value()));
+        end;
         POSUnit.Get(RegNo);
         POSSetup.SetPOSUnit(POSUnit);
 
         Window.Open(t005 + '\#1##############################\' + t002);
 
         //Primo := Kasse."Opening Cash";
-        POSWorkshiftCheckpoint."Opening Cash (LCY)" := CashRegister."Opening Cash";
+        POSWorkshiftCheckpoint."Opening Cash (LCY)" := OpeningCash;
         POSWorkshiftCheckpoint."Created At" := CurrentDateTime;
         POSWorkshiftCheckpoint."POS Unit No." := RegNo;
         POSWorkshiftCheckpoint.Open := true;
@@ -2494,6 +2502,6 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         exit(POSEntry."Entry No.");
     end;
 
-    #endregion
+    #endregion    
 }
 

@@ -28,16 +28,25 @@ table 6014401 "NPR Register"
             InitValue = " ";
             OptionCaption = ' ,Sale,Balanced,Doing Balancing';
             OptionMembers = " ",Ekspedition,Afsluttet,"Under afslutning";
+            ObsoleteState = Pending;
+            ObsoleteReason = 'This table won''t be used anymore';
+            ObsoleteTag = 'NPR Register -> NPR POS Unit';
         }
         field(3; "Opening Cash"; Decimal)
         {
             Caption = 'Opening Cash';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'This table won''t be used anymore';
+            ObsoleteTag = 'NPR Register';
         }
         field(4; "Closing Cash"; Decimal)
         {
             Caption = 'Closing Cash';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'This table won''t be used anymore';
+            ObsoleteTag = 'NPR Register';
         }
         field(5; Balanced; Date)
         {
@@ -59,6 +68,9 @@ table 6014401 "NPR Register"
         {
             Caption = 'Opened Date';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore';
+            ObsoleteTag = 'NPR Register';
         }
         field(8; "Location Code"; Code[10])
         {
@@ -136,6 +148,9 @@ table 6014401 "NPR Register"
             Caption = 'Difference Account';
             DataClassification = CustomerContent;
             TableRelation = "G/L Account";
+            ObsoleteState = Pending;
+            ObsoleteReason = 'This table won''t be used anymore';
+            ObsoleteTag = 'NPR Register -> NPR POS Posting Profile';
         }
         field(15; "Balance Account"; Code[20])
         {
@@ -153,6 +168,9 @@ table 6014401 "NPR Register"
             Caption = 'Difference Account - Neg.';
             DataClassification = CustomerContent;
             TableRelation = "G/L Account";
+            ObsoleteState = Pending;
+            ObsoleteReason = 'This table won''t be used anymore';
+            ObsoleteTag = 'NPR Register -> NPR POS Posting Profile';
         }
         field(17; "Gift Voucher Discount Account"; Code[20])
         {
@@ -190,6 +208,9 @@ table 6014401 "NPR Register"
         {
             Caption = 'Status set by Sales Ticket';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(23; "Name 2"; Text[50])
         {
@@ -204,6 +225,9 @@ table 6014401 "NPR Register"
             Caption = 'Register Change Account';
             DataClassification = CustomerContent;
             TableRelation = "G/L Account"."No.";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(27; "City Gift Voucher Account"; Code[20])
         {
@@ -243,6 +267,9 @@ table 6014401 "NPR Register"
         {
             Caption = 'Opened on Sales Ticket';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(81; "Use Sales Statistics"; Boolean)
         {
@@ -256,6 +283,9 @@ table 6014401 "NPR Register"
         {
             Caption = 'Date Filter';
             FieldClass = FlowFilter;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(91; "Global Dimension 1 Filter"; Code[20])
         {
@@ -281,6 +311,9 @@ table 6014401 "NPR Register"
         {
             Caption = 'Customer Display';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
 
             trigger OnValidate()
             var
@@ -635,8 +668,7 @@ table 6014401 "NPR Register"
         {
             CalcFormula = Count("NPR Audit Roll" WHERE("Register No." = FIELD("Register No."),
                                                     "Sale Type" = CONST(Sale),
-                                                    "Line No." = CONST(1),
-                                                    "Sale Date" = FIELD("Date Filter")));
+                                                    "Line No." = CONST(1)));
             Caption = 'Attendance Count in Audit Roll';
             FieldClass = FlowField;
             ObsoleteState = Removed;
@@ -645,7 +677,7 @@ table 6014401 "NPR Register"
         }
         field(403; "Normal Sales in Audit Roll"; Decimal)
         {
-            CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
+            CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE(
                                                                          "Register No." = FIELD("Register No."),
                                                                          "Sale Type" = CONST(Sale),
                                                                          Type = CONST(Item)));
@@ -657,7 +689,7 @@ table 6014401 "NPR Register"
         }
         field(404; "Debit Sales in Audit Roll"; Decimal)
         {
-            CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
+            CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE(
                                                                          "Register No." = FIELD("Register No."),
                                                                          "Sale Type" = CONST("Debit Sale"),
                                                                          "Gift voucher ref." = FILTER(= '')));
@@ -673,8 +705,7 @@ table 6014401 "NPR Register"
             CalcFormula = Count("NPR Audit Roll" WHERE("Register No." = FIELD("Register No."),
                                                     Type = CONST("Debit Sale"),
                                                     "Line No." = CONST(2),
-                                                    "Gift voucher ref." = FILTER(= ''),
-                                                    "Sale Date" = FIELD("Date Filter")));
+                                                    "Gift voucher ref." = FILTER(= '')));
             Caption = 'Item Count in Audit Debit Roll';
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
@@ -702,6 +733,9 @@ table 6014401 "NPR Register"
         {
             Caption = 'Description';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteReason = 'This table won''t be used anymore';
+            ObsoleteTag = 'NPR Register';
         }
         field(417; "Balancing every"; Option)
         {
@@ -709,10 +743,13 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             OptionCaption = 'Day before 00:00pm,Manual';
             OptionMembers = Day,Manual;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(503; "All Normal Sales in Audit Roll"; Decimal)
         {
-            CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
+            CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE(
                                                                          "Sale Type" = CONST(Sale),
                                                                          Type = CONST(Item)));
             Caption = 'Normal Sales in Audit Roll';
@@ -723,7 +760,7 @@ table 6014401 "NPR Register"
         }
         field(504; "All Debit Sales in Audit Roll"; Decimal)
         {
-            CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
+            CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE(
                                                                          "Sale Type" = CONST("Debit Sale"),
                                                                          Type = CONST(Item),
                                                                          "Gift voucher ref." = FILTER(= '')));
@@ -922,6 +959,9 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             Description = 'NPR5.36';
             TableRelation = Customer;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(855; "Touch Screen Login Type"; Option)
         {
@@ -1059,6 +1099,9 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             Description = 'NPR5.29';
             TableRelation = "NPR Payment Type POS";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore';
+            ObsoleteTag = 'NPR Register';
         }
     }
 
@@ -1073,7 +1116,9 @@ table 6014401 "NPR Register"
         }
         key(Key3; Status)
         {
-
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore';
+            ObsoleteTag = 'NPR Register -> NPR POS Unit';
         }
     }
 
@@ -1212,8 +1257,6 @@ table 6014401 "NPR Register"
 
         Register.Init;
         Register."Register No." := RegNo;
-        Register."Closing Cash" := Primo;
-        Register."Opening Cash" := Primo;
 
         RetailSetup.Get();
         if RetailSetup."Payment Type By Register" then

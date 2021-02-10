@@ -299,6 +299,20 @@ codeunit 85002 "NPR Library - POS Master Data"
         CreateGeneralPostingSetupForSaleItem(POSStore."Gen. Bus. Posting Group", Item."Gen. Prod. Posting Group", POSStore."Location Code", Item."Inventory Posting Group");
     end;
 
+    procedure OpenPOSUnit(var POSUnit: Record "NPR POS Unit")
+    var
+        POSOpenPOSUnit: Codeunit "NPR POS Manage POS Unit";
+        POSCreateEntry: Codeunit "NPR POS Create Entry";
+        Setup: Codeunit "NPR POS Setup";
+        OpeningEntryNo: Integer;
+    begin
+        POSOpenPOSUnit.ClosePOSUnitOpenPeriods(POSUnit."No."); // make sure pos period register is correct
+        POSOpenPOSUnit.OpenPOSUnit(POSUnit);
+        OpeningEntryNo := POSCreateEntry.InsertUnitOpenEntry(POSUnit."No.", Setup.Salesperson());
+        POSOpenPOSUnit.SetOpeningEntryNo(POSUnit."No.", OpeningEntryNo);
+        Commit();
+    end;
+
     procedure CreateVATPostingSetupForSaleItem(VATBusPostGrp: Code[10]; VATProdPostGrp: Code[10])
     var
         VATPostingSetup: Record "VAT Posting Setup";

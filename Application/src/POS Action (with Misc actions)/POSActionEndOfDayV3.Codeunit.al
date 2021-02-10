@@ -201,6 +201,7 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         NPRetailSetup: Record "NPR NP Retail Setup";
         "Audit Roll Check": Record "NPR Audit Roll";
         Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         "Payment Type - Detailed": Record "NPR Payment Type - Detailed";
         SalePOS: Record "NPR Sale POS";
         POSQuoteMgt: Codeunit "NPR POS Quote Mgt.";
@@ -217,8 +218,8 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
 
         // TODO - Needs to verified for UNITS / BINS
         RetailSetup.Get;
-        Register.Get(RegisterNo);
-        if (Register.Status = Register.Status::Afsluttet) then
+        POSUnit.Get(RegisterNo);
+        if (POSUnit.Status = POSUnit.Status::CLOSED) then
             Error(t001);
 
         SalePOS.Get(RegisterNo, SalesTicketNo);

@@ -82,6 +82,7 @@ codeunit 85006 "NPR POS Payment Tests"
         Item."Unit Price" := 10;
         Item.Modify;
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+        NPRLibraryPOSMasterData.OpenPOSUnit(_POSUnit);
 
         // [When] Paying 4 LCY
         SaleEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, 10, '');
@@ -136,7 +137,7 @@ codeunit 85006 "NPR POS Payment Tests"
         Item."Unit Price" := 10;
         Item.Modify;
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
-
+        NPRLibraryPOSMasterData.OpenPOSUnit(_POSUnit);
         // [When] Paying 4 LCY
         SaleEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, 15, '');
 

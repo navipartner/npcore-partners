@@ -1358,8 +1358,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
         POSAuditProfile.TestField("Fill Sale Fiscal No. On", POSAuditProfile."Fill Sale Fiscal No. On"::Successful);
         POSAuditProfile.TestField("Print Receipt On Sale Cancel", false);
 
-        Register.TestField("Balancing every", Register."Balancing every"::Day);
-
         if POSEndofDayProfile.Get(POSUnit."POS End of Day Profile") then begin
             POSEndofDayProfile.TestField(POSEndofDayProfile."End of Day Type", POSEndofDayProfile."End of Day Type"::INDIVIDUAL);
         end;

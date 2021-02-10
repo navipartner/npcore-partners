@@ -1156,7 +1156,8 @@ codeunit 6150614 "NPR POS Create Entry"
     var
         PaymentTypePOS: Record "NPR Payment Type POS";
         POSPostingSetup: Record "NPR POS Posting Setup";
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
+        POSPostingProfile: Record "NPR POS Posting Profile";
         POSStore: Record "NPR POS Store";
     begin
 
@@ -1186,19 +1187,19 @@ codeunit 6150614 "NPR POS Create Entry"
         if not POSPostingSetup.Find then
             POSPostingSetup.Insert(true);
 
-        if Register.FindSet then
+        if POSUnit.FindSet then
             repeat
-                ;
-                if POSStore.Get(Register."Register No.") then begin
-                    POSPostingSetup."POS Store Code" := POSStore.Code;
-                    POSPostingSetup."Difference Account Type" := POSPostingSetup."Difference Account Type"::"G/L Account";
-                    POSPostingSetup."Difference Acc. No." := Register."Difference Account";
-                    POSPostingSetup."Difference Acc. No. (Neg)" := Register."Difference Account - Neg.";
-                    if not POSPostingSetup.Find then
-                        POSPostingSetup.Insert(true);
+                if POSStore.Get(POSUnit."POS Store Code") then begin
+                    if POSPostingProfile.Get(POSUnit."POS Posting Profile") then begin
+                        POSPostingSetup."POS Store Code" := POSStore.Code;
+                        POSPostingSetup."Difference Account Type" := POSPostingSetup."Difference Account Type"::"G/L Account";
+                        POSPostingSetup."Difference Acc. No." := POSPostingProfile."POS Posting Diff. Account";
+                        POSPostingSetup."Difference Acc. No. (Neg)" := POSPostingProfile."Posting Diff. Account (Neg.)";
+                        if not POSPostingSetup.Find then
+                            POSPostingSetup.Insert(true);
+                    end;
                 end;
-
-            until Register.Next = 0;
+            until POSUnit.Next() = 0;
     end;
 
     local procedure CreateRMAEntry(POSEntry: Record "NPR POS Entry"; SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS")

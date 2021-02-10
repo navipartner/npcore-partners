@@ -35,6 +35,12 @@ table 6150653 "NPR POS Posting Profile"
             DataClassification = CustomerContent;
             TableRelation = "G/L Account";
         }
+        field(41; "Posting Diff. Account (Neg.)"; Code[20])
+        {
+            Caption = 'Differences Account - Neg.';
+            DataClassification = CustomerContent;
+            TableRelation = "G/L Account";
+        }
         field(50; "Automatic Item Posting"; Option)
         {
             Caption = 'Automatic Item Posting';

@@ -1,29 +1,7 @@
 codeunit 6150697 "NPR RetailDataModel AR Upgr."
 {
-    // URNPR5.33/AP  /20170426 CASE 262628 "Extention" to CU 6150699 to be able to migrate Audit Roll data without using RecRef and FieldRef
-    // NPR5.36/AP  /20170426 CASE 262628 "Extention" to CU 6150699 to be able to migrate Audit Roll data without using RecRef and FieldRef
-    // NPR5.36/BR  /20170919 CASE 279551 Added functions to split control posting and creation
-    // NPR5.37/BR  /20171024 CASE 294219 Fix check
-    // NPR5.37/NPKNAV/20171030  CASE 292364 Transport NPR5.37 - 27 October 2017
-    // NPR5.38/TSA /20171124 CASE 297087 Added function DuplicateAuditRollTicketToPosEntry() to copy balancing lines to new pos entry
-    // NPR5.38/BR  /20180110 CASE 301600 Fix Error on Balancing, added link to positing
-    // NPR5.38/BR  /20180112 CASE 301600 Check that Automatic posting of Audit Roll is switched OFF when activating POS Entry Posting
-    // NPR5.39/MMV /20180207 CASE 304835 Added MAXSTRLEN check.
-    // NPR5.39/BR  /20180219 CASE 305590 Allow in PROD
-    // NPR5.41/JDH /20180426 CASE 312644  Added indirect permissions to table Audit roll
-    // NPR5.44/MHA /20180705 CASE 321231 Added Discount Fields added to InsertPOSSaleLine()
-    // NPR5.48/LS  /20181121 CASE 334335 When Upgrading Audit Roll, added migration of Setups
-    // NPR5.48/TSA /20181126 CASE 336921 Adding on code on ActivatePoseidonPosting() and DeActivatePoseidonPosting(). Removing commented code
-    // NPR5.48/TJ  /20190102 CASE 340615 Commented out usage of field Item."Product Group Code"
-    // NPR5.51/MHA /20190718 CASE 362329 Added "Exclude from Posting" on POS Sales Lines in InsertPOSSaleLine()
-    // NPR5.51/LS  /20190826 CASE 334335 Modified function UpgradeSetupsBalancingV3()
-    // NPR5.52/SARA/20191011 CASE 371142 Enhancement on conversion tool for POS Entry, function UpgradeSetupsBalancingV3
-    // NPR5.53/SARA/20191119 CASE 375828 Modify mapping for fields 'Rounding Gain Account' and 'Rounding Losses Account' for POS Paymeny Method
-    // NPR5.53/SARA/20191206 CASE 381094 Correction Description for in POS Payment Bin for 'Bank' and 'Safe'
-    // NPR5.55/SARA/20200305 CASE 394811 Added CheckPaymentTypePOSAccount to check payment types not having an account number
-    // NPR5.55/SARA/20200310 CASE 395030 Update POS Unit 'Name' with Register 'Description'
-    // NPR5.55/SARA/20200525 CASE 404019 Create Tax Amount Line when convert Audit roll to POS Entry
-    // NPR5.55/SARA/20200608 CASE 407687 Update "Condensed Posting Description" in POS Payment Method
+    //this codeunit is changed to Upgrade to handle Obsolete fields and it needs to be called from Powershell when upgrade from older databases is runned
+    Subtype = Upgrade;
 
     Permissions = TableData "NPR Audit Roll" = rimd;
 
@@ -1472,4 +1450,3 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
 
     end;
 }
-

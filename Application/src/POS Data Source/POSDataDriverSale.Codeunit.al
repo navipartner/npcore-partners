@@ -85,6 +85,7 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
         Customer: Record Customer;
         Contact: Record Contact;
         Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         ContactBusinessRelation: Record "Contact Business Relation";
     begin
         if DataSource <> GetSourceNameText() then
@@ -109,6 +110,7 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
         Clear(Register);
         if Register.Get(SalePOS."Register No.") then;
         Clear(Customer);
+        if POSUnit.Get(SalePOS."Register No.") then;
         if Customer.Get(SalePOS."Customer No.") then;
         Clear(Contact);
         if Contact.Get(SalePOS."Contact No.") then begin
@@ -120,7 +122,7 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
                     if Contact.Get(ContactBusinessRelation."Contact No.") then;
             end;
 
-        DataRow.Add(GetRegisterNameText(), Register.Description);
+        DataRow.Add(GetRegisterNameText(), POSUnit.Name);
         DataRow.Add(GetCustomerNameText(), Customer.Name);
         DataRow.Add(GetContactNameText(), Contact.Name);
 

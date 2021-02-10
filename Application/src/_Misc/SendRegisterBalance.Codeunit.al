@@ -12,7 +12,7 @@ codeunit 6014515 "NPR Send Register Balance"
         AuditRoll: Record "NPR Audit Roll";
         IComm: Record "NPR I-Comm";
         PaymentTypePOS: Record "NPR Payment Type POS";
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         RetailSetup: Record "NPR Retail Setup";
         CuSMS: Codeunit "NPR SMS";
         RegisterEndDate: Date;
@@ -25,8 +25,7 @@ codeunit 6014515 "NPR Send Register Balance"
         if RetailSetup."Receive Register Turnover" <> RetailSetup."Receive Register Turnover"::None then begin
             if RegisterEndDate = 0D then
                 RegisterEndDate := Today;
-            Register.SetCurrentKey(Status);
-            Register.SetFilter(Status, '<>%1', Register.Status::Afsluttet);
+            POSUnit.SetFilter(Status, '<>%1', POSUnit.Status::CLOSED);
             Clear(AuditRoll);
 
             if not AuditRoll.Get(SalePOS."Register No.",
@@ -37,7 +36,7 @@ codeunit 6014515 "NPR Send Register Balance"
                                     Today) then
                 AuditRoll.Init();
 
-            if (not Register.Find('-')) or
+            if (not POSUnit.Find('-')) or
                (RetailSetup."Receive Register Turnover" = RetailSetup."Receive Register Turnover"::"Per Register") then begin
 
                 PaymentTypePOS.Reset();
