@@ -1,8 +1,8 @@
 report 6060108 "NPR Balancing Ticket IV"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Balancing Ticket IV.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Balancing Ticket IV.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Counter Report Ticket IV';
     dataset
@@ -130,8 +130,6 @@ report 6060108 "NPR Balancing Ticket IV"
                 GlobalPeriod.SetRange("Register No.", "Register No.");
                 GlobalPeriod.SetRange("Sales Ticket No.", "Sales Ticket No.");
                 GlobalPeriod.FindLast();
-
-                TitelTXT := Register.Description;
 
                 Revisionsrulle1.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Type", Type);
                 Revisionsrulle1.SetRange("Register No.", "Register No.");

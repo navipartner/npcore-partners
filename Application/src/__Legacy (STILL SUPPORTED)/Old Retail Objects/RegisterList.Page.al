@@ -20,26 +20,6 @@ page 6014405 "NPR Register List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Description; Description)
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Description field';
-                }
-                field("Opening Cash"; "Opening Cash")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Opening Cash field';
-                }
-                field("Closing Cash"; "Closing Cash")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Closing Cash field';
-                }
-                field("Customer Display"; "Customer Display")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Customer Display field';
-                }
             }
         }
     }

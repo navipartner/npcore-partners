@@ -1,8 +1,8 @@
 report 6014452 "NPR Sales Ticket Stats/Date"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Sales Ticket StatisticsDate.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Sales Ticket StatisticsDate.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Sales Ticket Statistics/Date';
     EnableHyperlinks = true;
@@ -67,7 +67,6 @@ report 6014452 "NPR Sales Ticket Stats/Date"
             var
                 Cust: Record Customer;
             begin
-                Kassedata.Reset();
                 AuditRoll.Reset();
                 SetDateFilter();
                 SetDimensionFilters();
@@ -163,16 +162,12 @@ report 6014452 "NPR Sales Ticket Stats/Date"
     var
         AuditRoll: Record "NPR Audit Roll";
         AuditRoll2: Record "NPR Audit Roll";
-        Kassedata: Record "NPR Register";
-        PeriodFormMgt: Codeunit PeriodFormManagement;
-        AuditRollForm: Page "NPR Audit Roll";
         Dim1Filter: Code[20];
         Dim2Filter: Code[20];
         FromDate: Date;
         ToDate: Date;
         "Average": Decimal;
         totalCount: Decimal;
-        Tidsvalg: Integer;
         Url1: Label '&$filter=''Sale Date''%20IS%20''%1..%2''%20AND%20''Sale Type''%20IS%20''%3''%20AND%20''Type''%20IS%20''%4''';
         BalanceDueCap: Label 'Balance Due (LCY)';
         Err1: Label 'From Date should be filled in';
@@ -181,7 +176,6 @@ report 6014452 "NPR Sales Ticket Stats/Date"
         StayExpeditionCap: Label 'Stay Expedition';
         TotalCap: Label 'Total';
         PeriodType: Option Day,Week,Month,Quarter,Year;
-        VendPeriodLength: Option Day,Week,Month,Quarter,Year,Period;
         AmountType: Option "Net Change","Balance at Date";
         Filters: Text;
         URLBalanceDue: Text;
@@ -189,11 +183,6 @@ report 6014452 "NPR Sales Ticket Stats/Date"
 
     local procedure SetDateFilter()
     begin
-        if AmountType = AmountType::"Net Change" then
-            Kassedata.SetRange("Date Filter", Date."Period Start", Date."Period End")
-        else
-            Kassedata.SetRange("Date Filter", 0D, Date."Period End");
-
         if AmountType = AmountType::"Net Change" then
             AuditRoll.SetRange("Sale Date", Date."Period Start", Date."Period End")
         else

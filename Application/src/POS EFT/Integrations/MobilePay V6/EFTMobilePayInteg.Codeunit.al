@@ -240,6 +240,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         EFTSetup := EFTSetupIn;
         PaymentTypePOS.Get(EFTSetup."Payment Type POS");
         Register.Get(EFTSetup."POS Unit No.");
+        POSUnit.Get(EFTSetup."POS Unit No.");
 
         LocationID := GetLocationID(EFTSetup);
         PoSID := GetPoSID(EFTSetup);
@@ -305,7 +306,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
             Error(MissingPOSUnitSetup, POSUnit.TableCaption, EFTSetup."POS Unit No.", IntegrationType());
 
         if InvokeUpdateRegisteredPoSName() then
-            Message(Text6014518, EFTSetup."POS Unit No.", Register.Description)
+            Message(Text6014518, EFTSetup."POS Unit No.", POSUnit.Name)
         else
             Error(GetLastErrorText);
     end;
@@ -516,12 +517,12 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
             Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
         if LocationID = '' then
             Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
-        Register.TestField(Description);
+        POSUNit.TestField(Name);
 
         RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
         RequestBody := RequestBody + StrSubstNo('"LocationId":"%1",', LocationID);
         RequestBody := RequestBody + StrSubstNo('"PosId":"%1",', PoSIdIn);
-        RequestBody := RequestBody + StrSubstNo('"Name":"%1"}', Register.Description);
+        RequestBody := RequestBody + StrSubstNo('"Name":"%1"}', POSUNit.Name);
 
         InvokeRESTHTTPRequest(RequestBody, 'RegisterPoS', ResponseText);
         ReadJSONValue(ResponseText, 'PoSId', PoSIdIn);
@@ -539,12 +540,12 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
             Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
         if PoSID = '' then
             Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'PoS ID');
-        Register.TestField(Description);
+        POSUnit.TestField(Name);
 
         RequestBody := StrSubstNo('{"MerchantId":"%1",', MerchantID);
         RequestBody := RequestBody + StrSubstNo('"LocationId":"%1",', LocationID);
         RequestBody := RequestBody + StrSubstNo('"PosId":"%1",', PoSID);
-        RequestBody := RequestBody + StrSubstNo('"Name":"%1"}', Register.Description);
+        RequestBody := RequestBody + StrSubstNo('"Name":"%1"}', POSUnit.Name);
 
         InvokeRESTHTTPRequest(RequestBody, 'UpdateRegisteredPoSName', ResponseText);
     end;

@@ -479,49 +479,6 @@ codeunit 6014505 "NPR Touch Screen - Func."
         exit(Round(Amount, PaymentTypePOS."Rounding Precision", '='));
     end;
 
-    procedure RegisterOpen(var SalePOS: Record "NPR Sale POS"): Boolean
-    var
-        Salesperson: Record "Salesperson/Purchaser";
-        t001: Label 'Register opened by %1 with amount %2';
-        Register: Record "NPR Register";
-        AuditRoll: Record "NPR Audit Roll";
-        RetailSetup: Record "NPR Retail Setup";
-    begin
-        Register.Get(SalePOS."Register No.");
-        OnBeforeRegisterOpen(Register);
-        Register.LockTable;
-        Register."Opened Date" := Today;
-        Register.Status := Register.Status::Ekspedition;
-        Register."Opening Cash" := Register."Closing Cash";
-        Register."Closing Cash" := 0;
-        Register.Modify;
-
-        AuditRoll.Init;
-        AuditRoll."Sales Ticket No." := SalePOS."Sales Ticket No.";
-
-        Register."Opened on Sales Ticket" := AuditRoll."Sales Ticket No.";
-        Register.Modify;
-
-        RetailSetup.Get;
-        if not RetailSetup."Create POS Entries Only" then begin
-            AuditRoll."Register No." := SalePOS."Register No.";
-            AuditRoll.Type := AuditRoll.Type::"Open/Close";
-            AuditRoll."Sale Type" := AuditRoll."Sale Type"::Comment;
-            Salesperson.Get(SalePOS."Salesperson Code");
-            AuditRoll.Description := CopyStr(StrSubstNo(t001, Salesperson.Name, Register."Opening Cash"), 1, 50);
-            AuditRoll."Sale Date" := Today;
-            AuditRoll."Starting Time" := Time;
-            AuditRoll."Closing Time" := Time;
-            AuditRoll."Opening Cash" := Register."Opening Cash";
-            AuditRoll.Posted := true;
-            AuditRoll."Offline receipt no." := SalePOS."Sales Ticket No.";
-            AuditRoll.Insert;
-        end;
-
-        if SalePOS.Delete then;
-        exit(true);
-    end;
-
     procedure SaleDebit(var SalePOS: Record "NPR Sale POS"; var SalesHeader: Record "Sales Header" temporary; var ValidationText: Code[20]; Internal: Boolean): Boolean
     var
         Customer: Record Customer;

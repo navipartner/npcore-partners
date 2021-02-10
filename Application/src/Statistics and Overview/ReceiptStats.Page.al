@@ -1,7 +1,5 @@
 page 6014491 "NPR Receipt Stats"
 {
-    // NPR4.16/JDH/20151019 CASE 225415 Recompiled to refresh field links to Register (fields have been rearranged)
-
     Caption = 'Receipt statistics';
     PageType = List;
     UsageCategory = Administration;
@@ -78,16 +76,6 @@ page 6014491 "NPR Receipt Stats"
         }
     }
 
-    actions
-    {
-    }
-
-    trigger OnAfterGetRecord()
-    begin
-
-        SetDateFilter;
-    end;
-
     trigger OnFindRecord(Which: Text): Boolean
     begin
 
@@ -109,24 +97,6 @@ page 6014491 "NPR Receipt Stats"
     var
         PeriodFormMgt: Codeunit PeriodFormManagement;
         VendPeriodLength: Option Day,Week,Month,Quarter,Year,Period;
-        AmountType: Option "Net Change","Balance at Date";
         PeriodType: Option Day,Week,Month,Quarter,Year;
-        Kassedata: Record "NPR Register";
-
-    procedure Set(var NewVend: Record "NPR Register"; NewVendPeriodLength: Integer; NewAmountType: Option "Net Change","Balance at Date"; var NewKassedata: Record "NPR Register")
-    begin
-        Kassedata.Copy(NewKassedata);
-        VendPeriodLength := NewVendPeriodLength;
-        AmountType := NewAmountType;
-        CurrPage.Update(false);
-    end;
-
-    local procedure SetDateFilter()
-    begin
-        if AmountType = AmountType::"Net Change" then
-            Kassedata.SetRange("Date Filter", "Period Start", "Period End")
-        else
-            Kassedata.SetRange("Date Filter", 0D, "Period End");
-    end;
 }
 

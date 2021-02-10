@@ -180,11 +180,6 @@ page 6014468 "NPR Sales Ticket Statistics"
 
     local procedure SetDateFilter()
     begin
-        if AmountType = AmountType::"Net Change" then
-            Kassedata.SetRange("Date Filter", "Period Start", "Period End")
-        else
-            Kassedata.SetRange("Date Filter", 0D, "Period End");
-
         //-NPR4.10
         if AmountType = AmountType::"Net Change" then
             AuditRoll.SetRange("Sale Date", "Period Start", "Period End")
