@@ -20,7 +20,7 @@ table 6151152 "NPR M2 Account Com. Template"
             OptionCaption = ' ,Welcome,Password Reset';
             OptionMembers = NA,WELCOME,PW_RESET;
         }
-        field(10; "Company Name"; Text[50])
+        field(10; "Company Name"; Text[100])
         {
             Caption = 'Company Name';
             DataClassification = CustomerContent;

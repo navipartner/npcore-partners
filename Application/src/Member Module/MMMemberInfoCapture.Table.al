@@ -143,7 +143,7 @@ table 6060134 "NPR MM Member Info Capture"
             OptionCaption = ' ,Yes,No';
             OptionMembers = NOT_SPECIFIED,YES,NO;
         }
-        field(95; Description; Text[50])
+        field(95; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;
@@ -168,7 +168,7 @@ table 6060134 "NPR MM Member Info Capture"
             Caption = 'Membership Code';
             DataClassification = CustomerContent;
         }
-        field(110; "External Card No."; Text[50])
+        field(110; "External Card No."; Text[100])
         {
             Caption = 'External Card No.';
             DataClassification = CustomerContent;
@@ -198,7 +198,7 @@ table 6060134 "NPR MM Member Info Capture"
             Caption = 'Valid Until';
             DataClassification = CustomerContent;
         }
-        field(115; "Replace External Card No."; Text[50])
+        field(115; "Replace External Card No."; Text[100])
         {
             Caption = 'Replace External Card No.';
             DataClassification = CustomerContent;

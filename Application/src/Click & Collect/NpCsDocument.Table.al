@@ -479,7 +479,7 @@ table 6151198 "NPR NpCs Document"
             Editable = false;
             FieldClass = FlowField;
         }
-        field(2000; "Sell-to Customer Name"; Text[50])
+        field(2000; "Sell-to Customer Name"; Text[100])
         {
             Caption = 'Sell-to Customer Name';
             DataClassification = CustomerContent;
@@ -491,7 +491,7 @@ table 6151198 "NPR NpCs Document"
             DataClassification = CustomerContent;
             Description = 'NPR5.51';
         }
-        field(2010; "To Store Contact Name"; Text[50])
+        field(2010; "To Store Contact Name"; Text[100])
         {
             CalcFormula = Lookup("NPR NpCs Store"."Contact Name" WHERE(Code = FIELD("To Store Code")));
             Caption = 'To Store Contact Name';

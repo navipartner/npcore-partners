@@ -73,7 +73,7 @@ xmlport 6060119 "NPR TM Ticket Revoke"
         QtySum: Integer;
         n: Integer;
 
-    procedure GetToken(): Text[50]
+    procedure GetToken(): Text[100]
     begin
         exit(ReservationID);
     end;

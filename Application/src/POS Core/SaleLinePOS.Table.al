@@ -128,7 +128,7 @@ table 6014406 "NPR Sale Line POS"
             Caption = 'Qty. Discount Code';
             DataClassification = CustomerContent;
         }
-        field(10; Description; Text[80])
+        field(10; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

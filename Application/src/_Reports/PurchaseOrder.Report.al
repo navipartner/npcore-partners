@@ -1275,14 +1275,14 @@ report 6014617 "NPR Purchase Order"
         CopyText: Text[30];
         PricesInclVATtxt: Text[30];
         PurchaserText: Text[30];
-        BuyFromAddr: array[8] of Text[50];
-        CompanyAddr: array[8] of Text[50];
-        ShipToAddr: array[8] of Text[50];
+        BuyFromAddr: array[8] of Text[100];
+        CompanyAddr: array[8] of Text[100];
+        ShipToAddr: array[8] of Text[100];
         TotalExclVATText: Text[50];
         TotalInclVATText: Text[50];
         TotalText: Text[50];
         VALExchRate: Text[50];
-        VendAddr: array[8] of Text[50];
+        VendAddr: array[8] of Text[100];
         OldDimText: Text[75];
         ReferenceText: Text[80];
         VALSpecLCYHeader: Text[80];

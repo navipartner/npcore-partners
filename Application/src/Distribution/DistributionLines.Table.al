@@ -45,7 +45,7 @@ table 6151058 "NPR Distribution Lines"
             Caption = 'Item Hiearachy Level';
             DataClassification = CustomerContent;
         }
-        field(10; Description; Text[50])
+        field(10; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

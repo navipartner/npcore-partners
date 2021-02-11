@@ -23,7 +23,7 @@ table 6151205 "NPR NpCs Store Inv. Buffer"
             DecimalPlaces = 0 : 5;
             Description = 'NPR5.52';
         }
-        field(15; Description; Text[50])
+        field(15; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

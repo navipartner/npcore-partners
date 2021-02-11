@@ -134,7 +134,7 @@ table 6059768 "NPR NaviDocs Entry"
             Caption = 'E-mail (Recipient)';
             DataClassification = CustomerContent;
         }
-        field(220; "Name (Recipient)"; Text[50])
+        field(220; "Name (Recipient)"; Text[100])
         {
             Caption = 'Name (Recipient)';
             Editable = false;
@@ -189,7 +189,7 @@ table 6059768 "NPR NaviDocs Entry"
         }
         field(1040; "Error Qty."; Integer)
         {
-            CalcFormula = Count ("NPR NaviDocs Entry Comment" WHERE("Table No." = FIELD("Table No."),
+            CalcFormula = Count("NPR NaviDocs Entry Comment" WHERE("Table No." = FIELD("Table No."),
                                                                 "Document No." = FIELD("No."),
                                                                 Warning = CONST(true)));
             Caption = 'Errors Qty.';

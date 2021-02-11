@@ -39,7 +39,7 @@ table 6151138 "NPR TM Ticket Wait. List"
             Caption = 'Created At';
             DataClassification = CustomerContent;
         }
-        field(30; Token; Text[50])
+        field(30; Token; Text[100])
         {
             Caption = 'Token';
             DataClassification = CustomerContent;

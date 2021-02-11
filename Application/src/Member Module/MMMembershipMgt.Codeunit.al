@@ -808,7 +808,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         exit(GetMembershipValidDate(MemberShipEntryNo, ReferenceDate, ValidFromDate, ValidUntilDate));
     end;
 
-    procedure IsMemberCardActive(ExternalCardNo: Text[50]; ReferenceDate: Date): Boolean
+    procedure IsMemberCardActive(ExternalCardNo: Text[100]; ReferenceDate: Date): Boolean
     var
         CardEntryNo: Integer;
         MemberCard: Record "NPR MM Member Card";
@@ -1240,7 +1240,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     end;
 
-    procedure CreateCancelMemberInfoRequest(ExternalMemberCardNo: Text[50]; CancelWithItemNo: Code[20]): Integer
+    procedure CreateCancelMemberInfoRequest(ExternalMemberCardNo: Text[100]; CancelWithItemNo: Code[20]): Integer
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Membership: Record "NPR MM Membership";
@@ -1392,7 +1392,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         exit(true);
     end;
 
-    procedure CreateRenewMemberInfoRequest(ExternalMemberCardNo: Text[50]; RenewWithItemNo: Code[20]): Integer
+    procedure CreateRenewMemberInfoRequest(ExternalMemberCardNo: Text[100]; RenewWithItemNo: Code[20]): Integer
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Membership: Record "NPR MM Membership";
@@ -1566,7 +1566,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         exit(true);
     end;
 
-    procedure CreateExtendMemberInfoRequest(ExternalMemberCardNo: Text[50]; RenewWithItemNo: Code[20]): Integer
+    procedure CreateExtendMemberInfoRequest(ExternalMemberCardNo: Text[100]; RenewWithItemNo: Code[20]): Integer
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Membership: Record "NPR MM Membership";
@@ -1767,7 +1767,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         exit(true);
     end;
 
-    procedure CreateUpgradeMemberInfoRequest(ExternalMemberCardNo: Text[50]; UpgradeWithItemNo: Code[20]): Integer
+    procedure CreateUpgradeMemberInfoRequest(ExternalMemberCardNo: Text[100]; UpgradeWithItemNo: Code[20]): Integer
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Membership: Record "NPR MM Membership";
@@ -2340,7 +2340,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     end;
 
-    local procedure PrefillMemberInfoCapture(var MemberInfoCapture: Record "NPR MM Member Info Capture"; Member: Record "NPR MM Member"; Membership: Record "NPR MM Membership"; ExternalMemberCardNo: Text[50]; MembershipSalesItemNo: Code[20])
+    local procedure PrefillMemberInfoCapture(var MemberInfoCapture: Record "NPR MM Member Info Capture"; Member: Record "NPR MM Member"; Membership: Record "NPR MM Membership"; ExternalMemberCardNo: Text[100]; MembershipSalesItemNo: Code[20])
     begin
 
         MemberInfoCapture."Member Entry No" := Member."Entry No.";
@@ -4803,7 +4803,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         ForeignMembershipSetup: Record "NPR MM Foreign Members. Setup";
         RemoteReasonText: Text;
         ForeignMembershipMgr: Codeunit "NPR MM Foreign Members. Mgr.";
-        FormatedCardNumber: Text[50];
+        FormatedCardNumber: Text[100];
     begin
 
         ForeignMembershipSetup.SetCurrentKey("Invokation Priority");
@@ -4834,7 +4834,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     end;
 
-    local procedure GetMembershipFromExtCardNoWorker(ExternalCardNo: Text[50]; ReferenceDate: Date; var ReasonNotFound: Text; var CardEntryNo: Integer) MembershipEntryNo: Integer
+    local procedure GetMembershipFromExtCardNoWorker(ExternalCardNo: Text[100]; ReferenceDate: Date; var ReasonNotFound: Text; var CardEntryNo: Integer) MembershipEntryNo: Integer
     var
         MemberCard: Record "NPR MM Member Card";
         Membership: Record "NPR MM Membership";
@@ -4956,7 +4956,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         exit(Member."Entry No.");
     end;
 
-    procedure GetMemberFromExtCardNo(ExternalCardNo: Text[50]; ReferenceDate: Date; var NotFoundReasonText: Text) MemberEntryNo: Integer
+    procedure GetMemberFromExtCardNo(ExternalCardNo: Text[100]; ReferenceDate: Date; var NotFoundReasonText: Text) MemberEntryNo: Integer
     var
         MemberCard: Record "NPR MM Member Card";
         Member: Record "NPR MM Member";
@@ -5056,7 +5056,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         exit(MemberCard."Entry No.");
     end;
 
-    procedure GetCardEntryNoFromExtCardNo(ExternalCardNo: Text[50]) CardEntryNo: Integer
+    procedure GetCardEntryNoFromExtCardNo(ExternalCardNo: Text[100]) CardEntryNo: Integer
     var
         MemberCard: Record "NPR MM Member Card";
         PrefixedCardNo: Text;

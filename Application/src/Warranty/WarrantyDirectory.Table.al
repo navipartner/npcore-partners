@@ -22,7 +22,7 @@ table 6014509 "NPR Warranty Directory"
             Caption = 'No.';
             DataClassification = CustomerContent;
         }
-        field(2; Description; Text[50])
+        field(2; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;
@@ -70,7 +70,7 @@ table 6014509 "NPR Warranty Directory"
                 end;
             end;
         }
-        field(9; Name; Text[50])
+        field(9; Name; Text[100])
         {
             Caption = 'Name';
             DataClassification = CustomerContent;
@@ -80,7 +80,7 @@ table 6014509 "NPR Warranty Directory"
             Caption = 'Name 2';
             DataClassification = CustomerContent;
         }
-        field(11; Address; Text[50])
+        field(11; Address; Text[100])
         {
             Caption = 'Address';
             DataClassification = CustomerContent;

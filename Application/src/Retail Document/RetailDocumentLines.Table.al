@@ -153,7 +153,7 @@ table 6014426 "NPR Retail Document Lines"
 
             end;
         }
-        field(6; Description; Text[50])
+        field(6; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

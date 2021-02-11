@@ -89,7 +89,7 @@ table 6060047 "NPR Reg. Item Wsht Var. Line"
             Editable = false;
             FieldClass = FlowField;
         }
-        field(180; Description; Text[50])
+        field(180; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

@@ -41,7 +41,7 @@ codeunit 6014421 "NPR Retail Item Jnl. Mgt."
         ItemJnlTemplate.Insert;
     end;
 
-    procedure GetItem(ItemNo: Code[20]; var ItemDescription: Text[50])
+    procedure GetItem(ItemNo: Code[20]; var ItemDescription: Text[100])
     var
         Item: Record Item;
         ItemReference: Record "Item Reference";

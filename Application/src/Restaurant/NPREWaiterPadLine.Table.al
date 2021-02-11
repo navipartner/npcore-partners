@@ -112,7 +112,7 @@ table 6150661 "NPR NPRE Waiter Pad Line"
             IF (Type = CONST(Item)) Item."No.";
             ValidateTableRelation = false;
         }
-        field(52; Description; Text[80])
+        field(52; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

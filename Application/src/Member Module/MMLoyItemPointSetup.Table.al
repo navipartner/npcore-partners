@@ -63,7 +63,7 @@ table 6060142 "NPR MM Loy. Item Point Setup"
             Caption = 'Variant Code';
             DataClassification = CustomerContent;
         }
-        field(15; Description; Text[80])
+        field(15; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

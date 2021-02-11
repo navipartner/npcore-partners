@@ -58,7 +58,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         exit(UpperCase(DelChr(Format(CreateGuid), '=', '{}-')));
     end;
 
-    procedure TokenRequestExists(Token: Text[50]): Boolean
+    procedure TokenRequestExists(Token: Text[100]): Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
@@ -68,7 +68,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         exit(TicketReservationRequest.FindFirst());
     end;
 
-    procedure DeleteReservationRequest(Token: Text[50]; RemoveRequest: Boolean)
+    procedure DeleteReservationRequest(Token: Text[100]; RemoveRequest: Boolean)
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
@@ -960,7 +960,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         POS_AppendToReservationRequest2(Token, SalesReceiptNo, SalesLineNo, ItemNo, VariantCode, AdmissionCode, Quantity, ExternalAdmissionScheduleEntryNo, ExternalMemberNo, '', '', '');
     end;
 
-    procedure POS_AppendToReservationRequest2(Token: Text[100]; SalesReceiptNo: Code[20]; SalesLineNo: Integer; ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; Quantity: Integer; ExternalAdmissionScheduleEntryNo: Integer; ExternalMemberNo: Code[20]; ExternalOrderNo: Code[20]; CustomerNo: Code[20]; NotificationAddress: Text[80])
+    procedure POS_AppendToReservationRequest2(Token: Text[100]; SalesReceiptNo: Code[20]; SalesLineNo: Integer; ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; Quantity: Integer; ExternalAdmissionScheduleEntryNo: Integer; ExternalMemberNo: Code[20]; ExternalOrderNo: Code[20]; CustomerNo: Code[20]; NotificationAddress: Text[100])
     var
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Admission: Record "NPR TM Admission";

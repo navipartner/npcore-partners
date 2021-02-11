@@ -262,7 +262,7 @@ codeunit 6014573 "NPR Report: Location Print"
 
     procedure PrintLineVariantDesc()
     var
-        VariantDesc: Text[50];
+        VariantDesc: Text[100];
         Text10600008: Label 'NO COLOR CODE';
         Text10600009: Label 'Color:';
         Text10600010: Label 'Size:';

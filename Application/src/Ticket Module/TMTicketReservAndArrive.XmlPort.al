@@ -175,7 +175,7 @@ xmlport 6060118 "NPR TM Ticket Reserv.AndArrive"
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         BLANK_DOC_ID: Label 'Document ID may not be blank.';
 
-    procedure GetToken(): Text[50]
+    procedure GetToken(): Text[100]
     begin
         exit('');
     end;

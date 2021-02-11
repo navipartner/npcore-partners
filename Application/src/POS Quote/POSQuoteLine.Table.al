@@ -51,7 +51,7 @@ table 6151003 "NPR POS Quote Line"
             DataClassification = CustomerContent;
             TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
         }
-        field(25; Description; Text[80])
+        field(25; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

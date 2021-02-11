@@ -703,12 +703,12 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
         SalesInvLineType: Text[30];
         TxtWoy: Text[30];
         VatNo: Text[30];
-        Banknavn: Text[50];
+        Banknavn: Text[100];
         Comment1: array[2] of Text[50];
-        Companyaddr: array[8] of Text[50];
-        DebAdr: array[8] of Text[50];
-        FirmaAdr: array[8] of Text[50];
-        LevAdresse: array[8] of Text[50];
+        CompanyAddr: array[8] of Text[100];
+        DebAdr: array[8] of Text[100];
+        FirmaAdr: array[8] of Text[100];
+        LevAdresse: array[8] of Text[100];
         TotalTekst: Text[50];
         TotaltInklMomsTekst: Text[50];
         DK_VariantVar: Variant;

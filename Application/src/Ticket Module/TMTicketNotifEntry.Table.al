@@ -112,7 +112,7 @@ table 6060110 "NPR TM Ticket Notif. Entry"
             OptionCaption = ' ,E-Mail,SMS';
             OptionMembers = NA,EMAIL,SMS;
         }
-        field(81; "Notification Address"; Text[80])
+        field(81; "Notification Address"; Text[100])
         {
             Caption = 'Notification Address';
             DataClassification = CustomerContent;
@@ -198,7 +198,7 @@ table 6060110 "NPR TM Ticket Notif. Entry"
             Caption = 'Seat';
             DataClassification = CustomerContent;
         }
-        field(160; "Ticket Holder E-Mail"; Text[80])
+        field(160; "Ticket Holder E-Mail"; Text[100])
         {
             Caption = 'Ticket Holder E-Mail';
             DataClassification = CustomerContent;
@@ -223,7 +223,7 @@ table 6060110 "NPR TM Ticket Notif. Entry"
             Caption = 'Adm. Location Description';
             DataClassification = CustomerContent;
         }
-        field(173; "Ticket BOM Description"; Text[80])
+        field(173; "Ticket BOM Description"; Text[100])
         {
             Caption = 'Ticket BOM Description';
             DataClassification = CustomerContent;

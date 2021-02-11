@@ -25,7 +25,7 @@ xmlport 6151198 "NPR NpCs Store Inv."
                         MinOccurs = Zero;
                         XmlName = 'product';
                         UseTemporary = true;
-                        fieldattribute(sku; TempItem.Description)
+                        fieldattribute(sku; TempItem."Description 2")
                         {
                         }
 
@@ -138,10 +138,10 @@ xmlport 6151198 "NPR NpCs Store Inv."
     begin
         TempItem.FindSet;
         repeat
-            if not NpCsStoreInventoryBuffer.Get(TempNpCsStore.Code, TempItem.Description) then begin
+            if not NpCsStoreInventoryBuffer.Get(TempNpCsStore.Code, TempItem."Description 2") then begin
                 NpCsStoreInventoryBuffer.Init;
                 NpCsStoreInventoryBuffer."Store Code" := TempNpCsStore.Code;
-                NpCsStoreInventoryBuffer.Sku := TempItem.Description;
+                NpCsStoreInventoryBuffer.Sku := tempitem."Description 2";
                 NpCsStoreInventoryBuffer.Insert;
             end;
         until TempItem.Next = 0;

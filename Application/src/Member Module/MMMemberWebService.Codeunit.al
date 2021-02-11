@@ -1126,7 +1126,7 @@ codeunit 6060128 "NPR MM Member WebService"
         exit(IsValid);
     end;
 
-    local procedure ValidateMemberAndRegisterArrival(ExternalMemberNo: Code[20]; ExternalMemberCardNo: Text[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ResponseMessage: Text) ResponseCode: Integer
+    local procedure ValidateMemberAndRegisterArrival(ExternalMemberNo: Code[20]; ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ResponseMessage: Text) ResponseCode: Integer
     var
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
