@@ -77,7 +77,7 @@ table 6151103 "NPR NpRi Reimbursement Entry"
             Caption = 'Source Entry No.';
             DataClassification = CustomerContent;
         }
-        field(140; Description; Text[50])
+        field(140; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

@@ -58,7 +58,7 @@ table 6151021 "NPR NpRv Voucher Buffer"
             Description = 'NPR5.49';
             TableRelation = "NPR NpRv Voucher Module".Code WHERE(Type = CONST("Validate Voucher"));
         }
-        field(210; Name; Text[50])
+        field(210; Name; Text[100])
         {
             Caption = 'Name';
             DataClassification = CustomerContent;
@@ -70,7 +70,7 @@ table 6151021 "NPR NpRv Voucher Buffer"
             Caption = 'Name 2';
             DataClassification = CustomerContent;
         }
-        field(220; Address; Text[50])
+        field(220; Address; Text[100])
         {
             Caption = 'Address';
             DataClassification = CustomerContent;

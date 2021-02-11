@@ -91,7 +91,7 @@ xmlport 6060115 "NPR TM Ticket PreConfirm"
         QtySum: Integer;
         n: Integer;
 
-    procedure GetToken(): Text[50]
+    procedure GetToken(): Text[100]
     begin
         exit(ReservationID);
     end;

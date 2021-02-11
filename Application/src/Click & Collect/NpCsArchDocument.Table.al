@@ -333,7 +333,7 @@ table 6151202 "NPR NpCs Arch. Document"
             Description = 'NPR5.51';
             TableRelation = "Salesperson/Purchaser";
         }
-        field(2000; "Sell-to Customer Name"; Text[50])
+        field(2000; "Sell-to Customer Name"; Text[100])
         {
             Caption = 'Sell-to Customer Name';
             DataClassification = CustomerContent;

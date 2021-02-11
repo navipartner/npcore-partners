@@ -161,7 +161,7 @@ codeunit 6060146 "NPR MM POS Action: Member Loy."
     begin
     end;
 
-    local procedure ViewPoints(POSSession: Codeunit "NPR POS Session"; MemberCardNumber: Text[50])
+    local procedure ViewPoints(POSSession: Codeunit "NPR POS Session"; MemberCardNumber: Text[100])
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MembershipEntryNo: Integer;
@@ -309,7 +309,7 @@ codeunit 6060146 "NPR MM POS Action: Member Loy."
         //
     end;
 
-    local procedure SetCustomer(POSSession: Codeunit "NPR POS Session"; MemberCardNumber: Text[50])
+    local procedure SetCustomer(POSSession: Codeunit "NPR POS Session"; MemberCardNumber: Text[100])
     var
         POSActionMemberMgt: Codeunit "NPR MM POS Action: MemberMgmt.";
         POSSale: Codeunit "NPR POS Sale";

@@ -767,7 +767,7 @@ page 6014402 "NPR Retail Item Journal"
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
         CalcWhseAdjmt: Report "Calculate Whse. Adjustment";
         CurrentJnlBatchName: Code[10];
-        ItemDescription: Text[50];
+        ItemDescription: Text[100];
         ShortcutDimCode: array[8] of Code[20];
         Text001: Label 'Item Journal lines have been successfully inserted from Standard Item Journal %1.';
         Text002: Label 'Standard Item Journal %1 has been successfully created.';

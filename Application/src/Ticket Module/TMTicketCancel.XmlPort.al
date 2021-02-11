@@ -72,7 +72,7 @@ xmlport 6060116 "NPR TM Ticket Cancel"
         QtySum: Integer;
         n: Integer;
 
-    procedure GetToken(): Text[50]
+    procedure GetToken(): Text[100]
     begin
         exit(ReservationID);
     end;

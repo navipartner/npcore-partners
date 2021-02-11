@@ -175,7 +175,7 @@ table 6014492 "NPR Archive NpRv SL POS Vouch."
                 UpdateContactInfo();
             end;
         }
-        field(210; Name; Text[50])
+        field(210; Name; Text[100])
         {
             Caption = 'Name';
             TableRelation = Customer;
@@ -187,7 +187,7 @@ table 6014492 "NPR Archive NpRv SL POS Vouch."
             Caption = 'Name 2';
             DataClassification = CustomerContent;
         }
-        field(220; Address; Text[50])
+        field(220; Address; Text[100])
         {
             Caption = 'Address';
             DataClassification = CustomerContent;

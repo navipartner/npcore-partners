@@ -546,7 +546,7 @@ report 6014410 "NPR Sales Ticket A4"
         TotalDiscountPct: Text;
         UnitPriceExclDiscountLine: Text;
         VariantCode: Text;
-        VariantDesc: Text[50];
+        VariantDesc: Text[100];
 
     procedure PrintCustomerInfo()
     begin

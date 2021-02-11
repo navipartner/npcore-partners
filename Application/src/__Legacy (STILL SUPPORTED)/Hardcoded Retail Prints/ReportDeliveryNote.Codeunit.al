@@ -58,9 +58,9 @@ codeunit 6014566 "NPR Report - Delivery Note"
         CompanyInformation: Record "Company Information";
         Register: Record "NPR Register";
         SalesShptPrinted: Codeunit "Sales Shpt.-Printed";
-        BillToCustomerAddress: array[8] of Text[50];
-        ShipToCustomerAddress: array[8] of Text[50];
-        CompanyAddress: array[8] of Text[50];
+        BillToCustomerAddress: array[8] of Text[100];
+        ShipToCustomerAddress: array[8] of Text[100];
+        CompanyAddress: array[8] of Text[100];
         SalespersonText2: Text[20];
         ReferenceText2: Text[30];
         MoreLines: Boolean;
@@ -76,9 +76,9 @@ codeunit 6014566 "NPR Report - Delivery Note"
         CompanyInfo: Record "Company Information";
         SalesPurchPerson: Record "Salesperson/Purchaser";
         RespCenter: Record "Responsibility Center";
-        CustAddr: array[8] of Text[50];
-        ShipToAddr: array[8] of Text[50];
-        CompanyAddr: array[8] of Text[50];
+        CustAddr: array[8] of Text[100];
+        ShipToAddr: array[8] of Text[100];
+        CompanyAddr: array[8] of Text[100];
         SalesPersonText: Text[20];
         ReferenceText: Text[30];
         ShowCustAddr: Boolean;

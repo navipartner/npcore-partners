@@ -211,7 +211,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
             Editable = false;
             FieldClass = FlowField;
         }
-        field(180; Description; Text[50])
+        field(180; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

@@ -906,9 +906,9 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
         Giro_No: Text;
         IK_Card_Type: Text;
         Payment_ID: Text;
-        CompanyAddr: array[8] of Text[50];
-        CustAddr: array[8] of Text[50];
-        Description: Text[50];
+        CompanyAddr: array[8] of Text[100];
+        CustAddr: array[8] of Text[100];
+        Description: Text[100];
 
     local procedure GetDate(PostingDate: Date; DueDate: Date): Date
     begin

@@ -320,8 +320,8 @@ report 6014505 "NPR Delivery Note"
         StarDisplay: Text;
         TelephoneCompText: Text;
         TelephoneText: Text;
-        CompanyAddr: array[8] of Text[50];
-        CustAddress: array[8] of Text[50];
+        CompanyAddr: array[8] of Text[100];
+        CustAddress: array[8] of Text[100];
         LetterText: array[5] of Text[50];
         GlobalDimension1Desc: Text[80];
         AddressLine: Text[100];

@@ -69,10 +69,10 @@ table 6151126 "NPR NpIa Item AddOn Line"
                     ItemVariant.Get("Item No.", "Variant Code")
                 else
                     Clear(ItemVariant);
-                "Description 2" := ItemVariant.Description;
+                "Description 2" := CopyStr(ItemVariant.Description, 1, MaxStrLen("Description 2"));
             end;
         }
-        field(25; Description; Text[50])
+        field(25; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

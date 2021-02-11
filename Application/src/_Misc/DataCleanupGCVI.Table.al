@@ -59,7 +59,7 @@ table 6060101 "NPR Data Cleanup GCVI"
                 IsApproved := "Approve Delete";
             end;
         }
-        field(8; Description; Text[50])
+        field(8; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

@@ -89,7 +89,7 @@ xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
 
                             if (TempSaleLinePOSReq."Description 2" = '') and (TempSaleLinePOSReq."Variant Code" <> '') then begin
                                 ItemVariant.Get(TempSaleLinePOSReq."No.", TempSaleLinePOSReq."Variant Code");
-                                TempSaleLinePOSReq."Description 2" := ItemVariant.Description;
+                                TempSaleLinePOSReq."Description 2" := CopyStr(ItemVariant.Description, 1, MaxStrLen(TempSaleLinePOSReq."Description 2"));
                             end;
                         end;
                     }

@@ -59,9 +59,9 @@ table 6151161 "NPR MM Loyalty Store Setup"
             DataClassification = CustomerContent;
             TableRelation = Customer;
         }
-        field(31; "Customer Name"; Text[50])
+        field(31; "Customer Name"; Text[100])
         {
-            CalcFormula = Lookup (Customer.Name WHERE("No." = FIELD("Customer No.")));
+            CalcFormula = Lookup(Customer.Name WHERE("No." = FIELD("Customer No.")));
             Caption = 'Customer Name';
             Editable = false;
             FieldClass = FlowField;
@@ -117,7 +117,7 @@ table 6151161 "NPR MM Loyalty Store Setup"
         }
         field(1100; "Outstanding Earn Points"; Integer)
         {
-            CalcFormula = Sum ("NPR MM Loy. LedgerEntry (Srvr)"."Earned Points" WHERE("Company Name" = FIELD("Client Company Name"),
+            CalcFormula = Sum("NPR MM Loy. LedgerEntry (Srvr)"."Earned Points" WHERE("Company Name" = FIELD("Client Company Name"),
                                                                                       "POS Store Code" = FIELD("Store Code"),
                                                                                       "POS Unit Code" = FIELD("Unit Code"),
                                                                                       "Entry Type" = FILTER(RECEIPT | RECONCILE),
@@ -128,7 +128,7 @@ table 6151161 "NPR MM Loyalty Store Setup"
         }
         field(1110; "Outstanding Burn Points"; Integer)
         {
-            CalcFormula = Sum ("NPR MM Loy. LedgerEntry (Srvr)"."Burned Points" WHERE("Company Name" = FIELD("Client Company Name"),
+            CalcFormula = Sum("NPR MM Loy. LedgerEntry (Srvr)"."Burned Points" WHERE("Company Name" = FIELD("Client Company Name"),
                                                                                       "POS Store Code" = FIELD("Store Code"),
                                                                                       "POS Unit Code" = FIELD("Unit Code"),
                                                                                       "Entry Type" = FILTER(RECEIPT | RECONCILE),

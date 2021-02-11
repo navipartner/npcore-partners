@@ -12,7 +12,7 @@ table 6014586 "NPR Sales Stats Time Period"
             Caption = 'No.';
             DataClassification = CustomerContent;
         }
-        field(2; Description; Text[50])
+        field(2; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

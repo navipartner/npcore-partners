@@ -77,7 +77,7 @@ table 6151602 "NPR NpDc Iss.OnSale Setup Line"
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
         }
-        field(100; Description; Text[50])
+        field(100; Description; Text[100])
         {
             Caption = 'Item Description';
             DataClassification = CustomerContent;

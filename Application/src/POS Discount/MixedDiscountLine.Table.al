@@ -67,9 +67,7 @@ table 6014412 "NPR Mixed Discount Line"
                             //+NPR5.40 [294655]
                             //-NPR5.31 [262904]
                             if ("Variant Code" <> '') and ItemVariant.Get("No.", "Variant Code") then
-                                "Description 2" := ItemVariant.Description;
-                            //+NPR5.31 [262904]
-                            //-NPR5.39 [299276]
+                                "Description 2" := CopyStr(ItemVariant.Description, 1, MaxStrLen("Description 2"));
                             "Vendor No." := Item."Vendor No.";
                             "Vendor Item No." := Item."Vendor Item No.";
                             //-NPR5.39 [299276]
@@ -94,7 +92,7 @@ table 6014412 "NPR Mixed Discount Line"
                 end;
             end;
         }
-        field(3; Description; Text[50])
+        field(3; Description; Text[100])
         {
             Caption = 'Description';
             Description = 'NPR5.31';

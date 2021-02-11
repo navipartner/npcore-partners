@@ -173,7 +173,7 @@ table 6150629 "NPR POS Tax Amount Line"
             Caption = 'Print Order';
             DataClassification = CustomerContent;
         }
-        field(10030; "Print Description"; Text[50])
+        field(10030; "Print Description"; Text[100])
         {
             Caption = 'Print Description';
             DataClassification = CustomerContent;

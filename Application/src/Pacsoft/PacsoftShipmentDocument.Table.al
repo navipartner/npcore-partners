@@ -86,12 +86,12 @@ table 6014452 "NPR Pacsoft Shipment Document"
             Caption = 'Receiver ID';
             DataClassification = CustomerContent;
         }
-        field(301; Name; Text[50])
+        field(301; Name; Text[100])
         {
             Caption = 'Name';
             DataClassification = CustomerContent;
         }
-        field(302; Address; Text[50])
+        field(302; Address; Text[100])
         {
             Caption = 'Address';
             DataClassification = CustomerContent;
@@ -122,7 +122,7 @@ table 6014452 "NPR Pacsoft Shipment Document"
             TableRelation = "Country/Region";
             DataClassification = CustomerContent;
         }
-        field(308; Contact; Text[50])
+        field(308; Contact; Text[100])
         {
             Caption = 'Contact';
             DataClassification = CustomerContent;
@@ -298,12 +298,12 @@ table 6014452 "NPR Pacsoft Shipment Document"
             Caption = 'Delivery Location';
             DataClassification = CustomerContent;
         }
-        field(701; "Ship-to Name"; Text[50])
+        field(701; "Ship-to Name"; Text[100])
         {
             Caption = 'Ship-to Name';
             DataClassification = CustomerContent;
         }
-        field(702; "Ship-to Address"; Text[50])
+        field(702; "Ship-to Address"; Text[100])
         {
             Caption = 'Ship-to Address';
             DataClassification = CustomerContent;
