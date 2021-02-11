@@ -39,8 +39,6 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
         DebugPostingMsg: Boolean;
         ProgressVis: Boolean;
         GlobalPostingNo: Code[10];
-        Text000: Label 'Gift Voucher %1';
-        Text001: Label 'Credit Voucher %1';
         GenJournalLine: Record "Gen. Journal Line";
         ItemJournalLine: Record "Item Journal Line";
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -267,17 +265,11 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
         case AccType of
             AccountType::"G/L":
                 begin
-                    if TempPost."Gift voucher ref." <> '' then
-                        FinKldLinie.Description := CopyStr(StrSubstNo(Text000, TempPost."Gift voucher ref.", CashRegisterNo), 1, MaxStrLen(FinKldLinie.Description))
-                    else
-                        if TempPost."Credit voucher ref." <> '' then
-                            FinKldLinie.Description := CopyStr(StrSubstNo(Text001, TempPost."Credit voucher ref.", CashRegisterNo), 1, MaxStrLen(FinKldLinie.Description))
-                        else
-                            if RevisionUdbetaling."Sale Type" = RevisionUdbetaling."Sale Type"::"Out payment" then begin
-                                FinKldLinie.Description := CopyStr(RevisionUdbetaling.Description, 1, 50);
-                                Clear(RevisionUdbetaling);
-                            end else
-                                FinKldLinie.Description := StrSubstNo(Bogf1, PostingDate, CashRegisterNo);
+                    if RevisionUdbetaling."Sale Type" = RevisionUdbetaling."Sale Type"::"Out payment" then begin
+                        FinKldLinie.Description := CopyStr(RevisionUdbetaling.Description, 1, 50);
+                        Clear(RevisionUdbetaling);
+                    end else
+                        FinKldLinie.Description := StrSubstNo(Bogf1, PostingDate, CashRegisterNo);
                 end;
             AccountType::Customer:
                 FinKldLinie.Description := StrSubstNo(Bogf2, PostingDate, CashRegisterNo);
@@ -896,7 +888,6 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
         ln6: Label ' Item Posting             @3@@@@@@@@@@@@@@@@@@ \';
         ln7: Label ' G/L Item Posting         @4@@@@@@@@@@@@@@@@@@ \';
         ln8: Label ' Net Change               @5@@@@@@@@@@@@@@@@@@ \';
-        ln9: Label ' Gift/Credit Voucher      @9@@@@@@@@@@@@@@@@@@ \';
         ln10: Label ' G/L / Payout             @7@@@@@@@@@@@@@@@@@@ \\';
         ln11: Label ' Posting G/L Entries      @10@@@@@@@@@@@@@@@@@ \';
         ln12: Label ' Posting Item Entries     @11@@@@@@@@@@@@@@@@@ \\';
@@ -905,7 +896,7 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
 
         WindowIsOpen := true;
 
-        Window.Open(ln100 + ln101 + ln102 + ln1 + ln2 + ln3 + ln4 + ln5 + ln7 + ln8 + ln9 + ln10 + ln11 + ln6 + ln12 + ln103);
+        Window.Open(ln100 + ln101 + ln102 + ln1 + ln2 + ln3 + ln4 + ln5 + ln7 + ln8 + ln10 + ln11 + ln6 + ln12 + ln103);
     end;
 
     procedure ClearStatusWindow()

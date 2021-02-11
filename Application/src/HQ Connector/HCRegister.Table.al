@@ -30,17 +30,6 @@ table 6150902 "NPR HC Register"
             DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = "G/L Account"."No.";
-
-            trigger OnValidate()
-            begin
-                if Account <> '' then begin
-                    if Account = "Gift Voucher Account" then
-                        Error(ErrGavekort);
-
-                    if Account = "Credit Voucher Account" then
-                        Error(ErrTilgode);
-                end;
-            end;
         }
         field(12; "Gift Voucher Account"; Code[20])
         {
@@ -48,35 +37,18 @@ table 6150902 "NPR HC Register"
             DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = "G/L Account"."No.";
-
-            trigger OnValidate()
-            begin
-                if "Gift Voucher Account" <> '' then begin
-                    if "Gift Voucher Account" = Account then
-                        Error(ErrKasse);
-                    if "Gift Voucher Account" = "Credit Voucher Account" then
-                        Error(ErrTilgode);
-                    if "Gift Voucher Account" = "Gift Voucher Discount Account" then
-                        Error(Text1060006, "Gift Voucher Account", FieldCaption("Gift Voucher Discount Account"));
-                end;
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(13; "Credit Voucher Account"; Code[20])
         {
             Caption = 'Credit Voucher Account';
             DataClassification = CustomerContent;
             TableRelation = "G/L Account";
-
-            trigger OnValidate()
-            begin
-                if "Credit Voucher Account" <> '' then begin
-                    if "Credit Voucher Account" = Account then
-                        Error(ErrKasse);
-
-                    if "Credit Voucher Account" = "Gift Voucher Account" then
-                        Error(ErrGavekort);
-                end;
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Credit voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Credit Voucher';
         }
         field(14; "Difference Account"; Code[20])
         {
@@ -104,13 +76,9 @@ table 6150902 "NPR HC Register"
             DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = "G/L Account"."No.";
-
-            trigger OnValidate()
-            begin
-                if "Gift Voucher Discount Account" <> '' then
-                    if "Gift Voucher Discount Account" = "Gift Voucher Account" then
-                        Error(Text1060006, "Gift Voucher Discount Account", FieldCaption("Gift Voucher Account"));
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(25; Rounding; Code[20])
         {
@@ -214,10 +182,6 @@ table 6150902 "NPR HC Register"
     var
         Text1060003: Label 'Register %1 cannot be renamed!';
         DimMgt: Codeunit DimensionManagement;
-        Text1060006: Label 'Acount No. %1 is used for  %2.';
-        ErrGavekort: Label 'Acount No. %1 is used for Gift Vouchers.';
-        ErrTilgode: Label 'Acount No. %1 is used for Credit Vouchers!';
-        ErrKasse: Label 'Acount No. %1 is used for Register Acount!';
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin

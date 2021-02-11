@@ -56,9 +56,6 @@ codeunit 6184515 "NPR EFT Flexiiterm Integ."
 
         GetCVM(EFTSetup);
         GetTransactionType(EFTSetup);
-        //-NPR5.54 [387965]
-        GetGiftVoucherCustomerID(EFTSetup);
-        //+NPR5.54 [387965]
 
         EFTSetup.ShowEftPaymentParameters();
     end;
@@ -179,15 +176,6 @@ codeunit 6184515 "NPR EFT Flexiiterm Integ."
         EFTTypePaymentGenParam: Record "NPR EFT Type Pay. Gen. Param.";
     begin
         exit(EFTTypePaymentGenParam.GetOptionParameterValue(IntegrationType(), EFTSetup."Payment Type POS", 'Transaction Type', 0, 'Not Forced,Forced Online,Forced Offline', true));
-    end;
-
-    procedure GetGiftVoucherCustomerID(EFTSetup: Record "NPR EFT Setup"): Text
-    var
-        EFTTypePaymentGenParam: Record "NPR EFT Type Pay. Gen. Param.";
-    begin
-        //-NPR5.54 [387965]
-        exit(EFTTypePaymentGenParam.GetTextParameterValue(IntegrationType(), EFTSetup."Payment Type POS", 'Gift Voucher Customer ID', '', true));
-        //+NPR5.54 [387965]
     end;
 }
 

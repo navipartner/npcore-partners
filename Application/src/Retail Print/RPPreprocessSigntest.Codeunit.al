@@ -23,19 +23,6 @@ codeunit 6014533 "NPR RP Preprocess: Sign. test"
         if AuditRollCustomerPayments.FindFirst then
             exit;
 
-        //GL payment check
-        AuditRollFinance.SetRange("Gift voucher ref.", '');
-        AuditRollFinance.SetRange("Credit voucher ref.", '');
-        if not AuditRollFinance.IsEmpty then
-            exit;
-
-        //Gift/credit voucher sale check
-        AuditRollFinance.SetRange("Gift voucher ref.");
-        AuditRollFinance.SetRange("Credit voucher ref.");
-        if not AuditRollFinance.IsEmpty then
-            if RetailSetup."Copy Sales Ticket on Giftvo." then
-                exit;
-
         // Out payment check
         AuditRollSale.SetRange("Sale Type", AuditRollSale."Sale Type"::"Out payment");
         if AuditRollSale.FindSet then

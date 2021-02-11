@@ -433,12 +433,6 @@ codeunit 6014611 "NPR Tax Free PTF PI"
                                   PaymentTypePOS."Processing Type"::"Terminal Card":
                                         PaymentMethod := '4';
 
-                                    PaymentTypePOS."Processing Type"::"Credit Voucher",
-                                  PaymentTypePOS."Processing Type"::"Gift Voucher",
-                                  PaymentTypePOS."Processing Type"::"Foreign Gift Voucher",
-                                  PaymentTypePOS."Processing Type"::"Foreign Credit Voucher":
-                                        PaymentMethod := '6';
-
                                     PaymentTypePOS."Processing Type"::"Manual Card":
                                         PaymentMethod := '11';
                                     else

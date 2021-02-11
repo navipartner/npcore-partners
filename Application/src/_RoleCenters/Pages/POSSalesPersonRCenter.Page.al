@@ -306,7 +306,6 @@ page 6014557 "NPR POS: SalesPerson R.Center"
             {
                 Caption = 'POS';
                 Image = Ledger;
-
                 action("Exchange Labels")
                 {
                     Caption = 'Exchange Labels';

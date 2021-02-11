@@ -463,7 +463,7 @@ codeunit 6150640 "NPR POS Info Management"
         //Register No.,Sales Ticket No.,Date,Sale Type,Line No.
         SaleLinePOS.Reset;
         SaleLinePOS.SetRange("Register No.", POSInfoTransaction."Register No.");
-        SaleLinePOS.SetFilter("Sale Type", '%1|%2|%3', SaleLinePOS."Sale Type"::Sale, SaleLinePOS."Sale Type"::"Debit Sale", SaleLinePOS."Sale Type"::"Gift Voucher");
+        SaleLinePOS.SetFilter("Sale Type", '%1|%2', SaleLinePOS."Sale Type"::Sale, SaleLinePOS."Sale Type"::"Debit Sale");
         SaleLinePOS.SetRange("Sales Ticket No.", POSInfoTransaction."Sales Ticket No.");
         SaleLinePOS.SetRange(Date, POSInfoTransaction."Sale Date");
         if POSInfoTransaction."Sales Line No." <> 0 then

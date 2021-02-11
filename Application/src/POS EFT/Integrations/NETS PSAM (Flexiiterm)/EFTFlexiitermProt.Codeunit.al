@@ -146,15 +146,8 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
             State.MatchSalesAmount := PaymentTypePOS."Match Sales Amount";
 
             EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."POS Payment Type Code");
-            Clear(GlobalGiftCardCustomerID);
-            if (PaymentTypePOS."Processing Type" = PaymentTypePOS."Processing Type"::"Gift Voucher") and (EFTFlexiitermIntegration.GetGiftVoucherCustomerID(EFTSetup) <> '') then begin
-                State.CardPanValidGiftVoucher := true;
-                GlobalGiftCardCustomerID := EFTFlexiitermIntegration.GetGiftVoucherCustomerID(EFTSetup);
-            end;
-
             EFTTransactionRequest."POS Payment Type Code" := PaymentTypePOS."No.";
             EFTTransactionRequest."Card Name" := CopyStr(PaymentTypePOS.Description, 1, MaxStrLen(EFTTransactionRequest."Card Name"));
-            ;
 
             EFTTransactionRequest.Modify();
         end;

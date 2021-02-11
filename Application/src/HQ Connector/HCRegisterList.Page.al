@@ -32,16 +32,6 @@ page 6150903 "NPR HC Register List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Account field';
                 }
-                field("Gift Voucher Account"; "Gift Voucher Account")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Gift Voucher Account field';
-                }
-                field("Credit Voucher Account"; "Credit Voucher Account")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Credit Voucher Account field';
-                }
                 field("Difference Account"; "Difference Account")
                 {
                     ApplicationArea = All;
@@ -61,11 +51,6 @@ page 6150903 "NPR HC Register List"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Difference Account - Neg. field';
-                }
-                field("Gift Voucher Discount Account"; "Gift Voucher Discount Account")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Gift Voucher Discount Account field';
                 }
                 field(Rounding; Rounding)
                 {

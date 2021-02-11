@@ -51,32 +51,6 @@ page 6014406 "NPR Register Card"
             group(Posting)
             {
                 Caption = 'Posting';
-                group(Control6150705)
-                {
-                    ShowCaption = false;
-                    field(Account; Rec.Account)
-                    {
-                        Style = Strong;
-                        StyleExpr = TRUE;
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Account field';
-                    }
-                    field("Gift Voucher Account"; Rec."Gift Voucher Account")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Gift Voucher Account field';
-                    }
-                    field("Gift Voucher Discount Account"; Rec."Gift Voucher Discount Account")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Gift Voucher Discount Account field';
-                    }
-                    field("Credit Voucher Account"; Rec."Credit Voucher Account")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Credit Voucher Account field';
-                    }
-                }
                 group(Control6150716)
                 {
                     ShowCaption = false;

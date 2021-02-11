@@ -109,7 +109,6 @@ codeunit 6151021 "NPR NpRv Ext. Voucher WS"
     local procedure CreateVoucher(var NpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer" temporary)
     var
         NpRvVoucher: Record "NPR NpRv Voucher";
-        NpRvVoucherEntry: Record "NPR NpRv Voucher Entry";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";

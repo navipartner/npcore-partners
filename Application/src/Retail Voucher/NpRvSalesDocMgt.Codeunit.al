@@ -421,7 +421,7 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
             until NpRvVoucherType.Next = 0;
     end;
 
-    local procedure SendVoucher(NpRvVoucher: Record "NPR NpRv Voucher")
+    procedure SendVoucher(NpRvVoucher: Record "NPR NpRv Voucher")
     var
         LastErrorText: Text;
     begin

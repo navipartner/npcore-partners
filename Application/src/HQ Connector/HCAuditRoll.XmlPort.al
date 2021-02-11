@@ -148,16 +148,6 @@ xmlport 6150900 "NPR HC Audit Roll"
                         MaxOccurs = Once;
                         MinOccurs = Zero;
                     }
-                    fieldelement(giftvoucherref; TempBCAuditRoll."Gift voucher ref.")
-                    {
-                        MaxOccurs = Once;
-                        MinOccurs = Zero;
-                    }
-                    fieldelement(creditvoucherref; TempBCAuditRoll."Credit voucher ref.")
-                    {
-                        MaxOccurs = Once;
-                        MinOccurs = Zero;
-                    }
                     fieldelement(shortcutdimension1; TempBCAuditRoll."Shortcut Dimension 1 Code")
                     {
                         MaxOccurs = Once;

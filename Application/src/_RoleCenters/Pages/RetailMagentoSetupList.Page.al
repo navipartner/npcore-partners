@@ -207,76 +207,11 @@ page 6151242 "NPR Retail Magento Setup List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item Disc. Group Enabled field';
                 }
-                field("Gift Voucher Enabled"; Rec."Gift Voucher Enabled")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Gift Voucher Enabled field';
-                }
-                field("Gift Voucher Item No."; Rec."Gift Voucher Item No.")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Gift Voucher Item No. field';
-                }
-                field("Gift Voucher Account No."; Rec."Gift Voucher Account No.")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Gift Voucher Account No. field';
-                }
-                field("Gift Voucher Report"; Rec."Gift Voucher Report")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Gift Voucher Report field';
-                }
-                field("Gift Voucher Code Pattern"; Rec."Gift Voucher Code Pattern")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Gift Voucher Code Pattern field';
-                }
-                field("Gift Voucher Language Code"; Rec."Gift Voucher Language Code")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Gift Voucher Language Code field';
-                }
-                field("Gift Voucher Valid Period"; Rec."Gift Voucher Valid Period")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Gift Voucher Validity field';
-                }
-                field("Credit Voucher Language Code"; Rec."Credit Voucher Language Code")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Credit Voucher Language Code field';
-                }
-                field("Credit Voucher Report"; Rec."Credit Voucher Report")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Credit Voucher Report field';
-                }
-                field("Credit Voucher Valid Period"; Rec."Credit Voucher Valid Period")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Credit Voucher Valid Period field';
-                }
-                field("Credit Voucher Account No."; Rec."Credit Voucher Account No.")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Credit Voucher Account No. field';
-                }
-                field("Credit Voucher Code Pattern"; Rec."Credit Voucher Code Pattern")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Credit Voucher Code Pattern field';
-                }
 
                 field("Exchange Web Code Pattern"; Rec."Exchange Web Code Pattern")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Exchange Web Code Pattern field';
-                }
-                field("Gift Voucher Activation"; Rec."Gift Voucher Activation")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Activate Gift Voucher field';
                 }
                 field("Customer Mapping"; Rec."Customer Mapping")
                 {

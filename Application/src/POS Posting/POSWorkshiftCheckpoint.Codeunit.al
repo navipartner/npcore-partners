@@ -1535,8 +1535,6 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         t011: Label 'Manual cards';
         t012: Label 'Other credit cards';
         t013: Label 'Cash terminal';
-        t014: Label 'Received/issued gift vouchers';
-        t015: Label 'Received/issued credit vouchers';
         t016: Label 'Number of sales, staff sale etc.';
         t017: Label 'Net turnover';
         t018: Label 'Net cost';
@@ -1631,11 +1629,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         AuditRoll.SetRange("No.");
         if AuditRoll.FindSet() then
             repeat
-                if AuditRoll."Gift voucher ref." = '' then
-                    POSWorkshiftCheckpoint."Credit Item Sales (LCY)" += AuditRoll."Amount Including VAT"
-                else begin
-                    POSWorkshiftCheckpoint."Redeemed Vouchers (LCY)" -= AuditRoll."Amount Including VAT";
-                end;
+                POSWorkshiftCheckpoint."Credit Item Sales (LCY)" += AuditRoll."Amount Including VAT";
             until AuditRoll.Next = 0;
 
         /* CASH INVENTORY */
@@ -1706,44 +1700,6 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
             AuditRoll.CalcSums("Amount Including VAT");
             POSWorkshiftCheckpoint."Cash Terminal (LCY)" += AuditRoll."Amount Including VAT";
         end;
-
-        /* RECEIVED CREDIT VOUCHERS */
-        Window.Update(1, t015);
-
-        "Payment Type POS".SetRange("Processing Type", "Payment Type POS"."Processing Type"::"Credit Voucher");
-        if "Payment Type POS".FindSet then begin
-            AuditRoll.SetRange(Type, AuditRoll.Type::Payment);
-            AuditRoll.SetRange("No.", "Payment Type POS"."No.");
-            AuditRoll.CalcSums("Amount Including VAT");
-            POSWorkshiftCheckpoint."Redeemed Credit Voucher (LCY)" := AuditRoll."Amount Including VAT";
-
-            /* BUT NOT OUT-HANDED CREDIT VOUCHERS */
-            AuditRoll.SetRange(Type, AuditRoll.Type::"G/L");
-            AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Deposit);
-            AuditRoll.SetRange("No.", CashRegister."Credit Voucher Account");
-            AuditRoll.CalcSums("Amount Including VAT");
-            POSWorkshiftCheckpoint."Created Credit Voucher (LCY)" := AuditRoll."Amount Including VAT";
-        end;
-
-        /* RECEIVED GIFT VOUCHERS */
-        Window.Update(1, t014);
-
-        "Payment Type POS".SetRange("Processing Type", "Payment Type POS"."Processing Type"::"Gift Voucher");
-        if "Payment Type POS".FindSet then
-            repeat
-                GvFilter += '|' + "Payment Type POS"."No.";
-                GvActFilter += '|' + "Payment Type POS"."G/L Account No.";
-            until "Payment Type POS".Next = 0;
-
-        GvFilter := CopyStr(GvFilter, 2);
-        GvActFilter := CopyStr(GvActFilter, 2);
-
-        /* CREATED GIFT VOUCHERS */
-        AuditRoll.SetRange(Type, AuditRoll.Type::"G/L");
-        AuditRoll.SetFilter("Sale Type", '%1|%2', AuditRoll."Sale Type"::Deposit, AuditRoll."Sale Type"::"Debit Sale");
-        AuditRoll.SetFilter("No.", GvActFilter);
-        AuditRoll.CalcSums("Amount Including VAT");
-        POSWorkshiftCheckpoint."Issued Vouchers (LCY)" -= AuditRoll."Amount Including VAT";
 
         Window.Update(1, t016);
         LastReceiptNo := '';
@@ -2049,14 +2005,10 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         Kasseperiode.Insert(true);
 
         Kasseperiode."Net. Cash Change" := POSWorkshiftCheckpoint."Local Currency (LCY)"; //"Cash Movements";
-        Kasseperiode."Net. Credit Voucher Change" := POSWorkshiftCheckpoint."Redeemed Credit Voucher (LCY)" - POSWorkshiftCheckpoint."Created Credit Voucher (LCY)";// "Credit Vouches";
-        Kasseperiode."Net. Gift Voucher Change" := POSWorkshiftCheckpoint."Issued Vouchers (LCY)"; // "Gift Vouchers";
         Kasseperiode."Net. Terminal Change" := POSWorkshiftCheckpoint."Cash Terminal (LCY)"; // "Credit Cards";
         Kasseperiode."Net. Dankort Change" := POSWorkshiftCheckpoint."EFT (LCY)"; // Dank;
         Kasseperiode."Net. VisaCard Change" := POSWorkshiftCheckpoint."Manual Card (LCY)"; // VisaDk;
         Kasseperiode."Net. Change Other Cedit Cards" := POSWorkshiftCheckpoint."Other Credit Card (LCY)"; // "Other Credit Cards";
-        Kasseperiode."Gift Voucher Sales" := Abs(POSWorkshiftCheckpoint."Issued Vouchers (LCY)"); //Udstedtegavekort;
-        Kasseperiode."Credit Voucher issuing" := Abs(POSWorkshiftCheckpoint."Created Credit Voucher (LCY)"); //Udstedtetilgodebeviser;
         Kasseperiode."Cash Received" := POSWorkshiftCheckpoint."Debtor Payment (LCY)"; // "Customer Payments";
         Kasseperiode."Pay Out" := POSWorkshiftCheckpoint."GL Payment (LCY)"; // "Out Payments";
         Kasseperiode."Debit Sale" := POSWorkshiftCheckpoint."Credit Item Sales (LCY)"; //DebetSalg;

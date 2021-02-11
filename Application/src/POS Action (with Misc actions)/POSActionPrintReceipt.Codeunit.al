@@ -42,7 +42,6 @@ codeunit 6150787 "NPR POS Action: Print Receipt"
                 RegisterOptionParameter('Setting', 'Last Receipt,Last Receipt Large,Choose Receipt,Choose Receipt Large,Last Receipt and Balance,Last Receipt and Balance Large,Last Balance,Last Balance Large', 'Last Receipt');
                 RegisterBooleanParameter('Print Tickets', false);
                 RegisterBooleanParameter('Print Memberships', false);
-                RegisterBooleanParameter('Print Credit Voucher', false);
                 RegisterBooleanParameter('Print Terminal Receipt', false);
                 RegisterOptionParameter('ReceiptListFilter', 'None,Current POS Store,Current POS Unit,Current Salesperson', 'None');
                 RegisterTextParameter('ReceiptListView', 'SORTING(Entry No.) ORDER(Descending)');

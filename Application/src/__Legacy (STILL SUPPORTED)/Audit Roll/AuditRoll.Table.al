@@ -311,11 +311,17 @@ table 6014407 "NPR Audit Roll"
         {
             Caption = 'Gift voucher ref.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher table won''t be used anymore.';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(60; "Credit voucher ref."; Code[20])
         {
             Caption = 'Credit voucher ref.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Credit Voucher table won''t be used anymore.';
+            ObsoleteTag = 'NPR Credit Voucher';
         }
         field(61; "Salgspris inkl. moms"; Boolean)
         {
@@ -372,11 +378,17 @@ table 6014407 "NPR Audit Roll"
         {
             Caption = 'Offline - Gift voucher ref.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher table won''t be used anymore.';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(73; "Offline - Credit voucher ref."; Code[20])
         {
             Caption = 'Offline - Credit voucher ref.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Credit voucher table won''t be used anymore.';
+            ObsoleteTag = 'NPR Credit Voucher';
         }
         field(75; "Bin Code"; Code[10])
         {
@@ -1001,6 +1013,9 @@ table 6014407 "NPR Audit Roll"
             MaintainSIFTIndex = false;
             MaintainSQLIndex = false;
             SumIndexFields = "Amount Including VAT", Quantity, "Line Discount Amount", Amount, Cost;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher table won''t be used anymore.';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         key(Key15; "Register No.", "Sale Date", "Sale Type", Type, Quantity, "Receipt Type", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code")
         {

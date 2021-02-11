@@ -1,8 +1,10 @@
-table 6014409 "NPR Gift Voucher"
+table 6014408 "NPR Credit Voucher"
 {
-    Caption = 'Gift Voucher';
+    Caption = 'Credit Voucher';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'This table won''t be used anymore.';
+    ObsoleteTag = 'NPR Register';
 
     fields
     {
@@ -33,6 +35,7 @@ table 6014409 "NPR Gift Voucher"
         }
         field(6; "Shortcut Dimension 1 Code"; Code[20])
         {
+            CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
             DataClassification = CustomerContent;
         }
@@ -57,15 +60,17 @@ table 6014409 "NPR Gift Voucher"
         {
             Caption = 'Name';
             DataClassification = CustomerContent;
+            Description = 'NPR5.38';
         }
         field(11; Address; Text[100])
         {
             Caption = 'Address';
             DataClassification = CustomerContent;
+            Description = 'NPR5.38';
         }
-        field(12; "ZIP Code"; Code[20])
+        field(12; "Post Code"; Code[20])
         {
-            Caption = 'ZIP Code';
+            Caption = 'Post Code';
             DataClassification = CustomerContent;
         }
         field(13; City; Text[50])
@@ -95,6 +100,7 @@ table 6014409 "NPR Gift Voucher"
         }
         field(26; "Cashed in Global Dim 1 Code"; Code[20])
         {
+            CaptionClass = '1,2,1';
             Caption = 'Cashed in Department Code';
             DataClassification = CustomerContent;
         }
@@ -108,27 +114,27 @@ table 6014409 "NPR Gift Voucher"
             Caption = 'Cashed External';
             DataClassification = CustomerContent;
         }
-        field(32; "No. Series"; Code[10])
-        {
-            Caption = 'No. Series';
-            DataClassification = CustomerContent;
-        }
-        field(33; Blocked; Boolean)
+        field(32; Blocked; Boolean)
         {
             Caption = 'Blocked';
             DataClassification = CustomerContent;
         }
-        field(34; "Last Date Modified"; Date)
+        field(33; "Last Date Modified"; Date)
         {
             Caption = 'Last Date Modified';
             DataClassification = CustomerContent;
         }
-        field(35; Reference; Text[50])
+        field(34; Reference; Text[50])
         {
             Caption = 'Reference';
             DataClassification = CustomerContent;
         }
-        field(36; "Customer No."; Code[20])
+        field(35; Nummerserie; Code[10])
+        {
+            Caption = 'Numberserie';
+            DataClassification = CustomerContent;
+        }
+        field(36; "Customer No"; Code[20])
         {
             Caption = 'Customer No.';
             DataClassification = CustomerContent;
@@ -138,66 +144,66 @@ table 6014409 "NPR Gift Voucher"
             Caption = 'Invoiced';
             DataClassification = CustomerContent;
         }
-        field(38; "Invoiced by Document Type"; Option)
+        field(38; "Invoiced on enclosure"; Option)
         {
-            Caption = 'Invoiced by Document Type';
+            Caption = 'Invoiced on enclosure';
             DataClassification = CustomerContent;
             OptionCaption = 'Offer,Order,Invoice,Creditnote,Requisition Worksheet';
             OptionMembers = Tilbud,Ordre,Faktura,Kreditnota,Rammeordre;
         }
-        field(39; "Invoiced by Document No."; Code[20])
+        field(39; "Invoiced on enclosure no."; Code[20])
         {
-            Caption = 'Invoiced by Document No.';
+            Caption = 'Invoiced on enclosure no.';
             DataClassification = CustomerContent;
         }
-        field(40; "Cashed Externaly on Doc. No."; Code[20])
+        field(40; "Checked external via enclosure"; Code[20])
         {
-            Caption = 'Cashed Externaly on Doc. No.';
+            Caption = 'Checked external via enclosure No';
             DataClassification = CustomerContent;
         }
-        field(41; "Cashed Audit Roll Type"; Integer)
+        field(41; "Issued on Drawer No"; Code[10])
         {
-            Caption = 'Cashed Audit Roll Type';
+            Caption = 'Issued on Drawer No';
             DataClassification = CustomerContent;
         }
-        field(42; "Cashed Audit Roll Line"; Integer)
+        field(42; "Issued on Ticket No"; Code[20])
         {
-            Caption = 'Cashed Audit Roll Line';
+            Caption = 'Issued on Ticket No';
             DataClassification = CustomerContent;
         }
-        field(43; "Issuing Register No."; Code[10])
+        field(43; "Issued Audit Roll Type"; Integer)
         {
-            Caption = 'Issuing Cash Register No.';
+            Caption = 'Issued Audit Roll Type';
             DataClassification = CustomerContent;
         }
-        field(44; "Issuing Sales Ticket No."; Code[20])
+        field(44; "Issued Audit Roll Line"; Integer)
         {
-            Caption = 'Issuing Sales Ticket No.';
+            Caption = 'Issued Audit Roll Line';
             DataClassification = CustomerContent;
         }
-        field(45; "Issuing Audit Roll Type"; Integer)
+        field(45; "Checked Audit"; Integer)
         {
-            Caption = 'Issuing Audit Roll Type';
+            Caption = 'Checked Audit';
             DataClassification = CustomerContent;
         }
-        field(46; "Issuing Audit Roll Line"; Integer)
+        field(46; "Check Audit Roll Line"; Integer)
         {
-            Caption = 'Issuing Audit Roll Line';
+            Caption = 'Check Audit Roll Line';
             DataClassification = CustomerContent;
         }
-        field(47; "External Gift Voucher"; Boolean)
+        field(47; "External Credit Voucher"; Boolean)
         {
             Caption = 'External Gift Voucher';
             DataClassification = CustomerContent;
         }
-        field(48; "Man. Change of Status Date"; Date)
+        field(48; "Status manually changed on"; Date)
         {
-            Caption = 'Man. Change of Status Date';
+            Caption = 'Status manually changed on';
             DataClassification = CustomerContent;
         }
-        field(49; "Status Changed Man. by"; Code[20])
+        field(49; "Status manually changed by"; Code[20])
         {
-            Caption = 'Status Changed Man. by';
+            Caption = 'Status manually changed by';
             DataClassification = CustomerContent;
         }
         field(50; "Customer Type"; Option)
@@ -207,19 +213,19 @@ table 6014409 "NPR Gift Voucher"
             OptionCaption = 'Ordinary,Cash';
             OptionMembers = Alm,Kontant;
         }
-        field(51; "Cashed in Store"; Code[20])
+        field(51; "Cashed in store"; Code[30])
         {
-            Caption = 'Cashed in Store';
+            Caption = 'Cashed in store';
             DataClassification = CustomerContent;
         }
-        field(53; "External No."; Code[20])
+        field(53; "External no"; Code[20])
         {
-            Caption = 'External No.';
+            Caption = 'Alien no';
             DataClassification = CustomerContent;
         }
-        field(54; "Canceling Salesperson"; Code[20])
+        field(54; "Cancelled by salesperson"; Code[20])
         {
-            Caption = 'Canceling Salesperson';
+            Caption = 'Cancelled by salesperson';
             DataClassification = CustomerContent;
         }
         field(55; "Created in Company"; Code[30])
@@ -262,11 +268,6 @@ table 6014409 "NPR Gift Voucher"
             Caption = 'Exported the';
             DataClassification = CustomerContent;
         }
-        field(63; "Secret Code"; Code[6])
-        {
-            Caption = 'Secret Code';
-            DataClassification = CustomerContent;
-        }
         field(70; "Cashed POS Entry No."; Integer)
         {
             Caption = 'Cashed POS Entry No.';
@@ -307,7 +308,7 @@ table 6014409 "NPR Gift Voucher"
             Caption = 'Voucher No.';
             DataClassification = CustomerContent;
         }
-        field(6151405; "External Gift Voucher No."; Code[10])
+        field(6151405; "External Credit Voucher No."; Code[10])
         {
             Caption = 'External Credit Voucher No.';
             DataClassification = CustomerContent;
@@ -330,11 +331,6 @@ table 6014409 "NPR Gift Voucher"
         field(6151425; "Sales Order No."; Code[20])
         {
             Caption = 'Sales Order No.';
-            DataClassification = CustomerContent;
-        }
-        field(6151430; "Gift Voucher Message"; BLOB)
-        {
-            Caption = 'Message';
             DataClassification = CustomerContent;
         }
     }

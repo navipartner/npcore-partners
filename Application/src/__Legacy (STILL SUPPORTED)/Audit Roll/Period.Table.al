@@ -138,12 +138,18 @@ table 6014423 "NPR Period"
             Caption = 'Net. Credit Voucher Change';
             Editable = false;
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Credit voucher table won''t be used anymore.';
+            ObsoleteTag = 'NPR Credit Voucher';
         }
         field(23; "Net. Gift Voucher Change"; Decimal)
         {
             Caption = 'Net. Gift Voucher Change';
             Editable = false;
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher table won''t be used anymore.';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(24; "Net. Terminal Change"; Decimal)
         {
@@ -174,12 +180,18 @@ table 6014423 "NPR Period"
             Caption = 'Gift Voucher Sales';
             Editable = false;
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher table won''t be used anymore.';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(29; "Credit Voucher issuing"; Decimal)
         {
             Caption = 'Credit Voucher issuing';
             Editable = false;
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Credit voucher table won''t be used anymore.';
+            ObsoleteTag = 'NPR Credit Voucher';
         }
         field(30; "Cash Received"; Decimal)
         {
@@ -267,6 +279,9 @@ table 6014423 "NPR Period"
         {
             Caption = 'Gift Voucher Debit';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher table won''t be used anymore.';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(51; "Euro Difference"; Decimal)
         {
@@ -529,17 +544,6 @@ table 6014423 "NPR Period"
             NPRDimMgt.SaveDefaultDim(DATABASE::"NPR Register", "Register No.", FieldNumber, ShortcutDimCode);
             Modify;
         end;
-    end;
-
-    procedure WriteBalancingInfo()
-    begin
-        "Balanced Sec. Currency" := StrSubstNo('%1;%2;%3;%4;%5;%6;%7;%8;%9;%10;%11;%12;%13;%14;%15;%16;', "Opening Cash",
-                                                                   "Net. Cash Change", "Net. Credit Voucher Change",
-                                                                   "Net. Gift Voucher Change", "Net. Terminal Change",
-                                                                   "Net. Dankort Change", "Net. VisaCard Change",
-                                                                   "Net. Change Other Cedit Cards", "Gift Voucher Sales",
-                                                                   "Credit Voucher issuing", "Cash Received", "Pay Out", "Debit Sale",
-                                                                   "Negative Sales Count", "Negative Sales Amount", "Gift Voucher Debit");
     end;
 
     procedure LookUpShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])

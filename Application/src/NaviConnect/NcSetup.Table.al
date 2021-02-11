@@ -1,36 +1,5 @@
 table 6151500 "NPR Nc Setup"
 {
-    // NC1.01/MH/20150201  CASE 199932 Object Created
-    // NC1.03/TS/20150202  CASE 201682 Added fields related to Gift Voucher
-    // NC1.04/TS/20150206  CASE 201682 Added more fields related to Gift Voucher
-    // NC1.04/MH/20150206  CASE 199932 Added field 20020 Variant System
-    // NC1.05/MH/20150223  CASE 206395 Added B2B Fields and Renumbered field 22061 "Gift Voucher Activated"
-    // NC1.05/TS/20150223  CASE 201682 Added Credit Voucher field
-    // NC1.06/TS/20150224  CASE 201682 Added Credit Voucher Bitmap
-    // NC1.07/TS/20150309  CASE 208236 Removed  Gift Voucher No.Series Management
-    // NC1.09/MH/20150313  CASE 208758 Added function GetNpXmlAPIUsername() and fields NpXml Setup Fields
-    // NC1.10/TS/20150317  CASE 208237 Added Field Customer Template Code
-    // NC1.11/MH/20150325  CASE 209616 Replaced ServerInstance Name with Database Name in automatic Username
-    //                                 Added field 30000 Task Worker Enabled
-    //                                 Moved field 10010 NpXml Task Worker Group to 30010 Task Worker Group
-    // NC1.12/MH/20150407  CASE 210712 Updated captions and field names
-    // NC1.12/TS/20150407  CASE 210753 Added Credit Voucher Language Code
-    // NC1.13/MH/20150409  CASE 211043 Added field 140 Salesperson Code
-    // NC1.16/TS/20150423  CASE 212103 Added fields - 200 Order Import Codeunit Id
-    //                                              - 205 Return Order Codeunit Id
-    //                                              - 210 Contact Import Codeunit Id
-    // NC1.16/TR/20150424  CASE 210960 Added Variety to field option on field 20020
-    // NC1.16/TS/20150429  CASE 195494 Added fields related to Navidocs
-    // NC1.17/MH/20150622  CASE 216851 Magento and NpXml related fields moved to new setup tables and renumbered the following fields:
-    //                                 - 22070 Customer Template Code --> 115
-    //                                 - 30000 Task Queue Enabled --> 300
-    //                                 - 30010 Task Worker Group --> 305
-    // NC1.21/TS/20151014  CASE 225075 Added field 310 Max Task Count per Batch
-    // NC1.21/TTH/20151118 CASE 227358 Changed the naming of fields 200 and 205, removed field 210 and 400-425
-    // NC1.22/MHA/20151202  CASE 227358 Removed Automatic SetupNaviConnect() in OnInsert()
-    // NC2.00/MHA/20160525  CASE 240005 NaviConnect
-    // NPR5.48/TJ/20190128 CASE 340446 Function not used
-
     Caption = 'Nc Setup';
     DataClassification = CustomerContent;
 

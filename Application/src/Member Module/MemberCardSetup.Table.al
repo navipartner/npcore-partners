@@ -24,9 +24,7 @@ table 6059772 "NPR Member Card Setup"
             Caption = 'Code';
             TableRelation = IF (Type = CONST(Item)) Item."No."
             ELSE
-            IF (Type = CONST("Item Group")) "NPR Item Group"."No."
-            ELSE
-            IF (Type = CONST("Gift Voucher")) "NPR Payment Type POS"."No." WHERE("Processing Type" = CONST("Gift Voucher"));
+            IF (Type = CONST("Item Group")) "NPR Item Group"."No.";
             ValidateTableRelation = false;
             DataClassification = CustomerContent;
         }

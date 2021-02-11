@@ -564,22 +564,10 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
         SetFinancialImpact(EftTransactionRequest);
         InsertSaleVoucherLine(POSSession, EftTransactionRequest);
         Commit; // This commit should handle both the sale line insertion and EFT transaction record result modification in one transaction to prevent synchronization issues.
-        WarnIfVoucherPaymentTypeMismatch(EftTransactionRequest);
         EFTInterface.OnAfterFinancialCommit(EftTransactionRequest);
         POSSession.RequestRefreshData();
 
         EFTFrameworkMgt.ResumeFrontEndAfterEFTRequest(EftTransactionRequest, POSFrontEnd);
-        //+NPR5.54 [364340]
-    end;
-
-    local procedure WarnIfVoucherPaymentTypeMismatch(EFTTransactionRequest: Record "NPR EFT Transaction Request")
-    var
-        PaymentTypePOS: Record "NPR Payment Type POS";
-    begin
-        //-NPR5.54 [364340]
-        PaymentTypePOS.GetByRegister(EFTTransactionRequest."POS Payment Type Code", EFTTransactionRequest."Register No.");
-        if PaymentTypePOS."Processing Type" <> PaymentTypePOS."Processing Type"::"Gift Voucher" then
-            Message(WARNING_GIFT_TYPE, PaymentTypePOS."No.", EFTTransactionRequest."Processing Type", PaymentTypePOS."Processing Type"::"Gift Voucher");
         //+NPR5.54 [364340]
     end;
 
