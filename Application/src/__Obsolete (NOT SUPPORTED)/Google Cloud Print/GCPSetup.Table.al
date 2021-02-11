@@ -4,6 +4,7 @@ table 6014583 "NPR GCP Setup"
     Caption = 'Google Cloud Print Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
+    ObsoleteReason = 'Cleanup GCP Setup';
 
     fields
     {

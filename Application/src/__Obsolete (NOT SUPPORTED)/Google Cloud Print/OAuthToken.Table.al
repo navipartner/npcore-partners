@@ -1,9 +1,11 @@
 table 6014582 "NPR OAuth Token"
 {
+
     Caption = 'OAuth Token';
     DataClassification = CustomerContent;
-    ObsoleteState = Removed;
 
+    ObsoleteState = Removed;
+    ObsoleteReason = 'GCP Removed';
     fields
     {
         field(1; "Token Name"; Code[20])
@@ -38,5 +40,6 @@ table 6014582 "NPR OAuth Token"
     fieldgroups
     {
     }
+
 }
 
