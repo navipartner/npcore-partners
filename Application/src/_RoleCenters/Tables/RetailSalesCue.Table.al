@@ -118,6 +118,9 @@ table 6059811 "NPR Retail Sales Cue"
             FieldClass = FlowField;
             CalcFormula = Count("NPR Gift Voucher");
             Editable = false;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher table won''t be used anymore.';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(104; "Credit Vouchers"; Integer)
         {
@@ -125,6 +128,9 @@ table 6059811 "NPR Retail Sales Cue"
             FieldClass = FlowField;
             CalcFormula = Count("NPR Credit Voucher");
             Editable = false;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Credit voucher table won''t be used anymore.';
+            ObsoleteTag = 'NPR Credit Voucher';
         }
         field(105; "Task List"; Integer)
         {

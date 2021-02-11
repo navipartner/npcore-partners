@@ -7,19 +7,12 @@ codeunit 6150725 "NPR POS Action: Payment"
     //  - OnAfterAction:  to change NPR behaviour or provide functionality where NPR does not
     var
         ActionDescription: Label 'This is a built-in action for inserting a payment line into the current transaction';
-        EFTIntegration: Codeunit "NPR EFT Framework Mgt.";
         Setup: Codeunit "NPR POS Setup";
         PaymentTypeNotFound: Label '%1 %2 for register %3 was not found.';
         TextAmountLabel: Label 'Enter Amount:';
         TextVoucherLabel: Label 'Enter Voucher Number:';
         VoucherNotValid: Label 'Voucher %1 is not valid.';
-        VoucherNotFound: Label 'Voucher %1 is not found.';
-        VoucherBlocked: Label 'Voucher %1 is Blocked.';
-        VoucherStatusNotOpen: Label 'Voucher %1 is %2.';
-        MaxAmountLimit: Label 'Maximum payment amount for %1 is %2.';
         MissingImpl: Label 'Payment failed!\%1 = %2, %3 = %4 on %5 = %6 did not respond with being handled.\\Check the setup for %1 and %5.';
-        NextWorkflowStep: Option Resume,InvokeEFTDevice,Pause,CheckResult,VoidPayment;
-        InvalidAmount: Label 'Amount %1 is not valid for payment type %2';
         NO_SALES_LINES: Label 'There are no sales lines in the POS. You must add at least one sales line before handling payment.';
 
     procedure ActionCode(): Text
@@ -134,14 +127,6 @@ codeunit 6150725 "NPR POS Action: Payment"
                     Handled := ConfigureCashWorkflow(Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
                 PaymentTypePOS."Processing Type"::"Foreign Currency":
                     Handled := ConfigureForeignCashWorkflow(Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
-                PaymentTypePOS."Processing Type"::"Gift Voucher":
-                    Handled := ConfigureVoucherWorkflow(Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
-                PaymentTypePOS."Processing Type"::"Credit Voucher":
-                    Handled := ConfigureVoucherWorkflow(Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
-                PaymentTypePOS."Processing Type"::"Foreign Gift Voucher":
-                    Handled := ConfigureForeignVoucherWorkflow(Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
-                PaymentTypePOS."Processing Type"::"Foreign Credit Voucher":
-                    Handled := ConfigureForeignVoucherWorkflow(Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
                 PaymentTypePOS."Processing Type"::EFT:
                     Handled := ConfigureCashTerminalWorkflow(Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
                 PaymentTypePOS."Processing Type"::"Manual Card":
@@ -228,7 +213,6 @@ codeunit 6150725 "NPR POS Action: Payment"
         SubTotal: Decimal;
         ReturnPaymentTypePOS: Record "NPR Payment Type POS";
     begin
-
         if not Action.IsThisAction(ActionCode()) then
             exit;
 
@@ -255,7 +239,6 @@ codeunit 6150725 "NPR POS Action: Payment"
                     CapturePayment(PaymentTypePOS, POSSession, FrontEnd, GetAmount(Context, FrontEnd), GetVoucherNo(Context, FrontEnd), PaymentHandled);
                     OnAfterAction(WorkflowStep, PaymentTypePOS, Context, POSSession, FrontEnd, PaymentHandled);
                 end;
-
             'tryEndSale':
                 begin
                     PaymentHandled := true;
@@ -470,7 +453,6 @@ codeunit 6150725 "NPR POS Action: Payment"
         EFTSetup.FindSetup(SalePOS."Register No.", PaymentType."No.");
         FrontEnd.PauseWorkflow(); //THIS IS ONLY REQUIRED BECAUSE A CONFIRM DIALOG IN THE EFT MODULE TO LOOKUP LAST TRX WOULD, IN NAV2016, CAUSE A CONTINUE IN THE FRONT END...
         EFTTransactionMgt.StartPayment(EFTSetup, PaymentType, AmountToCapture, POSLine."Currency Code", SalePOS);
-
         exit(true);
     end;
 

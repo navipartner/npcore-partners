@@ -94,7 +94,7 @@ table 6151002 "NPR POS Quote Entry"
         field(1000; Amount; Decimal)
         {
             CalcFormula = Sum("NPR POS Quote Line".Amount WHERE("Quote Entry No." = FIELD("Entry No."),
-                                                             "Sale Type" = FILTER(Sale | "Debit Sale" | "Gift Voucher" | "Credit Voucher" | Deposit),
+                                                             "Sale Type" = FILTER(Sale | "Debit Sale" | Deposit),
                                                              Type = FILTER(<> Comment & <> "Open/Close")));
             Caption = 'Amount';
             DecimalPlaces = 2 : 2;
@@ -104,7 +104,7 @@ table 6151002 "NPR POS Quote Entry"
         field(1005; "Amount Including VAT"; Decimal)
         {
             CalcFormula = Sum("NPR POS Quote Line"."Amount Including VAT" WHERE("Quote Entry No." = FIELD("Entry No."),
-                                                                             "Sale Type" = FILTER(Sale | "Debit Sale" | "Gift Voucher" | "Credit Voucher" | Deposit),
+                                                                             "Sale Type" = FILTER(Sale | "Debit Sale" | Deposit),
                                                                              Type = FILTER(<> Comment & <> "Open/Close")));
             Caption = 'Amount Including VAT';
             Editable = false;

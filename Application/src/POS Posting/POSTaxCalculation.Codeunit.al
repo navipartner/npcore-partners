@@ -555,7 +555,7 @@ codeunit 6150633 "NPR POS Tax Calculation"
             SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
             SetRange(Date, SalePOS.Date);
             SetRange("VAT Calculation Type", "VAT Calculation Type"::"Sales Tax");
-            SetFilter("Sale Type", '%1|%2|%3|%4|%5', "Sale Type"::Sale, "Sale Type"::"Gift Voucher", "Sale Type"::"Credit Voucher", "Sale Type"::Deposit, "Sale Type"::"Out payment");
+            SetFilter("Sale Type", '%1|%2|%3', "Sale Type"::Sale, "Sale Type"::Deposit, "Sale Type"::"Out payment");
             if FindSet then
                 repeat
                     if (not (("Sale Type" = "Sale Type"::"Out payment") and (Type <> Type::"G/L Entry"))) then
@@ -728,8 +728,7 @@ codeunit 6150633 "NPR POS Tax Calculation"
                     SaleLinePOS.Amount :=
                       Round(SaleLinePOS.Amount, Currency."Amount Rounding Precision");
                     SaleLinePOS."VAT Base Amount" := SaleLinePOS.Amount;
-                    if (((SaleLinePOS."Tax Area Code" = '') and ("Tax Area Code" <> '')) or (SaleLinePOS."Tax Group Code" = '')) or
-                      (SaleLinePOS."Sale Type" in [SaleLinePOS."Sale Type"::"Credit Voucher", SaleLinePOS."Sale Type"::"Gift Voucher"]) then //Vouchers always excluding VAT
+                    if ((SaleLinePOS."Tax Area Code" = '') and ("Tax Area Code" <> '')) or (SaleLinePOS."Tax Group Code" = '') then
                         SaleLinePOS."Amount Including VAT" := SaleLinePOS.Amount;
                     SaleLinePOS.Modify;
                 until SaleLinePOS.Next = 0;

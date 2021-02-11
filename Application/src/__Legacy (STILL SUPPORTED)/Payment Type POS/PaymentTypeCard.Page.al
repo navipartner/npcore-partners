@@ -107,13 +107,6 @@ page 6014433 "NPR Payment Type - Card"
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Processing Type field';
-
-                        trigger OnValidate()
-                        begin
-                            FixedAmountEditable := ("Processing Type" = "Processing Type"::"Gift Voucher");
-                            QtyperSaleEditable := ("Processing Type" = "Processing Type"::"Gift Voucher");
-                            MinSalesAmountEditable := ("Processing Type" = "Processing Type"::"Gift Voucher");
-                        end;
                     }
                     field("Payment Method Code"; "Payment Method Code")
                     {
@@ -351,7 +344,6 @@ page 6014433 "NPR Payment Type - Card"
 
     var
         GLAccount: Record "G/L Account";
-        ErrPBSGiftEnable: Label 'Processing type must be gift voucher and via terminal must be set.';
         [InDataSet]
         CustomerEditable: Boolean;
         [InDataSet]

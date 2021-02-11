@@ -23,7 +23,6 @@ page 6151330 "NPR Voucher Cue"
                     ToolTip = 'Specifies the value of the Retail Vouchers field';
                 }
 
-
             }
         }
     }
@@ -36,13 +35,11 @@ page 6151330 "NPR Voucher Cue"
             VisibilityRetailVoucher := FALSE
         ELSE
             VisibilityRetailVoucher := TRUE;
-
     end;
 
     var
 
         VisibilityRetailVoucher: Boolean;
         NpRvVoucher: Record "NPR NpRv Voucher";
-
 
 }

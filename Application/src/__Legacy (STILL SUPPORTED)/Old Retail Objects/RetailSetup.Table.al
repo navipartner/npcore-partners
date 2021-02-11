@@ -126,6 +126,9 @@ table 6014400 "NPR Retail Setup"
             DataClassification = CustomerContent;
             Description = 'Nummerserie til tilgodebevis';
             TableRelation = "No. Series";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Credit voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Credit Voucher';
         }
         field(55; "Gift Voucher No. Management"; Code[10])
         {
@@ -133,6 +136,9 @@ table 6014400 "NPR Retail Setup"
             DataClassification = CustomerContent;
             Description = 'Nummerserie til gavekort';
             TableRelation = "No. Series";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(56; "External EAN-No. Management"; Code[10])
         {
@@ -190,6 +196,9 @@ table 6014400 "NPR Retail Setup"
         {
             Caption = 'Gift And Credit Valid Period';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift and credit voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Gift Voucher and NPR Credit Voucher';
         }
         field(100; "Sales Line Description Code"; Code[20])
         {
@@ -421,6 +430,9 @@ table 6014400 "NPR Retail Setup"
             Caption = 'Pop-up (Gift Voucher Quantity And Discount)';
             DataClassification = CustomerContent;
             Description = 'Show Quantity And Discount % for giftvoucher Sale';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(2001; "Base for FIK-71"; Option)
         {
@@ -569,6 +581,9 @@ table 6014400 "NPR Retail Setup"
             Caption = 'Copy Of Gift Voucher etc.';
             DataClassification = CustomerContent;
             Description = 'Udskriv kopi af gavekort';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(5030; "FIK No."; Code[10])
         {
@@ -861,6 +876,9 @@ table 6014400 "NPR Retail Setup"
             Caption = 'Show Create Credit Voucher Form';
             DataClassification = CustomerContent;
             Description = 'Vis form til oprettelse af tilgodebevis, når disse laves';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift and credit voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Credit Voucher';
         }
         field(5145; "Editable eksp. reverse sale"; Boolean)
         {
@@ -936,12 +954,18 @@ table 6014400 "NPR Retail Setup"
         {
             Caption = 'Profit On Gift Vouchers';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(5165; "Copy Sales Ticket on Giftvo."; Boolean)
         {
             Caption = 'Copy Sales Ticket When Selling Gift Voucher';
             DataClassification = CustomerContent;
             Description = 'Printer to bonner ved salg af gavekort';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(5166; "Show Customer info on ticket"; Boolean)
         {
@@ -974,12 +998,18 @@ table 6014400 "NPR Retail Setup"
             Caption = 'Foreign Gift Voucher No. Series';
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(5187; "Foreign Credit Voucher No.Seri"; Code[10])
         {
             Caption = 'Foreign Credit Voucher No. Series';
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Credit voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Credit Voucher';
         }
         field(5188; "Appendix no. eq Sales Ticket"; Boolean)
         {
@@ -1066,12 +1096,18 @@ table 6014400 "NPR Retail Setup"
             Caption = 'Gift Voucher Prefix';
             DataClassification = CustomerContent;
             Description = 'Nummerserie til EAN numre for gavekort';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(6196; "EAN Mgt. Credit voucher"; Code[2])
         {
             Caption = 'Credit Voucher Prefix';
             DataClassification = CustomerContent;
             Description = 'Nummerserie til EAN numre for tilgodebeviser';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Credit voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Credit Voucher';
         }
         field(6198; "Dim Stat Method"; Option)
         {

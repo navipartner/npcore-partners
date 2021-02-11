@@ -1,14 +1,5 @@
 codeunit 6014551 "NPR RP Aux: Captions"
 {
-    // NPR5.36/MMV /20170906 CASE 289514 Added line discount caption
-    // NPR5.38/MMV /20171207 CASE 294044 Added warranty caption
-    // NPR5.43/EMGO/20180528 CASE 316833 Added Test Environment caption
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Caption_Total: Label 'Total';
         Caption_Vat: Label 'VAT';
@@ -22,8 +13,6 @@ codeunit 6014551 "NPR RP Aux: Captions"
         Caption_ValidYears: Label 'Validity Period (Years)';
         Caption_VoucherLegal: Label 'Invalid without company stamp and signature.';
         Caption_StampSignature: Label 'Stamp and Signature';
-        Caption_GiftVoucher: Label 'Gift Voucher';
-        Caption_CreditVoucher: Label 'Credit Voucher';
         Caption_TotalInclVAT: Label 'Total Incl. VAT';
         Caption_TotalExclVAT: Label 'Total Excl. VAT';
         Caption_Address: Label 'Address';
@@ -131,10 +120,6 @@ codeunit 6014551 "NPR RP Aux: Captions"
                     "Processing Value" := Caption_VoucherLegal;
                 'CAPTION_STAMP_SIGNATURE':
                     "Processing Value" := Caption_StampSignature;
-                'CAPTION_GIFTVOUCHER':
-                    "Processing Value" := Caption_GiftVoucher;
-                'CAPTION_CREDITVOUCHER':
-                    "Processing Value" := Caption_CreditVoucher;
                 'CAPTION_ADDRESS':
                     "Processing Value" := Caption_Address;
                 'CAPTION_CUSTOMERSIGNATURE':

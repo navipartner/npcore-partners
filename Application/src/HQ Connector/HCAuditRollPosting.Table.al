@@ -179,11 +179,17 @@ table 6150903 "NPR HC Audit Roll Posting"
         {
             Caption = 'Gift voucher ref.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(60; "Credit voucher ref."; Code[20])
         {
             Caption = 'Credit voucher ref.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(70; "Shortcut Dimension 1 Code"; Code[20])
         {

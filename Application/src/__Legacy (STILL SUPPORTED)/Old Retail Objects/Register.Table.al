@@ -100,17 +100,9 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = "G/L Account"."No.";
-
-            trigger OnValidate()
-            begin
-                if Account <> '' then begin
-                    if Account = "Gift Voucher Account" then
-                        Error(ErrGavekort);
-
-                    if Account = "Credit Voucher Account" then
-                        Error(ErrTilgode);
-                end;
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore';
+            ObsoleteTag = 'NPR Register';
         }
         field(12; "Gift Voucher Account"; Code[20])
         {
@@ -118,35 +110,18 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = "G/L Account"."No.";
-
-            trigger OnValidate()
-            begin
-                if "Gift Voucher Account" <> '' then begin
-                    if "Gift Voucher Account" = Account then
-                        Error(ErrKasse);
-                    if "Gift Voucher Account" = "Credit Voucher Account" then
-                        Error(ErrTilgode);
-                    if "Gift Voucher Account" = "Gift Voucher Discount Account" then
-                        Error(Text1060006, "Gift Voucher Account", FieldCaption("Gift Voucher Discount Account"));
-                end;
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore';
+            ObsoleteTag = 'NPR Register';
         }
         field(13; "Credit Voucher Account"; Code[20])
         {
             Caption = 'Credit Voucher Account';
             DataClassification = CustomerContent;
             TableRelation = "G/L Account";
-
-            trigger OnValidate()
-            begin
-                if "Credit Voucher Account" <> '' then begin
-                    if "Credit Voucher Account" = Account then
-                        Error(ErrKasse);
-
-                    if "Credit Voucher Account" = "Gift Voucher Account" then
-                        Error(ErrGavekort);
-                end;
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore';
+            ObsoleteTag = 'NPR Register';
         }
         field(14; "Difference Account"; Code[20])
         {
@@ -183,13 +158,9 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = "G/L Account"."No.";
-
-            trigger OnValidate()
-            begin
-                if "Gift Voucher Discount Account" <> '' then
-                    if "Gift Voucher Discount Account" = "Gift Voucher Account" then
-                        Error(Text1060006, "Gift Voucher Discount Account", FieldCaption("Gift Voucher Account"));
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore';
+            ObsoleteTag = 'NPR Register';
         }
         field(18; "Gen. Business Posting Group"; Code[10])
         {
@@ -660,6 +631,9 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             OptionCaption = 'TM-T88,Samsung,Star';
             OptionMembers = "TM-T88",Samsung,Star;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(340; "Send Receipt Logo from NAV"; Boolean)
         {
@@ -696,8 +670,7 @@ table 6014401 "NPR Register"
         {
             CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE(
                                                                          "Register No." = FIELD("Register No."),
-                                                                         "Sale Type" = CONST("Debit Sale"),
-                                                                         "Gift voucher ref." = FILTER(= '')));
+                                                                         "Sale Type" = CONST("Debit Sale")));
             Caption = 'Dabit Sales in Audit Roll';
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
@@ -709,8 +682,7 @@ table 6014401 "NPR Register"
         {
             CalcFormula = Count("NPR Audit Roll" WHERE("Register No." = FIELD("Register No."),
                                                     Type = CONST("Debit Sale"),
-                                                    "Line No." = CONST(2),
-                                                    "Gift voucher ref." = FILTER(= '')));
+                                                    "Line No." = CONST(2)));
             Caption = 'Item Count in Audit Debit Roll';
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
@@ -767,8 +739,7 @@ table 6014401 "NPR Register"
         {
             CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE(
                                                                          "Sale Type" = CONST("Debit Sale"),
-                                                                         Type = CONST(Item),
-                                                                         "Gift voucher ref." = FILTER(= '')));
+                                                                         Type = CONST(Item)));
             Caption = 'Dabit Sales in Audit Roll';
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
@@ -1168,8 +1139,6 @@ table 6014401 "NPR Register"
         DimMgt: Codeunit DimensionManagement;
         PostCode: Record "Post Code";
         Text1060006: Label 'Acount No. %1 is used for  %2.';
-        ErrGavekort: Label 'Acount No. %1 is used for Gift Vouchers.';
-        ErrTilgode: Label 'Acount No. %1 is used for Credit Vouchers!';
         ErrKasse: Label 'Acount No. %1 is used for Register Acount!';
         Text1060008: Label 'Warning:\You are about to delete register %1\Last entry is registered on %2\Do you wish to delete it anyway?';
         Text1060009: Label 'Warning:\You are about to delete register %1\Do you wish to delete it anyway?';

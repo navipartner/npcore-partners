@@ -582,7 +582,7 @@ table 6014405 "NPR Sale POS"
             AutoFormatType = 1;
             CalcFormula = Sum("NPR Sale Line POS".Amount WHERE("Register No." = FIELD("Register No."),
                                                             "Sales Ticket No." = FIELD("Sales Ticket No."),
-                                                            "Sale Type" = FILTER(Sale | "Debit Sale" | "Gift Voucher" | "Credit Voucher" | Deposit),
+                                                            "Sale Type" = FILTER(Sale | "Debit Sale" | Deposit),
                                                             Type = FILTER(<> Comment & <> "Open/Close")));
             Caption = 'Amount';
             Description = 'NPR5.54';
@@ -600,7 +600,7 @@ table 6014405 "NPR Sale POS"
             AutoFormatType = 1;
             CalcFormula = Sum("NPR Sale Line POS"."Amount Including VAT" WHERE("Register No." = FIELD("Register No."),
                                                                             "Sales Ticket No." = FIELD("Sales Ticket No."),
-                                                                            "Sale Type" = FILTER(Sale | "Debit Sale" | "Gift Voucher" | "Credit Voucher" | Deposit),
+                                                                            "Sale Type" = FILTER(Sale | "Debit Sale" | Deposit),
                                                                             Type = FILTER(<> Comment & <> "Open/Close")));
             Caption = 'Amount Including VAT';
             Description = 'NPR5.54';

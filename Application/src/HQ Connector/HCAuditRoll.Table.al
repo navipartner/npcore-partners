@@ -185,11 +185,17 @@ table 6150901 "NPR HC Audit Roll"
         {
             Caption = 'Gift voucher ref.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(60; "Credit voucher ref."; Code[20])
         {
             Caption = 'Credit voucher ref.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Credit voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Credit Voucher';
         }
         field(70; "Shortcut Dimension 1 Code"; Code[20])
         {
@@ -593,6 +599,9 @@ table 6150901 "NPR HC Audit Roll"
         }
         key(Key6; "Register No.", Posted, "Sale Date", Type, "Credit voucher ref.")
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Gift Voucher';            
         }
         key(Key7; "Sale Type", Type, "No.", Posted)
         {
@@ -635,6 +644,9 @@ table 6150901 "NPR HC Audit Roll"
             MaintainSIFTIndex = false;
             MaintainSQLIndex = false;
             SumIndexFields = "Amount Including VAT", Quantity, "Line Discount Amount", Amount, Cost;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         key(Key15; "Register No.", "Sale Date", "Sale Type", Type, Quantity, "Receipt Type", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code")
         {

@@ -9787,36 +9787,6 @@ End Function
         <Field Name="Amountinauditroll_PaymentTypePOSFormat">
           <DataField>Amountinauditroll_PaymentTypePOSFormat</DataField>
         </Field>
-        <Field Name="No_GiftVoucher">
-          <DataField>No_GiftVoucher</DataField>
-        </Field>
-        <Field Name="RegisterNo_GiftVoucher">
-          <DataField>RegisterNo_GiftVoucher</DataField>
-        </Field>
-        <Field Name="Description_GiftVoucher">
-          <DataField>Description_GiftVoucher</DataField>
-        </Field>
-        <Field Name="Amountinauditroll_GiftVoucher">
-          <DataField>Amountinauditroll_GiftVoucher</DataField>
-        </Field>
-        <Field Name="Amountinauditroll_GiftVoucherFormat">
-          <DataField>Amountinauditroll_GiftVoucherFormat</DataField>
-        </Field>
-        <Field Name="No_CreditVoucher">
-          <DataField>No_CreditVoucher</DataField>
-        </Field>
-        <Field Name="RegisterNo_CreditVoucher">
-          <DataField>RegisterNo_CreditVoucher</DataField>
-        </Field>
-        <Field Name="Description_CreditVoucher">
-          <DataField>Description_CreditVoucher</DataField>
-        </Field>
-        <Field Name="Amountinauditroll_CreditVoucher">
-          <DataField>Amountinauditroll_CreditVoucher</DataField>
-        </Field>
-        <Field Name="Amountinauditroll_CreditVoucherFormat">
-          <DataField>Amountinauditroll_CreditVoucherFormat</DataField>
-        </Field>
         <Field Name="No_PaymentTypePOS4">
           <DataField>No_PaymentTypePOS4</DataField>
         </Field>
@@ -9861,21 +9831,6 @@ End Function
         </Field>
         <Field Name="Amountinauditroll_PaymentTypePOS6Format">
           <DataField>Amountinauditroll_PaymentTypePOS6Format</DataField>
-        </Field>
-        <Field Name="No_ForeignCreditVoucher">
-          <DataField>No_ForeignCreditVoucher</DataField>
-        </Field>
-        <Field Name="RegisterNo_ForeignCreditVoucher">
-          <DataField>RegisterNo_ForeignCreditVoucher</DataField>
-        </Field>
-        <Field Name="Description_ForeignCreditVoucher">
-          <DataField>Description_ForeignCreditVoucher</DataField>
-        </Field>
-        <Field Name="Amountinauditroll_ForeignCreditVoucher">
-          <DataField>Amountinauditroll_ForeignCreditVoucher</DataField>
-        </Field>
-        <Field Name="Amountinauditroll_ForeignCreditVoucherFormat">
-          <DataField>Amountinauditroll_ForeignCreditVoucherFormat</DataField>
         </Field>
         <Field Name="No_ElectronicFundsTransfer">
           <DataField>No_ElectronicFundsTransfer</DataField>

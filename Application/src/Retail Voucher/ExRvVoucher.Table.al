@@ -50,7 +50,7 @@ table 6151081 "NPR ExRv Voucher"
         {
             Caption = 'Source No.';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Source Type" = CONST("Gift Voucher")) "NPR Gift Voucher"."No.";
+            TableRelation = if ("Source Type" = Const("Gift Voucher")) "NPR NpRv Voucher"."No.";
         }
         field(40; "Reference No."; Code[20])
         {

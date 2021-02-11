@@ -147,8 +147,6 @@ codeunit 6150904 "NPR HC Audit Roll Mgt."
         Evaluate(TempHCAuditRoll."VAT Prod. Posting Group", NpXmlDomMgt.GetXmlText(Element, 'vatprodpostinggroup', 0, false), 9);
         Evaluate(TempHCAuditRoll."Currency Code", NpXmlDomMgt.GetXmlText(Element, 'currencycode', 0, false), 9);
         Evaluate(TempHCAuditRoll.Cost, NpXmlDomMgt.GetXmlText(Element, 'cost', 0, false), 9);
-        Evaluate(TempHCAuditRoll."Gift voucher ref.", NpXmlDomMgt.GetXmlText(Element, 'giftvoucherref', 0, false), 9);
-        Evaluate(TempHCAuditRoll."Credit voucher ref.", NpXmlDomMgt.GetXmlText(Element, 'creditvoucherref', 0, false), 9);
         Evaluate(TempHCAuditRoll."Shortcut Dimension 1 Code", NpXmlDomMgt.GetXmlText(Element, 'shortcutdimension1', 0, false), 9);
         Evaluate(TempHCAuditRoll."Shortcut Dimension 2 Code", NpXmlDomMgt.GetXmlText(Element, 'shortcutdimension2', 0, false), 9);
         Evaluate(TempHCAuditRoll."Bin Code", NpXmlDomMgt.GetXmlText(Element, 'bincode', 0, false), 9);

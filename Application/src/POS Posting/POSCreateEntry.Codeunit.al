@@ -65,8 +65,6 @@ codeunit 6150614 "NPR POS Create Entry"
             repeat
                 case SaleLinePOS."Sale Type" of
                     SaleLinePOS."Sale Type"::Sale,
-                  SaleLinePOS."Sale Type"::"Gift Voucher",
-                  SaleLinePOS."Sale Type"::"Credit Voucher",
                   SaleLinePOS."Sale Type"::Deposit:
                         InsertPOSSaleLine(SalePOS, SaleLinePOS, POSEntry, false, POSSalesLine);
                     SaleLinePOS."Sale Type"::"Out payment":
@@ -206,187 +204,156 @@ codeunit 6150614 "NPR POS Create Entry"
         POSEntrySalesDocLinkMgt: Codeunit "NPR POS Entry S.Doc. Link Mgt.";
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
     begin
-        with POSSalesLine do begin
-            Init;
-            "POS Entry No." := POSEntry."Entry No.";
-            "POS Period Register No." := POSEntry."POS Period Register No.";
-            "Line No." := SaleLinePOS."Line No.";
-            SetRecFilter;
-            if not IsEmpty() then
-                repeat
-                    "Line No." := "Line No." + 10000;
-                    SetRecFilter;
-                until IsEmpty();
+        POSSalesLine.Init();
+        POSSalesLine."POS Entry No." := POSEntry."Entry No.";
+        POSSalesLine."POS Period Register No." := POSEntry."POS Period Register No.";
+        POSSalesLine."Line No." := SaleLinePOS."Line No.";
+        POSSalesLine.SetRecFilter();
+        if not POSSalesLine.IsEmpty() then
+            repeat
+                POSSalesLine."Line No." := POSSalesLine."Line No." + 10000;
+                POSSalesLine.SetRecFilter();
+            until POSSalesLine.IsEmpty();
 
-            Reset;
+        POSSalesLine.Reset();
 
-            "POS Store Code" := SalePOS."POS Store Code";
-            "POS Unit No." := SaleLinePOS."Register No.";
-            "Document No." := SaleLinePOS."Sales Ticket No.";
-            "Customer No." := SalePOS."Customer No.";
-            "Salesperson Code" := SalePOS."Salesperson Code";
+        POSSalesLine."POS Store Code" := SalePOS."POS Store Code";
+        POSSalesLine."POS Unit No." := SaleLinePOS."Register No.";
+        POSSalesLine."Document No." := SaleLinePOS."Sales Ticket No.";
+        POSSalesLine."Customer No." := SalePOS."Customer No.";
+        POSSalesLine."Salesperson Code" := SalePOS."Salesperson Code";
 
-            case SaleLinePOS.Type of
-                SaleLinePOS.Type::Item:
-                    Type := Type::Item;
-                SaleLinePOS.Type::"G/L Entry":
-                    Type := Type::"G/L Account";
-                else
-                    ;//Add silent error comment line
-            end;
-
-            case SaleLinePOS."Sale Type" of
-                SaleLinePOS."Sale Type"::"Gift Voucher",
-              SaleLinePOS."Sale Type"::"Credit Voucher":
-                    Type := Type::Voucher;
-                SaleLinePOS."Sale Type"::Deposit:
-                    if SaleLinePOS.Type = SaleLinePOS.Type::Customer then
-                        Type := Type::Customer
-                    else
-                        Type := Type::Voucher;      //Marked as Voucher because no VA
-
-                SaleLinePOS."Sale Type"::"Out payment":
-                    //This is currently the only way to see the difference between a Rounding and a Payout line!
-                    if SaleLinePOS."Discount Type" = SaleLinePOS."Discount Type"::Rounding then
-                        Type := Type::Rounding
-                    else
-                        if SaleLinePOS."Gen. Posting Type" <> SaleLinePOS."Gen. Posting Type"::Purchase then
-                            Type := Type::"G/L Account"
-                        else
-                            Type := Type::Payout;
-            end;
-
-
-            "Exclude from Posting" := ExcludeFromPosting(SaleLinePOS);
-            "No." := SaleLinePOS."No.";
-            "Variant Code" := SaleLinePOS."Variant Code";
-            "Location Code" := SaleLinePOS."Location Code";
-            "Posting Group" := SaleLinePOS."Posting Group";
-            Description := SaleLinePOS.Description;
-            //Description 2?
-
-            "Gen. Posting Type" := SaleLinePOS."Gen. Posting Type";
-            "Gen. Bus. Posting Group" := SaleLinePOS."Gen. Bus. Posting Group";
-            "VAT Bus. Posting Group" := SaleLinePOS."VAT Bus. Posting Group";
-            "Gen. Prod. Posting Group" := SaleLinePOS."Gen. Prod. Posting Group";
-            "VAT Prod. Posting Group" := SaleLinePOS."VAT Prod. Posting Group";
-            "Tax Area Code" := SaleLinePOS."Tax Area Code";
-            "Tax Liable" := SaleLinePOS."Tax Liable";
-            "Tax Group Code" := SaleLinePOS."Tax Group Code";
-            "Use Tax" := SaleLinePOS."Use Tax";
-
-            "Unit of Measure Code" := SaleLinePOS."Unit of Measure Code";
-            Quantity := SaleLinePOS.Quantity;
-            "Quantity (Base)" := SaleLinePOS."Quantity (Base)";
-            "Qty. per Unit of Measure" := SaleLinePOS."Qty. per Unit of Measure";
-            "Unit Price" := SaleLinePOS."Unit Price";
-            "Unit Cost (LCY)" := SaleLinePOS."Unit Cost (LCY)";
-            "Unit Cost" := SaleLinePOS."Unit Cost";
-            "VAT %" := SaleLinePOS."VAT %";
-            "VAT Identifier" := SaleLinePOS."VAT Identifier";
-            "VAT Calculation Type" := SaleLinePOS."VAT Calculation Type";
-
-            "Discount Type" := SaleLinePOS."Discount Type";
-            "Discount Code" := SaleLinePOS."Discount Code";
-            "Discount Authorised by" := SaleLinePOS."Discount Authorised by";
-
-            "Reason Code" := SaleLinePOS."Reason Code";
-            "Line Discount %" := SaleLinePOS."Discount %";
-
-            PricesIncludeTax := SalePOS."Prices Including VAT";
-            if (SaleLinePOS."Sale Type" in [SaleLinePOS."Sale Type"::"Gift Voucher"]) then
-                PricesIncludeTax := true;
-            if PricesIncludeTax then begin
-                "Line Discount Amount Incl. VAT" := SaleLinePOS."Discount Amount";
-                "Line Discount Amount Excl. VAT" := SaleLinePOS."Discount Amount" / (1 + (SaleLinePOS."VAT %" / 100));
-            end else begin
-                "Line Discount Amount Excl. VAT" := SaleLinePOS."Discount Amount";
-                "Line Discount Amount Incl. VAT" := (1 + (SaleLinePOS."VAT %" / 100)) * SaleLinePOS."Discount Amount";
-            end;
-
-            "Amount Excl. VAT" := SaleLinePOS.Amount;
-            "Amount Incl. VAT" := SaleLinePOS."Amount Including VAT";
-            "VAT Base Amount" := SaleLinePOS."VAT Base Amount";
-            "Line Amount" := SaleLinePOS."Line Amount";
-
-            if ((SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::"Out payment")
-              and (SaleLinePOS."Discount Type" <> SaleLinePOS."Discount Type"::Rounding)) then
-                "Line Amount" *= -1;
-
-            "Amount Excl. VAT (LCY)" := SaleLinePOS.Amount * POSEntry."Currency Factor";
-            "Amount Incl. VAT (LCY)" := SaleLinePOS."Amount Including VAT" * POSEntry."Currency Factor";
-
-            "Line Dsc. Amt. Excl. VAT (LCY)" := "Line Discount Amount Excl. VAT" * POSEntry."Currency Factor";
-            "Line Dsc. Amt. Incl. VAT (LCY)" := "Line Discount Amount Incl. VAT" * POSEntry."Currency Factor";
-
-            "Orig. POS Sale ID" := SaleLinePOS."Orig. POS Sale ID";
-            "Orig. POS Line No." := SaleLinePOS."Orig. POS Line No.";
-
-            "Retail ID" := SaleLinePOS."Retail ID";
-
-            POSSalesLine."Item Category Code" := SaleLinePOS."Item Category Code";
-            POSSalesLine."Product Group Code" := SaleLinePOS."Product Group Code";
-
-            "Serial No." := SaleLinePOS."Serial No.";
-            "Retail Serial No." := SaleLinePOS."Serial No. not Created";
-            "Return Reason Code" := SaleLinePOS."Return Reason Code";
-            "NPRE Seating Code" := SaleLinePOS."NPRE Seating Code";
-
-            CreateRMAEntry(POSEntry, SalePOS, SaleLinePOS);
-
-            if SaleLinePOS."Sales Document No." <> '' then begin
-                POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSSalesLine, SaleLinePOS."Sales Document Type", SaleLinePOS."Sales Document No.");
-            end;
-
-            if SaleLinePOS."Posted Sales Document No." <> '' then begin
-                case SaleLinePOS."Posted Sales Document Type" of
-                    SaleLinePOS."Posted Sales Document Type"::INVOICE:
-                        POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSSalesLine, POSEntrySalesDocLink."Sales Document Type"::POSTED_INVOICE, SaleLinePOS."Posted Sales Document No.");
-                    SaleLinePOS."Posted Sales Document Type"::CREDIT_MEMO:
-                        POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSSalesLine, POSEntrySalesDocLink."Sales Document Type"::POSTED_CREDIT_MEMO, SaleLinePOS."Posted Sales Document No.");
-                end;
-            end;
-
-            if SaleLinePOS."Delivered Sales Document No." <> '' then begin
-                case SaleLinePOS."Delivered Sales Document Type" of
-                    SaleLinePOS."Delivered Sales Document Type"::SHIPMENT:
-                        POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSSalesLine, POSEntrySalesDocLink."Sales Document Type"::SHIPMENT, SaleLinePOS."Delivered Sales Document No.");
-                    SaleLinePOS."Delivered Sales Document Type"::RETURN_RECEIPT:
-                        POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSSalesLine, POSEntrySalesDocLink."Sales Document Type"::RETURN_RECEIPT, SaleLinePOS."Delivered Sales Document No.");
-                end;
-            end;
-
-            "Applies-to Doc. Type" := SaleLinePOS."Buffer Document Type";
-            "Applies-to Doc. No." := SaleLinePOS."Buffer Document No.";
-
-            "Shortcut Dimension 1 Code" := SaleLinePOS."Shortcut Dimension 1 Code";
-            "Shortcut Dimension 2 Code" := SaleLinePOS."Shortcut Dimension 2 Code";
-            "Dimension Set ID" := SaleLinePOS."Dimension Set ID";
-
-            if (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::"Out payment") and
-                (SaleLinePOS.Amount = 0) and (SaleLinePOS."Amount Including VAT" <> 0) then begin
-                "Amount Excl. VAT" := "Amount Incl. VAT" / (1 + ("VAT %" / 100));
-                "Amount Excl. VAT (LCY)" := "Amount Incl. VAT (LCY)" / (1 + ("VAT %" / 100));
-            end;
-
-            if ReverseSign then begin
-                Quantity := -Quantity;
-                "Line Discount Amount Excl. VAT" := -"Line Discount Amount Excl. VAT";
-                "Line Discount Amount Incl. VAT" := -"Line Discount Amount Incl. VAT";
-                "Amount Excl. VAT" := -"Amount Excl. VAT";
-                "Amount Incl. VAT" := -"Amount Incl. VAT";
-                "Line Dsc. Amt. Excl. VAT (LCY)" := -"Line Dsc. Amt. Excl. VAT (LCY)";
-                "Line Dsc. Amt. Incl. VAT (LCY)" := -"Line Dsc. Amt. Incl. VAT (LCY)";
-                "Amount Excl. VAT (LCY)" := -"Amount Excl. VAT (LCY)";
-                "Amount Incl. VAT (LCY)" := -"Amount Incl. VAT (LCY)";
-                "VAT Base Amount" := -"VAT Base Amount";
-                "Quantity (Base)" := -"Quantity (Base)";
-                "VAT Difference" := -"VAT Difference";
-            end;
-
-            OnBeforeInsertPOSSalesLine(SalePOS, SaleLinePOS, POSEntry, POSSalesLine);
-            Insert;
+        case SaleLinePOS.Type of
+            SaleLinePOS.Type::Item:
+                POSSalesLine.Type := POSSalesLine.Type::Item;
+            SaleLinePOS.Type::"G/L Entry":
+                POSSalesLine.Type := POSSalesLine.Type::"G/L Account";
+            else
+                ;//Add silent error comment line
         end;
+
+        case SaleLinePOS."Sale Type" of
+            SaleLinePOS."Sale Type"::Deposit:
+                if SaleLinePOS.Type = SaleLinePOS.Type::Customer then
+                    POSSalesLine.Type := POSSalesLine.Type::Customer;
+
+            SaleLinePOS."Sale Type"::"Out payment":
+                //This is currently the only way to see the difference between a Rounding and a Payout line!
+                if SaleLinePOS."Discount Type" = SaleLinePOS."Discount Type"::Rounding then
+                    POSSalesLine.Type := POSSalesLine.Type::Rounding
+                else
+                    if SaleLinePOS."Gen. Posting Type" <> SaleLinePOS."Gen. Posting Type"::Purchase then
+                        POSSalesLine.Type := POSSalesLine.Type::"G/L Account"
+                    else
+                        POSSalesLine.Type := POSSalesLine.Type::Payout;
+        end;
+
+
+        POSSalesLine."Exclude from Posting" := ExcludeFromPosting(SaleLinePOS);
+        POSSalesLine."No." := SaleLinePOS."No.";
+        POSSalesLine."Variant Code" := SaleLinePOS."Variant Code";
+        POSSalesLine."Location Code" := SaleLinePOS."Location Code";
+        POSSalesLine."Posting Group" := SaleLinePOS."Posting Group";
+        POSSalesLine.Description := SaleLinePOS.Description;
+
+        POSSalesLine."Gen. Posting Type" := SaleLinePOS."Gen. Posting Type";
+        POSSalesLine."Gen. Bus. Posting Group" := SaleLinePOS."Gen. Bus. Posting Group";
+        POSSalesLine."VAT Bus. Posting Group" := SaleLinePOS."VAT Bus. Posting Group";
+        POSSalesLine."Gen. Prod. Posting Group" := SaleLinePOS."Gen. Prod. Posting Group";
+        POSSalesLine."VAT Prod. Posting Group" := SaleLinePOS."VAT Prod. Posting Group";
+        POSSalesLine."Tax Area Code" := SaleLinePOS."Tax Area Code";
+        POSSalesLine."Tax Liable" := SaleLinePOS."Tax Liable";
+        POSSalesLine."Tax Group Code" := SaleLinePOS."Tax Group Code";
+        POSSalesLine."Use Tax" := SaleLinePOS."Use Tax";
+
+        POSSalesLine."Unit of Measure Code" := SaleLinePOS."Unit of Measure Code";
+        POSSalesLine.Quantity := SaleLinePOS.Quantity;
+        POSSalesLine."Quantity (Base)" := SaleLinePOS."Quantity (Base)";
+        POSSalesLine."Qty. per Unit of Measure" := SaleLinePOS."Qty. per Unit of Measure";
+        POSSalesLine."Unit Price" := SaleLinePOS."Unit Price";
+        POSSalesLine."Unit Cost (LCY)" := SaleLinePOS."Unit Cost (LCY)";
+        POSSalesLine."Unit Cost" := SaleLinePOS."Unit Cost";
+        POSSalesLine."VAT %" := SaleLinePOS."VAT %";
+        POSSalesLine."VAT Identifier" := SaleLinePOS."VAT Identifier";
+        POSSalesLine."VAT Calculation Type" := SaleLinePOS."VAT Calculation Type";
+
+        POSSalesLine."Discount Type" := SaleLinePOS."Discount Type";
+        POSSalesLine."Discount Code" := SaleLinePOS."Discount Code";
+        POSSalesLine."Discount Authorised by" := SaleLinePOS."Discount Authorised by";
+
+        POSSalesLine."Reason Code" := SaleLinePOS."Reason Code";
+        POSSalesLine."Line Discount %" := SaleLinePOS."Discount %";
+
+        PricesIncludeTax := SalePOS."Prices Including VAT";
+        if PricesIncludeTax then begin
+            POSSalesLine."Line Discount Amount Incl. VAT" := SaleLinePOS."Discount Amount";
+            POSSalesLine."Line Discount Amount Excl. VAT" := SaleLinePOS."Discount Amount" / (1 + (SaleLinePOS."VAT %" / 100));
+        end else begin
+            POSSalesLine."Line Discount Amount Excl. VAT" := SaleLinePOS."Discount Amount";
+            POSSalesLine."Line Discount Amount Incl. VAT" := (1 + (SaleLinePOS."VAT %" / 100)) * SaleLinePOS."Discount Amount";
+        end;
+
+        POSSalesLine."Amount Excl. VAT" := SaleLinePOS.Amount;
+        POSSalesLine."Amount Incl. VAT" := SaleLinePOS."Amount Including VAT";
+        POSSalesLine."VAT Base Amount" := SaleLinePOS."VAT Base Amount";
+        POSSalesLine."Line Amount" := SaleLinePOS."Line Amount";
+
+        if ((SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::"Out payment")
+          and (SaleLinePOS."Discount Type" <> SaleLinePOS."Discount Type"::Rounding)) then
+            POSSalesLine."Line Amount" *= -1;
+
+        POSSalesLine."Amount Excl. VAT (LCY)" := SaleLinePOS.Amount * POSEntry."Currency Factor";
+        POSSalesLine."Amount Incl. VAT (LCY)" := SaleLinePOS."Amount Including VAT" * POSEntry."Currency Factor";
+
+        POSSalesLine."Line Dsc. Amt. Excl. VAT (LCY)" := POSSalesLine."Line Discount Amount Excl. VAT" * POSEntry."Currency Factor";
+        POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)" := POSSalesLine."Line Discount Amount Incl. VAT" * POSEntry."Currency Factor";
+
+        POSSalesLine."Orig. POS Sale ID" := SaleLinePOS."Orig. POS Sale ID";
+        POSSalesLine."Orig. POS Line No." := SaleLinePOS."Orig. POS Line No.";
+
+        POSSalesLine."Retail ID" := SaleLinePOS."Retail ID";
+
+        POSSalesLine."Item Category Code" := SaleLinePOS."Item Category Code";
+        POSSalesLine."Product Group Code" := SaleLinePOS."Product Group Code";
+
+        POSSalesLine."Serial No." := SaleLinePOS."Serial No.";
+        POSSalesLine."Retail Serial No." := SaleLinePOS."Serial No. not Created";
+        POSSalesLine."Return Reason Code" := SaleLinePOS."Return Reason Code";
+        POSSalesLine."NPRE Seating Code" := SaleLinePOS."NPRE Seating Code";
+
+        CreateRMAEntry(POSEntry, SalePOS, SaleLinePOS);
+
+        if SaleLinePOS."Sales Document No." <> '' then begin
+            POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSSalesLine, SaleLinePOS."Sales Document Type", SaleLinePOS."Sales Document No.");
+        end;
+
+        if SaleLinePOS."Posted Sales Document No." <> '' then begin
+            case SaleLinePOS."Posted Sales Document Type" of
+                SaleLinePOS."Posted Sales Document Type"::INVOICE:
+                    POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSSalesLine, POSEntrySalesDocLink."Sales Document Type"::POSTED_INVOICE, SaleLinePOS."Posted Sales Document No.");
+                SaleLinePOS."Posted Sales Document Type"::CREDIT_MEMO:
+                    POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSSalesLine, POSEntrySalesDocLink."Sales Document Type"::POSTED_CREDIT_MEMO, SaleLinePOS."Posted Sales Document No.");
+            end;
+        end;
+
+        if SaleLinePOS."Delivered Sales Document No." <> '' then begin
+            case SaleLinePOS."Delivered Sales Document Type" of
+                SaleLinePOS."Delivered Sales Document Type"::SHIPMENT:
+                    POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSSalesLine, POSEntrySalesDocLink."Sales Document Type"::SHIPMENT, SaleLinePOS."Delivered Sales Document No.");
+                SaleLinePOS."Delivered Sales Document Type"::RETURN_RECEIPT:
+                    POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSSalesLine, POSEntrySalesDocLink."Sales Document Type"::RETURN_RECEIPT, SaleLinePOS."Delivered Sales Document No.");
+            end;
+        end;
+
+        POSSalesLine."Applies-to Doc. Type" := SaleLinePOS."Buffer Document Type";
+        POSSalesLine."Applies-to Doc. No." := SaleLinePOS."Buffer Document No.";
+
+        POSSalesLine."Shortcut Dimension 1 Code" := SaleLinePOS."Shortcut Dimension 1 Code";
+        POSSalesLine."Shortcut Dimension 2 Code" := SaleLinePOS."Shortcut Dimension 2 Code";
+        POSSalesLine."Dimension Set ID" := SaleLinePOS."Dimension Set ID";
+
+        OnBeforeInsertPOSSalesLine(SalePOS, SaleLinePOS, POSEntry, POSSalesLine);
+        POSSalesLine.Insert();
         OnAfterInsertPOSSalesLine(SalePOS, SaleLinePOS, POSEntry, POSSalesLine);
     end;
 
@@ -394,69 +361,65 @@ codeunit 6150614 "NPR POS Create Entry"
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
     begin
-        with POSPaymentLine do begin
-            Init;
-            "POS Entry No." := POSEntry."Entry No.";
-            "POS Period Register No." := POSEntry."POS Period Register No.";
-            "Line No." := SaleLinePOS."Line No.";
+        POSPaymentLine.Init();
+        POSPaymentLine."POS Entry No." := POSEntry."Entry No.";
+        POSPaymentLine."POS Period Register No." := POSEntry."POS Period Register No.";
+        POSPaymentLine."Line No." := SaleLinePOS."Line No.";
 
-            SetRecFilter;
-            if not IsEmpty() then
-                repeat
-                    "Line No." := "Line No." + 10000;
-                    SetRecFilter;
-                until IsEmpty();
-            Reset;
+        POSPaymentLine.SetRecFilter();
+        if not POSPaymentLine.IsEmpty() then
+            repeat
+                POSPaymentLine."Line No." := POSPaymentLine."Line No." + 10000;
+                POSPaymentLine.SetRecFilter();
+            until POSPaymentLine.IsEmpty();
+        POSPaymentLine.Reset();
 
-            "POS Store Code" := SalePOS."POS Store Code";
-            "POS Unit No." := SaleLinePOS."Register No.";
-            "Document No." := SaleLinePOS."Sales Ticket No.";
+        POSPaymentLine."POS Store Code" := SalePOS."POS Store Code";
+        POSPaymentLine."POS Unit No." := SaleLinePOS."Register No.";
+        POSPaymentLine."Document No." := SaleLinePOS."Sales Ticket No.";
 
-            if not POSPaymentMethod.Get(SaleLinePOS."No.") then
-                CreatePOSPaymentMethod(SaleLinePOS, POSPaymentMethod);
-            "POS Payment Method Code" := POSPaymentMethod.Code;
+        if not POSPaymentMethod.Get(SaleLinePOS."No.") then
+            CreatePOSPaymentMethod(SaleLinePOS, POSPaymentMethod);
+        POSPaymentLine."POS Payment Method Code" := POSPaymentMethod.Code;
 
-            "POS Payment Bin Code" := SelectUnitBin("POS Unit No.");
-            "Retail ID" := SaleLinePOS."Retail ID";
+        POSPaymentLine."POS Payment Bin Code" := SelectUnitBin(POSPaymentLine."POS Unit No.");
+        POSPaymentLine."Retail ID" := SaleLinePOS."Retail ID";
 
-            Description := SaleLinePOS.Description;
-            if SaleLinePOS."Currency Amount" <> 0 then begin
-                Amount := SaleLinePOS."Currency Amount";
-                "Payment Amount" := SaleLinePOS."Currency Amount";
-            end else begin
-                Amount := SaleLinePOS."Amount Including VAT";
-                "Payment Amount" := SaleLinePOS."Amount Including VAT";
-            end;
-            "Amount (LCY)" := SaleLinePOS."Amount Including VAT";
-            "Amount (Sales Currency)" := SaleLinePOS."Amount Including VAT"; //Sales Currency is always LCY for now
-            "Currency Code" := POSPaymentMethod."Currency Code";
-
-
-            "Orig. POS Sale ID" := SaleLinePOS."Orig. POS Sale ID";
-            "Orig. POS Line No." := SaleLinePOS."Orig. POS Line No.";
-            EFT := SaleLinePOS."EFT Approved";
-
-            "Shortcut Dimension 1 Code" := SaleLinePOS."Shortcut Dimension 1 Code";
-            "Shortcut Dimension 2 Code" := SaleLinePOS."Shortcut Dimension 2 Code";
-            "Dimension Set ID" := SaleLinePOS."Dimension Set ID";
-
-            "Applies-to Doc. Type" := SaleLinePOS."Buffer Document Type";
-            "Applies-to Doc. No." := SaleLinePOS."Buffer Document No.";
-
-            "VAT Base Amount (LCY)" := SaleLinePOS."Amount Including VAT";
-            if (SaleLinePOS."VAT Base Amount" <> 0) then begin
-                "VAT Amount (LCY)" := SaleLinePOS."Amount Including VAT" - SaleLinePOS."VAT Base Amount";
-                "VAT Base Amount (LCY)" := SaleLinePOS."VAT Base Amount";
-            end;
-
-            "VAT Bus. Posting Group" := SaleLinePOS."VAT Bus. Posting Group";
-            "VAT Prod. Posting Group" := SaleLinePOS."VAT Prod. Posting Group";
-
-            CreatePaymentLineBinEntry(POSPaymentLine);
-
-            OnBeforeInsertPOSPaymentLine(SalePOS, SaleLinePOS, POSEntry, POSPaymentLine);
-            Insert;
+        POSPaymentLine.Description := SaleLinePOS.Description;
+        if SaleLinePOS."Currency Amount" <> 0 then begin
+            POSPaymentLine.Amount := SaleLinePOS."Currency Amount";
+            POSPaymentLine."Payment Amount" := SaleLinePOS."Currency Amount";
+        end else begin
+            POSPaymentLine.Amount := SaleLinePOS."Amount Including VAT";
+            POSPaymentLine."Payment Amount" := SaleLinePOS."Amount Including VAT";
         end;
+        POSPaymentLine."Amount (LCY)" := SaleLinePOS."Amount Including VAT";
+        POSPaymentLine."Amount (Sales Currency)" := SaleLinePOS."Amount Including VAT"; //Sales Currency is always LCY for now
+        POSPaymentLine."Currency Code" := POSPaymentMethod."Currency Code";
+
+
+        POSPaymentLine."Orig. POS Sale ID" := SaleLinePOS."Orig. POS Sale ID";
+        POSPaymentLine."Orig. POS Line No." := SaleLinePOS."Orig. POS Line No.";
+        POSPaymentLine.EFT := SaleLinePOS."EFT Approved";
+
+        POSPaymentLine."Shortcut Dimension 1 Code" := SaleLinePOS."Shortcut Dimension 1 Code";
+        POSPaymentLine."Shortcut Dimension 2 Code" := SaleLinePOS."Shortcut Dimension 2 Code";
+        POSPaymentLine."Dimension Set ID" := SaleLinePOS."Dimension Set ID";
+
+        POSPaymentLine."VAT Base Amount (LCY)" := SaleLinePOS."Amount Including VAT";
+        if (SaleLinePOS."VAT Base Amount" <> 0) then begin
+            POSPaymentLine."VAT Amount (LCY)" := SaleLinePOS."Amount Including VAT" - SaleLinePOS."VAT Base Amount";
+            POSPaymentLine."VAT Base Amount (LCY)" := SaleLinePOS."VAT Base Amount";
+        end;
+
+        POSPaymentLine."VAT Bus. Posting Group" := SaleLinePOS."VAT Bus. Posting Group";
+        POSPaymentLine."VAT Prod. Posting Group" := SaleLinePOS."VAT Prod. Posting Group";
+
+        CreatePaymentLineBinEntry(POSPaymentLine);
+
+        OnBeforeInsertPOSPaymentLine(SalePOS, SaleLinePOS, POSEntry, POSPaymentLine);
+
+        POSPaymentLine.Insert();
         OnAfterInsertPOSPaymentLine(SalePOS, SaleLinePOS, POSEntry, POSPaymentLine);
     end;
 
@@ -1037,30 +1000,16 @@ codeunit 6150614 "NPR POS Create Entry"
                 POSPaymentMethod.Validate("Processing Type", POSPaymentMethod."Processing Type"::EFT);
             PaymentTypePOS."Processing Type"::"Other Credit Cards":
                 POSPaymentMethod.Validate("Processing Type", POSPaymentMethod."Processing Type"::EFT);
-            PaymentTypePOS."Processing Type"::"Credit Voucher":
-                POSPaymentMethod.Validate("Processing Type", POSPaymentMethod."Processing Type"::VOUCHER);
-            PaymentTypePOS."Processing Type"::"Gift Voucher":
-                POSPaymentMethod.Validate("Processing Type", POSPaymentMethod."Processing Type"::VOUCHER);
             PaymentTypePOS."Processing Type"::EFT:
                 POSPaymentMethod.Validate("Processing Type", POSPaymentMethod."Processing Type"::EFT);
             PaymentTypePOS."Processing Type"::"Foreign Currency":
                 POSPaymentMethod.Validate("Processing Type", POSPaymentMethod."Processing Type"::CASH);
-            PaymentTypePOS."Processing Type"::"Foreign Credit Voucher":
-                POSPaymentMethod.Validate("Processing Type", POSPaymentMethod."Processing Type"::VOUCHER);
-            PaymentTypePOS."Processing Type"::"Foreign Gift Voucher":
-                POSPaymentMethod.Validate("Processing Type", POSPaymentMethod."Processing Type"::VOUCHER);
             PaymentTypePOS."Processing Type"::"Debit sale":
                 POSPaymentMethod.Validate("Processing Type", POSPaymentMethod."Processing Type"::CUSTOMER);
             PaymentTypePOS."Processing Type"::Invoice:
                 POSPaymentMethod.Validate("Processing Type", POSPaymentMethod."Processing Type"::CUSTOMER);
-            PaymentTypePOS."Processing Type"::"Finance Agreement":
-                ;//???  //POSPaymentMethod.VALIDATE("Processing Type",POSPaymentMethod."Processing Type"::VOUCHER);
             PaymentTypePOS."Processing Type"::Payout:
                 POSPaymentMethod.Validate("Processing Type", POSPaymentMethod."Processing Type"::PAYOUT);
-            PaymentTypePOS."Processing Type"::DIBS:
-                ;//???  //POSPaymentMethod.VALIDATE("Processing Type",POSPaymentMethod."Processing Type"::VOUCHER);
-            PaymentTypePOS."Processing Type"::"Point Card":
-                ;//???  //POSPaymentMethod.VALIDATE("Processing Type",POSPaymentMethod."Processing Type"::VOUCHER);
         end;
         if (PaymentTypePOS."Fixed Rate" <> 0) and (PaymentTypePOS."Fixed Rate" <> 1) then begin
             Clear(Currency);

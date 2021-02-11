@@ -376,40 +376,6 @@ page 6059789 "NPR E-mail Setup"
                         Message(StrSubstNo(EMailTemplateCreatedMsg, EmailTemplateCode));
                     end;
                 }
-                action(CreateCreditVoucherEmailTemplate)
-                {
-                    Caption = 'Credit Voucher';
-                    Image = NewOrder;
-                    Visible = CreditVoucherExists;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Credit Voucher action';
-
-                    trigger OnAction()
-                    var
-                        EmailDocumentMgt: Codeunit "NPR E-mail Doc. Mgt.";
-                        EmailTemplateCode: Code[20];
-                    begin
-                        EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.CreditVoucher");
-                        Message(StrSubstNo(EMailTemplateCreatedMsg, EmailTemplateCode));
-                    end;
-                }
-                action(CreateGiftVoucherEmailTemplate)
-                {
-                    Caption = 'Gift Voucher';
-                    Image = NewOrder;
-                    Visible = GiftVoucherExists;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Gift Voucher action';
-
-                    trigger OnAction()
-                    var
-                        EmailDocumentMgt: Codeunit "NPR E-mail Doc. Mgt.";
-                        EmailTemplateCode: Code[20];
-                    begin
-                        EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.GiftVoucher");
-                        Message(StrSubstNo(EMailTemplateCreatedMsg, EmailTemplateCode));
-                    end;
-                }
             }
         }
     }

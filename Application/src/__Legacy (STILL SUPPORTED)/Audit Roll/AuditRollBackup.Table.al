@@ -307,11 +307,17 @@ table 6014538 "NPR Audit Roll Backup"
         {
             Caption = 'Gift Voucher Reference';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher table won''t be used anymore.';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(60; "Credit voucher ref."; Code[20])
         {
             Caption = 'Credit Voucher Reference';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Credit voucher table won''t be used anymore.';
+            ObsoleteTag = 'NPR Credit Voucher';
         }
         field(61; "Salgspris inkl. moms"; Boolean)
         {
@@ -351,6 +357,9 @@ table 6014538 "NPR Audit Roll Backup"
         {
             Caption = 'Offline - Gift Voucher Reference';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Credit voucher table won''t be used anymore.';
+            ObsoleteTag = 'NPR Credit Voucher';
         }
         field(80; "Special price"; Decimal)
         {
@@ -791,6 +800,9 @@ table 6014538 "NPR Audit Roll Backup"
         }
         key(Key6; "Register No.", Posted, "Sale Date", Type, "Credit voucher ref.")
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Credit voucher table won''t be used anymore.';
+            ObsoleteTag = 'NPR Credit Voucher';
         }
         key(Key7; "Sale Type", Type, "No.", Posted)
         {
@@ -833,6 +845,9 @@ table 6014538 "NPR Audit Roll Backup"
             MaintainSIFTIndex = false;
             MaintainSQLIndex = false;
             SumIndexFields = "Amount Including VAT", Quantity, "Line Discount Amount", Amount, Cost;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher table won''t be used anymore.';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         key(Key15; "Register No.", "Sale Date", "Sale Type", Type, Quantity, "Receipt Type", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code")
         {

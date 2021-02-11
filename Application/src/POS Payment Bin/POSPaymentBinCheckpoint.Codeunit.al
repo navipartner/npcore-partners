@@ -391,12 +391,6 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
           PaymentTypePOS."Processing Type"::"Manual Card",
           PaymentTypePOS."Processing Type"::"Other Credit Cards":
                 CountAsPaymentTypeCode := 'T';
-
-            PaymentTypePOS."Processing Type"::"Credit Voucher",
-          PaymentTypePOS."Processing Type"::"Gift Voucher",
-          PaymentTypePOS."Processing Type"::"Foreign Credit Voucher",
-          PaymentTypePOS."Processing Type"::"Foreign Gift Voucher":
-                CountAsPaymentTypeCode := 'V'
         end;
     end;
 
