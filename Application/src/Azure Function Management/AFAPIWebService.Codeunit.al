@@ -377,11 +377,9 @@ codeunit 6151572 "NPR AF API WebService"
 
         ReportBasedOn := ReportBasedOn::None;
         if NPRetailSetup.Get then begin
-            if NPRetailSetup."Advanced Posting Activated" then begin
-                POSEntry.SetRange("Document No.", SalesTicketNo);
-                if not POSEntry.IsEmpty then
-                    ReportBasedOn := ReportBasedOn::POSEntry;
-            end;
+            POSEntry.SetRange("Document No.", SalesTicketNo);
+            if not POSEntry.IsEmpty then
+                ReportBasedOn := ReportBasedOn::POSEntry;
         end;
         if ReportBasedOn = ReportBasedOn::None then begin
             AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);

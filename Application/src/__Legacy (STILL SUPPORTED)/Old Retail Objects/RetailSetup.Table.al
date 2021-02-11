@@ -1315,9 +1315,6 @@ table 6014400 "NPR Retail Setup"
                 NPRetailSetup: Record "NPR NP Retail Setup";
             begin
                 if "Create POS Entries Only" then begin
-                    NPRetailSetup.Get;
-                    NPRetailSetup.TestField("Advanced Posting Activated");
-                    NPRetailSetup.TestField("Advanced POS Entries Activated");
                     if GuiAllowed then
                         if not Confirm(TextAuditRollWillBeDisabled) then
                             "Create POS Entries Only" := false;

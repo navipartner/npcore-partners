@@ -22,8 +22,6 @@ codeunit 6151165 "NPR NpGp POS Session Mgt."
     begin
         if not NPRetailSetup.Get then
             exit;
-        if not NPRetailSetup."Advanced POS Entries Activated" then
-            exit;
 
         if not POSUnit.Get(SalePOS."Register No.") then
             exit;
@@ -52,8 +50,6 @@ codeunit 6151165 "NPR NpGp POS Session Mgt."
         TaskProcessorCode: Text;
     begin
         if not NPRetailSetup.Get then
-            exit;
-        if not NPRetailSetup."Advanced POS Entries Activated" then
             exit;
 
         if not POSUnit.Get(SalePOS."Register No.") then

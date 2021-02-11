@@ -858,20 +858,8 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
     end;
 
     local procedure GetEntrySourceMethod(): Integer
-    var
-        NPRetailSetup: Record "NPR NP Retail Setup";
     begin
-
-        NPRetailSetup.Get();
-
-        if (not NPRetailSetup."Advanced POS Entries Activated") then
-            exit(EntrySourceMethodOption::AUDITROLL);
-
-        if (NPRetailSetup."Advanced POS Entries Activated") then
-            exit(EntrySourceMethodOption::BINENTRY);
-
-        exit(EntrySourceMethodOption::NA);
-
+        exit(EntrySourceMethodOption::BINENTRY);
     end;
 
     local procedure StoreCountedDenominations(UnitNo: Code[10]; WorkshiftEntryNo: Integer)

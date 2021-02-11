@@ -377,9 +377,6 @@ codeunit 85002 "NPR Library - POS Master Data"
     begin
         if not NPRetailSetup.Get then
             NPRetailSetup.Insert;
-        NPRetailSetup."Advanced POS Entries Activated" := true;
-        NPRetailSetup."Advanced Posting Activated" := true;
-        NPRetailSetup.Modify;
     end;
 
     local procedure CreateDefaultRetailSetup()

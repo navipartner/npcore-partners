@@ -665,8 +665,6 @@ codeunit 6150614 "NPR POS Create Entry"
     begin
 
         // Adjustment to bin
-        if not IsActivated then
-            exit;
         POSBinEntry.Init;
         POSBinEntry.TransferFields(CheckpointBinEntry);
         POSBinEntry."Entry No." := 0;
@@ -686,9 +684,6 @@ codeunit 6150614 "NPR POS Create Entry"
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSAuditLog: Record "NPR POS Audit Log";
     begin
-        if (not IsActivated) then
-            exit(0);
-
         EntryNo := CreatePOSSystemEntry(POSUnitNo, SalespersonCode, '[System Event] Unit Login (With Open)');
 
         POSEntry.Get(EntryNo);
@@ -703,9 +698,6 @@ codeunit 6150614 "NPR POS Create Entry"
         POSEntry: Record "NPR POS Entry";
     begin
 
-        if (not IsActivated) then
-            exit(0);
-
         EntryNo := CreatePOSSystemEntry(POSUnitNo, SalespersonCode, '[System Event] Unit Login');
         POSEntry.Get(EntryNo);
         POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::SIGN_IN, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
@@ -713,17 +705,11 @@ codeunit 6150614 "NPR POS Create Entry"
 
     procedure InsertUnitCloseBeginEntry(POSUnitNo: Code[10]; SalespersonCode: Code[10]) EntryNo: Integer
     begin
-        if (not IsActivated) then
-            exit(0);
-
         EntryNo := CreatePOSSystemEntry(POSUnitNo, SalespersonCode, '[System Event] Unit Close (Balancing Begin)');
     end;
 
     procedure InsertUnitCloseEndEntry(POSUnitNo: Code[10]; SalespersonCode: Code[10]) EntryNo: Integer
     begin
-        if (not IsActivated) then
-            exit(0);
-
         EntryNo := CreatePOSSystemEntry(POSUnitNo, SalespersonCode, '[System Event] Unit Close (Balancing End)');
     end;
 
@@ -733,10 +719,6 @@ codeunit 6150614 "NPR POS Create Entry"
         POSAuditLog: Record "NPR POS Audit Log";
         POSEntry: Record "NPR POS Entry";
     begin
-
-        if (not IsActivated) then
-            exit(0);
-
         EntryNo := CreatePOSSystemEntry(POSUnitNo, SalespersonCode, '[System Event] Unit Logout');
         POSEntry.Get(EntryNo);
         POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::SIGN_OUT, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
@@ -748,10 +730,6 @@ codeunit 6150614 "NPR POS Create Entry"
         POSAuditLog: Record "NPR POS Audit Log";
         POSEntry: Record "NPR POS Entry";
     begin
-
-        if (not IsActivated) then
-            exit(0);
-
         EntryNo := CreatePOSSystemEntry(POSUnitNo, SalespersonCode, '[System Event] Unit Lock');
         POSEntry.Get(EntryNo);
         POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::UNIT_LOCK, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
@@ -764,10 +742,6 @@ codeunit 6150614 "NPR POS Create Entry"
         POSAuditLog: Record "NPR POS Audit Log";
         POSEntry: Record "NPR POS Entry";
     begin
-
-        if (not IsActivated) then
-            exit(0);
-
         EntryNo := CreatePOSSystemEntry(POSUnitNo, SalespersonCode, '[System Event] Unit Unlock');
         POSEntry.Get(EntryNo);
         POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::UNIT_UNLOCK, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
@@ -776,9 +750,7 @@ codeunit 6150614 "NPR POS Create Entry"
 
     procedure InsertBinOpenEntry(POSUnitNo: Code[10]; SalespersonCode: Code[10])
     begin
-
-        if IsActivated then
-            CreatePOSSystemEntry(POSUnitNo, SalespersonCode, '[System Event] Unit Bin Open');
+        CreatePOSSystemEntry(POSUnitNo, SalespersonCode, '[System Event] Unit Bin Open');
     end;
 
     procedure InsertParkSaleEntry(POSUnitNo: Code[10]; SalespersonCode: Code[10]) EntryNo: Integer
@@ -787,10 +759,6 @@ codeunit 6150614 "NPR POS Create Entry"
         POSAuditLog: Record "NPR POS Audit Log";
         POSEntry: Record "NPR POS Entry";
     begin
-
-        if (not IsActivated) then
-            exit(0);
-
         EntryNo := CreatePOSSystemEntry(POSUnitNo, SalespersonCode, '[System Event] Unit Park Sale');
         POSEntry.Get(EntryNo);
         POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::SALE_PARK, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
@@ -803,10 +771,6 @@ codeunit 6150614 "NPR POS Create Entry"
         LoadQuoteMsg: Label 'Parked sales ticket No. %1 loaded as ticket No. %2';
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
     begin
-
-        if not IsActivated then
-            exit(0);
-
         EntryNo := CreatePOSSystemEntry(POSUnitNo, SalespersonCode, '[System Event] Unit Retrieve Parked Sale');
         POSEntry.Get(EntryNo);
         POSAuditLogMgt.CreateEntryExtended(
@@ -822,8 +786,6 @@ codeunit 6150614 "NPR POS Create Entry"
         ResumeSaleMsg: Label 'Unfinished sales ticket No. %1 resumed as ticket No. %2';
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
     begin
-        if not IsActivated then
-            exit(0);
 
         EntryNo := CreatePOSSystemEntry(POSUnitNo, SalespersonCode, '[System Event] Unit Resume Sale');
         POSEntry.Get(EntryNo);
@@ -837,9 +799,7 @@ codeunit 6150614 "NPR POS Create Entry"
         POSEntry: Record "NPR POS Entry";
         CreatedEntryNo: Integer;
     begin
-
-        if IsActivated then
-            CreatedEntryNo := CreatePOSSystemEntry(POSUnitNo, SalespersonCode, CopyStr(StrSubstNo('[System Event] %1 transferred to location receipt %2', OldDocumentNo, NewDocumentNo), 1, MaxStrLen(POSEntry.Description)));
+        CreatedEntryNo := CreatePOSSystemEntry(POSUnitNo, SalespersonCode, CopyStr(StrSubstNo('[System Event] %1 transferred to location receipt %2', OldDocumentNo, NewDocumentNo), 1, MaxStrLen(POSEntry.Description)));
     end;
 
     local procedure CreatePOSSystemEntry(POSUnitNo: Code[10]; SalespersonCode: Code[10]; Description: Text[80]) EntryNo: Integer
@@ -1224,14 +1184,6 @@ codeunit 6150614 "NPR POS Create Entry"
         exit(POSUnit."POS Store Code");
     end;
 
-    local procedure IsActivated(): Boolean
-    var
-        NPRetailSetup: Record "NPR NP Retail Setup";
-    begin
-        if not NPRetailSetup.Find then
-            exit(false);
-        exit(NPRetailSetup."Advanced POS Entries Activated");
-    end;
 
     local procedure SelectUnitBin(UnitNo: Code[10]) BinNo: Code[10]
     var

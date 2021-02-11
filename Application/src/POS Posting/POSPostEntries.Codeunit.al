@@ -51,7 +51,6 @@ codeunit 6150615 "NPR POS Post Entries"
 
     local procedure "Code"(var POSEntry: Record "NPR POS Entry")
     var
-        NPRetailSetup: Record "NPR NP Retail Setup";
         TempPOSPostingBuffer: Record "NPR POS Posting Buffer" temporary;
         TempPOSSalesLineToPost: Record "NPR POS Sales Line" temporary;
         POSSalesLine: Record "NPR POS Sales Line";
@@ -61,11 +60,6 @@ codeunit 6150615 "NPR POS Post Entries"
         GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
         POSEntryTemp: Record "NPR POS Entry" temporary;
     begin
-        NPRetailSetup.Get;
-        if not NPRetailSetup."Advanced POS Entries Activated" then
-            exit;
-        if (not NPRetailSetup."Advanced Posting Activated") then
-            exit;
 
         if ((not PostItemEntriesVar) and (not PostPOSEntriesVar)) or POSEntry.IsEmpty then
             Error(TextNothingToPost);

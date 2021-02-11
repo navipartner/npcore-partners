@@ -683,13 +683,11 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
     begin
         //-NPR5.54 [364340]
         if NPRetailSetup.Get then begin
-            if NPRetailSetup."Advanced Posting Activated" then begin
-                POSEntry.SetRange("Retail ID", RetailID);
-                //-NPR5.55 [386254]
-                POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
-                //+NPR5.55 [386254]
-                exit(not POSEntry.IsEmpty);
-            end;
+            POSEntry.SetRange("Retail ID", RetailID);
+            //-NPR5.55 [386254]
+            POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
+            //+NPR5.55 [386254]
+            exit(not POSEntry.IsEmpty);
         end;
         //+NPR5.54 [364340]
 

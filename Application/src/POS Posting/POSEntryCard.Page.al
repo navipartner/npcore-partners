@@ -844,21 +844,14 @@ page 6150675 "NPR POS Entry Card"
     end;
 
     trigger OnOpenPage()
-    var
-        NPRetailSetup: Record "NPR NP Retail Setup";
     begin
-        NPRetailSetup.Get;
-        AdvancedPostingOff := (not NPRetailSetup."Advanced Posting Activated");
+
     end;
 
     var
-        TextAdvancedPostingOff: Label 'WARNING: Advanced Posting is OFF. Audit Roll used for posting.';
-        TextClicktoSeeAuditRoll: Label 'Click here to see Audit Roll';
         TextPostCompressed: Label 'Post Compressed?';
         TextPostItemEntries: Label 'Post Item Entries?';
         TextPostPosEntries: Label 'Post all other Entries?';
-        AdvancedPostingOff: Boolean;
-        Text10600006: Label 'There are no credit card transactions attached to sales ticket no. %1/Register %2';
         TextSalesDocNotFound: Label 'Sales Document %1 %2 not found.';
         HasSaleLines: Boolean;
         HasPaymentLines: Boolean;

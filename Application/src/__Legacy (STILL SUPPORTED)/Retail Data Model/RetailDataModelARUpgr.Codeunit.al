@@ -151,10 +151,8 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
             until AuditRoll.Next = 0;
             if NoOfPOSEntriesCreated > 0 then begin
                 FinalizePOSEntry(POSEntry, AuditRoll);
-                //-NPR5.55 [404019]
                 CalcVATAmountLines(POSEntry, VATAmountLine, POSSalesLine);
                 PersistVATAmountLines(POSEntry, VATAmountLine);
-                //+NPR5.55 [404019]
             end;
             if GuiAllowed then
                 ProgressDialog.Close;
@@ -196,7 +194,6 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
                         RunningDuration := CurrentDateTime - StartDateTime;
                         ProgressDialog.Update(4, Format(RunningDuration));
                         ProgressDialog.Update(5, Format(Round(((RunningDuration * 1) * ((EstNoOfEntries - Counter) / Counter)) / (1000 * 60))) + ' minutes');
-                        //ProgressDialog.UPDATE(5,FORMAT(ROUND(RunningDuration*1),1));
                         NextProgress := Round(Progress, 10, '>');
                     end;
                 end;
@@ -220,63 +217,6 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
             ProgressDialog.Close;
     end;
 
-    procedure ActivatePoseidonPOSEntries()
-    var
-        NPRetailSetup: Record "NPR NP Retail Setup";
-    begin
-        NPRetailSetup.Get;
-        NPRetailSetup.TestField("Advanced POS Entries Activated", false);
-        if not Confirm('This will trigger Step 1 in the Upgrade to POS Entries. Do you wish to continue?') then
-            Error('');
-        UpgradeAuditRollStep1;
-    end;
-
-    procedure DeactivatePoseidonPOSEntries()
-    var
-        NPRetailSetup: Record "NPR NP Retail Setup";
-    begin
-        NPRetailSetup.Get;
-        NPRetailSetup.TestField("Advanced POS Entries Activated");
-        //-NPR5.37 [294219]
-        NPRetailSetup.TestField("Advanced Posting Activated", false);
-        //+NPR5.37 [294219]
-        //-NPR5.36 [279551]
-        //ERROR('You cannot change this setting')
-        //+NPR5.36 [279551]
-    end;
-
-    procedure ActivatePoseidonPosting()
-    var
-        NPRetailSetup: Record "NPR NP Retail Setup";
-        RetailSetup: Record "NPR Retail Setup";
-        POSWorkshiftCheckpoint: Codeunit "NPR POS Workshift Checkpoint";
-    begin
-
-        NPRetailSetup.Get;
-        NPRetailSetup.TestField("Advanced POS Entries Activated");
-        NPRetailSetup.TestField("Advanced Posting Activated", false);
-
-        RetailSetup.Get;
-        RetailSetup.TestField("Posting Audit Roll", RetailSetup."Posting Audit Roll"::Manual);
-
-        //-NPR5.48 [336921]
-        POSWorkshiftCheckpoint.OnActivatePosEntryPosting();
-        //+NPR5.48 [336921]
-    end;
-
-    procedure DeactivatePoseidonPosting()
-    var
-        NPRetailSetup: Record "NPR NP Retail Setup";
-        POSWorkshiftCheckpoint: Codeunit "NPR POS Workshift Checkpoint";
-    begin
-
-        NPRetailSetup.Get;
-        NPRetailSetup.TestField("Advanced Posting Activated");
-
-        //-NPR5.48 [336921]
-        POSWorkshiftCheckpoint.OnDeactivatePosEntryPosting();
-        //+NPR5.48 [336921]
-    end;
 
     local procedure InsertPOSSaleLine(var AuditRoll: Record "NPR Audit Roll"; var POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Sales Line")
     var
@@ -304,8 +244,6 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
                 AuditRoll.Type::"G/L":
                     Type := Type::"G/L Account";
                 AuditRoll.Type::Comment:
-                    //AuditRoll.Type::Cancelled,
-                    //AuditRoll.Type::"Open/Close",
                     Type := Type::Comment;
                 AuditRoll.Type::Customer:
                     Type := Type::Customer;
@@ -324,9 +262,7 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
                 else
                     Error('Sales Line Type %1 not implemented in migration (%2 %3 %4)', AuditRoll.Type, AuditRoll.TableName, AuditRoll.FieldName("Clustered Key"), AuditRoll."Clustered Key");
             end;
-            //-NPR5.51 [362329]
             "Exclude from Posting" := ExcludeFromPosting(AuditRoll);
-            //+NPR5.51 [362329]
             "No." := AuditRoll."No.";
             "Variant Code" := AuditRoll."Variant Code";
             "Location Code" := AuditRoll.Lokationskode;
@@ -346,20 +282,15 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
             "Tax Liable" := AuditRoll."Tax Liable";
             "Tax Group Code" := AuditRoll."Tax Group Code";
             "Use Tax" := AuditRoll."Use Tax";
-            //-NPR5.55 [404019]
             if VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group") then begin
                 "VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
                 "VAT Identifier" := VATPostingSetup."VAT Identifier";
             end;
-            //+NPR5.55 [404019]
             "Unit of Measure Code" := AuditRoll."Unit of Measure Code";
             Quantity := AuditRoll.Quantity;
             if (Type = Type::Item) then begin
                 if Item.Get("No.") then begin
                     "Item Category Code" := Item."Item Category Code";
-                    //-NPR5.48 [340615]
-                    //"Product Group Code" := Item."Product Group Code";
-                    //+NPR5.48 [340615]
                 end;
                 if IUoM.Get("No.", "Unit of Measure Code") then
                     "Qty. per Unit of Measure" := IUoM."Qty. per Unit of Measure";
@@ -370,12 +301,10 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
             "Unit Price" := AuditRoll."Unit Price";
             "Unit Cost (LCY)" := AuditRoll."Unit Cost (LCY)";
             "VAT %" := AuditRoll."VAT %";
-            //-NPR5.44 [321231]
             "Discount Type" := "Discount Type";
             "Discount Code" := "Discount Code";
             "Discount Authorised by" := "Discount Authorised by";
             "Reason Code" := "Reason Code";
-            //+NPR5.44 [321231]
             "Line Discount Amount Excl. VAT" := Round(AuditRoll."Line Discount Amount" / (1 + AuditRoll."VAT %" / 100)); //Assuming Line Disc. Amount was alwas incl. VAYT
             "Line Discount Amount Incl. VAT" := AuditRoll."Line Discount Amount";
             "Amount Excl. VAT" := AuditRoll.Amount;
@@ -425,9 +354,6 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
             AuditRolltoPOSEntryLink.Insert;
 
             //Update POS Entry
-            //-NPR5.55 [404019]
-            //IF Type <> Type::Comment THEN //any line not being comment should change type to sale
-            //POSEntry."Entry Type" := POSEntry."Entry Type"::"Direct Sale";
             case AuditRoll."Sale Type" of
                 AuditRoll."Sale Type"::"Debit Sale":
                     begin
@@ -448,7 +374,6 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
                         POSEntry.Description := AuditRoll.Description;
                     end;
             end;
-            //+NPR5.55 [404019]
 
             if POSEntry."Dimension Set ID" = 0 then begin
                 POSEntry."Dimension Set ID" := AuditRoll."Dimension Set ID";
@@ -456,29 +381,21 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
                 POSEntry."Shortcut Dimension 2 Code" := AuditRoll."Shortcut Dimension 2 Code";
             end;
             if AuditRoll."Item Entry Posted" then
-                //POSEntry."Item Entries Posted" := TRUE;
                 POSEntry."Post Item Entry Status" := POSEntry."Post Item Entry Status"::Posted;
             if AuditRoll."Salgspris inkl. moms" then
                 POSEntry."Prices Including VAT" := true;
             //Update measures
             if Type = Type::Item then begin
                 POSEntry."Item Sales (LCY)" += "Amount Incl. VAT";
-                //-NPR5.55 [404019]
-                //POSEntry."Discount Amount" += "Line Discount Amount Incl. VAT";
                 POSEntry."Discount Amount" += "Line Discount Amount Excl. VAT";
-                //+NPR5.55 [404019]
                 if Quantity < 0 then
                     POSEntry."Return Sales Quantity" -= Quantity
                 else
                     POSEntry."Sales Quantity" += Quantity;
             end;
             POSEntry."Amount Excl. Tax" += "Amount Excl. VAT";
-            //-NPR5.55 [404019]
-            //POSEntry."Tax Amount" += "Amount Incl. VAT";
-            //POSEntry."Amount Incl. Tax" += "Amount Incl. VAT"-"Amount Excl. VAT";
             POSEntry."Tax Amount" += "Amount Incl. VAT" - "Amount Excl. VAT";
             POSEntry."Amount Incl. Tax" += "Amount Incl. VAT";
-            //-NPR5.55 [404019]
         end;
     end;
 
@@ -555,10 +472,7 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
             if CashRegister.Get(AuditRoll."Register No.") then
                 "POS Payment Method Code" := CashRegister."Primary Payment Type";
 
-            //-NPR5.39 [304835]
-            //Description := AuditRoll.Description;
             Description := CopyStr(AuditRoll.Description, 1, MaxStrLen(Description));
-            //+NPR5.39 [304835]
 
             CashRegPeriod.SetRange("Register No.", AuditRoll."Register No.");
             CashRegPeriod.SetRange("Sales Ticket No.", AuditRoll."Sales Ticket No.");
@@ -591,13 +505,7 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
             AuditRolltoPOSEntryLink."Line Type" := AuditRolltoPOSEntryLink."Line Type"::Balancing;
             AuditRolltoPOSEntryLink."Line No." := "Line No.";
             AuditRolltoPOSEntryLink.Insert;
-
-            //Update POS Entry
-            //-NPR5.38 [297087]
-            //POSEntry."Entry Type" := POSEntry."Entry Type"::Other;
             POSEntry."Entry Type" := POSEntry."Entry Type"::Balancing;
-            //+NPR5.38 [297087]
-
             POSEntry.Description := AuditRoll.Description;
             if POSEntry."Dimension Set ID" = 0 then begin
                 POSEntry."Dimension Set ID" := AuditRoll."Dimension Set ID";
@@ -610,10 +518,7 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
             POSLedgerRegister."Closing Entry No." := "POS Entry No.";
             POSLedgerRegister.Status := POSLedgerRegister.Status::CLOSED;
             POSLedgerRegister.Modify;
-            //-NPR5.38 [301600]
             POSPostingControl.AutomaticPostPeriodRegister(POSLedgerRegister);
-            //+NPR5.38 [301600]
-
         end;
     end;
 
@@ -640,9 +545,7 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
                 POSBalancingLine.DeleteAll;
                 POSLedgerRegister.DeleteAll;
                 POSEntryCommentLine.DeleteAll;
-                //-NPR5.55 [404019]
                 POSTaxAmountLine.DeleteAll;
-                //+NPR5.55 [404019]
             end else
                 Error('Can not initialize Poseidon Datamodel.');
         end;
@@ -678,7 +581,6 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
             POSEntry."No. Printed" := AuditRoll."No. Printed";
 
         if AuditRoll.Posted then begin
-            //POSEntry.Posted := TRUE;
             if (AuditRoll."Sale Type" = AuditRoll."Sale Type"::"Debit Sale") then
                 POSEntry."Post Entry Status" := POSEntry."Post Entry Status"::"Not To Be Posted"
             else
@@ -691,9 +593,7 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
     begin
         if POSEntry."Post Item Entry Status" = POSEntry."Post Item Entry Status"::Unposted then
             POSEntry."Post Item Entry Status" := POSEntry."Post Entry Status";
-        //-NPR5.55 [404019]
         POSEntry."Amount Incl. Tax & Round" := POSEntry."Amount Incl. Tax" + POSEntry."Rounding Amount (LCY)";
-        //+NPR5.55 [404019]
         POSEntry.Modify;
     end;
 
@@ -725,8 +625,6 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
         POSLedgerRegister: Record "NPR POS Period Register";
         HasOpenPOSLedgerRegister: Boolean;
     begin
-
-        //-NPR5.38 [297087]
         if (SalesTicketNo = '') then
             exit;
 
@@ -783,10 +681,6 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
                 AuditRolltoPOSEntryLink."Upgrade Step" := 1;
                 AuditRolltoPOSEntryLink.Insert;
                 NoOfPOSEntriesCreated += 1;
-                //-NPR5.38 [301600]
-                //END;
-                //+NPR5.38 [301600]
-
                 case AuditRoll."Sale Type" of
                     AuditRoll."Sale Type"::Sale,
                   AuditRoll."Sale Type"::"Out payment",
@@ -805,15 +699,11 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
                 end;
                 UpdatePOSEntry(POSEntry, AuditRoll);
                 xAuditRoll := AuditRoll;
-                //-NPR5.38 [301600]
             end;
-        //+NPR5.38 [301600]
         until AuditRoll.Next = 0;
 
         if NoOfPOSEntriesCreated > 0 then
             FinalizePOSEntry(POSEntry, AuditRoll);
-
-        //+NPR5.38 [297087]
     end;
 
     procedure UpgradeSetupsBalancingV3()
@@ -833,16 +723,11 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
         POSPostingProfile: Record "NPR POS Posting Profile";
         BlankPosStoreCode: Integer;
     begin
-        //-NPR5.48 [334335]
-        //-NPR5.51 [334335]
         if GuiAllowed then
             ProgressDialog.Open('Upgrade Setups for BalancingV3 \' +
                                  'Estimated Payment Type @1@@@@@@@@\' +
                                  'Populate POS Payment Bin #2########\' +
                                  'Set POS Posting Setup #3########');
-        //+NPR5.51 [334335]
-        //Upadte POS Unit Name with Register Decsription
-        //-NPR5.55 [395030]
         Register.Reset;
         POSUnit.Reset;
         if Register.FindSet then begin
@@ -854,23 +739,17 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
                 end;
             until Register.Next = 0;
         end;
-        //+NPR5.55 [395030]
-
         //1. Populate POS Payment Method
         POSPaymentMethod.Reset;  // Target
         POSPaymentMethodCheck.Reset;
         PaymentTypePOS.Reset;   //  Source
         Register.Reset;
 
-        //-NPR5.52[371142]
         PaymentTypePOS.SetRange(Status, PaymentTypePOS.Status::Active); //Check for Active Status
-        //+NPR5.52[371142]
         if PaymentTypePOS.FindSet then
             repeat
-                //-NPR5.51 [334335]
                 if GuiAllowed then
                     ProgressDialog.Update(1, PaymentTypePOS.Count);
-                //+NPR5.51 [334335]
                 POSPaymentMethodCheck.Reset;
                 POSPaymentMethod.Reset;
                 if not POSPaymentMethodCheck.Get(PaymentTypePOS."No.") then begin
@@ -905,7 +784,6 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
                         PaymentTypePOS."Processing Type"::"Credit Voucher":
                             POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::VOUCHER;
 
-                        //-NPR5.51 [334335]
                         PaymentTypePOS."Processing Type"::"Terminal Card":
                             POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::EFT;
 
@@ -926,7 +804,6 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
 
                         PaymentTypePOS."Processing Type"::"Point Card":
                             POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::EFT;
-                    //+NPR5.51 [334335]
 
                     end;
                     if PaymentTypePOS."To be Balanced" then
@@ -935,29 +812,18 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
                         POSPaymentMethod."Include In Counting" := POSPaymentMethod."Include In Counting"::NO;
 
                     POSPaymentMethod."Post Condensed" := (PaymentTypePOS.Posting = PaymentTypePOS.Posting::Condensed);
-                    //-NPR5.55 [407687]
                     if (POSPaymentMethod."Post Condensed") and (POSPaymentMethod."Condensed Posting Description" = '') then
                         POSPaymentMethod."Condensed Posting Description" := 'Dagens bevægelser %6 %3 kasse %1';
-                    //+NPR5.55 [407687]
                     POSPaymentMethod."Rounding Type" := POSPaymentMethod."Rounding Type"::Nearest;
                     POSPaymentMethod."Rounding Precision" := PaymentTypePOS."Rounding Precision";
-                    //-NPR5.52[371142]
                     if POSPaymentMethod."Processing Type" = POSPaymentMethod."Processing Type"::CASH then
                         POSPaymentMethod."Include In Counting" := POSPaymentMethod."Include In Counting"::YES;
 
-                    //-NPR5.53 [375828]
-                    /*
-                    IF Register.FINDFIRST THEN BEGIN
-                      POSPaymentMethod."Rounding Gains Account" := Register.Rounding;
-                      POSPaymentMethod."Rounding Losses Account" := Register.Rounding;
-                    END;
-                    */
                     if POSPostingProfile.FindFirst then begin
                         POSPaymentMethod."Rounding Gains Account" := POSPostingProfile."POS Sales Rounding Account";
                         POSPaymentMethod."Rounding Losses Account" := POSPostingProfile."POS Sales Rounding Account";
                     end;
-                    //+NPR5.53 [375828]
-                    //+NPR5.52[371142]
+
                     POSPaymentMethod.Insert(true);
                 end;
             until PaymentTypePOS.Next = 0;
@@ -968,10 +834,8 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
         POSUnit.Reset;
         if POSUnit.FindSet then
             repeat
-                //-NPR5.51 [334335]
                 if GuiAllowed then
                     ProgressDialog.Update(2, POSUnit.Count);
-                //+NPR5.51 [334335]
                 POSPaymentBinCheck.Reset;
                 POSPaymentBin.Reset;
                 if not POSPaymentBinCheck.Get(POSUnit."No.") then begin
@@ -981,52 +845,13 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
                     POSPaymentBin."Attached to POS Unit No." := POSUnit."No.";
                     POSPaymentBin."Eject Method" := 'Printer';
                     POSPaymentBin."Bin Type" := POSPaymentBin."Bin Type"::CASH_DRAWER;
-                    //-NPR5.52[371142]
                     POSPaymentBin.Description := 'Payment Bin' + ' ' + POSPaymentBin."No.";
-                    //+NPR5.52[371142]
                     POSPaymentBin.Insert(true);
                 end;
-                //-NPR5.52[371142]
                 //Default POS Payment Bin
                 CreateDefaultBins(POSUnit."No.");
-            //+NPR5.52[371142]
             until POSUnit.Next = 0;
 
-        //3. POS Posting Setup
-        //-NPR5.52[371142]
-        /*
-        POSPostingSetup.RESET;
-        POSPostingSetupCheck.RESET;
-        PaymentTypePOS.RESET;
-        Register.RESET;
-        POSPostingSetupCheck.RESET;  //POS Store Code,POS Payment Method Code,POS Payment Bin Code
-        IF POSPostingSetupCheck.COUNT < 1 THEN BEGIN
-          IF Register.FINDSET THEN REPEAT
-            BlankPosStoreCode := 1;
-            PaymentTypePOS.RESET;
-            IF PaymentTypePOS.FINDSET THEN REPEAT
-              //-NPR5.51 [334335]
-              IF GUIALLOWED THEN
-                ProgressDialog.UPDATE(3,PaymentTypePOS.COUNT);
-              //+NPR5.51 [334335]
-              POSPostingSetup.RESET;
-              POSPostingSetup.INIT;
-              POSPostingSetup."POS Store Code" := Register."Register No.";
-              POSPostingSetup."POS Payment Method Code" := PaymentTypePOS."No.";
-              POSPostingSetup."POS Payment Bin Code" := Register."Register No.";
-              POSPostingSetup."Account Type" := PaymentTypePOS."Account Type";
-              POSPostingSetup."Account No." := PaymentTypePOS."G/L Account No.";
-              POSPostingSetup."Difference Account Type" := POSPostingSetup."Difference Account Type"::"G/L Account";
-              POSPostingSetup."Difference Acc. No." := Register."Difference Account";
-              POSPostingSetup."Difference Acc. No. (Neg)" := Register."Difference Account - Neg.";
-              POSPostingSetup.INSERT(TRUE);
-        
-              BlankPosStoreCode +=1;
-        
-            UNTIL PaymentTypePOS.NEXT = 0;
-          UNTIL Register.NEXT = 0;
-        END;
-        */
 
         POSPostingSetupCheck.Reset;
         if POSPostingSetupCheck.Count < 1 then begin
@@ -1040,13 +865,9 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
             PaymentTypePOS.SetRange(Status, PaymentTypePOS.Status::Active); //Check for Active Status
             if PaymentTypePOS.FindSet then
                 repeat
-                    //-NPR5.51 [334335]
                     if GuiAllowed then
                         ProgressDialog.Update(3, PaymentTypePOS.Count);
-                    //+NPR5.51 [334335]
-                    //-NPR5.55 [394811]
                     if CheckPaymentTypePOSAccount(PaymentTypePOS) then begin
-                        //+NPR5.55 [394811]
                         POSPostingSetup.Reset;
                         POSPostingSetup.Init;
                         POSPostingSetup."POS Store Code" := '';
@@ -1091,10 +912,8 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
                     POSPaymentMethod.SetRange(POSPaymentMethod."Processing Type", POSPaymentMethod."Processing Type"::CASH);
                     if POSPaymentMethod.FindSet then
                         repeat
-                            //-NPR5.51 [334335]
                             if GuiAllowed then
                                 ProgressDialog.Update(3, PaymentTypePOS.Count);
-                            //+NPR5.51 [334335]
                             POSPostingSetup.Reset;
                             POSPostingSetup.Init;
                             POSPostingSetup."POS Store Code" := POSStore.Code;
@@ -1139,28 +958,16 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
                 end;
             until POSUnit.Next = 0;
         end;
-        //+NPR5.52[371142]
 
-        //-NPR5.51 [334335]
         if GuiAllowed then
             ProgressDialog.Close;
-        //+NPR5.51 [334335]
-
-        //+NPR5.48 [334335]
-
     end;
 
     procedure ExcludeFromPosting(AuditRoll: Record "NPR Audit Roll"): Boolean
     begin
-        //-NPR5.51 [362329]
         if AuditRoll.Type in [AuditRoll.Type::Comment] then
             exit(true);
-
-        //-NPR5.55 [404019]
-        //EXIT(AuditRoll."Sale Type" IN [AuditRoll."Sale Type"::Comment,AuditRoll."Sale Type"::"Debit Sale",AuditRoll."Sale Type"::"Open/Close"]);
         exit(AuditRoll."Sale Type" in [AuditRoll."Sale Type"::Comment, AuditRoll."Sale Type"::"Open/Close"]);//Remove "Sale Type"::"Debit Sale"
-        //+NPR5.55 [404019]
-        //+NPR5.51 [362329]
     end;
 
     local procedure CreateDefaultBins(POSUnitNo: Code[10])
@@ -1171,23 +978,15 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
         POSPaymentBin: Record "NPR POS Payment Bin";
         POSPaymentBinCheck: Record "NPR POS Payment Bin";
     begin
-        //-NPR5.52[371142]
         BinNoArray[1] := 'AUTO-BIN';
         BinNoArray[2] := 'BANK';
         BinNoArray[3] := 'SAFE';
 
         BinDescArray[1] := 'Auto Count Bin';
-        //-NPR5.53 [381094]
-        //BinDescArray[2] := 'Safe';
-        //BinDescArray[3] := 'Bank';
         BinDescArray[2] := 'Bank';
         BinDescArray[3] := 'Safe';
-        //+NPR5.53 [381094]
 
         for i := 1 to 3 do begin
-            //POSPaymentBinCheck.RESET;
-            //POSPaymentBinCheck.SETRANGE("No.",BinNoArray[i]);
-            //POSPaymentBinCheck.SETRANGE("Attached to POS Unit No.",POSUnitNo);
             if not POSPaymentBinCheck.Get(BinNoArray[i]) then begin
                 POSPaymentBin.Init;
                 POSPaymentBin."No." := BinNoArray[i];
@@ -1206,12 +1005,10 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
                 POSPaymentBin.Insert(true);
             end;
         end;
-        //+NPR5.52[371142]
     end;
 
     local procedure CheckPaymentTypePOSAccount(PaymentTypePOS: Record "NPR Payment Type POS"): Boolean
     begin
-        //-NPR5.55 [394811]
         case PaymentTypePOS."Account Type" of
             PaymentTypePOS."Account Type"::Bank:
                 exit(PaymentTypePOS."Bank Acc. No." <> '');
@@ -1222,7 +1019,6 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
             else
                 exit(false);
         end;
-        //+NPR5.55 [394811]
     end;
 
     local procedure DeleteDuplicatePOSStore()
@@ -1284,16 +1080,6 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
         RoundingLineInserted: Boolean;
     begin
         POSEntry := POSEntryIn;
-        /*
-        Posted := POSEntry."Post Entry Status" >= POSEntry."Post Entry Status"::Posted;
-        SetUpCurrency(POSEntry."Currency Code");
-        IF POSEntry."Currency Code" <> '' THEN
-          POSEntry.TESTFIELD("Currency Factor");
-        IF POSEntry."Currency Factor" = 0 THEN
-          ExchangeFactor := 1
-        ELSE
-          ExchangeFactor := POSEntry."Currency Factor";
-        */
         VATAmountLine.DeleteAll;
 
         with POSSalesLine do begin
@@ -1330,123 +1116,5 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
                     end;
                 until Next = 0;
         end;
-        /*
-        WITH VATAmountLine DO
-          IF FINDSET THEN
-            REPEAT
-              IF (PrevVatAmountLine."VAT Identifier" <> "VAT Identifier") OR
-                 (PrevVatAmountLine."VAT Calculation Type" <> "VAT Calculation Type") OR
-                 (PrevVatAmountLine."Tax Group Code" <> "Tax Group Code") OR
-                 (PrevVatAmountLine."Use Tax" <> "Use Tax")
-              THEN
-                PrevVatAmountLine.INIT;
-              //IF POSEntry."Prices Including VAT" THEN BEGIN
-                CASE "VAT Calculation Type" OF
-                  "VAT Calculation Type"::"Normal VAT",
-                  "VAT Calculation Type"::"Reverse Charge VAT":
-                    BEGIN
-                      "VAT Base" := "Line Amount";
-                      {
-                        ROUND(
-                          ("Line Amount" - "Invoice Discount Amount") / (1 + "VAT %" / 100),
-                          Currency."Amount Rounding Precision") - "VAT Difference";
-                      }
-                      "VAT Amount" := POSSalesLine.va
-                        "VAT Difference" +
-                        ROUND(
-                          PrevVatAmountLine."VAT Amount" +
-                          ("Line Amount" - "Invoice Discount Amount" - "VAT Base" - "VAT Difference"),
-                          Currency."Amount Rounding Precision",Currency.VATRoundingDirection);
-                      "Amount Including VAT" := "VAT Base" + "VAT Amount";
-                      IF Positive THEN
-                        PrevVatAmountLine.INIT
-                      ELSE BEGIN
-                        PrevVatAmountLine := VATAmountLine;
-                        PrevVatAmountLine."VAT Amount" :=
-                          ("Line Amount" - "Invoice Discount Amount" - "VAT Base" - "VAT Difference");
-                        PrevVatAmountLine."VAT Amount" :=
-                          PrevVatAmountLine."VAT Amount" -
-                          ROUND(PrevVatAmountLine."VAT Amount",Currency."Amount Rounding Precision",Currency.VATRoundingDirection);
-                      END;
-                    END;
-                  "VAT Calculation Type"::"Full VAT":
-                    BEGIN
-                      "VAT Base" := 0;
-                      "VAT Amount" := "VAT Difference" + "Line Amount" - "Invoice Discount Amount";
-                      "Amount Including VAT" := "VAT Amount";
-                    END;
-                  "VAT Calculation Type"::"Sales Tax":
-                    BEGIN
-                      "Amount Including VAT" := "Line Amount" - "Invoice Discount Amount";
-                      "VAT Base" :=
-                        ROUND(
-                          SalesTaxCalculate.ReverseCalculateTax(
-                            POSEntry."Tax Area Code","Tax Group Code",POSSalesLine."Tax Liable",
-                            POSEntry."Posting Date","Amount Including VAT",Quantity,POSEntry."Currency Factor"),
-                          Currency."Amount Rounding Precision");
-                      "VAT Amount" := "VAT Difference" + "Amount Including VAT" - "VAT Base";
-                      IF "VAT Base" = 0 THEN
-                        "VAT %" := 0
-                      ELSE
-                        "VAT %" := ROUND(100 * "VAT Amount" / "VAT Base",0.00001);
-                    END;
-                END;
-              //END ELSE
-              {
-                CASE "VAT Calculation Type" OF
-                  "VAT Calculation Type"::"Normal VAT",
-                  "VAT Calculation Type"::"Reverse Charge VAT":
-                    BEGIN
-                      "VAT Base" := "Line Amount" - "Invoice Discount Amount";
-                      "VAT Amount" :=
-                        "VAT Difference" +
-                        ROUND(
-                          PrevVatAmountLine."VAT Amount" +
-                          "VAT Base" * "VAT %" / 100,
-                          Currency."Amount Rounding Precision",Currency.VATRoundingDirection);
-                      "Amount Including VAT" := "Line Amount" - "Invoice Discount Amount" + "VAT Amount";
-                      IF Positive THEN
-                        PrevVatAmountLine.INIT
-                      ELSE
-                        IF NOT "Includes Prepayment" THEN BEGIN
-                          PrevVatAmountLine := VATAmountLine;
-                          PrevVatAmountLine."VAT Amount" :=
-                            "VAT Base" * "VAT %" / 100;
-                          PrevVatAmountLine."VAT Amount" :=
-                            PrevVatAmountLine."VAT Amount" -
-                            ROUND(PrevVatAmountLine."VAT Amount",Currency."Amount Rounding Precision",Currency.VATRoundingDirection);
-                        END;
-                    END;
-                  "VAT Calculation Type"::"Full VAT":
-                    BEGIN
-                      "VAT Base" := 0;
-                      "VAT Amount" := "VAT Difference" + "Line Amount" - "Invoice Discount Amount";
-                      "Amount Including VAT" := "VAT Amount";
-                    END;
-                  "VAT Calculation Type"::"Sales Tax":
-                    BEGIN
-                      "VAT Base" := "Line Amount" - "Invoice Discount Amount";
-                      "VAT Amount" :=
-                        SalesTaxCalculate.CalculateTax(
-                          POSEntry."Tax Area Code","Tax Group Code",POSSalesLine."Tax Liable",
-                          POSEntry."Posting Date","VAT Base",Quantity,POSEntry."Currency Factor");
-                      IF "VAT Base" = 0 THEN
-                        "VAT %" := 0
-                      ELSE
-                        "VAT %" := ROUND(100 * "VAT Amount" / "VAT Base",0.00001);
-                      "VAT Amount" :=
-                        "VAT Difference" +
-                        ROUND("VAT Amount",Currency."Amount Rounding Precision",Currency.VATRoundingDirection);
-                      "Amount Including VAT" := "VAT Base" + "VAT Amount";
-                    END;
-                    }
-                //END;
-        
-              "Calculated VAT Amount" := "VAT Amount" - "VAT Difference";
-              MODIFY;
-            UNTIL NEXT = 0;
-        */
-        //+NPR5.48 [335967]
-
     end;
 }

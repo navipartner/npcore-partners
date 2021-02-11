@@ -43,7 +43,6 @@ codeunit 6150860 "NPR POS Action: LoginButton"
         JSON: Codeunit "NPR POS JSON Management";
         Setup: Codeunit "NPR POS Setup";
         POSUnitIdentity: Codeunit "NPR POS Unit Identity";
-        NPRetailSetup: Record "NPR NP Retail Setup";
         POSUnitIdentityRec: Record "NPR POS Unit Identity";
         Register: Record "NPR Register";
         UserSetup: Record "User Setup";
@@ -96,9 +95,10 @@ codeunit 6150860 "NPR POS Action: LoginButton"
                     if ((SalespersonPurchaser.FindFirst() and (Password <> ''))) then begin
                         Setup.SetSalesperson(SalespersonPurchaser);
 
-                        if (NPRetailSetup.Get()) then;
-                        if (NPRetailSetup."Advanced Posting Activated") then
-                            OpenPosUnit(FrontEnd, Setup, POSSession);
+                        //-NPR5.46 [328338] - refactored
+                        OpenPosUnit(FrontEnd, Setup, POSSession);
+                        //+NPR5.46 [328338]
+
                     end else begin
                         Error('Illegal password.');
                     end;
@@ -114,10 +114,7 @@ codeunit 6150860 "NPR POS Action: LoginButton"
                     SalespersonPurchaser.Get(SalespersonCode);
                     Setup.SetSalesperson(SalespersonPurchaser);
 
-                    if (NPRetailSetup.Get()) then;
-
-                    if (NPRetailSetup."Advanced Posting Activated") then
-                        OpenPosUnit(FrontEnd, Setup, POSSession);
+                    OpenPosUnit(FrontEnd, Setup, POSSession);
                 end;
             else
                 FrontEnd.ReportBug(StrSubstNo(Text001, Type));
