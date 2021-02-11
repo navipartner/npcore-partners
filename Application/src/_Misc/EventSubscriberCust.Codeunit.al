@@ -153,16 +153,6 @@ codeunit 6014442 "NPR Event Subscriber (Cust)"
         PAGE.RunModal(PAGE::"Item Ledger Entries", ItemLedgerEntry);
     end;
 
-    [EventSubscriber(ObjectType::Page, Page::"Customer List", 'OnAfterActionEvent', 'NPR AuditRoll', false, false)]
-    local procedure CustomerListOnAfterActionEventAuditRoll(var Rec: Record Customer)
-    var
-        AuditRoll: Record "NPR Audit Roll";
-    begin
-        AuditRoll.SetCurrentKey("Customer No.");
-        AuditRoll.SetRange("Customer No.", Rec."No.");
-        PAGE.RunModal(PAGE::"NPR Audit Roll", AuditRoll);
-    end;
-
     [EventSubscriber(ObjectType::Page, Page::"Customer Card", 'OnAfterActionEvent', 'NPR ItemLedgerEntries', false, false)]
     local procedure CustomerCardOnAfterActionEventItemLedgerEntries(var Rec: Record Customer)
     var
@@ -170,16 +160,6 @@ codeunit 6014442 "NPR Event Subscriber (Cust)"
     begin
         ItemLedgerEntry.SetRange("Source No.", Rec."No.");
         PAGE.RunModal(PAGE::"Item Ledger Entries", ItemLedgerEntry);
-    end;
-
-    [EventSubscriber(ObjectType::Page, Page::"Customer Card", 'OnAfterActionEvent', 'NPR AlternativeNo', false, false)]
-    local procedure CustomerCardOnAfterActionEventAlternativNo(var Rec: Record Customer)
-    var
-        AlternativeNo: Record "NPR Alternative No.";
-    begin
-        AlternativeNo.SetRange(Type, AlternativeNo.Type::Customer);
-        AlternativeNo.SetRange(AlternativeNo.Code, Rec."No.");
-        PAGE.RunModal(PAGE::"NPR Alternative Number", AlternativeNo);
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"Customer Card", 'OnAfterActionEvent', 'NPR PrintShippingLabel', false, false)]
@@ -193,16 +173,6 @@ codeunit 6014442 "NPR Event Subscriber (Cust)"
         Customer.SetRecFilter;
         RecRef.GetTable(Customer);
         LabelLibrary.PrintCustomShippingLabel(RecRef, '');
-    end;
-
-    [EventSubscriber(ObjectType::Page, Page::"Customer Card", 'OnAfterActionEvent', 'NPR AuditRoll', false, false)]
-    local procedure CustomerCardOnAfterActionEventAuditRoll(var Rec: Record Customer)
-    var
-        AuditRoll: Record "NPR Audit Roll";
-    begin
-        AuditRoll.SetCurrentKey("Customer No.");
-        AuditRoll.SetRange("Customer No.", Rec."No.");
-        PAGE.RunModal(PAGE::"NPR Audit Roll", AuditRoll);
     end;
 }
 

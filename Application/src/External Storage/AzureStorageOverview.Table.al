@@ -2,6 +2,7 @@ table 6184861 "NPR Azure Storage Overview"
 {
     Caption = 'Azure Storage Overview';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
 
     fields
     {
@@ -9,7 +10,6 @@ table 6184861 "NPR Azure Storage Overview"
         {
             Caption = 'Azure Account Name';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Azure Storage API Setup";
         }
         field(10; "Container Name"; Text[63])
         {

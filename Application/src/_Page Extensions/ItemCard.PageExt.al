@@ -52,10 +52,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Statistics Group field';
-                trigger OnValidate()
-                begin
-                    NPR_CheckItemGroup();
-                end;
             }
         }
 
@@ -67,121 +63,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 ToolTip = 'Specifies the value of the NPR Explode BOM auto field';
             }
         }
-
-        modify("Search Description")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify(Blocked)
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify("Costing Method")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify("Standard Cost")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify("Last Direct Cost")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify("Price/Profit Calculation")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify("Profit %")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify("Unit Price")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify("Gen. Prod. Posting Group")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify("VAT Prod. Posting Group")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify("Sales Unit of Measure")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify("Purch. Unit of Measure")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-
-        modify("Reorder Point")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-        modify("Maximum Inventory")
-        {
-            trigger OnAfterValidate()
-            begin
-                NPR_CheckItemGroup();
-            end;
-        }
-
-
 
         addafter("Sales Blocked")
         {
@@ -910,23 +791,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
         addafter("Item Tracing")
         {
-            action("NPR NPR_ReplicateItem")
-            {
-                Caption = 'Replicate Item';
-                Image = Copy;
-                ApplicationArea = All;
-                ToolTip = 'Executes the Replicate Item action';
-
-                trigger OnAction()
-                begin
-                    NPR_ReplicateItem();
-                end;
-
-            }
-        }
-
-        addafter("NPR NPR_ReplicateItem")
-        {
             group("NPR NPR_TransferTo")
             {
                 Caption = 'Transfer to';
@@ -1385,7 +1249,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         ItemCostMgt.CalculateAverageCost(Rec, AverageCostACY, AverageCostACY);
     end;
 
-
     procedure NPR_SetMagentoEnabled()
     var
         MagentoSetup: Record "NPR Magento Setup";
@@ -1404,56 +1267,5 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         MagentoPictureVarietyTypeVisible :=
           (MagentoSetup."Variant System" = MagentoSetup."Variant System"::Variety) and
           (MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::"Select on Item");
-    end;
-
-    procedure NPR_CheckItemGroup()
-    begin
-        IF (Rec."NPR Item Group" = '') THEN
-            Rec.FIELDERROR("NPR Item Group");
-    end;
-
-    procedure NPR_ReplicateItem()
-    var
-        InputDialog: Page "NPR Input Dialog";
-        NewItemNo: Code[20];
-        ItemCopy: Record Item;
-        ItemUnitofMeasure: Record "Item Unit of Measure";
-        ItemUnitofMeasureNew: Record "Item Unit of Measure";
-    begin
-        NewItemNo := '';
-
-        InputDialog.SetInput(1, NewItemNo, Text10600012);
-        if InputDialog.RunModal = ACTION::OK then
-            InputDialog.InputCode(1, NewItemNo)
-        else
-            Error('');
-
-        ItemCopy.Copy(Rec);
-
-        ItemCopy.Validate("No.", NewItemNo);
-        ItemCopy."Vendor Item No." := '';
-        ItemCopy."Search Description" := '';
-        ItemCopy."Reorder Point" := 0;
-        ItemCopy."Reorder Quantity" := 0;
-        ItemCopy."Maximum Inventory" := 0;
-        ItemCopy."Units per Parcel" := 0;
-        ItemCopy."Search Description" := Rec.Description;
-        ItemCopy."NPR Label Barcode" := '';
-        ItemCopy."Net Weight" := 0;
-        Rec.CalcFields("NPR Magento Description");
-        ItemCopy."NPR Magento Description" := Rec."NPR Magento Description";
-        ItemCopy.Insert(true);
-
-        ItemUnitofMeasure.SetRange("Item No.", Rec."No.");
-        if ItemUnitofMeasure.Find('-') then begin
-            repeat
-                ItemUnitofMeasureNew.Copy(ItemUnitofMeasure);
-                ItemUnitofMeasureNew."Item No." := NewItemNo;
-                if ItemUnitofMeasureNew.Insert then;
-            until ItemUnitofMeasure.Next = 0;
-        end;
-
-        Rec.Get(ItemCopy."No.");
-        CurrPage.Update(false);
     end;
 }

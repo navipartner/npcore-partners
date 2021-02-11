@@ -20,9 +20,6 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
         GlobalGiftCardCustomerID: Text;
 
     procedure SendRequest(EFTTransactionRequest: Record "NPR EFT Transaction Request")
-    var
-        RetailFormCode: Codeunit "NPR Retail Form Code";
-        KasseNr: Code[20];
     begin
         case EFTTransactionRequest."Processing Type" of
             //-NPR5.51 [359385]
@@ -122,7 +119,6 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
     local procedure FindPaymentType(Data: Text; var ReturnData: Text)
     var
         PaymentTypePOS: Record "NPR Payment Type POS";
-        RetailSalesLineCode: Codeunit "NPR Retail Sales Line Code";
         CreditCardHelper: Codeunit "NPR Credit Card Prot. Helper";
         PaymentNo: Code[10];
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -150,18 +146,11 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
             State.MatchSalesAmount := PaymentTypePOS."Match Sales Amount";
 
             EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."POS Payment Type Code");
-            //-NPR5.54 [387965]
             Clear(GlobalGiftCardCustomerID);
             if (PaymentTypePOS."Processing Type" = PaymentTypePOS."Processing Type"::"Gift Voucher") and (EFTFlexiitermIntegration.GetGiftVoucherCustomerID(EFTSetup) <> '') then begin
                 State.CardPanValidGiftVoucher := true;
                 GlobalGiftCardCustomerID := EFTFlexiitermIntegration.GetGiftVoucherCustomerID(EFTSetup);
             end;
-            //+NPR5.54 [387965]
-            //-NPR5.54 [364340]
-            //  ConfirmFee := EFTFlexiitermIntegration.GetSurchargeDialogStatus(EFTSetup);
-            //  State.NewFee := CreditCardHelper.CalcTransFee (PaymentTypePOS, EFTTransactionRequest."Amount Input", ConfirmFee);
-            //  State.FeeItem := PaymentTypePOS."Fee Item No.";
-            //+NPR5.54 [364340]
 
             EFTTransactionRequest."POS Payment Type Code" := PaymentTypePOS."No.";
             EFTTransactionRequest."Card Name" := CopyStr(PaymentTypePOS.Description, 1, MaxStrLen(EFTTransactionRequest."Card Name"));
@@ -177,12 +166,8 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
     var
         GiftVoucherBalance: Decimal;
         ExpiryDate: Text;
-        POSActionNETSGiftLookup: Codeunit "NPR POS Action: NETSGift.Look.";
     begin
-        if POSActionNETSGiftLookup.InvokeWebservice(GlobalGiftCardCustomerID, GiftVoucherNo, ExpiryDate, GiftVoucherBalance) then
-            ReturnData := SerializeJson(GiftVoucherBalance)
-        else
-            ReturnData := SerializeJson(0);
+        ReturnData := SerializeJson(0);
     end;
 
     local procedure CheckTransactionFromCheckResult(Data: Text; var ReturnData: Text)
@@ -247,7 +232,7 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
         Lines: DotNet NPRNetArray;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         OStream: OutStream;
-        Util: Codeunit "NPR Utility";
+        Util: Codeunit "NPR Receipt Footer Mgt.";
         ReceiptLine: Text;
         CreditCardTransaction: Record "NPR EFT Receipt";
         EntryNo: Integer;

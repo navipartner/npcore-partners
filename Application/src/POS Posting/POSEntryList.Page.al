@@ -16,33 +16,6 @@ page 6150652 "NPR POS Entry List"
     {
         area(content)
         {
-            field(AdvancedPostingWarning; TextAdvancedPostingOff)
-            {
-                ApplicationArea = All;
-                Caption = 'Advanced Posting Warning';
-                Editable = false;
-                MultiLine = false;
-                ShowCaption = false;
-                Style = Unfavorable;
-                StyleExpr = TRUE;
-                Visible = AdvancedPostingOff;
-                ToolTip = 'Specifies the value of the Advanced Posting Warning field';
-            }
-            field(ClicktoSeeAuditRoll; TextClicktoSeeAuditRoll)
-            {
-                ApplicationArea = All;
-                Caption = 'Click to See Audit Roll';
-                LookupPageID = "NPR POS Entries";
-                ShowCaption = false;
-                Visible = AdvancedPostingOff;
-                ToolTip = 'Specifies the value of the Click to See Audit Roll field';
-
-                trigger OnAssistEdit()
-                begin
-                    PAGE.Run(PAGE::"NPR Audit Roll");
-                    CurrPage.Close;
-                end;
-            }
             repeater(Group)
             {
                 FreezeColumn = "Ending Time";
@@ -470,52 +443,7 @@ page 6150652 "NPR POS Entry List"
             {
                 Caption = 'Vouchers';
                 Image = Voucher;
-                group("Gift Vouchers")
-                {
-                    Caption = 'Gift Vouchers';
-                    Image = Voucher;
-                    action(IssuedGiftVouchers)
-                    {
-                        Caption = 'Issued';
-                        Image = PostedPayableVoucher;
-                        RunObject = Page "NPR Gift Voucher List";
-                        RunPageLink = "Issuing POS Entry No" = FIELD("Entry No.");
-                        ApplicationArea = All;
-                        ToolTip = 'Executes the Issued action';
-                    }
-                    action(RedeemedGiftVouchers)
-                    {
-                        Caption = 'Redeemed';
-                        Image = PostedReceivableVoucher;
-                        RunObject = Page "NPR Gift Voucher List";
-                        RunPageLink = "Cashed POS Entry No." = FIELD("Entry No.");
-                        ApplicationArea = All;
-                        ToolTip = 'Executes the Redeemed action';
-                    }
-                }
-                group("Credit Vouchers")
-                {
-                    Caption = 'Credit Vouchers';
-                    Image = Voucher;
-                    action(IssuedCreditVouchers)
-                    {
-                        Caption = 'Issued';
-                        Image = PostedPayableVoucher;
-                        RunObject = Page "NPR Credit Voucher List";
-                        RunPageLink = "Issuing POS Entry No" = FIELD("Entry No.");
-                        ApplicationArea = All;
-                        ToolTip = 'Executes the Issued action';
-                    }
-                    action(RedeemdedCreditVouchers)
-                    {
-                        Caption = 'Redeemed';
-                        Image = PostedReceivableVoucher;
-                        RunObject = Page "NPR Credit Voucher List";
-                        RunPageLink = "Cashed POS Entry No." = FIELD("Entry No.");
-                        ApplicationArea = All;
-                        ToolTip = 'Executes the Redeemed action';
-                    }
-                }
+
                 group("Tax Free Vouchers")
                 {
                     Caption = 'Tax Free Vouchers';

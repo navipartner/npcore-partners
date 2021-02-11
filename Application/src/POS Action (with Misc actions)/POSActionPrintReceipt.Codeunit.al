@@ -118,18 +118,12 @@ codeunit 6150787 "NPR POS Action: Print Receipt"
                                 POSEntryMgt.DeObfuscateTicketNo(JSON.GetIntegerParameter('ObfuscationMethod', true), SalesTicketNo);
                             end;
                     end;
-                    if NPRetailSetup."Advanced Posting Activated" then
-                        SalesTicketNo := ChooseReceiptPOSEntry(Setting, PresetTableView, ReceiptListFilterOption, FilterEntityCode, SalesTicketNo)
-                    else
-                        SalesTicketNo := ChooseReceiptAuditRoll(Setting, SalesTicketNo);
+                    SalesTicketNo := ChooseReceiptPOSEntry(Setting, PresetTableView, ReceiptListFilterOption, FilterEntityCode, SalesTicketNo)
                 end;
 
             Setting::"Last Receipt",
             Setting::"Last Receipt Large":
-                if NPRetailSetup."Advanced Posting Activated" then
-                    SalesTicketNo := LastReceiptPOSEntry(Setting)
-                else
-                    SalesTicketNo := LastReceiptAuditRoll(Setting);
+                SalesTicketNo := LastReceiptPOSEntry(Setting);
 
             Setting::"Last Receipt and Balance",
             Setting::"Last Receipt and Balance Large":
@@ -144,70 +138,6 @@ codeunit 6150787 "NPR POS Action: Print Receipt"
             AdditionalPrints(CurrentRegisterNo, SalesTicketNo, JSON);
 
         Handled := true;
-    end;
-
-    local procedure PrintReceiptAuditRoll(var AuditRoll: Record "NPR Audit Roll"; Setting: Option "Last Receipt","Last Receipt Large","Choose Receipt","Choose Receipt Large")
-    var
-        RecRef: RecordRef;
-        RetailReportSelMgt: Codeunit "NPR Retail Report Select. Mgt.";
-        SalesInvoiceHeader: Record "Sales Invoice Header";
-        ReportSelectionRetail: Record "NPR Report Selection Retail";
-        StdCodeunitCode: Codeunit "NPR Std. Codeunit Code";
-    begin
-        if AuditRoll."Sale Type" = AuditRoll."Sale Type"::"Debit Sale" then begin
-            RecRef.GetTable(AuditRoll);
-            RetailReportSelMgt.SetRegisterNo(CurrentRegisterNo);
-            RetailReportSelMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Customer Sales Receipt");
-            exit;
-        end;
-
-        if Setting in [Setting::"Last Receipt Large", Setting::"Choose Receipt Large"] then
-            AuditRoll.PrintReceiptA4(false)
-        else
-            StdCodeunitCode.PrintReceipt(AuditRoll, true);
-    end;
-
-    local procedure ChooseReceiptAuditRoll(Setting: Option "Last Receipt","Last Receipt Large","Choose Receipt","Choose Receipt Large"; SalesTicketNo: Code[20]): Code[20]
-    var
-        AuditRoll: Record "NPR Audit Roll";
-        AuditRollPage: Page "NPR Audit Roll";
-    begin
-        AuditRoll.SetFilter(Type, '<>%1&<>%2', AuditRoll.Type::Cancelled, AuditRoll.Type::"Open/Close");
-        if SalesTicketNo <> '' then begin
-            AuditRoll.SetRange("Sales Ticket No.", SalesTicketNo);
-            AuditRoll.FindFirst;
-        end else begin
-            AuditRollPage.LookupMode(true);
-            AuditRollPage.SetTableView(AuditRoll);
-            if AuditRollPage.RunModal = ACTION::LookupOK then begin
-                AuditRollPage.GetRecord(AuditRoll);
-            end else
-                exit('');
-        end;
-        AuditRoll.SetRecFilter();
-        PrintReceiptAuditRoll(AuditRoll, Setting);
-        exit(AuditRoll."Sales Ticket No.");
-    end;
-
-    local procedure LastReceiptAuditRoll(Setting: Option "Last Receipt","Last Receipt Large","Choose Receipt","Choose Receipt Large"): Code[20]
-    var
-        AuditRoll: Record "NPR Audit Roll";
-    begin
-        AuditRoll.SetCurrentKey("Sales Ticket No.", Type);
-        AuditRoll.SetRange("Register No.", CurrentRegisterNo);
-        AuditRoll.SetRange("Sale Date", Today);
-        AuditRoll.SetFilter(Type, '<>%1&<>%2', AuditRoll.Type::Cancelled, AuditRoll.Type::"Open/Close");
-        if not AuditRoll.FindLast then begin
-            Message(TxtNoReceiptFound);
-            exit('');
-        end;
-        AuditRoll.SetRange("Sales Ticket No.", AuditRoll."Sales Ticket No.");
-        PrintReceiptAuditRoll(AuditRoll, Setting);
-        exit(AuditRoll."Sales Ticket No.");
-    end;
-
-    local procedure PrintReceiptPOSEntry(var POSEntry: Record "NPR POS Entry"; Setting: Option "Last Receipt","Last Receipt Large","Choose Receipt","Choose Receipt Large")
-    begin
     end;
 
     local procedure ChooseReceiptPOSEntry(Setting: Option "Last Receipt","Last Receipt Large","Choose Receipt","Choose Receipt Large"; ListTableView: Text; FilterOn: Option; FilterEntityCode: Code[20]; SalesTicketNo: Code[20]): Code[20]
@@ -278,12 +208,10 @@ codeunit 6150787 "NPR POS Action: Print Receipt"
 
     local procedure AdditionalPrints(RegisterNo: Code[10]; SalesTicketNo: Code[20]; var JSON: Codeunit "NPR POS JSON Management")
     var
-        AuditRoll: Record "NPR Audit Roll";
         POSEntry: Record "NPR POS Entry";
         NpRvVoucher: Record "NPR NpRv Voucher";
         TMTicketManagement: Codeunit "NPR TM Ticket Management";
         MMMemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        StdCodeunitCode: Codeunit "NPR Std. Codeunit Code";
         TaxFree: Codeunit "NPR Tax Free Handler Mgt.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         PrintDoc: Boolean;
@@ -301,11 +229,6 @@ codeunit 6150787 "NPR POS Action: Print Receipt"
             MMMemberRetailIntegration.PrintMembershipOnEndOfSales(SalesTicketNo);
 
         if JSON.GetBoolean('Print Credit Voucher', true) then begin
-            AuditRoll.SetRange("Register No.", CurrentRegisterNo);
-            AuditRoll.SetRange("Sales Ticket No.", SalesTicketNo);
-            if AuditRoll.FindFirst then
-                StdCodeunitCode.PrintCreditGiftVoucher(AuditRoll);
-
             NpRvVoucher.SetRange("Issue Document Type", NpRvVoucher."Issue Document Type"::"Audit Roll");
             NpRvVoucher.SetRange("Issue Document No.", SalesTicketNo);
             if NpRvVoucher.FindSet then
@@ -324,18 +247,12 @@ codeunit 6150787 "NPR POS Action: Print Receipt"
         end;
 
         if JSON.GetBoolean('Print Tax Free Voucher', false) then begin
-            if NPRetailSetup."Advanced Posting Activated" then begin
-                POSEntry.Reset;
-                POSEntry.SetRange("System Entry", false);
-                POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
-                POSEntry.SetRange("Document No.", SalesTicketNo);
-                PrintDoc := not POSEntry.IsEmpty;
-            end else begin
-                AuditRoll.SetCurrentKey("Sales Ticket No.");
-                AuditRoll.SetRange("Sales Ticket No.", SalesTicketNo);
-                AuditRoll.SetFilter(Type, '<>%1&<>%2', AuditRoll.Type::Cancelled, AuditRoll.Type::"Open/Close");
-                PrintDoc := not AuditRoll.IsEmpty;
-            end;
+            POSEntry.Reset;
+            POSEntry.SetRange("System Entry", false);
+            POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
+            POSEntry.SetRange("Document No.", SalesTicketNo);
+            PrintDoc := not POSEntry.IsEmpty;
+
             if PrintDoc then
                 TaxFree.VoucherIssueFromPOSSale(SalesTicketNo);
         end;

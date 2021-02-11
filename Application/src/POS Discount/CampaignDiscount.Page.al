@@ -1,39 +1,5 @@
 page 6014453 "NPR Campaign Discount"
 {
-    // 001:  NPK-Henrik Ohm, 21-01-2003
-    //       Medtage ikke varer med salgspris = 0.  Er tilf¢jet på ALLE punkter under dropdownknap funktioner undtagen UDSKRIV
-    // //-NPR3.0e ved Simon 2005.08.02
-    //   Oversaettelser
-    // 
-    // //-NPR3.0f ved Anders 2006.08.14
-    //   Tilf¢jet funktion til kopiering af rabat til alle andre regnskaber
-    // 
-    // //-NPR 280509 Ny menupunkt under funktion Sag 70115
-    // Send to Retail Journal
-    // 
-    // 
-    // NPR4.002.004, 01-06-10, MH - Added Function, UpdateStatus(). It corrects the status depending on "Closing date" and "Closing Time"
-    //                         (Job 87927).
-    // NPR4.002.004, 21-10-10, RR - Updated function to print Shelf Fronts
-    // NPR4.14/BHR/20150812 CASE 220174 Added name to action
-    // NPR4.14/TS/20150818 CASE 220973 Removed Starting Date and End Date
-    // NPR4.14/MH/20150818  CASE 220972 Deleted deprecated Web field "Internet Campaign"
-    // NPR5.27/TJ/20160926 CASE 248282 Removed fields Order Deadline, Week Of Delivery, Valuation and Campaign Ref.
-    // NPR5.30/TS  /20170206  CASE 265535 Removed Action List
-    // NPR5.30/BHR /20170223  CASE 265244 Copy Discount Functionality
-    // NPR5.33/MHA /20170605  CASE 278733 Replaced Location and Global Dims "Customer Disc. Group Filter"
-    // NPR5.36/TJ  /20170809  CASE 286283 Renamed variables/function into english and into proper naming terminology
-    //                                    Removed unused variables/functions
-    // NPR5.38/AP  /20171102  CASE 295330 Deleted function UpdateStatus()
-    // NPR5.38/TS  /20171211  CASE 299279 Added Report Lager Kampagnestat
-    // NPR5.38/TS  /20171213  CASE 299281 Added Field Comment
-    // NPR5.39/JLK /20180207  CASE 304016 Corrected issue on printing shelf label
-    // NPR5.42/MHA /20180521  CASE 315554 Added Period Fields to enable Weekly Condition
-    // NPR5.45/TS  /20180803  CASE 308194 Removed Quantity Sold and Turnover
-    // NPR5.46/JDH /20180928 CASE 294354  Added Retail Print Actions, and removed the old ones
-    // NPR5.53/ALPO/20191029 CASE 369115 New control added: "Block Custom Disc."
-    // NPR5.55/TJ  /20200421 CASE 400524 Recreated Dimensions action under new action group RelatedInformation
-
     Caption = 'Period Discount';
     PageType = Card;
     UsageCategory = Administration;
@@ -87,7 +53,7 @@ page 6014453 "NPR Campaign Discount"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Block Custom Discount field';
                 }
-                field("CommentBoolean"; Comment)
+                field(CommentBoolean; Comment)
                 {
                     Caption = 'Comment';
                     ApplicationArea = All;
@@ -263,7 +229,7 @@ page 6014453 "NPR Campaign Discount"
                     Ellipsis = true;
                     Image = BinContent;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -274,7 +240,7 @@ page 6014453 "NPR Campaign Discount"
                     Caption = 'Price Label';
                     Image = BinContent;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -385,20 +351,6 @@ page 6014453 "NPR Campaign Discount"
                 }
                 separator(Separator1160330004)
                 {
-                }
-                action("&Read from scanner")
-                {
-                    Caption = '&Read from scanner';
-                    Image = "Action";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the &Read from scanner action';
-
-                    trigger OnAction()
-                    var
-                        ScannerFunctions: Codeunit "NPR Scanner - Functions";
-                    begin
-                        ScannerFunctions.initCampaignDiscount(Rec);
-                    end;
                 }
                 action("Copy to all companies")
                 {
@@ -587,214 +539,6 @@ page 6014453 "NPR Campaign Discount"
             end;
         until Item.Next = 0;
         Message(OkMsg, Item.Count, Code);
-    end;
-
-    procedure PrintEANLabel()
-    var
-        RetailFormCode: Codeunit "NPR Retail Form Code";
-    begin
-        //PrintEANLabel()
-        CurrPage.SubForm.PAGE.GetCurrLine(PeriodDiscountLineGlobal);
-        Item.Get(PeriodDiscountLineGlobal."Item No.");
-        RetailFormCode.PrintLabelItemCard(Item, true, 0, true);
-    end;
-
-    procedure TransferToRetailJournalLine()
-    var
-        RetailJournalLine: Record "NPR Retail Journal Line";
-        NextLineNo: Integer;
-        FirstLineNo: Integer;
-        PeriodDiscountLine2: Record "NPR Period Discount Line";
-    begin
-        if RetailJournalLine.Find('+') then;
-        if RetailJournalLine."Line No." <> 0 then
-            NextLineNo := RetailJournalLine."Line No." + 1
-        else
-            NextLineNo := 1;
-        FirstLineNo := NextLineNo;
-
-        PeriodDiscountLine2.SetRange(Code, Code);
-        if PeriodDiscountLine2.Find('-') then
-            repeat
-                RetailJournalLine.Init();
-                RetailJournalLine.Validate("Line No.", NextLineNo);
-                RetailJournalLine.Validate("Item No.", PeriodDiscountLine2."Item No.");
-                RetailJournalLine.Insert();
-                RetailJournalLine.Validate(RetailJournalLine."Quantity to Print", 1);
-                RetailJournalLine.Validate("Discount Price Incl. Vat", PeriodDiscountLine2."Campaign Unit Price");
-                RetailJournalLine.Validate("Last Direct Cost", PeriodDiscountLine2."Unit Cost Purchase");
-                RetailJournalLine.Modify();
-                NextLineNo += 1;
-            until PeriodDiscountLine2.Next = 0;
-
-        Commit();
-
-        Clear(RetailJournalLine);
-        RetailJournalLine.SetRange("Line No.", FirstLineNo, NextLineNo);
-        ReportSelectionRetail.SetRange("Report Type", ReportSelectionRetail."Report Type"::"Shelf Label");
-        ReportSelectionRetail.SetFilter("Report ID", '<>0');
-        ReportSelectionRetail.Find('-');
-        repeat
-            REPORT.RunModal(ReportSelectionRetail."Report ID", true, false, RetailJournalLine);
-        until ReportSelectionRetail.Next = 0;
-    end;
-
-    procedure CopyCampaignsToLocations()
-    var
-        PeriodDiscount: Record "NPR Period Discount";
-        PeriodDiscountLine: Record "NPR Period Discount Line";
-        Location: Record Location;
-        RetailList: Record "NPR Retail List";
-        RetailListPage: Page "NPR Retail List";
-        CampaignCode: Code[20];
-        Counter: Integer;
-        LocationsString: Text[1024];
-    begin
-        Clear(RetailList);
-        if RetailList.Count > 0 then
-            RetailList.DeleteAll;
-        Counter := 1;
-        if "Location Code" <> '' then
-            Location.SetFilter(Code, '<>%1', "Location Code");
-        if Location.Find('-') then
-            repeat
-                RetailList.Init;
-                RetailList.Number := Counter;
-                RetailList.Choice := Location.Code;
-                RetailList.Insert;
-                Counter := Counter + 1;
-            until Location.Next = 0;
-        Commit;
-
-        Clear(RetailListPage);
-        if ACTION::LookupOK = RetailListPage.RunModal then begin
-            Error('Getselection filter ISSUE');
-            //retailListForm.getSelectionFilter(retailListRec);
-            //retailListRec.MARKEDONLY(TRUE);
-            if RetailList.Find('-') then
-                repeat
-                    LocationsString := LocationsString + CopyStr(RetailList.Choice, 1, StrLen(RetailList.Choice)) + ',';
-                until RetailList.Next = 0;
-
-            LocationsString := CopyStr(LocationsString, 1, StrLen(LocationsString) - 1);
-            if Confirm(TxtDoYouWantToCopyLoc + LocationsString + ' ?') then begin
-                if RetailList.Find('-') then
-                    repeat
-                        if Location.Get(RetailList.Choice) then
-                            Clear(PeriodDiscount);
-                        PeriodDiscount.Init;
-                        PeriodDiscount.Copy(Rec);
-                        if StrPos(PeriodDiscount.Code, '_') > 0 then
-                            CampaignCode := CopyStr(PeriodDiscount.Code, 1, StrPos(PeriodDiscount.Code, '_') - 1)
-                        else
-                            CampaignCode := PeriodDiscount.Code;
-                        CampaignCode := CampaignCode + '_' + Location.Code;
-                        PeriodDiscount.Code := CampaignCode;
-                        PeriodDiscount."Location Code" := Location.Code;
-                        PeriodDiscount.Insert(true);
-                        PeriodDiscount."Global Dimension 1 Code" := "Global Dimension 1 Code";
-                        PeriodDiscount."Global Dimension 2 Code" := "Global Dimension 2 Code";
-                        PeriodDiscount.Modify(true);
-                        CurrPage.SubForm.PAGE.GetCurrLine(PeriodDiscountLineGlobal);
-                        PeriodDiscountLineGlobal.SetRange(Code, Code);
-                        if PeriodDiscountLineGlobal.Find('-') then
-                            repeat
-                                Clear(PeriodDiscountLine);
-                                PeriodDiscountLine.Init;
-                                PeriodDiscountLine.Copy(PeriodDiscountLineGlobal);
-                                PeriodDiscountLine.Code := CampaignCode;
-                                PeriodDiscountLine.Insert(true);
-                            until PeriodDiscountLineGlobal.Next = 0;
-                        PeriodDiscountLineGlobal.SetRange(Code);
-                    until RetailList.Next = 0;
-
-            end;
-        end;
-
-        RetailList.ClearMarks;
-        RetailList.Reset;
-        RetailList.DeleteAll;
-        Commit;
-    end;
-
-    procedure CopyCampaignsToGlobalDim1()
-    var
-        PeriodDiscount: Record "NPR Period Discount";
-        PeriodDiscountLine: Record "NPR Period Discount Line";
-        DimensionValue: Record "Dimension Value";
-        RetailList: Record "NPR Retail List";
-        RetailListPage: Page "NPR Retail List";
-        CampaignCode: Code[20];
-        Counter: Integer;
-        LocationsString: Text[1024];
-    begin
-        Clear(RetailList);
-        if RetailList.Count > 0 then
-            RetailList.DeleteAll;
-        Counter := 1;
-        DimensionValue.SetRange("Global Dimension No.", 1);
-        if "Global Dimension 1 Code" <> '' then
-            DimensionValue.SetFilter(Code, '<>%1', "Global Dimension 1 Code");
-        if DimensionValue.Find('-') then
-            repeat
-                RetailList.Init;
-                RetailList.Number := Counter;
-                RetailList.Choice := DimensionValue.Code;
-                RetailList.Insert;
-                Counter := Counter + 1;
-            until DimensionValue.Next = 0;
-        Commit;
-
-        Clear(RetailListPage);
-        if ACTION::LookupOK = RetailListPage.RunModal then begin
-            Error('Getselection filter ISSUE');
-            // retailListForm.getSelectionFilter(retailListRec);
-            if RetailList.Find('-') then
-                repeat
-                    LocationsString := LocationsString + CopyStr(RetailList.Choice, 1, StrLen(RetailList.Choice)) + ',';
-                until RetailList.Next = 0;
-
-            LocationsString := CopyStr(LocationsString, 1, StrLen(LocationsString) - 1);
-            if Confirm(TxtDoYouWantToCopyDim1 + LocationsString + ' ?') then begin
-                if RetailList.Find('-') then
-                    repeat
-                        DimensionValue.SetCurrentKey(Code, "Global Dimension No.");
-                        DimensionValue.SetRange(Code, RetailList.Choice);
-                        DimensionValue.SetRange("Global Dimension No.", 1);
-                        if DimensionValue.Find('-') then
-                            Clear(PeriodDiscount);
-                        PeriodDiscount.Init;
-                        PeriodDiscount.Copy(Rec);
-                        if StrPos(PeriodDiscount.Code, '_') > 0 then
-                            CampaignCode := CopyStr(PeriodDiscount.Code, 1, StrPos(PeriodDiscount.Code, '_') - 1)
-                        else
-                            CampaignCode := PeriodDiscount.Code;
-                        CampaignCode := CampaignCode + '_' + DimensionValue.Code;
-                        PeriodDiscount.Code := CampaignCode;
-                        PeriodDiscount."Location Code" := '';
-                        PeriodDiscount.Insert(true);
-                        PeriodDiscount."Global Dimension 1 Code" := DimensionValue.Code;
-                        PeriodDiscount.Modify(true);
-                        CurrPage.SubForm.PAGE.GetCurrLine(PeriodDiscountLineGlobal);
-                        PeriodDiscountLineGlobal.SetRange(Code, Code);
-                        if PeriodDiscountLineGlobal.Find('-') then
-                            repeat
-                                Clear(PeriodDiscountLine);
-                                PeriodDiscountLine.Init;
-                                PeriodDiscountLine.Copy(PeriodDiscountLineGlobal);
-                                PeriodDiscountLine.Code := CampaignCode;
-                                PeriodDiscountLine.Insert(true);
-                            until PeriodDiscountLineGlobal.Next = 0;
-                        PeriodDiscountLineGlobal.SetRange(Code);
-                    until RetailList.Next = 0;
-
-            end;
-        end;
-
-        RetailList.ClearMarks;
-        RetailList.Reset;
-        RetailList.DeleteAll;
-        Commit;
     end;
 
     local procedure GetFieldCaption(CaptionFieldNo: Integer) Caption: Text

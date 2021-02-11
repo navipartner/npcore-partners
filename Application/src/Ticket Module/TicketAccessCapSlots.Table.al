@@ -1,15 +1,13 @@
 table 6059787 "NPR Ticket Access Cap. Slots"
 {
-    // NPR4.16/TSA/20150807/CASE 219658 - Object Touched
-
     Caption = 'Access Capacity';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
 
     fields
     {
         field(1; "Slot ID"; Integer)
         {
-            AutoIncrement = true;
             Caption = 'Entry No.';
             DataClassification = CustomerContent;
         }
@@ -17,15 +15,6 @@ table 6059787 "NPR Ticket Access Cap. Slots"
         {
             Caption = 'Ticket Type Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR TM Ticket Type";
-
-            trigger OnValidate()
-            var
-                TicketType: Record "NPR TM Ticket Type";
-            begin
-                if TicketType.Get("Ticket Type Code") then
-                    Description := TicketType.Description;
-            end;
         }
         field(10; "Access Date"; Date)
         {
@@ -51,14 +40,6 @@ table 6059787 "NPR Ticket Access Cap. Slots"
         {
             Caption = 'Point Card - Issued Cards';
             DataClassification = CustomerContent;
-            Editable = true;
-            InitValue = 1;
-        }
-        field(40; "Quantity Reserved"; Decimal)
-        {
-            CalcFormula = Sum ("NPR Ticket Access Reserv.".Quantity WHERE("Ticket Access Capacity Slot ID" = FIELD("Slot ID")));
-            Caption = 'Access Reservatation';
-            FieldClass = FlowField;
         }
     }
 
@@ -72,10 +53,5 @@ table 6059787 "NPR Ticket Access Cap. Slots"
     fieldgroups
     {
     }
-
-    trigger OnInsert()
-    begin
-        "Slot ID" := 0;
-    end;
 }
 

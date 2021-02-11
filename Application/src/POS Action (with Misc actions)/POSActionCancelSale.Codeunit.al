@@ -161,7 +161,7 @@ codeunit 6150797 "NPR POSAction: Cancel Sale"
         POSSaleLine.InsertLine(Line);
 
         POSSession.GetSale(POSSale);
-        exit(POSSale.TryEndSale2(POSSession, false));
+        exit(POSSale.TryEndSale(POSSession, false));
         //+NPR5.54 [364658]
     end;
 

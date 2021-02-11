@@ -170,7 +170,7 @@ table 6014412 "NPR Mixed Discount Line"
 
             trigger OnLookup()
             var
-                BarcodeLibrary: Codeunit "NPR Barcode Library";
+                BarcodeLibrary: Codeunit "NPR Barcode Lookup Mgt.";
             begin
                 BarcodeLibrary.CallItemRefNoLookupMixDiscount(Rec);
             end;
@@ -263,9 +263,6 @@ table 6014412 "NPR Mixed Discount Line"
         MixedDiscount.Get(Code);
         MixedDiscount."Last Date Modified" := Today;
 
-        RecRef.GetTable(Rec);
-        syncCU.OnInsert(RecRef);
-
         UpdateLine();
     end;
 
@@ -276,9 +273,6 @@ table 6014412 "NPR Mixed Discount Line"
         MixedDiscount.Get(Code);
         MixedDiscount."Last Date Modified" := Today;
         "Last Date Modified" := Today;
-
-        RecRef.GetTable(Rec);
-        syncCU.OnModify(RecRef);
 
         UpdateLine();
     end;
@@ -292,10 +286,6 @@ table 6014412 "NPR Mixed Discount Line"
 
         UpdateLine();
     end;
-
-    var
-        syncCU: Codeunit "NPR CompanySyncManagement";
-        RecRef: RecordRef;
 
     local procedure UpdateLine()
     var

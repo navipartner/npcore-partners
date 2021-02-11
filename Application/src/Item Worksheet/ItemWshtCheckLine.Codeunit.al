@@ -43,7 +43,6 @@ codeunit 6060045 "NPR Item Wsht.-Check Line"
         RecItem: Record Item;
         ItemCategory: Record "Item Category";
         NoSeries: Record "No. Series";
-        AlternativeNo: Record "NPR Alternative No.";
         ItemWorksheetVariantLineToCreate: Record "NPR Item Worksh. Variant Line";
         ItemWkshtValidateTestRnr: Codeunit "NPR Item Wksht.Valid.Test Rnr.";
         ItemWshtRegisterLine: Codeunit "NPR Item Wsht.Register Line";
@@ -108,13 +107,6 @@ codeunit 6060045 "NPR Item Wsht.-Check Line"
                                 if "Tariff No." <> '' then
                                     if not TariffNumber.Get("Tariff No.") then
                                         ProcessError(ItemWkshtLine, StrSubstNo(Text127, FieldCaption("Tariff No.")), StopOnError);
-                        end;
-                        if Status <> Status::Error then begin
-                            if "Item No." <> '' then
-                                AlternativeNo.Reset;
-                            AlternativeNo.SetRange("Alt. No.", "Item No.");
-                            if AlternativeNo.FindFirst then
-                                ProcessError(ItemWkshtLine, StrSubstNo(Text128, "Item No.", AlternativeNo.Code), StopOnError);
                         end;
                         if Status <> Status::Error then
                             if Description = '' then

@@ -1,14 +1,11 @@
 page 6184478 "NPR EFT Type Pay. Gen. Param."
 {
-    // NPR5.46/MMV /20181008 CASE 290734 Created object
-
     Caption = 'EFT Type Payment Gen. Param.';
     DeleteAllowed = false;
     InsertAllowed = false;
     LinksAllowed = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     ShowFilter = false;
     SourceTable = "NPR EFT Type Pay. Gen. Param.";
 

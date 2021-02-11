@@ -1,55 +1,38 @@
 codeunit 6014593 "NPR Change Log Auto Enabler"
 {
-    var
-        RunSilent: Boolean;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterInitialization', '', true, false)]
     local procedure OnAfterInitialization()
     var
-        RetailSetup: Record "NPR Retail Setup";
+        ChangeLogSetup: Record "Change Log Setup";
+        ChangeLogSetupTable: Record "Change Log Setup (Table)";
     begin
         if NavApp.IsInstalling() then
             exit;
 
-        if not (CurrentClientType() in [CLIENTTYPE::Windows, CLIENTTYPE::Web, CLIENTTYPE::Tablet, CLIENTTYPE::Phone, CLIENTTYPE::Desktop]) then
-            exit;
-
-        if not RetailSetup.ReadPermission() then
-            exit;
-
-        if not RetailSetup.Get() then
-            exit;
-
-        RunSilent := true;
-        TestChangeLogSetup(RetailSetup);
-    end;
-
-    procedure TestChangeLogSetup(var RetailSetup: Record "NPR Retail Setup")
-    var
-        ChangeLogSetup: Record "Change Log Setup";
-        ChangeLogSetupTable: Record "Change Log Setup (Table)";
-    begin
-        if RetailSetup."Auto Changelog Level" = RetailSetup."Auto Changelog Level"::None then
+        if not GuiAllowed then
             exit;
 
         if not (ChangeLogSetup.WritePermission() and ChangeLogSetupTable.WritePermission()) then
             exit;
 
+        SetChangeLogSetup();
+    end;
+
+    procedure SetChangeLogSetup()
+    var
+        ChangeLogSetup: Record "Change Log Setup";
+        ChangeLogSetupTable: Record "Change Log Setup (Table)";
+    begin
         if not ChangeLogSetup.Get() then begin
             ChangeLogSetup.Init();
-            if not RunSilent then
-                ChangeLogSetup.Insert(true)
-            else
-                if not ChangeLogSetup.Insert(true) then
-                    exit;
+            if not ChangeLogSetup.Insert(true) then
+                exit;
         end;
 
         if not ChangeLogSetup."Change Log Activated" then begin
             ChangeLogSetup."Change Log Activated" := true;
-            if not RunSilent then
-                ChangeLogSetup.Modify(true)
-            else
-                if ChangeLogSetup.Modify(true) then;
+            if ChangeLogSetup.Modify(true) then;
         end;
 
         TestTable(DATABASE::"Report Selections");
@@ -68,17 +51,18 @@ codeunit 6014593 "NPR Change Log Auto Enabler"
         TestTable(DATABASE::"NPR Object Output Selection");
         TestTable(DATABASE::"NPR Report Selection Retail");
         TestTable(DATABASE::"NPR Dependency Mgt. Setup");
-
-        if RetailSetup."Auto Changelog Level" = RetailSetup."Auto Changelog Level"::Extended then begin
-            TestTable(DATABASE::"Payment Terms");
-            TestTable(DATABASE::Currency);
-            TestTable(DATABASE::"Finance Charge Terms");
-            TestTable(DATABASE::Location);
-            TestTable(DATABASE::"G/L Account");
-            TestTable(DATABASE::"NPR Payment Type POS");
-            TestTable(DATABASE::"NPR Item Group");
-            TestTable(DATABASE::"NPR Payment Type - Prefix");
-        end;
+        TestTable(DATABASE::"NPR POS Unit");
+        TestTable(DATABASE::"NPR POS Store");
+        TestTable(DATABASE::"NPR POS Audit Profile");
+        TestTable(DATABASE::"NPR POS View Profile");
+        TestTable(DATABASE::"NPR POS Posting Profile");
+        TestTable(DATABASE::"NPR POS End of Day Profile");
+        TestTable(DATABASE::"NPR POS Payment Method");
+        TestTable(DATABASE::"NPR POS Payment Bin");
+        TestTable(DATABASE::"NPR RP Template Header");
+        TestTable(DATABASE::"NPR EFT BIN Group");
+        TestTable(DATABASE::"NPR Item Group");
+        TestTable(DATABASE::"NPR Payment Type POS");
     end;
 
     local procedure TestTable(TableID: Integer)
@@ -112,52 +96,6 @@ codeunit 6014593 "NPR Change Log Auto Enabler"
             ChangeLogSetupTable."Log Modification" := ChangeLogSetupTable."Log Modification"::"All Fields";
             if ChangeLogSetupTable.Insert() then;
         end;
-    end;
-
-    procedure ValidateChangeLogLevel(var Rec: Record "NPR Retail Setup"; var xRec: Record "NPR Retail Setup")
-    var
-        ChangeLogSetupTable: Record "Change Log Setup (Table)";
-        FilterString: Text;
-    begin
-        //Disables everything on the tables that are managed by this codeunit and runs validation of the new level set.
-        if Rec.IsTemporary or xRec.IsTemporary then
-            exit;
-
-        if Rec."Auto Changelog Level" = xRec."Auto Changelog Level" then
-            exit;
-
-        FilterString := StrSubstNo('%1|%2|%3|%4|%5|%6|%7|%8|%9|%10|%11|%12|%13|%14|%15|%16|%17|%18|%19|%20|%21|%22|%23|%24',
-                                  DATABASE::"Report Selections",
-                                  DATABASE::"Printer Selection",
-                                  DATABASE::"Company Information",
-                                  DATABASE::"User Setup",
-                                  DATABASE::"General Ledger Setup",
-                                  DATABASE::"Source Code Setup",
-                                  DATABASE::"General Posting Setup",
-                                  DATABASE::"Sales & Receivables Setup",
-                                  DATABASE::"Purchases & Payables Setup",
-                                  DATABASE::"Inventory Setup",
-                                  DATABASE::"VAT Posting Setup",
-                                  DATABASE::"NPR Retail Setup",
-                                  DATABASE::"NPR Register",
-                                  DATABASE::"NPR Object Output Selection",
-                                  DATABASE::"NPR Report Selection Retail",
-                                  DATABASE::"NPR Dependency Mgt. Setup",
-                                  DATABASE::"Payment Terms",
-                                  DATABASE::Currency,
-                                  DATABASE::"Finance Charge Terms",
-                                  DATABASE::Location,
-                                  DATABASE::"G/L Account",
-                                  DATABASE::"NPR Payment Type POS",
-                                  DATABASE::"NPR Item Group",
-                                  DATABASE::"NPR Payment Type - Prefix");
-
-        ChangeLogSetupTable.SetFilter("Table No.", FilterString);
-        ChangeLogSetupTable.ModifyAll("Log Deletion", ChangeLogSetupTable."Log Deletion"::" ");
-        ChangeLogSetupTable.ModifyAll("Log Insertion", ChangeLogSetupTable."Log Insertion"::" ");
-        ChangeLogSetupTable.ModifyAll("Log Modification", ChangeLogSetupTable."Log Modification"::" ");
-
-        TestChangeLogSetup(Rec);
     end;
 }
 

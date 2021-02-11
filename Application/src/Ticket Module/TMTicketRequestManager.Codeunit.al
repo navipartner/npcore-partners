@@ -735,7 +735,6 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
     var
         Item: Record Item;
         ItemReference: Record "Item Reference";
-        AlternativeNo: Record "NPR Alternative No.";
         ItemVariant: Record "Item Variant";
     begin
 

@@ -2,6 +2,8 @@ table 6014400 "NPR Retail Setup"
 {
     Caption = 'Retail Setup';
     DataClassification = CustomerContent;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Fields will be spread out to more module specific areas';
 
     fields
     {
@@ -915,9 +917,11 @@ table 6014400 "NPR Retail Setup"
             OptionMembers = Search,"Do Not Search";
 
             trigger OnValidate()
+            var
+                ItemLedgerEntry: Record "Item Ledger Entry";
             begin
                 if "Serialno. (Itemno nonexist)" = "Serialno. (Itemno nonexist)"::Search then
-                    if not NFRetailCode.TR400SerialNoKeyExists then
+                    if not ItemLedgerEntry.SetCurrentKey(Open, Positive, "Serial No.", "Item No.") then
                         if not Confirm(Text1060017) then
                             Error(Text1060018);
             end;
@@ -1243,13 +1247,7 @@ table 6014400 "NPR Retail Setup"
             DataClassification = CustomerContent;
             OptionCaption = 'Core,Extended,None';
             OptionMembers = Core,Extended,"None";
-
-            trigger OnValidate()
-            var
-                ChangeLogAutoEnabler: Codeunit "NPR Change Log Auto Enabler";
-            begin
-                ChangeLogAutoEnabler.ValidateChangeLogLevel(Rec, xRec);
-            end;
+            ObsoleteState = Removed;
         }
         field(6310; "Customer Config. Template"; Code[10])
         {
@@ -1348,7 +1346,6 @@ table 6014400 "NPR Retail Setup"
     trigger OnDelete()
     begin
         recRef.GetTable(Rec);
-        syncCU.OnDelete(recRef);
     end;
 
     trigger OnInsert()
@@ -1372,13 +1369,11 @@ table 6014400 "NPR Retail Setup"
             end;
 
         recRef.GetTable(Rec);
-        syncCU.OnInsert(recRef);
     end;
 
     trigger OnModify()
     begin
         recRef.GetTable(Rec);
-        syncCU.OnModify(recRef);
     end;
 
     var
@@ -1386,10 +1381,8 @@ table 6014400 "NPR Retail Setup"
         Text1060007: Label 'Example: 0,25 * 4 = 1';
         Text1060008: Label 'No. Series cannot be changed!';
         Text1060009: Label 'The field cannot be modified when there is payment choise.';
-        NFRetailCode: Codeunit "NPR NF Retail Code";
         Text1060017: Label 'Due to missing index, this option can delay the sales. Accept?';
         Text1060018: Label 'The update was cancelled by the user.';
-        syncCU: Codeunit "NPR CompanySyncManagement";
         recRef: RecordRef;
         TextAuditRollWillBeDisabled: Label 'Warning: this will disable the creation of Audit Roll records. Do you want to continue?';
         AllObj: Record AllObj;

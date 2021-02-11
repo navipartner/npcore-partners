@@ -284,29 +284,7 @@ page 6014433 "NPR Payment Type - Card"
             {
                 Caption = '&Function';
                 Image = Setup;
-                action("Prefix Table")
-                {
-                    Caption = 'Prefix Table';
-                    Image = "Table";
-                    ShortCutKey = 'F9';
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Prefix Table action';
 
-                    trigger OnAction()
-                    var
-                        PaymentTypePrefix: Record "NPR Payment Type - Prefix";
-                        CreditCardPrefix: Page "NPR Credit Card Prefix";
-                    begin
-                        PaymentTypePrefix.Reset;
-                        PaymentTypePrefix.SetRange("Payment Type", "No.");
-                        PaymentTypePrefix.SetRange("Register No.", "Register No.");
-                        PaymentTypePrefix.SetRange("Global Dimension 1 Code", "Global Dimension 1 Code");
-                        CreditCardPrefix.SetTableView(PaymentTypePrefix);
-                        CreditCardPrefix.LookupMode := true;
-                        CreditCardPrefix.ShowPrefix;
-                        CreditCardPrefix.RunModal;
-                    end;
-                }
                 action("Coin Types")
                 {
                     Caption = 'Coin Types';
@@ -317,16 +295,15 @@ page 6014433 "NPR Payment Type - Card"
 
                     trigger OnAction()
                     var
-                        PaymentTypePrefix: Record "NPR Payment Type - Prefix";
-                        CreditCardPrefix: Page "NPR Credit Card Prefix";
+                        POSCountingDenomination: Record "NPR POS Counting Denomination";
+                        POSCountDenominationList: Page "NPR POS Count. Denomin. List";
                     begin
-                        PaymentTypePrefix.Reset;
-                        PaymentTypePrefix.SetRange("Payment Type", "No.");
-                        PaymentTypePrefix.SetRange("Register No.", "Register No.");
-                        CreditCardPrefix.SetTableView(PaymentTypePrefix);
-                        CreditCardPrefix.LookupMode := true;
-                        CreditCardPrefix.weights;
-                        CreditCardPrefix.RunModal;
+                        POSCountingDenomination.Reset;
+                        POSCountingDenomination.SetRange("Payment Type", "No.");
+                        POSCountingDenomination.SetRange("Register No.", "Register No.");
+                        POSCountDenominationList.SetTableView(POSCountingDenomination);
+                        POSCountDenominationList.LookupMode := true;
+                        POSCountDenominationList.RunModal;
                     end;
                 }
                 action("G/L Account")
@@ -346,7 +323,7 @@ page 6014433 "NPR Payment Type - Card"
                 }
             }
 
-            group(Dimensions_Menu)
+            group("Dimensions_Menu")
             {
                 Caption = '&Dimensions';
                 Image = Setup;

@@ -41,14 +41,6 @@ page 6059982 "NPR Web Processor Role Center"
     {
         area(reporting)
         {
-            action("Sale Statistics")
-            {
-                Caption = 'Sale Statistics';
-                Image = "Report";
-                RunObject = Report "NPR Sales Ticket Stat.";
-                ApplicationArea = All;
-                ToolTip = 'Executes the Sale Statistics action';
-            }
             action("Discount Statistics")
             {
                 Caption = 'Discount Statistics';
@@ -64,14 +56,6 @@ page 6059982 "NPR Web Processor Role Center"
                 RunObject = Report "NPR Customer Analysis";
                 ApplicationArea = All;
                 ToolTip = 'Executes the Customer Analysis action';
-            }
-            action("Gift Voucher/Credit Voucher")
-            {
-                Caption = 'Gift Voucher/Credit Voucher';
-                Image = "Report";
-                RunObject = Report "NPR Gift/Credit Voucher";
-                ApplicationArea = All;
-                ToolTip = 'Executes the Gift Voucher/Credit Voucher action';
             }
             action("Sales Person Top 20")
             {
@@ -136,40 +120,12 @@ page 6059982 "NPR Web Processor Role Center"
                 ApplicationArea = All;
                 ToolTip = 'Executes the Retail Journal action';
             }
-            action("Retail Documents")
-            {
-                Caption = 'Retail Documents';
-                RunObject = Page "NPR Retail Document List";
-                ApplicationArea = All;
-                ToolTip = 'Executes the Retail Documents action';
-            }
-            action("Audit Roll")
-            {
-                Caption = 'Audit Roll';
-                RunObject = Page "NPR Audit Roll";
-                ApplicationArea = All;
-                ToolTip = 'Executes the Audit Roll action';
-            }
             action("POS Entry List")
             {
                 Caption = 'POS Entry List';
                 RunObject = Page "NPR POS Entry List";
                 ApplicationArea = All;
                 ToolTip = 'Executes the POS Entry List action';
-            }
-            action("Gift Vouchers")
-            {
-                Caption = 'Gift Vouchers';
-                RunObject = Page "NPR Gift Voucher List";
-                ApplicationArea = All;
-                ToolTip = 'Executes the Gift Vouchers action';
-            }
-            action("Credit Vouchers")
-            {
-                Caption = 'Credit Vouchers';
-                RunObject = Page "NPR Credit Voucher List";
-                ApplicationArea = All;
-                ToolTip = 'Executes the Credit Vouchers action';
             }
             action("Sales Ticket Statistics")
             {

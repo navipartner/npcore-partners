@@ -73,7 +73,7 @@ page 6151018 "NPR NpRv Sales Line Card"
                     var
                         Contact: Record Contact;
                     begin
-                        if PAGE.RunModal(PAGE::"NPR Touch Screen: CRM Contacts", Contact) <> ACTION::LookupOK then
+                        if PAGE.RunModal(0, Contact) <> ACTION::LookupOK then
                             exit;
 
                         Validate("Contact No.", Contact."No.");
@@ -240,7 +240,7 @@ page 6151018 "NPR NpRv Sales Line Card"
                 Caption = 'References';
                 Image = BarCode;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

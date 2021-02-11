@@ -1,12 +1,5 @@
 table 6014520 "NPR Report Selection: Contract"
 {
-    // NPR5.26/TS/20160809 CASE 248289 Changed Option Caption Values from Danish to English
-    // NPR5.30/MHA /20170201  CASE 264918 Object renamed from Report Selection - Photo to Report Selection - Contract and Np Photo removed
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
-    // NPR5.30/BHR /20170203  CASE 262923  Add Field "Print Template". Add option "Repair Label" to repair type.
-    // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj fields 3,4,5,6,8,9
-    // NPR5.48/JDH /20181108 CASE 334560 Changed Data port fields to XML Port fields, and fixed reference to Object table. Fixed option Caption for "Report Type"
-
     Caption = 'Report Selection - Contract';
     DataClassification = CustomerContent;
 
@@ -15,7 +8,6 @@ table 6014520 "NPR Report Selection: Contract"
         field(1; "Report Type"; Option)
         {
             Caption = 'Report Type';
-            Description = 'NPR5.30';
             InitValue = "Insurance Offer";
             OptionCaption = ',Insurance Offer,Insurance Voucher,Guarantee Certificate,,,Repair reminder,Delivery note,Customer receipt,Repair guarantee,Repair finished,Repair offer,Rental contract,Purchase contract,Customer letter,Contract financing,Signs,Quote,Repair Label';
             OptionMembers = ,"Insurance Offer",Police,"Guarantee Certificate",,,"Reparation Reminder","Shipment note","Customer receipt","Repair warranty","Repair finished","Repair offer","Rental contract","Purchase contract",CustLetter,"Contract financing",Signs,Quote,"Repair Label";
@@ -40,7 +32,7 @@ table 6014520 "NPR Report Selection: Contract"
         }
         field(4; "Report Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Report),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Report),
                                                              "Object ID" = FIELD("Report ID")));
             Caption = 'Report Name';
             Editable = false;
@@ -59,7 +51,7 @@ table 6014520 "NPR Report Selection: Contract"
         }
         field(6; "XML Port Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(XMLport),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(XMLport),
                                                              "Object ID" = FIELD("XML Port ID")));
             Caption = 'XML Port Name';
             Editable = false;
@@ -79,7 +71,7 @@ table 6014520 "NPR Report Selection: Contract"
         }
         field(9; "Codeunit Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
                                                              "Object ID" = FIELD("Codeunit ID")));
             Caption = 'Codeunit Name';
             Editable = false;

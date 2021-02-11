@@ -149,9 +149,6 @@ table 6014439 "NPR Quantity Discount Header"
         RetailComment.SetRange("No. 2", "Main No.");
         RetailComment.DeleteAll;
 
-        RecRef.GetTable(Rec);
-        CompanySyncMgt.OnDelete(RecRef);
-
         DimMgt.DeleteDefaultDim(DATABASE::"NPR Quantity Discount Header", "Main No.");
     end;
 
@@ -172,9 +169,6 @@ table 6014439 "NPR Quantity Discount Header"
         if Date.FindLast then
             "Closing Date" := Date."Period Start";
 
-        RecRef.GetTable(Rec);
-        CompanySyncMgt.OnInsert(RecRef);
-
         RetailSetup.Get;
 
         DimMgt.UpdateDefaultDim(
@@ -185,16 +179,12 @@ table 6014439 "NPR Quantity Discount Header"
     trigger OnModify()
     begin
         "Last Date Modified" := Today;
-        RecRef.GetTable(Rec);
-        CompanySyncMgt.OnModify(RecRef);
     end;
 
     var
         RetailSetup: Record "NPR Retail Setup";
         DimMgt: Codeunit DimensionManagement;
         NoSeriesMgt: Codeunit NoSeriesManagement;
-        CompanySyncMgt: Codeunit "NPR CompanySyncManagement";
-        RecRef: RecordRef;
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin

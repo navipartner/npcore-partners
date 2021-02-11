@@ -28,21 +28,21 @@ table 6014506 "NPR Accessory/Spare Part"
         }
         field(3; Description; Text[50])
         {
-            CalcFormula = Lookup (Item.Description WHERE("No." = FIELD("Item No.")));
+            CalcFormula = Lookup(Item.Description WHERE("No." = FIELD("Item No.")));
             Caption = 'Description';
             Editable = false;
             FieldClass = FlowField;
         }
         field(4; Vendor; Code[20])
         {
-            CalcFormula = Lookup (Item."Vendor No." WHERE("No." = FIELD("Item No.")));
+            CalcFormula = Lookup(Item."Vendor No." WHERE("No." = FIELD("Item No.")));
             Caption = 'Buy-from Vendor';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5; "Buy-from Vendor Name"; Text[50])
         {
-            CalcFormula = Lookup (Vendor.Name WHERE("No." = FIELD(Vendor)));
+            CalcFormula = Lookup(Vendor.Name WHERE("No." = FIELD(Vendor)));
             Caption = 'Buy-from Vendor Name';
             Editable = false;
             FieldClass = FlowField;
@@ -54,7 +54,7 @@ table 6014506 "NPR Accessory/Spare Part"
         }
         field(9; Inventory; Decimal)
         {
-            CalcFormula = Sum ("Item Ledger Entry".Quantity WHERE("Item No." = FIELD("Item No."),
+            CalcFormula = Sum("Item Ledger Entry".Quantity WHERE("Item No." = FIELD("Item No."),
                                                                   "Posting Date" = FIELD("Date Filter"),
                                                                   "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
                                                                   "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
@@ -64,7 +64,7 @@ table 6014506 "NPR Accessory/Spare Part"
         }
         field(10; "Unit Price"; Decimal)
         {
-            CalcFormula = Lookup (Item."Unit Price" WHERE("No." = FIELD("Item No.")));
+            CalcFormula = Lookup(Item."Unit Price" WHERE("No." = FIELD("Item No.")));
             Caption = 'Unit Price';
             FieldClass = FlowField;
         }
@@ -176,34 +176,18 @@ table 6014506 "NPR Accessory/Spare Part"
     {
     }
 
-    trigger OnDelete()
-    begin
-        recRef.GetTable(Rec);
-        syncCU.OnDelete(recRef);
-    end;
-
     trigger OnInsert()
     begin
         if Quantity = 0 then
             Quantity := 1;
 
         "Add Extra Line Automatically" := true;
-
-        recRef.GetTable(Rec);
-        syncCU.OnInsert(recRef);
     end;
 
     trigger OnModify()
     begin
         "Last Date Modified" := Today;
-        recRef.GetTable(Rec);
-        syncCU.OnModify(recRef);
     end;
 
-    var
-        "//-SyncProfiles": Integer;
-        syncCU: Codeunit "NPR CompanySyncManagement";
-        recRef: RecordRef;
-        "//+SyncProfiles": Integer;
 }
 

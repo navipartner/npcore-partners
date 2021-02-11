@@ -195,7 +195,7 @@ codeunit 6151572 "NPR AF API WebService"
         AFHelperFunctions: Codeunit "NPR AF Helper Functions";
         Base64String: Text;
         PictureFilename: Text;
-        BarcodeLibrary: Codeunit "NPR Barcode Library";
+        BarcodeLibrary: Codeunit "NPR Barcode Lookup Mgt.";
         ItemNo2: Code[20];
         VariantCode: Code[10];
         ResolvingTable: Integer;
@@ -280,7 +280,7 @@ codeunit 6151572 "NPR AF API WebService"
         Variant2CommaString: Text;
         Variant3CommaString: Text;
         AFHelperFunctions: Codeunit "NPR AF Helper Functions";
-        BarcodeLibrary: Codeunit "NPR Barcode Library";
+        BarcodeLibrary: Codeunit "NPR Barcode Lookup Mgt.";
         ItemNo: Code[20];
         VariantCode: Code[10];
         ResolvingTable: Integer;

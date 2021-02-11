@@ -263,8 +263,10 @@ codeunit 85002 "NPR Library - POS Master Data"
             LibraryUtility.GenerateRandomCode(POSAuditProfile.FieldNo(Code), DATABASE::"NPR POS Audit Profile"), 1,
             LibraryUtility.GetFieldLength(DATABASE::"NPR POS Audit Profile", POSAuditProfile.FieldNo(Code))));
 
-        LibraryUtility.CreateNoSeries(NoSeries, true, false, true);
+        LibraryUtility.CreateNoSeries(NoSeries, true, false, false);
         LibraryUtility.CreateNoSeriesLine(NoSeriesLine, NoSeries.Code, 'TEST_ST_1', 'TEST_ST_999999999');
+        NoSeriesLine.Validate("Allow Gaps in Nos.", true);
+        NoSeriesLine.Modify();
         POSAuditProfile."Sales Ticket No. Series" := NoSeries.Code;
         POSAuditProfile.Insert;
     end;

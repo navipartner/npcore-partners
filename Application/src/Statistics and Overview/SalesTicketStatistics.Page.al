@@ -158,7 +158,6 @@ page 6014468 "NPR Sales Ticket Statistics"
 
     var
         PeriodFormMgt: Codeunit PeriodFormManagement;
-        AuditRollForm: Page "NPR Audit Roll";
         VendPeriodLength: Option Day,Week,Month,Quarter,Year,Period;
         AmountType: Option "Net Change","Balance at Date";
         Kassedata: Record "NPR Register";

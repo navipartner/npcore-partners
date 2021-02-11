@@ -222,7 +222,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                 group(ActionGroup6014408)
                 {
                     Caption = 'Retail';
-                    Image = Report; 
+                    Image = Report;
                     group(Management)
                     {
                         Caption = 'Management';
@@ -230,7 +230,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
 
                         {
                             Caption = 'Salespersons';
-                            Image = SalesPerson; 
+                            Image = SalesPerson;
                             action("NPR Sales Person Top 20")
                             {
                                 Caption = 'NPR Sales Person Top 20';
@@ -280,12 +280,12 @@ page 6151241 "NPR Retail POS- Sales Person R"
                         group(History)
                         {
                             Caption = 'History';
-                            Image = History; 
+                            Image = History;
 
                             group(HistoryList)
                             {
                                 Caption = 'Lists';
-                                Image = List; 
+                                Image = List;
 
                                 action("Sales Ticket Statistics")
                                 {
@@ -303,19 +303,11 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     ApplicationArea = All;
                                     ToolTip = 'Executes the Advanced Sales Statistics action';
                                 }
-                                action(Periods)
-                                {
-                                    Caption = 'Periods';
-                                    Image = ListPage;
-                                    RunObject = page "NPR Periods";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the Periods action';
-                                }
                             }
                             group(HistoryReport)
                             {
                                 Caption = 'Reports and Analysis';
-                                Image = AnalysisView; 
+                                Image = AnalysisView;
                                 action("NPR Sales per week year/Last year")
                                 {
                                     Caption = 'NPR Sales per week year/Last year';
@@ -332,30 +324,22 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     ApplicationArea = All;
                                     ToolTip = 'Executes the NPR Discount Statistics action';
                                 }
-                                action("NPR Sales Ticket Statistics/Date")
-                                {
-                                    Caption = 'NPR Sales Ticket Statistics/Date';
-                                    Image = Report2;
-                                    RunObject = Report "NPR Sales Ticket Stats/Date";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Sales Ticket Statistics/Date action';
-                                }
                             }
                         }
                     }
                     group(ItemandPrices)
                     {
                         Caption = 'Item & Prices';
-                        Image = ItemCosts; 
+                        Image = ItemCosts;
                         group(Goods)
                         {
                             Caption = 'Goods';
-                            Image = Item; 
+                            Image = Item;
 
                             group(Lists)
                             {
                                 Caption = 'Lists';
-                                Image = List; 
+                                Image = List;
                                 action("Retail Item List")
                                 {
                                     Caption = 'Retail Item';
@@ -384,7 +368,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                             group(ReportsGoods)
                             {
                                 Caption = 'Reports and Analysis';
-                                Image = AnalysisView; 
+                                Image = AnalysisView;
                                 action("NPR Inventory by age")
                                 {
                                     Caption = 'NPR Inventory by age';
@@ -469,24 +453,6 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     ApplicationArea = All;
                                     ToolTip = 'Executes the NPR Inventory per Variant at date action';
                                 }
-                                action("NPR Item Group Statistic M/Y")
-                                {
-                                    Caption = 'NPR Item Group Statistic M/Y';
-                                    Image = Report;
-                                    RunObject = report "NPR Item Group Stat M/Y";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Item Group Statistic M/Y action';
-                                }
-
-                                action("NPR Item Group Listing M/Y")
-                                {
-                                    Caption = 'NPR Item Group Listing M/Y';
-                                    Image = Report;
-                                    RunObject = report "NPR Item Group Listing M/Y";
-                                    ApplicationArea = All;
-                                    ToolTip = 'Executes the NPR Item Group Listing M/Y action';
-                                }
-
                                 action("NPR Item Barcode Sheet")
                                 {
                                     Caption = 'NPR Item Barcode Sheet';
@@ -534,13 +500,13 @@ page 6151241 "NPR Retail POS- Sales Person R"
                         group(Lines)
                         {
                             Caption = 'Lines';
-                            Image = AllLines; 
+                            Image = AllLines;
 
                             group(ListsLine)
                             {
 
                                 Caption = 'Lists';
-                                Image = List; 
+                                Image = List;
                                 action("Item Groups")
                                 {
                                     Caption = 'Item AddOns';
@@ -570,7 +536,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                             {
 
                                 Caption = 'Reports and Analysis';
-                                Image = AnalysisView; 
+                                Image = AnalysisView;
                                 action("NPR Item Group Overview")
                                 {
                                     Caption = 'NPR Item Group Overview';
@@ -608,11 +574,11 @@ page 6151241 "NPR Retail POS- Sales Person R"
                         group(Discount)
                         {
                             Caption = 'Discount';
-                            Image = Discount; 
+                            Image = Discount;
                             group(DiscountList)
                             {
                                 Caption = 'Lists';
-                                Image = List; 
+                                Image = List;
                                 action("Item Groups Tree")
                                 {
                                     Caption = 'Mix Discounts';
@@ -642,7 +608,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                             {
 
                                 Caption = 'Reports and Analysis';
-                                Image = AnalysisView; 
+                                Image = AnalysisView;
                                 action("NPR Period Discount Statistics")
                                 {
                                     Caption = 'NPR Period Discount Statistics';
@@ -801,7 +767,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Caption = 'POS Entry List';
                     Image = RegisteredDocs;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = page "NPR POS Entry List";
                     ToolTip = 'View POS Entry that have been done.';
@@ -813,7 +779,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Caption = 'POS Quotes';
                     Image = RegisteredDocs;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = page "NPR POS Quotes";
                     ToolTip = 'View POS Quotes that have been done.';
@@ -825,7 +791,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Caption = 'Posted Sales Invoices List';
                     Image = RegisteredDocs;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "Posted Sales Invoices";
                     ToolTip = 'View Sales Invoices that have been done.';
@@ -837,7 +803,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Caption = 'Posted Sales Credit Memos List';
                     Image = RegisteredDocs;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "Posted Sales Credit Memos";
                     ToolTip = 'View Sales Credit Memos that have been done.';
@@ -848,7 +814,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Caption = 'Repair Document List';
                     Image = RegisteredDocs;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Customer Repair List";
                     ToolTip = 'View the list of Repair List.';
@@ -955,8 +921,9 @@ page 6151241 "NPR Retail POS- Sales Person R"
                 ToolTip = 'Executes the Purchase Return Order action';
             }
         }
-        area(Processing){
-            
+        area(Processing)
+        {
+
             group(Vendor)
             {
                 Caption = 'Vendor';
@@ -997,30 +964,6 @@ page 6151241 "NPR Retail POS- Sales Person R"
             group(SalesAssistent)
             {
                 Caption = 'Sales Assistent';
-                action("NPR Sales Statistics")
-                {
-                    Caption = 'NPR Sales Statistics';
-                    Image = Report2;
-                    RunObject = Report "NPR Sales Ticket Stat.";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the NPR Sales Statistics action';
-                }
-                action("NPR Salesperson Statistics")
-                {
-                    Caption = 'NPR Salesperson Statistics';
-                    Image = Report2;
-                    RunObject = Report "NPR Salesperson Stats";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the NPR Salesperson Statistics action';
-                }
-                action("NPR Sales Time")
-                {
-                    Caption = 'NPR  Sales Time';
-                    Image = Report2;
-                    RunObject = Report "NPR Sale Time Report";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the NPR  Sales Time action';
-                }
                 action("NPR Sales Statistics By Department")
                 {
                     Caption = 'NPR Sales Statistics By Department';

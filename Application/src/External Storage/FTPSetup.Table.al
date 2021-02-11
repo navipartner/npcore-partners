@@ -1,10 +1,8 @@
 table 6184880 "NPR FTP Setup"
 {
-    // NPR5.54/ALST/20200212 CASE 383718 Object created
-    // NPR5.55/ALST/20200709 CASE 408285 added port number
-
     Caption = 'FTP Setup';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
 
     fields
     {
@@ -49,18 +47,6 @@ table 6184880 "NPR FTP Setup"
         {
             Caption = 'Server files location';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                FileManagement: Codeunit "File Management";
-                BadDirErr: Label 'Directory "%1" does not exist on the server, please check %2';
-            begin
-                if not FileManagement.ServerDirectoryExists("Storage On Server") then
-                    Error(BadDirErr, "Storage On Server", TableCaption);
-
-                if CopyStr("Storage On Server", StrLen("Storage On Server")) <> '\' then
-                    "Storage On Server" += '\';
-            end;
         }
     }
 
@@ -74,33 +60,5 @@ table 6184880 "NPR FTP Setup"
     fieldgroups
     {
     }
-
-    var
-        NoPassErr: Label 'No password found';
-
-    procedure HandlePassword(Password: Text): Text
-    begin
-        if Password = '' then begin
-            if IsolatedStorage.Contains("Service Password", DataScope::Company) then
-                IsolatedStorage.Delete("Service Password", DataScope::Company);
-            exit;
-        end;
-
-        if not IsolatedStorage.Contains("Service Password", DataScope::Company) then begin
-            "Service Password" := CreateGuid();
-            Modify;
-        end;
-        IsolatedStorage.Set("Service Password", Password, DataScope::Company);
-    end;
-
-    procedure GetPassword(): Text
-    var
-        PasswordValue: Text;
-    begin
-        if not IsolatedStorage.Get("Service Password", DataScope::Company, PasswordValue) then
-            Error(NoPassErr);
-
-        exit(PasswordValue);
-    end;
 }
 

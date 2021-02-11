@@ -285,14 +285,6 @@ page 6151259 "NPR Retail Owner RC"
                     RunObject = Page "Issued Reminder List";
                     ToolTip = 'View the list of issued reminders.';
                 }
-                action("Retail Document List")
-                {
-                    ApplicationArea = Suite;
-                    Caption = 'Retail Document List';
-                    Image = Document;
-                    RunObject = Page "NPR Retail Document List";
-                    ToolTip = 'Executes the Retail Document List action';
-                }
                 action("Repair Document List")
                 {
                     Caption = 'Repair Document List';
@@ -300,14 +292,6 @@ page 6151259 "NPR Retail Owner RC"
                     RunObject = Page "NPR Customer Repair List";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Repair Document List action';
-                }
-                action("Warranty Catalog List")
-                {
-                    Caption = 'Warranty Catalog List';
-                    Image = List;
-                    RunObject = Page "NPR Warranty Catalog List";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Warranty Catalog List action';
                 }
             }
             group("Discount, Coupons & Vouchers")
@@ -437,7 +421,7 @@ page 6151259 "NPR Retail Owner RC"
                     Caption = '&Purchase Order';
                     Image = Document;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "Purchase Order";
                     RunPageMode = Create;
@@ -502,22 +486,6 @@ page 6151259 "NPR Retail Owner RC"
                 group(RetailReport)
                 {
                     Caption = 'Retail';
-                    action("Sales Statistics")
-                    {
-                        Caption = 'Sales Statistics';
-                        Image = Report2;
-                        RunObject = Report "NPR Sales Ticket Stat.";
-                        ApplicationArea = All;
-                        ToolTip = 'Executes the Sales Statistics action';
-                    }
-                    action("Sale Report")
-                    {
-                        Caption = 'Sale Report';
-                        Image = Report2;
-                        RunObject = Report "NPR Sale Time Report";
-                        ApplicationArea = All;
-                        ToolTip = 'Executes the Sale Report action';
-                    }
                     separator(Separator6014423)
                     {
                     }

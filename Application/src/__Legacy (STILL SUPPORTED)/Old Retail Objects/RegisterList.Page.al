@@ -94,24 +94,5 @@ page 6014405 "NPR Register List"
 
     var
         selectionfilter: Boolean;
-
-    procedure getRecords(var "record": Record "NPR Register")
-    var
-        RetailTableCode: Codeunit "NPR Retail Table Code";
-    begin
-
-        CurrPage.SetSelectionFilter(Rec);
-        if Find('-') then
-            repeat
-                record.Init;
-                record := Rec;
-                //-NPR4.21
-                RetailTableCode.RegisterCheckNo(record."Register No.");
-                //+NPR4.21
-                record.Insert;
-            until Next = 0;
-
-        MarkedOnly(false);
-    end;
 }
 

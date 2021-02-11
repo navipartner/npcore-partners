@@ -20,7 +20,7 @@ report 6060136 "NPR MM Membership Not Renewed"
 
                         trigger OnAfterGetRecord()
                         var
-                            BarcodeLib: Codeunit "NPR Barcode Library";
+                            BarcodeLib: Codeunit "NPR Barcode Image Library";
                         begin
                             TempMembers.Init();
                             TempMembers.Template := "MM Membership Setup".Code;

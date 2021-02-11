@@ -1,19 +1,5 @@
 page 6014450 "NPR Mixed Discount"
 {
-    // VRT1.00/JDH/20150305  CASE 201022 Show item card without an error
-    // NPR5.30/BHR /20170223  CASE 265244 Copy Discount Functionality
-    // NPR5.31/MHA /20170109  CASE 262903 Layout updated to update Visible instead of Enable depending on Discount Type, renamed Danish variables to English and refactored Discount Amount Calculation
-    // NPR5.31/MHA /20170110  CASE 262904 Added field 100 "Mix Type" to enable multi layered Mixed Discount
-    // NPR5.31/MHA /20170113  CASE 263093 Added field 325 "Customer Disc. Group" to Group Conditions
-    // NPR5.40/MHA /20180320  CASE 306304 Added field 40 "Total Amount Excl. VAT"
-    // NPR5.45/TS  /20180803  CASE 308194 Removed Quantity Sold and Turnover
-    // NPR5.45/MHA /20180820  CASE 323568 Added Time Intervals
-    // NPR5.46/JDH /20181002 CASE 294354 Changed how mix discount are send to Retail Journal
-    // NPR5.52/ANPA/20191001  CASE 370260 Removed Assist Edit for the Customer Disc. Group filter, added group around start date, end date, start time and end time
-    // NPR5.54/SARA/20200218  CASE 388008 Hide "Starting time" and "Ending time"
-    // NPR5.55/TJ  /20200421  CASE 400524 Changed Caption of action Default Dimensions to Dimensions
-    // NPR5.55/ALPO/20200714  CASE 412946 Mixed Discount enhancement: support for multiple discount amount levels
-
     Caption = 'Mix Discount';
     PageType = Card;
     UsageCategory = Administration;
@@ -509,24 +495,7 @@ page 6014450 "NPR Mixed Discount"
                         end;
                     }
                 }
-                separator(Separator1160330004)
-                {
-                }
-                action("&Read from scanner")
-                {
-                    Caption = '&Read from scanner';
-                    Image = "Action";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the &Read from scanner action';
 
-                    trigger OnAction()
-                    var
-                        cuScanner: Codeunit "NPR Scanner - Functions";
-                    begin
-
-                        cuScanner.initMixedDiscount(Rec);
-                    end;
-                }
                 separator(Separator1160330020)
                 {
                 }

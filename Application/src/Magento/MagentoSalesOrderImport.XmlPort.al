@@ -452,62 +452,6 @@ xmlport 6151401 "NPR Magento Sales Order Import"
                         {
                             MinOccurs = Zero;
                         }
-                        textelement(gift_vouchers)
-                        {
-                            MaxOccurs = Once;
-                            MinOccurs = Zero;
-                            tableelement(tempgiftvoucher; "NPR Gift Voucher")
-                            {
-                                AutoUpdate = true;
-                                MinOccurs = Zero;
-                                XmlName = 'gift_voucher';
-                                UseTemporary = true;
-                                fieldattribute(external_no; TempGiftVoucher."No.")
-                                {
-                                }
-                                fieldattribute(certificate_number; TempGiftVoucher."External Reference No.")
-                                {
-                                }
-                                fieldelement(amount; TempGiftVoucher.Amount)
-                                {
-                                }
-                                fieldelement(name; TempGiftVoucher.Name)
-                                {
-                                }
-                                textelement(giftvouchermessage)
-                                {
-                                    XmlName = 'message';
-
-                                    trigger OnBeforePassVariable()
-                                    var
-                                        InStr: InStream;
-                                        Line: Text;
-                                    begin
-                                        TempGiftVoucher.CalcFields("Gift Voucher Message");
-                                        TempGiftVoucher."Gift Voucher Message".CreateInStream(InStr);
-                                        GiftVoucherMessage := '';
-                                        while not InStr.EOS do begin
-                                            InStr.ReadText(Line);
-                                            GiftVoucherMessage += Line;
-                                        end;
-                                    end;
-                                }
-
-                                trigger OnPreXmlItem()
-                                begin
-                                    TempGiftVoucher.SetRange("Primary Key Length", TempSalesLine."Line No.");
-                                end;
-
-                                trigger OnBeforeInsertRecord()
-                                var
-                                    OutStr: OutStream;
-                                begin
-                                    TempGiftVoucher."Primary Key Length" := TempSalesLine."Line No.";
-                                    TempGiftVoucher."Gift Voucher Message".CreateOutStream(OutStr);
-                                    OutStr.WriteText(GiftVoucherMessage);
-                                end;
-                            }
-                        }
                         fieldelement(requested_delivery_date; TempSalesLine."Requested Delivery Date")
                         {
                             MinOccurs = Zero;

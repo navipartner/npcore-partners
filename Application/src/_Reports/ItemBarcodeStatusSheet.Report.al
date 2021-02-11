@@ -182,7 +182,7 @@ report 6014455 "NPR Item Barcode Status Sheet"
     var
         ShowInventory: Boolean;
         ShowVariantInfo: Integer;
-        BarcodeLib: Codeunit "NPR Barcode Library";
+        BarcodeLib: Codeunit "NPR Barcode Image Library";
         TempBlobCol1: Codeunit "Temp Blob";
         TempBlobCol2: Codeunit "Temp Blob";
         TempBlobCol3: Codeunit "Temp Blob";

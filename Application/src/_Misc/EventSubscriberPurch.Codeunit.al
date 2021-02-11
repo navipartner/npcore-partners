@@ -40,7 +40,6 @@ codeunit 6014444 "NPR Event Subscriber (Purch)"
                     end else
                         Error(VendorItemNoNotCreatedErr, Rec."Vendor Item No.");
             end;
-
         end;
     end;
 
@@ -59,52 +58,6 @@ codeunit 6014444 "NPR Event Subscriber (Purch)"
             Item.FindItemVend(ItemVend, Rec."Location Code");
             if (ItemVend."Vendor Item No." = '') and (Item."Vendor Item No." <> '') then
                 Rec."Vendor Item No." := Item."Vendor Item No.";
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Table, 39, 'OnAfterValidateEvent', 'NPR Gift Voucher', true, false)]
-    local procedure OnAfterValidateEventGiftVoucher(var Rec: Record "Purchase Line"; var xRec: Record "Purchase Line"; CurrFieldNo: Integer)
-    var
-        GiftVoucher: Record "NPR Gift Voucher";
-        UpdateDirectUnitCostQst: Label '%1 on %2 is %3. Do You want to update %4 on %5 with %3?',
-                               Comment = '%1=GiftVoucher.FieldCaption(Amount);%2=GiftVoucher.TableCaption();%3=GiftVoucher.Amount;%4=PurchLine.FieldCaption("Amount Including VAT");%5=PurchLine.TableCaption()';
-    begin
-        if Rec."NPR Gift Voucher" <> '' then begin
-            Rec.TestField(Type, Rec.Type::"G/L Account");
-            Rec."NPR Credit Note" := '';
-            GiftVoucher.Get(Rec."NPR Gift Voucher");
-            GiftVoucher.TestField(Status, GiftVoucher.Status::Open);
-            if GiftVoucher.Amount <> Rec."Amount Including VAT" then
-                if Confirm(StrSubstNo(UpdateDirectUnitCostQst,
-                  GiftVoucher.FieldCaption(Amount), GiftVoucher.TableCaption(),
-                  GiftVoucher.Amount, Rec.FieldCaption("Amount Including VAT"), Rec.TableCaption())) then begin
-                    Rec."Direct Unit Cost" := GiftVoucher.Amount;
-                    Rec."Direct Unit Cost" := Rec."Direct Unit Cost" / 1 + (Rec."VAT %" / 100);
-                    Rec.Validate("Direct Unit Cost", Round(Rec."Direct Unit Cost"));
-                end;
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Table, 39, 'OnAfterValidateEvent', 'NPR Credit Note', true, false)]
-    local procedure OnAfterValidateEventCreditNote(var Rec: Record "Purchase Line"; var xRec: Record "Purchase Line"; CurrFieldNo: Integer)
-    var
-        CreditVoucher: Record "NPR Credit Voucher";
-        UpdateDirectUnitCostQst: Label '%1 on %2 is %3. Do You want to update %4 on %5 with %3?',
-        Comment = '%1=CreditVoucher.FieldCaption(Amount);%2=CreditVoucher.TableCaption();%3=CreditVoucher.Amount;%4=PurchLine.FieldCaption("Amount Including VAT");%5=PurchLine.TableCaption()';
-    begin
-        if Rec."NPR Credit Note" <> '' then begin
-            Rec.TestField(Type, Rec.Type::"G/L Account");
-            Rec."NPR Gift Voucher" := '';
-            CreditVoucher.Get(Rec."NPR Credit Note");
-            CreditVoucher.TestField(Status, CreditVoucher.Status::Open);
-            if CreditVoucher.Amount <> Rec."Amount Including VAT" then
-                if Confirm(StrSubstNo(UpdateDirectUnitCostQst,
-                  CreditVoucher.FieldCaption(Amount), CreditVoucher.TableCaption(),
-                  CreditVoucher.Amount, Rec.FieldCaption("Amount Including VAT"), Rec.TableCaption())) then begin
-                    Rec."Direct Unit Cost" := CreditVoucher.Amount;
-                    Rec."Direct Unit Cost" := Rec."Direct Unit Cost" / 1 + (Rec."VAT %" / 100);
-                    Rec.Validate("Direct Unit Cost", Round(Rec."Direct Unit Cost"));
-                end;
         end;
     end;
 

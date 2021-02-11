@@ -21,7 +21,6 @@ page 6014518 "NPR Sales Order Pick"
                 var
                     SalesOrderTestSearch: Record "Sales Header";
                 begin
-                    Clear(AlternativeNo);
                     Clear(ItemBarcode);
                     Clear(ItemVariantBarcode);
                     ItemFoundonLines := false;
@@ -33,41 +32,6 @@ page 6014518 "NPR Sales Order Pick"
                         CurrPage.Update();
                     end else
                         ItemBarcodeInput := '';
-                end;
-            }
-            field("Item Barcode"; ItemBarcodeInput)
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the ItemBarcodeInput field';
-
-                trigger OnValidate()
-                var
-                    SalesLinesSearch: Record "Sales Line";
-                begin
-                    Clear(AlternativeNo);
-                    Clear(ItemBarcode);
-                    Clear(ItemVariantBarcode);
-                    ItemFoundonLines := false;
-                    if ItemBarcodeInput <> '' then begin
-                        AlternativeNo.SetRange(Type, AlternativeNo.Type::Item);
-                        AlternativeNo.SetRange("Alt. No.", ItemBarcodeInput);
-                        AlternativeNo.FindFirst();
-                        ItemBarcode.Get(AlternativeNo.Code);
-
-                        if AlternativeNo."Variant Code" <> '' then
-                            ItemVariantBarcode.Get(AlternativeNo.Code, AlternativeNo."Variant Code");
-
-                        SalesLinesSearch.SetRange("Document Type", SalesLinesSearch."Document Type"::Order);
-                        SalesLinesSearch.SetRange("Document No.", "No.");
-                        SalesLinesSearch.SetRange(Type, SalesLinesSearch.Type::Item);
-                        SalesLinesSearch.SetRange("No.", ItemBarcode."No.");
-                        SalesLinesSearch.FindFirst();
-
-                        ItemFoundonLines := true;
-
-                        CurrPage.SalesLines.PAGE.UpdateQtyToShipOnLines(ItemBarcode."No.", ItemVariantBarcode.Code, 1);
-                        CurrPage.Update();
-                    end;
                 end;
             }
             field("Item No."; ItemBarcode."No.")
@@ -744,7 +708,6 @@ page 6014518 "NPR Sales Order Pick"
     var
         ItemBarcode: Record Item;
         ItemVariantBarcode: Record "Item Variant";
-        AlternativeNo: Record "NPR Alternative No.";
         CopySalesDoc: Report "Copy Sales Document";
         MoveNegSalesLines: Report "Move Negative Sales Lines";
         ArchiveManagement: Codeunit ArchiveManagement;

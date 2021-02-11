@@ -5,38 +5,9 @@ codeunit 6014527 "NPR Credit Card Prot. Helper"
     end;
 
     procedure FindPaymentType(CardPan: Code[20]; var PaymentTypePOS: Record "NPR Payment Type POS"; LocationCode: Code[10]): Boolean
-    var
-        PaymentTypePrefix: Record "NPR Payment Type - Prefix";
-        "Filter": Text[30];
-        Len: Integer;
     begin
         if MatchEFTBINRange(CardPan, PaymentTypePOS, LocationCode) then
             exit(true);
-
-        Filter := CardPan;
-        Len := StrLen(Filter);
-        while Len > 0 do begin
-            PaymentTypePrefix.SetRange(PaymentTypePrefix.Prefix, Filter);
-            if PaymentTypePrefix.Find('-') then
-                repeat
-                    PaymentTypePOS.Reset;
-                    PaymentTypePOS.SetCurrentKey("No.", "Via Terminal");
-                    PaymentTypePOS.SetRange("No.", PaymentTypePrefix."Payment Type");
-                    PaymentTypePOS.SetRange("Via Terminal", true);
-                    PaymentTypePOS.SetRange("Location Code", LocationCode);
-                    if PaymentTypePOS.FindFirst then
-                        exit(true)
-                    else
-                        if LocationCode <> '' then begin
-                            PaymentTypePOS.SetRange("Location Code", '');
-                            if PaymentTypePOS.FindFirst then
-                                exit(true);
-                        end;
-                until (PaymentTypePrefix.Next = 0);
-            Len := Len - 1;
-            Filter := CopyStr(Filter, 1, Len);
-        end;
-        exit(false);
     end;
 
     procedure CutCardPan(CardPan: Code[100]): Code[30]

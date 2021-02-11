@@ -1640,7 +1640,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         RetailComment: Record "NPR Retail Comment";
         Register: Record "NPR Register";
         POSUnit: Record "NPR POS Unit";
-        Utility: Codeunit "NPR Utility";
+        Utility: Codeunit "NPR Receipt Footer Mgt.";
         ReceiptLineText: Text;
         Encoding: TextEncoding;
         I: Integer;

@@ -357,7 +357,6 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
 
     procedure UnAssignPoSUnitIdToPoS(EFTSetupIn: Record "NPR EFT Setup")
     var
-        TouchScreenFunctions: Codeunit "NPR Touch Screen - Func.";
         RegisterPoSUnitId: Text[50];
         EFTTypePOSUnitGenParam: Record "NPR EFTType POSUnit Gen.Param.";
     begin
@@ -406,7 +405,6 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
 
     procedure ReadPoSUnitAssignedPoSId(EFTSetupIn: Record "NPR EFT Setup")
     var
-        TouchScreenFunctions: Codeunit "NPR Touch Screen - Func.";
         RegisterPoSUnitId: Text[50];
         RegisterPoSId: Text[100];
         EFTTypePOSUnitGenParam: Record "NPR EFTType POSUnit Gen.Param.";

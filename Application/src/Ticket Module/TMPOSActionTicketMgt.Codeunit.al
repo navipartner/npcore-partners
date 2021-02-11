@@ -1147,7 +1147,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         PageAction: Action;
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePos: Record "NPR Sale Line POS";
-        BarcodeLibrary: Codeunit "NPR Barcode Library";
+        BarcodeLibrary: Codeunit "NPR Barcode Image Library";
         Resolver: Integer;
         Ticket: Record "NPR TM Ticket";
         TicketManagement: Codeunit "NPR TM Ticket Management";

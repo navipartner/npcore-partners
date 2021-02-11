@@ -230,16 +230,5 @@ codeunit 6150860 "NPR POS Action: LoginButton"
 
         exit(Today - DT2Date(POSWorkshiftCheckpoint."Created At"));
     end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6014505, 'OnBeforeRegisterOpen', '', true, true)]
-    local procedure OnRegisterOpen_LegacySubscriber(Register: Record "NPR Register")
-    var
-        POSCreateEntry: Codeunit "NPR POS Create Entry";
-    begin
-
-        //-NPR5.38 [297087]
-        POSCreateEntry.InsertUnitOpenEntry(Register."Register No.", '');
-        //+NPR5.38 [297087]
-    end;
 }
 

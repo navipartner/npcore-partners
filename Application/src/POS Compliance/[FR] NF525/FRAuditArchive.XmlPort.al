@@ -411,58 +411,6 @@ xmlport 6184850 "NPR FR Audit Archive"
                     }
                     textelement(AssociatedDocuments)
                     {
-                        tableelement(issuedcreditvoucher; "NPR Credit Voucher")
-                        {
-                            LinkFields = "Issuing POS Entry No" = FIELD("Entry No.");
-                            LinkTable = "POS Entry";
-                            MinOccurs = Zero;
-                            XmlName = 'IssuedCreditVoucher';
-                            fieldelement(VoucherNo; IssuedCreditVoucher."No.")
-                            {
-                            }
-                            fieldelement(Amount; IssuedCreditVoucher.Amount)
-                            {
-                            }
-                        }
-                        tableelement(appliedcreditvoucher; "NPR Credit Voucher")
-                        {
-                            LinkFields = "Cashed POS Entry No." = FIELD("Entry No.");
-                            LinkTable = "POS Entry";
-                            MinOccurs = Zero;
-                            XmlName = 'AppliedCreditVoucher';
-                            fieldelement(VoucherNo; AppliedCreditVoucher."No.")
-                            {
-                            }
-                            fieldelement(Amount; AppliedCreditVoucher.Amount)
-                            {
-                            }
-                        }
-                        tableelement(issuedgiftvoucher; "NPR Gift Voucher")
-                        {
-                            LinkFields = "Issuing POS Entry No" = FIELD("Entry No.");
-                            LinkTable = "POS Entry";
-                            MinOccurs = Zero;
-                            XmlName = 'IssuedGiftVoucher';
-                            fieldelement(VoucherNo; IssuedGiftVoucher."No.")
-                            {
-                            }
-                            fieldelement(Amount; IssuedGiftVoucher.Amount)
-                            {
-                            }
-                        }
-                        tableelement(appliedgiftvoucher; "NPR Gift Voucher")
-                        {
-                            LinkFields = "Cashed POS Entry No." = FIELD("Entry No.");
-                            LinkTable = "POS Entry";
-                            MinOccurs = Zero;
-                            XmlName = 'AppliedGiftVoucher';
-                            fieldelement(VoucherNo; AppliedGiftVoucher."No.")
-                            {
-                            }
-                            fieldelement(Amount; AppliedGiftVoucher.Amount)
-                            {
-                            }
-                        }
                         tableelement(issuedgenericvoucher; "NPR NpRv Voucher Entry")
                         {
                             LinkFields = "Register No." = FIELD("POS Unit No."), "Document No." = FIELD("Document No.");

@@ -2,6 +2,7 @@ table 6184893 "NPR Storage Operation Param."
 {
     Caption = 'Storage Operation Parameters';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
 
     fields
     {

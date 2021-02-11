@@ -321,5 +321,21 @@ table 6150615 "NPR POS Unit"
             exit;
         exit(MPOSProfile.Get("MPOS Profile"));
     end;
+
+    procedure GetCurrentPOSUnit(): Code[10]
+    var
+        UserSetup: Record "User Setup";
+        POSSession: Codeunit "NPR POS Session";
+        POSSetup: Codeunit "NPR POS Setup";
+    begin
+        if POSSession.GetSession(POSSession, false) then begin
+            POSSession.GetSetup(POSSetup);
+            exit(POSSetup.Register());
+        end;
+
+        if not UserSetup.Get(UserId) then
+            exit('?'); //Old syntax - kept in case anyone matches on question mark.
+        exit(UserSetup."NPR Backoffice Register No.");
+    end;
 }
 

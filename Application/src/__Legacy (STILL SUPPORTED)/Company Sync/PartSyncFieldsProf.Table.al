@@ -3,27 +3,23 @@ table 6059779 "NPR Part. Sync Fields Prof."
     Caption = 'Partiel Synk. Felt Profiler';
     DataPerCompany = false;
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
 
     fields
     {
         field(1; "Synchronisation Profile"; Code[20])
         {
             Caption = 'Synchronisation Profile';
-            NotBlank = true;
-            TableRelation = "NPR Company Sync Profiles"."Synchronisation Profile";
             DataClassification = CustomerContent;
         }
         field(2; "Table No."; Integer)
         {
             Caption = 'Table No.';
-            NotBlank = true;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
             DataClassification = CustomerContent;
         }
         field(3; "Field No."; Integer)
         {
             Caption = 'Field No.';
-            NotBlank = true;
             DataClassification = CustomerContent;
         }
         field(4; Description; Text[100])

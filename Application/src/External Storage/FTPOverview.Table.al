@@ -1,9 +1,8 @@
 table 6184881 "NPR FTP Overview"
 {
-    // NPR5.54/ALST/20200212 CASE 383718 Object created
-
     Caption = 'FTP Overview';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
 
     fields
     {
@@ -11,7 +10,6 @@ table 6184881 "NPR FTP Overview"
         {
             Caption = 'FTP Host Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR FTP Setup".Code;
         }
         field(10; "File Name"; Text[250])
         {

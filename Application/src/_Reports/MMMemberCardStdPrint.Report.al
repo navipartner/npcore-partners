@@ -79,7 +79,7 @@ report 6060123 "NPR MM Member Card Std Print"
                 MMMembership: Record "NPR MM Membership";
                 MMMembershipRole: Record "NPR MM Membership Role";
                 MMMembershipSetup: Record "NPR MM Membership Setup";
-                BarcodeLib: Codeunit "NPR Barcode Library";
+                BarcodeLib: Codeunit "NPR Barcode Image Library";
                 PointTo: Integer;
                 Code128Lbl: Label 'CODE128';
             begin

@@ -11,14 +11,6 @@ page 6059980 "NPR Sales Person Role Center"
             group(Control1900724808)
             {
                 ShowCaption = false;
-                part(Control6150615; "NPR Sale POS Activities")
-                {
-                    ApplicationArea = All;
-                }
-                part(Control6150614; "NPR Retail Document Activities")
-                {
-                    ApplicationArea = All;
-                }
                 part(Control21; "NPR Discount Activities")
                 {
                     ApplicationArea = All;
@@ -80,40 +72,12 @@ page 6059980 "NPR Sales Person Role Center"
                 ApplicationArea = All;
                 ToolTip = 'Executes the Retail Journal action';
             }
-            action("Retail Documents")
-            {
-                Caption = 'Retail Documents';
-                RunObject = Page "NPR Retail Document List";
-                ApplicationArea = All;
-                ToolTip = 'Executes the Retail Documents action';
-            }
-            action("Audit Roll")
-            {
-                Caption = 'Audit Roll';
-                RunObject = Page "NPR Audit Roll";
-                ApplicationArea = All;
-                ToolTip = 'Executes the Audit Roll action';
-            }
             action("POS Entry List")
             {
                 Caption = 'POS Entry List';
                 RunObject = Page "NPR POS Entry List";
                 ApplicationArea = All;
                 ToolTip = 'Executes the POS Entry List action';
-            }
-            action("Gift Vouchers")
-            {
-                Caption = 'Gift Vouchers';
-                RunObject = Page "NPR Gift Voucher List";
-                ApplicationArea = All;
-                ToolTip = 'Executes the Gift Vouchers action';
-            }
-            action("Credit Vouchers")
-            {
-                Caption = 'Credit Vouchers';
-                RunObject = Page "NPR Credit Voucher List";
-                ApplicationArea = All;
-                ToolTip = 'Executes the Credit Vouchers action';
             }
             action("Sales Ticket Statistics")
             {

@@ -74,10 +74,8 @@ table 6014405 "NPR Sale POS"
                 SaleLinePOS: Record "NPR Sale Line POS";
                 Item: Record Item;
                 Contact: Record Contact;
-                AltNo: Record "NPR Alternative No.";
                 DoCreate: Boolean;
                 Cust: Record Customer;
-                RetailFormCode: Codeunit "NPR Retail Form Code";
                 POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
                 xSaleLinePOS: Record "NPR Sale Line POS";
                 POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -95,49 +93,21 @@ table 6014405 "NPR Sale POS"
                 "Tax Liable" := POSStore."Tax Liable";
                 "VAT Bus. Posting Group" := POSStore."VAT Bus. Posting Group";
 
-                //- Alternative Customer no.
-                AltNo.SetCurrentKey("Alt. No.", Type);
-                AltNo.SetRange("Alt. No.", "Customer No.");
-                AltNo.SetFilter(Type, '=%1|=%2', AltNo.Type::Customer, AltNo.Type::"CRM Customer");
-                if AltNo.FindFirst then begin
-                    if AltNo.Type = AltNo.Type::Customer then
-                        "Customer Type" := "Customer Type"::Ord
-                    else
-                        "Customer Type" := "Customer Type"::Cash;
-                    "Customer No." := AltNo.Code;
-                end;
-
                 if ("Customer Type" = "Customer Type"::Cash) and ("Customer No." <> '') then begin
-                    if not Contact.Get("Customer No.") then begin
-                        RetailFormCode.CreateContact("Customer No.");
-
-                        if "Customer No." <> '' then begin
-                            Contact.Get("Customer No.");
-                            "Customer No." := Contact."No.";
-                            Name := Contact.Name;
-                            Address := Contact.Address;
-                            "Address 2" := Contact."Address 2";
-                            Validate("Post Code", Contact."Post Code");
-                            Validate("Country Code", Contact."Country/Region Code");
-                        end;
-                    end else begin
-                        Name := Contact.Name;
-                        Address := Contact.Address;
-                        "Address 2" := Contact."Address 2";
-                        "Post Code" := Contact."Post Code";
-                        City := Contact.City;
-                        "Contact No." := Contact."No.";
-                        Validate("Country Code", Contact."Country/Region Code");
-                    end;
+                    Contact.Get("Customer No.");
+                    Name := Contact.Name;
+                    Address := Contact.Address;
+                    "Address 2" := Contact."Address 2";
+                    "Post Code" := Contact."Post Code";
+                    City := Contact.City;
+                    "Contact No." := Contact."No.";
+                    Validate("Country Code", Contact."Country/Region Code");
                 end;
 
                 Modify;
 
                 if ("Customer No." <> '') and ("Customer Type" = "Customer Type"::Ord) then begin
-                    //ohm - customer lookup
-                    if not Cust.Get("Customer No.") then begin
-                        RetailFormCode.CreateCustomer("Customer No.");
-                    end;
+                    Cust.Get("Customer No.");
 
                     if "Customer No." <> '' then begin
                         Cust.Get("Customer No.");
@@ -771,29 +741,6 @@ table 6014405 "NPR Sale POS"
         RetailSetup.Get;
         if RetailSetup."Use Adv. dimensions" then
             NPRDimMgt.LookupDimValueCode(FieldNumber, ShortcutDimCode);
-    end;
-
-    procedure DeleteDimOnEkspAndLines()
-    var
-        EkspeditionLinie: Record "NPR Sale Line POS";
-    begin
-        RetailSetup.Get;
-        if not RetailSetup."Use Adv. dimensions" then
-            exit;
-
-        if "Register No." <> '' then
-            if "Sales Ticket No." <> '' then begin
-                NPRDimMgt.DeleteNPRDim(DATABASE::"NPR Sale POS", "Register No.", "Sales Ticket No.", 0D, 0, 0, '');
-                EkspeditionLinie.SetRange("Register No.", "Register No.");
-                EkspeditionLinie.SetRange("Sales Ticket No.", "Sales Ticket No.");
-                with EkspeditionLinie do begin
-                    if FindSet then
-                        repeat
-                            NPRDimMgt.DeleteNPRDim(DATABASE::"NPR Sale Line POS", "Register No.",
-                            "Sales Ticket No.", Date, "Sale Type", "Line No.", '');
-                        until Next = 0;
-                end;
-            end;
     end;
 
     procedure CreateDim(Type1: Integer; No1: Code[20]; Type2: Integer; No2: Code[20]; Type3: Integer; No3: Code[20]; Type4: Integer; No4: Code[20]; Type5: Integer; No5: Code[20])

@@ -614,9 +614,6 @@ table 6014410 "NPR Item Group"
 
         CreateNoSeries;
 
-        RecRef.GetTable(Rec);
-        CompanySyncMgt.OnInsert(RecRef);
-
         DimMgt.UpdateDefaultDim(
           DATABASE::"NPR Item Group", "No.",
           "Global Dimension 1 Code", "Global Dimension 2 Code");
@@ -626,9 +623,6 @@ table 6014410 "NPR Item Group"
     begin
         "Last Date Modified" := Today;
         "Primary Key Length" := StrLen("No.");
-
-        RecRef.GetTable(Rec);
-        CompanySyncMgt.OnModify(RecRef);
     end;
 
     trigger OnRename()
@@ -650,7 +644,6 @@ table 6014410 "NPR Item Group"
         Text1060004: Label 'The item group cannot be subgroup to itself!';
         Text1060008: Label 'The main groups to item group %1 must be activated to used goods groups!';
         RetailSetup: Record "NPR Retail Setup";
-        CompanySyncMgt: Codeunit "NPR CompanySyncManagement";
         DimMgt: Codeunit DimensionManagement;
         Text1060010: Label 'Items have been found belonging to %1 %2, but not having %3 in %4.\Edit these to %4 %5';
         Text1060011: Label 'You are about to move the relation to another item group, do you with to inherit the attributes?';
@@ -837,5 +830,99 @@ table 6014410 "NPR Item Group"
                (not ItemGroup2.Get("Parent Item Group No."))
             then
                 Blocked := true;
+    end;
+
+    procedure SetupItemFromGroup(var Item: Record Item; var ItemGroup: Record "NPR Item Group")
+    var
+        DefaultDimension: Record "Default Dimension";
+        DefaultDimension2: Record "Default Dimension";
+        ItemUnitofMeasure: Record "Item Unit of Measure";
+        ConfigTemplateHeader: Record "Config. Template Header";
+        ConfigTemplateManagement: Codeunit "Config. Template Management";
+        RecRef: RecordRef;
+        RetailSetup: Record "NPR Retail Setup";
+    begin
+        RetailSetup.Get();
+
+        ItemGroup.TestField("VAT Bus. Posting Group");
+        ItemGroup.TestField("Gen. Prod. Posting Group");
+        ItemGroup.TestField("VAT Prod. Posting Group");
+        if Item.Type <> ItemGroup.Type then begin
+            Item.Validate(Item.Type, ItemGroup.Type);
+        end;
+
+        if ItemGroup.Type <> ItemGroup.Type::Service then
+            ItemGroup.TestField("Inventory Posting Group");
+
+        ItemGroup.TestField(Blocked, false);
+        ItemGroup.TestField("Main Item Group", false);
+        Item.Validate(Item."Gen. Prod. Posting Group", ItemGroup."Gen. Prod. Posting Group");
+        Item."VAT Prod. Posting Group" := ItemGroup."VAT Prod. Posting Group";
+        Item."VAT Bus. Posting Gr. (Price)" := ItemGroup."VAT Bus. Posting Group";
+        Item."Tax Group Code" := ItemGroup."Tax Group Code";
+        Item.Validate(Item."Inventory Posting Group", ItemGroup."Inventory Posting Group");
+
+        Item.Validate(Item."Reordering Policy", ItemGroup."Reordering Policy");
+        Item.Validate(Item."Item Disc. Group", ItemGroup."Item Discount Group");
+        Item.Validate(Item."NPR Guarantee Index", ItemGroup."Warranty File");
+        Item.Validate(Item."NPR Guarantee voucher", ItemGroup.Warranty);
+        Item.Validate(Item."Tariff No.", ItemGroup."Tarif No.");
+        if (RetailSetup."Item Description at 1 star") and (Item.Description = '') then Item.Validate(Item.Description, ItemGroup.Description);
+        Item."Costing Method" := ItemGroup."Costing Method";
+        Item."NPR Insurrance category" := ItemGroup."Insurance Category";
+
+        DefaultDimension2.SetRange("Table ID", DATABASE::Item);
+        DefaultDimension2.SetRange("No.", Item."No.");
+        DefaultDimension2.DeleteAll;
+        DefaultDimension.SetRange("Table ID", DATABASE::"NPR Item Group");
+        DefaultDimension.SetRange("No.", Item."NPR Item Group");
+        if DefaultDimension.FindSet then
+            repeat
+                DefaultDimension2 := DefaultDimension;
+                DefaultDimension2."Table ID" := DATABASE::Item;
+                DefaultDimension2."No." := Item."No.";
+                DefaultDimension2.Insert;
+            until DefaultDimension.Next = 0;
+
+        Item."Global Dimension 1 Code" := ItemGroup."Global Dimension 1 Code";
+        Item."Global Dimension 2 Code" := ItemGroup."Global Dimension 2 Code";
+
+        if not ItemUnitofMeasure.Get(Item."No.", ItemGroup."Base Unit of Measure") and (ItemGroup."Base Unit of Measure" <> '') then begin
+            ItemUnitofMeasure."Item No." := Item."No.";
+            ItemUnitofMeasure.Code := ItemGroup."Base Unit of Measure";
+            ItemUnitofMeasure."Qty. per Unit of Measure" := 1;
+            if ItemUnitofMeasure.Insert then;
+        end;
+
+        if not ItemUnitofMeasure.Get(Item."No.", ItemGroup."Sales Unit of Measure") and (ItemGroup."Sales Unit of Measure" <> '') then begin
+            ItemUnitofMeasure."Item No." := Item."No.";
+            ItemUnitofMeasure.Code := ItemGroup."Sales Unit of Measure";
+            ItemUnitofMeasure."Qty. per Unit of Measure" := 1;
+            if ItemUnitofMeasure.Insert then;
+        end;
+
+        if not ItemUnitofMeasure.Get(Item."No.", ItemGroup."Purch. Unit of Measure") and (ItemGroup."Purch. Unit of Measure" <> '') then begin
+            ItemUnitofMeasure."Item No." := Item."No.";
+            ItemUnitofMeasure.Code := ItemGroup."Purch. Unit of Measure";
+            ItemUnitofMeasure."Qty. per Unit of Measure" := 1;
+            if ItemUnitofMeasure.Insert then;
+        end;
+
+        if Item."Base Unit of Measure" <> ItemGroup."Base Unit of Measure" then begin
+            Item.Validate(Item."Base Unit of Measure", ItemGroup."Base Unit of Measure");
+            Item.Validate(Item."Sales Unit of Measure", ItemGroup."Sales Unit of Measure");
+            Item.Validate(Item."Sales Unit of Measure", ItemGroup."Purch. Unit of Measure");
+        end;
+
+        if ItemGroup."Variety Group" <> '' then
+            Item.Validate(Item."NPR Variety Group", ItemGroup."Variety Group");
+
+        if ItemGroup."Config. Template Header" <> '' then begin
+            if ConfigTemplateHeader.Get(ItemGroup."Config. Template Header") then begin
+                RecRef.GetTable(Item);
+                ConfigTemplateManagement.UpdateRecord(ConfigTemplateHeader, RecRef);
+                Item.Get(Item."No.");
+            end;
+        end;
     end;
 }

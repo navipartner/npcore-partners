@@ -2,8 +2,6 @@ table 6151081 "NPR ExRv Voucher"
 {
     Caption = 'External Retail Voucher';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR ExRv Vouchers";
-    LookupPageID = "NPR ExRv Vouchers";
 
     fields
     {

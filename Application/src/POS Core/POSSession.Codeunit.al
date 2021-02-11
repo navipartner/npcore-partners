@@ -201,7 +201,6 @@ codeunit 6150700 "NPR POS Session"
 
     procedure StartPOSSession()
     var
-        RetailFormCode: Codeunit "NPR Retail Form Code";
         CultureInfo: DotNet NPRNetCultureInfo;
     begin
         InitializePOSSession();

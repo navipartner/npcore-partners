@@ -1,7 +1,6 @@
 table 6014423 "NPR Period"
 {
     Caption = 'Period';
-    LookupPageID = "NPR Register Period List";
     DataClassification = CustomerContent;
 
     fields

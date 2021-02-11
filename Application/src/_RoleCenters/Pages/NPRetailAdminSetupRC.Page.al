@@ -122,13 +122,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Info List action';
                 }
-                action("POS Customer Location")
-                {
-                    Caption = 'POS Customer Location';
-                    RunObject = Page "NPR POS Customer Loc.";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the POS Customer Location action';
-                }
                 action("POS Admin. Template List")
                 {
                     Caption = 'POS Admin. Template List';
@@ -313,13 +306,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Coupon Modules action';
                 }
-                action("External Retail Voucher Types")
-                {
-                    Caption = 'External Retail Voucher Types';
-                    RunObject = Page "NPR ExRv Voucher Types";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the External Retail Voucher Types action';
-                }
                 action("Voucher Types")
                 {
                     Caption = 'Voucher Types';
@@ -416,13 +402,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Retail Logo Setup action';
                 }
-                action("Google Cloud Print Setup")
-                {
-                    Caption = 'Google Cloud Print Setup';
-                    RunObject = Page "NPR GCP Setup";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Google Cloud Print Setup action';
-                }
                 action("E-mail Templates")
                 {
                     Caption = 'E-mail Templates';
@@ -485,13 +464,7 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Web Fonts action';
                 }
-                action("Lookup Templates")
-                {
-                    Caption = 'Lookup Templates';
-                    RunObject = Page "NPR Lookup Templates";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Lookup Templates action';
-                }
+
                 action("POS Stargate Packages")
                 {
                     Caption = 'POS Stargate Packages';

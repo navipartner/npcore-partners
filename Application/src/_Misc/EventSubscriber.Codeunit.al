@@ -28,63 +28,54 @@ codeunit 6014404 "NPR Event Subscriber"
             Error(RegisterCodeAlreadyUsedErr, Rec."NPR Register Password");
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Item Journal Line", 'OnAfterValidateEvent', 'Item Reference No.', false, false)]
-    local procedure T83OnAfterValidateEventItemReferenceNo(var Rec: Record "Item Journal Line"; var xRec: Record "Item Journal Line"; CurrFieldNo: Integer)
-    var
-        StdTableCode: Codeunit "NPR Std. Table Code";
-    begin
-        StdTableCode.ItemJnlLineCrossReferenceOV(Rec, xRec);
-    end;
-
     [EventSubscriber(ObjectType::Table, Database::"Default Dimension", 'OnAfterInsertEvent', '', false, false)]
     local procedure DefaultDimensionOnAfterInsertEvent(var Rec: Record "Default Dimension"; RunTrigger: Boolean)
     var
-        StdTableCode: Codeunit "NPR Std. Table Code";
         GLSetup: Record "General Ledger Setup";
+        DefaultDimensionMgt: Codeunit "NPR Default Dimension Mgt.";
     begin
         if RunTrigger then begin
             GLSetup.Get();
             if Rec."Dimension Code" = GLSetup."Global Dimension 1 Code" then
-                StdTableCode.UpdateGlobalDimCode(1, Rec."Table ID", Rec."No.", Rec."Dimension Value Code");
+                DefaultDimensionMgt.UpdateGlobalDimCode(1, Rec."Table ID", Rec."No.", Rec."Dimension Value Code");
             if Rec."Dimension Code" = GLSetup."Global Dimension 2 Code" then
-                StdTableCode.UpdateGlobalDimCode(2, Rec."Table ID", Rec."No.", Rec."Dimension Value Code");
+                DefaultDimensionMgt.UpdateGlobalDimCode(2, Rec."Table ID", Rec."No.", Rec."Dimension Value Code");
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Default Dimension", 'OnAfterModifyEvent', '', false, false)]
     local procedure DefaultDimensionOnAfterModifyEvent(var Rec: Record "Default Dimension"; var xRec: Record "Default Dimension"; RunTrigger: Boolean)
     var
-        StdTableCode: Codeunit "NPR Std. Table Code";
         GLSetup: Record "General Ledger Setup";
+        DefaultDimensionMgt: Codeunit "NPR Default Dimension Mgt.";
     begin
         if RunTrigger then begin
             GLSetup.Get();
             if Rec."Dimension Code" = GLSetup."Global Dimension 1 Code" then
-                StdTableCode.UpdateGlobalDimCode(1, Rec."Table ID", Rec."No.", Rec."Dimension Value Code");
+                DefaultDimensionMgt.UpdateGlobalDimCode(1, Rec."Table ID", Rec."No.", Rec."Dimension Value Code");
             if Rec."Dimension Code" = GLSetup."Global Dimension 2 Code" then
-                StdTableCode.UpdateGlobalDimCode(2, Rec."Table ID", Rec."No.", Rec."Dimension Value Code");
+                DefaultDimensionMgt.UpdateGlobalDimCode(2, Rec."Table ID", Rec."No.", Rec."Dimension Value Code");
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Default Dimension", 'OnAfterDeleteEvent', '', false, false)]
     local procedure DefaultDimensionOnAfterDeleteEvent(var Rec: Record "Default Dimension"; RunTrigger: Boolean)
     var
-        StdTableCode: Codeunit "NPR Std. Table Code";
         GLSetup: Record "General Ledger Setup";
+        DefaultDimensionMgt: Codeunit "NPR Default Dimension Mgt.";
     begin
         if RunTrigger then begin
             GLSetup.Get();
             if Rec."Dimension Code" = GLSetup."Global Dimension 1 Code" then
-                StdTableCode.UpdateGlobalDimCode(1, Rec."Table ID", Rec."No.", '');
+                DefaultDimensionMgt.UpdateGlobalDimCode(1, Rec."Table ID", Rec."No.", '');
             if Rec."Dimension Code" = GLSetup."Global Dimension 2 Code" then
-                StdTableCode.UpdateGlobalDimCode(2, Rec."Table ID", Rec."No.", '');
+                DefaultDimensionMgt.UpdateGlobalDimCode(2, Rec."Table ID", Rec."No.", '');
         end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnBeforeInsertTransferEntry', '', true, false)]
     local procedure ItemJnlPostLineOnBeforeInsertTransferEntry(var NewItemLedgerEntry: Record "Item Ledger Entry"; var OldItemLedgerEntry: Record "Item Ledger Entry"; var ItemJournalLine: Record "Item Journal Line")
     var
-        RetailCodeunitCode: Codeunit "NPR Std. Codeunit Code";
         RetailSetup: Record "NPR Retail Setup";
     begin
         RetailSetup.Get();
@@ -393,14 +384,6 @@ codeunit 6014404 "NPR Event Subscriber"
         ConsignorEntry.InsertFromPostedInvoiceHeader(Rec."No.");
     end;
 
-    [EventSubscriber(ObjectType::Page, Page::"Req. Worksheet", 'OnAfterActionEvent', 'NPR &ReadFromScanner', false, false)]
-    local procedure ReqWorksheetOnAfterActionEventReadFromScanner(var Rec: Record "Requisition Line")
-    var
-        ScannerFunctions: Codeunit "NPR Scanner - Functions";
-    begin
-        ScannerFunctions.initPurchJnl(Rec);
-    end;
-
     [EventSubscriber(ObjectType::Page, Page::"Transfer Order", 'OnAfterActionEvent', 'NPR Import From Scanner File', false, false)]
     local procedure TransferOrderOnAfterActionEventImportFromScannerFile(var Rec: Record "Transfer Header")
     var
@@ -409,14 +392,6 @@ codeunit 6014404 "NPR Event Subscriber"
         ImportfromScannerFileTO.SelectTable(Rec);
         ImportfromScannerFileTO.SetTableView(Rec);
         ImportfromScannerFileTO.Run();
-    end;
-
-    [EventSubscriber(ObjectType::Page, Page::"Transfer Order", 'OnAfterActionEvent', 'NPR &Read from scanner', false, false)]
-    local procedure TransferOrderOnAfterActionEventReadFromScanner(var Rec: Record "Transfer Header")
-    var
-        ScannerFunctions: Codeunit "NPR Scanner - Functions";
-    begin
-        ScannerFunctions.initTransfer(Rec);
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"Concurrent Session List", 'OnAfterActionEvent', 'NPR Kill Session', false, false)]

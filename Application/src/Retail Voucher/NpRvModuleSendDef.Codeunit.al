@@ -113,7 +113,7 @@ codeunit 6151013 "NPR NpRv Module Send: Def."
     var
         EmailTemplateHeader: Record "NPR E-mail Template Header";
         TempBlob: Codeunit "Temp Blob";
-        BarcodeLibrary: Codeunit "NPR Barcode Library";
+        BarcodeLibrary: Codeunit "NPR Barcode Image Library";
         EmailManagement: Codeunit "NPR E-mail Management";
         RecRef: RecordRef;
     begin

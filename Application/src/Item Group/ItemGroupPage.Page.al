@@ -1,18 +1,5 @@
 page 6014421 "NPR Item Group Page"
 {
-    // NPR70.00.01.04/LS/20121222  CASE  201562 added action Create Item From Item Group
-    // NPR70.00.02.04/MH/20150113  CASE 199932 Removed Web references (WEB1.00).
-    // VRT1.00/JDH/20150305  CASE 201022 Variety Group Added
-    // NPR5.20/JDH/20160218 CASE 234014 restructured Item Group - deleted code on trigger "OnNextRecord" (to get default behaviour)
-    // NPR5.23/JDH /20160516 CASE 240916 Removed VariaX References
-    // NPR5.26/LS  /20160824 CASE 249735 Removed field "Used" and global variable Text "Text10600001" + Modified action "Page Item List"
-    // NPR5.27/JDH /20161018 CASE 255575 Removed action Create item groups as item, since there was no code that did anything in the database
-    // NPR5.30/TJ  /20170213 CASE 265534 Added field Config. Template Header to Settings tab
-    // NPR5.38/BR  /20180125 CASE 302803 Added Field "Tax Group Code"
-    // NPR5.41/TS  /20180105 CASE 300893 Added s to Picture
-    // NPR5.48/TS  /20181206 CASE 338656 Added Missing Picture to Action
-    // NPR5.48/BHR /20190107 CASE 334217 Added Field Type
-
     UsageCategory = None;
     Caption = 'Item Group';
     PromotedActionCategories = 'New,Process,Prints,History,Items,Test6,Test7,Test8';
@@ -395,39 +382,7 @@ page 6014421 "NPR Item Group Page"
             group("&Function")
             {
                 Caption = '&Function';
-                action("Create Number Series")
-                {
-                    Caption = 'Create Number Series';
-                    Image = CreateSerialNo;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Create Number Series action';
 
-                    trigger OnAction()
-                    begin
-                        RetailTableCode.CreateItemGroupNoSeries(Rec);
-                    end;
-                }
-                action("Create Number Series to All Item Groups")
-                {
-                    Caption = 'Create Number Series to All Item Groups';
-                    Image = CreateSerialNo;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Create Number Series to All Item Groups action';
-
-                    trigger OnAction()
-                    var
-                        ItemGroup: Record "NPR Item Group";
-                        MsgCreated: Label 'Number Series has been created for %1 Item Groups';
-                    begin
-                        ItemGroup.SetFilter("No. Series", '<>%1', '');
-                        if ItemGroup.Find('-') then
-                            repeat
-                                RetailTableCode.CreateItemGroupNoSeries(ItemGroup);
-                            until ItemGroup.Next = 0;
-
-                        Message(MsgCreated, ItemGroup.Count);
-                    end;
-                }
                 separator(Separator6150621)
                 {
                 }
@@ -473,7 +428,7 @@ page 6014421 "NPR Item Group Page"
                     Caption = '&Item Ledger Entries';
                     Image = Form;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     RunObject = Page "Item Ledger Entries";
                     RunPageLink = "NPR Item Group No." = FIELD("No.");
@@ -528,7 +483,6 @@ page 6014421 "NPR Item Group Page"
 
     var
         Text10600000: Label 'Enter VAT Posting settings on the item group card!';
-        RetailTableCode: Codeunit "NPR Retail Table Code";
         FileManagement: Codeunit "File Management";
         Text10600003: Label 'Do you want to update ALL items in this item group using this change?';
         GLAccountSale: Record "G/L Account";

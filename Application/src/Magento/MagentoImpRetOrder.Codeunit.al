@@ -647,37 +647,5 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
             end;
         end;
 
-
-        if not GenericSetupMgt.OpenRecRef(6014416, RecRef) then
-            exit(false);
-
-        if not GenericSetupMgt.OpenFieldRef(RecRef, 2, FieldRef) then
-            exit(false);
-        if StrLen(Barcode) > FieldRef.Length then
-            exit(false);
-        FieldRef.SetFilter('=%1', UpperCase(Barcode));
-
-        if not GenericSetupMgt.OpenFieldRef(RecRef, 4, FieldRef) then
-            exit(false);
-        FieldRef.SetFilter('=%1', 0);
-
-        if not RecRef.FindFirst then
-            exit(false);
-
-        if not GenericSetupMgt.OpenFieldRef(RecRef, 1, FieldRef) then
-            exit(false);
-
-        if not Item.Get(CopyStr(UpperCase(Format(FieldRef.Value)), 1, MaxStrLen(Item."No."))) then
-            exit(false);
-
-        if GenericSetupMgt.OpenFieldRef(RecRef, 6, FieldRef) then begin
-            if (Format(FieldRef.Value) <> '') and (not ItemVariant.Get(Item."No.", CopyStr(UpperCase(Format(FieldRef.Value)), 1, MaxStrLen(ItemVariant.Code)))) then
-                exit(false);
-        end;
-
-        ResolvingTable := DATABASE::"NPR Alternative No.";
-        ItemNo := Item."No.";
-        VariantCode := ItemVariant.Code;
-        exit(true);
     end;
 }

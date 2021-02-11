@@ -60,20 +60,13 @@ table 6014411 "NPR Mixed Discount"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
-            var
-                StdTableCode: Codeunit "NPR Std. Table Code";
             begin
                 if Status = Status::Active then begin
                     TestField("Starting date");
                     TestField("Ending date");
-                    //-NPR5.31 [262904]
-                    //IF NOT "Quantity at line" THEN
-                    //  TESTFIELD(Quantity);
-                    //StdTableCode.TestMiksStatus(Code);
                     if (not Lot) and ("Mix Type" = 0) then
                         TestField("Min. Quantity");
                     TestStatus();
-                    //+NPR5.31 [262904]
                 end;
             end;
         }
@@ -128,10 +121,8 @@ table 6014411 "NPR Mixed Discount"
 
             trigger OnValidate()
             begin
-                //-NPR5.55 [412946]
                 if Lot and ("Discount Type" = "Discount Type"::"Multiple Discount Levels") then
                     FieldError("Discount Type");
-                //+NPR5.55 [412946]
             end;
         }
         field(17; "Discount Type"; Enum "NPR Mixed Discount Type")
@@ -141,10 +132,8 @@ table 6014411 "NPR Mixed Discount"
 
             trigger OnValidate()
             begin
-                //-NPR5.55 [412946]
                 if "Discount Type" = "Discount Type"::"Multiple Discount Levels" then
                     Lot := false;
-                //+NPR5.55 [412946]
             end;
         }
         field(18; "Total Discount %"; Decimal)
@@ -201,7 +190,7 @@ table 6014411 "NPR Mixed Discount"
         }
         field(200; "Quantity sold"; Decimal)
         {
-            CalcFormula = - Sum ("Item Ledger Entry".Quantity WHERE("NPR Discount Type" = CONST(Mixed),
+            CalcFormula = - Sum("Item Ledger Entry".Quantity WHERE("NPR Discount Type" = CONST(Mixed),
                                                                    "NPR Discount Code" = FIELD(Code)));
             Caption = 'Sold Qty';
             DecimalPlaces = 0 : 5;
@@ -211,7 +200,7 @@ table 6014411 "NPR Mixed Discount"
         }
         field(201; Turnover; Decimal)
         {
-            CalcFormula = Sum ("Value Entry"."Sales Amount (Actual)" WHERE("NPR Discount Type" = CONST(Mixed),
+            CalcFormula = Sum("Value Entry"."Sales Amount (Actual)" WHERE("NPR Discount Type" = CONST(Mixed),
                                                                            "NPR Discount Code" = FIELD(Code)));
             Caption = 'Turnover';
             Editable = false;
@@ -222,8 +211,6 @@ table 6014411 "NPR Mixed Discount"
             Caption = 'Customer Disc. Group Filter';
             Description = 'NPR5.31';
             TableRelation = "Customer Discount Group";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
             DataClassification = CustomerContent;
 
@@ -231,11 +218,9 @@ table 6014411 "NPR Mixed Discount"
             var
                 CustomerDiscountGroup: Record "Customer Discount Group";
             begin
-                //-NPR5.31 [263093]
                 "Customer Disc. Group Filter" := UpperCase("Customer Disc. Group Filter");
                 CustomerDiscountGroup.SetFilter(Code, "Customer Disc. Group Filter");
                 "Customer Disc. Group Filter" := CustomerDiscountGroup.GetFilter(Code);
-                //+NPR5.31 [263093]
             end;
         }
         field(316; "Global Dimension 1 Code"; Code[20])
@@ -269,15 +254,6 @@ table 6014411 "NPR Mixed Discount"
             Caption = 'Period Discount';
             TableRelation = "NPR Period Discount";
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                //-NPR5.31 [262904]
-                // IF Periodrabat.GET("Campaign Ref.") THEN
-                //  "Starting date" := Periodrabat."Starting Date";
-                // "Ending date" := Periodrabat."Ending Date";
-                //+NPR5.31 [262904]
-            end;
         }
         field(500; "Actual Discount Amount"; Decimal)
         {
@@ -319,16 +295,10 @@ table 6014411 "NPR Mixed Discount"
         MixedDiscountLine.SetRange(Code, Code);
         MixedDiscountLine.DeleteAll(true);
 
-        RecRef.GetTable(Rec);
-        SyncCU.OnDelete(RecRef);
-
-        //-NPR5.31 [262904]
-        //RetailSetup.GET;
         MixedDiscountLine.SetRange(Code);
         MixedDiscountLine.SetRange("Disc. Grouping Type", MixedDiscountLine."Disc. Grouping Type"::"Mix Discount");
         MixedDiscountLine.SetRange("No.", Code);
         MixedDiscountLine.DeleteAll(true);
-        //+NPR5.31 [262904]
         DimMgt.DeleteDefaultDim(DATABASE::"NPR Mixed Discount", Code);
     end;
 
@@ -351,31 +321,17 @@ table 6014411 "NPR Mixed Discount"
             NoSeriesMgt.InitSeries(RetailSetup."Mixed Discount No. Management", xRec."No. Serie", 0D, Code, "No. Serie");
         end;
 
-        RecRef.GetTable(Rec);
-        SyncCU.OnInsert(RecRef);
-
-        //-NPR5.31 [262904]
-        //RetailSetup.GET;
-        //+NPR5.31 [262904]
-
         DimMgt.UpdateDefaultDim(
           DATABASE::"NPR Mixed Discount", Code,
           "Global Dimension 1 Code", "Global Dimension 2 Code");
 
-        //-NPR5.40 [294655]
         UpdateLines();
-        //-NPR5.40 [294655]
     end;
 
     trigger OnModify()
     begin
         "Last Date Modified" := Today;
-        RecRef.GetTable(Rec);
-        SyncCU.OnModify(RecRef);
-
-        //-NPR5.40 [294655]
         UpdateLines();
-        //-NPR5.40 [294655]
     end;
 
     var
@@ -385,10 +341,6 @@ table 6014411 "NPR Mixed Discount"
         Text1060000: Label 'This field cannot be changed. Modification is done via NPK Retail configuration!';
         RetailSetup: Record "NPR Retail Setup";
         StatusErr: Label 'Mix discount configuration not activated.';
-        "//-SyncProfiles": Integer;
-        SyncCU: Codeunit "NPR CompanySyncManagement";
-        RecRef: RecordRef;
-        "//+SyncProfiles": Integer;
 
     procedure Assistedit(MixedDiscount: Record "NPR Mixed Discount"): Boolean
     var

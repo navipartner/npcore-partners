@@ -546,7 +546,7 @@ codeunit 6014613 "NPR Tax Free GB I2"
         InStream: InStream;
         Line: Text;
     begin
-        Output := ObjectOutputMgt.GetCodeunitOutputPath(CODEUNIT::"NPR Report: TaxFree Receipt");
+        Output := ObjectOutputMgt.GetCodeunitOutputPath(CODEUNIT::"NPR Tax Free Receipt");
         if Output = '' then
             Error(Error_MissingPrintSetup);
 
@@ -561,7 +561,7 @@ codeunit 6014613 "NPR Tax Free GB I2"
 
         PrintThermalLine(Printer, '<TearOff>'); //A final cut is not included in the printjob from I2 server.
 
-        Printer.ProcessBufferForCodeunit(CODEUNIT::"NPR Report: TaxFree Receipt", ''); //Use the object output selection of old object so no new setup is needed.
+        Printer.ProcessBufferForCodeunit(CODEUNIT::"NPR Tax Free Receipt", ''); //Use the object output selection of old object so no new setup is needed.
     end;
 
     local procedure PrintThermalLine(var Printer: Codeunit "NPR RP Line Print Mgt."; Line: Text)
@@ -687,15 +687,13 @@ codeunit 6014613 "NPR Tax Free GB I2"
         TaxFreeRequest.Print.CreateInStream(InStream);
         CopyStream(MemoryStream, InStream);
 
-        Output := ObjectOutputMgt.GetCodeunitOutputPath(CODEUNIT::"NPR Report: TaxFree Receipt");
-        OutputType := ObjectOutputMgt.GetCodeunitOutputType(CODEUNIT::"NPR Report: TaxFree Receipt");
+        Output := ObjectOutputMgt.GetCodeunitOutputPath(CODEUNIT::"NPR Tax Free Receipt");
+        OutputType := ObjectOutputMgt.GetCodeunitOutputType(CODEUNIT::"NPR Tax Free Receipt");
 
         if Output = '' then
             Error(Error_MissingPrintSetup);
 
         case OutputType of
-            ObjectOutputSelection."Output Type"::"Google Print":
-                PrintMethodMgt.PrintViaGoogleCloud(Output, MemoryStream, 'application/pdf', 1, CODEUNIT::"NPR Report: TaxFree Receipt");
             ObjectOutputSelection."Output Type"::"E-mail":
                 PrintMethodMgt.PrintViaEmail(Output, MemoryStream);
             ObjectOutputSelection."Output Type"::"Printer Name":

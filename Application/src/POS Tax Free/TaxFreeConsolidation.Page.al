@@ -42,7 +42,7 @@ page 6014571 "NPR Tax Free Consolidation"
                 Caption = 'Add Receipt';
                 Image = Add;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -50,23 +50,19 @@ page 6014571 "NPR Tax Free Consolidation"
 
                 trigger OnAction()
                 var
-                    AuditRoll: Record "NPR Audit Roll";
-                    AuditRollPage: Page "NPR Audit Roll";
+                    POSEntry: Record "NPR POS Entry";
+                    POSEntryPage: Page "NPR POS Entry List";
                     TaxFreeMgt: Codeunit "NPR Tax Free Handler Mgt.";
                     TaxFreeVoucher: Record "NPR Tax Free Voucher";
                 begin
-                    AuditRoll.SetFilter(Type, '<>%1&<>%2', AuditRoll.Type::Cancelled, AuditRoll.Type::"Open/Close");
-                    AuditRollPage.LookupMode(true);
-                    AuditRollPage.SetTableView(AuditRoll);
-                    if AuditRollPage.RunModal = ACTION::LookupOK then begin
-                        AuditRollPage.GetRecord(AuditRoll);
+                    POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
+                    if Page.RunModal(0, POSEntry) = Action::LookupOK then begin
+                        Rec.SetRange("Sales Ticket No.", POSEntry."Document No.");
+                        if Rec.FindFirst then
+                            Error(Error_AlreadySelected, POSEntry."Document No.");
+                        Rec.SetRange("Sales Ticket No.");
 
-                        SetRange("Sales Ticket No.", AuditRoll."Sales Ticket No.");
-                        if FindFirst then
-                            Error(Error_AlreadySelected, AuditRoll."Sales Ticket No.");
-                        SetRange("Sales Ticket No.");
-
-                        if TaxFreeMgt.TryGetActiveVoucherFromReceiptNo(AuditRoll."Sales Ticket No.", TaxFreeVoucher) then begin
+                        if TaxFreeMgt.TryGetActiveVoucherFromReceiptNo(POSEntry."Document No.", TaxFreeVoucher) then begin
                             if not Confirm(Caption_VoidExisting) then
                                 exit;
 
@@ -76,10 +72,10 @@ page 6014571 "NPR Tax Free Consolidation"
                                 exit;
                         end;
 
-                        "Entry No." := "Entry No." + 1;
-                        "Sales Ticket No." := AuditRoll."Sales Ticket No.";
-                        "Sale Date" := AuditRoll."Sale Date";
-                        Insert;
+                        Rec."Entry No." += 1;
+                        Rec."Sales Ticket No." := POSEntry."Document No.";
+                        Rec."Sale Date" := POSEntry."Document Date";
+                        Rec.Insert;
                     end;
                 end;
             }
@@ -88,7 +84,7 @@ page 6014571 "NPR Tax Free Consolidation"
                 Caption = 'Remove Receipt';
                 Image = Delete;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -105,7 +101,7 @@ page 6014571 "NPR Tax Free Consolidation"
                 Caption = 'Consolidate Receipts';
                 Image = Approve;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

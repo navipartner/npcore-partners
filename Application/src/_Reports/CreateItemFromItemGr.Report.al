@@ -1,8 +1,8 @@
 report 6014610 "NPR Create Item From ItemGr."
 {
     Caption = 'Create Item(s) From Item Group';
-    ProcessingOnly = true; 
-    UsageCategory = ReportsAndAnalysis; 
+    ProcessingOnly = true;
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     dataset
     {
@@ -19,7 +19,7 @@ report 6014610 "NPR Create Item From ItemGr."
                     Item."No." := "No.";
                     Item.Insert(true);
                     Item."NPR Item Group" := "No.";
-                    StdTableCode.VareTVGOVAfter(Item, "Item Group");
+                    "Item Group".SetupItemFromGroup(Item, "Item Group");
                     Item."Costing Method" := Item."Costing Method"::FIFO;
                     Item.Validate("NPR Group sale", true);
                     Item.Validate("Price Includes VAT", true);
@@ -61,7 +61,6 @@ report 6014610 "NPR Create Item From ItemGr."
 
     var
         Item: Record Item;
-        StdTableCode: Codeunit "NPR Std. Table Code";
         ProfitPct: Decimal;
         Counter: Integer;
         ItemsCreatedMsg: Label '%1 Item(s) has been created.', Comment = '%1 = Number of Items';

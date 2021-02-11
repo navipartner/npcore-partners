@@ -715,11 +715,10 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
             if not FindItemReferenceFromGTIN(EntryNo, HeaderRecordNo, RecordNo) then
                 if not FindItemReferenceFromVendor(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
                     if not FindItemReferenceFromVendorItemNo(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
-                        if not FindItemReferenceFromAltNo(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
                             if not FindItemReferenceFromItemNo(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
-                                if not CreateItemWorksheetLine(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
-                                    if not FindGLAccountForLine(EntryNo, HeaderRecordNo, RecordNo) then
-                                        LogErrorIfItemNotFound(EntryNo, HeaderRecordNo, RecordNo, VendorNo);
+                            if not CreateItemWorksheetLine(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
+                                if not FindGLAccountForLine(EntryNo, HeaderRecordNo, RecordNo) then
+                                    LogErrorIfItemNotFound(EntryNo, HeaderRecordNo, RecordNo, VendorNo);
 
             FindVariantFromSizeAndColor(EntryNo, HeaderRecordNo, RecordNo);
 
@@ -846,44 +845,6 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
                       HeaderRecordNo, RecordNo, Format(PurchaseLine.Type::Item, 0, 9));
                     InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Item Reference No."),
                       HeaderRecordNo, RecordNo, '');
-                    InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Item Reference No."),
-                            HeaderRecordNo, RecordNo, '');
-                    exit(true);
-                end;
-            end;
-
-            exit(false);
-        end;
-    end;
-
-    local procedure FindItemReferenceFromAltNo(EntryNo: Integer; HeaderRecordNo: Integer; RecordNo: Integer; VendorNo: Code[20]): Boolean
-    var
-        IntermediateDataImport: Record "Intermediate Data Import";
-        PurchaseLine: Record "Purchase Line";
-        AltNo: Record "NPR Alternative No.";
-        Vendor: Record Vendor;
-        ItemVariant: Record "Item Variant";
-    begin
-        if not Vendor.Get(VendorNo) then
-            exit(false);
-
-        with IntermediateDataImport do begin
-            if FindEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Item Reference No."), HeaderRecordNo, RecordNo) then begin
-                AltNo.SetRange(Type, AltNo.Type::Item);
-                AltNo.SetRange("Alt. No.", Value);
-                AltNo.SetFilter("Blocked Reason Code", '');
-                if AltNo.FindFirst then begin
-                    InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("No."),
-                      HeaderRecordNo, RecordNo, Format(AltNo.Code, 0, 9));
-                    InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo(Type),
-                      HeaderRecordNo, RecordNo, Format(PurchaseLine.Type::Item, 0, 9));
-                    if AltNo."Variant Code" <> '' then
-                        if ItemVariant.Get(AltNo.Code, AltNo."Variant Code") then
-                            if not ItemVariant."NPR Blocked" then
-                                InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Variant Code"),
-                                  HeaderRecordNo, RecordNo, Format(ItemVariant.Code, 0, 9));
-                    InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Item Reference No."),
-                            HeaderRecordNo, RecordNo, '');
                     exit(true);
                 end;
             end;

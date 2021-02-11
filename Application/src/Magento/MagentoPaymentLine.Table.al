@@ -142,20 +142,4 @@ table 6151409 "NPR Magento Payment Line"
         }
     }
 
-    trigger OnDelete()
-    begin
-        if "Payment Type" = "Payment Type"::Voucher then begin
-            CreditVoucher.SetRange(Status, CreditVoucher.Status::Cancelled);
-            CreditVoucher.SetRange("External Reference No.", "No.");
-            CreditVoucher.DeleteAll(true);
-
-            GiftVoucher.SetRange(Status, GiftVoucher.Status::Cancelled);
-            GiftVoucher.SetRange("External Reference No.", "No.");
-            GiftVoucher.DeleteAll(true);
-        end;
-    end;
-
-    var
-        CreditVoucher: Record "NPR Credit Voucher";
-        GiftVoucher: Record "NPR Gift Voucher";
 }

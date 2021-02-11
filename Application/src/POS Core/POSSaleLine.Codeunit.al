@@ -149,7 +149,6 @@ codeunit 6150706 "NPR POS Sale Line"
         Contact: Record Contact;
         Linie: Record "NPR Sale Line POS";
         "Linie 2": Record "NPR Sale Line POS";
-        TouchScreenFunctions: Codeunit "NPR Touch Screen - Func.";
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
         LinieInteger: Integer;
         Mikspris: Record "NPR Mixed Discount Line";
@@ -297,9 +296,6 @@ codeunit 6150706 "NPR POS Sale Line"
         RefreshCurrent();
         OnBeforeSetQuantity(Rec, Quantity);
 
-        if ((Rec.Type = Rec.Type::"G/L Entry") and (Abs(Quantity) <> 1)) and (Rec."Gift Voucher Ref." + Rec."Credit voucher ref." <> '') then
-            Error(QTY_CHANGE_NOT_ALLOWED, Rec.Type);
-
         xRec := Rec;
         Rec.Validate(Quantity, Quantity);
         Rec.Modify(true);
@@ -336,7 +332,6 @@ codeunit 6150706 "NPR POS Sale Line"
     procedure CalculateBalance(var AmountExclVAT: Decimal; var VATAmount: Decimal; var TotalAmount: Decimal)
     var
         SaleLine: Record "NPR Sale Line POS";
-        RetailFormCode: Codeunit "NPR Retail Form Code";
         OutPaymentAmount: Decimal;
     begin
         AmountExclVAT := 0;

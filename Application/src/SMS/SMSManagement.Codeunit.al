@@ -615,32 +615,24 @@ codeunit 6059940 "NPR SMS Management"
     #region Subscribers
     [EventSubscriber(ObjectType::Page, 21, 'OnAfterActionEvent', 'NPR SendSMS', true, true)]
     local procedure Page21OnAfterActionEventSendSMS(var Rec: Record Customer)
-    var
-        AlternativeNo: Record "NPR Alternative No.";
     begin
         EditAndSendSMS(Rec);
     end;
 
     [EventSubscriber(ObjectType::Page, 41, 'OnAfterActionEvent', 'NPR SendSMS', true, true)]
     local procedure Page41OnAfterActionEventSendSMS(var Rec: Record "Sales Header")
-    var
-        AlternativeNo: Record "NPR Alternative No.";
     begin
         EditAndSendSMS(Rec);
     end;
 
     [EventSubscriber(ObjectType::Page, 42, 'OnAfterActionEvent', 'NPR SendSMS', true, true)]
     local procedure Page42OnAfterActionEventSendSMS(var Rec: Record "Sales Header")
-    var
-        AlternativeNo: Record "NPR Alternative No.";
     begin
         EditAndSendSMS(Rec);
     end;
 
     [EventSubscriber(ObjectType::Page, 5050, 'OnAfterActionEvent', 'NPR SendSMS', true, true)]
     local procedure Page5050OnAfterActionEventSendSMS(var Rec: Record Contact)
-    var
-        AlternativeNo: Record "NPR Alternative No.";
     begin
         EditAndSendSMS(Rec);
     end;

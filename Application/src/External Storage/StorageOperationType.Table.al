@@ -2,8 +2,7 @@ table 6184891 "NPR Storage Operation Type"
 {
     Caption = 'Storage Operations';
     DataClassification = CustomerContent;
-    LookupPageID = "NPR Storage Operation Types";
-
+    ObsoleteState = Removed;
     fields
     {
         field(1; "Storage Type"; Code[20])

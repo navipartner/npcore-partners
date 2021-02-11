@@ -52,7 +52,7 @@ codeunit 85003 "NPR Library - POS Mock"
         POSSale: Codeunit "NPR POS Sale";
     begin
         POSSession.GetSale(POSSale);
-        exit(POSSale.TryEndSale2(POSSession, false));
+        exit(POSSale.TryEndSale(POSSession, false));
     end;
 
     procedure PayAndTryEndSaleAndStartNew(POSSession: Codeunit "NPR POS Session"; PaymentMethod: Code[10]; Amount: Decimal; VoucherNo: Text): Boolean

@@ -2,6 +2,7 @@ table 6060064 "NPR EAN Prefix per Country"
 {
     Caption = 'EAN Prefix per Country';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
 
     fields
     {
@@ -14,20 +15,11 @@ table 6060064 "NPR EAN Prefix per Country"
         {
             Caption = 'Prefix';
             DataClassification = CustomerContent;
-            Numeric = true;
         }
         field(20; "Country Code"; Code[10])
         {
             Caption = 'Country Code';
             DataClassification = CustomerContent;
-            TableRelation = "Country/Region";
-        }
-        field(21; "Country Name"; Text[50])
-        {
-            CalcFormula = Lookup("Country/Region".Name WHERE(Code = FIELD("Country Code")));
-            Caption = 'Country Name';
-            Editable = false;
-            FieldClass = FlowField;
         }
     }
 
@@ -36,18 +28,6 @@ table 6060064 "NPR EAN Prefix per Country"
         key(Key1; "Entry No.")
         {
         }
-        key(Key2; "Country Code")
-        {
-        }
     }
-
-    trigger OnInsert()
-    var
-        EANPrefixPerCountry: Record "NPR EAN Prefix per Country";
-    begin
-        "Entry No." := 1;
-        if EANPrefixPerCountry.FindLast() then
-            "Entry No." := EANPrefixPerCountry."Entry No." + 1;
-    end;
 }
 

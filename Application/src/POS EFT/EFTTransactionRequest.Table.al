@@ -508,7 +508,7 @@ table 6184495 "NPR EFT Transaction Request"
         }
         field(10000; "FF Moved to POS Entry"; Boolean)
         {
-            CalcFormula = Exist ("NPR POS Entry" WHERE("Document No." = FIELD("Sales Ticket No.")));
+            CalcFormula = Exist("NPR POS Entry" WHERE("Document No." = FIELD("Sales Ticket No.")));
             Caption = 'Moved to POS Entry';
             FieldClass = FlowField;
         }
@@ -561,19 +561,6 @@ table 6184495 "NPR EFT Transaction Request"
         EFTInterface: Codeunit "NPR EFT Interface";
         Handled: Boolean;
     begin
-        //-NPR5.46 [290734]
-        // CreditCardTransaction.SETFILTER ("EFT Trans. Request Entry No.", '=%1', "Entry No.");
-        // IF ("Initiated from Entry No." <> 0) THEN
-        //  CreditCardTransaction.SETFILTER ("EFT Trans. Request Entry No.", '=%1', "Initiated from Entry No.");
-        //
-        // IF NOT Reprint THEN
-        //  CreditCardTransaction.SETFILTER("No. Printed", '=%1', 0);
-        //
-        // IF NOT CreditCardTransaction.FINDSET THEN
-        //  EXIT;
-        //
-        // CreditCardTransaction.PrintTerminalReceipt(FALSE);
-
         if "Entry No." = 0 then
             exit;
 
@@ -602,14 +589,11 @@ table 6184495 "NPR EFT Transaction Request"
             EntryNo := CreditCardTransaction."EFT Trans. Request Entry No.";
             First := false;
         until CreditCardTransaction.Next = 0;
-        //+NPR5.46 [290734]
     end;
 
     procedure IsType(Type: Text): Boolean
     begin
-        //-NPR5.46 [290734]
         exit(Type = "Integration Type");
-        //+NPR5.46 [290734]
     end;
 }
 

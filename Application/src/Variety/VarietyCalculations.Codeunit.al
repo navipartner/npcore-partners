@@ -190,21 +190,6 @@ codeunit 6059979 "NPR Variety Calculations"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6059971, 'GetVarietyMatrixFieldValue', '', true, false)]
-    local procedure GetAlternativeNo(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
-    var
-        AlternativeNo: Record "NPR Alternative No.";
-    begin
-        if not CheckIsMe2(CalledFrom, VrtFieldSetup, 'GetAlternativeNo') then
-            exit;
-
-        AlternativeNo.SetRange(Type, AlternativeNo.Type::Item);
-        AlternativeNo.SetRange(Code, TMPVrtBuffer."Item No.");
-        AlternativeNo.SetRange("Variant Code", TMPVrtBuffer."Variant Code");
-        if AlternativeNo.FindFirst then
-            FieldValue := AlternativeNo."Alt. No.";
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6059971, 'GetVarietyMatrixFieldValue', '', true, false)]
     local procedure GetQuantityAvailable(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
     var
         Item: Record Item;

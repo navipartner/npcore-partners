@@ -28,23 +28,26 @@ table 6059970 "NPR Variety Setup"
             DataClassification = CustomerContent;
             OptionCaption = ' ,EAN8,EAN13';
             OptionMembers = " ",EAN8,EAN13;
+            ObsoleteState = Removed;
         }
         field(21; "Alt. No. No. Series (I)"; Code[10])
         {
             Caption = 'Alt. No. No. Series (Item)';
             DataClassification = CustomerContent;
-            TableRelation = "No. Series";
+            ObsoleteState = Removed;
         }
         field(22; "Create Alt. No. automatic"; Boolean)
         {
             Caption = 'Create Alt. No. automatic';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(23; "Alt. No. No. Series (V)"; Code[10])
         {
             Caption = 'Alt. No. No. Series (Variant)';
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
+            ObsoleteState = Removed;
         }
         field(30; "Barcode Type (Item Cross Ref.)"; Option)
         {

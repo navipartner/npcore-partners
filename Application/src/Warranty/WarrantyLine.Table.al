@@ -1,18 +1,14 @@
 table 6014519 "NPR Warranty Line"
 {
-    // //-NPR3.0g
-    //   Tilf¢jet insurance
-    // NPR5.38/TJ  /20171218  CASE 225415 Renumbered fields from range 50xxx to range below 50000
-
     Caption = 'Warranty Line';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
 
     fields
     {
         field(1; "Warranty No."; Code[20])
         {
             Caption = 'Warranty No.';
-            TableRelation = "NPR Warranty Directory";
             DataClassification = CustomerContent;
         }
         field(2; "Line No."; Integer)
@@ -23,18 +19,7 @@ table 6014519 "NPR Warranty Line"
         field(3; "Item No."; Code[20])
         {
             Caption = 'Item No.';
-            TableRelation = Item."No.";
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                Vare: Record Item;
-            begin
-                Vare.Get("Item No.");
-                Description := Vare.Description;
-                if Vare."NPR Insurrance category" <> '' then
-                    Validate(InsuranceType, Vare."NPR Insurrance category");
-            end;
         }
         field(4; Quantity; Decimal)
         {
@@ -70,45 +55,20 @@ table 6014519 "NPR Warranty Line"
         {
             Caption = 'Policy 1';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                if "Policy 1" then begin
-                    "Policy 2" := false;
-                    "Policy 3" := false;
-                end;
-            end;
         }
         field(11; "Policy 2"; Boolean)
         {
             Caption = 'Policy 2';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                if "Policy 2" then begin
-                    "Policy 1" := false;
-                    "Policy 3" := false;
-                end;
-            end;
         }
         field(12; "Policy 3"; Boolean)
         {
             Caption = 'Policy 3';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                if "Policy 3" then begin
-                    "Policy 1" := false;
-                    "Policy 2" := false;
-                end;
-            end;
         }
         field(13; InsuranceType; Code[50])
         {
             Caption = 'Insurance Type ';
-            TableRelation = "NPR Insurance Category";
             DataClassification = CustomerContent;
         }
         field(14; Insurance; Boolean)
@@ -149,13 +109,6 @@ table 6014519 "NPR Warranty Line"
         key(Key1; "Warranty No.", "Line No.")
         {
             SumIndexFields = "Amount incl. VAT";
-        }
-        key(Key2; "Warranty No.", "Policy 1", "Policy 2", "Policy 3", InsuranceType)
-        {
-            SumIndexFields = "Amount incl. VAT";
-        }
-        key(Key3; InsuranceType)
-        {
         }
     }
 

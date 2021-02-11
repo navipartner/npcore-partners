@@ -1,14 +1,8 @@
 table 6014582 "NPR OAuth Token"
 {
-    // NPR5.22/MMV/20160415 CASE 228382 Created table
-    // NPR5.26/MMV /20160826 CASE 246209 Added AddOrUpdate() function.
-    // NPR5.29/MMV /20161207 CASE 260366 Changed field 2 type from text to BLOB. Data upgrade is handled by CU 6059991.
-    // NPR5.30/MMV /20170208 CASE 261964 Added field "Expires In (Seconds)"
-    //                                   Added functions GetValue() & IsExpired().
-    // NPR5.51/MMV /20190617 CASE 358889 Removed non sensical locks.
-
     Caption = 'OAuth Token';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
 
     fields
     {
@@ -44,84 +38,5 @@ table 6014582 "NPR OAuth Token"
     fieldgroups
     {
     }
-
-    procedure AddOrUpdate(TokenName: Text; TokenValue: Text; TimeStamp: DateTime; ExpiresInSeconds: Integer) Result: Boolean
-    var
-        TempBlob: Codeunit "Temp Blob";
-        OutStream: OutStream;
-        RecRef: RecordRef;
-    begin
-        //-NPR5.51 [358889]
-        //LOCKTABLE;
-        //+NPR5.51 [358889]
-
-        TempBlob.CreateOutStream(OutStream, TEXTENCODING::UTF8);
-        OutStream.WriteText(TokenValue);
-
-        if Get(TokenName) then begin
-            RecRef.GetTable(Rec);
-            TempBlob.ToRecordRef(RecRef, FieldNo("Token Value"));
-            RecRef.SetTable(Rec);
-
-            //-NPR5.30 [261964]
-            "Expires In (Seconds)" := ExpiresInSeconds;
-            if TimeStamp <> 0DT then
-                "Time Stamp" := TimeStamp
-            else
-                //+NPR5.30 [261964]
-                "Time Stamp" := CreateDateTime(Today, Time);
-            Result := Modify;
-        end else begin
-            Init;
-            "Token Name" := TokenName;
-
-            RecRef.GetTable(Rec);
-            TempBlob.ToRecordRef(RecRef, FieldNo("Token Value"));
-            RecRef.SetTable(Rec);
-
-            //-NPR5.30 [261964]
-            "Expires In (Seconds)" := ExpiresInSeconds;
-            if TimeStamp <> 0DT then
-                "Time Stamp" := TimeStamp
-            else
-                //+NPR5.30 [261964]
-                "Time Stamp" := CreateDateTime(Today, Time);
-            Result := Insert;
-        end;
-
-        //-NPR5.51 [358889]
-        //COMMIT;
-        //+NPR5.51 [358889]
-    end;
-
-    procedure GetValue(): Text
-    var
-        InStream: InStream;
-        Value: Text;
-    begin
-        //-NPR5.30 [261964]
-        if not "Token Value".HasValue then
-            exit('');
-
-        CalcFields("Token Value");
-        "Token Value".CreateInStream(InStream, TEXTENCODING::UTF8);
-        InStream.ReadText(Value);
-
-        exit(Value);
-        //+NPR5.30 [261964]
-    end;
-
-    procedure IsExpired(): Boolean
-    var
-        Deadline: DateTime;
-    begin
-        //-NPR5.30 [261964]
-        if ("Time Stamp" = 0DT) or ("Expires In (Seconds)" = 0) then
-            exit(false);
-
-        Deadline := "Time Stamp" + ("Expires In (Seconds)" * 1000);
-        exit(Deadline < CreateDateTime(Today, Time));
-        //+NPR5.30 [261964]
-    end;
 }
 

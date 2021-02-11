@@ -183,12 +183,6 @@ page 6151070 "NPR Retail Repl. Demand Lines"
                 Visible = false;
                 ApplicationArea = All;
             }
-            part(Control6014412; "NPR Purchase Price Factbox")
-            {
-                SubPageLink = "Item No." = FIELD("Item No."),
-                              "Vendor No." = FIELD("Vendor No.");
-                ApplicationArea = All;
-            }
         }
     }
 

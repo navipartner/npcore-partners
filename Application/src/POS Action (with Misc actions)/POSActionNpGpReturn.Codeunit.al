@@ -93,6 +93,7 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
         TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary;
         JSON: Codeunit "NPR POS JSON Management";
         ReturnReasonCode: Code[20];
+        UseNormalReverseAction: Label 'This receipt is from the current company. Use the normal reversal action instead';
     begin
         if not Action.IsThisAction(ActionCode) then
             exit;
@@ -111,8 +112,7 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
                     CheckSetup(POSSession);
                     FindReference(Context, FrontEnd, POSSession, TempNpGpPOSSalesLine, TempNpGpPOSSalesEntry);
                     if CompanyName = TempNpGpPOSSalesEntry."Original Company" then begin
-                        VerifyReceiptForReversal(Context, FrontEnd, TempNpGpPOSSalesEntry."Document No.");
-                        CreateNormalReverseSale(Context, POSSession, FrontEnd, TempNpGpPOSSalesEntry, TempNpGpPOSSalesLine);
+                        Error(UseNormalReverseAction)
                     end else
                         CreateGlobalReverseSale(Context, POSSession, FrontEnd, TempNpGpPOSSalesLine, TempNpGpPOSSalesEntry);
 
@@ -129,10 +129,6 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
     begin
         Captions.AddActionCaption(ActionCode, 'title', TitleCaption);
         Captions.AddActionCaption(ActionCode, 'refprompt', RefNoPromptCaption);
-    end;
-
-    local procedure "--- Auxiliary"()
-    begin
     end;
 
     local procedure SelectReturnReason(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Code[20]
@@ -509,50 +505,6 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
             Error(NotFoundErr, ReferenceNumber);
     end;
 
-    local procedure CreateNormalReverseSale(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary)
-    var
-        JSON: Codeunit "NPR POS JSON Management";
-        POSSale: Codeunit "NPR POS Sale";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
-        RetailSetup: Record "NPR Retail Setup";
-        ReturnReasonCode: Code[20];
-        FullSale: Boolean;
-    begin
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-
-        FullSale := JSON.GetBooleanParameter('ShowFullSale', true);
-
-        if not FullSale then
-            TestQuantity(TempNpGpPOSSalesLine, SalePOS)
-        else begin
-            TempNpGpPOSSalesLine.SetFilter(Quantity, '<0');
-            if TempNpGpPOSSalesLine.IsEmpty then
-                exit;
-        end;
-
-        POSSession.GetSaleLine(POSSaleLine);
-
-        SetCustomerOnReverseSale(SalePOS, TempNpGpPOSSalesEntry);
-
-        UpdateLineNos(SalePOS, TempNpGpPOSSalesLine);
-
-        RetailSetup.Get;
-        if (RetailSetup."Reason for Return Mandatory") then begin
-            JSON.SetScope('/', true);
-            ReturnReasonCode := JSON.GetString('ReturnReasonCode', true);
-        end;
-
-        ReverseLocalSale(SalePOS, TempNpGpPOSSalesLine, TempNpGpPOSSalesEntry, ReturnReasonCode, FullSale);
-
-        POSSaleLine.ResendAllOnAfterInsertPOSSaleLine;
-        POSSale.RefreshCurrent;
-    end;
-
     local procedure SetCustomerOnReverseSale(var SalePOS: Record "NPR Sale POS"; var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary)
     var
         AuditRoll: Record "NPR Audit Roll";
@@ -582,60 +534,6 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
         SalePOS.Modify(true);
         POSSale.Refresh(SalePOS);
         POSSale.Modify(true, false);
-    end;
-
-    local procedure ReverseLocalSale(var SalePOS: Record "NPR Sale POS"; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary; ReturnReason: Code[10]; FullSale: Boolean)
-    var
-        AuditRoll: Record "NPR Audit Roll";
-        SaleLinePOS: Record "NPR Sale Line POS";
-        RetailCrossReference: Record "NPR Retail Cross Reference";
-        RetailSalesCode: Codeunit "NPR Retail Sales Code";
-    begin
-        AuditRoll.SetRange("Register No.", TempNpGpPOSSalesEntry."POS Unit No.");
-        AuditRoll.SetRange("Sales Ticket No.", TempNpGpPOSSalesEntry."Document No.");
-        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
-        AuditRoll.SetRange(Type, AuditRoll.Type::Item);
-        AuditRoll.SetFilter(Quantity, '>0');
-
-        repeat
-            AuditRoll.SetRange("Line No.", TempNpGpPOSSalesLine."Line No.");
-            AuditRoll.SetRange("No.", TempNpGpPOSSalesLine."No.");
-            if AuditRoll.FindFirst then begin
-                SaleLinePOS.Init;
-                SaleLinePOS."Register No." := SalePOS."Register No.";
-                SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
-                SaleLinePOS.Date := SalePOS.Date;
-                SaleLinePOS.Type := SaleLinePOS.Type::Item;
-                SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Sale;
-                SaleLinePOS."Line No." := AuditRoll."Line No.";
-                SaleLinePOS.Insert(true);
-
-                RetailSalesCode.ReverseAuditInfoToSalesLine(SaleLinePOS, AuditRoll);
-
-                if FullSale then
-                    SaleLinePOS.Validate(Quantity, TempNpGpPOSSalesLine.Quantity)
-                else
-                    SaleLinePOS.Validate(Quantity, -1);
-
-                SaleLinePOS."Return Sale No." := SalePOS."Sales Ticket No.";
-                SaleLinePOS."Return Sale Register No." := SalePOS."Register No.";
-                SaleLinePOS."Return Sale Sales Ticket No." := TempNpGpPOSSalesEntry."Document No.";
-                SaleLinePOS."Return Sales Sales Type" := SalePOS."Sale type";
-                SaleLinePOS."Return Reason Code" := ReturnReason;
-
-                SaleLinePOS.UpdateAmounts(SaleLinePOS);
-
-                SaleLinePOS.Modify(true);
-
-                RetailCrossReference."Retail ID" := SaleLinePOS."Retail ID";
-                RetailCrossReference.Insert;
-
-                RetailCrossReference."Reference No." := TempNpGpPOSSalesLine."Global Reference";
-                RetailCrossReference."Table ID" := DATABASE::"NPR Sale Line POS";
-                RetailCrossReference."Record Value" := SaleLinePOS."Sales Ticket No." + '_' + Format(SaleLinePOS."Line No.");
-                RetailCrossReference.Modify;
-            end;
-        until not FullSale or (TempNpGpPOSSalesLine.Next = 0);
     end;
 
     local procedure TestQuantity(var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; SalePOS: Record "NPR Sale POS")

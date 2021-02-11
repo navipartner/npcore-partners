@@ -215,16 +215,14 @@ table 6060081 "NPR MCS Recomm. Model"
     local procedure LookupCustomerView()
     var
         Customer: Record Customer;
-        TouchScreenCustomers: Page "NPR Touch Screen: Customers";
     begin
         if "Customer View" <> '' then begin
             Customer.SetView("Customer View");
-            TouchScreenCustomers.SetTableView(Customer);
         end;
-        TouchScreenCustomers.LookupMode := true;
-        if TouchScreenCustomers.RunModal <> ACTION::LookupOK then
+        if Page.RunModal(0, Customer) <> ACTION::LookupOK then
             exit;
-        "Customer View" := TouchScreenCustomers.GetViewText;
+
+        "Customer View" := Customer.GetView();
     end;
 
     local procedure LookupItemLedgerEntryView()

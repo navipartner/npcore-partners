@@ -1,11 +1,8 @@
 page 6184515 "NPR EFT NETSCloud POSUnitSetup"
 {
-    // NPR5.54/JAKUBV/20200408  CASE 364340 Transport NPR5.54 - 8 April 2020
-
     Caption = 'EFT NETS Cloud POS Unit Setup';
     PageType = Card;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "NPR EFT NETSCloud Unit Setup";
 
     layout

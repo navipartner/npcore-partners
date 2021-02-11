@@ -21,11 +21,6 @@ page 6014406 "NPR Register Card"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Logon-User Name field';
-
-                    trigger OnLookup(var Text: Text): Boolean
-                    begin
-                        RetailFormCode.RegisterLogonnameAutofill(Rec);
-                    end;
                 }
                 field("Shop id"; Rec."Shop id")
                 {
@@ -134,38 +129,6 @@ page 6014406 "NPR Register Card"
     {
         area(processing)
         {
-            group(RegisterActions)
-            {
-                Caption = 'Register';
-                action(Autofill)
-                {
-                    Caption = 'Autofill';
-                    Image = Interaction;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    PromotedOnly = true;
-                    PromotedIsBig = true;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Autofill action';
-
-                    trigger OnAction()
-                    begin
-                        RetailFormCode.RegisterLogonnameAutofill(Rec);
-                    end;
-                }
-                action("Create new register")
-                {
-                    Caption = 'Create New Register';
-                    Image = Register;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Create New Register action';
-
-                    trigger OnAction()
-                    begin
-                        CreateNewRegister;
-                    end;
-                }
-            }
             group(Functions)
             {
                 Caption = 'Functions';
@@ -177,26 +140,6 @@ page 6014406 "NPR Register Card"
                     RunPageLink = "NPR Backoffice Register No." = FIELD("Register No.");
                     ApplicationArea = All;
                     ToolTip = 'Executes the User Setup action';
-                }
-                action(Skuffer)
-                {
-                    Caption = 'Drawers';
-                    Image = "Action";
-                    RunObject = Page "NPR Alternative Number";
-                    RunPageLink = Code = FIELD("Register No."),
-                                  Type = CONST(Register);
-                    RunPageView = SORTING(Type, Code, "Alt. No.");
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Drawers action';
-                }
-                action("Show Registers Periods")
-                {
-                    Caption = 'Show Register Periods';
-                    Image = Register;
-                    RunObject = Page "NPR Register Period List";
-                    RunPageLink = "Register No." = FIELD("Register No.");
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Show Register Periods action';
                 }
             }
             group(Dimensions)
@@ -233,7 +176,6 @@ page 6014406 "NPR Register Card"
     end;
 
     var
-        RetailFormCode: Codeunit "NPR Retail Form Code";
         Text10600007: Label 'Saldo Inicial';
         [InDataSet]
         FieldDisplay1: Boolean;

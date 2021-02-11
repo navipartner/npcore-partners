@@ -1,11 +1,8 @@
 page 6184508 "NPR EFT NETS Cloud Paym. Setup"
 {
-    // NPR5.54/MMV /20200129 CASE 364340 Created object
-
     Caption = 'EFT NETS Cloud Payment Setup';
     PageType = Card;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "NPR EFT NETS Cloud Paym. Setup";
 
     layout

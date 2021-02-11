@@ -2,8 +2,8 @@ table 6059780 "NPR Companies in Profile"
 {
     Caption = 'Companies in Profile';
     DataPerCompany = false;
-    //LookupPageID = "NPR Stock-Take Config. Card";
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
 
     fields
     {
@@ -15,7 +15,6 @@ table 6059780 "NPR Companies in Profile"
         field(2; "Company Name"; Text[30])
         {
             Caption = 'Company Name';
-            TableRelation = Company.Name;
             DataClassification = CustomerContent;
         }
         field(3; ReplicationDirection; Option)
