@@ -47,7 +47,7 @@ codeunit 85011 "NPR Library - Ticket Module"
     var
         TicketItem: Record "Item";
         ItemVariant: Record "Item Variant";
-        ItemCrossReference: Record "Item Cross Reference";
+        ItemReference: Record "Item Reference";
         LibraryInventory: Codeunit "NPR Library - Inventory";
     begin
         LibraryInventory.CreateItem(TicketItem);
@@ -72,22 +72,22 @@ codeunit 85011 "NPR Library - Ticket Module"
             ItemVariant.MODIFY();
         end;
 
-        ItemCrossReference.INIT();
-        ItemCrossReference.SETFILTER("Cross-Reference Type", '=%1', ItemCrossReference."Cross-Reference Type"::"Bar Code");
-        ItemCrossReference.SETFILTER("Cross-Reference No.", '=%1', STRSUBSTNO('IXRF-%1', TicketItem."No."));
+        ItemReference.INIT();
+        ItemReference.SETFILTER("Reference Type", '=%1', ItemReference."Reference Type"::"Bar Code");
+        ItemReference.SETFILTER("Reference No.", '=%1', STRSUBSTNO('IXRF-%1', TicketItem."No."));
         if (VariantCode <> '') then
-            ItemCrossReference.SETFILTER("Cross-Reference No.", '=%1', STRSUBSTNO('IXRF-%1-%2', TicketItem."No.", VariantCode));
+            ItemReference.SETFILTER("Reference No.", '=%1', STRSUBSTNO('IXRF-%1-%2', TicketItem."No.", VariantCode));
 
-        if (NOT ItemCrossReference.FINDFIRST()) then begin
-            ItemCrossReference."Item No." := TicketItem."No.";
-            ItemCrossReference."Variant Code" := VariantCode;
-            ItemCrossReference."Unit of Measure" := TicketItem."Sales Unit of Measure";
-            ItemCrossReference."Cross-Reference Type" := ItemCrossReference."Cross-Reference Type"::"Bar Code";
-            ItemCrossReference."Cross-Reference No." := STRSUBSTNO('IXRF-%1', TicketItem."No.");
+        if (NOT ItemReference.FINDFIRST()) then begin
+            ItemReference."Item No." := TicketItem."No.";
+            ItemReference."Variant Code" := VariantCode;
+            ItemReference."Unit of Measure" := TicketItem."Sales Unit of Measure";
+            ItemReference."Reference Type" := ItemReference."Reference Type"::"Bar Code";
+            ItemReference."Reference No." := STRSUBSTNO('IXRF-%1', TicketItem."No.");
             if (VariantCode <> '') then
-                ItemCrossReference."Cross-Reference No." := STRSUBSTNO('IXRF-%1-%2', TicketItem."No.", VariantCode);
-            ItemCrossReference.Description := TicketItem.Description;
-            ItemCrossReference.INSERT();
+                ItemReference."Reference No." := STRSUBSTNO('IXRF-%1-%2', TicketItem."No.", VariantCode);
+            ItemReference.Description := TicketItem.Description;
+            ItemReference.INSERT();
         end;
 
         exit(TicketItem."No.");

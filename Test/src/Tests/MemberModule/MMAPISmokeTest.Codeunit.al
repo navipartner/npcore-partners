@@ -349,6 +349,7 @@ codeunit 85016 "NPR MM API Smoke Test"
         Assert.IsFalse(ApiStatus, 'Membership not expected to be found.');
     end;
 
+    [Test]
     procedure MemberRegisterArrival()
     var
         MembershipSetup: Record "NPR MM Membership Setup";
@@ -381,6 +382,7 @@ codeunit 85016 "NPR MM API Smoke Test"
 
     end;
 
+    [Test]
     procedure MemberCardRegisterArrival()
     var
         MembershipSetup: Record "NPR MM Membership Setup";
