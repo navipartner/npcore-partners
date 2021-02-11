@@ -143,7 +143,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                 field("Internal Bar Code"; Rec."Internal Bar Code")
                 {
                     ApplicationArea = All;
-                    Editable = AltNoEditable;
+                    Editable = false;
                     ToolTip = 'Specifies the value of the Internal Bar Code field.';
 
                     trigger OnValidate()
@@ -325,7 +325,6 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
     begin
         if not VarietySetup.Get then
             VarietySetup.Init;
-        AltNoEditable := VarietySetup."Create Alt. No. automatic";
         CrossRefEditable := VarietySetup."Create Item Cross Ref. auto.";
     end;
 
@@ -333,7 +332,6 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
         VarietySetup: Record "NPR Variety Setup";
         AutoFormatManagement: Codeunit "Auto Format";
-        AltNoEditable: Boolean;
         CrossRefEditable: Boolean;
         PurchasePriceBold: Boolean;
         RecommendedRetailPriceBold: Boolean;

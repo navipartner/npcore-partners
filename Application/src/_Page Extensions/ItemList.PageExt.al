@@ -4,10 +4,6 @@ pageextension 6014433 "NPR Item List" extends "Item List"
     {
         addafter(Control1901314507)
         {
-            part("NPR Item Availability FactBox"; "NPR Item Availability FactBox")
-            {
-                ApplicationArea = All;
-            }
             part("NPR NP Attributes FactBox"; "NPR NP Attributes FactBox")
             {
                 SubPageLink = "No." = FIELD("No.");
@@ -18,14 +14,6 @@ pageextension 6014433 "NPR Item List" extends "Item List"
             {
                 Caption = 'Discounts';
                 SubPageLink = "No." = FIELD("No.");
-                ApplicationArea = All;
-            }
-            part("NPR Magento Item Pict. Factbox"; "NPR Magento Item Pict. Factbox")
-            {
-                Caption = 'Picture';
-                ShowFilter = false;
-                SubPageLink = "No." = FIELD("No.");
-                Visible = MagentoEnabled;
                 ApplicationArea = All;
             }
         }
@@ -366,7 +354,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 var
                     InputDialog: Page "NPR Input Dialog";
                     Validering: Text;
-                    BarcodeLibrary: Codeunit "NPR Barcode Library";
+                    BarcodeLibrary: Codeunit "NPR Barcode Lookup Mgt.";
                     ItemNo: Code[20];
                     VariantCode: Code[10];
                     ResolvingTable: Integer;

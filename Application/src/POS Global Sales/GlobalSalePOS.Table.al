@@ -1,16 +1,14 @@
 table 6060104 "NPR Global Sale POS"
 {
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
-
     Caption = 'Global Sale POS';
     DataClassification = CustomerContent;
     DataPerCompany = false;
+    ObsoleteState = Removed;
 
     fields
     {
         field(1; "Entry No."; Integer)
         {
-            AutoIncrement = true;
             Caption = 'Entry No.';
             DataClassification = CustomerContent;
         }
@@ -61,23 +59,10 @@ table 6060104 "NPR Global Sale POS"
         key(Key1; "Entry No.")
         {
         }
-        key(Key2; "Register No.", "Sales Ticket No.", "Company Name")
-        {
-        }
     }
 
     fieldgroups
     {
     }
-
-    procedure GetBarcode() EANNumber: Code[20]
-    var
-        Utility: Codeunit "NPR Utility";
-        NPRConfig: Record "NPR Retail Setup";
-    begin
-        NPRConfig.Get;
-        NPRConfig.TestField(NPRConfig."EAN Prefix Exhange Label");
-        EANNumber := Utility.CreateEAN(Format("Entry No.", 10), NPRConfig."EAN Prefix Exhange Label");
-    end;
 }
 

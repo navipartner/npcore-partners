@@ -482,19 +482,9 @@ codeunit 6059972 "NPR Variety Clone Data"
         if not GetVRTSetup() then
             exit;
 
-        //-NPR5.42 [315499]
         CheckIfSkipCreateDefaultBarcode(ItemNo, VariantCode, SkipCreateDefaultBarcode, Handled);
         if SkipCreateDefaultBarcode then
             exit;
-        //+NPR5.42 [315499]
-
-        if (VRTSetup."Create Alt. No. automatic") or (not CalledFromInsert) then begin
-            if (VariantCode = '') and (VRTSetup."Alt. No. No. Series (I)" <> '') then
-                AddAlternativeNo(ItemNo, '');
-            if (VariantCode <> '') and (VRTSetup."Alt. No. No. Series (V)" <> '') then begin
-                AddAlternativeNo(ItemNo, VariantCode);
-            end;
-        end;
 
         if (VRTSetup."Create Item Cross Ref. auto.") or (not CalledFromInsert) then begin
             if (VariantCode = '') and (VRTSetup."Item Cross Ref. No. Series (I)" <> '') then
@@ -503,53 +493,6 @@ codeunit 6059972 "NPR Variety Clone Data"
                 AddItemRef(ItemNo, VariantCode);
 
         end;
-    end;
-
-    procedure AddAlternativeNo(ItemNo: Code[20]; VariantCode: Code[20])
-    var
-        NextCode: Code[20];
-        NoSeriesMgt: Codeunit NoSeriesManagement;
-    begin
-        //-VRT1.11
-        if not GetVRTSetup() then
-            exit;
-
-        if VariantCode = '' then begin
-            VRTSetup.TestField("Alt. No. No. Series (I)");
-            NextCode := NoSeriesMgt.GetNextNo(VRTSetup."Alt. No. No. Series (I)", Today, true);
-        end else begin
-            VRTSetup.TestField("Alt. No. No. Series (V)");
-            NextCode := NoSeriesMgt.GetNextNo(VRTSetup."Alt. No. No. Series (V)", Today, true);
-        end;
-
-        case VRTSetup."Barcode Type (Alt. No.)" of
-            VRTSetup."Barcode Type (Alt. No.)"::EAN8:
-                InsertAltNo(ItemNo, VariantCode, CreateBarcodeEAN8(NextCode));
-            VRTSetup."Barcode Type (Alt. No.)"::EAN13:
-                InsertAltNo(ItemNo, VariantCode, CreateBarcodeEAN13(NextCode));
-        end;
-        //+VRT1.11
-    end;
-
-    procedure InsertAltNo(ItemNo: Code[20]; VariantCode: Code[20]; Barcode: Code[20])
-    var
-        Item: Record Item;
-        AltNo: Record "NPR Alternative No.";
-    begin
-        if Item.Get(Barcode) then
-            Error(Text002);
-
-        AltNo.SetCurrentKey("Alt. No.");
-        AltNo.SetRange("Alt. No.", Barcode);
-        if AltNo.FindFirst then
-            Error(Text003, AltNo.TableCaption, Barcode, AltNo.Code);
-
-        AltNo.Init;
-        AltNo.Type := AltNo.Type::Item;
-        AltNo.Code := ItemNo;
-        AltNo."Alt. No." := Barcode;
-        AltNo."Variant Code" := VariantCode;
-        AltNo.Insert(true);
     end;
 
     procedure AddItemRef(ItemNo: Code[20]; VariantCode: Code[20])
@@ -804,9 +747,7 @@ codeunit 6059972 "NPR Variety Clone Data"
     var
         RetailSetup: Record "NPR Retail Setup";
         NoSeriesMgt: Codeunit NoSeriesManagement;
-        AlternativeNo1: Record "NPR Alternative No.";
         ItemRef1: Record "Item Reference";
-        AlternativeNo2: Record "NPR Alternative No.";
         ItemRef2: Record "Item Reference";
         Filler: array[3] of Text;
         NextNo: array[3] of Text;
@@ -814,10 +755,6 @@ codeunit 6059972 "NPR Variety Clone Data"
         //-VRT1.11
         RetailSetup.Get;
         if RetailSetup."EAN-Internal" <> 0 then begin
-            AlternativeNo1.SetCurrentKey("Alt. No.", Type);
-            AlternativeNo1.SetRange(Type, AlternativeNo1.Type::Item);
-            AlternativeNo1.SetFilter("Alt. No.", '%1', Format(RetailSetup."EAN-Internal") + '*');
-            if AlternativeNo1.FindLast then;
             ItemRef1.SetCurrentKey("Reference Type", "Reference No.");
             ItemRef1.SetRange("Reference Type", ItemRef1."Reference Type"::"Bar Code");
             ItemRef1.SetFilter("Reference No.", '%1', Format(RetailSetup."EAN-Internal") + '*');
@@ -826,10 +763,6 @@ codeunit 6059972 "NPR Variety Clone Data"
             Filler[1] := PadStr('', 12 - StrLen(Format(RetailSetup."EAN-Internal")) - StrLen(NextNo[1]), '0')
         end;
         if RetailSetup."EAN-External" <> 0 then begin
-            AlternativeNo2.SetCurrentKey("Alt. No.", Type);
-            AlternativeNo2.SetRange(Type, AlternativeNo2.Type::Item);
-            AlternativeNo2.SetFilter("Alt. No.", '%1', Format(RetailSetup."EAN-External") + '*');
-            if AlternativeNo2.FindLast then;
             ItemRef2.SetCurrentKey("Reference Type", "Reference No.");
             ItemRef2.SetRange("Reference Type", ItemRef2."Reference Type"::"Bar Code");
             ItemRef2.SetFilter("Reference No.", '%1', Format(RetailSetup."EAN-External") + '*');
@@ -842,13 +775,11 @@ codeunit 6059972 "NPR Variety Clone Data"
                 '   ' + RetailSetup.FieldCaption("Internal EAN No. Management") + ' : ' + RetailSetup."Internal EAN No. Management" + '\' +
                 '   ' + RetailSetup.FieldCaption("EAN-Internal") + ' : ' + Format(RetailSetup."EAN-Internal") + '\' +
                 '   ' + Format(RetailSetup."EAN-Internal") + '-' + Filler[1] + '-' + NextNo[1] + '-x\' +
-                '    Last Alternative number found  : ' + AlternativeNo1."Alt. No." + '\' +
                 '    Last Item reference found: ' + ItemRef1."Reference No." + '\' +
                 RetailSetup.FieldCaption("EAN-External") + '\' +
                 '   ' + RetailSetup.FieldCaption("External EAN-No. Management") + ' : ' + RetailSetup."External EAN-No. Management" + '\' +
                 '   ' + RetailSetup.FieldCaption("EAN-External") + ' : ' + Format(RetailSetup."EAN-External") + '\' +
                 '   ' + Format(RetailSetup."EAN-External") + '-' + Filler[2] + '-' + NextNo[2] + '-x\' +
-                '    Last Alternative number found  : ' + AlternativeNo2."Alt. No." + '\' +
                 '    Last Item reference found: ' + ItemRef2."Reference No." + '\' +
                 'Retail Setup Enabled Fields:\' +
                 '   ' + RetailSetup.FieldCaption("ISBN Bookland EAN") + ' : ' + Format(RetailSetup."ISBN Bookland EAN") + '\' +
@@ -877,21 +808,11 @@ codeunit 6059972 "NPR Variety Clone Data"
     procedure AssignBarcodes(Item: Record Item)
     var
         ItemVar: Record "Item Variant";
-        AltNo: Record "NPR Alternative No.";
         ItemRef: Record "Item Reference";
     begin
         //-VRT1.11
         if not GetVRTSetup() then
             exit;
-
-        if (VRTSetup."Alt. No. No. Series (I)" <> '') then begin
-            //check for alt no on item
-            AltNo.SetRange(Type, AltNo.Type::Item);
-            AltNo.SetRange(Code, Item."No.");
-            AltNo.SetRange("Variant Code", '');
-            if AltNo.IsEmpty then
-                AddAlternativeNo(Item."No.", '');
-        end;
 
         if (VRTSetup."Item Cross Ref. No. Series (I)" <> '') then begin
             ItemRef.SetRange("Item No.", Item."No.");
@@ -904,15 +825,6 @@ codeunit 6059972 "NPR Variety Clone Data"
         ItemVar.SetRange("Item No.", Item."No.");
         if ItemVar.FindSet then
             repeat
-                if (VRTSetup."Alt. No. No. Series (V)" <> '') then begin
-                    //check for alt no on variant
-                    AltNo.SetRange(Type, AltNo.Type::Item);
-                    AltNo.SetRange(Code, Item."No.");
-                    AltNo.SetRange("Variant Code", ItemVar.Code);
-                    if AltNo.IsEmpty then
-                        AddAlternativeNo(Item."No.", ItemVar.Code);
-                end;
-
                 if (VRTSetup."Item Cross Ref. No. Series (V)" <> '') then begin
                     ItemRef.SetRange("Item No.", Item."No.");
                     ItemRef.SetRange("Variant Code", ItemVar.Code);
@@ -1020,23 +932,10 @@ codeunit 6059972 "NPR Variety Clone Data"
 
     procedure LookupBarcodes(ItemNo: Code[20]; VariantCode: Code[10]): Code[20]
     var
-        AlternativeNo: Record "NPR Alternative No.";
         ItemRef: Record "Item Reference";
     begin
         //-VRT1.20 [261631]
         case GetPrimaryBarcodeTableNo of
-            DATABASE::"NPR Alternative No.":
-                begin
-                    AlternativeNo.SetRange(Type, AlternativeNo.Type::Item);
-                    AlternativeNo.SetRange(Code, ItemNo);
-                    if VariantCode <> '' then
-                        AlternativeNo.SetRange("Variant Code", VariantCode);
-                    if PAGE.RunModal(0, AlternativeNo) = ACTION::LookupOK then
-                        //-NPR5.30 [263917]
-                        //EXIT(AlternativeNo.Code);
-                        exit(AlternativeNo."Alt. No.");
-                    //+NPR5.30 [263917]
-                end;
             DATABASE::"Item Reference":
                 begin
                     ItemRef.SetRange("Item No.", ItemNo);
@@ -1064,8 +963,6 @@ codeunit 6059972 "NPR Variety Clone Data"
         end;
 
         case GetPrimaryBarcodeTableNo of
-            DATABASE::"NPR Alternative No.":
-                InsertAltNo(ItemNo, VariantCode, Barcode);
             DATABASE::"Item Reference":
                 InsertItemRef(ItemNo, VariantCode, Barcode, 3, '')
         end;
@@ -1074,15 +971,7 @@ codeunit 6059972 "NPR Variety Clone Data"
 
     local procedure GetPrimaryBarcodeTableNo(): Integer
     begin
-        //-VRT1.20 [261631]
-        if GetVRTSetup then begin
-            if VRTSetup."Create Alt. No. automatic" then
-                exit(DATABASE::"NPR Alternative No.")
-            else
                 exit(DATABASE::"Item Reference");
-        end;
-        exit(DATABASE::"NPR Alternative No.");
-        //+VRT1.20 [261631]
     end;
 
     procedure SetupTransferLine(var MasterTransferLine: Record "Transfer Line"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]

@@ -50,8 +50,8 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
         NpRvSalesLineReference.DeleteAll;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014435, 'OnBeforeAuditRoleLineInsertEvent', '', true, true)]
-    local procedure OnBeforeAuditRollInsert(var SaleLinePos: Record "NPR Sale Line POS")
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSSalesLine', '', true, false)]
+    local procedure OnAfterInsertPOSSalesLine(SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS"; POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Sales Line")
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
     begin

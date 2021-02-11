@@ -207,33 +207,9 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
     {
         addfirst(Navigation)
         {
-            group("NPR Retail Documents")
-            {
-                Caption = 'Retail Documents';
-                action("NPR Selection Contract")
-                {
-                    Caption = 'Selections contracts';
-                    Image = Document;
-                    RunObject = Page "NPR Retail Document Header";
-                    RunPageLink = "Document Type" = CONST("Selection Contract"),
-                                  "Customer No." = FIELD("No."),
-                                  "Customer Type" = CONST(Alm);
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Selections contracts action';
-                }
-            }
             group("NPR Retail")
             {
                 Caption = 'Retail';
-                action("NPR Brugtvarer")
-                {
-                    Caption = 'Used Goods';
-                    Image = "Action";
-                    RunObject = Page "NPR Used Goods Reg. Card";
-                    RunPageLink = "Purchased By Customer No." = FIELD("No.");
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Used Goods action';
-                }
                 action("NPR ItemLedgerEntries")
                 {
                     Caption = 'Item Ledger Entries';

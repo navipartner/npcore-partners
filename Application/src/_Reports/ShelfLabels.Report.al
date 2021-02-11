@@ -1,8 +1,8 @@
 report 6014428 "NPR Shelf Labels"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Shelf Labels.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Shelf Labels.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Shelf Labels';
     PreviewMode = PrintLayout;
@@ -181,7 +181,7 @@ report 6014428 "NPR Shelf Labels"
         ItemVariant: Record "Item Variant";
         BlobBuffer: Record "NPR BLOB buffer" temporary;
         ItemGroup: Record "NPR Item Group";
-        BarcodeLib: Codeunit "NPR Barcode Library";
+        BarcodeLib: Codeunit "NPR Barcode Image Library";
         StringLibrary: Codeunit "NPR String Library";
         TempBlobCol1: Codeunit "Temp Blob";
         CurrencyChar: Char;

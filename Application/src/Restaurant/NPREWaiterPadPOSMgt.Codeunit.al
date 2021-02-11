@@ -771,32 +771,6 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Retail Form Code", 'OnBeforeAuditRoleLineInsertEvent', '', true, false)]
-    local procedure UpdateBilledQtyOnLegacyPOSSalePost(sender: Codeunit "NPR Retail Form Code"; var SalePOS: Record "NPR Sale POS"; var SaleLinePos: Record "NPR Sale Line POS"; var AuditRole: Record "NPR Audit Roll")
-    var
-        NPRetailSetup: Record "NPR NP Retail Setup";
-        WaiterPad: Record "NPR NPRE Waiter Pad";
-        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
-    begin
-        if not NPRetailSetup.Get() or NPRetailSetup."Advanced Posting Activated" then
-            exit;
-        if IsNullGuid(SaleLinePos."Retail ID") then
-            exit;
-        WaiterPadLine.SetRange("Sale Line Retail ID", SaleLinePos."Retail ID");
-        if WaiterPadLine.FindFirst() then begin
-            if SaleLinePos."Quantity (Base)" <> 0 then begin
-                if WaiterPadLine."Qty. per Unit of Measure" = SaleLinePos."Qty. per Unit of Measure" then
-                    WaiterPadLine.Validate("Billed Quantity", WaiterPadLine."Billed Quantity" + SaleLinePos.Quantity)
-                else
-                    WaiterPadLine.Validate("Billed Qty. (Base)", WaiterPadLine."Billed Qty. (Base)" + SaleLinePos."Quantity (Base)");
-                WaiterPadLine.Modify();
-            end;
-
-            if WaiterPad.Get(WaiterPadLine."Waiter Pad No.") then
-                WaiterPadMgt.CloseWaiterPad(WaiterPad, false);
-        end;
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: SavePOSQuote", 'OnBeforeSaveAsQuote', '', true, false)]
     local procedure OnBeforeSaveAsPOSQuote(var SalePOS: Record "NPR Sale POS")
     begin

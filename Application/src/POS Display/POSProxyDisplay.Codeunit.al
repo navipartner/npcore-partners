@@ -577,7 +577,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
 
     local procedure UpdateDisplay(Line1: Text; Line2: Text)
     var
-        PrintToDisplay: Codeunit "NPR Report: Print To Display";
+        PrintToDisplay: Codeunit "NPR Print To Display";
     begin
 
         PrintToDisplay.SetLine(Line1, Line2);

@@ -226,7 +226,6 @@ codeunit 6059784 "NPR TM Ticket Management"
     local procedure PrintTicketUsingFormatter(var Ticket: Record "NPR TM Ticket"; PrintObjectType: Option; PrintObjectId: Integer; PrintTemplateCode: Code[20]) Printed: Boolean
     var
         TicketType: Record "NPR TM Ticket Type";
-        StdCodeunitCode: Codeunit "NPR Std. Codeunit Code";
         ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
         LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
         ReportPrinterInterface: Codeunit "NPR Report Printer Interface";
@@ -259,7 +258,6 @@ codeunit 6059784 "NPR TM Ticket Management"
     procedure PrintSingleTicket(var Ticket: Record "NPR TM Ticket") Printed: Boolean
     var
         TicketType: Record "NPR TM Ticket Type";
-        StdCodeunitCode: Codeunit "NPR Std. Codeunit Code";
         ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
         LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
         ReportPrinterInterface: Codeunit "NPR Report Printer Interface";

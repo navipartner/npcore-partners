@@ -98,11 +98,6 @@ page 6014424 "NPR Retail Setup"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Use WIN User Profile field';
                     }
-                    field("Auto Changelog Level"; "Auto Changelog Level")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Auto Changelog Level field';
-                    }
                 }
             }
             group(Nummerserie)

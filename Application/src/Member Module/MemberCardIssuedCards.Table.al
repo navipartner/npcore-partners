@@ -71,7 +71,7 @@ table 6059774 "NPR Member Card Issued Cards"
         }
         field(7; "Points (Total)"; Decimal)
         {
-            CalcFormula = Sum ("NPR Member Card Trx Log"."Remaining Points" WHERE("Card Code" = FIELD("No."),
+            CalcFormula = Sum("NPR Member Card Trx Log"."Remaining Points" WHERE("Card Code" = FIELD("No."),
                                                                                       "Posting Date" = FIELD("Expiration Date Filter")));
             Caption = 'Points (Total)';
             FieldClass = FlowField;
@@ -174,7 +174,7 @@ table 6059774 "NPR Member Card Issued Cards"
         }
         field(6014401; Comment; Boolean)
         {
-            CalcFormula = Exist ("NPR Retail Comment" WHERE("Table ID" = CONST(6059974),
+            CalcFormula = Exist("NPR Retail Comment" WHERE("Table ID" = CONST(6059974),
                                                         "No." = FIELD("No.")));
             Caption = 'Comment';
             FieldClass = FlowField;
@@ -227,8 +227,6 @@ table 6059774 "NPR Member Card Issued Cards"
                                           0D,
                                           "No.",
                                           PointCardTypes."Card No. Series");
-            if PointCardTypes."EAN Prefix" <> '' then
-                "No." := Utility.CreateEAN("No.", Format(PointCardTypes."EAN Prefix"));
         end;
 
         "Date Created" := CurrentDateTime;
@@ -240,7 +238,7 @@ table 6059774 "NPR Member Card Issued Cards"
     var
         PointCardTypes: Record "NPR Member Card Types";
         NoSeriesManagement: Codeunit NoSeriesManagement;
-        Utility: Codeunit "NPR Utility";
+        Utility: Codeunit "NPR Receipt Footer Mgt.";
 
     procedure GenerateSecretCode()
     begin

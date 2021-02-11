@@ -245,8 +245,6 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
             if not SelectCustomer(SalePOS, POSSale) then
                 SalePOS.TestField("Customer No.");
         end;
-        if JSON.GetBooleanParameter('CheckCustomerCredit', true) then
-            CheckCustCredit(SalePOS);
         SetReference(SalePOS, JSON);
         SetPricesInclVAT(SalePOS, JSON);
         SetParameters(POSSaleLine, JSON, RetailSalesDocMgt);
@@ -437,6 +435,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         RetailSalesDocMgt.SetSendDocument(JSON.GetBooleanParameter('SetSend', true));
         RetailSalesDocMgt.SetWriteInAuditRoll(true);
         RetailSalesDocMgt.SetSendICOrderConf(JSON.GetBooleanParameter('SendICOrderConfirmation', false));
+        RetailSalesDocMgt.SetCustomerCreditCheck(JSON.GetBooleanParameter('CheckCustomerCredit', false));
 
         if JSON.GetBooleanParameter('SetShowCreationMessage', true) then
             RetailSalesDocMgt.SetShowCreationMessage();
@@ -485,7 +484,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
 
     local procedure HandlePrepayment(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; PrepaymentValue: Decimal; PrepaymentIsAmount: Boolean; Print: Boolean; Send: Boolean; Pdf2Nav: Boolean)
     var
-        HandlePayment: Codeunit "NPR POS Handle Payment";
+        HandlePayment: Codeunit "NPR POS Doc. Export Try Pay";
     begin
         //An error after sale end, before front end sync, is not allowed so we catch all
         Commit;
@@ -496,25 +495,13 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
 
     local procedure HandlePayAndPost(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Print: Boolean; Pdf2Nav: Boolean; Send: Boolean; FullPosting: Boolean)
     var
-        HandlePayment: Codeunit "NPR POS Handle Payment";
+        HandlePayment: Codeunit "NPR POS Doc. Export Try Pay";
     begin
         //An error after sale end, before front end sync, is not allowed so we catch all
         Commit;
         if not HandlePayment.HandlePayAndPostTransactional(POSSession, SalesHeader, Print, Pdf2Nav, Send, FullPosting, HandlePayment) then
             Message(ERR_PAY, GetLastErrorText);
         POSSession.RequestRefreshData();
-    end;
-
-    local procedure CheckCustCredit(SalePOS: Record "NPR Sale POS")
-    var
-        RetailSetup: Record "NPR Retail Setup";
-        TempSalesHeader: Record "Sales Header" temporary;
-        FormCode: Codeunit "NPR Retail Form Code";
-        POSCheckCrLimit: Codeunit "NPR POS-Check Cr. Limit";
-    begin
-        FormCode.CreateSalesHeader(SalePOS, TempSalesHeader);
-        if not POSCheckCrLimit.SalesHeaderPOSCheck(TempSalesHeader) then
-            Error('');
     end;
 
     local procedure SaleLinesExists(SalePOS: Record "NPR Sale POS"): Boolean

@@ -1,10 +1,5 @@
 codeunit 6014498 "NPR Exchange Label Mgt."
 {
-
-    // NPR5.51/ALST/20190624 CASE 337539 "Retail Cross Reference No." gets a value if global exchange is set up
-    // NPR5.53/ALST/20191028 CASE 372948 check EAN prefix in range instead of single value
-    // NPR5.55/ALPO/20200731 CASE 412253 Correct unit price calclulation with prices set to be VAT-excluding
-
     var
         Text00001: Label 'The item was not found. Use manual procedure in order to return the item.';
         Text00002: Label 'The function can only be used with a POS Sale.';
@@ -18,12 +13,12 @@ codeunit 6014498 "NPR Exchange Label Mgt."
         RetailConfiguration: Record "NPR Retail Setup";
         Register: Record "NPR Register";
         String: Codeunit "NPR String Library";
-        RetailFormCode: Codeunit "NPR Retail Form Code";
+        POSUnit: Record "NPR POS Unit";
     begin
         RetailConfiguration.Get;
         ExchangeLabel.Init;
 
-        if Register.Get(RetailFormCode.FetchRegisterNumber) then;
+        if Register.Get(POSUnit.GetCurrentPOSUnit()) then;
 
         if StrLen(Register."Shop id") <> 3 then
             Register."Shop id" := String.PadStrLeft(Register."Shop id", 3, ' ', false);
@@ -34,9 +29,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
         ExchangeLabel."Company Name" := CompanyName;
         ExchangeLabel."Table No." := RecRef.Number;
         ExchangeLabel."Valid From" := ValidFromDate;
-        //-NPR5.49 [345209]
         ExchangeLabel."Unit Price" := GetUnitPriceInclVat(RecRef);
-        //+NPR5.49 [345209]
         ExchangeLabel."Sales Price Incl. Vat" := GetSalesPriceInclVat(RecRef);
         ExchangeLabel."Valid To" := CalcDate(RetailConfiguration."Exchange Label Exchange Period", ValidFromDate);
         ExchangeLabel."Batch No." := LabelBatchNumber;
@@ -80,7 +73,6 @@ codeunit 6014498 "NPR Exchange Label Mgt."
     var
         RetailConfiguration: Record "NPR Retail Setup";
         String: Codeunit "NPR String Library";
-        Utility: Codeunit "NPR Utility";
         StoreCode: Code[3];
         LabelCode: Code[7];
     begin
@@ -88,7 +80,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
 
         with ExchangeLabel do begin
             LabelCode := String.PadStrLeft("No.", 7, '0', false);
-            exit(Utility.CreateEAN(StoreCode + LabelCode, RetailConfiguration."EAN Prefix Exhange Label"));
+            exit(CreateEAN(StoreCode + LabelCode, RetailConfiguration."EAN Prefix Exhange Label"));
         end;
     end;
 
@@ -195,11 +187,11 @@ codeunit 6014498 "NPR Exchange Label Mgt."
         RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
         ReportSelectionRetail: Record "NPR Report Selection Retail";
         RecRef: RecordRef;
-        RetailFormCode: Codeunit "NPR Retail Form Code";
         ExchangeLabelRec: Record "NPR Exchange Label";
+        POSUnit: Record "NPR POS Unit";
     begin
 
-        RetailReportSelectionMgt.SetRegisterNo(RetailFormCode.FetchRegisterNumber());
+        RetailReportSelectionMgt.SetRegisterNo(POSUnit.GetCurrentPOSUnit());
 
         ExchangeLabel.SetRange("Packaged Batch", false);
         if ExchangeLabel.FindSet then
@@ -230,10 +222,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
     begin
         RetailConfiguration.Get;
 
-        //-NPR5.53 [372948]
-        //IF COPYSTR(CopyValidering, 1, 2) = RetailConfiguration."EAN Prefix Exhange Label" THEN BEGIN
         if CheckPrefix(CopyValidering, RetailConfiguration."EAN Prefix Exhange Label") then begin
-            //+NPR5.53 [372948]
             ExchangeLabel.SetCurrentKey(Barcode);
             ExchangeLabel.SetRange(Barcode, CopyValidering);
 
@@ -277,39 +266,24 @@ codeunit 6014498 "NPR Exchange Label Mgt."
                         SaleLinePOS."Variant Code" := ExchangeLabel."Variant Code";
                     SaleLinePOS.Validate("No.", ExchangeLabel."Item No.");
 
-                    //-NPR5.48 [335967]
-                    //SaleLinePOS."Unit of Measure Code" := ExchangeLabel."Unit of Measure";
                     SaleLinePOS.Validate("Unit of Measure Code", ExchangeLabel."Unit of Measure");
-                    //+NPR5.48 [335967]
 
                     if ExchangeLabel.Quantity > 0 then
                         SaleLinePOS.Validate(Quantity, ExchangeLabel.Quantity * -1)
                     else
                         SaleLinePOS.Validate(Quantity, -1);
                     SaleLinePOS.Insert(true);
-                    //SaleLinePOS."Price Includes VAT" := TRUE;  //NPR5.55 [412253]-revoked
-                    //-NPR5.55 [412253]
                     if not SaleLinePOS."Price Includes VAT" and (SaleLinePOS."VAT %" <> 0) then begin
                         ExchangeLabel."Unit Price" := Round(ExchangeLabel."Unit Price" / (1 + SaleLinePOS."VAT %" / 100), 0.00001);
                         SalesPrice := Round(ExchangeLabel."Sales Price Incl. Vat" / (1 + SaleLinePOS."VAT %" / 100), 0.00001);
                     end else
                         SalesPrice := ExchangeLabel."Sales Price Incl. Vat";
-                    //+NPR5.55 [412253]
-                    //-NPR5.49 [345209]
-                    //SaleLinePOS.VALIDATE("Unit Price", ExchangeLabel."Sales Price Incl. Vat");
                     if ExchangeLabel."Unit Price" <> 0 then
                         SaleLinePOS.Validate("Unit Price", ExchangeLabel."Unit Price");
-                    //-NPR5.55 [412253]-revoked
-                    //IF SaleLinePOS."Unit Price" < ExchangeLabel."Sales Price Incl. Vat" THEN
-                    //  SaleLinePOS.VALIDATE("Unit Price", ExchangeLabel."Sales Price Incl. Vat")
-                    //+NPR5.55 [412253]-revoked
-                    //-NPR5.55 [412253]
                     if SaleLinePOS."Unit Price" < SalesPrice then
                         SaleLinePOS.Validate("Unit Price", SalesPrice)
-                    //+NPR5.55 [412253]
                     else
                         SaleLinePOS.Validate("Amount Including VAT", ExchangeLabel."Sales Price Incl. Vat" * SaleLinePOS.Quantity);
-                    //+NPR5.49 [345209]
                     SaleLinePOS.Modify;
                     Validering := '';
                     Found := true;
@@ -497,85 +471,45 @@ codeunit 6014498 "NPR Exchange Label Mgt."
         //+NPR5.53 [372948]
     end;
 
-    procedure "-- Enums"()
-    begin
-    end;
-
-    procedure PrintTypeLine(): Integer
+    procedure CreateEAN(Unique: Code[25]; Prefix: Code[2]) EAN: Code[20]
     var
-        PrintType: Option Single,LineQuantity,All;
+        ErrEAN: Label 'Check No. is invalid for EAN-No.';
+        ErrLength: Label 'EAN Creation number is too long.';
+        Register: Record "NPR Register";
+        RetailSetup: Record "NPR Retail Setup";
+        EAN1: Code[20];
+        POSUnit: Record "NPR POS Unit";
+        INVALID_EAN_VALUE: Label 'Only digits are allowed when creating EAN: %1';
     begin
-        exit(PrintType::Single)
-    end;
+        if StrLen(Prefix) + StrLen(Register."Shop id") + StrLen(Format(Unique)) > 12 then
+            Error(ErrLength);
 
-    procedure PrintTypeLineQuantity(): Integer
-    var
-        PrintType: Option Single,LineQuantity,All;
-    begin
-        exit(PrintType::LineQuantity)
-    end;
+        RetailSetup.Get;
 
-    procedure PrintTypeLineAll(): Integer
-    var
-        PrintType: Option Single,LineQuantity,All;
-    begin
-        exit(PrintType::All)
-    end;
+        if Register.Get(POSUnit.GetCurrentPOSUnit()) then;
 
-    procedure ScanExchangeLabelRetailJnl(var RetailJnlLine: Record "NPR Retail Journal Line"; var Validering: Code[20]) Found: Boolean
-    var
-        ExchangeLabel: Record "NPR Exchange Label";
-        IComm: Record "NPR I-Comm";
-        Item: Record Item;
-        RetailConfiguration: Record "NPR Retail Setup";
-        RetailJnlLine2: Record "NPR Retail Journal Line";
-        LineNo: Integer;
-    begin
-        RetailConfiguration.Get;
+        if StrLen(DelChr(LowerCase(Unique), '=', 'abcdefghijklmnopqrstuvwyz')) <> StrLen(Unique) then
+            Error(INVALID_EAN_VALUE, Unique);
 
-        if CopyStr(Validering, 1, 2) <> RetailConfiguration."EAN Prefix Exhange Label" then
-            exit(false);
-
-        ExchangeLabel.SetCurrentKey(Barcode);
-        ExchangeLabel.SetRange(Barcode, Validering);
-
-        if not ExchangeLabel.FindFirst and RetailConfiguration."Use I-Comm" and
-           IComm.Get and (IComm."Exchange Label Center Company" <> '') then
-            ExchangeLabel.ChangeCompany(IComm."Company - Clearing");
-
-        if ExchangeLabel.FindFirst then begin
-            if ExchangeLabel."Packaged Batch" then begin
-                ExchangeLabel.SetRange(Barcode);
-                ExchangeLabel.SetRange("Batch No.", ExchangeLabel."Batch No.");
-                ExchangeLabel.SetRange("Store ID", ExchangeLabel."Store ID");
-                ExchangeLabel.SetRange("Register No.", ExchangeLabel."Register No.");
-                ExchangeLabel.SetRange("Sales Ticket No.", ExchangeLabel."Sales Ticket No.");
-                ExchangeLabel.SetCurrentKey("Register No.", "Sales Ticket No.", "Batch No.");
-                ExchangeLabel.FindSet;
+        if StrLen(Unique) <= 10 then begin
+            case Prefix of
+                '':
+                    begin
+                        Prefix := Format(RetailSetup."EAN-Internal");
+                        EAN1 := PadStr('', 10 - StrLen(Format(Unique)), '0');
+                        EAN := Format(Prefix) + PadStr('', 10 - StrLen(Format(Unique)), '0') + Format(Unique);
+                    end;
+                else begin
+                        EAN := Format(Prefix) + Format(Register."Shop id") +
+                               PadStr('', 12 - StrLen(Prefix) - (StrLen(Register."Shop id") + StrLen(Format(Unique))), '0') + Format(Unique);
+                    end;
             end;
+            EAN := EAN + Format(StrCheckSum(EAN, '131313131313'));
 
-            repeat
-                with RetailJnlLine do begin
-                    if not Item.Get(ExchangeLabel."Item No.") then
-                        Error(Text00001);
-
-                    RetailJnlLine2.SetRange("No.", "No.");
-                    if RetailJnlLine2.FindLast then;
-
-                    Init;
-                    "Line No." := RetailJnlLine2."Line No." + 10000;
-
-                    Validate("Item No.", ExchangeLabel."Item No.");
-                    "Sales Unit of measure" := ExchangeLabel."Unit of Measure";
-                    Validate("Quantity to Print", ExchangeLabel.Quantity);
-                    if ExchangeLabel."Variant Code" <> '' then
-                        Validate("Variant Code", ExchangeLabel."Variant Code");
-                    Insert;
-                end;
-            until ExchangeLabel.Next = 0;
-            exit(true);
-        end;
-        exit(false);
+            if StrCheckSum(EAN, '1313131313131') <> 0 then
+                Error(ErrEAN);
+        end else
+            Error(ErrLength);
     end;
 }
 

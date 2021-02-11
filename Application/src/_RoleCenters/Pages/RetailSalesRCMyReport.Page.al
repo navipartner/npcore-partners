@@ -80,13 +80,6 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 ApplicationArea = All;
                 ToolTip = 'Executes the Attribute Sets action';
             }
-            action("Audit Roll")
-            {
-                Caption = 'Audit Roll';
-                RunObject = Page "NPR Audit Roll";
-                ApplicationArea = All;
-                ToolTip = 'Executes the Audit Roll action';
-            }
             action(Brands)
             {
                 Caption = 'Brands';
@@ -115,20 +108,6 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 RunObject = Page "Contact List";
                 ApplicationArea = All;
                 ToolTip = 'Executes the Contact List action';
-            }
-            action("Credit Vouchers")
-            {
-                Caption = 'Credit Vouchers';
-                RunObject = Page "NPR Credit Voucher List";
-                ApplicationArea = All;
-                ToolTip = 'Executes the Credit Vouchers action';
-            }
-            action("Gift Vouchers")
-            {
-                Caption = 'Gift Vouchers';
-                RunObject = Page "NPR Gift Voucher List";
-                ApplicationArea = All;
-                ToolTip = 'Executes the Gift Vouchers action';
             }
             action("Item List")
             {
@@ -188,13 +167,6 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 RunObject = Page "Purchase Order List";
                 ApplicationArea = All;
                 ToolTip = 'Executes the Purchase Orders action';
-            }
-            action("Retail Documents")
-            {
-                Caption = 'Retail Documents';
-                RunObject = Page "NPR Retail Document List";
-                ApplicationArea = All;
-                ToolTip = 'Executes the Retail Documents action';
             }
             action("Retail Journal")
             {
@@ -803,7 +775,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = 'C&ustomer';
                 Image = Customer;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "Customer Card";
                 RunPageMode = Create;
@@ -815,7 +787,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = 'Sales &Order';
                 Image = Document;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "Sales Order";
                 RunPageMode = Create;
@@ -827,7 +799,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = 'Sales Credit &Memo';
                 Image = CreditMemo;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "Sales Credit Memo";
                 RunPageMode = Create;
@@ -839,7 +811,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = '&Sales Reminder';
                 Image = Reminder;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page Reminder;
                 RunPageMode = Create;
@@ -854,7 +826,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = '&Vendor';
                 Image = Vendor;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "Vendor Card";
                 RunPageMode = Create;
@@ -866,7 +838,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = '&Purchase Order';
                 Image = Document;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "Purchase Order";
                 RunPageMode = Create;

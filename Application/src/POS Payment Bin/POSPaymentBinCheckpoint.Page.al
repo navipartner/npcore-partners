@@ -301,7 +301,7 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
                 Ellipsis = true;
                 Image = CalculateRemainingUsage;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -476,7 +476,7 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
     var
         PaymentTypeDetailed: Record "NPR Payment Type - Detailed";
         TouchScreenBalancingLine: Page "NPR Touch Screen: Balanc.Line";
-        PaymentTypePrefix: Record "NPR Payment Type - Prefix";
+        POSCountingDenomination: Record "NPR POS Counting Denomination";
     begin
 
         PaymentTypeDetailed.SetFilter("Payment No.", '=%1', "Payment Type No.");
@@ -484,16 +484,16 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
         if (PaymentTypeDetailed.IsEmpty()) then begin
 
 
-            PaymentTypePrefix.SetFilter("Payment Type", '=%1', "Payment Type No.");
-            if PaymentTypePrefix.FindSet() then begin
+            POSCountingDenomination.SetFilter("Payment Type", '=%1', "Payment Type No.");
+            if POSCountingDenomination.FindSet() then begin
                 repeat
                     PaymentTypeDetailed.Init;
                     PaymentTypeDetailed."Payment No." := "Payment Type No.";
                     PaymentTypeDetailed."Register No." := GetRegisterNo();
-                    PaymentTypeDetailed.Weight := PaymentTypePrefix.Weight;
+                    PaymentTypeDetailed.Weight := POSCountingDenomination.Weight;
                     PaymentTypeDetailed.Insert();
 
-                until (PaymentTypePrefix.Next() = 0);
+                until (POSCountingDenomination.Next() = 0);
                 Commit;
             end;
         end;

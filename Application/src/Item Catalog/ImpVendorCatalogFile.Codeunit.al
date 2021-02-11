@@ -78,13 +78,14 @@ codeunit 6060061 "NPR Imp. Vendor Catalog File"
 
     local procedure ReadLine(var FileToImport: File; var FieldArray: array[200] of Text): Boolean
     var
-        Utility: Codeunit "NPR Utility";
+        Utility: Codeunit "NPR Receipt Footer Mgt.";
         FieldNo: Integer;
         CharsRead: Integer;
         FieldSep: Char;
         LF: Char;
         CR: Char;
         Character: Char;
+        StringConversionMgt: Codeunit StringConversionManagement;
     begin
         FieldNo := 1;
         Clear(FieldArray);  // Delete Array
@@ -103,10 +104,7 @@ codeunit 6060061 "NPR Imp. Vendor Catalog File"
                     Error(StrSubstNo(TooManyFields, ArrayLen(FieldArray)));
             end else begin
                 if not (Character in [CR, LF]) then
-                    //-NPR5.42
-                    //FieldArray[FieldNo] := FieldArray[FieldNo] + FORMAT(Character);
-                    FieldArray[FieldNo] := FieldArray[FieldNo] + Utility.Ansi2Ascii(Format(Character));
-                //+NPR5.42
+                    FieldArray[FieldNo] := FieldArray[FieldNo] + StringConversionMgt.WindowsToAscii(Format(Character));
             end;
         until Character = LF;  // End of rec
         exit(false);

@@ -1,32 +1,5 @@
 page 6014490 "NPR Retail Journal Header"
 {
-    // NPR70.00.01.01/MH/20140819  Removed WEBRETAIL functionality: Removed Menu Item; Function --> Generate Report and Mail.
-    // NPR4.14/TS/20150218 CASE 206013 Added Missing Code in Function Import From ->Scanner
-    // NPR4.14/TS/20150218 CASE 221050 Change Caption Item Card to Export Til Item Card
-    // NPR4.15/TS/20151013 CASE 224751 Added NpAttribute Factbox
-    // NPR4.16/JDH/20151016 CASE 225285 Removed Action ImportFromExternaldatabase - Not used any more
-    // NPR4.18/MMV/20151210 CASE 229221 Unify how label printing of lines are handled.
-    //                                  Disabled actions "Shelf Label" & "Sign" since they are not used currently. Should be rewritten if needed.
-    // NPR5.22/MMV/20160420 CASE 237743 Updated references to label library CU.
-    //                                  Reenabled & refactored action "Shelf Label".
-    // NPR5.23/MMV/20160510 CASE 240211 Changed "Shelf Label" to work via print selection buffer.
-    //                                  Renabled "Sign" action and refactored to work via print selection buffer.
-    // NPR5.23/JDH /20160513 CASE 240916 Deleted old VariaX Matrix Action
-    // NPR5.30/TS  /20170206 CASE 265531 Correct Action Caption
-    // NPR5.30/MMV /20170221 CASE 266517 Renamed label action caption.
-    // NPR5.31/MHA /20170110 CASE 262904 Added filter on MixDiscountLine."Disc. Grouping Type"::Item in UpdateDiscount()
-    // NPR5.36/MMV /20170919 CASE 290792 Deleted action "Check Barcodes".
-    // NPR5.37/MMV /20171024 CASE 294148 Promoted print actions for tablet (POS) use.
-    // NPR5.40/MHA /20180316 CASE 304031 Added Action ImportFromPriceLog and PriceLog
-    // NPR5.46/JDH /20180926 CASE 294354 Action Export to Item Card removed. Its replaced by Item Worksheet. Recoded some import and export actions, and added a few new fields
-    // NPR5.48/TS  /20181206 CASE 338656 Added Missing Picture to Action
-    // NPR5.48/TS  /20180104 CASE 338609 Added Shortcut Ctrl+Alt+L to Price Label
-    // NPR5.49/ZESO/20190214 CASE 334538 Reworked Function for Sales Return
-    // NPR5.53/ZESO/20191108 CASE 334538 Enabled Function for Sales Return
-    // NPR5.53/TJ  /20191118 CASE 375557 Restored old print option List
-    // NPR5.53/MHA /20191121 CASE 374290 Added filter fields
-    // NPR5.54/SARA/20200316 CASE 395769 Re activate button 'Invert Selection'
-
     Caption = 'Retail Journal';
     PageType = Card;
     UsageCategory = Administration;
@@ -263,7 +236,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Shelf Label';
                     Image = BinContent;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Shelf Label action';
@@ -280,7 +253,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Price Label';
                     Image = BinLedger;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = "Report";
                     ShortCutKey = 'Ctrl+Alt+L';
                     ApplicationArea = All;
@@ -298,7 +271,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Sign Print';
                     Image = Bin;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Sign Print action';
@@ -315,7 +288,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Invert selection';
                     Image = Change;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Invert selection action';
@@ -347,7 +320,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'List';
                     Image = "Report";
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
                     ToolTip = 'Executes the List action';
@@ -408,24 +381,6 @@ page 6014490 "NPR Retail Journal Header"
                         RetJnlImportItems.RunModal;
                     end;
                 }
-                action(ImportFromScanner)
-                {
-                    Caption = 'Scanner';
-                    Image = MiniForm;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Scanner action';
-
-                    trigger OnAction()
-                    var
-                        LabelPrintLine: Record "NPR Retail Journal Line";
-                        Scanner: Codeunit "NPR Scanner - Functions";
-                    begin
-                        //-NPR4.14
-                        CurrPage.SubLine.PAGE.GetRecord(LabelPrintLine);
-                        //+NPR4.14
-                        Scanner.initRetailJournal(Rec);
-                    end;
-                }
                 action(ImportFromPeriodDiscount)
                 {
                     Caption = 'Period Discounts';
@@ -466,29 +421,6 @@ page 6014490 "NPR Retail Journal Header"
                         // RetJnlImpMixDisc.RUNMODAL;
                         // CLEAR(RetJnlImpMixDisc);
                         //+NPR5.46 [294354]
-                    end;
-                }
-                action(ImportFromReturnSales)
-                {
-                    Caption = 'Return Sales';
-                    Enabled = true;
-                    Image = ReturnReceipt;
-                    Visible = true;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Return Sales action';
-
-                    trigger OnAction()
-                    begin
-                        //-NPR5.46 [294354]
-                        // RetailJournalHeader.GET("No.");
-                        // RetailJournalHeader.SETRECFILTER;
-                        // REPORT.RUNMODAL(REPORT::"Ret. Jnl. - Imp. Return Sales", TRUE, FALSE, RetailJournalHeader);
-                        //+NPR5.46 [294354]
-
-
-                        //-NPR5.49 [334538]
-                        RetailJournalCode.SalesReturn2RetailJnl("No.");
-                        //-NPR5.49 [334538]
                     end;
                 }
                 action(ImportFromTransferOrder)
@@ -578,22 +510,6 @@ page 6014490 "NPR Retail Journal Header"
                         //CurrPage.SubLine.PAGE.GetSelectionFilter(RetailJournalLine);
                         //RetailJournalCode.ExportToItems(RetailJournalLine);
                         //+NPR5.46 [294354]
-                    end;
-                }
-                action(ExportToScanner)
-                {
-                    Caption = 'Scanner';
-                    Image = MiniForm;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Scanner action';
-
-                    trigger OnAction()
-                    var
-                        RetailJournalLine: Record "NPR Retail Journal Line";
-                        ScannerFunctions: Codeunit "NPR Scanner - Functions";
-                    begin
-                        CurrPage.SubLine.PAGE.GetSelectionFilter(RetailJournalLine);
-                        ScannerFunctions.GoSend(RetailJournalLine)
                     end;
                 }
                 action(ExportToOtherRetailJournal)

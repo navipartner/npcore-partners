@@ -55,7 +55,6 @@ codeunit 6150779 "NPR POS Action: PepperTerminal"
     var
         JSON: Codeunit "NPR POS JSON Management";
         POSSale: Codeunit "NPR POS Sale";
-        TouchScreenFunctions: Codeunit "NPR Touch Screen - Func.";
         Setup: Codeunit "NPR POS Setup";
         Register: Record "NPR Register";
         SalePOS: Record "NPR Sale POS";
@@ -162,7 +161,6 @@ codeunit 6150779 "NPR POS Action: PepperTerminal"
         SaleLine: Record "NPR Sale Line POS";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         Handled: Boolean;
-        TouchScreenFunctions: Codeunit "NPR Touch Screen - Func.";
         PepperLibraryTranscendence: Codeunit "NPR Pepper Library TSD";
         EFTSetup: Record "NPR EFT Setup";
     begin

@@ -1,17 +1,5 @@
 table 6014413 "NPR Period Discount"
 {
-    // Ohm - 05.10.04 - IF Status = Status::Aktiv // alle steder
-    // //+NPR Sag 84805 opdater start og slut dato miksrabat.
-    // NPR70.00.01.00/MH/20150113  CASE 199932 Removed Web references (WEB1.00).
-    // NPR4.14/MHA /20150818  CASE 220972 Deleted deprecated Web fields
-    // NPR5.27/TJ  /20160926  CASE 248282 Removing unused variables and fields, renaming fields and variables to use standard naming procedures
-    // NPR5.29/BHR /20161119  CASE 257922 Filter on time
-    // NPR5.29/JC  /20160110  CASE 261710 Fixed issue with Dimenison wrong table
-    // NPR5.31/MHA /20170213  CASE 265229 Added field 310 "Customer Disc. Group Filter" to be used as filter
-    // NPR5.38/MHA /20171106  CASE 295330 Renamed Option "Balanced" to "Closed" for field 5 "Status"
-    // NPR5.40/MMV /20180213  CASE 294655 Performance optimization
-    // NPR5.42/MHA /20180521  CASE 315554 Added Period Fields to enable Weekly Condition
-
     Caption = 'Period Discount';
     LookupPageID = "NPR Campaign Discount List";
     DataClassification = CustomerContent;
@@ -25,8 +13,6 @@ table 6014413 "NPR Period Discount"
 
             trigger OnValidate()
             begin
-                //IF Status = Status::Aktiv THEN ERROR(Text1060001);
-
                 if Code <> xRec.Code then begin
                     NoSeriesMgt.TestManual("No. Series");
                     "No. Series" := '';
@@ -47,17 +33,6 @@ table 6014413 "NPR Period Discount"
             begin
                 if ("Ending Date" <> 0D) and ("Ending Date" < "Starting Date") then
                     Error(Text1060002);
-                //IF Status = Status::Aktiv THEN ERROR(Text1060003);
-                //-NPR5.31 [265229]
-                // //+NPR Sag 84805
-                // MixedDiscount.SETRANGE("Campaign Ref.",Code);
-                // IF MixedDiscount.FIND('-') THEN
-                //  REPEAT
-                //    MixedDiscount."Starting date":= "Starting Date";
-                //    MixedDiscount.MODIFY;
-                //  UNTIL MixedDiscount.NEXT=0;
-                // //-NPR Sag 84805
-                //+NPR5.31 [265229]
             end;
         }
         field(4; "Ending Date"; Date)
@@ -69,18 +44,6 @@ table 6014413 "NPR Period Discount"
             begin
                 if ("Starting Date" <> 0D) and ("Ending Date" < "Starting Date") then
                     Error(Text1060002);
-
-                //IF Status = Status::Aktiv THEN ERROR(Text1060004);
-                //-NPR5.31 [265229]
-                // //+NPR Sag 84805
-                // MixedDiscount.SETRANGE("Campaign Ref.",Code);
-                // IF MixedDiscount.FIND('-') THEN
-                //  REPEAT
-                //    MixedDiscount."Ending date":= "Ending Date";
-                //    MixedDiscount.MODIFY;
-                //  UNTIL MixedDiscount.NEXT=0;
-                // //-NPR Sag 84805
-                //+NPR5.31 [265229]
             end;
         }
         field(5; Status; Option)
@@ -134,7 +97,7 @@ table 6014413 "NPR Period Discount"
         }
         field(20; Comment; Boolean)
         {
-            CalcFormula = Exist ("NPR Retail Comment" WHERE("Table ID" = CONST(6014413),
+            CalcFormula = Exist("NPR Retail Comment" WHERE("Table ID" = CONST(6014413),
                                                         "No." = FIELD(Code)));
             Caption = 'Comment';
             Editable = false;
@@ -274,7 +237,7 @@ table 6014413 "NPR Period Discount"
         }
         field(200; "Quantity Sold"; Decimal)
         {
-            CalcFormula = - Sum ("Item Ledger Entry".Quantity WHERE("NPR Discount Type" = CONST(Period),
+            CalcFormula = - Sum("Item Ledger Entry".Quantity WHERE("NPR Discount Type" = CONST(Period),
                                                                    "NPR Discount Code" = FIELD(Code),
                                                                    "Global Dimension 1 Code" = FIELD("Global Dimension 1 Code"),
                                                                    "Global Dimension 2 Code" = FIELD("Global Dimension 2 Code")));
@@ -284,7 +247,7 @@ table 6014413 "NPR Period Discount"
         }
         field(201; Turnover; Decimal)
         {
-            CalcFormula = Sum ("Value Entry"."Sales Amount (Actual)" WHERE("NPR Discount Type" = CONST(Period),
+            CalcFormula = Sum("Value Entry"."Sales Amount (Actual)" WHERE("NPR Discount Type" = CONST(Period),
                                                                            "NPR Discount Code" = FIELD(Code),
                                                                            "Global Dimension 1 Code" = FIELD("Global Dimension 1 Code"),
                                                                            "Global Dimension 2 Code" = FIELD("Global Dimension 2 Code")));
@@ -378,21 +341,11 @@ table 6014413 "NPR Period Discount"
         CommentLine.SetRange("No.", Code);
         CommentLine.DeleteAll;
 
-        //+NPR-2.1
-
-        RecRef.GetTable(Rec);
-        CompanySyncMgt.OnDelete(RecRef);
-
         RetailComment.SetRange("Table ID", 6014414);
         RetailComment.SetRange("No.", Code);
         RetailComment.DeleteAll;
 
         DimMgt.DeleteDefaultDim(DATABASE::"NPR Period Discount", Code);
-
-        //-NPR70.00.01.00
-        //RecRef.GETTABLE(Rec);
-        //Changelog.OnDelete(RecRef);
-        //+NPR70.00.01.00
     end;
 
     trigger OnInsert()
@@ -412,30 +365,19 @@ table 6014413 "NPR Period Discount"
         if Date.Find('+') then
             "Ending Date" := Date."Period Start";
 
-        RecRef.GetTable(Rec);
-        CompanySyncMgt.OnInsert(RecRef);
-
         RetailSetup.Get;
 
         DimMgt.UpdateDefaultDim(
           DATABASE::"NPR Period Discount", Code,
           "Global Dimension 1 Code", "Global Dimension 2 Code");
 
-        //-NPR5.40 [294655]
         UpdateLines();
-        //+NPR5.40 [294655]
     end;
 
     trigger OnModify()
     begin
         "Last Date Modified" := Today;
-
-        RecRef.GetTable(Rec);
-        CompanySyncMgt.OnModify(RecRef);
-
-        //-NPR5.40 [294655]
         UpdateLines();
-        //+NPR5.40 [294655]
     end;
 
     trigger OnRename()
@@ -443,7 +385,6 @@ table 6014413 "NPR Period Discount"
         RetailComment: Record "NPR Retail Comment";
         RetailComment2: Record "NPR Retail Comment";
     begin
-        //IF Status = Status::Aktiv THEN ERROR(Text1060000);
         "Last Date Modified" := Today;
         PeriodDiscountLine.SetRange(Code, Code);
         if PeriodDiscountLine.Find('-') then
@@ -461,12 +402,6 @@ table 6014413 "NPR Period Discount"
                     RetailComment2.Modify(true);
             until RetailComment.Next = 0;
         RetailComment.DeleteAll;
-
-        //-NPR70.00.01.00
-        //RecRef.GETTABLE(Rec);
-        //xRecRef.GETTABLE(xRec);
-        //Changelog.OnRename(RecRef,xRecRef);
-        //+NPR70.00.01.00
     end;
 
     var
@@ -481,8 +416,6 @@ table 6014413 "NPR Period Discount"
         NoSeriesMgt: Codeunit NoSeriesManagement;
         PeriodDiscount: Record "NPR Period Discount";
         DimMgt: Codeunit DimensionManagement;
-        CompanySyncMgt: Codeunit "NPR CompanySyncManagement";
-        RecRef: RecordRef;
 
     procedure AssistEdit(PeriodDisc: Record "NPR Period Discount"): Boolean
     begin

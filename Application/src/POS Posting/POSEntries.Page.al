@@ -10,33 +10,6 @@ page 6150650 "NPR POS Entries"
     {
         area(content)
         {
-            field(AdvancedPostingWarning; TextAdvancedPostingOff)
-            {
-                ApplicationArea = All;
-                Caption = 'Advanced Posting Warning';
-                Editable = false;
-                MultiLine = false;
-                ShowCaption = false;
-                Style = Unfavorable;
-                StyleExpr = TRUE;
-                Visible = AdvancedPostingOff;
-                ToolTip = 'Specifies the value of the Advanced Posting Warning field';
-            }
-            field(ClicktoSeeAuditRoll; TextClicktoSeeAuditRoll)
-            {
-                ApplicationArea = All;
-                Caption = 'Click to See Audit Roll';
-                LookupPageID = "NPR POS Entries";
-                ShowCaption = false;
-                Visible = AdvancedPostingOff;
-                ToolTip = 'Specifies the value of the Click to See Audit Roll field';
-
-                trigger OnAssistEdit()
-                begin
-                    PAGE.Run(PAGE::"NPR Audit Roll");
-                    CurrPage.Close;
-                end;
-            }
             repeater(Group)
             {
                 field("POS Store Code"; "POS Store Code")
@@ -180,7 +153,7 @@ page 6150650 "NPR POS Entries"
                 Caption = '&Navigate';
                 Image = Navigate;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -199,7 +172,7 @@ page 6150650 "NPR POS Entries"
                 Caption = 'Post Entry';
                 Image = Post;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -226,7 +199,7 @@ page 6150650 "NPR POS Entries"
                 Caption = 'Post Range';
                 Image = PostBatch;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -298,7 +271,7 @@ page 6150650 "NPR POS Entries"
                     Caption = 'Sales Receipt';
                     Image = PrintCheck;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -325,7 +298,7 @@ page 6150650 "NPR POS Entries"
                     Caption = 'Large Sales Receipt';
                     Image = PrintCover;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -348,7 +321,7 @@ page 6150650 "NPR POS Entries"
                     Caption = 'Balancing';
                     Image = PrintReport;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -376,7 +349,7 @@ page 6150650 "NPR POS Entries"
                     Caption = 'EFT Receipt';
                     Image = PrintCheck;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -419,7 +392,7 @@ page 6150650 "NPR POS Entries"
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Send as PDF action';
                 }

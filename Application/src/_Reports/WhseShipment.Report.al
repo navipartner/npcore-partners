@@ -129,7 +129,7 @@ report 6014495 "NPR Whse. - Shipment"
     var
         Location: Record Location;
         BlobBuffer: Record "NPR BLOB buffer" temporary;
-        BarcodeLib: Codeunit "NPR Barcode Library";
+        BarcodeLib: Codeunit "NPR Barcode Image Library";
         TmpBarcode: Codeunit "Temp Blob";
         InStr: InStream;
         CurrReportPageNoCaptionLbl: Label 'Page';

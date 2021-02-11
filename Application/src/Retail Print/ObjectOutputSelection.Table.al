@@ -1,17 +1,5 @@
 table 6014580 "NPR Object Output Selection"
 {
-    // NPR4.15/MMV/20151002 CASE 223893 Added field 12 : Output Slave Path
-    //                                  Added option 'Web' to field 10.
-    // NPR5.22/MMV/20160317 CASE 228382 Added option 'E-mail', 'Google Print' to field 10.
-    //                                  Renamed option 'Web' to 'Epson Web'.
-    // NPR5.26/MMV /20160826 CASE 246209 Added lookup on GCP printers.
-    // NPR5.29/MMV /20161208 CASE 260621 Fixed messy lookup code.
-    // NPR5.29/MMV /20161220 CASE 241549 Renamed field 8
-    // NPR5.29/MMV /20161018 CASE 253590 Added new option 'HTTP' in field 10.
-    // NPR5.32/MMV /20170324 CASE 253590 Added new option 'Bluetooth' in field 10.
-    //                                   Removed field 12.
-    // NPR5.53/THRO/20200106 CASE 383562 Added new Option 'PrintNode PDF' and 'PrintNode Raw' in field 10
-
     Caption = 'Object Output Selection';
     DataClassification = CustomerContent;
 
@@ -76,15 +64,10 @@ table 6014580 "NPR Object Output Selection"
         {
             Caption = 'Output Path';
             DataClassification = CustomerContent;
-            //This property is currently not supported
-            //TestTableRelation = false;
-            //The property 'ValidateTableRelation' can only be set if the property 'TableRelation' is set
-            //ValidateTableRelation = false;
 
             trigger OnLookup()
             var
                 Printer: Record Printer;
-                GCPMgt: Codeunit "NPR GCP Mgt.";
                 PrintNodeMgt: Codeunit "NPR PrintNode Mgt.";
                 ID: Text;
             begin
@@ -95,19 +78,12 @@ table 6014580 "NPR Object Output Selection"
                                 "Output Path" := Printer.ID;
                         end;
 
-                    "Output Type"::"Google Print":
-                        begin
-                            if GCPMgt.LookupPrinters(ID) then
-                                "Output Path" := ID;
-                        end;
-                    //-NPR5.53 [383562]
                     "Output Type"::"PrintNode PDF",
                     "Output Type"::"PrintNode Raw":
                         begin
                             if PrintNodeMgt.LookupPrinter(ID) then
                                 "Output Path" := ID;
                         end;
-                //-NPR5.53 [383562]
 
                 end;
             end;

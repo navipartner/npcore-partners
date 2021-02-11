@@ -43,12 +43,12 @@ codeunit 6014531 "NPR Retail Logo Mgt."
         Encoding: DotNet NPRNetEncoding;
         FromDate: Date;
         ToDate: Date;
-        RetailFormCode: Codeunit "NPR Retail Form Code";
+        POSUnit: Record "NPR POS Unit";
     begin
         //Use RetailLogo.SETAUTOCALCFIELDS() on the blobs you need, before you call this function.
 
         if RegisterNo = '' then
-            RegisterNo := RetailFormCode.FetchRegisterNumber();
+            RegisterNo := POSUnit.GetCurrentPOSUnit();
 
         RetailLogo.SetRange(Keyword, KeywordIn);
         RetailLogo.SetRange("Register No.", RegisterNo);

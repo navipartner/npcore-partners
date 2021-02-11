@@ -1,12 +1,5 @@
 codeunit 6014413 "NPR Label Library"
 {
-    // NPR5.51/BHR /20190614 CASE 358287  Add retail print and Price label for Posted Purchase Invoice
-    // NPR5.51/MMV /20190906 CASE 367416 Skip obsolete fields in NAV2018+ when moving to temp buffer.
-    // NPR5.52/SARA/20190906 CASE 366969 Added 'Shelf Label' and 'Price Label' for Item Worksheet line
-    // NPR5.53/MHA /20191121 CASE 374290 Added function SetSelectionBuffer()
-    // NPR5.55/BHR /202020713 CASE 414268 Add retail print and Price label for warehouse activity line
-
-
     trigger OnRun()
     begin
     end;
@@ -81,10 +74,10 @@ codeunit 6014413 "NPR Label Library"
     var
         RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
         RecRef: RecordRef;
-        RetailFormCode: Codeunit "NPR Retail Form Code";
+        POSUnit: Record "NPR POS Unit";
     begin
         RetailReportSelectionMgt.SetRequestWindow(true);
-        RetailReportSelectionMgt.SetRegisterNo(RetailFormCode.FetchRegisterNumber);
+        RetailReportSelectionMgt.SetRegisterNo(POSUnit.GetCurrentPOSUnit());
         RecRef.GetTable(Bin);
         RetailReportSelectionMgt.RunObjects(RecRef, ReportType);
     end;
@@ -143,10 +136,6 @@ codeunit 6014413 "NPR Label Library"
             else
                 Error(Err_InvalidShippingLabel, RecRef.Caption);
         end
-    end;
-
-    local procedure "// Print Buffer Functions:"()
-    begin
     end;
 
     procedure ToggleLine(var RecRefIn: RecordRef)
@@ -483,10 +472,6 @@ codeunit 6014413 "NPR Label Library"
         //+NPR5.30 [262533]
     end;
 
-    local procedure "// Aux"()
-    begin
-    end;
-
     local procedure FieldIsObsolete(TableNo: Integer; FieldNo: Integer): Boolean
     var
         FieldRecRef: RecordRef;
@@ -512,7 +497,6 @@ codeunit 6014413 "NPR Label Library"
 
     local procedure PurchaseLineToRetailJnlLine(var PurchaseLine: Record "Purchase Line"; var RetailJnlLine: Record "NPR Retail Journal Line")
     var
-        AltNo: Record "NPR Alternative No.";
         DummyCust: Record Customer;
         Item: Record Item;
         ItemLedgerEntry: Record "Item Ledger Entry";
@@ -520,15 +504,14 @@ codeunit 6014413 "NPR Label Library"
         TempSalePOS: Record "NPR Sale POS" temporary;
         TempSaleLinePOS: Record "NPR Sale Line POS" temporary;
         POSSalesPriceCalcMgt: Codeunit "NPR POS Sales Price Calc. Mgt.";
-        RetailFormCode: Codeunit "NPR Retail Form Code";
         PurchaseUnit: Code[10];
         RegisterNo: Code[10];
         SalesUnit: Code[10];
         UnitPrice: Decimal;
         LineNo: Integer;
         GUID: Guid;
+        POSUnit: Record "NPR POS Unit";
     begin
-        //-NPR5.30 [262533]
         RetailJnlLine.Reset;
 
         with PurchaseLine do begin
@@ -539,7 +522,7 @@ codeunit 6014413 "NPR Label Library"
 
             PurchaseHeader.Get("Document Type", "Document No.");
 
-            RegisterNo := RetailFormCode.FetchRegisterNumber();
+            RegisterNo := POSUnit.GetCurrentPOSUnit();
             GUID := CreateGuid;
 
             repeat
@@ -549,21 +532,6 @@ codeunit 6014413 "NPR Label Library"
                 PurchaseUnit := Item."Purch. Unit of Measure";
 
                 if "Variant Code" <> '' then begin
-                    AltNo.SetCurrentKey("Variant Code");
-                    AltNo.SetRange("Variant Code", "Variant Code");
-                    if AltNo.FindFirst() then begin
-                        if AltNo."Sales Unit of Measure" <> '' then
-                            SalesUnit := AltNo."Sales Unit of Measure";
-                        if AltNo."Purch. Unit of Measure" <> '' then
-                            PurchaseUnit := AltNo."Purch. Unit of Measure";
-                    end;
-
-                    //-NPR5.45 [323705]
-                    // POSSalesPriceCalcMgt.GetItemSalesPrice(SalesPrice,'',"No.","Variant Code",Item."Base Unit of Measure",
-                    //                                    Item."Price Includes VAT",DummyCust);
-                    //
-                    // IF SalesPrice."Unit Price" <> 0 THEN
-                    //   UnitPrice := SalesPrice."Unit Price";
                     TempSaleLinePOS.Type := TempSaleLinePOS.Type::Item;
                     TempSaleLinePOS."No." := "No.";
                     TempSaleLinePOS."Variant Code" := "Variant Code";
@@ -574,7 +542,6 @@ codeunit 6014413 "NPR Label Library"
                     POSSalesPriceCalcMgt.FindItemPrice(TempSalePOS, TempSaleLinePOS);
                     if TempSaleLinePOS."Unit Price" <> 0 then
                         UnitPrice := TempSaleLinePOS."Unit Price";
-                    //+NPR5.45 [323705]
                 end;
 
                 if Item."Costing Method" = Item."Costing Method"::Specific then begin
@@ -599,16 +566,7 @@ codeunit 6014413 "NPR Label Library"
                             RetailJnlLine."Serial No." := ItemLedgerEntry."Serial No.";
                             RetailJnlLine."Item group" := Item."NPR Item Group";
                             RetailJnlLine.Validate("Variant Code", "Variant Code");
-                            //-NPR5.37 [294640]
-                            //RetailJnlLine."Size Filter"           := Size;
-                            //RetailJnlLine."Color Filter"          := Color;
-                            //+NPR5.37 [294640]
-                            //-NPR5.37 [289725]
                             RetailJnlLine.Insert(true);
-                        //        IF NOT RetailJnlLine.INSERT THEN
-                        //          RetailJnlLine.MODIFY;
-                        //+NPR5.37 [289725]
-
                         until ItemLedgerEntry.Next = 0;
                 end else begin
                     LineNo += 10000;
@@ -628,17 +586,12 @@ codeunit 6014413 "NPR Label Library"
                     RetailJnlLine."Purch. Unit of measure" := PurchaseUnit;
                     RetailJnlLine."Item group" := Item."NPR Item Group";
                     RetailJnlLine.Validate("Variant Code", "Variant Code");
-                    //-NPR5.37 [289725]
                     RetailJnlLine.Insert(true);
-                    //      IF NOT RetailJnlLine.INSERT THEN
-                    //        RetailJnlLine.MODIFY;
-                    //+NPR5.37 [289725]
                 end;
             until Next = 0;
         end;
 
         RetailJnlLine.SetRange("No.", Format(GUID));
-        //+NPR5.30 [262533]
     end;
 
     local procedure TransferLineToRetailJnlLine(var TransferLine: Record "Transfer Line"; var RetailJnlLine: Record "NPR Retail Journal Line")
@@ -648,9 +601,8 @@ codeunit 6014413 "NPR Label Library"
         Item: Record Item;
         RegisterNo: Code[10];
         ItemLedgerEntry: Record "Item Ledger Entry";
-        RetailFormCode: Codeunit "NPR Retail Form Code";
+        POSUnit: Record "NPR POS Unit";
     begin
-        //-NPR5.30 [262533]
         RetailJnlLine.Reset;
 
         with TransferLine do begin
@@ -659,7 +611,7 @@ codeunit 6014413 "NPR Label Library"
 
             TransferHeader.Get("Document No.");
 
-            RegisterNo := RetailFormCode.FetchRegisterNumber();
+            RegisterNo := POSUnit.GetCurrentPOSUnit();
             GUID := CreateGuid();
 
             repeat
@@ -678,11 +630,7 @@ codeunit 6014413 "NPR Label Library"
                             RetailJnlLine."Description 2" := "Description 2";
                             RetailJnlLine."Serial No." := ItemLedgerEntry."Serial No.";
                             RetailJnlLine.Validate("Variant Code", "Variant Code");
-                            //-NPR5.37 [289725]
                             RetailJnlLine.Insert(true);
-                        //        IF NOT RetailJnlLine.INSERT THEN
-                        //          RetailJnlLine.MODIFY;
-                        //+NPR5.37 [289725]
                         until ItemLedgerEntry.Next = 0;
                 end else begin
                     RetailJnlLine.Init;
@@ -694,25 +642,20 @@ codeunit 6014413 "NPR Label Library"
                     RetailJnlLine.Description := Description;
                     RetailJnlLine."Description 2" := "Description 2";
                     RetailJnlLine.Validate("Variant Code", "Variant Code");
-                    //-NPR5.37 [289725]
                     RetailJnlLine.Insert(true);
-                    //        IF NOT RetailJnlLine.INSERT THEN
-                    //          RetailJnlLine.MODIFY;
-                    //+NPR5.37 [289725]
                 end;
             until Next = 0;
         end;
 
         RetailJnlLine.SetRange("No.", Format(GUID));
-        //+NPR5.30 [262533]
     end;
 
     procedure ItemToRetailJnlLine(ItemNo: Code[20]; VariantCode: Code[10]; Quantity: Integer; PK: Code[40]; var RetailJournalLineOut: Record "NPR Retail Journal Line")
     var
         RetailJournalLine: Record "NPR Retail Journal Line";
-        RetailFormCode: Codeunit "NPR Retail Form Code";
         Item: Record Item;
         ItemLedgerEntry: Record "Item Ledger Entry";
+        POSUnit: Record "NPR POS Unit";
     begin
         //-NPR5.37 [289725]
         Item.Get(ItemNo);
@@ -723,7 +666,7 @@ codeunit 6014413 "NPR Label Library"
         RetailJournalLineOut.Init;
         RetailJournalLineOut."No." := PK;
         RetailJournalLineOut."Line No." := RetailJournalLine."Line No." + 10000;
-        RetailJournalLineOut."Register No." := RetailFormCode.FetchRegisterNumber();
+        RetailJournalLineOut."Register No." := POSUnit.GetCurrentPOSUnit();
         RetailJournalLineOut.Validate("Item No.", ItemNo);
         RetailJournalLineOut.Validate("Variant Code", VariantCode);
         RetailJournalLineOut."Quantity to Print" := Quantity;
@@ -744,27 +687,23 @@ codeunit 6014413 "NPR Label Library"
     procedure PrintRetailJournal(var JournalLine: Record "NPR Retail Journal Line"; ReportType: Integer)
     var
         RecRef: RecordRef;
-        RetailFormCode: Codeunit "NPR Retail Form Code";
         RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
         Skip: Boolean;
+        POSUnit: Record "NPR POS Unit";
     begin
-        //-NPR5.48 [327107]
         Commit; //Will send data to external device.
 
         OnBeforePrintRetailJournal(JournalLine, ReportType, Skip);
         if Skip then
             exit;
-        //+NPR5.48 [327107]
 
         RetailReportSelectionMgt.SetMatrixPrintIterationFieldNo(JournalLine.FieldNo("Quantity to Print"));
         RetailReportSelectionMgt.SetRequestWindow(true);
-        RetailReportSelectionMgt.SetRegisterNo(RetailFormCode.FetchRegisterNumber);
+        RetailReportSelectionMgt.SetRegisterNo(POSUnit.GetCurrentPOSUnit());
         RecRef.GetTable(JournalLine);
         RetailReportSelectionMgt.RunObjects(RecRef, ReportType);
 
-        //-NPR5.48 [327107]
         OnAfterPrintRetailJournal(JournalLine, ReportType);
-        //+NPR5.48 [327107]
     end;
 
     local procedure PrintPurchaseOrder(var PurchLine: Record "Purchase Line"; ReportType: Integer)
@@ -834,14 +773,13 @@ codeunit 6014413 "NPR Label Library"
         Item: Record Item;
         RegisterNo: Code[10];
         ItemLedgerEntry: Record "Item Ledger Entry";
-        RetailFormCode: Codeunit "NPR Retail Form Code";
+        POSUnit: Record "NPR POS Unit";
     begin
-        //-NPR5.43 [317852]
         RetailJnlLine.Reset;
         with ItemJournalLine do begin
             if not FindSet then
                 exit;
-            RegisterNo := RetailFormCode.FetchRegisterNumber();
+            RegisterNo := POSUnit.GetCurrentPOSUnit();
             GUID := CreateGuid();
             repeat
                 Item.Get("Item No.");
@@ -874,7 +812,6 @@ codeunit 6014413 "NPR Label Library"
             until Next = 0;
         end;
         RetailJnlLine.SetRange("No.", Format(GUID));
-        //+NPR5.43 [317852]
     end;
 
     local procedure PrintTransferShipment(var TransferShipmentLine: Record "Transfer Shipment Line"; ReportType: Integer)
@@ -882,12 +819,10 @@ codeunit 6014413 "NPR Label Library"
         TempRetailJnlNo: Code[40];
         RetailJournalCode: Codeunit "NPR Retail Journal Code";
     begin
-        //-NPR5.46 [294354]
         Evaluate(TempRetailJnlNo, CreateGuid);
         RetailJournalCode.SetRetailJnlTemp(TempRetailJnlNo);
         RetailJournalCode.CopyTransferShipment2RetailJnlLines(TransferShipmentLine, TempRetailJnlNo);
         FlushJournalToPrinter(TempRetailJnlNo, ReportType);
-        //+NPR5.46 [294354]
     end;
 
     local procedure PrintTransferReceipt(var TransferReceiptLine: Record "Transfer Receipt Line"; ReportType: Integer)
@@ -895,12 +830,10 @@ codeunit 6014413 "NPR Label Library"
         TempRetailJnlNo: Code[40];
         RetailJournalCode: Codeunit "NPR Retail Journal Code";
     begin
-        //-NPR5.46 [294354]
         Evaluate(TempRetailJnlNo, CreateGuid);
         RetailJournalCode.SetRetailJnlTemp(TempRetailJnlNo);
         RetailJournalCode.CopyTransferReceipt2RetailJnlLines(TransferReceiptLine, TempRetailJnlNo);
         FlushJournalToPrinter(TempRetailJnlNo, ReportType);
-        //+NPR5.46 [294354]
     end;
 
     local procedure PrintPeriodDiscount(var PeriodDiscountLine: Record "NPR Period Discount Line"; ReportType: Integer)
@@ -908,19 +841,16 @@ codeunit 6014413 "NPR Label Library"
         TempRetailJnlNo: Code[40];
         RetailJournalCode: Codeunit "NPR Retail Journal Code";
     begin
-        //-NPR5.46 [294354]
         Evaluate(TempRetailJnlNo, CreateGuid);
         RetailJournalCode.SetRetailJnlTemp(TempRetailJnlNo);
         RetailJournalCode.CopyCampaign2RetailJnlLines(PeriodDiscountLine, TempRetailJnlNo);
         FlushJournalToPrinter(TempRetailJnlNo, ReportType);
-        //+NPR5.46 [294354]
     end;
 
     local procedure FlushJournalToPrinter(RetailJournalCode: Code[40]; ReportType: Integer)
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
     begin
-        //-NPR5.46 [294354]
         if RetailJournalCode = '' then
             exit;
         RetailJnlLine.SetRange("No.", RetailJournalCode);
@@ -929,7 +859,6 @@ codeunit 6014413 "NPR Label Library"
 
         PrintRetailJournal(RetailJnlLine, ReportType);
         RetailJnlLine.DeleteAll;
-        //+NPR5.46 [294354]
     end;
 
     local procedure PrintPostedPurchaseInvoice(var PurchInvLine: Record "Purch. Inv. Line"; ReportType: Integer)
@@ -942,20 +871,17 @@ codeunit 6014413 "NPR Label Library"
         RetailJournalCode.SetRetailJnlTemp(TempRetailJnlNo);
         RetailJournalCode.CopyPostedPurchaseInv2RetailJnlLines(PurchInvLine, TempRetailJnlNo);
         FlushJournalToPrinter(TempRetailJnlNo, ReportType);
-        //+NPR5.46 [294354]
     end;
 
     local procedure PrintItemWorksheetLine(var ItemWorksheetLine: Record "NPR Item Worksheet Line"; ReportType: Integer)
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
     begin
-        //-NPR5.52 [366969]
         ItemWorksheetLineToRetailJnlLine(ItemWorksheetLine, RetailJnlLine);
         if ItemWorksheetLine.FindSet then begin
             PrintRetailJournal(RetailJnlLine, ReportType);
             RetailJnlLine.DeleteAll;
         end;
-        //+NPR5.52 [366969]
     end;
 
     local procedure ItemWorksheetLineToRetailJnlLine(var ItemWorksheetLine: Record "NPR Item Worksheet Line"; var RetailJnlLine: Record "NPR Retail Journal Line")
@@ -964,14 +890,13 @@ codeunit 6014413 "NPR Label Library"
         Item: Record Item;
         RegisterNo: Code[10];
         ItemLedgerEntry: Record "Item Ledger Entry";
-        RetailFormCode: Codeunit "NPR Retail Form Code";
+        POSUnit: Record "NPR POS Unit";
     begin
-        //-NPR5.52 [366969]
         RetailJnlLine.Reset;
         with ItemWorksheetLine do begin
             if not FindSet then
                 exit;
-            RegisterNo := RetailFormCode.FetchRegisterNumber();
+            RegisterNo := POSUnit.GetCurrentPOSUnit();
             GUID := CreateGuid();
             repeat
                 if not Item.Get("Item No.") then
@@ -1005,7 +930,6 @@ codeunit 6014413 "NPR Label Library"
             until Next = 0;
         end;
         RetailJnlLine.SetRange("No.", Format(GUID));
-        //+NPR5.52 [366969]
     end;
 
     local procedure PrintWarehouseActivityLine(var WarehouseActivityLine: Record "Warehouse Activity Line"; ReportType: Integer)
@@ -1013,16 +937,10 @@ codeunit 6014413 "NPR Label Library"
         TempRetailJnlNo: Code[40];
         RetailJournalCode: Codeunit "NPR Retail Journal Code";
     begin
-        //-NPR5.55 [414268]
         Evaluate(TempRetailJnlNo, CreateGuid);
         RetailJournalCode.SetRetailJnlTemp(TempRetailJnlNo);
         RetailJournalCode.CopyInventoryPutAway2RetailJnlLines(WarehouseActivityLine, TempRetailJnlNo);
         FlushJournalToPrinter(TempRetailJnlNo, ReportType);
-        //+NPR5.55 [414268]
-    end;
-
-    local procedure "// Event Publishers"()
-    begin
     end;
 
     [IntegrationEvent(false, false)]

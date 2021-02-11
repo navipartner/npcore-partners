@@ -133,5 +133,59 @@ table 6150653 "NPR POS Posting Profile"
                 exit('<');
         end;
     end;
+
+    procedure CheckPostingDateAllowed(TestDate: Date): Boolean
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        UserSetup: Record "User Setup";
+        PostingAllowedFrom: Date;
+        PostingAllowedTo: Date;
+    begin
+        GeneralLedgerSetup.Get;
+        if UserId <> '' then
+            if UserSetup.Get(UserId) then begin
+                PostingAllowedFrom := UserSetup."Allow Posting From";
+                PostingAllowedTo := UserSetup."Allow Posting To";
+            end;
+        if (PostingAllowedFrom = 0D) and (PostingAllowedTo = 0D) then begin
+            PostingAllowedFrom := GeneralLedgerSetup."Allow Posting From";
+            PostingAllowedTo := GeneralLedgerSetup."Allow Posting To";
+        end;
+        if PostingAllowedTo = 0D then
+            PostingAllowedTo := DMY2Date(31, 12, 9999);
+        if (TestDate < PostingAllowedFrom) or (TestDate > PostingAllowedTo) then
+            exit(false)
+        else
+            exit(true);
+    end;
+
+    procedure EditPostingDateAllowed(UserIDCode: Code[20]; Date2: Date)
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        UserSetup: Record "User Setup";
+    begin
+        if UserIDCode <> '' then begin
+            if UserSetup.Get(UserIDCode) then begin
+                if UserSetup."Allow Posting From" > Date2 then begin
+                    UserSetup."Allow Posting From" := Date2;
+                    UserSetup.Modify(true);
+                end;
+                if UserSetup."Allow Posting To" < Date2 then begin
+                    UserSetup."Allow Posting To" := Date2;
+                    UserSetup.Modify(true);
+                end;
+            end;
+        end;
+
+        GeneralLedgerSetup.Get;
+        if GeneralLedgerSetup."Allow Posting From" > Date2 then begin
+            GeneralLedgerSetup."Allow Posting From" := Date2;
+            GeneralLedgerSetup.Modify(true);
+        end;
+        if GeneralLedgerSetup."Allow Posting To" < Date2 then begin
+            GeneralLedgerSetup."Allow Posting To" := Date2;
+            GeneralLedgerSetup.Modify(true);
+        end;
+    end;
 }
 

@@ -337,7 +337,7 @@ table 6014414 "NPR Period Discount Line"
 
             trigger OnLookup()
             var
-                BarcodeLibrary: Codeunit "NPR Barcode Library";
+                BarcodeLibrary: Codeunit "NPR Barcode Lookup Mgt.";
             begin
                 BarcodeLibrary.CallItemRefNoLookupPeriodicDiscount(Rec);
             end;

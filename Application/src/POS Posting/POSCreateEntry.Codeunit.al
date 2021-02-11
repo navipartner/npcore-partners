@@ -202,8 +202,6 @@ codeunit 6150614 "NPR POS Create Entry"
     local procedure InsertPOSSaleLine(SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS"; POSEntry: Record "NPR POS Entry"; ReverseSign: Boolean; var POSSalesLine: Record "NPR POS Sales Line")
     var
         POSSalesLine2: Record "NPR POS Sales Line";
-        GiftVoucher: Record "NPR Gift Voucher";
-        CreditVoucher: Record "NPR Credit Voucher";
         PricesIncludeTax: Boolean;
         POSEntrySalesDocLinkMgt: Codeunit "NPR POS Entry S.Doc. Link Mgt.";
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
@@ -386,17 +384,6 @@ codeunit 6150614 "NPR POS Create Entry"
                 "VAT Difference" := -"VAT Difference";
             end;
 
-            if SaleLinePOS."Gift Voucher Ref." <> '' then begin
-                GiftVoucher.Get(SaleLinePOS."Gift Voucher Ref.");
-                GiftVoucher.CreateFromPOSSalesLine(POSSalesLine);
-                GiftVoucher.Modify;
-            end;
-            if SaleLinePOS."Credit voucher ref." <> '' then begin
-                CreditVoucher.Get(SaleLinePOS."Credit voucher ref.");
-                CreditVoucher.CreateFromPOSSalesLine(POSSalesLine);
-                CreditVoucher.Modify;
-            end;
-
             OnBeforeInsertPOSSalesLine(SalePOS, SaleLinePOS, POSEntry, POSSalesLine);
             Insert;
         end;
@@ -406,8 +393,6 @@ codeunit 6150614 "NPR POS Create Entry"
     local procedure InsertPOSPaymentLine(SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS"; POSEntry: Record "NPR POS Entry"; var POSPaymentLine: Record "NPR POS Payment Line")
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
-        GiftVoucher: Record "NPR Gift Voucher";
-        CreditVoucher: Record "NPR Credit Voucher";
     begin
         with POSPaymentLine do begin
             Init;
@@ -457,19 +442,6 @@ codeunit 6150614 "NPR POS Create Entry"
 
             "Applies-to Doc. Type" := SaleLinePOS."Buffer Document Type";
             "Applies-to Doc. No." := SaleLinePOS."Buffer Document No.";
-
-            "External Document No." := SaleLinePOS."External Document No.";
-
-            if SaleLinePOS."Gift Voucher Ref." <> '' then begin
-                GiftVoucher.Get(SaleLinePOS."Gift Voucher Ref.");
-                GiftVoucher.LinkToPOSPaymentLine(POSPaymentLine);
-                GiftVoucher.Modify;
-            end;
-            if SaleLinePOS."Credit voucher ref." <> '' then begin
-                CreditVoucher.Get(SaleLinePOS."Credit voucher ref.");
-                CreditVoucher.LinkToPOSPaymentLine(POSPaymentLine);
-                CreditVoucher.Modify;
-            end;
 
             "VAT Base Amount (LCY)" := SaleLinePOS."Amount Including VAT";
             if (SaleLinePOS."VAT Base Amount" <> 0) then begin

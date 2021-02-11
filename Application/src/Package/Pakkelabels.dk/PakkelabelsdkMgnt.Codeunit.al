@@ -661,7 +661,6 @@ codeunit 6014490 "NPR Pakkelabels.dk Mgnt"
     local procedure C80OnBeforePostSalesDoc(var SalesHeader: Record "Sales Header")
     var
         ShipmentDocument: Record "NPR Pacsoft Shipment Document";
-        RetailCodeunitCode: Codeunit "NPR Std. Codeunit Code";
         RecRefSalesHeader: RecordRef;
     begin
         if not InitPackageProvider() then

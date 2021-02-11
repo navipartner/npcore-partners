@@ -107,9 +107,8 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
     local procedure PrintReceiptText(var TemplateLine: Record "NPR RP Template Line"; RecordID: RecordID)
     var
         LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
-        Utility: Codeunit "NPR Utility";
+        Utility: Codeunit "NPR Receipt Footer Mgt.";
         tmpRetailComment: Record "NPR Retail Comment" temporary;
-        RetailFormCode: Codeunit "NPR Retail Form Code";
         Register: Record "NPR Register";
         RecRef: RecordRef;
         AuditRoll: Record "NPR Audit Roll";
@@ -117,13 +116,6 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
         POSUnit: Record "NPR POS Unit";
     begin
         case RecordID.TableNo of
-            DATABASE::"NPR Audit Roll":
-                begin
-                    RecRef := RecordID.GetRecord();
-                    RecRef.SetTable(AuditRoll);
-                    AuditRoll.Find;
-                    Register.Get(AuditRoll."Register No.");
-                end;
             DATABASE::"NPR POS Entry":
                 begin
                     RecRef := RecordID.GetRecord();

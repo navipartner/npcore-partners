@@ -2,6 +2,7 @@ table 6184862 "NPR Azure Storage Cogn. Search"
 {
     Caption = 'Azure Storage Cognitive Search';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
 
     fields
     {

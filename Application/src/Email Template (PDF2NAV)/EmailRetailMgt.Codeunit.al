@@ -23,8 +23,6 @@ codeunit 6014474 "NPR E-mail Retail Mgt."
     local procedure GetEmailAddressFromRecRef(var RecRef: RecordRef): Text
     var
         POSEntry: Record "NPR POS Entry";
-        GiftVoucher: Record "NPR Gift Voucher";
-        CreditVoucher: Record "NPR Credit Voucher";
         Customer: Record Customer;
         Contact: Record Contact;
     begin
@@ -46,30 +44,6 @@ codeunit 6014474 "NPR E-mail Retail Mgt."
                     end;
 
                 end;
-            DATABASE::"NPR Gift Voucher":
-                begin
-                    RecRef.SetTable(GiftVoucher);
-                    case GiftVoucher."Customer Type" of
-                        GiftVoucher."Customer Type"::Alm:
-                            if Customer.Get(GiftVoucher."Customer No.") then
-                                exit(Customer."E-Mail");
-                        GiftVoucher."Customer Type"::Kontant:
-                            if Contact.Get(GiftVoucher."Customer No.") then
-                                exit(Contact."E-Mail");
-                    end;
-                end;
-            DATABASE::"NPR Credit Voucher":
-                begin
-                    RecRef.SetTable(CreditVoucher);
-                    case CreditVoucher."Customer Type" of
-                        CreditVoucher."Customer Type"::Alm:
-                            if Customer.Get(CreditVoucher."Customer No") then
-                                exit(Customer."E-Mail");
-                        CreditVoucher."Customer Type"::Kontant:
-                            if Contact.Get(CreditVoucher."Customer No") then
-                                exit(Contact."E-Mail");
-                    end;
-                end;
         end;
     end;
 
@@ -88,10 +62,6 @@ codeunit 6014474 "NPR E-mail Retail Mgt."
     begin
         Clear(RetailReportSelection);
         case RecRef.Number of
-            DATABASE::"NPR Gift Voucher":
-                RetailReportSelection.SetRange("Report Type", RetailReportSelection."Report Type"::"Gift Voucher");
-            DATABASE::"NPR Credit Voucher":
-                RetailReportSelection.SetRange("Report Type", RetailReportSelection."Report Type"::"Credit Voucher");
             DATABASE::"NPR POS Entry":
                 RetailReportSelection.SetRange("Report Type", RetailReportSelection."Report Type"::"Large Sales Receipt (POS Entry)");
             else
@@ -111,71 +81,9 @@ codeunit 6014474 "NPR E-mail Retail Mgt."
     begin
         RecRef.GetTable(RecVariant);
         case RecRef.Number of
-            DATABASE::"NPR Credit Voucher":
-                SendReportCreditVoucher(RecVariant, Silent);
-            DATABASE::"NPR Gift Voucher":
-                SendReportGiftVoucher(RecVariant, Silent);
             DATABASE::"NPR POS Entry":
                 SendReportPOSEntry(RecVariant, Silent);
         end;
-    end;
-
-    procedure SendReportCreditVoucher(var CreditVoucher: Record "NPR Credit Voucher"; Silent: Boolean)
-    var
-        Customer: Record Customer;
-        EmailMgt: Codeunit "NPR E-mail Management";
-        RecRef: RecordRef;
-        ReportID: Integer;
-        Contact: Record Contact;
-        EmailAddr: Text;
-    begin
-        RecRef.GetTable(CreditVoucher);
-        if not EmailMgt.ConfirmResendEmail(RecRef) then
-            exit;
-
-        ReportID := EmailMgt.GetReportIDFromRecRef(RecRef);
-        if ReportID = 0 then
-            exit;
-
-        case CreditVoucher."Customer Type" of
-            CreditVoucher."Customer Type"::Alm:
-                if Customer.Get(CreditVoucher."Customer No") then
-                    EmailAddr := Customer."E-Mail";
-            CreditVoucher."Customer Type"::Kontant:
-                if Contact.Get(CreditVoucher."Customer No") then
-                    EmailAddr := Contact."E-Mail";
-        end;
-
-        EmailMgt.SendReport(ReportID, RecRef, EmailAddr, Silent);
-    end;
-
-    procedure SendReportGiftVoucher(var GiftVoucher: Record "NPR Gift Voucher"; Silent: Boolean)
-    var
-        Customer: Record Customer;
-        EmailMgt: Codeunit "NPR E-mail Management";
-        RecRef: RecordRef;
-        ReportID: Integer;
-        Contact: Record Contact;
-        EmailAddr: Text;
-    begin
-        RecRef.GetTable(GiftVoucher);
-        if not EmailMgt.ConfirmResendEmail(RecRef) then
-            exit;
-
-        ReportID := EmailMgt.GetReportIDFromRecRef(RecRef);
-        if ReportID = 0 then
-            exit;
-
-        case GiftVoucher."Customer Type" of
-            GiftVoucher."Customer Type"::Alm:
-                if Customer.Get(GiftVoucher."Customer No.") then
-                    EmailAddr := Customer."E-Mail";
-            GiftVoucher."Customer Type"::Kontant:
-                if Contact.Get(GiftVoucher."Customer No.") then
-                    EmailAddr := Contact."E-Mail";
-        end;
-
-        EmailMgt.SendReport(ReportID, RecRef, EmailAddr, Silent);
     end;
 
     local procedure SendReportPOSEntry(var PosEntry: Record "NPR POS Entry"; Silent: Boolean)

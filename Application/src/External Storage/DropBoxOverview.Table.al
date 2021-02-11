@@ -2,6 +2,7 @@ table 6184871 "NPR DropBox Overview"
 {
     Caption = 'DropBox Overview';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
 
     fields
     {
@@ -9,7 +10,6 @@ table 6184871 "NPR DropBox Overview"
         {
             Caption = 'DropBox Account Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR DropBox API Setup";
         }
         field(10; "File Name"; Text[250])
         {

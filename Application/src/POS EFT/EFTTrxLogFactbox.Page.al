@@ -1,14 +1,11 @@
 page 6184473 "NPR EFT Trx Log Factbox"
 {
-    // NPR5.53/MMV /20191120 CASE 377533 Created object
-
     Caption = 'EFT Transaction Logs';
     DeleteAllowed = false;
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "NPR EFT Transaction Log";
 
     layout
@@ -46,7 +43,7 @@ page 6184473 "NPR EFT Trx Log Factbox"
                 Caption = 'Download';
                 Image = CreateXMLFile;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

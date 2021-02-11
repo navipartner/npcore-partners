@@ -60,7 +60,6 @@ codeunit 6060041 "NPR Item Worksheet Item Mgt."
     local procedure FindItemNo(ItemRefNo: Code[50]; AltNo: Code[50]; VendorsItemNo: Code[20]; OurVendorNo: Code[20]; var OurItemNo: Code[20]; var OurVariantCode: Code[20]) found: Boolean
     var
         ItemRef: Record "Item Reference";
-        AlternativeNo: Record "NPR Alternative No.";
         Item: Record Item;
     begin
         if ItemRefNo <> '' then begin
@@ -71,17 +70,6 @@ codeunit 6060041 "NPR Item Worksheet Item Mgt."
             if ItemRef.FindFirst then begin
                 OurItemNo := ItemRef."Item No.";
                 OurVariantCode := ItemRef."Variant Code";
-                exit(true);
-            end;
-        end;
-
-        if AltNo <> '' then begin
-            AlternativeNo.SetCurrentKey("Alt. No.", Type);
-            AlternativeNo.SetRange("Alt. No.", AltNo);
-            AlternativeNo.SetRange(Type, AlternativeNo.Type::Item);
-            if AlternativeNo.FindFirst then begin
-                OurItemNo := AlternativeNo.Code;
-                OurVariantCode := AlternativeNo."Variant Code";
                 exit(true);
             end;
         end;

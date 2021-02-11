@@ -909,7 +909,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
     var
         Item: Record Item;
         ItemReference: Record "Item Reference";
-        AlternativeNo: Record "NPR Alternative No.";
         ItemVariant: Record "Item Variant";
     begin
 
@@ -939,26 +938,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                 exit(true);
             end;
         end;
-
-        with AlternativeNo do begin
-            if (StrLen(Barcode) <= MaxStrLen("Alt. No.")) then begin
-                SetCurrentKey("Alt. No.", Type);
-                SetFilter("Alt. No.", '=%1', UpperCase(Barcode));
-                SetFilter(Type, '=%1', Type::Item);
-                if (FindFirst()) then begin
-                    if (not Item.Get(Code)) then
-                        exit(false);
-                    if ("Variant Code" <> '') then
-                        if (not ItemVariant.Get(Code, "Variant Code")) then
-                            exit(false);
-                    ResolvingTable := DATABASE::"NPR Alternative No.";
-                    ItemNo := Code;
-                    VariantCode := "Variant Code";
-                    exit(true);
-                end;
-            end;
-        end;
-
         exit(false);
     end;
 

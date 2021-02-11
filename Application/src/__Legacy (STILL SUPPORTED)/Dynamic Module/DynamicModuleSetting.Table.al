@@ -1,9 +1,8 @@
 table 6014480 "NPR Dynamic Module Setting"
 {
-    // NPR5.38/NPKNAV/20180126  CASE 294992 Transport NPR5.38 - 26 January 2018
-
     Caption = 'Dynamic Module Setting';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
 
     fields
     {

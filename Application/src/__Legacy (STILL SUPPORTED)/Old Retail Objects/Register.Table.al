@@ -4,6 +4,8 @@ table 6014401 "NPR Register"
     DataClassification = CustomerContent;
     LookupPageID = "NPR Register List";
     Permissions =;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Replaced with POS Unit, POS store, POS unit profiles';
 
     fields
     {
@@ -15,9 +17,12 @@ table 6014401 "NPR Register"
 
             trigger OnValidate()
             var
-                RetailTableCode: Codeunit "NPR Retail Table Code";
+                Int: Integer;
+                Dec: Decimal;
             begin
-                RetailTableCode.RegisterCheckNo("Register No.");
+                if not (Evaluate(Int, "Register No.") and Evaluate(Dec, "Register No.")) then
+                    if not (int = dec) then
+                        FieldError("Register No.");
             end;
         }
         field(2; Status; Option)
@@ -1144,9 +1149,12 @@ table 6014401 "NPR Register"
 
     trigger OnInsert()
     var
-        RetailTableCode: Codeunit "NPR Retail Table Code";
+        Int: Integer;
+        Dec: Decimal;
     begin
-        RetailTableCode.RegisterCheckNo("Register No.");
+        if not (Evaluate(Int, "Register No.") and Evaluate(Dec, "Register No.")) then
+            if not (int = dec) then
+                FieldError("Register No.");
     end;
 
     trigger OnRename()
@@ -1214,72 +1222,6 @@ table 6014401 "NPR Register"
                     end;
                 end;
         end;
-    end;
-
-    procedure CreateNewRegister()
-    var
-        t000: Label 'Create new register';
-        t001: Label 'Password';
-        t002: Label 'Create register no.';
-        t003: Label 'Primo amount';
-        PageAction: Action;
-        InputDialog: Page "NPR Input Dialog";
-        Pwd: Code[10];
-        RegNo: Code[10];
-        PaymentTypePOS: Record "NPR Payment Type POS";
-        Register: Record "NPR Register";
-        Primo: Decimal;
-        Text10600006: Label 'You must create a payment option to cash sales!';
-        Text10600007: Label 'You must create a payment choice for the journal entry for gift cards!';
-        Text10600008: Label 'You must create a payment choice for the journal entry for vouchers!';
-        CompInf: Record "Company Information";
-        RetailTableCode: Codeunit "NPR Retail Table Code";
-    begin
-        Pwd := '';
-        RegNo := '';
-        Primo := 0;
-
-        InputDialog.Caption := t000;
-
-        repeat
-            Pwd := '';
-            InputDialog.SetInput(1, Pwd, t001);
-            InputDialog.SetInput(2, RegNo, t002);
-            InputDialog.SetInput(3, Primo, t003);
-            PageAction := InputDialog.RunModal();
-            InputDialog.InputCode(1, Pwd);
-            InputDialog.InputCode(2, RegNo);
-            InputDialog.InputDecimal(3, Primo);
-            Clear(InputDialog);
-        until (Pwd = '4552') or (Pwd = '1304') or (PageAction <> ACTION::OK);
-
-        RetailTableCode.RegisterCheckNo(RegNo);
-
-        Register.Init;
-        Register."Register No." := RegNo;
-
-        RetailSetup.Get();
-        if RetailSetup."Payment Type By Register" then
-            PaymentTypePOS.SetRange("Register No.", RegNo);
-
-        PaymentTypePOS.SetRange("Processing Type", PaymentTypePOS."Processing Type"::Cash);
-        if not PaymentTypePOS.Find('-') then
-            Error(Text10600006);
-
-        Register.Account := PaymentTypePOS."G/L Account No.";
-
-        PaymentTypePOS.SetRange("Processing Type", PaymentTypePOS."Processing Type"::"Gift Voucher");
-        if not PaymentTypePOS.Find('-') then
-            Error(Text10600007);
-
-        Register."Gift Voucher Account" := PaymentTypePOS."G/L Account No.";
-
-        PaymentTypePOS.SetRange("Processing Type", PaymentTypePOS."Processing Type"::"Credit Voucher");
-        if not PaymentTypePOS.Find('-') then
-            Error(Text10600008);
-
-        Register."Credit Voucher Account" := PaymentTypePOS."G/L Account No.";
-        Register.Insert;
     end;
 
     procedure DimsAreDiscontinuedOnRegister()

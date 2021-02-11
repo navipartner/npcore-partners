@@ -796,10 +796,6 @@ table 6060043 "NPR Item Worksh. Variant Line"
         ItemWorksheetTemplate.Get("Worksheet Template Name");
         if "Internal Bar Code" <> '' then
             case ItemWorksheetTemplate."Create Internal Barcodes" of
-                ItemWorksheetTemplate."Create Internal Barcodes"::"As Alt. No.":
-                    begin
-                        ItemNumberManagement.UpdateBarcode("Item No.", "Variant Code", "Internal Bar Code", 0);
-                    end;
                 ItemWorksheetTemplate."Create Internal Barcodes"::"As Cross Reference":
                     begin
                         ItemNumberManagement.UpdateBarcode("Item No.", "Variant Code", "Internal Bar Code", 1);
@@ -807,10 +803,6 @@ table 6060043 "NPR Item Worksh. Variant Line"
             end;
         if "Vendors Bar Code" <> '' then
             case ItemWorksheetTemplate."Create Vendor  Barcodes" of
-                ItemWorksheetTemplate."Create Vendor  Barcodes"::"As Alt. No.":
-                    begin
-                        ItemNumberManagement.UpdateBarcode("Item No.", "Variant Code", "Vendors Bar Code", 0);
-                    end;
                 ItemWorksheetTemplate."Create Vendor  Barcodes"::"As Cross Reference":
                     begin
                         ItemNumberManagement.UpdateBarcode("Item No.", "Variant Code", "Vendors Bar Code", 1);

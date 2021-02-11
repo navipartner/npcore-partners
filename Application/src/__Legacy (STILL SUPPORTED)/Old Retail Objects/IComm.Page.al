@@ -254,7 +254,6 @@ page 6014516 "NPR I-Comm"
     }
 
     var
-        "I-Comm": Codeunit "NPR I-Comm";
         msgConfigFilePDFAppCreate: Label 'Config File successfully created for PDF Application.';
         errConfigFilePDFAppCreate: Label 'Error creating Config File for PDF Application.';
         TextPhoneLook: Label 'Please select appropriate Phone Lookup codeunit ';

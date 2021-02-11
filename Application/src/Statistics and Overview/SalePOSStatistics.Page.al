@@ -1,10 +1,5 @@
 page 6014410 "NPR Sale POS - Statistics"
 {
-    // NPR4.12/JDH/20150703 CASE 217884 Caption changed
-    // NPR5.35/TJ /20170823 CASE 286283 Renamed variables/function into english and into proper naming terminology
-    //                                  Removed unused variables
-    // NPR5.40/BHR /20180316 CASE 308385 Removed unused function CallSub
-
     UsageCategory = None;
     Caption = 'Sales Statistics';
     SourceTable = "NPR Sale POS";
@@ -38,19 +33,15 @@ page 6014410 "NPR Sale POS - Statistics"
         InsuranceProfit: Decimal;
         AverageAuditRollSaleAmt: Decimal;
         NoOfAuditRollRecords: Integer;
-        Utility: Codeunit "NPR Utility";
+        Utility: Codeunit "NPR Receipt Footer Mgt.";
 
     procedure EnableMenu()
     begin
-        //EnableMenu
-
-        //CurrForm.CAPTION("Eksp. Caption");
         CalculatePotentialInvoiceDiscount(Rec);
     end;
 
     procedure SaleLineStatistics()
     begin
-        //SaleLineStatistics
         SaleLinePOS.SetRange("Register No.", "Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
         SaleLinePOS.SetRange(Date, Date);
@@ -77,13 +68,6 @@ page 6014410 "NPR Sale POS - Statistics"
             DG := 0;
 
         CalculateSaleLineNoAmount("Register No.", Date);
-
-        if RetailContractSetup.Get then begin
-            InsuranceCost := RetailContractMgt.CalcInsCost(Rec, InsuranceCompanyCode);
-            InsuranceProfit := RetailContractMgt.GetInsuranceProfit;
-            ShowFoto(true);
-        end else
-            ShowFoto(false);
     end;
 
     procedure CalculatePotentialInvoiceDiscount(var SalePOS: Record "NPR Sale POS")
@@ -98,7 +82,6 @@ page 6014410 "NPR Sale POS - Statistics"
         CurrencyFactor: Decimal;
         CurrencyDate: Date;
     begin
-        //CalculatePotentialInvoiceDiscount
         InvoiceDiscountAmt := 0;
         InvoiceFee := 0;
 
@@ -171,7 +154,6 @@ page 6014410 "NPR Sale POS - Statistics"
     var
         PaymentTypePOS: Record "NPR Payment Type POS";
     begin
-        //CalculateSaleLineNoAmount
         if RegisterFilter <> '' then
             PaymentTypePOS.SetFilter("Register Filter", RegisterFilter)
         else
@@ -194,7 +176,6 @@ page 6014410 "NPR Sale POS - Statistics"
 
     procedure Initialize(StatMenu: Integer)
     begin
-        //OnInit
         FilterGroup(2);
         SetRange("Register No.", "Register No.");
         SetRange("Sales Ticket No.", "Sales Ticket No.");
@@ -203,117 +184,9 @@ page 6014410 "NPR Sale POS - Statistics"
         if RetailContractSetup.Get then
             InsuranceCompanyCode := RetailContractSetup."Default Insurance Company";
 
-        //CurrForm.Kassenummer.VISIBLE( TRUE );
         EnableMenu;
         SaleLineStatistics;
     end;
 
-    procedure ShowFoto(Show: Boolean)
-    begin
-        //CurrForm.Forsikringsselskab.VISIBLE( Show );
-        //CurrForm.Forsikringssum.VISIBLE( Show );
-        //CurrForm.Forsikringsavance.VISIBLE( Show );
-        //CurrForm.txtForsikringsselskab.VISIBLE( Show );
-        //CurrForm.txtForsikringssum.VISIBLE( Show );
-        //CurrForm.txtForsikringsavance.VISIBLE( Show );
-    end;
-
-    procedure GetSaleLineStat(var NPRTempBuffer: Record "NPR TEMP Buffer")
-    var
-        Txt001: Label 'Gross price total';
-        Txt002: Label 'Discount';
-        Txt003: Label 'Profit incl. VAT';
-        Txt008: Label 'Invoice discount';
-        Txt009: Label 'Invoice fee';
-        Txt010: Label 'Net price';
-        Txt011: Label 'Unit cost';
-        Txt012: Label 'Profit contribution';
-        Txt013: Label 'Contribution ratio';
-        i: Integer;
-        j: Integer;
-        Txt016: Label 'Register No.';
-        Txt017: Label 'Receipt No.';
-    begin
-        // GetSaleLineStat
-
-        i := 1;
-        NPRTempBuffer.Init;
-        NPRTempBuffer."Line No." := i;
-        //buffer.Description := "Eksp. Caption";
-        NPRTempBuffer.Bold := true;
-        NPRTempBuffer.Sel := true;
-        NPRTempBuffer.Insert;
-
-        i += 1;
-        NPRTempBuffer.Init;
-        NPRTempBuffer."Line No." := i;
-        NPRTempBuffer.Description := Txt016;
-        NPRTempBuffer.Bold := true;
-        NPRTempBuffer."Description 2" := "Register No.";
-        NPRTempBuffer.Insert;
-
-        i += 1;
-        NPRTempBuffer.Init;
-        NPRTempBuffer."Line No." := i;
-        NPRTempBuffer.Description := Txt017;
-        NPRTempBuffer.Bold := true;
-        NPRTempBuffer."Description 2" := "Sales Ticket No.";
-        NPRTempBuffer.Insert;
-
-        for j := 1 to 11 do begin
-            i += 1;
-            NPRTempBuffer.Init;
-            NPRTempBuffer."Line No." := i;
-            NPRTempBuffer.Bold := true;
-            case j of
-                1:
-                    begin
-                        NPRTempBuffer.Description := Txt001;
-                        NPRTempBuffer."Description 2" := Utility.FormatDec2Text(SalesPrice + DiscountAmt, 2);
-                    end;
-                2:
-                    begin
-                        NPRTempBuffer.Description := Txt002;
-                        NPRTempBuffer."Description 2" := Utility.FormatDec2Text(DiscountAmt, 2);
-                    end;
-                3:
-                    begin
-                        NPRTempBuffer.Description := Txt003;
-                        NPRTempBuffer."Description 2" := Utility.FormatDec2Text(SalesPrice - Netto, 2);
-                    end;
-                4:
-                    begin
-                        NPRTempBuffer.Description := Txt008;
-                        NPRTempBuffer."Description 2" := Utility.FormatDec2Text(InvoiceDiscountAmt, 2);
-                    end;
-                5:
-                    begin
-                        NPRTempBuffer.Description := Txt009;
-                        NPRTempBuffer."Description 2" := Utility.FormatDec2Text(InvoiceFee, 2);
-                    end;
-                6:
-                    begin
-                        NPRTempBuffer.Description := Txt010;
-                        NPRTempBuffer."Description 2" := Utility.FormatDec2Text(Netto, 2);
-                    end;
-                7:
-                    begin
-                        NPRTempBuffer.Description := Txt011;
-                        NPRTempBuffer."Description 2" := Utility.FormatDec2Text(CostPrice, 2);
-                    end;
-                8:
-                    begin
-                        NPRTempBuffer.Description := Txt012;
-                        NPRTempBuffer."Description 2" := Utility.FormatDec2Text(DB, 2);
-                    end;
-                9:
-                    begin
-                        NPRTempBuffer.Description := Txt013;
-                        NPRTempBuffer."Description 2" := Utility.FormatDec2Text(DG, 2);
-                    end;
-            end;
-            NPRTempBuffer.Insert;
-        end;
-    end;
 }
 

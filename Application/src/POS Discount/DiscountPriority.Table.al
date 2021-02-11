@@ -1,10 +1,5 @@
 table 6014417 "NPR Discount Priority"
 {
-    // NPR5.31/MHA /20170210  CASE 262904 Added fields: 10 Disabled, 15 "Discount Calc. Codeunit ID", 20 "Discount Calc. Codeunit Name"
-    // NPR5.44/MMV /20180627  CASE 312154 Added field 30
-    // NPR5.44/JDH /20180726 CASE 323366  changed flowfields to correct length 50 -> 30
-    // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj
-
     Caption = 'Discount Priority';
     DataClassification = CustomerContent;
 
@@ -20,13 +15,9 @@ table 6014417 "NPR Discount Priority"
                 TempObject: Record AllObj temporary;
             begin
                 Clear(TempObject);
-                RetailSalesLineCode.SetupObjectNoList(TempObject);
-                //-NPR5.46 [322752]
-                //IF PAGE.RUNMODAL(PAGE::Objects,TempObject) = ACTION::LookupOK THEN BEGIN
-                //  "Table ID" := TempObject.ID;
+                SetupObjectNoList(TempObject);
                 if PAGE.RunModal(PAGE::"Table Objects", TempObject) = ACTION::LookupOK then begin
                     "Table ID" := TempObject."Object ID";
-                    //+NPR5.46 [322752]
                     Validate("Table ID");
                 end;
             end;
@@ -36,13 +27,9 @@ table 6014417 "NPR Discount Priority"
                 TempObject: Record AllObj temporary;
             begin
                 CalcFields("Table Name");
-                RetailSalesLineCode.SetupObjectNoList(TempObject);
-                //-NPR5.46 [322752]
-                //TempObject.Type := TempObject.Type::Table;
-                //TempObject.ID := "Table ID";
+                SetupObjectNoList(TempObject);
                 TempObject."Object Type" := TempObject."Object Type"::Table;
                 TempObject."Object ID" := "Table ID";
-                //+NPR5.46 [322752]
                 if not TempObject.Find then
                     FieldError("Table ID");
             end;
@@ -54,7 +41,7 @@ table 6014417 "NPR Discount Priority"
         }
         field(3; "Table Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Table ID")));
             Caption = 'Table Name';
             Editable = false;
@@ -74,7 +61,7 @@ table 6014417 "NPR Discount Priority"
         }
         field(20; "Discount Calc. Codeunit Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
                                                              "Object ID" = FIELD("Discount Calc. Codeunit ID")));
             Caption = 'Discount Calc. Codeunit Name';
             Description = 'NPR5.31';
@@ -84,6 +71,7 @@ table 6014417 "NPR Discount Priority"
         field(30; "Cross Line Calculation"; Boolean)
         {
             Caption = 'Cross Line Calculation';
+            Editable = false;
             DataClassification = CustomerContent;
         }
     }
@@ -101,8 +89,27 @@ table 6014417 "NPR Discount Priority"
     fieldgroups
     {
     }
-
+    procedure SetupObjectNoList(var TempObject: Record AllObj temporary)
     var
-        RetailSalesLineCode: Codeunit "NPR Retail Sales Line Code";
+        "Object": Record AllObj;
+        DiscountPriorities: array[5] of Integer;
+        Index: Integer;
+        NumberOfObjects: Integer;
+    begin
+        NumberOfObjects := 4;
+        DiscountPriorities[1] := DATABASE::"NPR Mixed Discount";
+        DiscountPriorities[2] := DATABASE::"Sales Line Discount";
+        DiscountPriorities[3] := DATABASE::"NPR Period Discount";
+        DiscountPriorities[4] := DATABASE::"NPR Quantity Discount Header";
+
+        Object.SetRange("Object Type", Object."Object Type"::Table);
+        for Index := 1 to NumberOfObjects do begin
+            Object.SetRange("Object ID", DiscountPriorities[Index]);
+            if Object.FindFirst then begin
+                TempObject := Object;
+                TempObject.Insert;
+            end;
+        end;
+    end;
 }
 

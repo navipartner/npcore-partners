@@ -22,7 +22,7 @@ table 6014422 "NPR Retail Journal Line"
             var
                 Item: Record Item;
                 Vendor: Record Vendor;
-                BarcodeLibrary: Codeunit "NPR Barcode Library";
+                BarcodeLibrary: Codeunit "NPR Barcode Image Library";
                 BarcodeValue: Text;
                 ResolvingTable: Integer;
             begin
@@ -134,7 +134,7 @@ table 6014422 "NPR Retail Journal Line"
 
             trigger OnValidate()
             var
-                BarcodeLibrary: Codeunit "NPR Barcode Library";
+                BarcodeLibrary: Codeunit "NPR Barcode Lookup Mgt.";
                 ItemNo: Code[20];
                 VariantCode: Code[10];
                 ResolvingTable: Integer;
@@ -392,18 +392,10 @@ table 6014422 "NPR Retail Journal Line"
             trigger OnValidate()
             var
                 Customer: Record Customer;
-                AltNo: Record "NPR Alternative No.";
             begin
                 if "Customer No." <> xRec."Customer No." then
                     if "Customer No." <> '' then begin
                         Customer.Get("Customer No.");
-
-                        Clear(AltNo);
-                        AltNo.SetCurrentKey(Type, Code, "Alt. No.");
-                        AltNo.SetRange(Type, AltNo.Type::Customer);
-                        AltNo.SetRange(Code, Customer."No.");
-                        if AltNo.FindFirst then
-                            Barcode := AltNo."Alt. No.";
 
                         Description := Customer.Name;
                     end;
@@ -534,13 +526,13 @@ table 6014422 "NPR Retail Journal Line"
     }
 
     trigger OnInsert()
+    var
+        POSUnit: Record "NPR POS Unit";
     begin
-        "Register No." := RetailFormCode.FetchRegisterNumber;
+        "Register No." := POSUnit.GetCurrentPOSUnit();
     end;
 
     var
-        RetailFormCode: Codeunit "NPR Retail Form Code";
-        Utility: Codeunit "NPR Utility";
         RetailJournalHeader: Record "NPR Retail Journal Header";
         LineNo: Integer;
         ShowDialog: Boolean;
@@ -562,6 +554,7 @@ table 6014422 "NPR Retail Journal Line"
         TMPDiscountPriority: Record "NPR Discount Priority" temporary;
         TempSaleLinePOS2: Record "NPR Sale Line POS" temporary;
         Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
     begin
         TempSaleLinePOS.Type := TempSaleLinePOS.Type::Item;
         TempSaleLinePOS."No." := "Item No.";
@@ -571,7 +564,7 @@ table 6014422 "NPR Retail Journal Line"
         if "Register No." <> '' then
             TempSalePOS."Register No." := "Register No."
         else
-            TempSalePOS."Register No." := RetailFormCode.FetchRegisterNumber;
+            TempSalePOS."Register No." := POSUnit.GetCurrentPOSUnit();
 
         if not Register.Get(TempSalePOS."Register No.") then
             Register.Init;
@@ -650,11 +643,12 @@ table 6014422 "NPR Retail Journal Line"
     procedure SelectRetailJournal(var RetailJournalCode: Code[40]) JournalSelected: Boolean
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
+        POSUnit: Record "NPR POS Unit";
     begin
         if not RetailJournalHeader.Get(RetailJournalCode) then begin
             RetailJournalHeader.Init;
             RetailJournalHeader."No." := RetailJournalCode;
-            RetailJournalHeader."Register No." := RetailFormCode.FetchRegisterNumber;
+            RetailJournalHeader."Register No." := POSUnit.GetCurrentPOSUnit();
         end;
         RetailJournalHeader.TestField("No.");
 
@@ -683,6 +677,7 @@ table 6014422 "NPR Retail Journal Line"
     procedure InitLine()
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
+        POSUnit: Record "NPR POS Unit";
     begin
         RetailJournalHeader.TestField("No.");
 
@@ -699,7 +694,7 @@ table 6014422 "NPR Retail Journal Line"
         "Customer Disc. Group" := RetailJournalHeader."Customer Disc. Group";
 
         if RetailJournalHeader."Register No." = '' then
-            "Register No." := RetailFormCode.FetchRegisterNumber
+            "Register No." := POSUnit.GetCurrentPOSUnit()
         else
             "Register No." := RetailJournalHeader."Register No.";
     end;
@@ -760,6 +755,7 @@ table 6014422 "NPR Retail Journal Line"
     var
         RetailJnlHeader: Record "NPR Retail Journal Header";
         i: Integer;
+        POSUnit: Record "NPR POS Unit";
     begin
         LastRetailJnlLine.FilterGroup(4);
         if not RetailJnlHeader.Get(LastRetailJnlLine.GetFilter("No.")) then begin
@@ -768,7 +764,7 @@ table 6014422 "NPR Retail Journal Line"
         end;
         LastRetailJnlLine.FilterGroup(0);
         if RetailJnlHeader."Register No." = '' then
-            "Register No." := RetailFormCode.FetchRegisterNumber
+            "Register No." := POSUnit.GetCurrentPOSUnit()
         else
             "Register No." := RetailJnlHeader."Register No.";
 
@@ -779,7 +775,7 @@ table 6014422 "NPR Retail Journal Line"
 
     local procedure UpdateBarcode()
     var
-        BarcodeLibrary: Codeunit "NPR Barcode Library";
+        BarcodeLibrary: Codeunit "NPR Barcode Lookup Mgt.";
         BarcodeValue: Text;
         ResolvingTable: Integer;
         TmpItemNo: Code[20];

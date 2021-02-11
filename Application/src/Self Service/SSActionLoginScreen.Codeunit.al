@@ -136,7 +136,7 @@ codeunit 6151283 "NPR SS Action: Login Screen"
         POSSaleLine.InsertLine(Line);
 
         POSSession.GetSale(POSSale);
-        exit(POSSale.TryEndSale2(POSSession, false));
+        exit(POSSale.TryEndSale(POSSession, false));
     end;
 }
 
