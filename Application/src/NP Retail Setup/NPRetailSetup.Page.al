@@ -33,16 +33,6 @@ page 6150613 "NPR NP Retail Setup"
                     Editable = false;
                     ToolTip = 'Specifies the value of the Prev. Data Model Build field';
                 }
-                field("Advanced POS Entries Activated"; "Advanced POS Entries Activated")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Advanced POS Entries Activated field';
-                }
-                field("Advanced Posting Activated"; "Advanced Posting Activated")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Advanced Posting Activated field';
-                }
             }
         }
     }

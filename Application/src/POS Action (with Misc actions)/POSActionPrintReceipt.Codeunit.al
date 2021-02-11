@@ -7,7 +7,6 @@ codeunit 6150787 "NPR POS Action: Print Receipt"
     var
         ActionDescription: Label 'This is a built-in action for printing a receipt for the current or selected transaction.';
         TxtNoReceiptFound: Label 'No receipts has been printed from this register today.';
-        NPRetailSetup: Record "NPR NP Retail Setup";
         CurrentRegisterNo: Code[10];
         ReceiptListFilterOption: Option "None","POS Store","POS Unit",Salesperson;
         EnterReceiptNoLbl: Label 'Enter Receipt Number';
@@ -85,7 +84,6 @@ codeunit 6150787 "NPR POS Action: Print Receipt"
         POSSession.GetSetup(POSSetup);
         CurrentRegisterNo := POSSetup.Register();
 
-        NPRetailSetup.Get;
         if (ReceiptListFilterOption < 0) or (ReceiptListFilterOption > ReceiptListFilterOption::Salesperson) then
             ReceiptListFilterOption := ReceiptListFilterOption::"POS Unit";
         case ReceiptListFilterOption of
@@ -131,8 +129,7 @@ codeunit 6150787 "NPR POS Action: Print Receipt"
 
             Setting::"Last Balance",
             Setting::"Last Balance Large":
-                if NPRetailSetup."Advanced Posting Activated" then
-                    SalesTicketNo := LastBalancePOSEntry(Setting = Setting::"Last Balance Large");
+                SalesTicketNo := LastBalancePOSEntry(Setting = Setting::"Last Balance Large");
         end;
         if SalesTicketNo <> '' then
             AdditionalPrints(CurrentRegisterNo, SalesTicketNo, JSON);

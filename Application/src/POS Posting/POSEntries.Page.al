@@ -405,14 +405,11 @@ page 6150650 "NPR POS Entries"
         NPRetailSetup: Record "NPR NP Retail Setup";
     begin
         if NPRetailSetup.Get then
-            AdvancedPostingOff := (not NPRetailSetup."Advanced Posting Activated");
+            AdvancedPostingOff := false;
     end;
 
     var
-        TextAdvancedPostingOff: Label 'WARNING: Advanced Posting is OFF. Audit Roll used for posting.';
-        TextClicktoSeeAuditRoll: Label 'Click here to see Audit Roll';
         AdvancedPostingOff: Boolean;
-        Text10600006: Label 'There are no credit card transactions attached to sales ticket no. %1/Register %2';
         TextPostItemEntries: Label 'Post Item Entries?';
         TextPostPosEntries: Label 'Post all other Entries?';
         TextPostCompressed: Label 'Post Compressed?';

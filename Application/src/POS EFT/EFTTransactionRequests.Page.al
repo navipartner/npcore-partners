@@ -371,7 +371,7 @@ page 6184498 "NPR EFT Transaction Requests"
                 Caption = 'Show Receipt 1';
                 Image = Text;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -393,7 +393,7 @@ page 6184498 "NPR EFT Transaction Requests"
                 Caption = 'Show Receipt 2';
                 Image = Text;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -415,7 +415,7 @@ page 6184498 "NPR EFT Transaction Requests"
                 Caption = 'Reprint';
                 Image = PrintCheck;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -466,10 +466,8 @@ page 6184498 "NPR EFT Transaction Requests"
     begin
         //-NPR5.54 [377533]
         if NPRetailSetup.Get() then begin
-            if NPRetailSetup."Advanced Posting Activated" then begin
-                UsesPOSEntry := true;
-                SetAutoCalcFields("FF Moved to POS Entry");
-            end;
+            UsesPOSEntry := true;
+            SetAutoCalcFields("FF Moved to POS Entry");
         end;
         //+NPR5.54 [377533]
 

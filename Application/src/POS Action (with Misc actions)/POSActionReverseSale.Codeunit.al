@@ -325,14 +325,8 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
     local procedure CopyDimensions(var CurrentSalePOS: Record "NPR Sale POS"; OriginalSalesTicketNo: Code[20]): Boolean
     var
         POSEntry: Record "NPR POS Entry";
-        RetailSetup: Record "NPR NP Retail Setup";
         OldDimSetID: Integer;
     begin
-        RetailSetup.Get;
-        if not RetailSetup."Advanced Posting Activated" then begin
-            Message(DimsNotCopied);
-            exit(false);
-        end;
 
         POSEntry.SetCurrentKey("Document No.");
         POSEntry.SetRange("Document No.", OriginalSalesTicketNo);

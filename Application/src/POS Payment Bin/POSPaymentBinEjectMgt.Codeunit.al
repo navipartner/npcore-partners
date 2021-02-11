@@ -192,10 +192,7 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
 
             //Change below to just loop and fire open on all unique payment bin from pos payment lines when the payment bins are properly implemented on payments
 
-            if NPRetailSetup."Advanced Posting Activated" then
-                OpenDrawer := IsDrawerOpenRequiredPOSEntry(SalePOS)
-            else
-                OpenDrawer := IsDrawerOpenRequiredAuditRoll(SalePOS);
+            OpenDrawer := IsDrawerOpenRequiredPOSEntry(SalePOS);
 
             if not OpenDrawer then
                 exit;
