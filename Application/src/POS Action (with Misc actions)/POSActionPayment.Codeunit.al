@@ -5,50 +5,6 @@ codeunit 6150725 "NPR POS Action: Payment"
     //  - OnBeforeActionWorkflow: to adapt the workflow to suit your payment method
     //  - OnBeforeAction: to handle the payment before NPR does. When Handled == TRUE, NPR will not bother with the paymentmethod
     //  - OnAfterAction:  to change NPR behaviour or provide functionality where NPR does not
-    // 
-    // NPR5.36/MMV /20170925 CASE 283791 Print function signature change.
-    // NPR5.37/ANEN/20170920 CASE 290857 Added default support for Procesing Type = Manual Card
-    // NPR5.37/TSA /20171024 CASE 283422 mPOS return dialog.
-    // NPR5.37/MMV /20171024 CASE 293784 Abort workflow for failed EFT transactions instead of attempting to end.
-    // NPR5.37.03/MMV /20171123 CASE 296642 Changed EndSale call
-    // NPR5.38/MMV /20180108 CASE 300957 Rounding fix.
-    // NPR5.38/MMV /20180111 CASE 298025 Calculate mPOS confirm differently.
-    // NPR5.38/MMV /20180122 CASE 300957 Use already calculated amount when forced amount is enabled.
-    // NPR5.39/MHA /20180208 CASE 303968 Added Parameters HideAmountDialog and HideZeroAmountDialog
-    // NPR5.39/TSA /20180214 CASE 305291 When payment type is setup per register only, payment line needs to carry the register no.
-    // NPR5.39/TSA /20180214 CASE 303399 If not payment view, change view (that will invoke workflow on view change)
-    // NPR5.40/TSA /20180314 CASE 308003 Added a check for zero sales lines to disallow payment (end of sale)
-    // NPR5.40/MMV /20180115 CASE 293106 Refactored tax free module.
-    // NPR5.40/TSA /20171013 CASE 293479 Added Context,SubTotal as a param to the "POS Action - Payment" event publisher OnBeforeActionWorkflow
-    // NPR5.42/TSA /20180502 CASE 312104 Made the zero sales line configurable via setting on NP Retail Setup.
-    // NPR5.42/JC  /20180515 CASE 315194 Update Register no. & Sales ticket no. on POS Line
-    // NPR5.42/MHA /20180524 CASE 303968 Updated EventPublisherElement for OnBeforeEditPaymentParameters()
-    // NPR5.43/MMV /20180620 CASE 315838 Added server stopwatch
-    // NPR5.44/THRO/20180724 CASE 322837 More informative message for invalid Gift Voucher
-    // NPR5.45/TSA /20180803 CASE 323780 Added call to Sale.SetModified() to have the data driver refresh data
-    // NPR5.46/MMV /20180716 CASE 290734 Moved return amount dialog to separate action.
-    //                                   EFT refactoring.
-    // NPR5.47/THRO/20181011 CASE 322837 More informative message for invalid Credit Voucher
-    // NPR5.48/MMV /20181211 CASE 318028 Moved zero sales check
-    // NPR5.48/MMV /20190201 CASE 341237 Re-added skip after failed EFT
-    // NPR5.49/MHA /20190404 CASE 351069 Zero payment should simply be skipped in CapturePayment()
-    // NPR5.50/MMV /20190503 CASE 353807 Fixed 351069. Broke cashback as the zero check is not on user input.
-    // NPR5.50/MMV /20190508 CASE 354510 Fixed 341237. Line No. in filter could be re-used and cause invalid decision to skip.
-    // NPR5.51/MMV /20190624 CASE 359714 Error when using advanced posting without a default payment bin.
-    // NPR5.51/MMV /20190625 CASE 359896 Look for linked successfull EFT record on failure, in skip check function.
-    // NPR5.51/THRO/20190718 CASE 361514 EventPublisherElement changed in OnBeforeEditPaymentParameters. Action renamed on Page 6150702
-    // NPR5.51/MMV /20190820 CASE 364694 Allow ending sale with voided payment even without items.
-    // NPR5.53/MHA /20200114 CASE 384841 Added parameter to SuggestAmount() to allow for negative payment balance
-    // NPR5.54/TSA /20200220 CASE 391850 Refactored initial parameters for payment action to hand POS Setup profiles per unit
-    // NPR5.54/MMV /20200304 CASE 364340 Isolated CapturePayment & TryEndSale from JSON parsing for test purposes.
-    // NPR5.55/MMV /20200421 CASE 386254 Moved ValidateAmount to "POS Payment Line" for reuse
-    // NPR5.55/ALPO/20200623 CASE 410991 Zero as default payment amount on popup window for specific payment types
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is a built-in action for inserting a payment line into the current transaction';
         EFTIntegration: Codeunit "NPR EFT Framework Mgt.";
@@ -73,10 +29,10 @@ codeunit 6150725 "NPR POS Action: Payment"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.3');
+        exit('1.4');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
@@ -88,8 +44,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         then begin
             Sender.RegisterWorkflowStep('voucher', 'context.capture_voucher && input({caption: labels.Voucher}).cancel(abort)');
             Sender.RegisterWorkflowStep('amount', 'if ((context.capture_amount) && (!param.HideAmountDialog) && ((!param.HideZeroAmountDialog) || (context.amounttocapture > 0))) {' +
-                                                 //'  numpad({title: context.amount_description, caption: labels.Amount, value: context.amounttocapture}).cancel(abort);' +  //NPR5.55 [410991]-revoked
-                                                 '  numpad({title: context.amount_description, caption: labels.Amount, value: context.defaultamount}).cancel(abort);' +  //NPR5.55 [410991]
+                                                 '  numpad({title: context.amount_description, caption: labels.Amount, value: context.defaultamount}).cancel(abort);' +
                                                    '}');
 
             Sender.RegisterWorkflowStep('capture_payment', 'respond();');
@@ -100,7 +55,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
 
@@ -108,7 +63,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         Captions.AddActionCaption(ActionCode(), 'Voucher', TextVoucherLabel);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnBeforeWorkflow', '', true, true)]
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         Context: Codeunit "NPR POS JSON Management";
@@ -136,26 +91,18 @@ codeunit 6150725 "NPR POS Action: Payment"
             exit;
 
         POSSession.GetSetup(Setup);
-        //-NPR5.51 [359714]
         Setup.GetPOSUnit(POSUnit);
         Register.Get(Setup.Register());
-        NPRetailSetup.Get;
-        //+NPR5.51 [359714]
+        NPRetailSetup.Get();
 
-        //-NPR5.51 [359714]
         if NPRetailSetup."Advanced Posting Activated" then begin
             POSUnit.TestField("Default POS Payment Bin");
         end;
-        //+NPR5.51 [359714]
 
-        //-NPR5.51 [364694]
-        // POSSession.GetSaleLine (POSSaleLine);
-        // POSSaleLine.GetCurrentSaleLine (SaleLinePOS);
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         SaleLinePOS.SetFilter("Register No.", '=%1', SalePOS."Register No.");
         SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', SalePOS."Sales Ticket No.");
-        //+NPR5.51 [364694]
         SaleLinePOS.SetFilter(Type, '<>%1', SaleLinePOS.Type::Comment);
 
         if (SaleLinePOS.IsEmpty()) then begin
@@ -170,10 +117,6 @@ codeunit 6150725 "NPR POS Action: Payment"
 
         JSON.InitializeJObjectParser(Parameters, FrontEnd);
         PaymentNo := JSON.GetString('paymentNo', true);
-
-        //-NPR5.51 [359714]
-        //Register.GET (Setup.Register());
-        //+NPR5.51 [359714]
 
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
@@ -213,7 +156,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         FrontEnd.SetActionContext(ActionCode, Context);
     end;
 
-    [EventSubscriber(ObjectType::Page, 6150702, 'OnBeforeActionEvent', 'RefreshActionCodeParameters', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"NPR POS Menu Buttons", 'OnBeforeActionEvent', 'RefreshActionCodeParameters', true, true)]
     local procedure OnBeforeEditPaymentParameters(var Rec: Record "NPR POS Menu Button")
     var
         POSSetup: Record "NPR POS Setup";
@@ -223,11 +166,6 @@ codeunit 6150725 "NPR POS Action: Payment"
         if Rec."Action Type" <> Rec."Action Type"::PaymentType then
             exit;
 
-        //-NPR5.54 [391850]
-        // IF NOT POSSetup.GET THEN
-        //  EXIT;
-        // IF POSSetup."Payment Action Code" <>  ActionCode() THEN
-        //  EXIT;
         if (not POSSetup.FindSet()) then
             exit;
 
@@ -235,7 +173,6 @@ codeunit 6150725 "NPR POS Action: Payment"
         repeat
             IsPaymentAction := IsPaymentAction or (POSSetup."Payment Action Code" = ActionCode());
         until ((POSSetup.Next() = 0) or (IsPaymentAction));
-        //-NPR5.54 [391850]
 
         ParamValue.FilterParameters(Rec.RecordId, 0);
         if not ParamValue.IsEmpty then
@@ -270,7 +207,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         POSParameterValue.Insert;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
@@ -286,7 +223,6 @@ codeunit 6150725 "NPR POS Action: Payment"
         PaymentHandled: Boolean;
         ShowConfirmMessage: Boolean;
         SaleIsEnded: Boolean;
-        MPOSAppSetup: Record "NPR MPOS App Setup";
         SalesAmount: Decimal;
         ReturnAmount: Decimal;
         PaidAmount: Decimal;
@@ -317,46 +253,19 @@ codeunit 6150725 "NPR POS Action: Payment"
                     POSSession.StoreActionState('ContextId', POSSession.BeginAction(ActionCode));
 
                     OnBeforeAction(WorkflowStep, PaymentTypePOS, Context, POSSession, FrontEnd, PaymentHandled);
-                    //-NPR5.54 [364340]
                     CapturePayment(PaymentTypePOS, POSSession, FrontEnd, GetAmount(Context, FrontEnd), GetVoucherNo(Context, FrontEnd), PaymentHandled);
-                    //+NPR5.54 [364340]
                     OnAfterAction(WorkflowStep, PaymentTypePOS, Context, POSSession, FrontEnd, PaymentHandled);
                 end;
 
             'tryEndSale':
                 begin
                     PaymentHandled := true;
-                    //-NPR5.54 [364340]
                     TryEndSale(PaymentTypePOS, POSSession);
-                    //      POSSale.SetModified ();
-                    //      POSSession.RequestRefreshData ();
-                    //      IF SkipAfterEFTTransaction(POSSession) THEN
-                    //        EXIT;
-                    //
-                    //      IF PaymentTypePOS."Auto End Sale" THEN BEGIN
-                    //        Register.GET(Setup.Register);
-                    //        IF (NOT POSPaymentLine.GetPaymentType (ReturnPaymentTypePOS, Register."Return Payment Type", Register."Register No.")) THEN
-                    //          ERROR (PaymentTypeNotFound, PaymentTypePOS.TABLECAPTION, PaymentNo, Setup.Register);
-                    //        SaleIsEnded := POSSale.TryEndSaleWithBalancing(POSSession, PaymentTypePOS, ReturnPaymentTypePOS);
-                    //      END;
-                    //+NPR5.54 [364340]
                 end;
         end;
 
         if (not PaymentHandled) then
             Message(MissingImpl, PaymentTypePOS.TableCaption(), PaymentTypePOS."No.", PaymentTypePOS.FieldCaption("Processing Type"), PaymentTypePOS."Processing Type", Register.TableCaption(), Setup.Register());
-
-        //-NPR5.54 [364340]
-        // CASE NextWorkflowStep OF
-        //  NextWorkflowStep::InvokeEFTDevice : FrontEnd.ContinueAtStep ('EftPayment_invokedevice');
-        //  NextWorkflowStep::CheckResult : FrontEnd.ContinueAtStep ('EftPayment_createpospayment');
-        //  NextWorkflowStep::VoidPayment : FrontEnd.ContinueAtStep ('EftPayment_voidpayment');
-        // END;
-        //+NPR5.54 [364340]
-    end;
-
-    local procedure "--Publishers"()
-    begin
     end;
 
     [IntegrationEvent(false, false)]
@@ -374,17 +283,10 @@ codeunit 6150725 "NPR POS Action: Payment"
     begin
     end;
 
-    local procedure "--WorkflowHandlers"()
-    begin
-    end;
-
     local procedure ConfigureCashWorkflow(var Context: Codeunit "NPR POS JSON Management"; PaymentType: Record "NPR Payment Type POS"; ReturnPaymentType: Record "NPR Payment Type POS"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
     begin
         Context.SetContext('capture_amount', true);
-        //-NPR5.53 [384841]
-        //Context.SetContext ('amounttocapture', SuggestAmount (SalesAmount, PaidAmount, PaymentType, ReturnPaymentType, TRUE));  //NPR5.55 [410991]-revoked
-        //+NPR5.53 [384841]
-        SetContextAmounts(Context, PaymentType, ReturnPaymentType, SalesAmount, PaidAmount, true, false);  //NPR5.55 [410991]
+        SetContextAmounts(Context, PaymentType, ReturnPaymentType, SalesAmount, PaidAmount, true, false);
         Context.SetContext('amount_description', PaymentType.Description);
         exit(true);
     end;
@@ -392,10 +294,7 @@ codeunit 6150725 "NPR POS Action: Payment"
     local procedure ConfigureManualCardWorkflow(var Context: Codeunit "NPR POS JSON Management"; PaymentType: Record "NPR Payment Type POS"; ReturnPaymentType: Record "NPR Payment Type POS"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
     begin
         Context.SetContext('capture_amount', true);
-        //-NPR5.53 [384841]
-        //Context.SetContext ('amounttocapture', SuggestAmount (SalesAmount, PaidAmount, PaymentType, ReturnPaymentType, FALSE));  //NPR5.55 [410991]-revoked
-        //+NPR5.53 [384841]
-        SetContextAmounts(Context, PaymentType, ReturnPaymentType, SalesAmount, PaidAmount, false, false);  //NPR5.55 [410991]
+        SetContextAmounts(Context, PaymentType, ReturnPaymentType, SalesAmount, PaidAmount, false, false);
         Context.SetContext('amount_description', PaymentType.Description);
         exit(true);
     end;
@@ -403,10 +302,7 @@ codeunit 6150725 "NPR POS Action: Payment"
     local procedure ConfigureForeignCashWorkflow(var Context: Codeunit "NPR POS JSON Management"; PaymentType: Record "NPR Payment Type POS"; ReturnPaymentType: Record "NPR Payment Type POS"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
     begin
         Context.SetContext('capture_amount', true);
-        //-NPR5.53 [384841]
-        //Context.SetContext ('amounttocapture', SuggestAmount (SalesAmount, PaidAmount, PaymentType, ReturnPaymentType, FALSE));  //NPR5.55 [410991]-revoked
-        //+NPR5.53 [384841]
-        SetContextAmounts(Context, PaymentType, ReturnPaymentType, SalesAmount, PaidAmount, false, false);  //NPR5.55 [410991]
+        SetContextAmounts(Context, PaymentType, ReturnPaymentType, SalesAmount, PaidAmount, false, false);
         Context.SetContext('amount_description', PaymentType.Description);
         exit(true);
     end;
@@ -415,10 +311,7 @@ codeunit 6150725 "NPR POS Action: Payment"
     begin
         Context.SetContext('capture_amount', false);
         Context.SetContext('capture_voucher', true);
-        //-NPR5.53 [384841]
-        //Context.SetContext ('amounttocapture', SuggestAmount (SalesAmount, PaidAmount, PaymentType, ReturnPaymentType, FALSE));  //NPR5.55 [410991]-revoked
-        //+NPR5.53 [384841]
-        SetContextAmounts(Context, PaymentType, ReturnPaymentType, SalesAmount, PaidAmount, false, false);  //NPR5.55 [410991]
+        SetContextAmounts(Context, PaymentType, ReturnPaymentType, SalesAmount, PaidAmount, false, false);
         exit(true);
     end;
 
@@ -426,19 +319,9 @@ codeunit 6150725 "NPR POS Action: Payment"
     var
         Amount: Decimal;
     begin
-        //-NPR5.55 [410991]-revoked
-        /*
-        //-NPR5.53 [384841]
-        Amount := SuggestAmount(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType,FALSE);
-        //+NPR5.53 [384841]
-        IF Amount < 0 THEN
-          Amount := 0;
-        */
-        //+NPR5.55 [410991]-revoked
         Context.SetContext('capture_amount', (PaymentType."Forced Amount" = false));
         Context.SetContext('capture_voucher', (PaymentType."Reference Incoming"));
-        //Context.SetContext ('amounttocapture', Amount);  //NPR5.55 [410991]-revoked
-        SetContextAmounts(Context, PaymentType, ReturnPaymentType, SalesAmount, PaidAmount, false, true);  //NPR5.55 [410991]
+        SetContextAmounts(Context, PaymentType, ReturnPaymentType, SalesAmount, PaidAmount, false, true);
         exit(true);
 
     end;
@@ -446,9 +329,6 @@ codeunit 6150725 "NPR POS Action: Payment"
     local procedure ConfigureCashTerminalWorkflow(var Context: Codeunit "NPR POS JSON Management"; PaymentType: Record "NPR Payment Type POS"; ReturnPaymentType: Record "NPR Payment Type POS"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
     begin
         Context.SetContext('capture_amount', (PaymentType."Forced Amount" = false));
-        //-NPR5.53 [384841]
-        //Context.SetContext ('amounttocapture', SuggestAmount (SalesAmount, PaidAmount, PaymentType, ReturnPaymentType, FALSE));  //NPR5.55 [410991]-revoked
-        //+NPR5.53 [384841]
         SetContextAmounts(Context, PaymentType, ReturnPaymentType, SalesAmount, PaidAmount, false, false);  //NPR5.55 [410991]
         Context.SetContext('amount_description', PaymentType.Description);
         exit(true);
@@ -458,7 +338,6 @@ codeunit 6150725 "NPR POS Action: Payment"
     var
         AmtToCapture: Decimal;
     begin
-        //-NPR5.55 [410991]
         AmtToCapture := SuggestAmount(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType, AllowNegativePaymentBalance);
         if PositiveOnly and (AmtToCapture < 0) then
             AmtToCapture := 0;
@@ -468,11 +347,6 @@ codeunit 6150725 "NPR POS Action: Payment"
             Context.SetContext('defaultamount', 0)
         else
             Context.SetContext('defaultamount', AmtToCapture);
-        //+NPR5.55 [410991]
-    end;
-
-    local procedure "--ActionHandlers"()
-    begin
     end;
 
     procedure CapturePayment(PaymentTypePOS: Record "NPR Payment Type POS"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; AmountToCapture: Decimal; VoucherNo: Text; var Handled: Boolean)
@@ -489,9 +363,6 @@ codeunit 6150725 "NPR POS Action: Payment"
     begin
 
         if (not Handled) then begin
-            //-NPR5.54 [364340]
-            //  JSON.InitializeJObjectParser (Context,FrontEnd);
-            //+NPR5.54 [364340]
             POSSession.GetPaymentLine(POSPaymentLine);
             POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
             POSSession.GetSale(POSSale);
@@ -505,7 +376,6 @@ codeunit 6150725 "NPR POS Action: Payment"
             POSLine."Register No." := SalePOS."Register No.";
             POSLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
 
-            //-NPR5.54 [364340]
             case PaymentTypePOS."Processing Type" of
                 PaymentTypePOS."Processing Type"::Cash:
                     Handled := CaptureCashPayment(AmountToCapture, POSPaymentLine, POSLine, PaymentTypePOS);
@@ -526,7 +396,6 @@ codeunit 6150725 "NPR POS Action: Payment"
                 else
                     Handled := false;
             end;
-            //+NPR5.54 [364340]
         end;
     end;
 
@@ -534,21 +403,12 @@ codeunit 6150725 "NPR POS Action: Payment"
     var
         AmountToCapture: Decimal;
     begin
-        //-NPR5.54 [364340]
-        // JSON.SetScope ('/', TRUE);
-        // AmountToCaptureLCY := JSON.GetDecimal('amounttocapture',FALSE);
-        // IF JSON.SetScope('$amount',FALSE) THEN
-        //  AmountToCaptureLCY := JSON.GetDecimal('numpad',TRUE);
-        //+NPR5.54 [364340]
-
         AmountToCapture := 0;
 
         if AmountToCaptureLCY = 0 then
             exit(true);
 
-        //-NPR5.55 [386254]
         POSPaymentLine.ValidateAmountBeforePayment(PaymentType, AmountToCaptureLCY);
-        //+NPR5.55 [386254]
 
         POSLine."Amount Including VAT" := AmountToCaptureLCY;
         POSPaymentLine.InsertPaymentLine(POSLine, AmountToCapture);
@@ -560,21 +420,12 @@ codeunit 6150725 "NPR POS Action: Payment"
     var
         AmountToCapture: Decimal;
     begin
-        //-NPR5.54 [364340]
-        // JSON.SetScope ('/', TRUE);
-        // AmountToCaptureLCY := JSON.GetDecimal('amounttocapture',FALSE);
-        // IF JSON.SetScope('$amount',FALSE) THEN
-        //  AmountToCaptureLCY := JSON.GetDecimal('numpad',TRUE);
-        //+NPR5.54 [364340]
-
         AmountToCapture := 0;
 
         if AmountToCaptureLCY = 0 then
             exit(true);
 
-        //-NPR5.55 [386254]
         POSPaymentLine.ValidateAmountBeforePayment(PaymentType, AmountToCaptureLCY);
-        //+NPR5.55 [386254]
 
         POSLine."Amount Including VAT" := AmountToCaptureLCY;
         POSPaymentLine.InsertPaymentLine(POSLine, AmountToCapture);
@@ -586,21 +437,12 @@ codeunit 6150725 "NPR POS Action: Payment"
     var
         AmountToCaptureLCY: Decimal;
     begin
-        //-NPR5.54 [364340]
-        // JSON.SetScope ('/', TRUE);
-        // AmountToCapture := JSON.GetDecimal('amounttocapture',FALSE);
-        // IF JSON.SetScope('$amount',FALSE) THEN
-        //  AmountToCapture := JSON.GetDecimal('numpad',TRUE);
-        //+NPR5.54 [364340]
-
         AmountToCaptureLCY := 0;
 
         if AmountToCapture = 0 then
             exit(true);
 
-        //-NPR5.55 [386254]
         POSPaymentLine.ValidateAmountBeforePayment(PaymentType, AmountToCapture);
-        //+NPR5.55 [386254]
 
         POSLine."Amount Including VAT" := AmountToCaptureLCY;
         POSPaymentLine.InsertPaymentLine(POSLine, AmountToCapture);
@@ -614,12 +456,6 @@ codeunit 6150725 "NPR POS Action: Payment"
         AmountCaptured: Decimal;
         VoucherStatusMsg: Text;
     begin
-        //-NPR5.54 [364340]
-        // JSON.SetScope ('/', TRUE);
-        // JSON.SetScope ('$voucher', TRUE);
-        // VoucherNumber := JSON.GetString ('input', FALSE);
-        //+NPR5.54 [364340]
-
         if not (VerifyGiftVoucherNumber(VoucherNumber, VoucherStatusMsg)) then begin
             if VoucherStatusMsg <> '' then
                 Error(VoucherStatusMsg);
@@ -640,12 +476,6 @@ codeunit 6150725 "NPR POS Action: Payment"
         AmountCaptured: Decimal;
         VoucherStatusMsg: Text;
     begin
-        //-NPR5.54 [364340]
-        // JSON.SetScope ('/', TRUE);
-        // JSON.SetScope ('$voucher', TRUE);
-        // VoucherNumber := JSON.GetString ('input', FALSE);
-        //+NPR5.54 [364340]
-
         if not (VerifyCreditVoucherNumber(VoucherNumber, VoucherStatusMsg)) then begin
             if VoucherStatusMsg <> '' then
                 Error(VoucherStatusMsg);
@@ -670,25 +500,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         EFTSetup: Record "NPR EFT Setup";
         SalePOS: Record "NPR Sale POS";
     begin
-        //-NPR5.54 [364340]
-        // Register.GET (Setup.Register);
-        //
-        // POSPaymentLine.GetPaymentLine (POSLine);
-        //
-        // IF (PaymentType."Forced Amount") THEN BEGIN
-        //  AmountToCapture := JSON.GetDecimal('amounttocapture',TRUE);
-        // END ELSE BEGIN
-        //  JSON.SetScope ('/', TRUE);
-        //  AmountToCapture := JSON.GetDecimal('amounttocapture',FALSE);
-        //  IF JSON.SetScope('$amount',FALSE) THEN
-        //    AmountToCapture := JSON.GetDecimal('numpad',TRUE);
-        //  ValidateAmount (PaymentType, AmountToCapture);
-        // END;
-
-        //-NPR5.55 [386254]
         POSPaymentLine.ValidateAmountBeforePayment(PaymentType, AmountToCapture);
-        //+NPR5.55 [386254]
-        //+NPR5.54 [364340]
 
         if AmountToCapture = 0 then
             exit(true);
@@ -697,10 +509,8 @@ codeunit 6150725 "NPR POS Action: Payment"
         POSSale.GetCurrentSale(SalePOS);
 
         EFTSetup.FindSetup(SalePOS."Register No.", PaymentType."No.");
-        //-NPR5.54 [364340]
         FrontEnd.PauseWorkflow(); //THIS IS ONLY REQUIRED BECAUSE A CONFIRM DIALOG IN THE EFT MODULE TO LOOKUP LAST TRX WOULD, IN NAV2016, CAUSE A CONTINUE IN THE FRONT END...
         EFTTransactionMgt.StartPayment(EFTSetup, PaymentType, AmountToCapture, POSLine."Currency Code", SalePOS);
-        //+NPR5.54 [364340]
 
         exit(true);
     end;
@@ -711,28 +521,9 @@ codeunit 6150725 "NPR POS Action: Payment"
         IComm: Codeunit "NPR I-Comm";
         RetailFormCode: Codeunit "NPR Retail Form Code";
     begin
-        //-NPR5.54 [364340]
-        // IF (PaymentType."Forced Amount") THEN BEGIN
-        //  AmountToCapture := JSON.GetDecimal('amounttocapture',TRUE);
-        // END ELSE BEGIN
-        //  JSON.SetScope ('/', TRUE);
-        //  AmountToCapture := JSON.GetDecimal('amounttocapture',FALSE);
-        //  IF JSON.SetScope('$amount',FALSE) THEN
-        //    AmountToCapture := JSON.GetDecimal('numpad',TRUE);
-        //  ValidateAmount (PaymentType, AmountToCapture);
-        // END;
-
-        //-NPR5.55 [386254]
         POSPaymentLine.ValidateAmountBeforePayment(PaymentType, AmountToCapture);
-        //+NPR5.55 [386254]
-        //+NPR5.54 [364340]
 
         if (PaymentType."Reference Incoming") then begin
-            //-NPR5.54 [364340]
-            //  JSON.SetScope ('/', TRUE);
-            //  JSON.SetScope ('$voucher', TRUE);
-            //  VoucherNumber := JSON.GetString ('input', TRUE);
-            //+NPR5.54 [364340]
             if (VoucherNumber = '') then
                 Error(VoucherNotValid, VoucherNumber);
 
@@ -791,10 +582,6 @@ codeunit 6150725 "NPR POS Action: Payment"
         exit(false);
     end;
 
-    local procedure "--"()
-    begin
-    end;
-
     procedure CalculateForeignAmount(PaymentTypePOS: Record "NPR Payment Type POS"; AmountLCY: Decimal) Amount: Decimal
     var
         POSPaymentLine: Codeunit "NPR POS Payment Line";
@@ -815,9 +602,7 @@ codeunit 6150725 "NPR POS Action: Payment"
     var
         POSPaymentLine: Codeunit "NPR POS Payment Line";
     begin
-        //-NPR5.53 [384841]
         exit(POSPaymentLine.CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType, AllowNegativePaymentBalance));
-        //+NPR5.53 [384841]
     end;
 
     local procedure GetAmount(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management"): Decimal
@@ -825,27 +610,23 @@ codeunit 6150725 "NPR POS Action: Payment"
         JSON: Codeunit "NPR POS JSON Management";
         AmountToCapture: Decimal;
     begin
-        //-NPR5.54 [364340]
         JSON.InitializeJObjectParser(Context, FrontEnd);
         AmountToCapture := JSON.GetDecimal('amounttocapture', false);
         if JSON.SetScope('$amount', false) then begin
             AmountToCapture := JSON.GetDecimal('numpad', true);
         end;
         exit(AmountToCapture);
-        //+NPR5.54 [364340]
     end;
 
     local procedure GetVoucherNo(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management"): Text
     var
         JSON: Codeunit "NPR POS JSON Management";
     begin
-        //-NPR5.54 [364340]
         JSON.InitializeJObjectParser(Context, FrontEnd);
         if JSON.SetScope('$voucher', false) then begin
             exit(JSON.GetString('input', true));
         end;
         exit('');
-        //+NPR5.54 [364340]
     end;
 
     procedure TryEndSale(PaymentTypePOS: Record "NPR Payment Type POS"; POSSession: Codeunit "NPR POS Session")
@@ -855,7 +636,6 @@ codeunit 6150725 "NPR POS Action: Payment"
         Setup: Codeunit "NPR POS Setup";
         ReturnPaymentTypePOS: Record "NPR Payment Type POS";
     begin
-        //+NPR5.54 [364340]
         POSSession.GetSale(POSSale);
         POSSession.GetSetup(Setup);
 
@@ -869,11 +649,6 @@ codeunit 6150725 "NPR POS Action: Payment"
             ReturnPaymentTypePOS.GetByRegister(Register."Return Payment Type", Register."Register No.");
             POSSale.TryEndSaleWithBalancing(POSSession, PaymentTypePOS, ReturnPaymentTypePOS);
         end;
-        //+NPR5.54 [364340]
-    end;
-
-    local procedure "-- GiftVouchers"()
-    begin
     end;
 
     local procedure SelectGiftVoucherFromList(var VoucherNoOut: Code[20]): Boolean
@@ -1031,10 +806,6 @@ codeunit 6150725 "NPR POS Action: Payment"
         exit(true);
     end;
 
-    local procedure "-- CreditVouchers"()
-    begin
-    end;
-
     local procedure SelectCreditVoucherFromList(var VoucherNoOut: Code[20]): Boolean
     var
         CreditVoucher: Record "NPR Credit Voucher";
@@ -1100,13 +871,6 @@ codeunit 6150725 "NPR POS Action: Payment"
         if (VoucherNo = '') then
             exit(false);
 
-        //-NPR5.47 [322837]
-        //CreditVoucher.RESET();
-        //CreditVoucher.SETFILTER (Status, '=%1', CreditVoucher.Status::Open);
-        //CreditVoucher.SETFILTER (Blocked, '=%1', FALSE);
-        //CreditVoucher.SETFILTER ("No.", '=%1', VoucherNo);
-
-        //EXIT (NOT CreditVoucher.ISEMPTY ());
         if CreditVoucher.Get(VoucherNo) then begin
             if CreditVoucher.Blocked then begin
                 VoucherStatusMsg := StrSubstNo(VoucherBlocked, VoucherNo);
@@ -1121,7 +885,6 @@ codeunit 6150725 "NPR POS Action: Payment"
             VoucherStatusMsg := StrSubstNo(VoucherNotFound, VoucherNo);
             exit(false);
         end;
-        //+NPR5.47 [322837]
     end;
 
     local procedure VerifyCreditVoucherNumber(var VoucherNumber: Code[20]; var VoucherStatusMsg: Text): Boolean
@@ -1131,17 +894,13 @@ codeunit 6150725 "NPR POS Action: Payment"
             if (not SelectCreditVoucherFromList(VoucherNumber)) then
                 VoucherNumber := '';
 
-        //-NPR5.47 [322837]
         if (not CreditVoucherExist(VoucherNumber, VoucherStatusMsg)) then
-            //+NPR5.47 [322837]
             if (not SelectCreditVoucherFromOfflineList(VoucherNumber, VoucherNumber)) then
                 if (not CopyCreditVoucherFromCommonCompany(VoucherNumber)) then
                     VoucherNumber := '';
 
         if (VoucherNumber <> '') then
-            //-NPR5.47 [322837]
             exit(CreditVoucherExist(VoucherNumber, VoucherStatusMsg));
-        //+NPR5.47 [322837]
 
         exit(false);
     end;

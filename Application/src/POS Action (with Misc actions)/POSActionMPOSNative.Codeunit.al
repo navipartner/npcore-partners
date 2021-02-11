@@ -21,10 +21,10 @@ codeunit 6150825 "NPR POS Action - MPOS Native"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.3');
+        exit('1.4');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     var
         NativeActionSetting: Enum "NPR POS Native Action Setting";
@@ -51,13 +51,14 @@ codeunit 6150825 "NPR POS Action - MPOS Native"
             end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
         NativeActionSetting: Enum "NPR POS Native Action Setting";
+        POSUnit: Record "NPR POS Unit";
+        MPOSProfile: Record "NPR MPOS Profile";
         actiontype: Enum "NPR Action Type";
-        MPOSAppSetup: Record "NPR MPOS App Setup";
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR Sale POS";
         POSStore: Record "NPR POS Store";
@@ -74,13 +75,10 @@ codeunit 6150825 "NPR POS Action - MPOS Native"
         POSSale.GetCurrentSale(SalePOS);
         POSStore.get(SalePOS."POS Store Code");
 
-        //-NPR5.39
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-        if not MPOSAppSetup.Get(SalePOS."Register No.") then
-            exit;
-
-        if not MPOSAppSetup.Enable then
+        POSUnit.Get(SalePOS."Register No.");
+        if not POSUnit.GetProfile(MPOSProfile) then
             exit;
 
         InitState();
@@ -93,8 +91,8 @@ codeunit 6150825 "NPR POS Action - MPOS Native"
         case NativeActionSetting of
             NativeActionSetting::ADMISSION:
                 begin
-                    MPOSAppSetup.TestField("Ticket Admission Web Url");
-                    JSONString := BuildJSONParams(Format(NativeActionSetting), MPOSAppSetup."Ticket Admission Web Url", '', '', '', Err_AdmissionFailed);
+                    MPOSProfile.TestField("Ticket Admission Web Url");
+                    JSONString := BuildJSONParams(Format(NativeActionSetting), MPOSProfile."Ticket Admission Web Url", '', '', '', Err_AdmissionFailed);
                 end;
             NativeActionSetting::EOD:
                 begin
@@ -204,7 +202,7 @@ codeunit 6150825 "NPR POS Action - MPOS Native"
         Model.AddScript('CallNativeFunction(' + JsonObject + ');');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnProtocolUIResponse', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnProtocolUIResponse', '', false, false)]
     local procedure OnProtocolUIResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; ModelID: Guid; Sender: Text; EventName: Text; var Handled: Boolean)
     var
         WebClientDependency: Record "NPR Web Client Dependency";
@@ -242,18 +240,5 @@ codeunit 6150825 "NPR POS Action - MPOS Native"
         Clear(Model);
         Clear(ActiveModelID);
         Clear(TransactionDone);
-    end;
-
-    local procedure HandleProtocolError(FrontEnd: Codeunit "NPR POS Front End Management")
-    var
-        ErrorText: Text;
-    begin
-        TransactionDone := true;
-        ErrorText := StrSubstNo(ProtocolError, 'MPOSNATIVE', GetLastErrorText);
-
-        if not IsNullGuid(ActiveModelID) then
-            FrontEnd.CloseModel(ActiveModelID);
-
-        Message(ErrorText);
     end;
 }
