@@ -168,7 +168,7 @@ table 6060113 "NPR TM Ticket Particpt. Wks."
             OptionCaption = ' ,E-Mail,SMS';
             OptionMembers = NA,EMAIL,SMS;
         }
-        field(81; "Notification Address"; Text[80])
+        field(81; "Notification Address"; Text[100])
         {
             Caption = 'Notification Address';
             DataClassification = CustomerContent;

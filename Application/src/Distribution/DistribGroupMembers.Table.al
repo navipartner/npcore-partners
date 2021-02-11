@@ -38,7 +38,7 @@ table 6151056 "NPR Distrib. Group Members"
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Store";
         }
-        field(10; Description; Text[50])
+        field(10; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

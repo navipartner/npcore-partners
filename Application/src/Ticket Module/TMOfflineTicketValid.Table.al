@@ -76,7 +76,7 @@ table 6060109 "NPR TM Offline Ticket Valid."
             Caption = 'Imported At';
             DataClassification = CustomerContent;
         }
-        field(75; "Import Reference Name"; Text[80])
+        field(75; "Import Reference Name"; Text[100])
         {
             Caption = 'Import Reference Name';
             DataClassification = CustomerContent;

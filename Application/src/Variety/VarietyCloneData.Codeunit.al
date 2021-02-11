@@ -440,7 +440,7 @@ codeunit 6059972 "NPR Variety Clone Data"
                 VRTSetup."Variant Description 2"::VarietyTableSetupNext50:
                     "Description 2" := CopyStr(TempDesc, MaxStrLen(Description), MaxStrLen("Description 2"));
                 VRTSetup."Variant Description 2"::ItemDescription1:
-                    "Description 2" := Item.Description;
+                    "Description 2" := CopyStr(Item.Description, 1, MaxStrLen("Description 2"));
                 VRTSetup."Variant Description 2"::ItemDescription2:
                     "Description 2" := Item."Description 2";
             end;

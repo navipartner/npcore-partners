@@ -408,7 +408,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     var
         TouchScreenFunctions: Codeunit "NPR Touch Screen - Func.";
         RegisterPoSUnitId: Text[50];
-        RegisterPoSId: Text[50];
+        RegisterPoSId: Text[100];
         EFTTypePOSUnitGenParam: Record "NPR EFTType POSUnit Gen.Param.";
         Found: Boolean;
     begin
@@ -508,7 +508,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     end;
 
     [TryFunction]
-    local procedure InvokeRegisterPoS(var PoSIdIn: Text[50])
+    local procedure InvokeRegisterPoS(var PoSIdIn: Text[100])
     var
         RequestBody: Text[1024];
         ResponseText: Text[1024];
@@ -571,7 +571,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     end;
 
     [TryFunction]
-    local procedure InvokeGetUniquePoSId(var PoSIdIn: Text[50])
+    local procedure InvokeGetUniquePoSId(var PoSIdIn: Text[100])
     var
         RequestBody: Text[1024];
         ResponseText: Text[1024];
@@ -654,7 +654,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
     end;
 
     [TryFunction]
-    local procedure InvokeReadPoSUnitAssignedPoSId(PoSUnitIdIn: Text[30]; var PoSIdIn: Text[50])
+    local procedure InvokeReadPoSUnitAssignedPoSId(PoSUnitIdIn: Text[30]; var PoSIdIn: Text[100])
     var
         RequestBody: Text[1024];
         ResponseText: Text[1024];

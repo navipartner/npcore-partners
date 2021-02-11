@@ -103,7 +103,7 @@ table 6014416 "NPR Alternative No."
             InitValue = true;
             DataClassification = CustomerContent;
         }
-        field(6014400; "Variant Description"; Text[50])
+        field(6014400; "Variant Description"; Text[100])
         {
             Caption = 'Variant Description';
             Description = 'NPR5.48';

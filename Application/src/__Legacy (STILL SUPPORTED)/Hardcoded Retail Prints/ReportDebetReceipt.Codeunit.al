@@ -45,7 +45,7 @@ codeunit 6014567 "NPR Report - Debet Receipt"
         "/--------": Integer;
         "NP Retail Configuration": Record "NPR Retail Setup";
         flg2ndLoop: Boolean;
-        VariantDescription: Text[50];
+        VariantDescription: Text[100];
         BonInfo: Text;
         BonInfo2: Text[50];
         QuantityAmountTxt: Text[50];

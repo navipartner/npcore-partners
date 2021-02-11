@@ -223,7 +223,7 @@ xmlport 6060117 "NPR TM Ticket Confirmation"
         n: Integer;
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
 
-    procedure GetToken(): Text[50]
+    procedure GetToken(): Text[100]
     begin
         exit(ReservationID);
     end;

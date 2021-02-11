@@ -124,13 +124,13 @@ table 6014409 "NPR Gift Voucher"
             FieldClass = Normal;
             MaxValue = 9999999;
         }
-        field(10; Name; Text[50])
+        field(10; Name; Text[100])
         {
             Caption = 'Name';
             DataClassification = CustomerContent;
             Description = 'NPR5.38';
         }
-        field(11; Address; Text[50])
+        field(11; Address; Text[100])
         {
             Caption = 'Address';
             DataClassification = CustomerContent;
@@ -414,7 +414,7 @@ table 6014409 "NPR Gift Voucher"
         }
         field(6014401; Comment; Boolean)
         {
-            CalcFormula = Exist ("NPR Retail Comment" WHERE("Table ID" = CONST(6014410),
+            CalcFormula = Exist("NPR Retail Comment" WHERE("Table ID" = CONST(6014410),
                                                         "No." = FIELD("No.")));
             Caption = 'Comment';
             FieldClass = FlowField;

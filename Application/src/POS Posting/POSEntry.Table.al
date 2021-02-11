@@ -63,7 +63,7 @@ table 6150621 "NPR POS Entry"
             Caption = 'Ending Time';
             DataClassification = CustomerContent;
         }
-        field(14; Description; Text[80])
+        field(14; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

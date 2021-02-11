@@ -104,7 +104,7 @@ table 6014504 "NPR Customer Repair"
                 end;
             end;
         }
-        field(3; Name; Text[50])
+        field(3; Name; Text[100])
         {
             Caption = 'Name';
             DataClassification = CustomerContent;
@@ -146,7 +146,7 @@ table 6014504 "NPR Customer Repair"
                 //+NPR5.30
             end;
         }
-        field(4; Address; Text[50])
+        field(4; Address; Text[100])
         {
             Caption = 'Address';
             DataClassification = CustomerContent;
@@ -375,7 +375,7 @@ table 6014504 "NPR Customer Repair"
                 end;
             end;
         }
-        field(9; "Customer Name"; Text[50])
+        field(9; "Customer Name"; Text[100])
         {
             Caption = 'Customer Name';
             DataClassification = CustomerContent;
@@ -409,7 +409,7 @@ table 6014504 "NPR Customer Repair"
                 end;
             end;
         }
-        field(10; "Customer Address"; Text[50])
+        field(10; "Customer Address"; Text[100])
         {
             Caption = 'Customer Address';
             DataClassification = CustomerContent;
@@ -576,7 +576,7 @@ table 6014504 "NPR Customer Repair"
                 end;
             end;
         }
-        field(15; "Repairer Name"; Text[50])
+        field(15; "Repairer Name"; Text[100])
         {
             Caption = 'Repairer Name';
             DataClassification = CustomerContent;
@@ -598,7 +598,7 @@ table 6014504 "NPR Customer Repair"
                 end;
             end;
         }
-        field(16; "Repairer Address"; Text[50])
+        field(16; "Repairer Address"; Text[100])
         {
             Caption = 'Repairer Address';
             DataClassification = CustomerContent;
@@ -1053,7 +1053,7 @@ table 6014504 "NPR Customer Repair"
             Description = 'NPR5.26';
             DataClassification = CustomerContent;
         }
-        field(150; "Item Description"; Text[50])
+        field(150; "Item Description"; Text[100])
         {
             Caption = 'Item Description';
             Description = 'NPR5.27';

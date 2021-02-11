@@ -10,7 +10,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         ContraintText: Text;
         USER_CONFIRM_MESSAGE: Label '%1\\Do you want to allow action anyway?';
 
-    procedure LogMemberCardArrival(ExternalMemberCardNo: Text[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; ResponseMessage: Text; ResponseCode: Integer): Integer
+    procedure LogMemberCardArrival(ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; ResponseMessage: Text; ResponseCode: Integer): Integer
     var
         ExternalMemberNo: Code[20];
         ExternalMembershipNo: Code[20];
@@ -27,13 +27,13 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         exit(ResponseCode);
     end;
 
-    procedure WS_CheckLimitMemberCardArrival(ExternalMemberCardNo: Text[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ReUseLogEntryNo: Integer; var ResponseMessage: Text; var ResponseCode: Integer) LogEntryNo: Integer
+    procedure WS_CheckLimitMemberCardArrival(ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ReUseLogEntryNo: Integer; var ResponseMessage: Text; var ResponseCode: Integer) LogEntryNo: Integer
     begin
 
         CheckLimitMemberCardArrival(1, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, ResponseMessage, ResponseCode);
     end;
 
-    procedure POS_CheckLimitMemberCardArrival(ExternalMemberCardNo: Text[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ReUseLogEntryNo: Integer; var ResponseMessage: Text; var ResponseCode: Integer) LogEntryNo: Integer
+    procedure POS_CheckLimitMemberCardArrival(ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ReUseLogEntryNo: Integer; var ResponseMessage: Text; var ResponseCode: Integer) LogEntryNo: Integer
     begin
 
         CheckLimitMemberCardArrival(0, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, ResponseMessage, ResponseCode);
@@ -55,7 +55,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         MemberArrivalLogEntry.Modify();
     end;
 
-    local procedure InternalLogArrival(ExternalMemberShipNo: Code[20]; ExternalMemberNo: Code[20]; ExternalMemberCardNo: Text[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ReUseLogEntryNo: Integer; ResponseMessage: Text; ResponseCode: Integer; ResponseRuleEntry: Integer)
+    local procedure InternalLogArrival(ExternalMemberShipNo: Code[20]; ExternalMemberNo: Code[20]; ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ReUseLogEntryNo: Integer; ResponseMessage: Text; ResponseCode: Integer; ResponseRuleEntry: Integer)
     var
         MembershipSetup: Record "NPR MM Membership Setup";
         MemberArrivalLogEntry: Record "NPR MM Member Arr. Log Entry";
@@ -107,7 +107,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
 
     end;
 
-    local procedure CheckLimitMemberCardArrival(ClientType: Option POS,WS; ExternalMemberCardNo: Text[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ReUseLogEntryNo: Integer; var ResponseMessage: Text; var ResponseCode: Integer) RuleNo: Integer
+    local procedure CheckLimitMemberCardArrival(ClientType: Option POS,WS; ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ReUseLogEntryNo: Integer; var ResponseMessage: Text; var ResponseCode: Integer) RuleNo: Integer
     var
         MembershipLimitationSetup: Record "NPR MM Membership Lim. Setup";
         ExternalMemberNo: Code[20];
@@ -147,7 +147,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         RuleNo := CheckAndLogArrival(ClientType, MembershipCode, ExternalMembershipNo, ExternalMemberNo, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, ResponseMessage, ResponseCode);
     end;
 
-    local procedure CheckAndLogArrival(ClientType: Option POS,WS; MembershipCode: Code[20]; ExternalMemberShipNo: Code[20]; ExternalMemberNo: Code[20]; ExternalMemberCardNo: Text[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ReUseLogEntryNo: Integer; var ResponseMessage: Text; var ResponseCode: Integer) RuleNo: Integer
+    local procedure CheckAndLogArrival(ClientType: Option POS,WS; MembershipCode: Code[20]; ExternalMemberShipNo: Code[20]; ExternalMemberNo: Code[20]; ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ReUseLogEntryNo: Integer; var ResponseMessage: Text; var ResponseCode: Integer) RuleNo: Integer
     var
         MembershipLimitationSetup: Record "NPR MM Membership Lim. Setup";
         NewResponseMessage: Text;
@@ -195,7 +195,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         exit(RuleNo);
     end;
 
-    local procedure CheckAllLimitations(ClientType: Option POS,WS; MembershipCode: Code[20]; ExternalMemberShipNo: Code[20]; ExternalMemberNo: Code[20]; ExternalMemberCardNo: Text[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; IgnoreLogEntryNo: Integer; var ResponseMessage: Text; var ResponseCode: Integer) RuleNo: Integer
+    local procedure CheckAllLimitations(ClientType: Option POS,WS; MembershipCode: Code[20]; ExternalMemberShipNo: Code[20]; ExternalMemberNo: Code[20]; ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; IgnoreLogEntryNo: Integer; var ResponseMessage: Text; var ResponseCode: Integer) RuleNo: Integer
     var
         MembershipLimitationSetup: Record "NPR MM Membership Lim. Setup";
     begin
@@ -238,7 +238,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
             exit(CheckAllLimitations(ClientType, MembershipCode, ExternalMemberShipNo, ExternalMemberNo, ExternalMemberCardNo, '', ScannerStationId, IgnoreLogEntryNo, ResponseMessage, ResponseCode));
     end;
 
-    local procedure CheckLimitations(ClientType: Option POS,WS; MembershipCode: Code[20]; KeyValueType: Option; KeyValue: Text[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; IgnoreLogEntryNo: Integer; var ResponseMessage: Text; var ResponseCode: Integer) RuleNo: Integer
+    local procedure CheckLimitations(ClientType: Option POS,WS; MembershipCode: Code[20]; KeyValueType: Option; KeyValue: Text[100]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; IgnoreLogEntryNo: Integer; var ResponseMessage: Text; var ResponseCode: Integer) RuleNo: Integer
     var
         MembershipLimitationSetup: Record "NPR MM Membership Lim. Setup";
         LimitFound: Boolean;
@@ -288,7 +288,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         exit(RuleNo);
     end;
 
-    local procedure DoesRuleApply(ClientType: Option; RuleEntryNo: Integer; KeyValue: Text[50]; AdmissionCode: Code[20]; var MatchCount: Integer; IgnoreLogEntryNo: Integer; var RuleConstraint: Text; var RuleConditionalValue: Text): Boolean
+    local procedure DoesRuleApply(ClientType: Option; RuleEntryNo: Integer; KeyValue: Text[100]; AdmissionCode: Code[20]; var MatchCount: Integer; IgnoreLogEntryNo: Integer; var RuleConstraint: Text; var RuleConditionalValue: Text): Boolean
     var
         MembershipLimitationSetup: Record "NPR MM Membership Lim. Setup";
         MemberArrivalLogEntry: Record "NPR MM Member Arr. Log Entry";
@@ -396,7 +396,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         end;
     end;
 
-    local procedure GetExternalMembershipNo(ExternalCardNo: Text[50]; var ExternalMembershipNo: Code[20]; var MembershipCode: Code[20]; var ResponseMessage: Text): Boolean
+    local procedure GetExternalMembershipNo(ExternalCardNo: Text[100]; var ExternalMembershipNo: Code[20]; var MembershipCode: Code[20]; var ResponseMessage: Text): Boolean
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         Membership: Record "NPR MM Membership";
@@ -410,7 +410,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         exit(ExternalMembershipNo <> '');
     end;
 
-    local procedure GetExternalMemberNo(ExternalCardNo: Text[50]; var ExternalMemberNo: Code[20]; var ResponseMessage: Text): Boolean
+    local procedure GetExternalMemberNo(ExternalCardNo: Text[100]; var ExternalMemberNo: Code[20]; var ResponseMessage: Text): Boolean
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         Member: Record "NPR MM Member";

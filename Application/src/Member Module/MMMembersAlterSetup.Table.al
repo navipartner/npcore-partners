@@ -47,7 +47,7 @@ table 6060136 "NPR MM Members. Alter. Setup"
             Caption = 'Presentation Order';
             DataClassification = CustomerContent;
         }
-        field(10; Description; Text[50])
+        field(10; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

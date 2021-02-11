@@ -245,8 +245,8 @@ report 6014501 "NPR Repair Offer"
         StarDisplay: Text;
         TelephoneText: Text;
         EstDelivery: Text[30];
-        CompanyAddr: array[8] of Text[50];
-        CustAddress: array[8] of Text[50];
+        CompanyAddr: array[8] of Text[100];
+        CustAddress: array[8] of Text[100];
         GlobalDimension1Desc: Text[80];
         AddrLine: Text[100];
         RepDescription: Text[100];

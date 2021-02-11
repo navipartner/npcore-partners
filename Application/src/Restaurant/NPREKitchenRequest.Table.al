@@ -111,7 +111,7 @@ table 6150678 "NPR NPRE Kitchen Request"
             DataClassification = CustomerContent;
             TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
         }
-        field(120; Description; Text[80])
+        field(120; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

@@ -123,7 +123,7 @@ page 6014434 "NPR Payment Type - List"
 
     var
         Kontonr: Code[20];
-        KontoNavn: Text[50];
+        KontoNavn: Text[100];
 
     procedure OpdaterFinKtoNavn(KtnNr: Code[20])
     var

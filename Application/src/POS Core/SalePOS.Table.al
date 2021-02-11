@@ -236,12 +236,12 @@ table 6014405 "NPR Sale POS"
                   DATABASE::"Salesperson/Purchaser", "Salesperson Code");
             end;
         }
-        field(8; Name; Text[50])
+        field(8; Name; Text[100])
         {
             Caption = 'Name';
             DataClassification = CustomerContent;
         }
-        field(9; Address; Text[50])
+        field(9; Address; Text[100])
         {
             Caption = 'Address';
             DataClassification = CustomerContent;
@@ -661,7 +661,7 @@ table 6014405 "NPR Sale POS"
                 ShowDocDim;
             end;
         }
-        field(485; "Customer Name"; Text[50])
+        field(485; "Customer Name"; Text[100])
         {
             CalcFormula = Lookup(Customer.Name WHERE("No." = FIELD("Customer No.")));
             Caption = 'Customer Name';

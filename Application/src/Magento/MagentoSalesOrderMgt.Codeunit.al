@@ -861,7 +861,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         SalesLine.Validate("No.", ItemNo);
         SalesLine."Variant Code" := VariantCode;
         if VariantCode <> '' then
-            SalesLine."Description 2" := ItemVariant.Description;
+            SalesLine."Description 2" := CopyStr(ItemVariant.Description, 1, MaxStrLen(SalesLine."Description 2"));
         SalesLine.Validate(Quantity, Quantity);
 
         if RequestedDeliveryDate <> 0D then

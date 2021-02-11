@@ -97,7 +97,7 @@ table 6151596 "NPR NpDc Coupon List Item"
             Caption = 'Priority';
             DataClassification = CustomerContent;
         }
-        field(100; Description; Text[50])
+        field(100; Description; Text[100])
         {
             Caption = 'Item Description';
             DataClassification = CustomerContent;

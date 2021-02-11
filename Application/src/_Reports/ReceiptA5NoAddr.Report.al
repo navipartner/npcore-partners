@@ -1,8 +1,8 @@
 report 6014563 "NPR Receipt A5 - No Addr."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Receipt A5 - No Addr..rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Receipt A5 - No Addr..rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Receipt A5';
     PreviewMode = PrintLayout;
@@ -587,7 +587,7 @@ report 6014563 "NPR Receipt A5 - No Addr."
         Text002: Label 'Eksp.  %1';
         Text000: Label 'Sales Ticket No.: %1';
         ReceiptInfoText: Text;
-        CustInf: array[8] of Text[50];
+        CustInf: array[8] of Text[100];
         DiscountPctTxt: Text[50];
         IndbetalTXT2: Text[50];
         IndbetalTXT3: Text[50];

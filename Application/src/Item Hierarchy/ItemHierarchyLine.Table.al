@@ -116,7 +116,7 @@ table 6151052 "NPR Item Hierarchy Line"
                 "Item Desc." := Item.Description;
             end;
         }
-        field(23; "Item Desc."; Text[80])
+        field(23; "Item Desc."; Text[100])
         {
             Caption = 'Item Desciption';
             DataClassification = CustomerContent;

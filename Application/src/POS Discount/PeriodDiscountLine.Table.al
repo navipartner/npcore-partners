@@ -29,7 +29,7 @@ table 6014414 "NPR Period Discount Line"
                 "Vendor Item No." := Item."Vendor Item No.";
             end;
         }
-        field(3; Description; Text[50])
+        field(3; Description; Text[100])
         {
             CalcFormula = Lookup(Item.Description WHERE("No." = FIELD("Item No.")));
             Caption = 'Description';
