@@ -62,7 +62,7 @@ table 6014422 "NPR Retail Journal Line"
             Caption = 'Quantity to Print';
             DataClassification = CustomerContent;
         }
-        field(4; Description; Text[50])
+        field(4; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;
@@ -170,7 +170,7 @@ table 6014422 "NPR Retail Journal Line"
                     exit;
 
                 if ItemVariant.Get("Item No.", "Variant Code") then
-                    "Description 2" := ItemVariant.Description;
+                    "Description 2" := CopyStr(ItemVariant.Description, 1, MaxStrLen("Description 2"));
 
                 UpdateBarcode;
 

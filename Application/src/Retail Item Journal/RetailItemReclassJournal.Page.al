@@ -786,7 +786,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
         ReportPrint: Codeunit "Test Report-Print";
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
         CurrentJnlBatchName: Code[10];
-        ItemDescription: Text[50];
+        ItemDescription: Text[100];
         ShortcutDimCode: array[8] of Code[20];
         NewShortcutDimCode: array[8] of Code[20];
         RetailItemJnlMgt: Codeunit "NPR Retail Item Jnl. Mgt.";

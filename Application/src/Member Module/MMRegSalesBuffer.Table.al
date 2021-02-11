@@ -39,7 +39,7 @@ table 6151160 "NPR MM Reg. Sales Buffer"
             Caption = 'Quantity';
             DataClassification = CustomerContent;
         }
-        field(23; Description; Text[80])
+        field(23; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

@@ -216,7 +216,7 @@ report 6014543 "NPR Item - Loss - Top 10"
         Item1: Record Item;
         "ItemNo.": Code[20];
         SourceCodeFilter: Code[10];
-        ItemDescription: Text[50];
+        ItemDescription: Text[100];
         ItemFilters: Text[250];
         ProgressText: Text[1024];
         SortBy: Text[30];

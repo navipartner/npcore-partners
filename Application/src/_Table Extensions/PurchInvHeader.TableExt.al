@@ -24,45 +24,45 @@ tableextension 6014411 "NPR Purch. Inv. Header" extends "Purch. Inv. Header"
             OptionCaption = 'Print,E-mail,,Print and E-Mail';
             OptionMembers = Print,Email,OIO,PrintAndEmail;
         }
-        field(6014420; "NPR Sell-to Customer Name"; Text[50])
+        field(6014420; "NPR Sell-to Customer Name"; Text[100])
         {
-            CalcFormula = Lookup (Customer.Name WHERE("No." = FIELD("Sell-to Customer No.")));
+            CalcFormula = Lookup(Customer.Name WHERE("No." = FIELD("Sell-to Customer No.")));
             Caption = 'Sell-to Customer Name';
             FieldClass = FlowField;
         }
         field(6014421; "NPR Sell-to Customer Name 2"; Text[50])
         {
-            CalcFormula = Lookup (Customer."Name 2" WHERE("No." = FIELD("Sell-to Customer No.")));
+            CalcFormula = Lookup(Customer."Name 2" WHERE("No." = FIELD("Sell-to Customer No.")));
             Caption = 'Sell-to Customer Name 2';
             FieldClass = FlowField;
         }
         field(6014422; "NPR Sell-to Address"; Text[50])
         {
-            CalcFormula = Lookup (Customer.Address WHERE("No." = FIELD("Sell-to Customer No.")));
+            CalcFormula = Lookup(Customer.Address WHERE("No." = FIELD("Sell-to Customer No.")));
             Caption = 'Sell-to Address';
             FieldClass = FlowField;
         }
         field(6014423; "NPR Sell-to Address 2"; Text[50])
         {
-            CalcFormula = Lookup (Customer."Address 2" WHERE("No." = FIELD("Sell-to Customer No.")));
+            CalcFormula = Lookup(Customer."Address 2" WHERE("No." = FIELD("Sell-to Customer No.")));
             Caption = 'Sell-to Address 2';
             FieldClass = FlowField;
         }
         field(6014424; "NPR Sell-to City"; Text[30])
         {
-            CalcFormula = Lookup (Customer.City WHERE("No." = FIELD("Sell-to Customer No.")));
+            CalcFormula = Lookup(Customer.City WHERE("No." = FIELD("Sell-to Customer No.")));
             Caption = 'Sell-to City';
             FieldClass = FlowField;
         }
         field(6014425; "NPR Sell-to Post Code"; Code[20])
         {
-            CalcFormula = Lookup (Customer."Post Code" WHERE("No." = FIELD("Sell-to Customer No.")));
+            CalcFormula = Lookup(Customer."Post Code" WHERE("No." = FIELD("Sell-to Customer No.")));
             Caption = 'Sell-to Post Code';
             FieldClass = FlowField;
         }
         field(6014430; "NPR Sell-to Phone No."; Text[30])
         {
-            CalcFormula = Lookup (Customer."Phone No." WHERE("No." = FIELD("Sell-to Customer No.")));
+            CalcFormula = Lookup(Customer."Phone No." WHERE("No." = FIELD("Sell-to Customer No.")));
             Caption = 'Sell-to Phone No.';
             FieldClass = FlowField;
         }

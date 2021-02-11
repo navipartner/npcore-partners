@@ -54,7 +54,7 @@ table 6150623 "NPR POS Payment Line"
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Payment Bin";
         }
-        field(14; Description; Text[80])
+        field(14; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

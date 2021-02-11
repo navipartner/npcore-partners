@@ -345,7 +345,7 @@ table 6014418 "NPR Archive Sale POS"
         field(300; Amount; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum ("NPR Archive Sale Line POS".Amount WHERE("Register No." = FIELD("Register No."),
+            CalcFormula = Sum("NPR Archive Sale Line POS".Amount WHERE("Register No." = FIELD("Register No."),
                                                                     "Sales Ticket No." = FIELD("Sales Ticket No."),
                                                                     "Sale Type" = FILTER(Sale | "Debit Sale" | "Gift Voucher" | "Credit Voucher" | Deposit),
                                                                     Type = FILTER(<> Comment & <> "Open/Close")));
@@ -362,7 +362,7 @@ table 6014418 "NPR Archive Sale POS"
         field(310; "Amount Including VAT"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum ("NPR Archive Sale Line POS"."Amount Including VAT" WHERE("Register No." = FIELD("Register No."),
+            CalcFormula = Sum("NPR Archive Sale Line POS"."Amount Including VAT" WHERE("Register No." = FIELD("Register No."),
                                                                                     "Sales Ticket No." = FIELD("Sales Ticket No."),
                                                                                     "Sale Type" = FILTER(Sale | "Debit Sale" | "Gift Voucher" | "Credit Voucher" | Deposit),
                                                                                     Type = FILTER(<> Comment & <> "Open/Close")));
@@ -373,7 +373,7 @@ table 6014418 "NPR Archive Sale POS"
         field(320; "Payment Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum ("NPR Archive Sale Line POS"."Amount Including VAT" WHERE("Register No." = FIELD("Register No."),
+            CalcFormula = Sum("NPR Archive Sale Line POS"."Amount Including VAT" WHERE("Register No." = FIELD("Register No."),
                                                                                     "Sales Ticket No." = FIELD("Sales Ticket No."),
                                                                                     "Sale Type" = FILTER(Payment | "Out payment"),
                                                                                     Type = FILTER(<> Comment & <> "Open/Close")));
@@ -388,9 +388,9 @@ table 6014418 "NPR Archive Sale POS"
             TableRelation = "Dimension Set Entry";
             DataClassification = CustomerContent;
         }
-        field(485; "Customer Name"; Text[50])
+        field(485; "Customer Name"; Text[100])
         {
-            CalcFormula = Lookup (Customer.Name WHERE("No." = FIELD("Customer No.")));
+            CalcFormula = Lookup(Customer.Name WHERE("No." = FIELD("Customer No.")));
             Caption = 'Customer Name';
             Editable = false;
             FieldClass = FlowField;

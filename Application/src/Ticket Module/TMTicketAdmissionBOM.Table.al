@@ -57,7 +57,7 @@ table 6060121 "NPR TM Ticket Admission BOM"
             DataClassification = CustomerContent;
             InitValue = 1;
         }
-        field(11; Description; Text[50])
+        field(11; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

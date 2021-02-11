@@ -73,7 +73,7 @@ table 6014505 "NPR Customer Repair Journal"
             DataClassification = CustomerContent;
             Description = 'NPR70.00.01.01';
         }
-        field(8; Description; Text[50])
+        field(8; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;
@@ -81,7 +81,7 @@ table 6014505 "NPR Customer Repair Journal"
         }
         field(15; "Qty Posted"; Decimal)
         {
-            CalcFormula = - Sum ("Item Ledger Entry".Quantity WHERE("Document No." = FIELD("Customer Repair No."),
+            CalcFormula = - Sum("Item Ledger Entry".Quantity WHERE("Document No." = FIELD("Customer Repair No."),
                                                                    "Item No." = FIELD("Item Part No.")));
             Caption = 'Qty Posted';
             Description = 'NPR5.26';

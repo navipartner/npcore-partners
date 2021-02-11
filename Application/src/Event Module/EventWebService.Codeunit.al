@@ -20,7 +20,7 @@ codeunit 6060158 "NPR Event Web Service"
         SourceJob: Record Job;
         TargetJob: Record Job;
         TargetJobNo: Code[20];
-        TargetJobDescription: Text[50];
+        TargetJobDescription: Text[100];
         JobsSetup: Record "Jobs Setup";
         NoSeriesManagement: Codeunit NoSeriesManagement;
         JobPlanningLine: Record "Job Planning Line";

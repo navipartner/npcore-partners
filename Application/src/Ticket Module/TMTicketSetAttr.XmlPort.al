@@ -91,15 +91,15 @@ xmlport 6060121 "NPR TM Ticket Set Attr."
 
     var
         EntryNo: Integer;
-        ReservationID: Text[50];
+        ReservationID: Text[100];
         AdmissionCodeArray: array[100] of Code[20];
 
-    procedure GetToken(): Text[50]
+    procedure GetToken(): Text[100]
     begin
         exit(ReservationID);
     end;
 
-    procedure SetResult(SuccessIn: Boolean; DocumentID: Text[50]; ResponseMessageIn: Text)
+    procedure SetResult(SuccessIn: Boolean; DocumentID: Text[100]; ResponseMessageIn: Text)
     begin
         success := Format(SuccessIn, 0, 9);
         if (not SuccessIn) then

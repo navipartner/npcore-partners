@@ -66,7 +66,7 @@ table 6060091 "NPR MM Admis. Service Entry"
             Caption = 'Member Entry No.';
             DataClassification = CustomerContent;
         }
-        field(23; "External Card No."; Text[50])
+        field(23; "External Card No."; Text[100])
         {
             Caption = 'External Card No.';
             DataClassification = CustomerContent;
@@ -125,7 +125,7 @@ table 6060091 "NPR MM Admis. Service Entry"
             DataClassification = CustomerContent;
             NotBlank = true;
         }
-        field(32; "Ticket Type Description"; Text[50])
+        field(32; "Ticket Type Description"; Text[100])
         {
             Caption = 'Ticket Type Description';
             DataClassification = CustomerContent;

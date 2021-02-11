@@ -75,7 +75,7 @@ table 6151462 "NPR Magento PostOnImport Setup"
                 end;
             end;
         }
-        field(20; Description; Text[50])
+        field(20; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

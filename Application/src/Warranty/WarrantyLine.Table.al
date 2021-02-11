@@ -61,7 +61,7 @@ table 6014519 "NPR Warranty Line"
             Caption = 'Discount %';
             DataClassification = CustomerContent;
         }
-        field(9; Description; Text[50])
+        field(9; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

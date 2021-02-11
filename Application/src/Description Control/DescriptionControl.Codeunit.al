@@ -119,7 +119,7 @@ codeunit 6059969 "NPR Description Control"
 
     local procedure GetDescription(var Desc1: Text; var Desc2: Text; ItemNo: Code[20]; VariantCode: Code[10]; LanguageCode: Code[10]; DescControlCode: Code[10])
     var
-        Description1: Text[50];
+        Description1: Text[100];
         Description2: Text[50];
         Item: Record Item;
         ItemVariant: Record "Item Variant";
@@ -153,8 +153,8 @@ codeunit 6059969 "NPR Description Control"
 
     local procedure GetDescriptionSimple(var Desc1: Text; var Desc2: Text; ItemNo: Code[20]; VariantCode: Code[10]; Desc1Setup: Option " ",ItemDescription1,ItemDescription2,VariantDescription1,VariantDescription2,VendorItemNo; Desc2Setup: Option " ",ItemDescription1,ItemDescription2,VariantDescription1,VariantDescription2,VendorItemNo)
     var
-        Description1: Text[50];
-        Description2: Text[50];
+        Description1: Text[100];
+        Description2: Text[100];
         Item: Record Item;
         ItemVariant: Record "Item Variant";
         "Field": Record "Field";
@@ -273,7 +273,7 @@ codeunit 6059969 "NPR Description Control"
         end;
     end;
 
-    local procedure GetItemTrans(ItemNo: Code[20]; VariantCode: Code[10]; LanguageCode: Code[10]; var Desc1: Text[50]; var Desc2: Text[50]): Boolean
+    local procedure GetItemTrans(ItemNo: Code[20]; VariantCode: Code[10]; LanguageCode: Code[10]; var Desc1: Text[100]; var Desc2: Text[50]): Boolean
     var
         ItemTranslation: Record "Item Translation";
     begin
@@ -285,7 +285,7 @@ codeunit 6059969 "NPR Description Control"
         exit(true);
     end;
 
-    procedure GetItemCrossRefDescription(ItemNo: Code[20]; VariantCode: Code[10]): Text[50]
+    procedure GetItemCrossRefDescription(ItemNo: Code[20]; VariantCode: Code[10]): Text[100]
     var
         VRTSetup: Record "NPR Variety Setup";
         Item: Record Item;
@@ -323,7 +323,7 @@ codeunit 6059969 "NPR Description Control"
         ItemGroup: Record "NPR Item Group";
         Vendor: Record Vendor;
         Pos: Integer;
-        VendorName: Text[50];
+        VendorName: Text[100];
         ItemGroupName: Text[50];
         ItemVariant: Record "Item Variant";
     begin
@@ -366,13 +366,13 @@ codeunit 6059969 "NPR Description Control"
                         RetailSetup."Description control"::"<Description><Variant Info>":
                             begin
                                 if ItemVariant.Get(Rec."No.", Rec."Variant Code") then
-                                    Description := Item.Description + ' ' + ItemVariant.Description;
+                                    Description := CopyStr(Item.Description + ' ' + ItemVariant.Description, 1, MaxStrLen(Description));
                             end;
                         RetailSetup."Description control"::"<Desc Item>:<Desc2 Variant>":
                             begin
                                 Description := Item.Description;
                                 if ItemVariant.Get(Rec."No.", Rec."Variant Code") then
-                                    "Description 2" := ItemVariant.Description;
+                                    "Description 2" := CopyStr(ItemVariant.Description, 1, MaxStrLen("Description 2"));
                             end;
                     end;
                 end;
@@ -389,12 +389,12 @@ codeunit 6059969 "NPR Description Control"
     var
         Item: Record Item;
         RetailSetup: Record "NPR Retail Setup";
-        Desc: Text[50];
+        Desc: Text[100];
         Desc2: Text[50];
         ItemGroup: Record "NPR Item Group";
         Vendor: Record Vendor;
         pos1: Integer;
-        VendorName: Text[50];
+        VendorName: Text[100];
         ItemGroupName: Text[50];
     begin
         with SalesLine do begin
@@ -456,7 +456,7 @@ codeunit 6059969 "NPR Description Control"
                         GetItemTranslation_OLD("No.", '', SalesHeader."Language Code", Desc, Desc2);
                         Description := Desc;
                         GetItemTranslation_OLD("No.", "Variant Code", SalesHeader."Language Code", Desc, Desc2);
-                        "Description 2" := Desc;
+                        "Description 2" := CopyStr(Desc, 1, MaxStrLen("Description 2"));
                     end;
             end;
         end;
@@ -466,12 +466,12 @@ codeunit 6059969 "NPR Description Control"
     var
         Item: Record Item;
         RetailSetup: Record "NPR Retail Setup";
-        Desc: Text[50];
+        Desc: Text[100];
         Desc2: Text[50];
         ItemGroup: Record "NPR Item Group";
         Vendor: Record Vendor;
         pos1: Integer;
-        VendorName: Text[50];
+        VendorName: Text[100];
         ItemGroupName: Text[50];
     begin
         with PurchLine do begin
@@ -533,7 +533,7 @@ codeunit 6059969 "NPR Description Control"
                         GetItemTranslation_OLD("No.", '', PurchHeader."Language Code", Desc, Desc2);
                         Description := Desc;
                         GetItemTranslation_OLD("No.", "Variant Code", PurchHeader."Language Code", Desc, Desc2);
-                        "Description 2" := Desc;
+                        "Description 2" := CopyStr(Desc, 1, MaxStrLen("Description 2"));
                     end;
             end;
         end;
@@ -543,12 +543,12 @@ codeunit 6059969 "NPR Description Control"
     var
         Item: Record Item;
         RetailSetup: Record "NPR Retail Setup";
-        Desc: Text[50];
+        Desc: Text[100];
         Desc2: Text[50];
         ItemGroup: Record "NPR Item Group";
         Vendor: Record Vendor;
         pos1: Integer;
-        VendorName: Text[50];
+        VendorName: Text[100];
         ItemGroupName: Text[50];
     begin
         with TransLine do begin
@@ -607,13 +607,13 @@ codeunit 6059969 "NPR Description Control"
                         GetItemTranslation_OLD("Item No.", '', '', Desc, Desc2);
                         Description := Desc;
                         GetItemTranslation_OLD("Item No.", "Variant Code", '', Desc, Desc2);
-                        "Description 2" := Desc;
+                        "Description 2" := CopyStr(Desc, 1, MaxStrLen("Description 2")); //check -TinF
                     end;
             end;
         end;
     end;
 
-    procedure GetItemTranslation_OLD(ItemNo: Code[20]; VariantCode: Code[10]; Languagecode: Code[10]; var Desc: Text[100]; var Desc2: Text[100])
+    procedure GetItemTranslation_OLD(ItemNo: Code[20]; VariantCode: Code[10]; Languagecode: Code[10]; var Desc: Text[100]; var Desc2: Text[50])
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";

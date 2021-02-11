@@ -66,7 +66,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         ReservationNodeList: XmlNodeList;
         NTicketAdmission: Integer;
         NReservation: Integer;
-        Token: Text[50];
+        Token: Text[100];
         TicketCreated: Boolean;
     begin
 
@@ -281,7 +281,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         NTicket: Integer;
         ResponseMessage: Text;
         ReusedToken: Text;
-        Token: Text[50];
+        Token: Text[100];
 
         TicketRequestElement: XmlElement;
         TicketNode: XmlNode;

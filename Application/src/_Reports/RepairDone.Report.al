@@ -233,8 +233,8 @@ report 6014502 "NPR Repair Done"
         MobileText: Text;
         StarDisplay: Text;
         TelephoneText: Text;
-        CompanyAddr: array[8] of Text[50];
-        DebAddress: array[8] of Text[50];
+        CompanyAddr: array[8] of Text[100];
+        DebAddress: array[8] of Text[100];
         GlobDim1Desc: Text[80];
         AdresseLine: Text[100];
         PriceNotAccepted: Text[100];

@@ -44,7 +44,7 @@ table 6060145 "NPR MM Member Arr. Log Entry"
             Caption = 'External Member No.';
             DataClassification = CustomerContent;
         }
-        field(40; "External Card No."; Text[50])
+        field(40; "External Card No."; Text[100])
         {
             Caption = 'External Card No.';
             DataClassification = CustomerContent;

@@ -91,7 +91,7 @@ table 6151023 "NPR NpRv Ext. Voucher Buffer"
             DataClassification = CustomerContent;
             Description = 'NPR5.48';
         }
-        field(210; Name; Text[50])
+        field(210; Name; Text[100])
         {
             Caption = 'Name';
             DataClassification = CustomerContent;
@@ -103,7 +103,7 @@ table 6151023 "NPR NpRv Ext. Voucher Buffer"
             Caption = 'Name 2';
             DataClassification = CustomerContent;
         }
-        field(220; Address; Text[50])
+        field(220; Address; Text[100])
         {
             Caption = 'Address';
             DataClassification = CustomerContent;

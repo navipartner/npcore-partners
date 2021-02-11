@@ -154,7 +154,7 @@ table 6060116 "NPR TM Ticket Reservation Req."
             OptionCaption = ' ,E-Mail,SMS';
             OptionMembers = NA,EMAIL,SMS;
         }
-        field(81; "Notification Address"; Text[80])
+        field(81; "Notification Address"; Text[100])
         {
             Caption = 'Notification Address';
             DataClassification = CustomerContent;

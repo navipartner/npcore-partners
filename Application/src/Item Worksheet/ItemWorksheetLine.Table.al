@@ -228,7 +228,7 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             TableRelation = Vendor;
         }
-        field(10; Description; Text[50])
+        field(10; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;
