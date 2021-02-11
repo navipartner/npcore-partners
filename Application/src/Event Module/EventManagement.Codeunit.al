@@ -2194,7 +2194,7 @@ codeunit 6060150 "NPR Event Management"
         NPRetailSetup: Record "NPR NP Retail Setup";
         AdvancedPostingActive: Boolean;
     begin
-        AdvancedPostingActive := NPRetailSetup.Get and NPRetailSetup."Advanced Posting Activated";
+        AdvancedPostingActive := NPRetailSetup.Get;
         if AdvancedPostingActive then begin
             POSEntry.SetRange("POS Unit No.", JobPlanningLineInvoice."NPR POS Unit No.");
             POSEntry.SetRange("POS Store Code", JobPlanningLineInvoice."NPR POS Store Code");

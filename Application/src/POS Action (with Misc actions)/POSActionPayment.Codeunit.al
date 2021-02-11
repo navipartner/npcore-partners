@@ -80,7 +80,6 @@ codeunit 6150725 "NPR POS Action: Payment"
         SubTotal: Decimal;
         ReturnPaymentTypePOS: Record "NPR Payment Type POS";
         CurrentView: Codeunit "NPR POS View";
-        NPRetailSetup: Record "NPR NP Retail Setup";
         POSUnit: Record "NPR POS Unit";
         POSAuditProfile: Record "NPR POS Audit Profile";
         POSSale: Codeunit "NPR POS Sale";
@@ -93,11 +92,11 @@ codeunit 6150725 "NPR POS Action: Payment"
         POSSession.GetSetup(Setup);
         Setup.GetPOSUnit(POSUnit);
         Register.Get(Setup.Register());
-        NPRetailSetup.Get();
+        //+NPR5.51 [359714]
 
-        if NPRetailSetup."Advanced Posting Activated" then begin
-            POSUnit.TestField("Default POS Payment Bin");
-        end;
+        //-NPR5.51 [359714]
+        POSUnit.TestField("Default POS Payment Bin");
+        //+NPR5.51 [359714]
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);

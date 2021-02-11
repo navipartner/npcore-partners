@@ -126,32 +126,18 @@ table 6150613 "NPR NP Retail Setup"
             Caption = 'Advanced POS Entries Activated';
             DataClassification = CustomerContent;
             Description = 'NPR5.32';
-
-            trigger OnValidate()
-            var
-                RetailDataModelARUpgrade: Codeunit "NPR RetailDataModel AR Upgr.";
-            begin
-                if "Advanced POS Entries Activated" then
-                    RetailDataModelARUpgrade.ActivatePoseidonPOSEntries
-                else
-                    RetailDataModelARUpgrade.DeactivatePoseidonPOSEntries;
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(10020; "Advanced Posting Activated"; Boolean)
         {
             Caption = 'Advanced Posting Activated';
             DataClassification = CustomerContent;
             Description = 'NPR5.36';
-
-            trigger OnValidate()
-            var
-                RetailDataModelARUpgrade: Codeunit "NPR RetailDataModel AR Upgr.";
-            begin
-                if "Advanced Posting Activated" then
-                    RetailDataModelARUpgrade.ActivatePoseidonPosting
-                else
-                    RetailDataModelARUpgrade.DeactivatePoseidonPosting;
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(20000; "Environment Database Name"; Text[250])
         {

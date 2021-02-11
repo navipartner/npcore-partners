@@ -204,8 +204,6 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         SalePOS: Record "NPR Sale POS";
         POSQuoteMgt: Codeunit "NPR POS Quote Mgt.";
     begin
-        NPRetailSetup.Get();
-        NPRetailSetup.TestField("Advanced Posting Activated");
 
         if (SalesTicketNo = '') then
             exit(true);

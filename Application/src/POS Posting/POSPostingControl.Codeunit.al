@@ -87,14 +87,8 @@ codeunit 6150637 "NPR POS Posting Control"
 
     procedure PostEntry(var POSEntry: Record "NPR POS Entry"; ItemPost: Boolean; POSPost: Boolean)
     var
-        NPRetailSetup: Record "NPR NP Retail Setup";
         POSPostEntries: Codeunit "NPR POS Post Entries";
     begin
-        NPRetailSetup.Get;
-        if not NPRetailSetup."Advanced POS Entries Activated" then
-            exit;
-        if not NPRetailSetup."Advanced Posting Activated" then
-            exit;
         if (not ItemPost) and (not POSPost) then
             exit;
         Commit;
