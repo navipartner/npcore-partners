@@ -18,7 +18,9 @@ codeunit 6014422 "NPR NP Retail Setup Upgrade"
         POSUnit: Record "NPR POS Unit";
         NPRNPRetailSetup: Record "NPR NP Retail Setup";
     begin
-        NPRNPRetailSetup.Get();
+        if not NPRNPRetailSetup.Get() then
+            exit;
+
         if NPRNPRetailSetup."Default POS Posting Profile" = '' then
             exit;
 
