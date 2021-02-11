@@ -88,15 +88,6 @@ page 6014405 "NPR Register List"
                     ApplicationArea = All;
                     ToolTip = 'Executes the 2nd Display Setup action';
                 }
-                action("mPos Setup")
-                {
-                    Caption = 'mPos Setup';
-                    Image = Add;
-                    RunObject = Page "NPR MPOS App Setup Card";
-                    RunPageLink = "Register No." = FIELD("Register No.");
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the mPos Setup action';
-                }
             }
         }
     }

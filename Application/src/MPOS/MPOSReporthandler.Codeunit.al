@@ -1,23 +1,16 @@
 codeunit 6059976 "NPR MPOS Report handler"
 {
-    // NPR5.33/NPKNAV/20170630  CASE 272155 Transport NPR5.33 - 30 June 2017
-    // NPR5.34/CLVA/20170703 CASE 280444 Upgrading MPOS functionality to transcendence
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Err_CreatePDFFailed: Label 'Error creating PDF report';
 
     procedure ExecutionHandler(ReportId: Integer; RegisterId: Code[10])
     var
-        MPOSAppSetup: Record "NPR MPOS App Setup";
+        MPOSProfile: Record "NPR MPOS Profile";
+        POSUnit: Record "NPR POS Unit";
         RecVariant: Variant;
     begin
-        if MPOSAppSetup.Get(RegisterId) then begin
-            if MPOSAppSetup.Enable then
+        if POSUnit.Get(RegisterId) then begin
+            if POSUnit.GetProfile(MPOSProfile) then
                 SendReportToLocalOS(ReportId, RecVariant)
             else
                 REPORT.RunModal(ReportId);
@@ -27,15 +20,16 @@ codeunit 6059976 "NPR MPOS Report handler"
 
     procedure ExecutionHandlerWithVars(ReportId: Integer; RecVariant: Variant; ReqWindow: Boolean; SystemPrinter: Boolean)
     var
-        MPOSAppSetup: Record "NPR MPOS App Setup";
+        MPOSProfile: Record "NPR MPOS Profile";
+        POSUnit: Record "NPR POS Unit";
         RegisterId: Code[10];
         UserSetup: Record "User Setup";
     begin
         if UserSetup.Get(UserId) then
             RegisterId := UserSetup."NPR Backoffice Register No.";
 
-        if MPOSAppSetup.Get(RegisterId) then begin
-            if MPOSAppSetup.Enable then
+        if POSUnit.Get(RegisterId) then begin
+            if POSUnit.GetProfile(MPOSProfile) then
                 SendReportToLocalOS(ReportId, RecVariant)
             else
                 REPORT.RunModal(ReportId, ReqWindow, SystemPrinter, RecVariant);

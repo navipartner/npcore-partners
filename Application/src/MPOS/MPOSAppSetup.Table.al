@@ -2,6 +2,9 @@ table 6059966 "NPR MPOS App Setup"
 {
     Caption = 'MPOS App Setup';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
+    ObsoleteReason = 'This table won''t be used anymore.';
+    ObsoleteTag = 'NPR MPOS App Setup -> NPR POS Unit -> NPR MPOS Profile';
 
     fields
     {
@@ -83,13 +86,4 @@ table 6059966 "NPR MPOS App Setup"
     fieldgroups
     {
     }
-
-    procedure IsMPOSEnabled(RegisterId: Code[10]): Boolean
-    var
-        MPOSAppSetup: Record "NPR MPOS App Setup";
-    begin
-        if MPOSAppSetup.Get(RegisterId) then
-            exit(MPOSAppSetup.Enable);
-    end;
 }
-

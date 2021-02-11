@@ -254,6 +254,12 @@ table 6150615 "NPR POS Unit"
             Description = 'NPR5.55';
             TableRelation = "NPR POS NPRE Rest. Profile";
         }
+        field(590; "MPOS Profile"; Code[20])
+        {
+            Caption = 'MPOS Profile';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MPOS Profile";
+        }
     }
 
     keys
@@ -306,6 +312,14 @@ table 6150615 "NPR POS Unit"
         POSUnit.Get(POSUnitNo);
         POSUnit.TestField("POS Posting Profile");
         POSPostingProfile.Get(POSUnit."POS Posting Profile");
+    end;
+
+    procedure GetProfile(var MPOSProfile: Record "NPR MPOS Profile"): Boolean
+    begin
+        Clear(MPOSProfile);
+        if "MPOS Profile" = '' then
+            exit;
+        exit(MPOSProfile.Get("MPOS Profile"));
     end;
 }
 

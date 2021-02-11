@@ -144,6 +144,11 @@ page 6150617 "NPR POS Unit Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Restaurant Profile field';
                 }
+                field("MPOS Profile"; Rec."MPOS Profile")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the MPOS Profile field where ticket admission should be set.';
+                }
             }
         }
     }

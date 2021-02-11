@@ -717,15 +717,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Retail Setup action';
                 }
-                action("MPOS App Setup")
-                {
-                    Caption = 'MPOS App Setup';
-                    RunObject = Page "NPR MPOS App Setup Card";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the MPOS App Setup action';
-                }
-
-
             }
             group("Posting Setup")
             {

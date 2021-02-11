@@ -37,7 +37,7 @@ codeunit 6014493 "NPR MPOS Admission API"
     var
         JSBridge: Page "NPR JS Bridge";
         JSONtext: Text;
-        mPOSAppSetup: Record "NPR MPOS App Setup";
+        MPOSProfile: Record "NPR MPOS Profile";
         POSSetup: Codeunit "NPR POS Setup";
         POSUnit: Record "NPR POS Unit";
         JSONMgr: Codeunit "NPR POS JSON Management";
@@ -54,12 +54,12 @@ codeunit 6014493 "NPR MPOS Admission API"
 
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
-        mPOSAppSetup.Get(POSUnit."No.");
-        if not mPOSAppSetup.Enable then
+        POSUnit.Get(POSUnit."No.");
+        if not POSUnit.GetProfile(MPOSProfile) then
             exit;
 
-        mPOSAppSetup.TestField("Ticket Admission Web Url");
-        JSONtext := BuildJSONParams(mPOSAppSetup."Ticket Admission Web Url", '', '', '', Err_AdmissionFailed);
+        MPOSProfile.TestField("Ticket Admission Web Url");
+        JSONtext := BuildJSONParams(MPOSProfile."Ticket Admission Web Url", '', '', '', Err_AdmissionFailed);
 
         JSONMgr.InitializeJObjectParser(Context, FrontEnd);
         AdmissionCode := JSONMgr.GetStringParameter('AdmissionCode', false);
