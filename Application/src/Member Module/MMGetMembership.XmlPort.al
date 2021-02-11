@@ -318,6 +318,15 @@ xmlport 6060129 "NPR MM Get Membership"
 
     end;
 
+    procedure GetResponse(var TmpMembershipOut: Record "NPR MM Membership" temporary; var TmpMembershipEntryOut: Record "NPR MM Membership Entry" temporary; var TmpAttributeValueSetOut: Record "NPR Attribute Value Set" temporary; var ResponseMessage: Text): Boolean
+    begin
+        TmpMembershipOut.Copy(tmpMembershipResponse, true);
+        TmpMembershipEntryOut.Copy(TmpMembershipEntry, true);
+        TmpAttributeValueSetOut.Copy(TmpAttributeValueSet, true);
+        ResponseMessage := errordescription;
+        exit(status = '1');
+    end;
+
     procedure AddErrorResponse(ErrorMessage: Text)
     begin
 

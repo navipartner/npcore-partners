@@ -159,6 +159,12 @@ xmlport 6060131 "NPR MM Update Member"
         tmpMember.Insert();
     end;
 
+    procedure GetResponse(var ResponseMessage: Text): Boolean
+    begin
+        ResponseMessage := errordescription;
+        exit(status = '1');
+    end;
+
     procedure AddErrorResponse(ErrorMessage: Text)
     begin
 

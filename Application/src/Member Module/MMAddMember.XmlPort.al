@@ -214,6 +214,14 @@ xmlport 6060128 "NPR MM Add Member"
         end;
     end;
 
+    procedure GetResponse(var MemberEntryNo: Integer; var ResponseMessage: Text): Boolean
+    begin
+        tmpMember.FindFirst();
+        MemberEntryNo := tmpMember."Entry No.";
+        ResponseMessage := errordescription;
+        exit(status = '1');
+    end;
+
     procedure AddErrorResponse(ErrorMessage: Text)
     begin
 
