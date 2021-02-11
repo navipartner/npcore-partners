@@ -20,7 +20,7 @@ codeunit 6060145 "NPR MM Foreign Members. Mgr."
         OnDiscoverExternalMembershipMgr(ForeignMembershipSetup);
     end;
 
-    procedure FormatForeignCardnumberFromScan(CommunityCode: Code[20]; ManagerCode: Code[20]; ScannedCardnumber: Text[100]; var FormatedCardnumber: Text[50])
+    procedure FormatForeignCardnumberFromScan(CommunityCode: Code[20]; ManagerCode: Code[20]; ScannedCardnumber: Text[100]; var FormatedCardnumber: Text[100])
     var
         ForeignMembershipSetup: Record "NPR MM Foreign Members. Setup";
         IsHandled: Boolean;
@@ -38,7 +38,7 @@ codeunit 6060145 "NPR MM Foreign Members. Mgr."
         OnFormatForeignCardnumberFromScan(CommunityCode, ManagerCode, ScannedCardnumber, FormatedCardnumber, IsHandled);
     end;
 
-    procedure DispatchToReplicateForeignMemberCard(CommunityCode: Code[20]; ForeignMembercardNumber: Text[100]; var FormatedCardNumber: Text[50]; var IsValid: Boolean; var NotValidReason: Text) MembershipEntryNo: Integer
+    procedure DispatchToReplicateForeignMemberCard(CommunityCode: Code[20]; ForeignMembercardNumber: Text[100]; var FormatedCardNumber: Text[100]; var IsValid: Boolean; var NotValidReason: Text) MembershipEntryNo: Integer
     var
         ForeignValidationSetup: Record "NPR MM Foreign Members. Setup";
         IsHandled: Boolean;
@@ -110,7 +110,7 @@ codeunit 6060145 "NPR MM Foreign Members. Mgr."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnFormatForeignCardnumberFromScan(CommunityCode: Code[20]; ManagerCode: Code[20]; ScannedCardNumber: Text[100]; var FormattedCardNumber: Text[50]; var IsHandled: Boolean)
+    local procedure OnFormatForeignCardnumberFromScan(CommunityCode: Code[20]; ManagerCode: Code[20]; ScannedCardNumber: Text[100]; var FormattedCardNumber: Text[100]; var IsHandled: Boolean)
     begin
     end;
 

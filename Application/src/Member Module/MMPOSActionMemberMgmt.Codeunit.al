@@ -705,7 +705,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         exit(JSON.GetString('input', false));
     end;
 
-    local procedure AddItemToPOS(POSSession: Codeunit "NPR POS Session"; MemberInfoEntryNo: Integer; ExternalItemNo: Code[20]; Description: Text[80]; Description2: Text[80]; Quantity: Decimal; UnitPrice: Decimal; var SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure AddItemToPOS(POSSession: Codeunit "NPR POS Session"; MemberInfoEntryNo: Integer; ExternalItemNo: Code[20]; Description: Text[100]; Description2: Text[100]; Quantity: Decimal; UnitPrice: Decimal; var SaleLinePOS: Record "NPR Sale Line POS")
     var
         Line: Record "NPR Sale Line POS";
         POSSaleLine: Codeunit "NPR POS Sale Line";

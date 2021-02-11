@@ -338,7 +338,7 @@ report 6014440 "NPR Sales Doc Confirmation A4"
         UnitPriceExclDiscountLine: Text;
         UnitPriceInclDiscountLine: Text;
         VariantCode: Text;
-        VariantDesc: Text[50];
+        VariantDesc: Text[100];
 
     procedure PrintCustomerInfo()
     begin

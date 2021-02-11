@@ -365,7 +365,7 @@ codeunit 6014560 "NPR Report - Sales Ticket"
     procedure PrintLineVariantDesc(AuditRoll: Record "NPR Audit Roll")
     var
         ColorDesc: Text[50];
-        VariantDesc: Text[50];
+        VariantDesc: Text[100];
         SizeDesc: Text[50];
         Text10600008: Label 'NO COLOR CODE';
         Text10600009: Label 'Color:';

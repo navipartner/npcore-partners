@@ -233,7 +233,7 @@ table 6060139 "NPR MM Member Notific. Entry"
             DataClassification = CustomerContent;
         }
 
-        field(160; "External Member Card No."; Text[50])
+        field(160; "External Member Card No."; Text[100])
         {
             Caption = 'External Member Card No.';
             DataClassification = CustomerContent;

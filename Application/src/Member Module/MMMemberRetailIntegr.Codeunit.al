@@ -82,8 +82,8 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         ForeignMembershipEntryNo: Integer;
         ForeignCommunityCode: Code[20];
         ForeignManagerCode: Code[20];
-        FormatedCardNumber: Text[50];
-        FormatedForeignCardNumber: Text[50];
+        FormatedCardNumber: Text[100];
+        FormatedForeignCardNumber: Text[100];
         ShowMemberDialog: Boolean;
         PageAction: Action;
     begin
@@ -211,7 +211,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         exit(true);
     end;
 
-    procedure POS_GetExternalTicketItemFromMembership(ExternalMemberCardNo: Text[50]) TicketItemBarcode: Code[20]
+    procedure POS_GetExternalTicketItemFromMembership(ExternalMemberCardNo: Text[100]) TicketItemBarcode: Code[20]
     var
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";

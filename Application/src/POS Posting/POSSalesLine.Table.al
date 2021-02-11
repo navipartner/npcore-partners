@@ -82,7 +82,7 @@ table 6150622 "NPR POS Sales Line"
             ELSE
             IF (Type = CONST(Customer)) "Customer Posting Group";
         }
-        field(14; Description; Text[80])
+        field(14; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

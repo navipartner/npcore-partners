@@ -29,7 +29,7 @@ table 6059982 "NPR Item Repair"
             //TestTableRelation = false;
             ValidateTableRelation = false;
         }
-        field(10; Description; Text[50])
+        field(10; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

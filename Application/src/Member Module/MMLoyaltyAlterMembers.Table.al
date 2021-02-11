@@ -31,7 +31,7 @@ table 6151163 "NPR MM Loyalty Alter Members."
             OptionCaption = 'Upgrade,Downgrade';
             OptionMembers = UPGRADE,DOWNGRADE;
         }
-        field(10; Description; Text[50])
+        field(10; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

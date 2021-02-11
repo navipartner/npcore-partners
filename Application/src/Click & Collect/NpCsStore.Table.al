@@ -199,7 +199,7 @@ table 6151195 "NPR NpCs Store"
             DataClassification = CustomerContent;
             ExtendedDatatype = PhoneNo;
         }
-        field(400; "Contact Name"; Text[50])
+        field(400; "Contact Name"; Text[100])
         {
             Caption = 'Contact Name';
             DataClassification = CustomerContent;
@@ -209,7 +209,7 @@ table 6151195 "NPR NpCs Store"
             Caption = 'Contact Name 2';
             DataClassification = CustomerContent;
         }
-        field(410; "Contact Address"; Text[50])
+        field(410; "Contact Address"; Text[100])
         {
             Caption = 'Contact Address';
             DataClassification = CustomerContent;

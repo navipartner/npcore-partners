@@ -386,7 +386,7 @@ table 6014401 "NPR Register"
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
-        field(256; Name; Text[50])
+        field(256; Name; Text[100])
         {
             Caption = 'Name';
             DataClassification = CustomerContent;

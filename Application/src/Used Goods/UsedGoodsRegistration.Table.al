@@ -188,12 +188,12 @@ table 6014500 "NPR Used Goods Registration"
                 //+NPR5.53 [369354]
             end;
         }
-        field(21; Name; Text[50])
+        field(21; Name; Text[100])
         {
             Caption = 'Name';
             DataClassification = CustomerContent;
         }
-        field(22; Address; Text[50])
+        field(22; Address; Text[100])
         {
             Caption = 'Address';
             DataClassification = CustomerContent;

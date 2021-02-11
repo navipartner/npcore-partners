@@ -50,7 +50,7 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'Vendor No.';
             DataClassification = CustomerContent;
         }
-        field(10; Description; Text[50])
+        field(10; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

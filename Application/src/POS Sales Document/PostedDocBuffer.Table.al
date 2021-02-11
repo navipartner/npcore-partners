@@ -43,7 +43,7 @@ table 6014433 "NPR Posted Doc. Buffer"
             TableRelation = Customer;
             DataClassification = CustomerContent;
         }
-        field(40; "Sell-to/Buy-from Name"; Text[50])
+        field(40; "Sell-to/Buy-from Name"; Text[100])
         {
             Caption = 'Sell-to/Buy-from Name';
             DataClassification = CustomerContent;
@@ -53,7 +53,7 @@ table 6014433 "NPR Posted Doc. Buffer"
             Caption = 'Sell-to/Buy-from Name 2';
             DataClassification = CustomerContent;
         }
-        field(60; "Bill-to/Pay-to Name"; Text[50])
+        field(60; "Bill-to/Pay-to Name"; Text[100])
         {
             Caption = 'Bill-to/Pay-to Name';
             DataClassification = CustomerContent;

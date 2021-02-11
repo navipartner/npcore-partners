@@ -13,7 +13,7 @@ table 6059958 "NPR MCS Person"
             DataClassification = CustomerContent;
             Editable = false;
         }
-        field(11; Name; Text[50])
+        field(11; Name; Text[150])
         {
             Caption = 'Name';
             DataClassification = CustomerContent;
@@ -44,7 +44,7 @@ table 6059958 "NPR MCS Person"
         }
         field(14; Faces; Integer)
         {
-            CalcFormula = Count ("NPR MCS Faces" WHERE(PersonId = FIELD(PersonId)));
+            CalcFormula = Count("NPR MCS Faces" WHERE(PersonId = FIELD(PersonId)));
             Caption = 'Faces';
             FieldClass = FlowField;
         }

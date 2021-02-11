@@ -29,7 +29,7 @@ table 6151061 "NPR Retail Repl. Demand Line"
                 Item.TestField("Base Unit of Measure");
             end;
         }
-        field(6; Description; Text[50])
+        field(6; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

@@ -75,12 +75,12 @@ table 6151201 "NPR NpCs Document Mapping"
                             Item.Get(ItemReference."Item No.");
                             if ItemVariant.Get(ItemReference."Item No.", ItemReference."Variant Code") then;
                             "To Description" := Item.Description;
-                            "To Description 2" := ItemVariant.Description;
+                            "To Description 2" := CopyStr(ItemVariant.Description, 1, MaxStrLen("To Description 2"));
                         end;
                 end;
             end;
         }
-        field(150; "To Description"; Text[50])
+        field(150; "To Description"; Text[100])
         {
             Caption = 'To Description';
             DataClassification = CustomerContent;

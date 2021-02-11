@@ -79,7 +79,7 @@ table 6060129 "NPR MM Membership Entry"
             Caption = 'Item No.';
             DataClassification = CustomerContent;
         }
-        field(22; Description; Text[50])
+        field(22; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

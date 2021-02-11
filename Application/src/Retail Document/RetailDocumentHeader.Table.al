@@ -122,7 +122,7 @@ table 6014425 "NPR Retail Document Header"
                 end;
             end;
         }
-        field(4; Name; Text[50])
+        field(4; Name; Text[100])
         {
             Caption = 'Name';
             DataClassification = CustomerContent;
@@ -137,7 +137,7 @@ table 6014425 "NPR Retail Document Header"
             Caption = 'First Name';
             DataClassification = CustomerContent;
         }
-        field(6; Address; Text[50])
+        field(6; Address; Text[100])
         {
             Caption = 'Address';
             DataClassification = CustomerContent;
@@ -1132,12 +1132,12 @@ table 6014425 "NPR Retail Document Header"
             Caption = 'Maximum Amount';
             DataClassification = CustomerContent;
         }
-        field(1004; "Ship-to Name"; Text[50])
+        field(1004; "Ship-to Name"; Text[100])
         {
             Caption = 'Ship-to Name';
             DataClassification = CustomerContent;
         }
-        field(1005; "Ship-to Address"; Text[50])
+        field(1005; "Ship-to Address"; Text[100])
         {
             Caption = 'Ship-to Address';
             DataClassification = CustomerContent;

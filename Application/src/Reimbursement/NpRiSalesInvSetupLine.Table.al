@@ -118,7 +118,7 @@ table 6151111 "NPR NpRi Sales Inv. Setup Line"
                 end;
             end;
         }
-        field(40; Description; Text[50])
+        field(40; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

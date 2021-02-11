@@ -246,7 +246,7 @@ page 6151577 "NPR Event Copy"
         FromJobTaskNo: Code[20];
         ToJobTaskNo: Code[20];
         TargetJobNo: Code[20];
-        TargetJobDescription: Text[50];
+        TargetJobDescription: Text[100];
         TargetBillToCustomerNo: Code[20];
         FromDate: Date;
         ToDate: Date;

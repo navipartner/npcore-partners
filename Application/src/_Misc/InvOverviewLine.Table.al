@@ -25,17 +25,17 @@ table 6060056 "NPR Inv. Overview Line"
             Caption = 'Quantity';
             DataClassification = CustomerContent;
         }
-        field(100; "Item Description"; Text[50])
+        field(100; "Item Description"; Text[100])
         {
             Caption = 'Item Description';
             DataClassification = CustomerContent;
         }
-        field(110; "Variant Description"; Text[50])
+        field(110; "Variant Description"; Text[100])
         {
             Caption = 'Variant Description';
             DataClassification = CustomerContent;
         }
-        field(111; "Location Name"; Text[50])
+        field(111; "Location Name"; Text[100])
         {
             Caption = 'Location Name';
             DataClassification = CustomerContent;

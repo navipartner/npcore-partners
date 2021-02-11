@@ -132,7 +132,7 @@ table 6060130 "NPR MM Members. Points Entry"
             Caption = 'Quantity';
             DataClassification = CustomerContent;
         }
-        field(55; Description; Text[80])
+        field(55; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

@@ -206,8 +206,8 @@ report 6014504 "NPR Customer Note"
         StarDisplay: Text;
         TelephoneText: Text;
         PriceText: Text[30];
-        CompanyAddr: array[8] of Text[50];
-        DebAddress: array[8] of Text[50];
+        CompanyAddr: array[8] of Text[100];
+        DebAddress: array[8] of Text[100];
         GlobalDimension1Desc: Text[80];
         AdresseLine: Text[100];
         PriceNotAccepted: Text[100];

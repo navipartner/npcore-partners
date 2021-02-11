@@ -14,7 +14,7 @@ table 6060131 "NPR MM Member Card"
             Caption = 'Entry No.';
             DataClassification = CustomerContent;
         }
-        field(10; "External Card No."; Text[50])
+        field(10; "External Card No."; Text[100])
         {
             Caption = 'External Card No.';
             DataClassification = CustomerContent;

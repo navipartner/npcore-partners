@@ -323,7 +323,7 @@ codeunit 6059955 "NPR MCS Face Service API"
                         MCSPerson.Init;
                         MCSPerson.PersonId := MCSFaces.PersonId;
                         MCSPerson.PersonGroupId := PersonGroups.PersonGroupId;
-                        MCSPerson.Name := MemberName;
+                        MCSPerson.Name :=  CopyStr(MemberName,1,MaxStrLen(MCSPerson.Name));
                         MCSPerson.UserData := UserData;
                         if MCSPerson.Insert(true) then begin
                             MCSPersonBusinessEntities.Init;

@@ -19,7 +19,7 @@ table 6151492 "NPR Raptor Data Buffer"
             Caption = 'Item No.';
             DataClassification = CustomerContent;
         }
-        field(4; "Item Description"; Text[50])
+        field(4; "Item Description"; Text[100])
         {
             Caption = 'Item Description';
             DataClassification = CustomerContent;
