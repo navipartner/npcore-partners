@@ -2879,9 +2879,6 @@ End Function
         <Field Name="Description_AuditRollPayment">
           <DataField>Description_AuditRollPayment</DataField>
         </Field>
-        <Field Name="CreditVoucherRef_AuditRollPayment">
-          <DataField>CreditVoucherRef_AuditRollPayment</DataField>
-        </Field>
         <Field Name="No_Item">
           <DataField>No_Item</DataField>
         </Field>

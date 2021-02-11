@@ -306,7 +306,6 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         Customer.Modify(true);
 
         UpdateContFromCust.OnModify(Customer);
-
     end;
 
     local procedure InsertPaymentLinePaymentMethod(XmlElement: XmlElement; var SalesHeader: Record "Sales Header"; var LineNo: Integer)

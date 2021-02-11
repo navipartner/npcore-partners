@@ -1,6 +1,5 @@
 query 6014418 "NPR ClickNCollectSales_Stats"
 {
-    // NPR5.55/ZESO/20200422  Object created for Report 6014409 Sales Statistics
 
     Caption = 'ClickNCollectSales_SalesStats';
 
@@ -18,9 +17,6 @@ query 6014418 "NPR ClickNCollectSales_Stats"
             {
             }
             filter(Type_Filter; Type)
-            {
-            }
-            filter(Gift_voucher_ref_Filter; "Gift voucher ref.")
             {
             }
             filter(Salesperson_Code_Filter; "Salesperson Code")

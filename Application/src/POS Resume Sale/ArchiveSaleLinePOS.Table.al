@@ -3,10 +3,6 @@ table 6014419 "NPR Archive Sale Line POS"
     // The purpose of this table:
     //   All existing unfinished sale transactions have been moved here for possible future reference (6014418 - header, 6014419 - lines).
     //   The table may be deleted later, when it is no longer relevant.
-    // 
-    // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
-    // NPR5.55/ALPO/20200429 CASE 402411 Starting from NAV2017 field's "Item Category Code" length is changed from 10 to 20
-
     Caption = 'Archive Sale Line POS';
     DrillDownPageID = "NPR Arch. POS S. Lines Subpage";
     LookupPageID = "NPR Arch. POS S. Lines Subpage";
@@ -244,7 +240,7 @@ table 6014419 "NPR Archive Sale Line POS"
         {
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum ("NPR Sale Line POS"."Amount Including VAT");
+            CalcFormula = Sum("NPR Sale Line POS"."Amount Including VAT");
             Caption = 'Sales Order Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -636,7 +632,7 @@ table 6014419 "NPR Archive Sale Line POS"
         }
         field(420; "Coupon Qty."; Integer)
         {
-            CalcFormula = Count ("NPR NpDc SaleLinePOS Coupon" WHERE("Register No." = FIELD("Register No."),
+            CalcFormula = Count("NPR NpDc SaleLinePOS Coupon" WHERE("Register No." = FIELD("Register No."),
                                                                    "Sales Ticket No." = FIELD("Sales Ticket No."),
                                                                    "Sale Type" = FIELD("Sale Type"),
                                                                    "Sale Date" = FIELD(Date),
@@ -649,7 +645,7 @@ table 6014419 "NPR Archive Sale Line POS"
         field(425; "Coupon Discount Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum ("NPR NpDc SaleLinePOS Coupon"."Discount Amount" WHERE("Register No." = FIELD("Register No."),
+            CalcFormula = Sum("NPR NpDc SaleLinePOS Coupon"."Discount Amount" WHERE("Register No." = FIELD("Register No."),
                                                                                    "Sales Ticket No." = FIELD("Sales Ticket No."),
                                                                                    "Sale Type" = FIELD("Sale Type"),
                                                                                    "Sale Date" = FIELD(Date),
@@ -897,6 +893,9 @@ table 6014419 "NPR Archive Sale Line POS"
         {
             Caption = 'Gift Certificate Line';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher table won''t be used anymore.';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(6038; "Label Date"; Date)
         {

@@ -1,24 +1,7 @@
 codeunit 6151461 "NPR M2 NpXml Setup Mgt."
 {
-    // MAG2.08/MHA /20171016  CASE 292926 Object created - M2 Integration
-    // MAG2.09/MHA /20171108  CASE 295656 Api Method changed to REST (Json)
-    // MAG2.22/MHA /20190625  CASE 359285 Adjusted SetupTemplate() to delete existing Template if Version Id belongs to Magento
-    // MAG2.22/MHA /20190708  CASE 352201 Added function SetupTemplateCollectStore
-    // MAG2.25/MHA /20200416  CASE 400486 Cleared Api Credentials in SetupTemplate() because Bearer Auth is used instead
-    // MAG2.26/MHA /20200501  CASE 402488 Stock NpXml Template is set on Magento Setup SetupTemplateItemInventory()
-    // MAG2.26/MHA /20200601  CASE 404580 Magento Categories and -Brands can now be managed externally
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
-
-    procedure "--- Generic Setup"()
-    begin
-    end;
 
     local procedure AddNpXmlTemplate(var XmlDoc: DotNet "NPRNetXmlDocument"; NodePath: Text; UpdateCode: Code[20]; DeleteCode: Code[20])
     var
@@ -32,10 +15,8 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
     var
         NpXmlTemplate: Record "NPR NpXml Template";
     begin
-        //-MAG2.26 [404580]
         if NpXmlTemplate.Get(TemplateCode) then
             NpXmlTemplate.Delete(true);
-        //+MAG2.26 [404580]
     end;
 
     procedure InitNpXmlTemplateSetup(var TempBlob: Codeunit "Temp Blob")
@@ -103,9 +84,6 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
         MagentoGenericSetupMgt.AddContainer(XmlDoc, NodePath, "ElementName.DisplayConfig");
         MagentoGenericSetupMgt.AddContainer(XmlDoc, NodePath, "ElementName.SalesPrice");
         MagentoGenericSetupMgt.AddContainer(XmlDoc, NodePath, "ElementName.SalesLineDiscount");
-        //-MAG2.09 [295656]
-        //MagentoGenericSetupMgt.AddContainer(XmlDoc,NodePath,"ElementName.ItemDiscountGroup");
-        //+MAG2.09 [295656]
 
         NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2B" + '/' + "ElementName.Customer";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_CONT_RELATION', 'DEL_CONTACT');
@@ -115,18 +93,10 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_SALES_PRICE', 'DEL_SALES_PRICE');
         NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2B" + '/' + "ElementName.SalesLineDiscount";
         AddNpXmlTemplate(XmlDoc, NodePath, 'UPD_SALES_LINE_DISC', 'DEL_SALES_LINE_DISC');
-        //-MAG2.09 [295656]
-        //NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2B" + '/' + "ElementName.ItemDiscountGroup";
-        //AddNpXmlTemplate(XmlDoc,NodePath,'UPD_ITEM_DISC_GROUP','DEL_ITEM_DISC_GROUP');
-        //+MAG2.09 [295656]
 
         Clear(TempBlob);
         TempBlob.CreateOutStream(OutStream);
         XmlDoc.Save(OutStream);
-    end;
-
-    procedure "--- Magento Template Setup"()
-    begin
     end;
 
     local procedure SetupTemplate(var TempBlob: Codeunit "Temp Blob"; TemplateCode: Code[20]; Enabled: Boolean)
@@ -143,11 +113,9 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
         if (TemplateCode = '') or (not MagentoSetup.Get) then
             exit;
 
-        //-MAG2.22 [359285]
         MagentoSetupMgt.UpdateVersionNo(MagentoSetup);
         if NpXmlTemplate.Get(TemplateCode) and (CopyStr(NpXmlTemplate."Template Version", 1, StrLen(MagentoSetupMgt.MagentoVersionId())) = MagentoSetupMgt.MagentoVersionId()) then
             NpXmlTemplate.Delete(true);
-        //+MAG2.22 [359285]
 
         if not Enabled then begin
             if NpXmlTemplate.Get(TemplateCode) then
@@ -171,22 +139,14 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
         NpXmlTemplate."API Transfer" := true;
         NpXmlTemplate."API Url" := MagentoSetup."Api Url" + NpXmlTemplate."Xml Root Name";
         NpXmlTemplate."API Authorization" := MagentoSetup."Api Authorization";
-        //-MAG2.25 [400486]
         NpXmlTemplate."API Username Type" := NpXmlTemplate."API Username Type"::Custom;
         NpXmlTemplate."API Username" := '';
         NpXmlTemplate."API Password" := '';
-        //+MAG2.25 [400486]
-        //-MAG2.09 [295656]
-        //NpXmlTemplate."API Content-Type" := 'naviconnect/xml';
         NpXmlTemplate."API Content-Type" := 'naviconnect/json';
-        //+MAG2.09 [295656]
         NpXmlTemplate."API Accept" := 'naviconnect/xml';
         NpXmlTemplate."API Response Path" := '';
         NpXmlTemplate."API Response Success Value" := '';
-        //-MAG2.09 [295656]
-        //NpXmlTemplate."API Type" := NpXmlTemplate."API Type"::"REST (Xml)";
         NpXmlTemplate."API Type" := NpXmlTemplate."API Type"::"REST (Json)";
-        //+MAG2.09 [295656]
         NpXmlTemplate."Batch Task" := false;
         NpXmlTemplate."Transaction Task" := MagentoSetup."Magento Enabled";
         NpXmlTemplate."Task Processor Code" := NcSetup."Task Worker Group";
@@ -201,11 +161,9 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
             NpXmlTemplateMgt.Archive(NpXmlTemplate);
         end;
 
-        //-MAG2.09 [295656]
         NpXmlElement.SetRange("Xml Template Code", NpXmlTemplate.Code);
         NpXmlElement.SetRange(CDATA, true);
         NpXmlElement.ModifyAll(CDATA, false);
-        //+MAG2.09 [295656]
     end;
 
     procedure SetupTemplateAttribute(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
@@ -283,11 +241,9 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        //-MAG1.21
         NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.ItemStore" + '/';
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
-        //+MAG1.21
     end;
 
     procedure SetupTemplateItemGroup(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)

@@ -1,17 +1,5 @@
 codeunit 6150874 "NPR POS Action: EFT Gift Card"
 {
-    // NPR5.51/MMV /20190625 CASE 359385 Created object
-    // NPR5.53/MMV /20200114 CASE 375525 Added support for discount & sequential giftcard issuing.
-    // NPR5.54/MMV /20200302 CASE 364340 Moved gift card functions into EFT payment object.
-    //                                   Isolated business logic.
-    //                                   Break loop if lookup trx happens instead, or trx error.
-    // NPR5.55/MMV /20200810 CASE 364340 Removed invalid & unused reference.
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'Sale of EFT Gift Cards';
         GIFTCARD_CAPTION_AMOUNT: Label 'Gift Card Amount';

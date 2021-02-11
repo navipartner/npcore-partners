@@ -12400,24 +12400,6 @@
       </DefaultValue>
       <Prompt>UnknownCCMovementCaptionLbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="GiftVoucherMovementCaptionLbl">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>GiftVoucherMovementCaptionLbl</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>GiftVoucherMovementCaptionLbl</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="CreditVoucherMovementCaptionLbl">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>CreditVoucherMovementCaptionLbl</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>CreditVoucherMovementCaptionLbl</Prompt>
-    </ReportParameter>
     <ReportParameter Name="TransferredToBankCaptionLbl">
       <DataType>String</DataType>
       <DefaultValue>
@@ -12728,7 +12710,7 @@
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>1</NumberOfColumns>
-      <NumberOfRows>63</NumberOfRows>
+      <NumberOfRows>61</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -12868,181 +12850,171 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>27</RowIndex>
-          <ParameterName>GiftVoucherMovementCaptionLbl</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>28</RowIndex>
-          <ParameterName>CreditVoucherMovementCaptionLbl</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>29</RowIndex>
           <ParameterName>TransferredToBankCaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>30</RowIndex>
+          <RowIndex>28</RowIndex>
           <ParameterName>CreditCardBalanceCaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>31</RowIndex>
+          <RowIndex>29</RowIndex>
           <ParameterName>DifferenceCaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>32</RowIndex>
+          <RowIndex>30</RowIndex>
           <ParameterName>ClosingCashCaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>33</RowIndex>
+          <RowIndex>31</RowIndex>
           <ParameterName>DebitCaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>34</RowIndex>
+          <RowIndex>32</RowIndex>
           <ParameterName>CreditCaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>35</RowIndex>
+          <RowIndex>33</RowIndex>
           <ParameterName>CurrReport_PAGENOCaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>36</RowIndex>
+          <RowIndex>34</RowIndex>
           <ParameterName>ReportCaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>37</RowIndex>
+          <RowIndex>35</RowIndex>
           <ParameterName>KeyFiguresCaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>38</RowIndex>
+          <RowIndex>36</RowIndex>
           <ParameterName>GrossTuroverCaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>39</RowIndex>
+          <RowIndex>37</RowIndex>
           <ParameterName>NetTurnoverCaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>40</RowIndex>
+          <RowIndex>38</RowIndex>
           <ParameterName>COGS_LCY_CaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>41</RowIndex>
+          <RowIndex>39</RowIndex>
           <ParameterName>Profit_LCY_CaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>42</RowIndex>
+          <RowIndex>40</RowIndex>
           <ParameterName>PCT_CaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>43</RowIndex>
+          <RowIndex>41</RowIndex>
           <ParameterName>PeriodDiscount_CaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>44</RowIndex>
+          <RowIndex>42</RowIndex>
           <ParameterName>MultiUnitDiscount_CaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>45</RowIndex>
+          <RowIndex>43</RowIndex>
           <ParameterName>MixPriceDiscount_CaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>46</RowIndex>
+          <RowIndex>44</RowIndex>
           <ParameterName>UserDiscount_CaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>47</RowIndex>
+          <RowIndex>45</RowIndex>
           <ParameterName>TotalDiscount_CaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>48</RowIndex>
+          <RowIndex>46</RowIndex>
           <ParameterName>PaymentTypePayOut_CaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>49</RowIndex>
+          <RowIndex>47</RowIndex>
           <ParameterName>PaymentType_CaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>50</RowIndex>
+          <RowIndex>48</RowIndex>
           <ParameterName>AmtInAuditRoll_CaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>51</RowIndex>
+          <RowIndex>49</RowIndex>
           <ParameterName>PayOut_CaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>52</RowIndex>
+          <RowIndex>50</RowIndex>
           <ParameterName>PayOutInAuditRoll_CaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>53</RowIndex>
+          <RowIndex>51</RowIndex>
           <ParameterName>Name_CaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>54</RowIndex>
+          <RowIndex>52</RowIndex>
           <ParameterName>NoTransactions_CaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>55</RowIndex>
+          <RowIndex>53</RowIndex>
           <ParameterName>AmtInclVAT_CaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>56</RowIndex>
+          <RowIndex>54</RowIndex>
           <ParameterName>CountUnit_CaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>57</RowIndex>
+          <RowIndex>55</RowIndex>
           <ParameterName>Qty_CaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>58</RowIndex>
+          <RowIndex>56</RowIndex>
           <ParameterName>Total_CaptionLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>59</RowIndex>
+          <RowIndex>57</RowIndex>
           <ParameterName>UnitLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>60</RowIndex>
+          <RowIndex>58</RowIndex>
           <ParameterName>NoLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>61</RowIndex>
+          <RowIndex>59</RowIndex>
           <ParameterName>TotalLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>62</RowIndex>
+          <RowIndex>60</RowIndex>
           <ParameterName>TotalCaseLbl</ParameterName>
         </CellDefinition>
       </CellDefinitions>

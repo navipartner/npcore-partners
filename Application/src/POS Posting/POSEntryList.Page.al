@@ -443,7 +443,6 @@ page 6150652 "NPR POS Entry List"
             {
                 Caption = 'Vouchers';
                 Image = Voucher;
-
                 group("Tax Free Vouchers")
                 {
                     Caption = 'Tax Free Vouchers';

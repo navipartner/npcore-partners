@@ -20,8 +20,6 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
         ServiceShipmentLbl: Label 'Service Shipment';
         ServiceInvoiceLbl: Label 'Service Invoice';
         POSEntryLbl: Label 'Salesticket';
-        CreditVoucherLbl: Label 'Credit Voucher';
-        GiftVoucherLbl: Label 'Gift Voucher';
         EMailSalesReceiptLbl: Label 'E-mail Sales Receipt';
 
     procedure RunEmailLog(RecVariant: Variant)
@@ -414,16 +412,6 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                         TempField."Field Caption" := POSEntryLbl;
                         TempField.Enabled := false;
                     end;
-                "TemplateType.CreditVoucher":
-                    begin
-                        TempField."Field Caption" := CreditVoucherLbl;
-                        TempField.Enabled := false;
-                    end;
-                "TemplateType.GiftVoucher":
-                    begin
-                        TempField."Field Caption" := GiftVoucherLbl;
-                        TempField.Enabled := false;
-                    end;
             end;
             TempField.Insert;
         end;
@@ -649,30 +637,6 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
                     EmailTemplate.Subject := POSEntryLbl + ' {1}';
                     EmailTemplate."Table No." := EmailRetailMgt.POSEntryTableId();
                     EmailTemplate.Filename := POSEntryLbl + '-{1}.pdf';
-                end;
-            "TemplateType.CreditVoucher":
-                begin
-                    if not EmailRetailMgt.CreditVoucherExists() then
-                        exit('');
-                    NewTemplateCode := UpperCase(CreditVoucherLbl);
-                    NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
-                    EmailTemplate.Code := NewTemplateCode;
-                    EmailTemplate.Description := CreditVoucherLbl;
-                    EmailTemplate.Subject := CreditVoucherLbl + ' {1}';
-                    EmailTemplate."Table No." := EmailRetailMgt.CreditVoucherTableId();
-                    EmailTemplate.Filename := CreditVoucherLbl + '-{1}.pdf';
-                end;
-            "TemplateType.GiftVoucher":
-                begin
-                    if not EmailRetailMgt.GiftVoucherExists() then
-                        exit('');
-                    NewTemplateCode := UpperCase(GiftVoucherLbl);
-                    NewTemplateCode := GetNewTemplateCode(NewTemplateCode);
-                    EmailTemplate.Code := NewTemplateCode;
-                    EmailTemplate.Description := GiftVoucherLbl;
-                    EmailTemplate.Subject := GiftVoucherLbl + ' {1}';
-                    EmailTemplate."Table No." := EmailRetailMgt.GiftVoucherTableId();
-                    EmailTemplate.Filename := GiftVoucherLbl + '-{1}.pdf';
                 end;
         end;
 

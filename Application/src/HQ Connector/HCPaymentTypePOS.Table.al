@@ -261,7 +261,6 @@ table 6150905 "NPR HC Payment Type POS"
                                                                             "Register No." = FIELD("Register Filter"),
                                                                             "Sale Type" = CONST("Debit Sale"),
                                                                             Type = CONST(Item),
-                                                                            "Gift voucher ref." = FILTER(= ''),
                                                                             "Salesperson Code" = FIELD("Salesperson Filter"),
                                                                             "Closing Time" = FIELD("End Time Filter"),
                                                                             "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
@@ -327,7 +326,6 @@ table 6150905 "NPR HC Payment Type POS"
                                                               "Sale Date" = FIELD("Date Filter"),
                                                               Type = CONST("Debit Sale"),
                                                               "Salesperson Code" = FIELD("Salesperson Filter"),
-                                                              "Gift voucher ref." = FILTER(= ''),
                                                               "Closing Time" = FIELD("End Time Filter"),
                                                               "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
                                                               "Shortcut Dimension 2 Code" = FIELD("Global Dimension Code 2 Filter")));
@@ -341,7 +339,6 @@ table 6150905 "NPR HC Payment Type POS"
                                                        "Sales Ticket No." = FIELD("Receipt Filter"),
                                                        Type = CONST("Debit Sale"),
                                                        "No." = FILTER(<> ''),
-                                                       "Gift voucher ref." = FILTER(= ''),
                                                        "Sale Date" = FIELD("Date Filter"),
                                                        "Salesperson Code" = FIELD("Salesperson Filter"),
                                                        "Closing Time" = FIELD("End Time Filter"),
@@ -357,7 +354,6 @@ table 6150905 "NPR HC Payment Type POS"
                                                        "Sales Ticket No." = FIELD("Receipt Filter"),
                                                        "Sale Type" = CONST("Debit Sale"),
                                                        "Line No." = CONST(10000),
-                                                       "Gift voucher ref." = FILTER(= ''),
                                                        "Sale Date" = FIELD("Date Filter"),
                                                        "Salesperson Code" = FIELD("Salesperson Filter"),
                                                        "Closing Time" = FIELD("End Time Filter"),
@@ -443,7 +439,6 @@ table 6150905 "NPR HC Payment Type POS"
                                                           "Register No." = FIELD("Register Filter"),
                                                           "Sale Type" = CONST("Debit Sale"),
                                                           Type = CONST(Item),
-                                                          "Gift voucher ref." = FILTER(= ''),
                                                           "Salesperson Code" = FIELD("Salesperson Filter"),
                                                           "Closing Time" = FIELD("End Time Filter"),
                                                           "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
@@ -459,7 +454,6 @@ table 6150905 "NPR HC Payment Type POS"
                                                             "Register No." = FIELD("Register Filter"),
                                                             "Sale Type" = CONST("Debit Sale"),
                                                             Type = CONST(Item),
-                                                            "Gift voucher ref." = FILTER(= ''),
                                                             "Salesperson Code" = FIELD("Salesperson Filter"),
                                                             "Closing Time" = FIELD("End Time Filter"),
                                                             "Shortcut Dimension 1 Code" = FIELD("Global Dimension Code 1 Filter"),
@@ -552,16 +546,17 @@ table 6150905 "NPR HC Payment Type POS"
         {
             Caption = 'Fixed Amount';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                TestField("Processing Type", "Processing Type"::"Gift Voucher");
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(81; "Qty. Per Sale"; Integer)
         {
             Caption = 'Qty. Per Sale';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Gift Voucher';
 
             trigger OnValidate()
             begin
@@ -572,11 +567,9 @@ table 6150905 "NPR HC Payment Type POS"
         {
             Caption = 'Min Sales Amount';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                TestField("Processing Type", "Processing Type"::"Gift Voucher");
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(83; "Human Validation"; Boolean)
         {
@@ -595,6 +588,9 @@ table 6150905 "NPR HC Payment Type POS"
             Caption = 'PBS Gift Voucher';
             DataClassification = CustomerContent;
             Description = 'PBS Gift Voucher if true card balance will be checked.';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(201; "PBS Customer ID"; Text[30])
         {
@@ -606,6 +602,9 @@ table 6150905 "NPR HC Payment Type POS"
         {
             Caption = 'PBS Gift Voucher Barcode';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher won''t be used anymore';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(250; "Loyalty Card Type"; Code[20])
         {

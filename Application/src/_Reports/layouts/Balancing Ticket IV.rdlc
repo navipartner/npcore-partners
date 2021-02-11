@@ -9015,24 +9015,6 @@
       </DefaultValue>
       <Prompt>TotalSales_Lbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="GiftCardSales_Lbl">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>GiftCardSales_Lbl</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>GiftCardSales_Lbl</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="VoucherSales_Lbl">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>VoucherSales_Lbl</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>VoucherSales_Lbl</Prompt>
-    </ReportParameter>
     <ReportParameter Name="Payments_Lbl">
       <DataType>String</DataType>
       <DefaultValue>
@@ -9222,42 +9204,6 @@
       </DefaultValue>
       <Prompt>PayedOtherValues_Lbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="PayedGiftCard_Lbl">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>PayedGiftCard_Lbl</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>PayedGiftCard_Lbl</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="PayedForeignGiftCard_Lbl">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>PayedForeignGiftCard_Lbl</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>PayedForeignGiftCard_Lbl</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="PayedVoucher_Lbl">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>PayedVoucher_Lbl</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>PayedVoucher_Lbl</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="PayedForeignVoucher_Lbl">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>PayedForeignVoucher_Lbl</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>PayedForeignVoucher_Lbl</Prompt>
-    </ReportParameter>
     <ReportParameter Name="PayedDankort_Lbl">
       <DataType>String</DataType>
       <DefaultValue>
@@ -9302,24 +9248,6 @@
         </Values>
       </DefaultValue>
       <Prompt>ForeignCurr_Lbl</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="GiftCardDisc_Lbl">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>GiftCardDisc_Lbl</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>GiftCardDisc_Lbl</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="DebetSalesGift_Lbl">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>DebetSalesGift_Lbl</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>DebetSalesGift_Lbl</Prompt>
     </ReportParameter>
     <ReportParameter Name="ControlSum_Lbl">
       <DataType>String</DataType>
@@ -9424,7 +9352,7 @@
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>1</NumberOfColumns>
-      <NumberOfRows>55</NumberOfRows>
+      <NumberOfRows>47</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -9479,226 +9407,186 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>10</RowIndex>
-          <ParameterName>GiftCardSales_Lbl</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>11</RowIndex>
-          <ParameterName>VoucherSales_Lbl</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>12</RowIndex>
           <ParameterName>Payments_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>13</RowIndex>
+          <RowIndex>11</RowIndex>
           <ParameterName>PaymentsOut_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>14</RowIndex>
+          <RowIndex>12</RowIndex>
           <ParameterName>Sum_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>15</RowIndex>
+          <RowIndex>13</RowIndex>
           <ParameterName>Calculated_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>16</RowIndex>
+          <RowIndex>14</RowIndex>
           <ParameterName>DanishKroner_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>17</RowIndex>
+          <RowIndex>15</RowIndex>
           <ParameterName>Prime_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>18</RowIndex>
+          <RowIndex>16</RowIndex>
           <ParameterName>RegisterDD_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>19</RowIndex>
+          <RowIndex>17</RowIndex>
           <ParameterName>SystemInventory_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>20</RowIndex>
+          <RowIndex>18</RowIndex>
           <ParameterName>Counted_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>21</RowIndex>
+          <RowIndex>19</RowIndex>
           <ParameterName>RegisterDiff_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>22</RowIndex>
+          <RowIndex>20</RowIndex>
           <ParameterName>NextDaysOpening_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>23</RowIndex>
+          <RowIndex>21</RowIndex>
           <ParameterName>PutIntoBank_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>24</RowIndex>
+          <RowIndex>22</RowIndex>
           <ParameterName>ExchangeRegister_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>25</RowIndex>
+          <RowIndex>23</RowIndex>
           <ParameterName>NoOfSales_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>26</RowIndex>
+          <RowIndex>24</RowIndex>
           <ParameterName>NoOfGoodSold_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>27</RowIndex>
+          <RowIndex>25</RowIndex>
           <ParameterName>NoOfCash_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>28</RowIndex>
+          <RowIndex>26</RowIndex>
           <ParameterName>NoOfRegisterOpen_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>29</RowIndex>
+          <RowIndex>27</RowIndex>
           <ParameterName>NoOfCopies_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>30</RowIndex>
+          <RowIndex>28</RowIndex>
           <ParameterName>VatInfo_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>31</RowIndex>
+          <RowIndex>29</RowIndex>
           <ParameterName>OtherPayments_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>32</RowIndex>
+          <RowIndex>30</RowIndex>
           <ParameterName>PayedOtherValues_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>33</RowIndex>
-          <ParameterName>PayedGiftCard_Lbl</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>34</RowIndex>
-          <ParameterName>PayedForeignGiftCard_Lbl</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>35</RowIndex>
-          <ParameterName>PayedVoucher_Lbl</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>36</RowIndex>
-          <ParameterName>PayedForeignVoucher_Lbl</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>37</RowIndex>
+          <RowIndex>31</RowIndex>
           <ParameterName>PayedDankort_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>38</RowIndex>
+          <RowIndex>32</RowIndex>
           <ParameterName>PayedOtherCreditCard_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>39</RowIndex>
+          <RowIndex>33</RowIndex>
           <ParameterName>ManuelCard_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>40</RowIndex>
+          <RowIndex>34</RowIndex>
           <ParameterName>TerminalDesc_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>41</RowIndex>
+          <RowIndex>35</RowIndex>
           <ParameterName>ForeignCurr_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>42</RowIndex>
-          <ParameterName>GiftCardDisc_Lbl</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>43</RowIndex>
-          <ParameterName>DebetSalesGift_Lbl</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>44</RowIndex>
+          <RowIndex>36</RowIndex>
           <ParameterName>ControlSum_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>45</RowIndex>
+          <RowIndex>37</RowIndex>
           <ParameterName>Calculation_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>46</RowIndex>
+          <RowIndex>38</RowIndex>
           <ParameterName>ReturnSales_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>47</RowIndex>
+          <RowIndex>39</RowIndex>
           <ParameterName>Payments2_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>48</RowIndex>
+          <RowIndex>40</RowIndex>
           <ParameterName>CountingDetails_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>49</RowIndex>
+          <RowIndex>41</RowIndex>
           <ParameterName>NothingCounted_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>50</RowIndex>
+          <RowIndex>42</RowIndex>
           <ParameterName>Unit_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>51</RowIndex>
+          <RowIndex>43</RowIndex>
           <ParameterName>No_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>52</RowIndex>
+          <RowIndex>44</RowIndex>
           <ParameterName>Total_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>53</RowIndex>
+          <RowIndex>45</RowIndex>
           <ParameterName>TotalCase_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>54</RowIndex>
+          <RowIndex>46</RowIndex>
           <ParameterName>Cash_Lbl</ParameterName>
         </CellDefinition>
       </CellDefinitions>
@@ -10002,12 +9890,6 @@ End Function
         </Field>
         <Field Name="AmountInAuditRoll_ForeignCurrencyFormat">
           <DataField>AmountInAuditRoll_ForeignCurrencyFormat</DataField>
-        </Field>
-        <Field Name="GLEntryInAuditRoll_Gavekortrabatkonto">
-          <DataField>GLEntryInAuditRoll_Gavekortrabatkonto</DataField>
-        </Field>
-        <Field Name="GLEntryInAuditRoll_GavekortrabatkontoFormat">
-          <DataField>GLEntryInAuditRoll_GavekortrabatkontoFormat</DataField>
         </Field>
         <Field Name="Number_Integer">
           <DataField>Number_Integer</DataField>

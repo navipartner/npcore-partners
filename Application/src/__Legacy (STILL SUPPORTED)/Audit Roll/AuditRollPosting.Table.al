@@ -311,11 +311,17 @@ table 6014424 "NPR Audit Roll Posting"
         {
             Caption = 'Gift Voucher Reference No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher table won''t be used anymore.';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(60; "Credit voucher ref."; Code[20])
         {
             Caption = 'Credit Voucher Reference No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Credit voucher table won''t be used anymore.';
+            ObsoleteTag = 'NPR Credit Voucher';
         }
         field(61; "Salgspris inkl. moms"; Boolean)
         {
@@ -350,11 +356,17 @@ table 6014424 "NPR Audit Roll Posting"
         {
             Caption = 'Offline - Gift Voucher Reference';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Gift voucher table won''t be used anymore.';
+            ObsoleteTag = 'NPR Gift Voucher';
         }
         field(73; "Offline - Credit voucher ref."; Code[20])
         {
             Caption = 'Offline - Gift Voucher Reference';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Credit voucher table won''t be used anymore.';
+            ObsoleteTag = 'NPR Credit Voucher';
         }
         field(75; "Bin Code"; Code[10])
         {

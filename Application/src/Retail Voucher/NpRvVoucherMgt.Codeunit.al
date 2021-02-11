@@ -965,6 +965,58 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
         exit(RandomChar);
     end;
 
+    procedure ArchiveRetailVoucher(var RetailVoucher: Record "NPR NpRv Voucher"; VoucherAmount: Decimal)
+    var
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+        VoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+    begin
+        RetailVoucher."Arch. No." := RetailVoucher."No.";
+
+        VoucherEntry.Init();
+        VoucherEntry."Entry No." := 0;
+        VoucherEntry."Voucher No." := RetailVoucher."No.";
+        VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Manual Archive";
+        VoucherEntry."Voucher Type" := RetailVoucher."Voucher Type";
+        VoucherEntry.Amount := -VoucherAmount;
+        VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
+        VoucherEntry.Positive := VoucherEntry.Amount > 0;
+        VoucherEntry."Posting Date" := Today;
+        VoucherEntry.Open := true;
+        VoucherEntry."Register No." := '';
+        VoucherEntry."Document No." := '';
+        VoucherEntry."User ID" := UserId();
+        VoucherEntry."Closed by Entry No." := 0;
+
+        InsertArchivedVoucher(RetailVoucher);
+        InsertArchivedVoucherEntry(RetailVoucher, VoucherEntry);
+    end;
+
+    procedure OpenRetailVoucher(RetailVoucher: Record "NPR NpRv Voucher"; VoucherAmount: Decimal)
+    var
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+        VoucherType: Record "NPR NpRv Voucher Type";
+        VoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+    begin
+        if VoucherMgt.InitialEntryExists(RetailVoucher) then
+            exit;
+
+        VoucherType.Get(RetailVoucher."Voucher Type");
+
+        VoucherEntry.Init;
+        VoucherEntry."Entry No." := 0;
+        VoucherEntry."Voucher No." := RetailVoucher."No.";
+        VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Issue Voucher";
+        VoucherEntry."Voucher Type" := RetailVoucher."Voucher Type";
+        VoucherEntry.Amount := VoucherAmount;
+        VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
+        VoucherEntry.Positive := VoucherEntry.Amount > 0;
+        VoucherEntry."Posting Date" := DT2Date(RetailVoucher."Starting Date");
+        VoucherEntry.Open := VoucherEntry.Amount <> 0;
+        VoucherEntry."Partner Code" := VoucherType."Partner Code";
+        VoucherEntry."Closed by Entry No." := 0;
+        VoucherEntry.Insert();
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertIssuedVoucher(var Voucher: Record "NPR NpRv Voucher"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line")
     begin

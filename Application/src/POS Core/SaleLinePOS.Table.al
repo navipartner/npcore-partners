@@ -1709,6 +1709,9 @@ table 6014406 "NPR Sale Line POS"
                         if PaymentTypePOS."Account Type" = PaymentTypePOS."Account Type"::"G/L Account" then
                             Error(Err002, "No.");
                     end;
+                end else begin
+                    if PaymentTypePOS."Account Type" = PaymentTypePOS."Account Type"::"G/L Account" then
+                        Error(Err002, "No.");
                 end;
 
         if GiftCrtLine <> 0 then begin
