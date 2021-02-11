@@ -137,6 +137,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         TransferAttributes(XmlElement, MemberInfoCapture);
 
         MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MemberInfoCapture."Item No.");
+        MembershipSalesSetup.TestField(Blocked, false);
 
         if (MemberInfoCapture.Amount = 0) then begin
             Item.Get(MemberInfoCapture."Item No.");
