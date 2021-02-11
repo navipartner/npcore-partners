@@ -108,6 +108,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
     begin
 
         MembershipSetup.Get(MembershipSalesSetup."Membership Code");
+        MembershipSetup.TestField(Blocked, false);
 
         case MembershipSetup."Membership Type" of
             // Single Shared membership object, anonymous members

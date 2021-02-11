@@ -276,6 +276,15 @@ xmlport 6060130 "NPR MM Get Members. Members"
             AddErrorResponse(NOT_FOUND);
     end;
 
+    procedure GetResponse(var TmpMemberInfoResponseOut: Record "NPR MM Member Info Capture"; var TmpAttributeValueSetOut: Record "NPR Attribute Value Set"; var ResponseMessage: Text): Boolean
+    begin
+        TmpMemberInfoResponseOut.Copy(tmpMemberInfoResponse, true);
+        TmpAttributeValueSetOut.Copy(TmpAttributeValueSet, true);
+        ResponseMessage := errordescription;
+
+        exit(status = '1');
+    end;
+
     procedure AddErrorResponse(ErrorMessage: Text)
     begin
 

@@ -156,6 +156,14 @@ xmlport 6060127 "NPR MM Create Membership"
         tmpMembershipResponse.Insert();
     end;
 
+    procedure GetResponse(var MembershipEntryNo: Integer; var ResponseMessage: Text): Boolean
+    begin
+        tmpmembershipresponse.FindFirst();
+        MembershipEntryNo := tmpmembershipresponse."Entry No.";
+        ResponseMessage := errordescription;
+        exit(status = '1');
+    end;
+
     procedure AddErrorResponse(ErrorMessage: Text)
     begin
 

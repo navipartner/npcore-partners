@@ -863,7 +863,7 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
         exit(GetNextNoFromSeries('C20'));
     end;
 
-    local procedure GetNextNoFromSeries(FromSeries: Code[2]): Code[20]
+    local procedure GetNextNoFromSeries(FromSeries: Code[20]): Code[20]
     var
         NoSeriesManagement: Codeunit NoSeriesManagement;
     begin
