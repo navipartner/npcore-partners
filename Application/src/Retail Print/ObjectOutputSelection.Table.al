@@ -77,7 +77,6 @@ table 6014580 "NPR Object Output Selection"
                             if PAGE.RunModal(PAGE::Printers, Printer) = ACTION::LookupOK then
                                 "Output Path" := Printer.ID;
                         end;
-
                     "Output Type"::"PrintNode PDF",
                     "Output Type"::"PrintNode Raw":
                         begin

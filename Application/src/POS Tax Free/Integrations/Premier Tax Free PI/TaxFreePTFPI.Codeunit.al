@@ -712,9 +712,7 @@ codeunit 6014611 "NPR Tax Free PTF PI"
         end;
     end;
 
-    local procedure "// Web Service Request functions"()
-    begin
-    end;
+    #region Web Service Request functions"
 
     local procedure BRTSearchRequest(var TaxFreeRequest: Record "NPR Tax Free Request"; IIN: Text)
     var
@@ -940,6 +938,8 @@ codeunit 6014611 "NPR Tax Free PTF PI"
         XMLDoc.Load(MemoryStream);
         GetCDataXML(XMLDoc, ResponseTagName);
     end;
+
+    #endregion
 
     #region Event subscribers
 
