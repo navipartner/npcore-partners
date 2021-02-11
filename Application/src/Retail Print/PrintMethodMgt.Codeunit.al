@@ -56,19 +56,6 @@ codeunit 6014582 "NPR Print Method Mgt."
         WebPrintMgt.CreatePrintJob(PrinterName, SlavePrinterName, PrintBytes, TargetEncoding);
     end;
 
-    procedure PrintViaGoogleCloud(PrinterID: Text; var Stream: DotNet NPRNetMemoryStream; ContentType: Text; ObjectType: Option "Report","Codeunit"; ObjectID: Integer): Boolean
-    var
-        GoogleCloudPrintMgt: Codeunit "NPR GCP Mgt.";
-    begin
-        if ContentType = '' then
-            exit(false);
-
-        if Stream.Length < 1 then
-            exit(false);
-
-        exit(GoogleCloudPrintMgt.PrintFile(PrinterID, Stream, ContentType, GoogleCloudPrintMgt.GetCustomCJT(PrinterID, ObjectType, ObjectID), '', ''));
-    end;
-
     [Obsolete('Use the overload without DotNet. This method can be deleted when there are 0 references left')]
     procedure PrintViaEmail(PrinterName: Text; var Stream: DotNet NPRNetMemoryStream)
     var

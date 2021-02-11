@@ -37,26 +37,20 @@ codeunit 6150705 "NPR POS Sale"
         IsModified: Boolean;
         Initialized: Boolean;
         Ended: Boolean;
-        "--- Last Sale Information ---": Integer;
         LastSaleRetrieved: Boolean;
         LastSaleTotal: Decimal;
         LastSalePayment: Decimal;
         LastSaleDateText: Text;
         LastSaleReturnAmount: Decimal;
         LastReceiptNo: Text;
-        PaymentTypeNotFound: Label '%1 %2 for register %3 was not found.';
-        Text10600003: Label 'Sale temporarily on hold';
-        TaxFreePromptCaption: Label 'Issue tax free voucher for this sale?';
         SetDimension01: Label 'Dimension %1 does not exist';
         SetDimension02: Label 'Dimension Value %1 does not exist for dimension %2';
-        "--- Ended Sale Information ---": Integer;
         EndedSalesAmount: Decimal;
         EndedPaidAmount: Decimal;
         EndedChangeAmount: Decimal;
         EndedRoundingAmount: Decimal;
         Text000: Label 'During End Sale, after Audit Roll Insert, before Audit Roll Posting';
         ERROR_AFTER_END_SALE: Label 'An error occurred after the sale ended: %1';
-        IsMock: Boolean;
 
         // OnRun helper globals
         OnRunType: Option Undefined,RunAfterEndSale,OnFinishSale;
@@ -89,8 +83,7 @@ codeunit 6150705 "NPR POS Sale"
         InitSale();
         OnAfterInitSale(Rec, FrontEnd);
 
-        if not IsMock then
-            FrontEnd.StartTransaction(Rec);
+        FrontEnd.StartTransaction(Rec);
     end;
 
     local procedure CheckInit(WithError: Boolean): Boolean
@@ -102,21 +95,21 @@ codeunit 6150705 "NPR POS Sale"
 
     local procedure InitSale()
     var
-        FormCode: Codeunit "NPR Retail Form Code";
-        TouchScreenFunctions: Codeunit "NPR Touch Screen - Func.";
     begin
         with Rec do begin
             "Salesperson Code" := Setup.Salesperson();
             "Register No." := Register."Register No.";
             Register.TestField("Return Payment Type");
-            "Sales Ticket No." := FormCode.FetchSalesTicketNumber("Register No.");
+            "Sales Ticket No." := GetNextReceiptNo("Register No.");
             Date := Today;
             "Start Time" := Time;
             "Sale type" := "Sale type"::Sale;
             "Saved Sale" := false;
             TouchScreen := true;
 
-            TouchScreenFunctions.TestSalesDate;
+            if WorkDate <> Today then begin
+                WorkDate := Today;
+            end;
 
             UpdateSaleDeviceID(Rec);
             Insert(true);
@@ -126,8 +119,6 @@ codeunit 6150705 "NPR POS Sale"
             SaleLine.Init("Register No.", "Sales Ticket No.", This, Setup, FrontEnd);
             PaymentLine.Init("Register No.", "Sales Ticket No.", This, Setup, FrontEnd);
 
-            // RetailSalesDocMgt.Reset(); // TODO
-
             FilterGroup := 2;
             SetRange("Register No.", "Register No.");
             SetRange("Sales Ticket No.", "Sales Ticket No.");
@@ -136,6 +127,33 @@ codeunit 6150705 "NPR POS Sale"
             IsModified := true;
         end;
 
+    end;
+
+    procedure GetNextReceiptNo(POSUnitNo: Text) ReceiptNo: Code[20]
+    var
+        NoSeriesManagement: Codeunit NoSeriesManagement;
+        POSAuditProfile: Record "NPR POS Audit Profile";
+        POSUnit: Record "NPR POS Unit";
+        POSEntry: Record "NPR POS Entry";
+        NoSeriesLine: Record "No. Series Line";
+        NoSeries: Record "No. Series";
+        DuplicateReceiptNo: Label 'Duplicate Receipt Number %1';
+    begin
+        POSUnit.Get(POSUnitNo);
+        POSUnit.TestField("POS Audit Profile");
+        POSAuditProfile.Get(POSUnit."POS Audit Profile");
+        POSAuditProfile.TestField("Sales Ticket No. Series");
+
+        NoSeries.Get(POSAuditProfile."Sales Ticket No. Series");
+        NoSeriesManagement.SetNoSeriesLineFilter(NoSeriesLine, POSAuditProfile."Sales Ticket No. Series", Today);
+        NoSeriesLine.FindFirst();
+        NoSeriesLine.TestField("Allow Gaps in Nos.", true); //Receipt Number should be non-blocking. We have fiscal receipt number when sale ENDS for numbering without gaps, not when sale starts!        
+
+        ReceiptNo := NoSeriesManagement.GetNextNo(POSAuditProfile."Sales Ticket No. Series", Today, true);
+
+        POSEntry.SetRange("Document No.", ReceiptNo);
+        if not POSEntry.IsEmpty() then
+            Error(DuplicateReceiptNo, ReceiptNo);
     end;
 
     procedure GetContext(var SaleLineOut: Codeunit "NPR POS Sale Line"; var PaymentLineOut: Codeunit "NPR POS Payment Line")
@@ -172,23 +190,36 @@ codeunit 6150705 "NPR POS Sale"
 
     procedure GetLastSaleInfo(var LastSaleTotalOut: Decimal; var LastSalePaymentOut: Decimal; var LastSaleDateTextOut: Text; var LastSaleReturnAmountOut: Decimal; var LastReceiptNoOut: Text)
     var
-        TouchScreenFunctions: Codeunit "NPR Touch Screen - Func.";
+        POSEntry: Record "NPR POS Entry";
+        POSSalesLine: Record "NPR POS Sales Line";
+        POSPaymentLine: Record "NPR POS Payment Line";
     begin
-        if not LastSaleRetrieved then
-            TouchScreenFunctions.GetLastSaleInfo(
-              Register."Register No.",
-              LastSaleTotal,
-              LastSalePayment,
-              LastSaleDateText,
-              LastSaleReturnAmount,
-              LastReceiptNo);
-        LastSaleRetrieved := true;
+        if not LastSaleRetrieved then begin
+            POSEntry.SetRange("POS Store Code", Rec."POS Store Code");
+            POSEntry.SetRange("POS Unit No.", Rec."Register No.");
+            POSEntry.SetFilter("Entry Type", '%1|%2', POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale");
+            if not POSEntry.FindLast() then
+                exit;
 
-        LastSaleTotalOut := LastSaleTotal;
-        LastSalePaymentOut := LastSalePayment;
-        LastSaleDateTextOut := LastSaleDateText;
-        LastSaleReturnAmountOut := LastSaleReturnAmount;
-        LastReceiptNoOut := LastReceiptNo;
+            LastReceiptNoOut := POSEntry."Fiscal No.";
+            LastSaleDateTextOut := StrSubstNo('%1 | %2', POSEntry."Entry Date", POSEntry."Ending Time");
+
+            POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+            if POSSalesLine.Findset() then
+                repeat
+                    LastSaleTotalOut += POSSalesLine."Amount Incl. VAT (LCY)";
+                until POSSalesLine.Next() = 0;
+
+            POSPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+            if POSPaymentLine.FindSet() then
+                repeat
+                    if POSPaymentLine."Amount (LCY)" > 0 then
+                        LastSalePaymentOut += POSPaymentLine."Amount (LCY)"
+                    else
+                        LastSaleReturnAmountOut += POSPaymentLine."Amount (LCY)";
+                until POSPaymentLine.Next() = 0;
+        end;
+        LastSaleRetrieved := true;
     end;
 
     procedure GetModified() Result: Boolean
@@ -292,26 +323,15 @@ codeunit 6150705 "NPR POS Sale"
 
     procedure TryEndSale(POSSession: Codeunit "NPR POS Session"): Boolean
     begin
-        exit(TryEndSale2(POSSession, true));
+        exit(TryEndSale(POSSession, true));
     end;
 
-    procedure TryEndSale2(POSSession: Codeunit "NPR POS Session"; StartNew: Boolean): Boolean
+    procedure TryEndSale(POSSession: Codeunit "NPR POS Session"; StartNew: Boolean): Boolean
     var
-        ReturnPaymentType: Record "NPR Payment Type POS";
-        SalePOS: Record "NPR Sale POS";
         SalesAmount: Decimal;
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
         SubTotal: Decimal;
-        RetailFormCode: Codeunit "NPR Retail Form Code";
-        TempSalesHeader: Record "Sales Header" temporary;
-        EmptySelf: Codeunit "NPR POS Sale";
-        POSStore: Record "NPR POS Store";
-        POSEntry: Record "NPR POS Entry";
-        RoundAmount: Decimal;
-        ChangeAmount: Decimal;
-        POSGiveChange: Codeunit "NPR POS Give Change";
-        POSRounding: Codeunit "NPR POS Rounding";
     begin
         if not Initialized then
             exit(false);
@@ -375,11 +395,11 @@ codeunit 6150705 "NPR POS Sale"
         ReturnAmount: Decimal;
         SubTotal: Decimal;
         TempSalesHeader: Record "Sales Header" temporary;
-        RetailFormCode: Codeunit "NPR Retail Form Code";
         StartTime: DateTime;
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
+        POSCreateEntry: Codeunit "NPR POS Create Entry";
+        SaleLinePOS: Record "NPR Sale Line POS";
     begin
-
         PaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
 
         RetailSalesDocMgt.HandleLinkedDocuments(POSSession);
@@ -389,13 +409,21 @@ codeunit 6150705 "NPR POS Sale"
         SalePOS := Rec;
 
         StartTime := CurrentDateTime;
-        RetailFormCode.FinishSale(Rec, SubTotal, 0, true, TempSalesHeader, SalesAmount);
-        Commit;
+
+        ValidateSaleBeforeEnd(Rec);
+        POSCreateEntry.Run(Rec);
+
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.DeleteAll();
+        Rec.Delete();
+
+        Commit; // Sale is now committed to POS entry
         Ended := true;
 
         LogStopwatch('FINISH_SALE', CurrentDateTime - StartTime);
 
-        RunAfterEndSale(SalePOS);
+        RunAfterEndSale(SalePOS); //Any error here would leave the front end with inconsistent state as view switch to new sale or login screen has not happened yet.
 
         if StartNew then begin
             SelectViewForEndOfSale(POSSession);
@@ -435,120 +463,153 @@ codeunit 6150705 "NPR POS Sale"
         end;
     end;
 
-    procedure LoadSavedSale(var SalePOS: Record "NPR Sale POS")
+
+    procedure ValidateSaleBeforeEnd(var Sale: Record "NPR Sale POS")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SaleLinePOS1: Record "NPR Sale Line POS";
-        GlobalSalePOS: Record "NPR Global Sale POS";
         PaymentTypePOS: Record "NPR Payment Type POS";
-        LineIsGiftVoucher: Boolean;
-        Value: Integer;
-        SavedGiftVoucher: Record "NPR Gift Voucher";
-        RetailFormCode: Codeunit "NPR Retail Form Code";
-        Text0000001: Label 'Transferred to location receipt %1';
+        SaleLinePOS: Record "NPR Sale Line POS";
+        Item: Record Item;
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
+        ServiceItemGrp: Record "Service Item Group";
+        ItemTrackingCode: Record "Item Tracking Code";
+        ItemTrackingSetup: Record "Item Tracking Setup";
+        SerialNoInfo: Record "Serial No. Information";
+        ItemTrackingManagement: Codeunit "Item Tracking Management";
+        ErrServiceNoCust: Label 'A Customer must be chosen, because the sale contains items which are to be transferred to service items.';
+        saleNegCashSum: Decimal;
         POSInfoManagement: Codeunit "NPR POS Info Management";
-        AmountExclVAT: Decimal;
-        VATAmount: Decimal;
-        TotalAmount: Decimal;
+        POSUnit: Record "NPR POS Unit";
+        POSStore: Record "NPR POS Store";
+        TotalItemAmountInclVat: Decimal;
+        ErrReturnCashExceeded: Label 'Return cash exceeded. Create credit voucher instead.';
+        ErrSerialNumberRequired: Label 'Serial Number must be supplied for Item %1 - %2';
+        Level: Integer;
     begin
-        OnBeforeLoadSavedSale(SalePOS."Sales Ticket No.", Rec."Sales Ticket No.");
+        POSStore.Get(Sale."POS Store Code");
 
-        with Rec do begin
-            "Customer No." := SalePOS."Customer No.";
-            "Customer Type" := SalePOS."Customer Type";
+        SaleLinePOS.Reset;
+        SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Type", Type);
+        SaleLinePOS.SetRange("Register No.", Sale."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", Sale."Sales Ticket No.");
+        if SaleLinePOS.FindSet then
+            repeat
+                SaleLinePOS.Validate("Shortcut Dimension 1 Code");
+                SaleLinePOS.Validate("Shortcut Dimension 2 Code");
+                if ((SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Sale) and (SaleLinePOS.Type = SaleLinePOS.Type::Item)) then begin
+                    TotalItemAmountInclVat += SaleLinePOS."Amount Including VAT";
+                end
+            until SaleLinePOS.Next = 0;
 
-            "Customer Name" := SalePOS."Customer Name";
-            Name := SalePOS.Name;
-            Address := SalePOS.Address;
-            "Address 2" := SalePOS."Address 2";
-            "Post Code" := SalePOS."Post Code";
-            City := SalePOS.City;
-            "Contact No." := SalePOS."Contact No.";
-            Reference := SalePOS.Reference;
-
-            Date := Today;
-            "Start Time" := Time;
-            "External Document No." := SalePOS."External Document No.";
-            "Prices Including VAT" := SalePOS."Prices Including VAT";
-            Modify(true);
-
-            POSInfoManagement.RetrieveSavedLines(Rec, SalePOS);
-
-            SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
-            SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-            if SaleLinePOS.FindSet then
-                repeat
-                    LineIsGiftVoucher := false;
-                    if (Value <> SaleLinePOS."Sale Type"::Sale) and
-                       (SaleLinePOS."Gift Voucher Ref." = '') then begin
-                        if SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Payment then begin
-                            PaymentTypePOS.SetRange("Processing Type", PaymentTypePOS."Processing Type"::"Gift Voucher");
-                            PaymentTypePOS.SetRange("G/L Account No.", SaleLinePOS."No.");
-                            if not PaymentTypePOS.Find('-') then
-                                Value := SaleLinePOS."Sale Type"
-                            else
-                                LineIsGiftVoucher := true;
-                        end else
-                            Value := SaleLinePOS."Sale Type";
-                    end;
-                    SaleLinePOS1 := SaleLinePOS;
-                    SaleLinePOS1."Register No." := "Register No.";
-                    SaleLinePOS1."Sales Ticket No." := "Sales Ticket No.";
-                    SaleLinePOS1.Date := Date;
-
-                    Clear(SaleLinePOS1."Customer Location No.");
-
-                    if SaleLinePOS1.Quantity < 0 then
-                        SaleLinePOS1.Insert(false)
-                    else
-                        SaleLinePOS1.Insert(true);
-                    if (SaleLinePOS."Gift Voucher Ref." <> '') or LineIsGiftVoucher then begin
-                        SaleLinePOS1.Description := SaleLinePOS.Description;
-                        if Value = -1 then
-                            Value := SaleLinePOS."Sale Type"::Sale;
-                        SaleLinePOS1.Modify;
-                    end;
-                    if SaleLinePOS1."Gift Voucher Ref." <> '' then begin
-                        if SavedGiftVoucher.Get(SaleLinePOS1."Gift Voucher Ref.") then begin
-                            SavedGiftVoucher."Sales Ticket No." := SaleLinePOS1."Sales Ticket No.";
-                            SavedGiftVoucher."Issuing Sales Ticket No." := SaleLinePOS1."Sales Ticket No.";
-                            SavedGiftVoucher.Modify(false);
-                        end
-                    end;
-                until SaleLinePOS.Next = 0;
-
-            GlobalSalePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-            GlobalSalePOS.ModifyAll("Sales Ticket No.", "Sales Ticket No.");
-
-            SaleLinePOS.ModifyAll("From Selection", false);
-            SaleLinePOS.DeleteAll;
-
-            SalePOS.SetRange("Register No.", SalePOS."Register No.");
-            SalePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-            SalePOS.Delete(true);
-
-            SaleLine.Init("Register No.", "Sales Ticket No.", This, Setup, FrontEnd);
-            SaleLine.RefreshCurrent();
-            SaleLine.CalculateBalance(AmountExclVAT, VATAmount, TotalAmount);
-
-            PaymentLine.Init("Register No.", "Sales Ticket No.", This, Setup, FrontEnd);
+        if TotalItemAmountInclVat < 0 then begin
+            saleNegCashSum := 0;
+            Clear(SaleLinePOS);
+            if SalespersonPurchaser.Get(Sale."Salesperson Code") then
+                if SalespersonPurchaser."NPR Maximum Cash Returnsale" > 0 then begin
+                    SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Type", Type);
+                    SaleLinePOS.SetRange("Register No.", Sale."Register No.");
+                    SaleLinePOS.SetRange("Sales Ticket No.", Sale."Sales Ticket No.");
+                    SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Payment);
+                    SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Payment);
+                    if SaleLinePOS.FindSet then
+                        repeat
+                            if PaymentTypePOS.Get(SaleLinePOS."No.") then
+                                if (PaymentTypePOS."Processing Type" = PaymentTypePOS."Processing Type"::Cash) and
+                                    (SaleLinePOS."Amount Including VAT" < 0) then begin
+                                    saleNegCashSum := saleNegCashSum + SaleLinePOS."Amount Including VAT";
+                                    if Abs(saleNegCashSum) > Abs(SalespersonPurchaser."NPR Maximum Cash Returnsale") then
+                                        Error(ErrReturnCashExceeded);
+                                end;
+                        until SaleLinePOS.Next = 0;
+                end;
         end;
 
-        OnAfterLoadSavedSale(SalePOS."Sales Ticket No.", Rec."Sales Ticket No.");
-    end;
 
-    procedure SaveSale()
-    var
-        FormCode: Codeunit "NPR Retail Form Code";
-        TouchScreenFunctions: Codeunit "NPR Touch Screen - Func.";
-        EmptySelf: Codeunit "NPR POS Sale";
-    begin
 
-        Rec."Saved Sale" := true;
-        Rec.Modify;
+        SaleLinePOS.Reset;
+        SaleLinePOS.SetRange("Register No.", Sale."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", Sale."Sales Ticket No.");
+        if SaleLinePOS.Find('+') then;
+        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::"BOM List");
+        if SaleLinePOS.Find('-') then
+            repeat
+                Item.Get(SaleLinePOS."No.");
+                if not Item."NPR Explode BOM auto" then begin
+                    SaleLinePOS.ExplodeBOM(SaleLinePOS."No.", 0, 0, Level, 0, 0);
+                    SaleLinePOS.Amount := 0;
+                    SaleLinePOS."Amount Including VAT" := 0;
+                    SaleLinePOS."Unit Price" := 0;
+                    SaleLinePOS.Quantity := 1;
+                    SaleLinePOS.Modify;
+                end;
+            until SaleLinePOS.Next = 0;
 
-        FormCode.AuditRollCancelSale(Rec, Text10600003);
-        InitializeNewSale(Register, FrontEnd, Setup, EmptySelf);
+        Clear(SaleLinePOS);
+        SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
+        SaleLinePOS.SetRange("Register No.", Sale."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", Sale."Sales Ticket No.");
+        if not SaleLinePOS.FindSet then
+            Error('No lines');
+
+        repeat
+            if (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Sale) and
+               (SaleLinePOS.Type = SaleLinePOS.Type::Item)
+            then begin
+                Item.Get(SaleLinePOS."No.");
+                if Item."Service Item Group" <> '' then begin
+                    ServiceItemGrp.Get(Item."Service Item Group");
+                    if ServiceItemGrp."Create Service Item" and (Item."Costing Method" = Item."Costing Method"::Specific) and
+                                                                (SaleLinePOS.Quantity > 0) then begin
+                        if not ((Sale."Customer Type" = Sale."Customer Type"::Ord) and (Sale."Customer No." <> '')) then
+                            Error(ErrServiceNoCust);
+                        SaleLinePOS.TransferToService;
+                    end;
+                end;
+                if Item."Item Tracking Code" <> '' then begin
+                    ItemTrackingCode.Get(Item."Item Tracking Code");
+                    ItemTrackingManagement.GetItemTrackingSetup(ItemTrackingCode, 1, false, ItemTrackingSetup);
+                    if ItemTrackingSetup."Serial No. Required" then begin
+                        if SaleLinePOS."Serial No." = '' then
+                            Error(ErrSerialNumberRequired, SaleLinePOS."No.", SaleLinePOS.Description);
+                    end;
+                    if ItemTrackingSetup."Serial No. Info Required" then begin
+                        SerialNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Serial No.");
+                        SerialNoInfo.TestField(Blocked, false);
+                    end;
+                end else begin
+                    if SerialNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Serial No.") then
+                        SerialNoInfo.TestField(Blocked, false);
+                end;
+            end;
+
+            if (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Sale)
+                and not (SaleLinePOS.Type = SaleLinePOS.Type::"BOM List")
+                and not (SaleLinePOS.Type = SaleLinePOS.Type::Comment) then begin
+                SaleLinePOS.TestField("Gen. Bus. Posting Group");
+                SaleLinePOS.TestField("Gen. Prod. Posting Group");
+                SaleLinePOS.TestField("VAT Bus. Posting Group");
+                SaleLinePOS.TestField("VAT Prod. Posting Group");
+                Item.Get(SaleLinePOS."No.");
+                if Item."Costing Method" = Item."Costing Method"::Specific then
+                    SaleLinePOS.TestField("Serial No.");
+            end;
+
+            if (SaleLinePOS."Discount %" = 0) and
+               (SaleLinePOS."Discount Type" = SaleLinePOS."Discount Type"::Manual) then begin
+                SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::" ";
+                SaleLinePOS."Discount Code" := '';
+            end;
+
+            if SaleLinePOS."Location Code" = '' then begin
+                SaleLinePOS."Location Code" := POSStore."Location Code";
+            end;
+            if SaleLinePOS."Shortcut Dimension 1 Code" = '' then
+                SaleLinePOS.Validate("Shortcut Dimension 1 Code", POSUnit."Global Dimension 1 Code");
+
+            if SaleLinePOS."Shortcut Dimension 2 Code" = '' then
+                SaleLinePOS.Validate("Shortcut Dimension 2 Code", POSUnit."Global Dimension 2 Code");
+        until SaleLinePOS.Next = 0;
+
+        POSInfoManagement.PostPOSInfo(Sale);
     end;
 
     procedure ResumeExistingSale(SalePOS_ToResume: Record "NPR Sale POS"; RegisterIn: Record "NPR Register"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; ThisIn: Codeunit "NPR POS Sale")
@@ -571,15 +632,13 @@ codeunit 6150705 "NPR POS Sale"
         ResumeSale(SalePOS_ToResume);
         OnAfterResumeSale(Rec, FrontEnd);
 
-        if not IsMock then
-            FrontEnd.StartTransaction(Rec);
+        FrontEnd.StartTransaction(Rec);
     end;
 
     local procedure ResumeSale(SalePOS_ToResume: Record "NPR Sale POS")
     var
         SaleLinePOS: Record "NPR Sale Line POS";
         POSResumeSale: Codeunit "NPR POS Resume Sale Mgt.";
-        TouchScreenFunctions: Codeunit "NPR Touch Screen - Func.";
     begin
         Rec := SalePOS_ToResume;
         with Rec do begin
@@ -814,10 +873,5 @@ codeunit 6150705 "NPR POS Sale"
     [IntegrationEvent(false, false)]
     local procedure OnFinishSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
     begin
-    end;
-
-    procedure SetMockMode()
-    begin
-        IsMock := true;
     end;
 }

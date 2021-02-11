@@ -96,7 +96,7 @@ codeunit 6059996 "NPR Scanner Service WS"
         DataError: Boolean;
         Item: Record Item;
         tmpInt: Integer;
-        BarcodeLibrary: Codeunit "NPR Barcode Library";
+        BarcodeLibrary: Codeunit "NPR Barcode Lookup Mgt.";
         ItemNo: Code[20];
         VariantCode: Code[10];
         ResolvingTable: Integer;
@@ -212,7 +212,7 @@ codeunit 6059996 "NPR Scanner Service WS"
         XMLdocOut: DotNet "NPRNetXmlDocument";
         Item: Record Item;
         //StockTakeWorksheet: Record "NPR Stock-Take Worksheet";
-        BarcodeLibrary: Codeunit "NPR Barcode Library";
+        BarcodeLibrary: Codeunit "NPR Barcode Lookup Mgt.";
         ItemNo: Code[20];
         VariantCode: Code[10];
         ResolvingTable: Integer;

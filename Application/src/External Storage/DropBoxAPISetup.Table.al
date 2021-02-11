@@ -2,6 +2,7 @@ table 6184870 "NPR DropBox API Setup"
 {
     Caption = 'DropBox API Setup';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
 
     fields
     {
@@ -19,7 +20,6 @@ table 6184870 "NPR DropBox API Setup"
         {
             Caption = 'Token';
             DataClassification = CustomerContent;
-            Description = 'https://www.dropbox.com/developers/apps -> select your app -> OAuth 2 section -> Generate Access token';
         }
         field(20; Timeout; Integer)
         {
@@ -31,17 +31,6 @@ table 6184870 "NPR DropBox API Setup"
         {
             Caption = 'Server files location';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                FileManagement: Codeunit "File Management";
-            begin
-                if not FileManagement.ServerDirectoryExists("Storage On Server") then
-                    Error(BadDirErr, "Storage On Server", TableCaption);
-
-                if CopyStr("Storage On Server", StrLen("Storage On Server")) <> '\' then
-                    "Storage On Server" += '\';
-            end;
         }
     }
 
@@ -55,34 +44,5 @@ table 6184870 "NPR DropBox API Setup"
     fieldgroups
     {
     }
-
-    var
-        NoTokenErr: Label 'No token found';
-        BadDirErr: Label 'Directory "%1" does not exist on the server, please check %2';
-
-    procedure HandleToken(DropBoxToken: Text): Text
-    begin
-        if DropBoxToken = '' then begin
-            if IsolatedStorage.Contains(Token, DataScope::Company) then
-                IsolatedStorage.Delete(Token, DataScope::Company);
-            exit;
-        end;
-
-        if not IsolatedStorage.Contains(Token, DataScope::Company) then begin
-            Token := CreateGuid();
-            Modify;
-        end;
-        IsolatedStorage.Set(Token, DropBoxToken, DataScope::Company);
-    end;
-
-    procedure GetToken(): Text
-    var
-        TokenValue: Text;
-    begin
-        if not IsolatedStorage.Get(Token, DataScope::Company, TokenValue) then
-            Error(NoTokenErr);
-
-        exit(TokenValue);
-    end;
 }
 

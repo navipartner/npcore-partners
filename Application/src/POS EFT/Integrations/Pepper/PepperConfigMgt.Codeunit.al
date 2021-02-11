@@ -158,7 +158,7 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
 
     procedure GetHeaderFooterText(Register: Record "NPR Register"; PrintType: Option Transaction,"Transaction CC",Administration; TextType: Option Header,Footer): Text
     var
-        Utility: Codeunit "NPR Utility";
+        Utility: Codeunit "NPR Receipt Footer Mgt.";
         RetailComment: Record "NPR Retail Comment" temporary;
         POSUnit: Record "NPR POS Unit";
         TextToPrint: Text;

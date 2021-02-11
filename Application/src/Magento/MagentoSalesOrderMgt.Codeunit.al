@@ -80,8 +80,6 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         if MagentoSetup."Send Order Confirmation" then
             MailErrorMessage := SendOrderConfirmation(XmlElement, SalesHeader);
         Commit;
-        ActivateAndMailGiftVouchers(SalesHeader);
-        Commit;
         PostOnImport(SalesHeader);
         Commit;
         if MailErrorMessage <> '' then
@@ -361,114 +359,6 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         PaymentLine.Insert(true);
     end;
 
-    local procedure InsertPaymentLineVoucher(XmlElement: XmlElement; var SalesHeader: Record "Sales Header"; var LineNo: Integer)
-    var
-        CreditVoucher: Record "NPR Credit Voucher";
-        GiftVoucher: Record "NPR Gift Voucher";
-        NaviConnectPaymentLine: Record "NPR Magento Payment Line";
-        ExternalReferenceNo: Code[50];
-        PaymentAccountNo: Code[20];
-        PaymentSourceNo: Code[20];
-        PaymentDescription: Text[50];
-        Amount: Decimal;
-        PaymentAmount: Decimal;
-        PaymentLineNo: Integer;
-        PaymentSourceTableNo: Integer;
-        Err001: Label 'Invalid Web Code %1';
-        Txt001: Label 'Giftvoucher %1';
-        Txt002: Label 'Credit Voucher %1';
-        NaviConnectPaymentLine2: Record "NPR Magento Payment Line";
-    begin
-        Initialize;
-        ExternalReferenceNo := NpXmlDomMgt.GetXmlText(XmlElement, 'transaction_id', MaxStrLen(ExternalReferenceNo), true);
-        Evaluate(Amount, NpXmlDomMgt.GetXmlText(XmlElement, 'payment_amount', 0, true), 9);
-
-        if Amount <> 0 then begin
-            GiftVoucher.SetRange("External Reference No.", ExternalReferenceNo);
-            CreditVoucher.SetRange("External Reference No.", ExternalReferenceNo);
-            if GiftVoucher.FindFirst then begin
-                PaymentDescription := StrSubstNo(Txt001, GiftVoucher."No.");
-                PaymentAccountNo := MagentoSetup."Gift Voucher Account No.";
-                PaymentSourceTableNo := DATABASE::"NPR Gift Voucher";
-                PaymentSourceNo := GiftVoucher."No.";
-                PaymentAmount := GiftVoucher.Amount;
-            end else
-                if CreditVoucher.FindFirst then begin
-                    PaymentDescription := StrSubstNo(Txt002, CreditVoucher."No.");
-                    PaymentAccountNo := MagentoSetup."Credit Voucher Account No.";
-                    PaymentSourceTableNo := DATABASE::"NPR Credit Voucher";
-                    PaymentSourceNo := CreditVoucher."No.";
-                    PaymentAmount := CreditVoucher.Amount;
-                end else
-                    Error(StrSubstNo(Err001, ExternalReferenceNo));
-
-            NaviConnectPaymentLine.Reset;
-            NaviConnectPaymentLine.LockTable;
-            NaviConnectPaymentLine.SetRange("Document Table No.", DATABASE::"Sales Header");
-            NaviConnectPaymentLine.SetRange("Document Type", SalesHeader."Document Type");
-            NaviConnectPaymentLine.SetRange("Document No.", SalesHeader."No.");
-            if NaviConnectPaymentLine.FindLast then;
-            PaymentLineNo := NaviConnectPaymentLine."Line No." + 10000;
-            NaviConnectPaymentLine.Init;
-            NaviConnectPaymentLine."Document Table No." := DATABASE::"Sales Header";
-            NaviConnectPaymentLine."Document Type" := SalesHeader."Document Type";
-            NaviConnectPaymentLine."Document No." := SalesHeader."No.";
-            NaviConnectPaymentLine."Line No." := PaymentLineNo;
-            NaviConnectPaymentLine."Payment Type" := NaviConnectPaymentLine."Payment Type"::Voucher;
-            NaviConnectPaymentLine.Description := PaymentDescription;
-            NaviConnectPaymentLine."Account No." := PaymentAccountNo;
-            NaviConnectPaymentLine."No." := ExternalReferenceNo;
-            NaviConnectPaymentLine.Amount := PaymentAmount;
-            NaviConnectPaymentLine."Posting Date" := SalesHeader."Posting Date";
-            NaviConnectPaymentLine."Source Table No." := PaymentSourceTableNo;
-            NaviConnectPaymentLine."Source No." := PaymentSourceNo;
-            NaviConnectPaymentLine.Insert;
-        end;
-
-        NaviConnectPaymentLine2.SetRange("Document Table No.", DATABASE::"Sales Header");
-        NaviConnectPaymentLine2.SetRange("Document Type", SalesHeader."Document Type");
-        NaviConnectPaymentLine2.SetRange("Document No.", SalesHeader."No.");
-        if NaviConnectPaymentLine2.FindLast then;
-        PaymentLineNo := NaviConnectPaymentLine2."Line No.";
-
-        SalesHeader.CalcFields("NPR Magento Payment Amount");
-        if VATAmountLineTemp.GetTotalAmountInclVAT < SalesHeader."NPR Magento Payment Amount" then begin
-            CreditVoucher.Init;
-            CreditVoucher."No." := '';
-            CreditVoucher.Status := CreditVoucher.Status::Cancelled;
-            CreditVoucher.Amount := SalesHeader."NPR Magento Payment Amount" - VATAmountLineTemp.GetTotalAmountInclVAT;
-            CreditVoucher."Customer No" := SalesHeader."Bill-to Customer No.";
-            CreditVoucher.Name := CopyStr(SalesHeader."Bill-to Name", 1, MaxStrLen(CreditVoucher.Name));
-            CreditVoucher.Address := SalesHeader."Bill-to Address";
-            CreditVoucher."Post Code" := SalesHeader."Bill-to Post Code";
-            CreditVoucher.City := SalesHeader."Bill-to City";
-            CreditVoucher."Location Code" := SalesHeader."Location Code";
-            CreditVoucher."Shortcut Dimension 1 Code" := SalesHeader."Shortcut Dimension 1 Code";
-            CreditVoucher."Shortcut Dimension 2 Code" := SalesHeader."Shortcut Dimension 2 Code";
-            CreditVoucher."Sales Order No." := SalesHeader."No.";
-            CreditVoucher."Currency Code" := SalesHeader."Currency Code";
-            CreditVoucher."Issue Date" := Today;
-            CreditVoucher."Salesperson Code" := SalesHeader."Salesperson Code";
-            CreditVoucher.Insert(true);
-
-            NaviConnectPaymentLine2.Init;
-            NaviConnectPaymentLine2."Document Table No." := DATABASE::"Sales Header";
-            NaviConnectPaymentLine2."Document Type" := SalesHeader."Document Type";
-            NaviConnectPaymentLine2."Document No." := SalesHeader."No.";
-            PaymentLineNo += 10000;
-            NaviConnectPaymentLine2."Line No." := PaymentLineNo;
-            NaviConnectPaymentLine2."Payment Type" := NaviConnectPaymentLine2."Payment Type"::Voucher;
-            NaviConnectPaymentLine2.Description := StrSubstNo(Txt002, CreditVoucher."No.");
-            NaviConnectPaymentLine2."Account No." := MagentoSetup."Credit Voucher Account No.";
-            NaviConnectPaymentLine2."No." := CopyStr(CreditVoucher."External Reference No.", 1, MaxStrLen(NaviConnectPaymentLine2."No."));
-            NaviConnectPaymentLine2."Posting Date" := SalesHeader."Posting Date";
-            NaviConnectPaymentLine2."Source Table No." := DATABASE::"NPR Credit Voucher";
-            NaviConnectPaymentLine2."Source No." := CreditVoucher."No.";
-            NaviConnectPaymentLine2.Amount := -CreditVoucher.Amount;
-            NaviConnectPaymentLine2.Insert;
-        end;
-    end;
-
     local procedure InsertRetailVoucherPayment(XmlElement: XmlElement; var SalesHeader: Record "Sales Header"; var LineNo: Integer): Boolean
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
@@ -554,8 +444,6 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
                 case LowerCase(NpXmlDomMgt.GetXmlAttributeText(XNode, 'type', true)) of
                     'payment_gateway', '':
                         InsertPaymentLinePaymentMethod(XNode.AsXmlElement(), SalesHeader, LineNo);
-                    'voucher':
-                        InsertPaymentLineVoucher(XNode.AsXmlElement(), SalesHeader, LineNo);
                     'retail_voucher':
                         InsertRetailVoucherPayment(XNode.AsXmlElement(), SalesHeader, LineNo);
                 end;
@@ -768,10 +656,6 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
                 begin
                     InsertSalesLineItem(XmlElement, SalesHeader, LineNo);
                 end;
-            'gift_voucher':
-                begin
-                    InsertSalesLineGiftVoucher(XmlElement, SalesHeader, LineNo);
-                end;
             'fee':
                 begin
                     InsertSalesLineFee(XmlElement, SalesHeader, LineNo);
@@ -883,49 +767,6 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         SalesLine.Modify(true);
     end;
 
-    local procedure InsertSalesLineGiftVoucher(XmlElement: XmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
-    var
-        XNodeList: XmlNodeList;
-        XNode: XmlNode;
-        SalesLine: Record "Sales Line";
-        LineAmount: Decimal;
-        Quantity: Decimal;
-        UnitPrice: Decimal;
-        VatPct: Decimal;
-        i: Integer;
-    begin
-        UnitPrice := NpXmlDomMgt.GetElementDec(XmlElement, 'unit_price_incl_vat', true);
-        LineAmount := NpXmlDomMgt.GetElementDec(XmlElement, 'line_amount_incl_vat', true);
-        if not SalesHeader."Prices Including VAT" then begin
-            UnitPrice := NpXmlDomMgt.GetElementDec(XmlElement, 'unit_price_excl_vat', true);
-            LineAmount := NpXmlDomMgt.GetElementDec(XmlElement, 'line_amount_excl_vat', true);
-        end;
-        Quantity := NpXmlDomMgt.GetElementDec(XmlElement, 'quantity', true);
-        VatPct := NpXmlDomMgt.GetElementDec(XmlElement, 'vat_percent', true);
-
-        LineNo += 10000;
-        SalesLine.Init;
-        SalesLine."Document Type" := SalesHeader."Document Type";
-        SalesLine."Document No." := SalesHeader."No.";
-        SalesLine."Line No." := LineNo;
-        SalesLine.Insert(true);
-
-        SalesLine.Validate(Type, SalesLine.Type::"G/L Account");
-        SalesLine.Validate("No.", MagentoSetup."Gift Voucher Account No.");
-        SalesLine.Description := NpXmlDomMgt.GetXmlText(XmlElement, 'description', MaxStrLen(SalesLine.Description), true);
-        SalesLine.Validate("Unit Price", UnitPrice);
-        SalesLine.Validate(Quantity, Quantity);
-        SalesLine.Validate("VAT %", VatPct);
-        SalesLine.Validate("Line Amount", LineAmount);
-        SalesLine.Modify(true);
-
-        XmlElement.SelectNodes('//gift_vouchers/gift_voucher', XNodeList);
-        for i := 1 to XNodeList.Count do begin
-            XNodeList.Get(i, XNode);
-            if not XNode.AsXmlElement().IsEmpty then
-                InsertGiftVoucher(XNode.AsXmlElement(), SalesHeader);
-        end;
-    end;
 
     local procedure InsertSalesLineFee(XmlElement: XmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
     var
@@ -1159,27 +1000,6 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         SalesLine.Validate("Unit Price", ShipmentFee);
         SalesLine.Validate(Quantity, 1);
         SalesLine.Modify(true);
-    end;
-
-    local procedure InsertGiftVoucher(XmlElement: XmlElement; SalesHeader: Record "Sales Header")
-    var
-        GiftVoucher: Record "NPR Gift Voucher";
-        Ostream: OutStream;
-    begin
-        GiftVoucher.Init;
-        Evaluate(GiftVoucher.Amount, NpXmlDomMgt.GetXmlText(XmlElement, 'amount', 0, true), 9);
-        GiftVoucher.Name := NpXmlDomMgt.GetXmlText(XmlElement, 'name', MaxStrLen(GiftVoucher.Name), true);
-        GiftVoucher."External Gift Voucher No." := NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'external_no', true);
-        GiftVoucher."External Reference No." := NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'certificate_number', true);
-        GiftVoucher.Status := GiftVoucher.Status::Cancelled;
-        GiftVoucher."Sales Order No." := SalesHeader."No.";
-        GiftVoucher."Gift Voucher Message".CreateOutStream(Ostream);
-        Ostream.Write(NpXmlDomMgt.GetXmlText(XmlElement, 'message', 0, true));
-        GiftVoucher."Issue Date" := Today;
-        GiftVoucher."Salesperson Code" := SalesHeader."Salesperson Code";
-        GiftVoucher."External No." := SalesHeader."External Document No.";
-        GiftVoucher."Customer No." := SalesHeader."Sell-to Customer No.";
-        GiftVoucher.Insert(true);
     end;
 
     local procedure InsertSalesLineCustomOption(XmlElement: XmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer)
@@ -1672,18 +1492,6 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         end;
     end;
 
-    local procedure ActivateAndMailGiftVouchers(SalesHeader: Record "Sales Header")
-    var
-        Customer: Record Customer;
-        MagentoGiftVoucherMgt: Codeunit "NPR Magento Gift Voucher Mgt.";
-    begin
-        if not (MagentoSetup."Gift Voucher Activation" = MagentoSetup."Gift Voucher Activation"::OnInsert) then
-            exit;
-        if not Customer.Get(SalesHeader."Sell-to Customer No.") then
-            exit;
-        MagentoGiftVoucherMgt.ActivateAndMailGiftVouchers(SalesHeader."NPR External Order No.", Customer."E-Mail");
-    end;
-
     local procedure TranslateBarcodeToItemVariant(Barcode: Text[50]; var ItemNo: Code[20]; var VariantCode: Code[10]; var ResolvingTable: Integer) Found: Boolean
     var
         Item: Record Item;
@@ -1720,39 +1528,6 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
             end;
         end;
 
-
-        // Try Alternative No
-        if not GenericSetupMgt.OpenRecRef(6014416, RecRef) then
-            exit(false);
-
-        if not GenericSetupMgt.OpenFieldRef(RecRef, 2, FieldRef) then
-            exit(false);
-        if StrLen(Barcode) > FieldRef.Length then
-            exit(false);
-        FieldRef.SetFilter('=%1', UpperCase(Barcode));
-
-        if not GenericSetupMgt.OpenFieldRef(RecRef, 4, FieldRef) then
-            exit(false);
-        FieldRef.SetFilter('=%1', 0);
-
-        if not RecRef.FindFirst then
-            exit(false);
-
-        if not GenericSetupMgt.OpenFieldRef(RecRef, 1, FieldRef) then
-            exit(false);
-
-        if not Item.Get(CopyStr(UpperCase(Format(FieldRef.Value)), 1, MaxStrLen(Item."No."))) then
-            exit(false);
-
-        if GenericSetupMgt.OpenFieldRef(RecRef, 6, FieldRef) then begin
-            if (Format(FieldRef.Value) <> '') and (not ItemVariant.Get(Item."No.", CopyStr(UpperCase(Format(FieldRef.Value)), 1, MaxStrLen(ItemVariant.Code)))) then
-                exit(false);
-        end;
-
-        ResolvingTable := DATABASE::"NPR Alternative No.";
-        ItemNo := Item."No.";
-        VariantCode := ItemVariant.Code;
-        exit(true);
     end;
 
     local procedure GetDate(Date1: Date; Date2: Date): Date

@@ -1,23 +1,7 @@
 codeunit 6150793 "NPR POS Action: Open Drawer"
 {
-    // NPR5.38/TSA /20171123 CASE 297087 Added POS Entry System Event for open drawer
-    // NPR5.38/ANEN /20171227 CASE 295200 Added option to as for salesperson pwd on open drawer. / Added Parameters to OnBeforeWorkflow
-    // NPR5.40/MMV /20180301 CASE 300660 Use new payment bin opening methods
-    // NPR5.40.02/MMV /20180418 CASE 311900 Fallback if missing setup
-    // NPR5.41/MMV /20180425 CASE 312990 Proper fallback.
-    // NPR5.46/TSA /20180925 CASE 314603 Implementing Secure Methods as security model, removing old security model (refactoring) & removing all comments (cleanup)
-    // NPR5.51/MHA /20190613 CASE 358392 Added find before modify in OnAction() in case POSSale is not current
-    // NPR5.51/ALST/20190614 CASE 353516 changed action to allow for cash drawer opening before sale is started
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is a built-in action for opening the cash drawer';
-        Title: Label 'Insert password';
-        InvalidPassword: Label 'Password is invalid';
 
     local procedure ActionCode(): Text
     begin
@@ -32,19 +16,18 @@ codeunit 6150793 "NPR POS Action: Open Drawer"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
+        if Sender.DiscoverAction(
               ActionCode,
               ActionDescription,
               ActionVersion,
-              Type::Generic,
-              "Subscriber Instances Allowed"::Multiple)
+              Sender.Type::Generic,
+              Sender."Subscriber Instances Allowed"::Multiple)
             then begin
 
-                RegisterWorkflow(false);
-                RegisterTextParameter('Cash Drawer No.', '');
+            Sender.RegisterWorkflow(false);
+            Sender.RegisterTextParameter('Cash Drawer No.', '');
 
-            end;
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -67,9 +50,7 @@ codeunit 6150793 "NPR POS Action: Open Drawer"
 
         POSSession.GetSetup(POSSetup);
         POSSession.GetSale(POSSale);
-        //-NPR5.51
         RecID := SalePOS.RecordId;
-        //+NPR5.51
         POSSale.GetCurrentSale(SalePOS);
 
         if (CashDrawerNo = '') then begin
@@ -79,12 +60,8 @@ codeunit 6150793 "NPR POS Action: Open Drawer"
 
         OpenDrawer(CashDrawerNo, SalePOS);
 
-        //-NPR5.51
         if SalePOS.RecordId <> RecID then begin
-            //+NPR5.51
-            //-NPR5.51 [358392]
             SalePOS.Find;
-            //+NPR5.51 [358392]
             SalePOS."Drawer Opened" := true;
             SalePOS.Modify;
             POSSale.Refresh(SalePOS);
@@ -98,10 +75,7 @@ codeunit 6150793 "NPR POS Action: Open Drawer"
         POSPaymentBin: Record "NPR POS Payment Bin";
         POSPaymentBinInvokeMgt: Codeunit "NPR POS Payment Bin Eject Mgt.";
     begin
-
-        if not POSPaymentBin.Get(CashDrawerNo) then
-            POSPaymentBin."Eject Method" := 'PRINTER';
-
+        POSPaymentBin.Get(CashDrawerNo);
         POSPaymentBinInvokeMgt.EjectDrawer(POSPaymentBin, SalePOS);
     end;
 }

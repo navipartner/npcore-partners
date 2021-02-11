@@ -364,7 +364,7 @@ page 6014402 "NPR Retail Item Journal"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     ShortCutKey = 'Shift+Ctrl+D';
                     ApplicationArea = All;
@@ -381,7 +381,7 @@ page 6014402 "NPR Retail Item Journal"
                     Caption = 'Item &Tracking Lines';
                     Image = ItemTrackingLines;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     ShortCutKey = 'Shift+Ctrl+I';
                     ApplicationArea = All;
@@ -527,7 +527,7 @@ page 6014402 "NPR Retail Item Journal"
                     Caption = 'E&xplode BOM';
                     Image = ExplodeBOM;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Codeunit "Item Jnl.-Explode BOM";
                     ApplicationArea = All;
@@ -558,7 +558,7 @@ page 6014402 "NPR Retail Item Journal"
                     Ellipsis = true;
                     Image = GetStandardJournal;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'Executes the &Get Standard Journals action';
@@ -605,20 +605,6 @@ page 6014402 "NPR Retail Item Journal"
                         Message(Text002, StdItemJnl.Code);
                     end;
                 }
-                action("Import from Scanner")
-                {
-                    Caption = 'Import from Scanner';
-                    Image = Import;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Import from Scanner action';
-
-                    trigger OnAction()
-                    var
-                        cuScanner: Codeunit "NPR Scanner - Functions";
-                    begin
-                        cuScanner.initItemJnl(Rec);
-                    end;
-                }
             }
             group("P&osting")
             {
@@ -642,7 +628,7 @@ page 6014402 "NPR Retail Item Journal"
                     Caption = 'P&ost';
                     Image = PostOrder;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
@@ -661,7 +647,7 @@ page 6014402 "NPR Retail Item Journal"
                     Caption = 'Post and &Print';
                     Image = PostPrint;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F9';
@@ -682,7 +668,7 @@ page 6014402 "NPR Retail Item Journal"
                 Ellipsis = true;
                 Image = Print;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the &Print action';

@@ -4,6 +4,8 @@ table 6014402 "NPR Payment Type POS"
     Caption = 'Payment Type';
     DataClassification = CustomerContent;
     LookupPageID = "NPR Payment Type - Register";
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Will be replaced by POS Payment Method';
 
     fields
     {
@@ -143,8 +145,6 @@ table 6014402 "NPR Payment Type POS"
 
             trigger OnValidate()
             var
-                PaymentTypePrefix: Record "NPR Payment Type - Prefix";
-                MsgPrefix: Label 'One or more prefixes has been defined for this payment type!';
                 Trans0001: Label 'Cashpayments cannot be run via terminal';
                 Trans0003: Label 'Credit note payments cannot be run via terminal';
                 Trans0004: Label 'Terminal is the link to via terminal, and cannot run via itself';
@@ -158,12 +158,6 @@ table 6014402 "NPR Payment Type POS"
                         "Processing Type"::EFT:
                             Error(Trans0004);
                     end;
-                end;
-
-                if (not "Via Terminal") then begin
-                    PaymentTypePrefix.SetRange("Payment Type", "No.");
-                    if (PaymentTypePrefix.Find('-')) then
-                        Message(MsgPrefix);
                 end;
             end;
         }
@@ -844,7 +838,6 @@ table 6014402 "NPR Payment Type POS"
 
     trigger OnDelete()
     var
-        PaymentTypePrefix: Record "NPR Payment Type - Prefix";
         Trans0001: Label 'You cannot delete paymentmethod %1, since there non-posted postings in the audit roll';
     begin
         AuditRoll.SetCurrentKey("Sale Type", Type, "No.", Posted);
@@ -855,11 +848,7 @@ table 6014402 "NPR Payment Type POS"
         if (AuditRoll.Find('-')) then
             Error(Trans0001, "No.");
 
-        PaymentTypePrefix.SetRange("Payment Type", "No.");
-        PaymentTypePrefix.DeleteAll;
-
         RecRef.GetTable(Rec);
-        CompanySyncMgt.OnDelete(RecRef);
 
         DimMgt.DeleteDefaultDim(DATABASE::"NPR Payment Type POS", "No.");
     end;
@@ -867,7 +856,6 @@ table 6014402 "NPR Payment Type POS"
     trigger OnInsert()
     begin
         RecRef.GetTable(Rec);
-        CompanySyncMgt.OnInsert(RecRef);
 
         DimMgt.UpdateDefaultDim(DATABASE::"NPR Payment Type POS", "No.",
                                 "Global Dimension 1 Code", "Global Dimension 2 Code");
@@ -876,7 +864,6 @@ table 6014402 "NPR Payment Type POS"
     trigger OnModify()
     begin
         RecRef.GetTable(Rec);
-        CompanySyncMgt.OnModify(RecRef);
     end;
 
     trigger OnRename()
@@ -901,7 +888,6 @@ table 6014402 "NPR Payment Type POS"
         AuditRoll: Record "NPR Audit Roll";
         Customer: Record Customer;
         DimMgt: Codeunit DimensionManagement;
-        CompanySyncMgt: Codeunit "NPR CompanySyncManagement";
         RecRef: RecordRef;
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])

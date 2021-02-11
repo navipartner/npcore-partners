@@ -1,8 +1,6 @@
 table 6014538 "NPR Audit Roll Backup"
 {
     Caption = 'Audit Roll Backup';
-    DrillDownPageID = "NPR Audit Roll Backup List";
-    LookupPageID = "NPR Audit Roll Backup List";
     PasteIsValid = false;
     DataClassification = CustomerContent;
 

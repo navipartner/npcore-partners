@@ -523,26 +523,12 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
             SalePOS.Modify(true);
         Commit;
 
-        if JSON.GetBooleanParameter('Check Customer Credit', false) then
-            CheckCustCredit(SalePOS);
-
-        SetParameters(POSSaleLine, RetailSalesDocMgt);
+        SetParameters(POSSaleLine, RetailSalesDocMgt, JSON);
         RetailSalesDocMgt.TestSalePOS(SalePOS);
         RetailSalesDocMgt.ProcessPOSSale(SalePOS);
     end;
 
-    local procedure CheckCustCredit(SalePOS: Record "NPR Sale POS")
-    var
-        TempSalesHeader: Record "Sales Header" temporary;
-        FormCode: Codeunit "NPR Retail Form Code";
-        POSCheckCrLimit: Codeunit "NPR POS-Check Cr. Limit";
-    begin
-        FormCode.CreateSalesHeader(SalePOS, TempSalesHeader);
-        if not POSCheckCrLimit.SalesHeaderPOSCheck(TempSalesHeader) then
-            Error('');
-    end;
-
-    local procedure SetParameters(var POSSaleLine: Codeunit "NPR POS Sale Line"; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.")
+    local procedure SetParameters(var POSSaleLine: Codeunit "NPR POS Sale Line"; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; JSON: Codeunit "NPR POS JSON Management")
     var
         AmountExclVAT: Decimal;
         VATAmount: Decimal;
@@ -563,6 +549,7 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         RetailSalesDocMgt.SetTransferTaxSetup(true);
         RetailSalesDocMgt.SetOpenSalesDocAfterExport(false);
         RetailSalesDocMgt.SetWriteInAuditRoll(true);
+        RetailSalesDocMgt.SetCustomerCreditCheck(JSON.GetBooleanParameter('Check Customer Credit', false));
 
         POSSaleLine.CalculateBalance(AmountExclVAT, VATAmount, AmountInclVAT);
         RetailSalesDocMgt.SetDocumentTypeOrder();

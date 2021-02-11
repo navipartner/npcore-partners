@@ -1,7 +1,7 @@
 codeunit 6150673 "NPR Retail Model Script Lib."
 {
-    // NPR5.47/MHA /20181026  CASE 326640 Object created - view Web Client Dependency
-
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Codeunit is one big hack. It abuses huge JS frameworks for no good reason. Depends on github URLs not guaranteed to be static and abuses a table that was built for a different purpose. Replace with built-in UI in dragonglass.';
 
     trigger OnRun()
     begin

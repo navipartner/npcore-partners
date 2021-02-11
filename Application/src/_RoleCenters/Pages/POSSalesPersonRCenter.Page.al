@@ -75,13 +75,6 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 ApplicationArea = All;
                 ToolTip = 'Executes the Vendor action';
             }
-            action("Audit Roll")
-            {
-                Caption = 'Audit Roll';
-                RunObject = Page "NPR Audit Roll";
-                ApplicationArea = All;
-                ToolTip = 'Executes the Audit Roll action';
-            }
             action("POS Entry List")
             {
                 Caption = 'POS Entry List';
@@ -252,22 +245,6 @@ page 6014557 "NPR POS: SalesPerson R.Center"
             group(ActionGroup6014408)
             {
                 Caption = 'Retail';
-                action("Sales Statistics")
-                {
-                    Caption = 'Sales Statistics';
-                    Image = Report2;
-                    RunObject = Report "NPR Sales Ticket Stat.";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Sales Statistics action';
-                }
-                action("Sale Report")
-                {
-                    Caption = 'Sale Report';
-                    Image = Report2;
-                    RunObject = Report "NPR Sale Time Report";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Sale Report action';
-                }
                 separator(Separator6014423)
                 {
                 }
@@ -329,27 +306,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
             {
                 Caption = 'POS';
                 Image = Ledger;
-                action(Action6014493)
-                {
-                    Caption = 'Audit Roll';
-                    RunObject = Page "NPR Audit Roll";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Audit Roll action';
-                }
-                action("Credit Vouchers")
-                {
-                    Caption = 'Credit Vouchers';
-                    RunObject = Page "NPR Credit Voucher List";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Credit Vouchers action';
-                }
-                action("Gift Vouchers")
-                {
-                    Caption = 'Gift Vouchers';
-                    RunObject = Page "NPR Gift Voucher List";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Gift Vouchers action';
-                }
+
                 action("Exchange Labels")
                 {
                     Caption = 'Exchange Labels';
@@ -364,26 +321,12 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Tax Free Voucher action';
                 }
-                action("Retail Document List")
-                {
-                    Caption = 'Retail Document List';
-                    RunObject = Page "NPR Retail Document List";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Retail Document List action';
-                }
                 action("Customer Repairs List")
                 {
                     Caption = 'Customer Repairs List';
                     RunObject = Page "NPR Customer Repair List";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Customer Repairs List action';
-                }
-                action("Warranty Catalog List")
-                {
-                    Caption = 'Warranty Catalog List';
-                    RunObject = Page "NPR Warranty Catalog List";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Warranty Catalog List action';
                 }
                 action(Coupons)
                 {
@@ -992,7 +935,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 Caption = 'Sales &Order';
                 Image = Document;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "Sales Order";
                 RunPageMode = Create;
@@ -1013,7 +956,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 Caption = 'Sales Credit &Memo';
                 Image = CreditMemo;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "Sales Credit Memo";
                 RunPageMode = Create;
@@ -1037,7 +980,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 Caption = '&Purchase Order';
                 Image = Document;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "Purchase Order";
                 RunPageMode = Create;
@@ -1242,14 +1185,6 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     RunObject = Report "NPR Inventory per Date";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Inventory per Date action';
-                }
-                action("Item Group Stat M/Y")
-                {
-                    Caption = 'Item Group Stat M/Y';
-                    Image = "Report";
-                    RunObject = Report "NPR Item Group Stat M/Y";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Item Group Stat M/Y action';
                 }
                 action("Sales Person Trn. by Item Gr.")
                 {

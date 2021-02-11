@@ -11,7 +11,6 @@ codeunit 6060042 "NPR Item Number Mgt."
         ItemVariant: Record "Item Variant";
         ItemUOM: Record "Item Unit of Measure";
         ItemVendor: Record "Item Vendor";
-        AlternativeNo: Record "NPR Alternative No.";
         UOMCodeSpecified: Boolean;
         VendorNoSpecified: Boolean;
     begin
@@ -44,7 +43,6 @@ codeunit 6060042 "NPR Item Number Mgt."
         ItemReference: Record "Item Reference";
         ItemVendor: Record "Item Vendor";
         NonstockItem: Record "Nonstock Item";
-        AlternativeNo: Record "NPR Alternative No.";
         UOMCodeSpecified: Boolean;
         VendorNoSpecified: Boolean;
     begin
@@ -103,27 +101,6 @@ codeunit 6060042 "NPR Item Number Mgt."
                             end;
                             if not UOMCodeSpecified then
                                 UnitOfMeasure := ItemReference."Unit of Measure";
-                            exit(true);
-                        end;
-                    end;
-                until ItemReference.Next = 0;
-        end;
-
-        if ExternalType in [ExternalType::All, ExternalType::AlternativeNo, ExternalType::Barcode] then begin
-            //Search Alternative No.
-            AlternativeNo.Reset();
-            AlternativeNo.SetCurrentKey("Alt. No.", Type);
-            AlternativeNo.SetRange(Type, AlternativeNo.Type::Item);
-            AlternativeNo.SetRange("Alt. No.", ExternalItemNo);
-            if AlternativeNo.FindSet() then
-                repeat
-                    if Item.Get(AlternativeNo.Code) then begin
-                        if Item.Blocked = Blocked then begin
-                            ItemNo := AlternativeNo.Code;
-                            VariantCode := AlternativeNo."Variant Code";
-                            if not VendorNoSpecified then begin
-                                VendorNo := Item."Vendor No.";
-                            end;
                             exit(true);
                         end;
                     end;
@@ -201,7 +178,6 @@ codeunit 6060042 "NPR Item Number Mgt."
     procedure GetItemBarcode(ItemNo: Code[20]; VariantCode: Code[20]; UnitOfMeasure: Code[10]; VendorNo: Code[20]) BarCode: Code[20]
     var
         Item: Record Item;
-        AlternativeNo: Record "NPR Alternative No.";
         ItemReference: Record "Item Reference";
         SKU: Record "Stockkeeping Unit";
         ItemVendor: Record "Item Vendor";
@@ -231,13 +207,6 @@ codeunit 6060042 "NPR Item Number Mgt."
                 ItemReference.SetFilter("Unit of Measure", '%1|%2', Item."Base Unit of Measure", '');
             if ItemReference.FindFirst then begin
                 exit(ItemReference."Reference No.");
-            end else begin
-                AlternativeNo.SetRange(Type, AlternativeNo.Type::Item);
-                AlternativeNo.SetRange(Code, ItemNo);
-                AlternativeNo.SetRange("Variant Code", VariantCode);
-                if AlternativeNo.FindFirst() then begin
-                    exit(AlternativeNo."Alt. No.");
-                end;
             end;
         end;
     end;
@@ -245,7 +214,6 @@ codeunit 6060042 "NPR Item Number Mgt."
     procedure GetItemItemVendorNo(ItemNo: Code[20]; VariantCode: Code[20]; VendorNo: Code[20]) VendorItemNo: Text[30]
     var
         Item: Record Item;
-        AlternativeNo: Record "NPR Alternative No.";
         SKU: Record "Stockkeeping Unit";
         ItemVendor: Record "Item Vendor";
     begin
@@ -273,7 +241,6 @@ codeunit 6060042 "NPR Item Number Mgt."
 
     procedure UpdateBarcode(ItemNo: Code[20]; VariantCode: Code[20]; BarCode: Code[20]; BarCodeType: Option AltNo,CrossReference)
     var
-        AlternativeNo: Record "NPR Alternative No.";
         ItemReference: Record "Item Reference";
         Item: Record Item;
         ItemVariant: Record "Item Variant";
@@ -281,35 +248,6 @@ codeunit 6060042 "NPR Item Number Mgt."
         if BarCode = '' then
             exit;
         case BarCodeType of
-            BarCodeType::AltNo:
-                begin
-                    //Search for Alternative No Based on existing Bar Codes
-                    AlternativeNo.Reset();
-                    AlternativeNo.SetRange(Type, AlternativeNo.Type::Item);
-                    AlternativeNo.SetRange(Code, ItemNo);
-                    AlternativeNo.SetRange("Alt. No.", BarCode);
-                    if not AlternativeNo.FindFirst() then begin
-                        AlternativeNo.SetRange(Code);
-                        if AlternativeNo.FindFirst() then begin
-                            //Delete Barcode Linked to another item
-                            AlternativeNo.Delete(true);
-                        end;
-                        AlternativeNo.Init;
-                        AlternativeNo.Validate(Type, AlternativeNo.Type::Item);
-                        AlternativeNo.Validate(Code, ItemNo);
-                        AlternativeNo.Validate("Alt. No.", BarCode);
-                        if Item.Get(ItemNo) then begin
-                            AlternativeNo."Base Unit of Measure" := Item."Base Unit of Measure";
-                            AlternativeNo."Sales Unit of Measure" := Item."Sales Unit of Measure";
-                            AlternativeNo."Purch. Unit of Measure" := Item."Purch. Unit of Measure";
-                        end;
-                        AlternativeNo.Insert(true);
-                    end;
-                    if AlternativeNo."Variant Code" <> VariantCode then begin
-                        AlternativeNo.Validate("Variant Code", VariantCode);
-                        AlternativeNo.Modify(true);
-                    end;
-                end;
             BarCodeType::CrossReference:
                 begin
                     ItemReference.Reset;

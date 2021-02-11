@@ -79,7 +79,6 @@ table 6060042 "NPR Item Worksheet Line"
 
             trigger OnValidate()
             var
-                AlternativeNo: Record "NPR Alternative No.";
                 ItemWorksheetTemplate2: Record "NPR Item Worksh. Template";
             begin
                 TestField("Line No.");
@@ -215,8 +214,6 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
-            var
-                AlternativeNo: Record "NPR Alternative No.";
             begin
                 ItemWorksheetItemMgt.MatchItemNo(Rec);
             end;
@@ -1915,7 +1912,6 @@ table 6060042 "NPR Item Worksheet Line"
     procedure FindItemNo(ItemRefNo: Code[50]; AltNo: Code[50]; VendorsItemNo: Code[20]; OurVendorNo: Code[20]; var OurItemNo: Code[20]; var OurVariantCode: Code[20]) found: Boolean
     var
         ItemRef: Record "Item Reference";
-        AlternativeNo: Record "NPR Alternative No.";
     begin
         if ItemRefNo <> '' then begin
             ItemRef.SetRange("Reference Type", ItemRef."Reference Type"::Vendor);
@@ -1925,17 +1921,6 @@ table 6060042 "NPR Item Worksheet Line"
             if ItemRef.FindFirst then begin
                 OurItemNo := ItemRef."Item No.";
                 OurVariantCode := ItemRef."Variant Code";
-                exit(true);
-            end;
-        end;
-
-        if AltNo <> '' then begin
-            AlternativeNo.SetCurrentKey("Alt. No.", Type);
-            AlternativeNo.SetRange("Alt. No.", AltNo);
-            AlternativeNo.SetRange(Type, AlternativeNo.Type::Item);
-            if AlternativeNo.FindFirst() then begin
-                OurItemNo := AlternativeNo.Code;
-                OurVariantCode := AlternativeNo."Variant Code";
                 exit(true);
             end;
         end;
@@ -2784,15 +2769,11 @@ table 6060042 "NPR Item Worksheet Line"
         ItemWorksheetTemplate.Get("Worksheet Template Name");
         if ("Internal Bar Code" <> '') and ("Variety 1" = '') then
             case ItemWorksheetTemplate."Create Internal Barcodes" of
-                ItemWorksheetTemplate."Create Internal Barcodes"::"As Alt. No.":
-                    ItemNumberManagement.UpdateBarcode("Item No.", "Variant Code", "Internal Bar Code", 0);
                 ItemWorksheetTemplate."Create Internal Barcodes"::"As Cross Reference":
                     ItemNumberManagement.UpdateBarcode("Item No.", "Variant Code", "Internal Bar Code", 1);
             end;
         if ("Vendors Bar Code" <> '') and ("Variety 1" = '') then
             case ItemWorksheetTemplate."Create Vendor  Barcodes" of
-                ItemWorksheetTemplate."Create Vendor  Barcodes"::"As Alt. No.":
-                    ItemNumberManagement.UpdateBarcode("Item No.", "Variant Code", "Vendors Bar Code", 0);
                 ItemWorksheetTemplate."Create Vendor  Barcodes"::"As Cross Reference":
                     ItemNumberManagement.UpdateBarcode("Item No.", "Variant Code", "Vendors Bar Code", 1);
             end;

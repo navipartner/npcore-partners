@@ -93,13 +93,13 @@ codeunit 6150707 "NPR POS Payment Line"
         PaymentLinePOS.Copy(Rec);
     end;
 
+    //ReturnAmount is LEGACY. Cannot calculate true return amount without knowing payment type that is being paid with, to adjust roundings. If you use this incorrectly you will not have equal transactions in both directions (positive/negative) for nearest rounding.
+    //Look at how the payment action calculates remaining amount to pay instead of using the parameter in new code.
     procedure CalculateBalance(var SaleAmount: Decimal; var PaidAmount: Decimal; var ReturnAmount: Decimal; var Subtotal: Decimal)
     var
         PaymentLine: Record "NPR Sale Line POS";
         PaymentType: Record "NPR Payment Type POS";
         Register: Record "NPR Register";
-        RetailCode: Codeunit "NPR Retail Form Code";
-        Functions: Codeunit "NPR Touch Screen - Func.";
         RoundingAmount: Decimal;
         Decimal: Decimal;
         DiscountRounding: Decimal;
@@ -120,24 +120,23 @@ codeunit 6150707 "NPR POS Payment Line"
         ReturnAmount := 0;
         Subtotal := 0;
 
-        with SaleLinePOS do begin
-            SetRange("Register No.", RegisterNo);
-            SetRange("Sales Ticket No.", SalesTicketNo);
-            SetFilter(Type, '<>%1', Type::Comment);
-            if FindSet then
-                repeat
-                    case true of
-                        ("Sale Type" in ["Sale Type"::Sale, "Sale Type"::Deposit]):
-                            SaleAmount += "Amount Including VAT";
-                        ("Sale Type" = "Sale Type"::"Out payment") and ("Discount Type" <> "Discount Type"::Rounding):
-                            SaleAmount -= "Amount Including VAT";
-                        ("Sale Type" = "Sale Type"::"Out payment") and ("Discount Type" = "Discount Type"::Rounding):
-                            RoundingAmount += "Amount Including VAT";
-                        ("Sale Type" = "Sale Type"::Payment):
-                            PaidAmount += "Amount Including VAT";
-                    end;
-                until Next = 0;
-        end;
+        SaleLinePOS.SetRange(SaleLinePOS."Register No.", RegisterNo);
+        SaleLinePOS.SetRange(SaleLinePOS."Sales Ticket No.", SalesTicketNo);
+        SaleLinePOS.SetFilter(SaleLinePOS.Type, '<>%1', SaleLinePOS.Type::Comment);
+        if SaleLinePOS.FindSet then
+            repeat
+                case true of
+                    (SaleLinePOS."Sale Type" in [SaleLinePOS."Sale Type"::Sale, SaleLinePOS."Sale Type"::Deposit]):
+                        SaleAmount += SaleLinePOS."Amount Including VAT";
+                    (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::"Out payment") and (SaleLinePOS."Discount Type" <> SaleLinePOS."Discount Type"::Rounding):
+                        SaleAmount -= SaleLinePOS."Amount Including VAT";
+                    (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::"Out payment") and (SaleLinePOS."Discount Type" = SaleLinePOS."Discount Type"::Rounding):
+                        RoundingAmount += SaleLinePOS."Amount Including VAT";
+                    (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Payment):
+                        PaidAmount += SaleLinePOS."Amount Including VAT";
+                end;
+            until SaleLinePOS.Next = 0;
+
 
         Subtotal := SaleAmount - PaidAmount - RoundingAmount;
         ReturnAmount := SaleAmount - PaidAmount - RoundingAmount - ReturnRounding;
@@ -243,7 +242,6 @@ codeunit 6150707 "NPR POS Payment Line"
     local procedure ApplyForeignAmountConversion(var SaleLinePOS: Record "NPR Sale Line POS"; PrecalculatedAmount: Boolean; ForeignAmount: Decimal)
     var
         PaymentType: Record "NPR Payment Type POS";
-        Functions: Codeunit "NPR Touch Screen - Func.";
         Register: Record "NPR Register";
     begin
 

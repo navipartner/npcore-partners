@@ -84,101 +84,6 @@ codeunit 6150617 "NPR POS-Audit Roll Integration"
             until AuditRoll.Next = 0;
     end;
 
-    procedure PrepareAuditRollCompare(var POSEntry: Record "NPR POS Entry")
-    var
-        AuditRolltoPOSEntryLink: Record "NPR Audit Roll 2 POSEntry Link";
-        AuditRoll: Record "NPR Audit Roll";
-        GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
-        AuditRollDocNo: Code[20];
-    begin
-        if POSEntry.FindSet then
-            repeat
-                AuditRollDocNo := '';
-                AuditRoll.Reset;
-                AuditRoll.SetRange("Sale Date", POSEntry."Posting Date");
-                AuditRoll.SetRange("Sales Ticket No.", POSEntry."Document No.");
-                AuditRoll.SetFilter("Posted Doc. No.", '<>%1', '');
-                if AuditRoll.FindFirst then begin
-                    AuditRollDocNo := AuditRoll."Posted Doc. No.";
-                end else begin
-                    AuditRolltoPOSEntryLink.SetRange("POS Entry No.", POSEntry."Entry No.");
-                    if AuditRolltoPOSEntryLink.FindFirst then begin
-                        AuditRoll.Reset;
-                        AuditRoll.SetRange("Clustered Key", AuditRolltoPOSEntryLink."Audit Roll Clustered Key");
-                        if AuditRoll.FindFirst then
-                            AuditRollDocNo := AuditRoll."Posted Doc. No.";
-                    end;
-                end;
-                if AuditRollDocNo = '' then
-                    Error('Audit Roll not found');
-                CopyPostedEntriesToPreview(AuditRollDocNo, POSEntry."Posting Date");
-            until POSEntry.Next = 0;
-    end;
-
-    local procedure CopyPostedEntriesToPreview(DocumentNo: Code[20]; PostingDate: Date)
-    var
-        ItemLedgerEntry: Record "Item Ledger Entry";
-        ValueEntry: Record "Value Entry";
-        GLEntry: Record "G/L Entry";
-        VATEntry: Record "VAT Entry";
-        BankAccountLedgerEntry: Record "Bank Account Ledger Entry";
-        GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
-    begin
-        Error('Function not possible in 2017');
-        /*
-        //-NPR5.37 [293133]
-        WITH GLEntry DO BEGIN
-          SETRANGE("Document No.",DocumentNo);
-          GLEntry.SETRANGE("Posting Date",PostingDate);
-          IF GLEntry.FINDFIRST THEN REPEAT
-            GLEntry.Description := COPYSTR(PrefixExistingPostingTxt + GLEntry.Description,1,MAXSTRLEN(GLEntry.Description));
-            GLEntry."Source Code" := COPYSTR(PrefixExistingPostingTxt + GLEntry."Source Code",1,MAXSTRLEN(GLEntry."Source Code"));
-            GenJnlPostPreview.SaveGLEntry(GLEntry);
-          UNTIL GLEntry.NEXT = 0;
-        END;
-        
-        WITH VATEntry DO BEGIN
-          SETRANGE("Document No.",DocumentNo);
-          SETRANGE("Posting Date",PostingDate);
-          IF FINDFIRST THEN REPEAT
-            "Source Code" := COPYSTR(PrefixExistingPostingTxt + "Source Code",1,MAXSTRLEN("Source Code"));
-            "Internal Ref. No." := COPYSTR(PrefixExistingPostingTxt + "Internal Ref. No.",1,MAXSTRLEN("Internal Ref. No."));
-            GenJnlPostPreview.SaveVATEntry(VATEntry);
-          UNTIL NEXT = 0;
-        END;
-        
-        WITH ValueEntry DO BEGIN
-          SETRANGE("Document No.",DocumentNo);
-          SETRANGE("Posting Date",PostingDate);
-          IF FINDFIRST THEN REPEAT
-            "Source Code" := COPYSTR(PrefixExistingPostingTxt + "Source Code",1,MAXSTRLEN("Source Code"));
-            GenJnlPostPreview.SaveValueEntry(ValueEntry);
-          UNTIL NEXT = 0;
-        END;
-        
-        WITH ItemLedgerEntry DO BEGIN
-          SETRANGE("Document No.",DocumentNo);
-          SETRANGE("Posting Date",PostingDate);
-          IF FINDFIRST THEN REPEAT
-            Description := COPYSTR(PrefixExistingPostingTxt + Description,1,MAXSTRLEN(Description));
-            GenJnlPostPreview.SaveItemLedgEntry(ItemLedgerEntry);
-          UNTIL NEXT = 0;
-        END;
-        
-        WITH BankAccountLedgerEntry DO BEGIN
-          SETRANGE("Document No.",DocumentNo);
-          SETRANGE("Posting Date",PostingDate);
-          IF FINDFIRST THEN REPEAT
-            Description := COPYSTR(PrefixExistingPostingTxt + Description,1,MAXSTRLEN(Description));
-            "Source Code" := COPYSTR(PrefixExistingPostingTxt + "Source Code",1,MAXSTRLEN("Source Code"));
-            GenJnlPostPreview.SaveBankAccLedgEntry(BankAccountLedgerEntry);
-          UNTIL NEXT = 0;
-        END;
-        //+NPR5.37 [293133]
-        */
-
-    end;
-
     procedure UpdatePostingStatusFromAuditRoll(var AuditRoll: Record "NPR Audit Roll")
     var
         AuditRolltoPOSEntryLink: Record "NPR Audit Roll 2 POSEntry Link";
@@ -268,37 +173,6 @@ codeunit 6150617 "NPR POS-Audit Roll Integration"
         Register.Init;
         Register."Register No." := Rec."No.";
         Register.Insert(true);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnBeforeEndSale', '', true, true)]
-    local procedure OnBeforeEndSaleCreatePOSEntry(var Sender: Codeunit "NPR POS Sale"; SaleHeader: Record "NPR Sale POS")
-    var
-        NPRetailSetup: Record "NPR NP Retail Setup";
-        SalePOS: Record "NPR Sale POS";
-    begin
-        exit;
-        if not NPRetailSetup.Get then
-            exit;
-        if not NPRetailSetup."Advanced POS Entries Activated" then
-            exit;
-        Sender.GetCurrentSale(SalePOS);
-        TryCreateSalePOS(SalePOS, false);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6014505, 'OnBeforeRegisterOpen', '', true, true)]
-    local procedure OnBeforeRegisterOpenCreatePOSPeriodRegister(Register: Record "NPR Register")
-    var
-        NPRetailSetup: Record "NPR NP Retail Setup";
-        POSUnit: Record "NPR POS Unit";
-        POSEntryManagement: Codeunit "NPR POS Entry Management";
-    begin
-        if not NPRetailSetup.Get then
-            exit;
-        if not NPRetailSetup."Advanced POS Entries Activated" then
-            exit;
-        if not POSUnit.Get(Register."Register No.") then
-            exit;
-        OpenPOSUnit(POSUnit);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150615, 'OnAfterPostPOSEntry', '', true, true)]

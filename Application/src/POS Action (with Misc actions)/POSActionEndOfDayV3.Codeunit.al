@@ -199,16 +199,10 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
     var
         RetailSetup: Record "NPR Retail Setup";
         NPRetailSetup: Record "NPR NP Retail Setup";
-        "Audit Roll Check": Record "NPR Audit Roll";
         Register: Record "NPR Register";
         POSUnit: Record "NPR POS Unit";
-        "Payment Type - Detailed": Record "NPR Payment Type - Detailed";
         SalePOS: Record "NPR Sale POS";
         POSQuoteMgt: Codeunit "NPR POS Quote Mgt.";
-        RetailFormCode: Codeunit "NPR Retail Form Code";
-        RetailSalesLineCode: Codeunit "NPR Retail Sales Line Code";
-        Action1: Action;
-        closingType: Option Cancel,Normal,Saved;
     begin
         NPRetailSetup.Get();
         NPRetailSetup.TestField("Advanced Posting Activated");
@@ -223,7 +217,7 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
             Error(t001);
 
         SalePOS.Get(RegisterNo, SalesTicketNo);
-        if (RetailSalesLineCode.LineExists(SalePOS)) then
+        if (LineExists(SalePOS)) then
             Error(t002);
 
         if not POSQuoteMgt.CleanupPOSQuotesBeforeBalancing(SalePOS) then
@@ -604,12 +598,23 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         if (CashDrawerNo = '') then
             CashDrawerNo := POSUnit."Default POS Payment Bin";
 
+        if not POSPaymentBin.Get(CashDrawerNo) then
+            exit;
+
         SalePOS."Drawer Opened" := true;
         SalePOS.Modify;
 
-        if not POSPaymentBin.Get(CashDrawerNo) then
-            POSPaymentBin."Eject Method" := 'PRINTER';
-
         POSPaymentBinInvokeMgt.EjectDrawer(POSPaymentBin, SalePOS);
+    end;
+
+
+    procedure LineExists(var SalePOS: Record "NPR Sale POS"): Boolean
+    var
+        SaleLinePOS: Record "NPR Sale Line POS";
+    begin
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetRange(Date, SalePOS.Date);
+        exit(not SaleLinePOS.IsEmpty);
     end;
 }

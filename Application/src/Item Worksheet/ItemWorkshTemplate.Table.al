@@ -138,6 +138,7 @@ table 6060040 "NPR Item Worksh. Template"
             DataClassification = CustomerContent;
             OptionCaption = 'None,As Alt. No.,As Cross Reference';
             OptionMembers = "None","As Alt. No.","As Cross Reference";
+            ;
         }
         field(120; "Sales Price Handling"; Option)
         {

@@ -13,7 +13,7 @@ codeunit 6014502 "NPR SMS"
         SMSFile: File;
         BSlash: Label '\';
         ErrNotSend: Label 'The mail could not be sent.';
-        Utility: Codeunit "NPR Utility";
+        Utility: Codeunit "NPR Receipt Footer Mgt.";
         NcEndpointMgt: Codeunit "NPR Nc Endpoint Mgt.";
         OStream: OutStream;
         FileContent: Text;
@@ -26,19 +26,6 @@ codeunit 6014502 "NPR SMS"
             Error(ErrEmpty);
 
         case IComm."SMS Type" of
-            IComm."SMS Type"::Mail:
-                begin
-                    if not SMSFile.Create(IComm."Local SMTP Pickup Library" + BSlash + Tlf + '.txt') then begin
-                        Message(ErrNotSend);
-                        exit;
-                    end;
-                    SMSFile.TextMode(true);
-                    Utility.MakeVars;
-                    SMSFile.Write('from: ' + Utility.Ascii2Ansi(IComm."Local E-Mail Address"));
-                    SMSFile.Write('to: ' + Utility.Ascii2Ansi(Tlf + IComm."SMS-Address Postfix"));
-                    SMSFile.Write('subject: ' + Utility.Ascii2Ansi(SMSMessage));
-                    SMSFile.Close;
-                end;
             IComm."SMS Type"::Eclub:
                 SmsEclub(Tlf, SMSMessage, IComm."E-Club Sender");
             IComm."SMS Type"::Endpoint:
@@ -68,7 +55,7 @@ codeunit 6014502 "NPR SMS"
 
     procedure SmsEclub(PhoneNo: Text[20]; SMSMessage: Text[250]; From: Text[20])
     var
-        Util: Codeunit "NPR Utility";
+        Util: Codeunit "NPR Receipt Footer Mgt.";
         Uri: Codeunit Uri;
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         Client: HttpClient;
@@ -79,6 +66,7 @@ codeunit 6014502 "NPR SMS"
         ForeignPhone: Boolean;
         SMSHandled: Boolean;
         SMSServiceUri: Text;
+        StringConversionManagement: Codeunit StringConversionManagement;
     begin
         OnSendSMS(SMSHandled, PhoneNo, From, SMSMessage);
         if SMSHandled then
@@ -98,16 +86,8 @@ codeunit 6014502 "NPR SMS"
         PhoneNo := DelChr(PhoneNo, '=', '+');
 
         if ServiceCalc.useService(ServiceCode) then begin
-            SMSMessage := DelChr(Util.Ansi2Ascii(SMSMessage), '%', '');
-            // Uses following Azure Key Vault secrets:
-            // - SMSHTTPRequestUrl    
-            //   The secret contains complete Request URL for sending SMS in the following format:
-            //   'https://wsx.sp247.net/linkdk/?username=%1&password=%2&from=%3&to=%4&message=%5&charset=%6'
-            //   EscapeDataString called after StrSubstNo
-            // - SMSUserName
-            // - SMSPassword
-
-            SMSServiceUri := AzureKeyVaultMgt.GetSecret('SMSHTTPRequestUrl');
+            SMSMessage := DelChr(StringConversionManagement.WindowsToASCII(SMSMessage), '%', '');
+            SMSServiceUri := 'https://wsx.sp247.net/linkdk/?username=%1&password=%2&from=%3&to=%4&message=%5&charset=%6';
             SMSServiceUri := StrSubstNo(SMSServiceUri, AzureKeyVaultMgt.GetSecret('SMSUserName'),
                              AzureKeyVaultMgt.GetSecret('SMSPassword'),
                              From, PhoneNo, SMSMessage, 'utf-8');

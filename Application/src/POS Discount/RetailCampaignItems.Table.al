@@ -42,14 +42,14 @@ table 6014612 "NPR Retail Campaign Items"
         }
         field(13; Description; Text[50])
         {
-            CalcFormula = Lookup (Item.Description WHERE("No." = FIELD("Item No.")));
+            CalcFormula = Lookup(Item.Description WHERE("No." = FIELD("Item No.")));
             Caption = 'Description';
             Editable = false;
             FieldClass = FlowField;
         }
         field(14; "Unit Price"; Decimal)
         {
-            CalcFormula = Lookup (Item."Unit Price" WHERE("No." = FIELD("Item No.")));
+            CalcFormula = Lookup(Item."Unit Price" WHERE("No." = FIELD("Item No.")));
             Caption = 'Unit Price';
             Editable = false;
             FieldClass = FlowField;
@@ -133,7 +133,7 @@ table 6014612 "NPR Retail Campaign Items"
         }
         field(112; "Unit Price Incl. VAT"; Boolean)
         {
-            CalcFormula = Lookup (Item."Price Includes VAT" WHERE("No." = FIELD("Item No.")));
+            CalcFormula = Lookup(Item."Price Includes VAT" WHERE("No." = FIELD("Item No.")));
             Caption = 'Price Includes VAT';
             Editable = false;
             FieldClass = FlowField;
@@ -226,7 +226,7 @@ table 6014612 "NPR Retail Campaign Items"
         }
         field(1101; Inventory; Decimal)
         {
-            CalcFormula = Sum ("Item Ledger Entry".Quantity WHERE("Item No." = FIELD("Item No."),
+            CalcFormula = Sum("Item Ledger Entry".Quantity WHERE("Item No." = FIELD("Item No."),
                                                                   "Posting Date" = FIELD("Date Filter"),
                                                                   "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
                                                                   "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
@@ -236,7 +236,7 @@ table 6014612 "NPR Retail Campaign Items"
         }
         field(1102; "Quantity On Purchase Order"; Decimal)
         {
-            CalcFormula = Sum ("Purchase Line"."Outstanding Qty. (Base)" WHERE("Document Type" = CONST(Order),
+            CalcFormula = Sum("Purchase Line"."Outstanding Qty. (Base)" WHERE("Document Type" = CONST(Order),
                                                                                Type = CONST(Item),
                                                                                "No." = FIELD("Item No."),
                                                                                "Order Date" = FIELD("Date Filter"),
@@ -276,7 +276,7 @@ table 6014612 "NPR Retail Campaign Items"
 
             trigger OnLookup()
             var
-                BarcodeLibrary: Codeunit "NPR Barcode Library";
+                BarcodeLibrary: Codeunit "NPR Barcode Image Library";
             begin
             end;
         }

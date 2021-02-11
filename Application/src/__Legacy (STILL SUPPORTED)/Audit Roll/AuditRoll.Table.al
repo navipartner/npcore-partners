@@ -2,9 +2,9 @@ table 6014407 "NPR Audit Roll"
 {
     Caption = 'Audit Roll';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR Audit Roll";
-    LookupPageID = "NPR Audit Roll";
     PasteIsValid = false;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Replaced with POS entry';
 
     fields
     {
@@ -1137,59 +1137,6 @@ table 6014407 "NPR Audit Roll"
         Text1060001: Label '%1 %2 has %3 %4. It is not possible to insert %5 with %6 %7.';
         Text1060002: Label 'Error at insert into the audit roll. \Sales ticket no. %1 <> Sales Ticket No. of set register status %2. \Status = %3.';
 
-    procedure PrintSalesReceipt(ViewDemand: Boolean): Boolean
-    var
-        StdCodeunitCode: Codeunit "NPR Std. Codeunit Code";
-    begin
-        StdCodeunitCode.OnRunSetShowDemand(ViewDemand);
-        if HandleErrorUnderPrintReceipt then
-            exit(StdCodeunitCode.Run(Rec))
-        else
-            StdCodeunitCode.Run(Rec);
-    end;
-
-    procedure PrintReceiptA4(ViewDemand: Boolean)
-    var
-        RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
-        RecRef: RecordRef;
-        ReportSelectionRetail: Record "NPR Report Selection Retail";
-    begin
-        AuditRoll.Copy(Rec);
-
-        RecRef.GetTable(AuditRoll);
-        RetailReportSelectionMgt.SetRegisterNo("Register No.");
-        RetailReportSelectionMgt.SetRequestWindow(ViewDemand);
-        RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Large Sales Receipt");
-    end;
-
-    procedure LineIsGiftCert(): Boolean
-    var
-        Register2: Record "NPR Register";
-        GiftVoucher2: Record "NPR Gift Voucher";
-    begin
-        if Type = Type::"G/L" then
-            if "Sale Type" = "Sale Type"::Deposit then
-                if Register2.Get("Register No.") then
-                    if "No." = Register2."Gift Voucher Account" then
-                        if "Gift voucher ref." <> '' then
-                            if GiftVoucher2.Get("Gift voucher ref.") then
-                                exit(true);
-        exit(false);
-    end;
-
-    procedure LineIsGiftCertDisc(): Boolean
-    var
-        Register2: Record "NPR Register";
-    begin
-        if Type = Type::"G/L" then
-            if "Sale Type" = "Sale Type"::Deposit then
-                if Register2.Get("Register No.") then
-                    if "No." = Register2."Gift Voucher Discount Account" then
-                        if "Discount Code" <> '' then
-                            exit(true);
-        exit(false);
-    end;
-
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
         RetailSetup.Get;
@@ -1206,51 +1153,6 @@ table 6014407 "NPR Audit Roll"
     procedure LookUpShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
         NPRDimMgt.LookupDimValueCode(FieldNumber, ShortcutDimCode);
-    end;
-
-    procedure ShowDimensions()
-    begin
-        DimMgt.ShowDimensionSet("Dimension Set ID", StrSubstNo('%1 %2', TableCaption, "No."));
-    end;
-
-    procedure ImmediatePost(AuditRoll: Record "NPR Audit Roll"): Boolean
-    var
-        PaymentTypePOS: Record "NPR Payment Type POS";
-    begin
-        PaymentTypePOS.Reset;
-        PaymentTypePOS.SetCurrentKey("Receipt - Post it Now");
-        PaymentTypePOS.SetRange("Receipt - Post it Now", true);
-        AuditRoll.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Date", "Sale Type", Type, "No.");
-        AuditRoll.SetRange("Register No.", AuditRoll."Register No.");
-        AuditRoll.SetRange("Sales Ticket No.", AuditRoll."Sales Ticket No.");
-        AuditRoll.SetRange(Type, AuditRoll.Type::Payment);
-        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Payment);
-        if PaymentTypePOS.FindSet then
-            repeat
-                AuditRoll.SetRange("No.", PaymentTypePOS."No.");
-                if AuditRoll.FindFirst then
-                    exit(true);
-            until PaymentTypePOS.Next = 0;
-        exit(false);
-    end;
-
-    procedure PrintReceiptErrorHandle(HandleError: Boolean)
-    begin
-        HandleErrorUnderPrintReceipt := HandleError;
-    end;
-
-    procedure LineIsReceivable(): Boolean
-    var
-        Register2: Record "NPR Register";
-        CreditVoucher2: Record "NPR Credit Voucher";
-    begin
-        if Type = Type::"G/L" then
-            if "Sale Type" = "Sale Type"::Deposit then
-                if Register2.Get("Register No.") then
-                    if "No." = Register2."Credit Voucher Account" then
-                        if CreditVoucher2.Get("Credit voucher ref.") then
-                            exit(true);
-        exit(false);
     end;
 
     procedure GetNoOfSales(): Integer
@@ -1322,10 +1224,7 @@ table 6014407 "NPR Audit Roll"
         "Document No." := Code2;
         "Document Type" := AuditDocType;
         "Allocated No." := AuditAdvanceNo;
-        "Credit voucher ref." := SaleLinePOS."Credit voucher ref.";
-        "Gift voucher ref." := SaleLinePOS."Gift Voucher Ref.";
         "Variant Code" := SaleLinePOS."Variant Code";
-        "Drawer Opened" := SaleLinePOS."Drawer Opened";
 
         "Order No. from Web" := SaleLinePOS."Order No. from Web";
         "Order Line No. from Web" := SaleLinePOS."Order Line No. from Web";

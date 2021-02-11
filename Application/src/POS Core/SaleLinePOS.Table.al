@@ -275,17 +275,6 @@ table 6014406 "NPR Sale Line POS"
                                 "Amount Including VAT" := "Unit Price" * Quantity;
                                 Amount := "Amount Including VAT";
                             end;
-                            if ("Sale Type" <> "Sale Type"::"Out payment") then
-                                if not Silent then
-                                    if RegisterGlobal."Credit Voucher Account" = "No." then
-                                        Error(Err002)
-                                    else
-                                        if RegisterGlobal."Gift Voucher Account" = "No." then begin
-                                            if GiftVoucher.Get("Discount Code") then begin
-                                                GiftVoucher.Amount := "Amount Including VAT";
-                                                GiftVoucher.Modify(true);
-                                            end;
-                                        end;
                         end;
                     Type::Item:
                         begin
@@ -294,32 +283,30 @@ table 6014406 "NPR Sale Line POS"
                             GetItem;
 
                             if not Item."NPR Group sale" then begin
-                                if not ForceApris then begin
-                                    case RetailSetup."Unit Cost Control" of
-                                        RetailSetup."Unit Cost Control"::Enabled:
-                                            begin
-                                            end;
-                                        RetailSetup."Unit Cost Control"::Disabled:
-                                            begin
-                                                if not (RetailSetup."Reset unit price on neg. sale" and (Quantity < 0)) then
-                                                    Error(ErrDisabled);
-                                            end;
-                                        RetailSetup."Unit Cost Control"::"Disabled if Quantity > 0":
-                                            begin
-                                                if Quantity > 0 then
-                                                    Error(ErrDisNo);
-                                            end;
-                                        RetailSetup."Unit Cost Control"::"Disabled if xUnit Cost > Unit Cost":
-                                            begin
-                                                if xRec."Unit Price" > "Unit Price" then
-                                                    Error(ErrDisX);
-                                            end;
-                                        RetailSetup."Unit Cost Control"::"Disabled if Quantity > 0 and xUnit Cost > Unit Cost":
-                                            begin
-                                                if not ((Quantity < 0) or ("Unit Price" >= FindItemSalesPrice())) then
-                                                    Error(ErrDisX);
-                                            end;
-                                    end;
+                                case RetailSetup."Unit Cost Control" of
+                                    RetailSetup."Unit Cost Control"::Enabled:
+                                        begin
+                                        end;
+                                    RetailSetup."Unit Cost Control"::Disabled:
+                                        begin
+                                            if not (RetailSetup."Reset unit price on neg. sale" and (Quantity < 0)) then
+                                                Error(ErrDisabled);
+                                        end;
+                                    RetailSetup."Unit Cost Control"::"Disabled if Quantity > 0":
+                                        begin
+                                            if Quantity > 0 then
+                                                Error(ErrDisNo);
+                                        end;
+                                    RetailSetup."Unit Cost Control"::"Disabled if xUnit Cost > Unit Cost":
+                                        begin
+                                            if xRec."Unit Price" > "Unit Price" then
+                                                Error(ErrDisX);
+                                        end;
+                                    RetailSetup."Unit Cost Control"::"Disabled if Quantity > 0 and xUnit Cost > Unit Cost":
+                                        begin
+                                            if not ((Quantity < 0) or ("Unit Price" >= FindItemSalesPrice())) then
+                                                Error(ErrDisX);
+                                        end;
                                 end;
                             end;
 
@@ -401,9 +388,7 @@ table 6014406 "NPR Sale Line POS"
                 SaleLinePOS: Record "NPR Sale Line POS";
                 ErrMin: Label 'Discount % cannot be negative.';
                 ErrMax: Label 'Discount % cannot exeed 100.';
-                RetailFormCode: Codeunit "NPR Retail Form Code";
                 POSSetup: Codeunit "NPR POS Setup";
-                GiftFound: Boolean;
                 Trans0001: Label 'A deptorpayment cannot have discount';
                 Trans0002: Label 'An itemgroup cannot have discount';
                 Trans0003: Label 'Financial posts cannot be given a rebate';
@@ -436,7 +421,8 @@ table 6014406 "NPR Sale Line POS"
                             "Amount Including VAT" := 0;
                             "Discount Amount" := 0;
                             if Modify then;
-                            RetailSalesLineCode.CalcAmounts(Rec);
+                            GetItem();
+                            GetAmount(Rec, Item, Rec."Unit Price");
                         end;
                     Type::"Item Group":
                         Error(Trans0002);
@@ -447,36 +433,6 @@ table 6014406 "NPR Sale Line POS"
                         end;
                     Type::Customer:
                         Error(Trans0001);
-                end;
-
-                GiftFound := false;
-                if ("Gift Voucher Ref." <> '') and not Silent then begin
-                    SaleLinePOS.Reset;
-                    if GiftCrtLine <> 0 then begin
-                        SaleLinePOS.SetRange("Register No.", "Register No.");
-                        SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-                        SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::"Out payment");
-                        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::"G/L Entry");
-                        SaleLinePOS.SetRange("Line No.", GiftCrtLine);
-                        if SaleLinePOS.FindSet(true, false) then begin
-                            if "Discount %" = 0 then begin
-                                SaleLinePOS.Delete;
-                            end else begin
-                                GiftFound := true;
-                                SaleLinePOS.Validate("Unit Price", "Unit Price" * "Discount %" / 100);
-                                SaleLinePOS.Modify;
-                                Silent := true;
-                                Validate("Discount %", 0);
-                                Silent := false;
-                            end;
-                        end
-                    end;
-                    if not GiftFound and ("Discount %" <> 0) then begin
-                        GiftCrtLine := RetailFormCode.InsertGiftCrtDiscLine(Rec, "Line No." + 558, "Unit Price" * "Discount %" / 100);
-                        Silent := true;
-                        Validate("Discount %", 0);
-                        Silent := false;
-                    end;
                 end;
             end;
         }
@@ -541,8 +497,7 @@ table 6014406 "NPR Sale Line POS"
                                 "Amount Including VAT" := 0;
 
                                 if Modify then;
-
-                                RetailSalesLineCode.CalcAmounts(Rec);
+                                GetAmount(Rec, Item, Rec."Unit Price");
                             end;
                     end;
                 end;
@@ -650,15 +605,6 @@ table 6014406 "NPR Sale Line POS"
             MaxValue = 100;
             MinValue = 0;
         }
-        field(45; "Sales Order Amount"; Decimal)
-        {
-            AutoFormatExpression = "Currency Code";
-            AutoFormatType = 1;
-            CalcFormula = Sum("NPR Sale Line POS"."Amount Including VAT");
-            Caption = 'Sales Order Amount';
-            Editable = false;
-            FieldClass = FlowField;
-        }
         field(46; "Invoice to Customer No."; Code[20])
         {
             Caption = 'Invoice to Customer No.';
@@ -763,6 +709,7 @@ table 6014406 "NPR Sale Line POS"
         {
             Caption = 'Lookup On No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(70; "Shortcut Dimension 1 Code"; Code[20])
         {
@@ -928,7 +875,7 @@ table 6014406 "NPR Sale Line POS"
         {
             Caption = 'System-Created Entry';
             DataClassification = CustomerContent;
-            Editable = false;
+            ObsoleteState = Removed;
         }
         field(102; "Variant Code"; Code[10])
         {
@@ -967,9 +914,9 @@ table 6014406 "NPR Sale Line POS"
         {
             Caption = 'Retail Document Type';
             DataClassification = CustomerContent;
-            NotBlank = true;
             OptionCaption = ' ,Selection,Retail Order,Wish,Customization,Delivery,Rental contract,Purchase contract,Qoute';
             OptionMembers = " ","Selection Contract","Retail Order",Wish,Customization,Delivery,"Rental contract","Purchase contract",Quote;
+            ObsoleteState = Removed;
         }
         field(118; "Retail Document No."; Code[20])
         {
@@ -1234,17 +1181,15 @@ table 6014406 "NPR Sale Line POS"
             Caption = 'Credit Card Tax Free';
             DataClassification = CustomerContent;
             Description = 'Only to be set if Cash Terminal Approved';
+            ObsoleteState = Removed;
 
-            trigger OnValidate()
-            begin
-                TestField("EFT Approved");
-            end;
         }
         field(550; "Drawer Opened"; Boolean)
         {
             Caption = 'Drawer Opened';
             DataClassification = CustomerContent;
             Description = 'NPR4.002.005, for indication of opening on drawer.';
+            ObsoleteState = Removed;
         }
         field(600; "VAT Calculation Type"; Enum "Tax Calculation Type")
         {
@@ -1283,11 +1228,13 @@ table 6014406 "NPR Sale Line POS"
         {
             Caption = 'Color';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(5003; Size; Code[20])
         {
             Caption = 'Size';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(5004; Clearing; Option)
         {
@@ -1300,11 +1247,13 @@ table 6014406 "NPR Sale Line POS"
         {
             Caption = 'External Document No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(5999; "Buffer Ref. No."; Integer)
         {
             Caption = 'Buffer Ref. No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(6000; "Buffer Document Type"; Enum "Gen. Journal Document Type")
         {
@@ -1410,6 +1359,7 @@ table 6014406 "NPR Sale Line POS"
         {
             Caption = 'NegPriceZero';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(6021; Reference; Text[50])
         {
@@ -1420,16 +1370,19 @@ table 6014406 "NPR Sale Line POS"
         {
             Caption = 'Rep. No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(6023; "Gift Voucher Ref."; Code[20])
         {
             Caption = 'Gift Voucher Ref.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(6024; "Credit voucher ref."; Code[20])
         {
             Caption = 'Credit voucher ref.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(6025; "Custom Cost"; Boolean)
         {
@@ -1440,13 +1393,13 @@ table 6014406 "NPR Sale Line POS"
         {
             Caption = 'Wish list';
             DataClassification = CustomerContent;
-            Description = 'NPR5.38';
+            ObsoleteState = Removed;
         }
         field(6027; "Wish List Line No."; Integer)
         {
             Caption = 'Wish List Line No.';
             DataClassification = CustomerContent;
-            Description = 'NPR5.38';
+            ObsoleteState = Removed;
         }
         field(6028; "Item group accessory"; Boolean)
         {
@@ -1462,11 +1415,13 @@ table 6014406 "NPR Sale Line POS"
         {
             Caption = 'Label Quantity';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(6033; "Offline Sales Ticket No"; Code[20])
         {
             Caption = 'Emergency Ticket No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(6034; "Custom Descr"; Boolean)
         {
@@ -1487,6 +1442,7 @@ table 6014406 "NPR Sale Line POS"
         {
             Caption = 'Label Date';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(6039; "Description 2"; Text[50])
         {
@@ -1523,7 +1479,7 @@ table 6014406 "NPR Sale Line POS"
         {
             Caption = 'Lock Code';
             DataClassification = CustomerContent;
-            Description = 'NPR4.007.016';
+            ObsoleteState = Removed;
         }
         field(6100; "Main Line No."; Integer)
         {
@@ -1548,6 +1504,7 @@ table 6014406 "NPR Sale Line POS"
         {
             Caption = 'Deleting';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(10002; NoWarning; Boolean)
         {
@@ -1558,17 +1515,19 @@ table 6014406 "NPR Sale Line POS"
         {
             Caption = 'Conditioned First Run';
             DataClassification = CustomerContent;
-            InitValue = true;
+            ObsoleteState = Removed;
         }
         field(10004; CurrencySilent; Boolean)
         {
             Caption = 'Currency (Silent)';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(10005; StyklisteSilent; Boolean)
         {
             Caption = 'Bill of materials (Silent)';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(10006; "Cust Forsikring"; Boolean)
         {
@@ -1594,12 +1553,14 @@ table 6014406 "NPR Sale Line POS"
         {
             Caption = 'Force A-Price';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(10011; GuaranteePrinted; Boolean)
         {
             Caption = 'Guarantee Certificat Printed';
             DataClassification = CustomerContent;
             Description = 'Field set true, if guarantee certificate has been printed';
+            ObsoleteState = Removed;
         }
         field(10012; "Custom Disc Blocked"; Boolean)
         {
@@ -1610,18 +1571,18 @@ table 6014406 "NPR Sale Line POS"
         {
             Caption = 'Invoiz Guid';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(6014511; "Label No."; Code[8])
         {
             Caption = 'Label Number';
             DataClassification = CustomerContent;
-            Description = 'NPR4.007.025 - Benyttes i forbindelse med Smart Safety forsikring';
+            ObsoleteState = Removed;
         }
         field(6014512; "SQL Server Timestamp"; BigInteger)
         {
             Caption = 'Timestamp';
             DataClassification = CustomerContent;
-            Description = 'NPR5.22';
             Editable = false;
             SQLTimestamp = true;
         }
@@ -1689,11 +1650,7 @@ table 6014406 "NPR Sale Line POS"
         SaleLinePOS: Record "NPR Sale Line POS";
         ErrNoDelete: Label 'Sales lines cannot be deleted when sale is part of a selection';
         ErrNoDeleteDep: Label 'Deposit line from a rental is not to be deleted.';
-        GiftVoucher2: Record "NPR Gift Voucher";
-        CreditVoucher2: Record "NPR Credit Voucher";
-        GiftVoucher3: Record "NPR Gift Voucher";
         ICommRec: Record "NPR I-Comm";
-        RetailCode: Codeunit "NPR Retail Table Code";
         Err001: Label '%1 is not legal tender';
         Err002: Label 'A financial account has not been selected for the purchase %1';
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
@@ -1702,7 +1659,6 @@ table 6014406 "NPR Sale Line POS"
             Error(ERR_EFT_DELETE);
 
         RetailSetup.Get;
-        Deleting := true;
 
         if RetailSetup."Sales Lines from Selection" and "From Selection" then
             Error(ErrNoDelete);
@@ -1730,21 +1686,7 @@ table 6014406 "NPR Sale Line POS"
                     end;
             end;
         end else
-            if Type = Type::"G/L Entry" then begin
-                if "Gift Voucher Ref." <> '' then
-                    if GiftVoucher3.Get("Gift Voucher Ref.") then
-                        if GiftVoucher3.Status <> GiftVoucher3.Status::Cancelled then begin
-                            GiftVoucher3.Validate(Status, GiftVoucher3.Status::Cancelled);
-                            GetPOSHeader;
-                            GiftVoucher3.Validate("Canceling Salesperson", SalePOS."Salesperson Code");
-                            GiftVoucher3.Modify(true);
-                            if RetailSetup."Use I-Comm" then begin
-                                ICommRec.Get;
-                                if ICommRec."Company - Clearing" <> '' then
-                                    RetailCode.GiftVoucherCommonValidate(SalePOS, GiftVoucher3."No.", GiftVoucher3.Status::Cancelled);
-                            end;
-                        end;
-            end else
+            if Type <> Type::"G/L Entry" then
                 if (Type = Type::Payment) then begin
                     GetPaymentTypePOS(PaymentTypePOS);
                     if PaymentTypePOS."G/L Account No." <> '' then begin
@@ -1762,52 +1704,12 @@ table 6014406 "NPR Sale Line POS"
                                         SaleLinePOS.DeleteAll;
                                     end;
                                 end;
-                            PaymentTypePOS."Processing Type"::"Credit Voucher":
-                                begin
-                                    if CreditVoucher.Get("Discount Code") then begin
-                                        CreditVoucher."Cashed on Register No." := '0';
-                                        CreditVoucher."Cashed on Sales Ticket No." := '';
-                                        CreditVoucher."Cashed Date" := 0D;
-                                        CreditVoucher."Cashed Salesperson" := '';
-                                        CreditVoucher."Cashed in Global Dim 1 Code" := '';
-                                        CreditVoucher."Cashed in Location Code" := '';
-                                        CreditVoucher."Cashed External" := false;
-                                        CreditVoucher.Status := CreditVoucher.Status::Open;
-                                        CreditVoucher.Modify;
-                                    end;
-                                end;
-                            PaymentTypePOS."Processing Type"::"Gift Voucher":
-                                begin
-                                    if GiftVoucher.Get("Discount Code") then begin
-                                        GiftVoucher."Cashed on Register No." := '0';
-                                        GiftVoucher."Cashed on Sales Ticket No." := '';
-                                        GiftVoucher."Cashed Date" := 0D;
-                                        GiftVoucher."Cashed Salesperson" := '';
-                                        GiftVoucher."Cashed in Global Dim 1 Code" := '';
-                                        GiftVoucher."Cashed in Location Code" := '';
-                                        GiftVoucher."Cashed External" := false;
-                                        GiftVoucher.Status := GiftVoucher.Status::Open;
-                                        GiftVoucher.Modify(true);
-                                    end;
-                                end;
                         end;
                     end else begin
                         if PaymentTypePOS."Account Type" = PaymentTypePOS."Account Type"::"G/L Account" then
                             Error(Err002, "No.");
                     end;
                 end;
-
-        if "Gift Voucher Ref." <> '' then begin
-            GiftVoucher2.Get("Gift Voucher Ref.");
-            GiftVoucher2."Sales Ticket No." := '';
-            GiftVoucher2.Modify;
-        end;
-
-        if "Credit voucher ref." <> '' then begin
-            CreditVoucher2.Get("Credit voucher ref.");
-            CreditVoucher2."Sales Ticket No." := '';
-            CreditVoucher2.Modify;
-        end;
 
         if GiftCrtLine <> 0 then begin
             SaleLinePOS.Reset;
@@ -1847,29 +1749,16 @@ table 6014406 "NPR Sale Line POS"
 
     var
         Item: Record Item;
-        InventorySetup: Record "Inventory Setup";
-        ItemGroup: Record "NPR Item Group";
         PaymentTypePOS: Record "NPR Payment Type POS";
         RetailSetup: Record "NPR Retail Setup";
-        RetailContractSetup: Record "NPR Retail Contr. Setup";
-        GLAcc: Record "G/L Account";
         RegisterGlobal: Record "NPR Register";
-        GiftVoucher: Record "NPR Gift Voucher";
-        CreditVoucher: Record "NPR Credit Voucher";
-        CustomerRepair: Record "NPR Customer Repair";
         CustomerGlobal: Record Customer;
         SalePOS: Record "NPR Sale POS";
         Currency: Record Currency;
         DimMgt: Codeunit DimensionManagement;
-        RetailSalesLineCode: Codeunit "NPR Retail Sales Line Code";
-        NFRetailCode: Codeunit "NPR NF Retail Code";
         NPRDimMgt: Codeunit "NPR Dimension Mgt.";
-        RegisterNo: Code[10];
-        CustomerDiscount: Decimal;
         TotalItemLedgerEntryQuantity: Decimal;
         TotalAuditRollQuantity: Decimal;
-        PreDefQty: Decimal;
-        VariationSelected: Boolean;
         ErrMaxExceeded: Label 'The amount on payment option %1 must not surpass %2';
         ErrMinExceeded: Label 'The amount on payment option %1 must not be below %2';
         SkipCalcDiscount: Boolean;
@@ -1966,60 +1855,14 @@ table 6014406 "NPR Sale Line POS"
         exit(TempSaleLinePOS."Unit Price");
     end;
 
-    procedure FindItemCostPrice(var Item: Record Item): Decimal
-    begin
-        exit(NFRetailCode.TR406FindItemCostPrice(Rec, Item, '', ''));
-    end;
-
-    procedure GetVATPct(ItemGroupCode: Code[10]): Decimal
-    begin
-        UpdateVATSetup;
-        exit("VAT %");   //For backwards compatibilty
-    end;
-
     procedure GetAmount(var SaleLinePOS: Record "NPR Sale Line POS"; var Item: Record Item; UnitPrice: Decimal)
     begin
         SaleLinePOS."Unit Price" := UnitPrice;
         UpdateAmounts(SaleLinePOS);
     end;
 
-    procedure InsertCashRoundingAmount(var RoundingAmount: Decimal; GLAccount: Record "G/L Account")
-    var
-        SaleLinePOS: Record "NPR Sale Line POS";
-        LineNo: Integer;
-    begin
-        SaleLinePOS.SetRange("Register No.", "Register No.");
-        SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-        SaleLinePOS.SetRange(Date, Date);
-
-        if SaleLinePOS.FindLast then
-            LineNo := SaleLinePOS."Line No." + 10000
-        else
-            LineNo := 10000;
-
-        SaleLinePOS.Init;
-        SaleLinePOS."Register No." := "Register No.";
-        SaleLinePOS."Sales Ticket No." := "Sales Ticket No.";
-        SaleLinePOS.Date := Date;
-        SaleLinePOS."Sale Type" := "Sale Type"::"Out payment";
-        SaleLinePOS."Line No." := LineNo;
-        SaleLinePOS.Type := Type::"G/L Entry";
-        SaleLinePOS.Validate("No.", GLAccount."No.");
-        SaleLinePOS."Location Code" := "Location Code";
-        SaleLinePOS.Description := GLAccount.Name;
-        SaleLinePOS.Quantity := 1;
-        SaleLinePOS."Unit Price" := -1 * RoundingAmount;
-        SaleLinePOS."Amount Including VAT" := -1 * RoundingAmount;
-        SaleLinePOS."Discount Type" := "Discount Type"::Rounding;
-        SaleLinePOS.Insert(true);
-
-        "Discount Type" := "Discount Type"::Rounding;
-        "Discount Code" := StrSubstNo('%1', LineNo);
-    end;
-
     procedure TransferToSalesLine(var SalesLine: Record "Sales Line"): Boolean
     var
-        RetailCode: Codeunit "NPR NF Retail Code";
         Txt001: Label 'Deposit';
     begin
         if ("No." = '*') or (Type = Type::Comment) then begin
@@ -2048,7 +1891,6 @@ table 6014406 "NPR Sale Line POS"
         SalesLine."Amount Including VAT" := "Amount Including VAT";
         SalesLine."Allow Invoice Disc." := "Allow Invoice Discount";
         SalesLine."Customer Price Group" := "Customer Price Group";
-        RetailCode.TS37SerieNoCopy(SalesLine, Rec);
         if CustomerGlobal."Bill-to Customer No." <> '' then
             SalesLine."Bill-to Customer No." := CustomerGlobal."Bill-to Customer No."
         else
@@ -2218,13 +2060,6 @@ table 6014406 "NPR Sale Line POS"
         SkipCalcDiscount := NewSkipCalcDiscount;
     end;
 
-    procedure ShowDimensions()
-    begin
-        "Dimension Set ID" :=
-          DimMgt.EditDimensionSet("Dimension Set ID", StrSubstNo('%1 %2 %3', "Register No.", "Sales Ticket No.", "Line No."));
-        DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-    end;
-
     procedure CreateDim(Type1: Integer; No1: Code[20]; Type2: Integer; No2: Code[20]; Type3: Integer; No3: Code[20]; Type4: Integer; No4: Code[20])
     var
         RetailConfiguration: Record "NPR Retail Setup";
@@ -2265,11 +2100,6 @@ table 6014406 "NPR Sale Line POS"
     begin
         DimMgt.LookupDimValueCode(FieldNumber, ShortcutDimCode);
         ValidateShortcutDimCode(FieldNumber, ShortcutDimCode);
-    end;
-
-    procedure ShowShortcutDimCode(var ShortcutDimCode: array[8] of Code[20])
-    begin
-        DimMgt.GetShortcutDimensions("Dimension Set ID", ShortcutDimCode);
     end;
 
     procedure UpdateVATSetup()

@@ -363,18 +363,6 @@ page 6014472 "NPR Retail Journal Line"
         IsWebClient: Boolean;
         ItemNo: Text;
 
-    procedure DeleteLines()
-    begin
-        DeleteAll;
-    end;
-
-    procedure RoundIt(dec1: Decimal): Decimal
-    var
-        Utility: Codeunit "NPR Utility";
-    begin
-        exit(Utility.FormatDec2Dec(dec1, 2));
-    end;
-
     procedure GetSelectionFilter(var Lines: Record "NPR Retail Journal Line")
     var
         t001: Label 'No lines chosen!\Select using mouse or keyboard';

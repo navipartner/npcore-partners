@@ -1,17 +1,13 @@
 table 6059788 "NPR Ticket Access Reserv."
 {
-    // NPR4.16/TSA/20150807/CASE 219658 - Object Touched
-
     Caption = 'Ticket Access Reservation';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR Ticket Access Reserv. List";
-    LookupPageID = "NPR Ticket Access Reserv. List";
+    ObsoleteState = Removed;
 
     fields
     {
         field(1; "Entry No."; Integer)
         {
-            AutoIncrement = true;
             Caption = 'Entry No.';
             DataClassification = CustomerContent;
         }
@@ -24,27 +20,11 @@ table 6059788 "NPR Ticket Access Reserv."
         {
             Caption = 'Ticket Type Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR TM Ticket Type";
-
-            trigger OnValidate()
-            var
-                TicketType: Record "NPR TM Ticket Type";
-            begin
-                TicketType.Get("Ticket Type Code");
-                Description := TicketType.Description;
-            end;
         }
         field(10; "Ticket Access Capacity Slot ID"; Integer)
         {
             Caption = 'Ticket Access Capacity';
             DataClassification = CustomerContent;
-            Editable = true;
-            TableRelation = "NPR Ticket Access Cap. Slots";
-
-            trigger OnValidate()
-            begin
-                ValidateCapacitySlotID;
-            end;
         }
         field(12; Description; Text[30])
         {
@@ -66,8 +46,6 @@ table 6059788 "NPR Ticket Access Reserv."
         {
             Caption = 'Point Card - Issued Cards';
             DataClassification = CustomerContent;
-            Editable = true;
-            InitValue = 1;
         }
         field(61; "Sales Header Type"; Option)
         {
@@ -93,31 +71,10 @@ table 6059788 "NPR Ticket Access Reserv."
         key(Key1; "Entry No.")
         {
         }
-        key(Key2; "Ticket Access Capacity Slot ID")
-        {
-            SumIndexFields = Quantity;
-        }
-        key(Key3; "Sales Ticket No.")
-        {
-        }
     }
 
     fieldgroups
     {
     }
-
-    trigger OnInsert()
-    begin
-        ValidateCapacitySlotID;
-    end;
-
-    procedure ValidateCapacitySlotID()
-    var
-        TicketAccessCapacitySlots: Record "NPR Ticket Access Cap. Slots";
-    begin
-        TicketAccessCapacitySlots.Get("Ticket Access Capacity Slot ID");
-        "Ticket Type Code" := TicketAccessCapacitySlots."Ticket Type Code";
-        Description := TicketAccessCapacitySlots.Description;
-    end;
 }
 

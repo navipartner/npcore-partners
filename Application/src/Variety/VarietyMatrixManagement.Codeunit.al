@@ -359,7 +359,6 @@ codeunit 6059971 "NPR Variety Matrix Management"
     procedure GetIntFunc(VRTFieldSetup: Record "NPR Variety Field Setup"; LocationFilter: Code[10]; GD1: Code[10]; GD2: Code[10]): Text[250]
     var
         ItemRef: Record "Item Reference";
-        AlternativeNo: Record "NPR Alternative No.";
         ItemVar: Record "Item Variant";
     begin
         case VRTFieldSetup."Field No." of
@@ -390,14 +389,6 @@ codeunit 6059971 "NPR Variety Matrix Management"
                     if ItemRef.FindFirst then
                         exit(ItemRef."Reference No.");
                 end;
-            4: //Barcode (Alternative No.)
-                begin
-                    AlternativeNo.SetRange(Type, AlternativeNo.Type::Item);
-                    AlternativeNo.SetRange(Code, TMPVRTBuffer."Item No.");
-                    AlternativeNo.SetRange("Variant Code", TMPVRTBuffer."Variant Code");
-                    if AlternativeNo.FindFirst then
-                        exit(AlternativeNo."Alt. No.");
-                end;
         end;
     end;
 
@@ -420,7 +411,6 @@ codeunit 6059971 "NPR Variety Matrix Management"
     procedure SetValueIntFunc(VRTFieldSetup: Record "NPR Variety Field Setup"; NewValue: Text[250])
     var
         VRTCloneData: Codeunit "NPR Variety Clone Data";
-        AlternativeNo: Record "NPR Alternative No.";
         ItemRef: Record "Item Reference";
         ItemVariant: Record "Item Variant";
     begin
@@ -460,20 +450,6 @@ codeunit 6059971 "NPR Variety Matrix Management"
                     ItemRef."Reference No." := NewValue;
                     ItemRef.Description := Item.Description;
                     ItemRef.Insert;
-                end;
-            4: //Barcode (Alternative No.)
-                begin
-                    AlternativeNo.SetRange("Alt. No.", NewValue);
-                    if AlternativeNo.FindFirst then
-                        Error(Text003, AlternativeNo.Code);
-
-                    AlternativeNo.Init;
-                    AlternativeNo.Type := AlternativeNo.Type::Item;
-                    AlternativeNo.Code := TMPVRTBuffer."Item No.";
-                    AlternativeNo."Alt. No." := NewValue;
-                    AlternativeNo."Variant Code" := TMPVRTBuffer."Variant Code";
-                    AlternativeNo."Created the" := Today;
-                    AlternativeNo.Insert;
                 end;
         end;
     end;

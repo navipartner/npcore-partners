@@ -83,11 +83,9 @@ codeunit 6060064 "NPR Nonstock Purchase Mgt."
         ProgWindow.Update(2, NonStock."Vendor No.");
         ProgWindow.Update(3, NonStock."Vendor Item No.");
         ProgWindow.Update(4, PurchaseLine2."No.");
-
         InvtSetup.Get;
         InvtSetup.TestField("Item Nos.");
         NoSeriesMgt.InitSeries(InvtSetup."Item Nos.", NewItem."No. Series", 0D, NewItem."No.", NewItem."No. Series");
-
         NewItem.Description := NonStock.Description;
         NewItem.Validate(Description, NewItem.Description);
         if not ItemUnitofMeasure.Get(NewItem."No.", NonStock."Unit of Measure") then begin
@@ -98,12 +96,10 @@ codeunit 6060064 "NPR Nonstock Purchase Mgt."
         end;
         NewItem.Validate("Base Unit of Measure", NonStock."Unit of Measure");
         NewItem."Unit Price" := NonStock."Unit Price";
-
         if NonStock."Negotiated Cost" <> 0 then
             NewItem."Last Direct Cost" := NonStock."Negotiated Cost"
         else
             NewItem."Last Direct Cost" := NonStock."Published Cost";
-
         NewItem."Automatic Ext. Texts" := false;
         if NewItem."Costing Method" = NewItem."Costing Method"::Standard then
             NewItem."Standard Cost" := NonStock."Negotiated Cost";
@@ -113,12 +109,8 @@ codeunit 6060064 "NPR Nonstock Purchase Mgt."
         NewItem."Gross Weight" := NonStock."Gross Weight";
         NewItem."Manufacturer Code" := NonStock."Manufacturer Code";
         NewItem."Item Category Code" := NonStock."Item Template Code";
-
         NewItem."Created From Nonstock Item" := true;
-
-        NewItem."NPR Label Barcode" := NonStock."Bar Code";
         NewItem."Unit Price" := NonStock."Unit Price";
-
         NewItem.Insert;
 
         PurchaseLine2."No." := NewItem."No.";
@@ -212,12 +204,9 @@ codeunit 6060064 "NPR Nonstock Purchase Mgt."
                 ItemReference.SetRange("Reference No.", Rec."Item Reference No.");
                 if not ItemReference.FindFirst then begin
                     Item.SetRange("Vendor Item No.");
-                    Item.SetRange("NPR Label Barcode", Rec."Item Reference No.");
-                    if not Item.FindFirst then begin
                         ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
                         if not ItemReference.FindFirst then
                             ShowNonstock(Rec, Rec."Item Reference No.");
-                    end;
                 end;
             end;
         end;

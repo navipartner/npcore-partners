@@ -633,38 +633,13 @@ codeunit 6014467 "NPR Retail Journal Code"
 
     procedure SetRetailJnlTemp(RetailJnlCode: Code[40])
     var
-        RetailFormCode: Codeunit "NPR Retail Form Code";
+        POSUnit: Record "NPR POS Unit";
     begin
         RetailJnlHeader.Init;
         RetailJnlHeader."No." := RetailJnlCode;
-        RetailJnlHeader."Register No." := RetailFormCode.FetchRegisterNumber;
+        RetailJnlHeader."Register No." := POSUnit.GetCurrentPOSUnit();
 
         LineNo := 10000;
-    end;
-
-    procedure SalesReturn2RetailJnl(RetailJnlCode: Code[40])
-    var
-        TransferHeader: Record "Transfer Header";
-        TransferLine: Record "Transfer Line";
-        Register: Record "NPR Register";
-        AuditRoll: Record "NPR Audit Roll";
-        PageAuditRoll: Page "NPR Audit Roll";
-        Filters: Text;
-        RecRef: RecordRef;
-    begin
-        if not RunDynamicRequestPage(Filters, '') then
-            exit;
-
-        if not SetFiltersOnTable(Filters, RecRef) then
-            exit;
-
-        RecRef.SetTable(AuditRoll);
-
-        AuditRoll.SetCurrentKey("Register No.", "Sale Type", Type, "No.", "Sale Date", "Discount Type", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
-        AuditRoll.SetRange(Type, AuditRoll.Type::Item);
-        AuditRoll.SetFilter(Quantity, '<%1', 0);
-        CopySalesReturn2RetailJnlLines(AuditRoll, RetailJnlCode);
     end;
 
     procedure CopySalesReturn2RetailJnlLines(var AuditRoll: Record "NPR Audit Roll"; RetailJnlCode: Code[40])

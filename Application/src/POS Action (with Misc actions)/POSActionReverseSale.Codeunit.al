@@ -102,6 +102,7 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
                 end;
             'handle':
                 begin
+                    Error('Needs to be updated from audit roll to POS entry');
                     VerifyReceiptForReversal(Context, POSSession, FrontEnd);
                     CopySalesReceiptForReversal(Context, POSSession, FrontEnd);
                     POSSession.ChangeViewSale();
@@ -150,7 +151,6 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
         JSON: Codeunit "NPR POS JSON Management";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        RetailSalesCode: Codeunit "NPR Retail Sales Code";
         SalePOS: Record "NPR Sale POS";
         SaleLinePOS: Record "NPR Sale Line POS";
         RetailSetup: Record "NPR Retail Setup";
@@ -175,7 +175,8 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
         JSON.SetScope('/', true);
         ReturnReasonCode := JSON.GetString('ReturnReasonCode', RetailSetup."Reason for Return Mandatory");
 
-        RetailSalesCode.ReverseSalesTicket2(SalePOS, SalesTicketNo, ReturnReasonCode);
+        //This function heavily used audit roll and tried to do too much. It should just reverse the simple types like Item, GL. Any aux module needs to subscribe and handle itself like retail voucher etc.
+        //RetailSalesCode.ReverseSalesTicket2(SalePOS, SalesTicketNo, ReturnReasonCode);     
 
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");

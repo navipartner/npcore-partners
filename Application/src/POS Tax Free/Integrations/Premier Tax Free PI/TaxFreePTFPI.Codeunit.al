@@ -569,8 +569,8 @@ codeunit 6014611 "NPR Tax Free PTF PI"
         PrintLines: DotNet NPRNetXmlNodeList;
     begin
         //See page 55 of doc. for print line prefix explanations.
-        Output := ObjectOutputMgt.GetCodeunitOutputPath(CODEUNIT::"NPR Report: TaxFree Receipt");
-        OutputType := ObjectOutputMgt.GetCodeunitOutputType(CODEUNIT::"NPR Report: TaxFree Receipt");
+        Output := ObjectOutputMgt.GetCodeunitOutputPath(CODEUNIT::"NPR Tax Free Receipt");
+        OutputType := ObjectOutputMgt.GetCodeunitOutputType(CODEUNIT::"NPR Tax Free Receipt");
 
         if Output = '' then
             Error(Error_MissingPrintSetup);
@@ -645,7 +645,7 @@ codeunit 6014611 "NPR Tax Free PTF PI"
             end;
         end;
 
-        Printer.ProcessBufferForCodeunit(CODEUNIT::"NPR Report: TaxFree Receipt", ''); //Use the object output selection of old object so no new setup is needed.
+        Printer.ProcessBufferForCodeunit(CODEUNIT::"NPR Tax Free Receipt", ''); //Use the object output selection of old object so no new setup is needed.
     end;
 
     local procedure PrintThermalLine(var Printer: Codeunit "NPR RP Line Print Mgt."; Value: Text; Font: Text; Bold: Boolean; Alignment: Text; CR: Boolean; Underline: Boolean)
@@ -688,8 +688,8 @@ codeunit 6014611 "NPR Tax Free PTF PI"
         XMLDoc: DotNet "NPRNetXmlDocument";
         InStream: InStream;
     begin
-        Output := ObjectOutputMgt.GetCodeunitOutputPath(CODEUNIT::"NPR Report: TaxFree Receipt");
-        OutputType := ObjectOutputMgt.GetCodeunitOutputType(CODEUNIT::"NPR Report: TaxFree Receipt");
+        Output := ObjectOutputMgt.GetCodeunitOutputPath(CODEUNIT::"NPR Tax Free Receipt");
+        OutputType := ObjectOutputMgt.GetCodeunitOutputType(CODEUNIT::"NPR Tax Free Receipt");
 
         if Output = '' then
             Error(Error_MissingPrintSetup);
@@ -711,8 +711,6 @@ codeunit 6014611 "NPR Tax Free PTF PI"
         MemoryStream := MemoryStream.MemoryStream(Convert.FromBase64String(base64));
 
         case OutputType of
-            ObjectOutputSelection."Output Type"::"Google Print":
-                PrintMethodMgt.PrintViaGoogleCloud(Output, MemoryStream, 'application/pdf', 1, CODEUNIT::"NPR Report: TaxFree Receipt");
             ObjectOutputSelection."Output Type"::"E-mail":
                 PrintMethodMgt.PrintViaEmail(Output, MemoryStream);
             ObjectOutputSelection."Output Type"::"Printer Name":

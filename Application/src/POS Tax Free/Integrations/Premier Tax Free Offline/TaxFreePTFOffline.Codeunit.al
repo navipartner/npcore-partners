@@ -77,7 +77,7 @@ codeunit 6014612 "NPR TaxFree PTF Offline"
     var
         LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
     begin
-        LinePrintMgt.ProcessCodeunit(CODEUNIT::"NPR Report: TaxFree Receipt", AuditRoll);
+        LinePrintMgt.ProcessCodeunit(CODEUNIT::"NPR Tax Free Receipt", AuditRoll);
     end;
 
     local procedure "// Aux"()

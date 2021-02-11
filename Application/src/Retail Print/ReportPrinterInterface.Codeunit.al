@@ -48,7 +48,6 @@ codeunit 6014583 "NPR Report Printer Interface"
         PDFStream: DotNet NPRNetMemoryStream;
     begin
         if not (ObjectOutputSelection."Output Type" in [ObjectOutputSelection."Output Type"::"Printer Name",
-                                                        ObjectOutputSelection."Output Type"::"Google Print",
                                                         ObjectOutputSelection."Output Type"::"PrintNode PDF",
                                                         ObjectOutputSelection."Output Type"::"E-mail"]) then
             ObjectOutputSelection.FieldError("Output Type");
@@ -125,8 +124,6 @@ codeunit 6014583 "NPR Report Printer Interface"
                 PrintMethodMgt.PrintViaEmail(OutputPath, Stream);
             ObjectOutputSelection."Output Type"::"Printer Name":
                 PrintMethodMgt.PrintFileLocal(OutputPath, Stream, 'pdf');
-            ObjectOutputSelection."Output Type"::"Google Print":
-                PrintMethodMgt.PrintViaGoogleCloud(OutputPath, Stream, 'application/pdf', 0, ObjectID);
             ObjectOutputSelection."Output Type"::"PrintNode PDF":
                 begin
                     ObjectOutputSelection."Object Type" := ObjectOutputSelection."Object Type"::Report;

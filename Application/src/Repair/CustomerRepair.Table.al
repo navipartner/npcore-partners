@@ -52,9 +52,8 @@ table 6014504 "NPR Customer Repair"
                 Contact: Record Contact;
                 ContactBusinessRelation: Record "Contact Business Relation";
                 Customer: Record Customer;
-                RetailFormCode: Codeunit "NPR Retail Form Code";
             begin
-                if RetailFormCode.CreateCustomerOld("Customer No.", "Customer Type", "Salesperson Code") then begin
+                if Rec."Customer No." <> '' then begin
                     if "Customer Type" = "Customer Type"::Ordinary then begin
                         Customer.Get("Customer No.");
                         Name := Customer.Name;

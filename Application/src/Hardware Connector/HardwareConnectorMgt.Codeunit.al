@@ -75,18 +75,11 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
     [TryFunction]
     local procedure TrySendGenericRequest(Handler: Text; JsonContent: JsonObject; Caption: Text)
     var
-        POSActionHardwareConnect: Codeunit "NPR POS Action: HardwareConn.";
         POSSession: Codeunit "NPR POS Session";
         Content: Text;
     begin
         JsonContent.WriteTo(Content);
-        if POSSession.GetSession(POSSession, false) then begin
-            //Send via V2 action running JS inside POS, asynchronously.
-            POSActionHardwareConnect.QueueRequest(Handler, Content);
-        end else begin
-            //Open modal page to run JS outside POS, synchronously.
-            SendRequestOutsidePOS(Handler, Content, Caption);
-        end;
+        SendRequestOutsidePOS(Handler, Content, Caption);
     end;
 
     local procedure SendRequestOutsidePOS(Handler: Text; Content: Text; Caption: Text)

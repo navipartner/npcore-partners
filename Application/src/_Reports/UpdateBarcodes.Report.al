@@ -86,7 +86,6 @@ report 6014601 "NPR Update Barcodes"
         VarietyCloneData: Codeunit "NPR Variety Clone Data";
         ItemReference: Record "Item Reference";
         CrossReferenceNo: Code[50];
-        AlternativeNo: Record "NPR Alternative No.";
         IgnoreAltNo: Boolean;
         AddPrefix: Text;
 
@@ -100,13 +99,6 @@ report 6014601 "NPR Update Barcodes"
                 exit(ItemReference."Reference No.");
             end;
 
-        AlternativeNo.SetRange(Code, ItemNo);
-        AlternativeNo.SetRange("Variant Code", VariantCode);
-        if (AlternativeNo.FindFirst()) and (not IgnoreAltNo) then
-            if (CheckBarcodeValidEAN13(AlternativeNo."Alt. No.") or CheckBarcodeValidEAN8(AlternativeNo."Alt. No.")) then begin
-                exit(AlternativeNo."Alt. No.");
-            end;
-
         if not InsertMissingBarcode then
             exit;
 
@@ -118,9 +110,6 @@ report 6014601 "NPR Update Barcodes"
         ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
         if ItemReference.FindFirst then
             exit(ItemReference."Reference No.");
-
-        if AlternativeNo.FindFirst and (not IgnoreAltNo) then
-            exit(AlternativeNo."Alt. No.");
     end;
 
     local procedure CheckBarcodeValidEAN13(barcode: Code[50]): Boolean

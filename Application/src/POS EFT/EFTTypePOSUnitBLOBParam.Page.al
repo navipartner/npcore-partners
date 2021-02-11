@@ -1,14 +1,11 @@
 page 6184477 "NPR EFTType POSUnit BLOB Param"
 {
-    // NPR5.46/MMV /20181008 CASE 290734 Created object
-
     Caption = 'EFT Type POS Unit BLOB Param.';
     DeleteAllowed = false;
     InsertAllowed = false;
     LinksAllowed = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     ShowFilter = false;
     SourceTable = "NPR EFTType POSUnit BLOBParam.";
 

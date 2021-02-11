@@ -34,23 +34,5 @@ pageextension 6014455 "NPR Salesperson/Purchaser Card" extends "Salesperson/Purc
             }
         }
     }
-    actions
-    {
-        addafter("Create &Interaction")
-        {
-            action("NPR CashCodes")
-            {
-                Caption = 'Cash Codes';
-                Image = "Action";
-                RunObject = Page "NPR Alternative Number";
-                RunPageLink = Code = FIELD(Code),
-                              Type = CONST(SalesPerson);
-                RunPageView = SORTING(Type, Code, "Alt. No.");
-                ShortCutKey = 'Ctrl+A';
-                ApplicationArea = All;
-                ToolTip = 'Executes the Cash Codes action';
-            }
-        }
-    }
 }
 

@@ -48,7 +48,7 @@ report 6060127 "NPR MM Member Card Print QR"
 
             trigger OnAfterGetRecord()
             var
-                BarcodeLib: Codeunit "NPR Barcode Library";
+                BarcodeLib: Codeunit "NPR Barcode Image Library";
                 Item: Record Item;
                 MMMembershipRole: Record "NPR MM Membership Role";
             begin
@@ -66,10 +66,8 @@ report 6060127 "NPR MM Member Card Print QR"
             end;
 
             trigger OnPreDataItem()
-            var
-                RetailFormCode: Codeunit "NPR Retail Form Code";
             begin
-                if POSUnit.Get(RetailFormCode.FetchRegisterNumber) then
+                if POSUnit.Get(POSUnit.GetCurrentPOSUnit()) then
                     if POSViewProfile.Get(POSUnit."POS View Profile") and POSViewProfile.Picture.HasValue then
                         POSViewProfile.CalcFields(Picture);
             end;

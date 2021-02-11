@@ -368,11 +368,7 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
     end;
 
     procedure PrintAltDefaultLogo()
-    var
-        Register: Record "NPR Register";
-        RetailFormCode: Codeunit "NPR Retail Form Code";
     begin
-        Register.Get(RetailFormCode.FetchRegisterNumber);
         PrintNVGraphicsDataNew(6, 0, 48, 69, 48, 48, 1, 1);
     end;
 

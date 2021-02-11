@@ -39,39 +39,6 @@ page 6059970 "NPR Variety Setup"
                     ToolTip = 'Specifies the value of the Create Variant Code From field';
                 }
             }
-            group("Barcode (Alternative No.)")
-            {
-                Caption = 'Barcode (Alternative No.)';
-                field("Create Alt. No. automatic"; Rec."Create Alt. No. automatic")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Create Alt. No. automatic field';
-                }
-                field("Barcode Type (Alt. No.)"; Rec."Barcode Type (Alt. No.)")
-                {
-                    ApplicationArea = All;
-                    Editable = "Create Alt. No. automatic";
-                    ToolTip = 'Specifies the value of the Barcode Type (Alt. No.) field';
-                }
-                field("Alt. No. No. Series (I)"; Rec."Alt. No. No. Series (I)")
-                {
-                    ApplicationArea = All;
-                    Editable = "Create Alt. No. automatic";
-                    ToolTip = 'Specifies the value of the Alt. No. No. Series (Item) field';
-
-                    trigger OnValidate()
-                    begin
-                        if Rec."Alt. No. No. Series (V)" = '' then
-                            Rec."Alt. No. No. Series (V)" := Rec."Alt. No. No. Series (I)";
-                    end;
-                }
-                field("Alt. No. No. Series (V)"; Rec."Alt. No. No. Series (V)")
-                {
-                    ApplicationArea = All;
-                    Editable = Rec."Create Alt. No. automatic";
-                    ToolTip = 'Specifies the value of the Alt. No. No. Series (Variant) field';
-                }
-            }
             group("Barcode (Item Cross Ref.)")
             {
                 Caption = 'Barcode (Item Cross Ref.)';
@@ -139,7 +106,7 @@ page 6059970 "NPR Variety Setup"
                     Caption = 'EAN13 Internal';
                     Image = BarCode;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = New;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -157,7 +124,7 @@ page 6059970 "NPR Variety Setup"
                     Caption = 'EAN13 External';
                     Image = BarCode;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = New;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -202,24 +169,12 @@ page 6059970 "NPR Variety Setup"
                         VRTCloneData.DisableOldBarcodeSetup();
                     end;
                 }
-                action("Alternative No.")
-                {
-                    Caption = 'Alternative No.';
-                    Image = BarCode;
-                    Promoted = true;
-				    PromotedOnly = true;
-                    PromotedCategory = Category4;
-                    RunObject = Page "NPR Alternative Number";
-                    RunPageView = SORTING("Alt. No.", Type);
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Alternative No. action';
-                }
                 action("Item Reference")
                 {
                     Caption = 'Item Reference';
                     Image = BarCode;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     RunObject = Page "Item Reference Entries";
                     RunPageView = SORTING("Reference Type", "Reference No.");
@@ -235,7 +190,7 @@ page 6059970 "NPR Variety Setup"
                     Caption = 'Item Variant Descriptions';
                     Image = UpdateDescription;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -253,7 +208,7 @@ page 6059970 "NPR Variety Setup"
                     Caption = 'Item Reference Descriptions';
                     Image = UpdateDescription;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -271,40 +226,12 @@ page 6059970 "NPR Variety Setup"
                     Caption = 'Barcodes';
                     Image = BarCode;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     RunObject = Report "NPR Update Barcodes";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Barcodes action';
-                }
-            }
-            group(Convert)
-            {
-                Caption = 'Convert';
-                action("Alt. No. to Item Reference")
-                {
-                    Caption = 'Alt. No. to Item Reference';
-                    Image = BarCode;
-                    Promoted = true;
-				    PromotedOnly = true;
-                    PromotedCategory = Category5;
-                    PromotedIsBig = true;
-                    RunObject = Report "NPR Alt. No. to ICR barcodes";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Alt. No. to Item Cross Reference action';
-                }
-                action("Item Reference to Alt. No.")
-                {
-                    Caption = 'Item Reference to Alt. No.';
-                    Image = BarCode;
-                    Promoted = true;
-				    PromotedOnly = true;
-                    PromotedCategory = Category5;
-                    PromotedIsBig = true;
-                    RunObject = Report "NPR ICR to Alt. No. barcodes";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Item Cross Reference to Alt. No. action';
                 }
             }
         }
@@ -319,7 +246,7 @@ page 6059970 "NPR Variety Setup"
                     Caption = 'Variety';
                     Image = ChangeLog;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Variety";
                     ApplicationArea = All;
@@ -330,7 +257,7 @@ page 6059970 "NPR Variety Setup"
                     Caption = 'Field Setup';
                     Image = Column;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Variety Fields Setup";
                     ApplicationArea = All;
@@ -341,7 +268,7 @@ page 6059970 "NPR Variety Setup"
                     Caption = 'Groups';
                     Image = Allocations;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Variety Group";
                     ApplicationArea = All;

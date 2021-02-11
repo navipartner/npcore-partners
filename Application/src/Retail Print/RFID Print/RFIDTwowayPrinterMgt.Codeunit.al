@@ -62,7 +62,7 @@ codeunit 6059830 "NPR RFID Two-way Printer Mgt."
     var
         RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
         RecRef: RecordRef;
-        RetailFormCode: Codeunit "NPR Retail Form Code";
+        POSUnit: Record "NPR POS Unit";
     begin
         PreparePrintBufferEntry(JournalLine);
         RecRef.GetTable(JournalLine);
@@ -70,7 +70,7 @@ codeunit 6059830 "NPR RFID Two-way Printer Mgt."
 
         RetailReportSelectionMgt.SetMatrixPrintIterationFieldNo(JournalLine.FieldNo("Quantity to Print"));
         RetailReportSelectionMgt.SetRequestWindow(true);
-        RetailReportSelectionMgt.SetRegisterNo(RetailFormCode.FetchRegisterNumber);
+        RetailReportSelectionMgt.SetRegisterNo(POSUnit.GetCurrentPOSUnit());
         RetailReportSelectionMgt.RunObjects(RecRef, ReportType);
     end;
 

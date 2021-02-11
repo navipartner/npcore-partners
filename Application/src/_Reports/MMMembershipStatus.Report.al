@@ -24,7 +24,7 @@ report 6060132 "NPR MM Membership Status"
 
                         trigger OnAfterGetRecord()
                         var
-                            BarcodeLib: Codeunit "NPR Barcode Library";
+                            BarcodeLib: Codeunit "NPR Barcode Image Library";
                         begin
                             TempMembers.Init();
                             TempMembers.Template := "MM Membership Setup".Code;
