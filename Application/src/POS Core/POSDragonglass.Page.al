@@ -83,17 +83,9 @@ page 6150750 "NPR POS (Dragonglass)"
         case Method of
             'KeepAlive':
                 exit(true);
-            'CloseRequested':
-                exit(CloseRequested());
             'InitializationComplete':
                 exit(InitializationComplete());
         end;
-    end;
-
-    local procedure CloseRequested(): Boolean
-    begin
-        Finalize();
-        exit(true);
     end;
 
     local procedure InitializationComplete(): Boolean
