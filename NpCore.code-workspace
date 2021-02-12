@@ -12,6 +12,12 @@
 	"settings": {
 		"al.compilationOptions": {			
 			"parallel": true
-		}
+		},
+		"al.codeAnalyzers": [
+			"${AppSourceCop}",
+			"${UICop}",
+			"${CodeCop}"
+		],
+		"al.ruleSetPath": "main.ruleset.json"
 	}
 }
