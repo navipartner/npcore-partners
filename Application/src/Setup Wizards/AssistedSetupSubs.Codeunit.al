@@ -21,11 +21,13 @@ codeunit 6014431 "NPR Assisted Setup Subs"
         AssistedSetupGroup: Enum "Assisted Setup Group";
         MagentoWizardName: Label 'NP Magento Setup Wizard';
     begin
-        if not AssistedSetup.Exists(Page::"NPR Magento Wizard") then
-            AssistedSetup.Add(CreateGuid(),
-                              Page::"NPR Magento Wizard",
-                              MagentoWizardName,
-                              AssistedSetupGroup::GettingStarted);
+        if AssistedSetup.Exists(Page::"NPR Magento Wizard") then
+            AssistedSetup.Remove(Page::"NPR Magento Wizard");
+
+        AssistedSetup.Add(CreateGuid(),
+                            Page::"NPR Magento Wizard",
+                            MagentoWizardName,
+                            AssistedSetupGroup::"NP Retail");
     end;
 
     local procedure UpdateMagentoWizardStatus()
@@ -44,11 +46,13 @@ codeunit 6014431 "NPR Assisted Setup Subs"
         AssistedSetupGroup: Enum "Assisted Setup Group";
         RetailWizardName: Label 'NP Retail Setup Wizard';
     begin
-        if not AssistedSetup.Exists(Page::"NPR Retail Wizard") then
-            AssistedSetup.Add(CreateGuid(),
-                              Page::"NPR Retail Wizard",
-                              RetailWizardName,
-                              AssistedSetupGroup::GettingStarted);
+        if AssistedSetup.Exists(Page::"NPR Retail Wizard") then
+            AssistedSetup.Remove(Page::"NPR Retail Wizard");
+
+        AssistedSetup.Add(CreateGuid(),
+                            Page::"NPR Retail Wizard",
+                            RetailWizardName,
+                            AssistedSetupGroup::"NP Retail");
     end;
 
     local procedure UpdateRetailWizardStatus()
