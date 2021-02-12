@@ -11,6 +11,7 @@ codeunit 6059899 "NPR Data Log Management"
     var
         TempDataLogSetup: Record "NPR Data Log Setup (Table)" temporary;
         TempDataLogSetupField: Record "NPR Data Log Setup (Field)" temporary;
+        TempDataLogSubscriber: Record "NPR Data Log Subscriber" temporary;
         DataLogSubscriberMgt: Codeunit "NPR Data Log Sub. Mgt.";
         DataLogChecked: Boolean;
         DataLogActivated: Boolean;
@@ -73,7 +74,7 @@ codeunit 6059899 "NPR Data Log Management"
         if TempDataLogSetup."Log Insertion" = TempDataLogSetup."Log Insertion"::Detailed then
             InsertDataFields(RecRef, RecordEntryNo, TimeStamp, false);
 
-        DataLogSubscriberMgt.ProcessRecord('', true, RecordEntryNo);
+        ProcessDataLogRecord(RecordEntryNo, RecRef.Number);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterOnDatabaseModify', '', true, false)]
@@ -102,7 +103,7 @@ codeunit 6059899 "NPR Data Log Management"
         if TempDataLogSetup."Log Modification" in [TempDataLogSetup."Log Modification"::Detailed, TempDataLogSetup."Log Modification"::Changes] then
             InsertDataFields(RecRef, RecordEntryNo, TimeStamp, TempDataLogSetup."Log Modification" = TempDataLogSetup."Log Modification"::Changes);
 
-        DataLogSubscriberMgt.ProcessRecord('', true, RecordEntryNo);
+        ProcessDataLogRecord(RecordEntryNo, RecRef.Number);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterOnDatabaseDelete', '', true, false)]
@@ -130,7 +131,7 @@ codeunit 6059899 "NPR Data Log Management"
         if TempDataLogSetup."Log Deletion" = TempDataLogSetup."Log Deletion"::Detailed then
             InsertDataFields(RecRef, RecordEntryNo, TimeStamp, false);
 
-        DataLogSubscriberMgt.ProcessRecord('', true, RecordEntryNo);
+        ProcessDataLogRecord(RecordEntryNo, RecRef.Number);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterOnDatabaseRename', '', true, false)]
@@ -158,11 +159,32 @@ codeunit 6059899 "NPR Data Log Management"
             exit;
 
         PreviousRecordEntryNo := InsertDataRecord(xRecRef, TimeStamp, 3);
-        DataLogSubscriberMgt.ProcessRecord('', true, PreviousRecordEntryNo);
+        ProcessDataLogRecord(PreviousRecordEntryNo, xRecRef.Number);
         RecordEntryNo := InsertDataRecordRename(RecRef, xRecRef, TimeStamp, 2);
         InsertPKDataFields(RecRef, xRecRef, RecordEntryNo, TimeStamp, false);
 
-        DataLogSubscriberMgt.ProcessRecord('', true, RecordEntryNo);
+        ProcessDataLogRecord(RecordEntryNo, RecRef.Number);
+    end;
+
+    local procedure ProcessDataLogRecord(RecordEntryNo: BigInteger; TableId: Integer)
+    var
+        DataLogRecord: Record "NPR Data Log Record";
+        DataLogSubscriberMgt: Codeunit "NPR Data Log Sub. Mgt.";
+    begin
+        Clear(TempDataLogSubscriber);
+        TempDataLogSubscriber.SetRange("Table ID", TableId);
+        TempDataLogSubscriber.SetFilter("Company Name", '=%1', '');
+        TempDataLogSubscriber.SetFilter("Data Processing Codeunit ID", '>%1', 0);
+        if TempDataLogSubscriber.IsEmpty then
+            exit;
+
+        if not DataLogRecord.Get(RecordEntryNo) then
+            exit;
+
+        TempDataLogSubscriber.FindSet();
+        repeat
+            DataLogSubscriberMgt.ProcessRecord(TempDataLogSubscriber, DataLogRecord);
+        until TempDataLogSubscriber.Next() = 0;
     end;
 
     //--- Setup ---
@@ -199,6 +221,15 @@ codeunit 6059899 "NPR Data Log Management"
                 TempDataLogSetup := DataLogSetup;
                 TempDataLogSetup.Insert;
             until DataLogSetup.Next = 0;
+
+        Clear(TempDataLogSubscriber);
+        TempDataLogSubscriber.SetFilter("Company Name", '=%1', '');
+        IF DataLogSubscriber.FindSet() THEN
+            repeat
+                TempDataLogSubscriber.Init();
+                TempDataLogSubscriber := DataLogSubscriber;
+                TempDataLogSubscriber.Insert();
+            until DataLogSubscriber.Next() = 0;
     end;
 
     procedure DisableDataLog(Disable: Boolean)

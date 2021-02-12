@@ -40,7 +40,7 @@ table 6059896 "NPR Data Log Subscriber"
         }
         field(5; "Table Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
                                                                            "Object ID" = FIELD("Table ID")));
             Caption = 'Table Name';
             Editable = false;
@@ -65,7 +65,7 @@ table 6059896 "NPR Data Log Subscriber"
         }
         field(115; "Data Processing Codeunit Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Codeunit),
                                                                            "Object ID" = FIELD("Data Processing Codeunit ID")));
             Caption = 'Data Processing Codeunit Name';
             Editable = false;
@@ -77,6 +77,27 @@ table 6059896 "NPR Data Log Subscriber"
             Description = 'DL1.03';
             Editable = false;
             DataClassification = CustomerContent;
+        }
+        field(130; "Delayed Data Processing (sec)"; Integer)
+        {
+            Caption = 'Delayed Data Processing (sec)';
+            Description = '#416503';
+            BlankZero = true;
+            DataClassification = CustomerContent;
+        }
+        field(140; "Failure Codeunit ID"; Integer)
+        {
+            Caption = 'Failure Codeunit ID';
+            BlankZero = true;
+            DataClassification = CustomerContent;
+        }
+        field(150; "Failure Codeunit Caption"; Text[249])
+        {
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Codeunit),
+                                                                           "Object ID" = FIELD("Failure Codeunit ID")));
+            Caption = 'Failure Codeunit Caption';
+            Editable = false;
+            FieldClass = FlowField;
         }
     }
 

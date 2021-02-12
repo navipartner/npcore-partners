@@ -335,6 +335,7 @@ codeunit 6059911 "NPR Delete Old Entries"
         DataLogSetup: Record "NPR Data Log Setup (Table)";
         DataLogField: Record "NPR Data Log Field";
         DataLogRecord: Record "NPR Data Log Record";
+        DataLogProcessingEntry: Record "NPR Data Log Processing Entry";
         TimeStamp: DateTime;
         RecRef: RecordRef;
     begin
@@ -376,6 +377,12 @@ codeunit 6059911 "NPR Delete Old Entries"
                     DataLogField.DeleteAll;
                 if NoOfEntries <> 0 then
                     WriteLogAndCommit(TaskLine, DataLogField.TableCaption);
+
+                DataLogProcessingEntry.SetFilter("Inserted at", '<%1', TimeStamp);
+                if DataLogProcessingEntry.FindFirst() then begin
+                    DataLogProcessingEntry.DeleteAll();
+                    WriteLogAndCommit(TaskLine, DataLogProcessingEntry.TableCaption);
+                end;
 
                 DataLogRecord.SetCurrentKey("Table ID");
                 DataLogRecord.SetRange("Table ID", DataLogSetup."Table ID");

@@ -65,6 +65,21 @@ page 6059896 "NPR Data Log Subscribers"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Last Date Modified field';
                 }
+                field("Delayed Data Processing (sec)"; Rec."Delayed Data Processing (sec)")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the number of seconds for Delayed Data Processing';
+                }
+                field("Failure Codeunit ID"; Rec."Failure Codeunit ID")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies ID of Failure Codeunit';
+                }
+                field("Failure Codeunit Caption"; Rec."Failure Codeunit Caption")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the Caption of Failure Codeunit';
+                }
             }
         }
     }

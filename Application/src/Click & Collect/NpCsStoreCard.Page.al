@@ -71,6 +71,18 @@ page 6151196 "NPR NpCs Store Card"
                 group(Control6014405)
                 {
                     ShowCaption = false;
+                    field("Store Stock Item Url"; Rec."Store Stock Item Url")
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Store Stock Item Url field';
+                        Importance = Additional;
+                    }
+                    field("Store Stock Status Url"; Rec."Store Stock Status Url")
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Store Stock Status Url field';
+                        Importance = Additional;
+                    }
                     field("Service Url"; Rec."Service Url")
                     {
                         ApplicationArea = All;
@@ -225,7 +237,7 @@ page 6151196 "NPR NpCs Store Card"
                 Caption = 'Validate Store Setup';
                 Image = Approve;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -246,7 +258,7 @@ page 6151196 "NPR NpCs Store Card"
                 Caption = 'Update Contact Information';
                 Image = User;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -265,7 +277,7 @@ page 6151196 "NPR NpCs Store Card"
                 Caption = 'Show Address';
                 Image = Map;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -283,7 +295,7 @@ page 6151196 "NPR NpCs Store Card"
                 Caption = 'Show Geolocation';
                 Image = Map;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -314,6 +326,15 @@ page 6151196 "NPR NpCs Store Card"
                     NpCsStoresbyDistance.SetFromStoreCode(Rec.Code);
                     NpCsStoresbyDistance.Run;
                 end;
+            }
+            action("Store Stock Items")
+            {
+                Caption = 'Store Stock Items';
+                Image = List;
+                RunObject = Page "NPR NpCs Store Stock Items";
+                RunPageLink = "Store Code" = FIELD(Code);
+                ApplicationArea = All;
+                ToolTip = 'Executes the Store Stock Items action';
             }
         }
     }
