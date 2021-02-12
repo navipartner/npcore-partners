@@ -159,8 +159,6 @@ codeunit 6150701 "NPR POS JavaScript Interface"
                 Method_FrontEndId(POSSession, FrontEnd, Context);
             'Unlock':
                 Method_Unlock(POSSession, FrontEnd, Context, Self);
-            'MajorTomEvent':
-                Method_MajorTomEvent(POSSession, FrontEnd, Context);
             'ProtocolUIResponse':
                 Method_ProtocolUIResponse(POSSession, FrontEnd, Context);
             else
@@ -436,20 +434,6 @@ codeunit 6150701 "NPR POS JavaScript Interface"
             InvokeAction(Action.Code, '', 0, 0, Context, POSSession, FrontEnd, Self)
         else
             POSSession.ChangeViewSale();
-    end;
-
-    local procedure Method_MajorTomEvent(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
-    var
-        JSON: Codeunit "NPR POS JSON Management";
-        Source: Text;
-    begin
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        Source := JSON.GetString('source', true);
-        // TODO: handle the event here, source can be:
-        // 'exitingMajorTom': Major Tom is closing, and it will close. The user was asked whether they want to close, and they confirmed, so this is the last thing that will happen in this Major Tom session.
-        // 'newSale':         New Sale button was clicked in Major Tom
-        // 'navRoleCenter':   RoleCenter button was clicked in Major Tom
-        // 'navigatingAway':  Navigating away from the sale view into a generic browser URL (such as http://navipartner.dk/)
     end;
 
     local procedure Method_KeyPress(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
