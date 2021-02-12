@@ -89,6 +89,7 @@ codeunit 6059898 "NPR Data Log Sub. Mgt."
         DataLogField: Record "NPR Data Log Field";
         DataLogSetup: Record "NPR Data Log Setup (Table)";
         DataLogRecord: Record "NPR Data Log Record";
+        DataLogProcessingEntry: Record "NPR Data Log Processing Entry";
         TimeStamp: DateTime;
     begin
         Clear(DataLogSetup);
@@ -98,6 +99,14 @@ codeunit 6059898 "NPR Data Log Sub. Mgt."
         if DataLogSetup.FindSet then
             repeat
                 TimeStamp := CurrentDateTime - DataLogSetup."Keep Log for";
+
+                DataLogProcessingEntry.SetRange("Table Number", DataLogSetup."Table ID");
+                DataLogProcessingEntry.SetFilter("Inserted at", '<%1', TimeStamp);
+                if DataLogProcessingEntry.FindFirst() then begin
+                    DataLogProcessingEntry.DeleteAll();
+                    Commit();
+                end;
+
                 DataLogField.SetRange("Table ID", DataLogSetup."Table ID");
                 DataLogField.SetFilter("Log Date", '<%1', TimeStamp);
                 DataLogField.DeleteAll;
@@ -109,6 +118,14 @@ codeunit 6059898 "NPR Data Log Sub. Mgt."
             until DataLogSetup.Next = 0;
 
         TimeStamp := CreateDateTime(CalcDate('<-3M>', Today), 0T);
+
+        DataLogProcessingEntry.SetRange("Table Number", DataLogSetup."Table ID");
+        DataLogProcessingEntry.SetFilter("Inserted at", '<%1', TimeStamp);
+        if DataLogProcessingEntry.FindFirst() then begin
+            DataLogProcessingEntry.DeleteAll();
+            Commit();
+        end;
+
         DataLogField.SetRange("Table ID");
         DataLogField.SetFilter("Log Date", '<%1', TimeStamp);
         DataLogField.DeleteAll;
@@ -314,37 +331,28 @@ codeunit 6059898 "NPR Data Log Sub. Mgt."
         //+DL9.14 [286526]
     end;
 
-    procedure ProcessNewRecords(SubscriberCode: Code[10])
+    procedure ProcessRecord(DataLogSubscriber: Record "NPR Data Log Subscriber"; DataLogRecord: Record "NPR Data Log Record")
     var
-        TempDataLogRecord: Record "NPR Data Log Record" temporary;
+        DataLogProcessingEntry: Record "NPR Data Log Processing Entry";
     begin
-        TempDataLogRecord.DeleteAll;
-        if GetNewRecords(SubscriberCode, true, 0, TempDataLogRecord) then begin
-            if TempDataLogRecord.FindSet then
-                repeat
-                    ProcessRecord(SubscriberCode, false, TempDataLogRecord."Entry No.");
-                until TempDataLogRecord.Next = 0;
-        end;
-    end;
-
-    procedure ProcessRecord(SubscriberCode: Code[10]; DirectDataProcessing: Boolean; var RecordEntryNo: BigInteger)
-    var
-        DataLogSubscriber: Record "NPR Data Log Subscriber";
-        DataLogRecord: Record "NPR Data Log Record";
-    begin
-        if not DataLogRecord.Get(RecordEntryNo) then
+        if DataLogSubscriber."Data Processing Codeunit ID" <= 0 then
             exit;
 
-        Clear(DataLogSubscriber);
-        DataLogSubscriber.SetFilter(Code, SubscriberCode);
-        DataLogSubscriber.SetFilter("Data Processing Codeunit ID", '>%1', 0);
-        DataLogSubscriber.SetFilter("Direct Data Processing", '%1', DirectDataProcessing);
-        if not DataLogSubscriber.FindSet then
-            exit;
+        DataLogProcessingEntry.Init();
+        DataLogProcessingEntry."Entry No." := 0;
+        DataLogProcessingEntry."Inserted at" := CurrentDateTime;
+        DataLogProcessingEntry."Subscriber Code" := DataLogSubscriber.Code;
+        DataLogProcessingEntry."Table Number" := DataLogSubscriber."Table ID";
+        DataLogProcessingEntry."Data Log Entry No." := DataLogRecord."Entry No.";
+        DataLogProcessingEntry."Data Log Record Value" := CopyStr(format(DataLogRecord."Record ID"), 1, MaxStrLen(DataLogProcessingEntry."Data Log Record Value"));
+        DataLogProcessingEntry.Insert(true);
 
-        repeat
-            CODEUNIT.Run(DataLogSubscriber."Data Processing Codeunit ID", DataLogRecord);
-        until DataLogSubscriber.Next = 0;
+        if DataLogSubscriber."Direct Data Processing" then
+            CODEUNIT.Run(CODEUNIT::"NPR Data Log Processing Mgt.", DataLogProcessingEntry)
+        else
+            TaskScheduler.CreateTask(
+              CODEUNIT::"NPR Data Log Processing Mgt.", CODEUNIT::"NPR Data Log Proces. Err. Mgt.", true, CompanyName,
+              DataLogRecord."Log Date" + (DataLogSubscriber."Delayed Data Processing (sec)" * 1000), DataLogProcessingEntry.RecordId);
     end;
 
     procedure RestoreRecordToRecRef(RecordEntryNo: BigInteger; Previous: Boolean; var RecRef: RecordRef): Boolean

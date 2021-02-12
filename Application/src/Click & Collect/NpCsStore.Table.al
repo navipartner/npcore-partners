@@ -23,6 +23,7 @@ table 6151195 "NPR NpCs Store"
             trigger OnValidate()
             var
                 Company: Record Company;
+                NpCsStoreStockDataMgt: Codeunit "NPR NpCs Store Stock Data Mgt.";
                 Url: Text;
             begin
                 if Name = '' then
@@ -32,6 +33,8 @@ table 6151195 "NPR NpCs Store"
                     exit;
 
                 "Local Store" := CompanyName = "Company Name";
+                "Store Stock Item Url" := NpCsStoreStockDataMgt.GetStoreStockItemUrl(Company.Name);
+                "Store Stock Status Url" := NpCsStoreStockDataMgt.GetStoreStockStatusUrl(Company.Name);
                 Url := GetUrl(CLIENTTYPE::SOAP, Company.Name, OBJECTTYPE::Codeunit, CODEUNIT::"NPR NpCs Collect WS");
                 "Service Url" := CopyStr(Url, 1, MaxStrLen("Service Url"));
             end;
@@ -71,6 +74,16 @@ table 6151195 "NPR NpCs Store"
         field(25; "Store Url"; Text[250])
         {
             Caption = 'Store Url';
+            DataClassification = CustomerContent;
+        }
+        field(95; "Store Stock Item Url"; Text[250])
+        {
+            Caption = 'Store Stock Item Url';
+            DataClassification = CustomerContent;
+        }
+        field(100; "Store Stock Status Url"; Text[250])
+        {
+            Caption = 'Store Stock Status Url';
             DataClassification = CustomerContent;
         }
         field(105; "Service Url"; Text[250])

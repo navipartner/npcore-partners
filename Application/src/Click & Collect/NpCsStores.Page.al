@@ -48,7 +48,7 @@ page 6151195 "NPR NpCs Stores"
                 Caption = 'Show Address';
                 Image = Map;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -66,7 +66,7 @@ page 6151195 "NPR NpCs Stores"
                 Caption = 'Show Geolocation';
                 Image = Map;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -97,6 +97,15 @@ page 6151195 "NPR NpCs Stores"
                     NpCsStoresbyDistance.SetFromStoreCode(Code);
                     NpCsStoresbyDistance.Run;
                 end;
+            }
+            action("Store Stock Items")
+            {
+                Caption = 'Store Stock Items';
+                Image = List;
+                RunObject = Page "NPR NpCs Store Stock Items";
+                RunPageLink = "Store Code" = FIELD(Code);
+                ApplicationArea = All;
+                ToolTip = 'Executes the Store Stock Items action';
             }
         }
     }
