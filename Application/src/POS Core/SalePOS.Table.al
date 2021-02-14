@@ -74,6 +74,7 @@ table 6014405 "NPR Sale POS"
                 SaleLinePOS: Record "NPR Sale Line POS";
                 Item: Record Item;
                 Contact: Record Contact;
+                POSPricingProfile: Record "NPR POS Pricing Profile";
                 DoCreate: Boolean;
                 Cust: Record Customer;
                 POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
@@ -86,8 +87,9 @@ table 6014405 "NPR Sale POS"
                 "POS Store Code" := POSUnit."POS Store Code";
                 GetPOSStore();
 
-                "Customer Price Group" := Register."Customer Price Group";
-                "Customer Disc. Group" := Register."Customer Disc. Group";
+                POSUnit.GetProfile(POSPricingProfile);
+                "Customer Price Group" := POSPricingProfile."Customer Price Group";
+                "Customer Disc. Group" := POSPricingProfile."Customer Disc. Group";
                 "Gen. Bus. Posting Group" := POSStore."Gen. Bus. Posting Group";
                 "Tax Area Code" := POSStore."Tax Area Code";
                 "Tax Liable" := POSStore."Tax Liable";
@@ -711,13 +713,17 @@ table 6014405 "NPR Sale POS"
     end;
 
     trigger OnInsert()
+    var
+        POSPricingProfile: Record "NPR POS Pricing Profile";
     begin
         RetailSetup.Get();
         GetPOSStore();
 
         Register.Get("Register No.");
+        GetPOSUnit();
+        POSUnit.GetProfile(POSPricingProfile);
         "Location Code" := POSStore."Location Code";
-        "Customer Disc. Group" := Register."Customer Disc. Group";
+        "Customer Disc. Group" := POSPricingProfile."Customer Disc. Group";
         "POS Sale ID" := 0;
         "Event No." := Register."Active Event No.";
 

@@ -555,6 +555,7 @@ table 6014422 "NPR Retail Journal Line"
         TempSaleLinePOS2: Record "NPR Sale Line POS" temporary;
         Register: Record "NPR Register";
         POSUnit: Record "NPR POS Unit";
+        POSPricingProfile: Record "NPR POS Pricing Profile";
     begin
         TempSaleLinePOS.Type := TempSaleLinePOS.Type::Item;
         TempSaleLinePOS."No." := "Item No.";
@@ -569,15 +570,19 @@ table 6014422 "NPR Retail Journal Line"
         if not Register.Get(TempSalePOS."Register No.") then
             Register.Init;
 
+        if not POSUnit.Get(TempSalePOS."Register No.") then
+            POSUnit.Init();
+
+        POSUnit.GetProfile(POSPricingProfile);
         if "Customer Price Group" <> '' then
             TempSalePOS."Customer Price Group" := "Customer Price Group"
         else
-            TempSalePOS."Customer Price Group" := Register."Customer Price Group";
+            TempSalePOS."Customer Price Group" := POSPricingProfile."Customer Price Group";
 
         if "Customer Disc. Group" <> '' then
             TempSalePOS."Customer Disc. Group" := "Customer Disc. Group"
         else
-            TempSalePOS."Customer Disc. Group" := Register."Customer Disc. Group";
+            TempSalePOS."Customer Disc. Group" := POSPricingProfile."Customer Disc. Group";
         if "Calculation Date" <> 0D then
             TempSalePOS.Date := "Calculation Date";
 

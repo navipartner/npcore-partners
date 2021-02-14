@@ -611,12 +611,18 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             Description = 'NPR5.31';
             TableRelation = "Customer Discount Group";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register -> NPR POS Unit -> NPR POS Pricing Profile';            
         }
         field(328; "Customer Price Group"; Code[10])
         {
             Caption = 'Item price group';
             DataClassification = CustomerContent;
             TableRelation = "Customer Price Group";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register -> NPR POS Unit -> NPR POS Pricing Profile';            
         }
         field(329; "Balanced Type"; Option)
         {

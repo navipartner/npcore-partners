@@ -144,6 +144,11 @@ page 6150617 "NPR POS Unit Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Restaurant Profile field';
                 }
+                field("POS Pricing Profile"; Rec."POS Pricing Profile")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Pricing Profile field where customer discount and price group should be set.';
+                }
                 field("MPOS Profile"; Rec."MPOS Profile")
                 {
                     ApplicationArea = All;
