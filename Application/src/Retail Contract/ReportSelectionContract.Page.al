@@ -1,9 +1,5 @@
 page 6014541 "NPR Report Selection: Contract"
 {
-    // NPR5.26/TS/20160809 CASE 248289 Changed OptionString Values
-    // NPR5.30/MHA /20170201  CASE 264918 Object renamed from Report Selection - Photo to Report Selection - Contract and Np Photo removed
-    // NPR5.30/BHR /20170203  CASE 262923  Fields 8 to 11 added to page
-
     Caption = 'Report Type - Contract';
     DelayedInsert = true;
     PageType = Card;
@@ -23,10 +19,7 @@ page 6014541 "NPR Report Selection: Contract"
 
                 trigger OnValidate()
                 begin
-                    //-NPR5.30 [264918]
-                    //SætBrugsFilter;
                     SetReportTypeFilter();
-                    //+NPR5.30 [264918]
                     CurrPage.Update(true);
                 end;
             }
@@ -99,10 +92,8 @@ page 6014541 "NPR Report Selection: Contract"
 
     trigger OnOpenPage()
     begin
-        //-NPR5.30 [264918]
         ReportType := "Report Type"::"Insurance Offer";
         SetReportTypeFilter();
-        //+NPR5.30 [264918]
     end;
 
     var

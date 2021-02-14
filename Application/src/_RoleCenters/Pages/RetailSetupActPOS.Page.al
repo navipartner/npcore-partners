@@ -1,6 +1,6 @@
-page 6014694 "NPR Retail Admin Activ. - POS"
+page 6151248 "NPR Setup Act - POS"
 {
-    Caption = 'Retail Admin Activities - POS';
+    Caption = 'NP Retail Setup - POS';
     PageType = CardPart;
     RefreshOnActivate = true;
     SourceTable = "NPR Retail Admin Cue";
@@ -10,9 +10,9 @@ page 6014694 "NPR Retail Admin Activ. - POS"
     {
         area(content)
         {
-            cuegroup(POS)
+            cuegroup(Users)
             {
-                Caption = 'POS';
+                Caption = 'Users';
                 field("User Setups"; Rec."User Setups")
                 {
                     ApplicationArea = All;
@@ -21,8 +21,13 @@ page 6014694 "NPR Retail Admin Activ. - POS"
                 field(Salespersons; Rec.Salespersons)
                 {
                     ApplicationArea = All;
+                    DrillDownPageID = "Salespersons/Purchasers";
                     ToolTip = 'Specifies the value of the Salespersons field';
                 }
+            }
+            cuegroup(stores)
+            {
+                Caption = 'Stores';
                 field("POS Stores"; Rec."POS Stores")
                 {
                     ApplicationArea = All;
@@ -33,29 +38,24 @@ page 6014694 "NPR Retail Admin Activ. - POS"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Units field';
                 }
-                field("Cash Registers"; Rec."Cash Registers")
+            }
+            cuegroup(payments)
+            {
+                Caption = 'Payments';
+                field("POS Payment Methods"; Rec."POS Payment Methods")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Cash Registers field';
+                    ToolTip = 'Specifies the value of the POS Payment Methods field';
                 }
                 field("POS Payment Bins"; Rec."POS Payment Bins")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Payment Bins field';
                 }
-                field("POS Payment Methods"; Rec."POS Payment Methods")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the POS Payment Methods field';
-                }
-                field("POS Posting Setups"; Rec."POS Posting Setups")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the POS Posting Setups field';
-                }
             }
         }
     }
+
     trigger OnOpenPage()
     begin
         Rec.Reset;
