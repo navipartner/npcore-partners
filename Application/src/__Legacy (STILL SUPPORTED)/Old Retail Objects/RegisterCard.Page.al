@@ -74,17 +74,6 @@ page 6014406 "NPR Register Card"
             group(Sale)
             {
                 Caption = 'Sale';
-                field("Customer Price Group"; Rec."Customer Price Group")
-                {
-                    ApplicationArea = All;
-                    Importance = Promoted;
-                    ToolTip = 'Specifies the value of the Item price group field';
-                }
-                field("Customer Disc. Group"; Rec."Customer Disc. Group")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Customer Disc. Group field';
-                }
                 field("Customer No. auto debit sale"; Rec."Customer No. auto debit sale")
                 {
                     ApplicationArea = All;
