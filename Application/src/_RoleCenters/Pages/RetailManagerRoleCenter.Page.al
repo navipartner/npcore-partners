@@ -1,6 +1,6 @@
-page 6151241 "NPR Retail POS- Sales Person R"
+page 6151241 "NPR Manager"
 {
-    Caption = 'NP Retail Salesperson';
+    Caption = 'NP Retail Manager';
     PageType = RoleCenter;
     UsageCategory = None;
     layout
@@ -32,14 +32,6 @@ page 6151241 "NPR Retail POS- Sales Person R"
             part(ControlPurchase; "NPR Acc. Payables Act")
             {
                 Caption = 'Purchase Activities';
-                ApplicationArea = All;
-            }
-            part(Control6150614; "NPR Retail 10 Items by Qty.")
-            {
-                ApplicationArea = All;
-            }
-            part(RetailTop10Vendors; "NPR Top 10 Vendors")
-            {
                 ApplicationArea = All;
             }
             part(PowerBi; "Power BI Report Spinner Part")
