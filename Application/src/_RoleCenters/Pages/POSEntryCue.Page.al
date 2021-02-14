@@ -11,11 +11,6 @@ page 6151260 "NPR POS Entry Cue"
             cuegroup("POS ENTRY POSTING")
             {
                 ShowCaption = false;
-                field("Failed G/L Posting Trans."; Rec."Failed G/L Posting Trans.")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Failed G/L Posting Trans. field';
-                }
                 field("Unposted Item Trans."; Rec."Unposted Item Trans.")
                 {
                     ApplicationArea = All;
@@ -30,6 +25,11 @@ page 6151260 "NPR POS Entry Cue"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Failed Item Transaction. field';
+                }
+                field("Failed G/L Posting Trans."; Rec."Failed G/L Posting Trans.")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Failed G/L Posting Trans. field';
                 }
             }
 
