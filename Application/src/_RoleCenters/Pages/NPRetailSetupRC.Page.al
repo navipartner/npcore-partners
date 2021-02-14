@@ -1,6 +1,6 @@
-page 6151245 "NPR NP Retail Admin Setup RC"
+page 6151245 "NPR Setup RC"
 {
-    Caption = 'NP Retail Admin Setup';
+    Caption = 'NP Retail Setup';
     PageType = RoleCenter;
     UsageCategory = None;
     layout
@@ -11,13 +11,13 @@ page 6151245 "NPR NP Retail Admin Setup RC"
             {
                 ApplicationArea = All;
             }
-            part(Control1904484608; "NPR Retail Admin Act - POS")
+            part(Control1904484608; "NPR Setup Act - POS")
             {
                 ApplicationArea = All;
 
             }
 
-            part(Control14; "NPR Retail Admin Act - WFs")
+            part(Control14; "NPR Setup Act - Scenarios")
             {
                 ApplicationArea = All;
             }
@@ -27,6 +27,38 @@ page 6151245 "NPR NP Retail Admin Setup RC"
 
     actions
     {
+        area(embedding)
+        {
+            action("POS Menus_top")
+            {
+                Caption = 'POS Menus';
+                Image = PaymentJournal;
+                RunObject = Page "NPR POS Menus";
+                ApplicationArea = All;
+                ToolTip = 'Executes the POS Menus action';
+            }
+            action("Coupon Types_top")
+            {
+                Caption = 'Coupon Types';
+                RunObject = Page "NPR NpDc Coupon Types";
+                ApplicationArea = All;
+                ToolTip = 'Executes the Coupon Types action';
+            }
+            action("E-mail Templates_top")
+            {
+                Caption = 'E-mail Templates';
+                RunObject = Page "NPR E-mail Templates";
+                ApplicationArea = All;
+                ToolTip = 'Executes the E-mail Templates action';
+            }
+            action("Sales Price Maintenance Setup_top")
+            {
+                Caption = 'Sales Price Maintenance Setup';
+                RunObject = Page "NPR Sales Price Maint. Setup";
+                ApplicationArea = All;
+                ToolTip = 'Executes the Sales Price Maintenance Setup action';
+            }
+        }
         area(sections)
         {
             group(POS)
@@ -87,6 +119,15 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Unit List action';
                 }
+                action("POS Unit Identity")
+                {
+                    Caption = 'POS Unit Identity';
+                    Image = List;
+                    RunObject = page "NPR POS Unit Identity List";
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the POS Unit Identity action';
+
+                }
                 action("POS Posting Setup")
                 {
                     Caption = 'POS Posting Setup';
@@ -122,20 +163,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Info List action';
                 }
-                action("POS Admin. Template List")
-                {
-                    Caption = 'POS Admin. Template List';
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the POS Admin. Template List action';
-                    // RunObject = Page "POS Admin. Template List";
-                }
-                action("Cash Registers")
-                {
-                    Caption = 'Cash Registers';
-                    RunObject = Page "NPR Register List";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Cash Registers action';
-                }
                 action("POS Display Setup")
                 {
                     Caption = 'POS Display Setup';
@@ -157,13 +184,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Sales Workflow Sets action';
                 }
-                action("No. Series")
-                {
-                    Caption = 'No. Series';
-                    RunObject = Page "No. Series";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the No. Series action';
-                }
                 action("Ean Box Events")
                 {
                     Caption = 'Ean Box Events';
@@ -179,15 +199,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     RunObject = Page "NPR Ean Box Setups";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Ean Box Setups action';
-                }
-                action("POS Unit Identity")
-                {
-                    Caption = 'POS Unit Identity';
-                    Image = List;
-                    RunObject = page "NPR POS Unit Identity List";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the POS Unit Identity action';
-
                 }
                 action("POS Payment view Event Setup")
                 {
@@ -328,17 +339,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     ToolTip = 'Executes the Retail Voucher Partners action';
                 }
             }
-            group("Global Setup")
-            {
-                Caption = 'Global Setup';
-                action("Global POS Sales Setups")
-                {
-                    Caption = 'Global POS Sales Setups';
-                    RunObject = Page "NPR NpGp Global POSSalesSetups";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Global POS Sales Setups action';
-                }
-            }
             group("Collect in Store")
             {
                 Caption = 'Collect in Store';
@@ -421,6 +421,7 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                 action("Report Selection - Contract")
                 {
                     Caption = 'Report Selection - Contract';
+                    RunObject = page "NPR Report Selection: Contract";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Report Selection - Contract action';
 
@@ -506,6 +507,13 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     RunObject = page "NPR Retail Replenish. SKU List";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Retail Replenisment Setup action';
+                }
+                action("Global POS Sales Setups")
+                {
+                    Caption = 'Global POS Sales Setups';
+                    RunObject = Page "NPR NpGp Global POSSalesSetups";
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the Global POS Sales Setups action';
                 }
             }
 
@@ -609,6 +617,13 @@ page 6151245 "NPR NP Retail Admin Setup RC"
             group(Configuration)
             {
                 Caption = 'Configuration';
+                action("No. Series")
+                {
+                    Caption = 'No. Series';
+                    RunObject = Page "No. Series";
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the No. Series action';
+                }
                 action("Configuration Templates")
                 {
                     Caption = 'Configuration Templates';

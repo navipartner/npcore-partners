@@ -1,18 +1,18 @@
-profile "NPR SALES PERSON"
+profile "NPR Manager"
 {
-    Description = 'NP Retail Sales Person';
-    Caption = 'NP Retail Sales Person';
+    Description = 'NP Retail Manager';
+    Caption = 'NP Retail Manager';
     ProfileDescription = '';
-    RoleCenter = "NPR Retail POS- Sales Person R";
+    RoleCenter = "NPR Manager";
     Enabled = true;
     Promoted = true;
 }
-profile "NPR ADMIN"
+profile "NPR Setup"
 {
-    Description = 'NP Retail Admin';
-    Caption = 'NP Retail Admin';
+    Description = 'NP Retail Setup';
+    Caption = 'NP Retail Setup';
     ProfileDescription = '';
-    RoleCenter = "NPR NP Retail Admin Setup RC";
+    RoleCenter = "NPR Setup RC";
     Enabled = true;
     Promoted = false;
 }
@@ -34,7 +34,7 @@ profile "NPR ENTERTAINMENT"
     Enabled = true;
     Promoted = false;
 }
-profile "NPR REESTAURANT"
+profile "NPR RESTAURANT"
 {
     Description = 'NP Retail Restaurant';
     Caption = 'NP Retail Restaurant';
