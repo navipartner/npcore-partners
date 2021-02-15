@@ -29,8 +29,7 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
         Initialize();
         if not XmlDoc.SelectNodes('.//*[local-name()="sales_return_order"]', XmlNodeList) then
             exit;
-        for i := 1 to XmlNodeList.Count do begin
-            XmlNodeList.Get(i, XmlNodeVar);
+        foreach XmlNodeVar in XmlNodeList do begin
             if XmlNodeVar.IsXmlElement() then
                 ImportSalesReturnOrder(XmlNodeVar.AsXmlElement());
         end;
@@ -91,8 +90,7 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
         i: Integer;
     begin
         XmlElement.SelectNodes('.//*[local-name()="comment_line"]', XmlNodeList);
-        for i := 1 to XmlNodeList.Count do begin
-            XmlNodeList.Get(i, Node);
+        foreach Node in XmlNodeList do begin
             InsertCommentLine(Node.AsXmlElement(), SalesHeader);
         end;
     end;
@@ -231,8 +229,7 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
         if not XmlElement.SelectNodes('.//*[local-name()="payment_refund"]', XmlNodeList) then
             exit;
 
-        for i := 1 to XmlNodeList.Count do begin
-            XmlNodeList.Get(i, Node);
+        foreach Node in XmlNodeList do begin
             InsertPaymentLinePaymentRefund(Node.AsXmlElement(), SalesHeader, LineNo);
         end;
     end;
@@ -333,13 +330,12 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
         LineNo := 0;
 
         if XmlElement.SelectNodes('.//*[local-name()="sales_return_order_line"]', XmlNodeList) then
-            for i := 1 to XmlNodeList.Count do begin
-                XmlNodeList.Get(i, Node);
+            foreach Node in XmlNodeList do begin
                 InsertSalesLine(Node.AsXmlElement(), SalesHeader, LineNo);
             end;
 
         if XmlElement.SelectNodes('/payment_refunds/payment_refund[payment_fee_refund != 0]', XmlNodeList) then
-            for i := 1 to XmlNodeList.Count do begin
+            foreach Node in XmlNodeList do begin
                 XmlNodeList.Get(i, Node);
                 InsertSalesLinePaymentFeeRefund(Node.AsXmlElement(), SalesHeader, LineNo);
             end;

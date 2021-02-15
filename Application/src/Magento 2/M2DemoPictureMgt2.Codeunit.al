@@ -1,17 +1,6 @@
 codeunit 6014446 "NPR M2 Demo Picture Mgt2"
 {
-    trigger OnRun()
-    begin
-    end;
-
-    var
-        Text000: Label 'Magento returned the following Error:\\';
-
-    local procedure "--- Subscribers"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Table, 6151411, 'OnGetMagentoUrl', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Picture", 'OnGetMagentoUrl', '', true, true)]
     local procedure GetM2DemoPictureUrl(var Sender: Record "NPR Magento Picture"; var MagentoUrl: Text; var Handled: Boolean)
     var
         MagentoSetup: Record "NPR Magento Setup";
@@ -32,4 +21,3 @@ codeunit 6014446 "NPR M2 Demo Picture Mgt2"
         exit(CODEUNIT::"NPR M2 Demo Picture Mgt2");
     end;
 }
-

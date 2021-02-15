@@ -1,9 +1,5 @@
 xmlport 6151146 "NPR M2 Item Price Request"
 {
-    // NPR5.48/TSA /20181207 CASE 320426 Initial Version
-    // MAG2.21/TSA /20190423 CASE 350006 Added optional request attribute OrderDate
-    // MAG2.25/TSA /20200226 CASE 391299 Removed NPR version tag
-
     Caption = 'Item Price Request';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -203,26 +199,12 @@ xmlport 6151146 "NPR M2 Item Price Request"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     trigger OnInitXmlPort()
     begin
         RequestLineNo := 1000000;
     end;
 
     var
-        GeneralLedgerSetup: Record "General Ledger Setup";
-        ItemResponseMessage: Text;
         RequestLineNo: Integer;
         StartTime: Time;
         ImportMessage: Text;
@@ -279,4 +261,3 @@ xmlport 6151146 "NPR M2 Item Price Request"
         ResponseMessage := ReasonText;
     end;
 }
-

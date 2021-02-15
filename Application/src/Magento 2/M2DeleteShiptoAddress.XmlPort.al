@@ -1,7 +1,5 @@
 xmlport 6151159 "NPR M2 Delete Shipto Address"
 {
-    // NPR5.48/TSA /20181221 CASE 320424 Intial Version
-
     Caption = 'Delete Shipto Address';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -61,18 +59,6 @@ xmlport 6151159 "NPR M2 Delete Shipto Address"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     var
         StartTime: Time;
 
@@ -109,4 +95,3 @@ xmlport 6151159 "NPR M2 Delete Shipto Address"
         ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime), 0, 9);
     end;
 }
-

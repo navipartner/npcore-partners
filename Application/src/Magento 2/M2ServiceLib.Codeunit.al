@@ -1,13 +1,5 @@
 codeunit 6151153 "NPR M2 Service Lib."
 {
-    // 
-    // MAG2.25/TSA /20200214 CASE 349999 Initial Version
-
-
-    trigger OnRun()
-    begin
-    end;
-
     procedure GetEstimatedDeliveryDate(ItemNo: Code[20]; CustomerNo: Code[20]; ReferenceDate: Date; var EstimatedDateFromVendor: Text[20]; var VendorCode: Text[20]; var EstimatedDateFromLocation: Text[20]; var LocationCode: Text[20]): Boolean
     var
         Item: Record Item;
@@ -31,13 +23,6 @@ codeunit 6151153 "NPR M2 Service Lib."
         VendorCode := Item."Vendor No.";
         LocationCode := Customer."Location Code";
 
-        // EstimatedDateFromVendor := Reference Date +
-        //                <Item Card> Lead Time Calculation +
-        //                <Location Code (from Customer Card)>
-        //                                <Location> Inbound Whse. Handling Time -> Apply Location Base Calendar to get first working day +
-        //                                <Location> Outbound Whse. Handling Time -> Apply Location Base Calendar to get first working day +
-        //                <Customer Card (shipping tab)> Shipping Time -> Apply Customer Base Calendar (shipping tab) to get first working day
-
         DateFromVendor := ReferenceDate;
 
         DateFromVendor := CalcDate(Item."Lead Time Calculation", DateFromVendor);
@@ -55,11 +40,6 @@ codeunit 6151153 "NPR M2 Service Lib."
         DateFromVendor := GetNextWorkDay(DateFromVendor, ParamRecArray[1]."Source Type"::Customer, Customer."No.");
         EstimatedDateFromVendor := Format(DateFromVendor, 0, 9);
 
-
-        // EstimatedDateFromLocation := Reference Date +
-        //                <Location Code (from Customer Card)>
-        //                                <Location> Outbound Whse. Handling Time -> Apply Location Base Calendar to get first working day +
-        //                <Customer Card (shipping tab)> Shipping Time -> Apply Customer Base Calendar to get first working day
 
         DateFromLocation := ReferenceDate;
         DateFromLocation := CalendarManagement.CalcDateBOC(Format(Location."Outbound Whse. Handling Time", 0, 9), DateFromLocation, ParamRecArray, true);
@@ -152,4 +132,3 @@ codeunit 6151153 "NPR M2 Service Lib."
         end;
     end;
 }
-

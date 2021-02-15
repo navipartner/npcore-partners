@@ -1,7 +1,5 @@
 xmlport 6151138 "NPR M2 Estimate Delivery Date"
 {
-    // MAG2.25/TSA /20200214 CASE 349999 Initial Version
-
     Caption = 'Estimate Delivery Date';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
@@ -93,18 +91,6 @@ xmlport 6151138 "NPR M2 Estimate Delivery Date"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     var
         M2ServiceLibrary: Codeunit "NPR M2 Service Lib.";
 
@@ -134,4 +120,3 @@ xmlport 6151138 "NPR M2 Estimate Delivery Date"
         end;
     end;
 }
-

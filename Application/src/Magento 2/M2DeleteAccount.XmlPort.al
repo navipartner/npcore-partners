@@ -1,7 +1,5 @@
 xmlport 6151158 "NPR M2 Delete Account"
 {
-    // NPR5.48/TSA /20181213 CASE 320424 Initial Version
-
     Caption = 'Delete Account';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -48,20 +46,7 @@ xmlport 6151158 "NPR M2 Delete Account"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     var
-        NPRDocLocalizationProxy: Codeunit "NPR Doc. Localization Proxy";
         StartTime: Time;
 
     procedure GetRequest() ContactNumber: Code[20]
@@ -90,15 +75,4 @@ xmlport 6151158 "NPR M2 Delete Account"
         ResponseCode := 'ERROR';
         ResponseMessage := ReasonText;
     end;
-
-    [TryFunction]
-    local procedure TryGetEanNo(Customer: Record Customer temporary; var EanNo: Text)
-    var
-        TmpEan: Variant;
-    begin
-
-        //NPRDocLocalizationProxy.T18_GetFieldValue (Customer, 'Ean No.', TmpEan);
-        EanNo := 'NOT IN W1';
-    end;
 }
-

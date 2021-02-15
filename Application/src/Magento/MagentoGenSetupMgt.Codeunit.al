@@ -192,8 +192,7 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         ParentNodePath := TempGenericSetupBuffer."Node Path";
         if TempGenericSetupBuffer.Container then begin
             XmlElement.SelectNodes('child::*', XNodeList);
-            for i := 1 to XNodeList.Count do begin
-                XNodeList.Get(i, XNode);
+            foreach XNode in XNodeList do begin
                 XElement2 := XNode.AsXmlElement();
                 if XElement2.Name <> '#text' then
                     AddGenericBufferElement(XElement2, LineNo, Level + 1, ParentNodePath, TempGenericSetupBuffer);
@@ -223,8 +222,7 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
             XmlDoc.SelectSingleNode(NodePath, XNodeRoot);
         if not IsLeafNode(XNodeRoot) then begin
             XNodeRoot.SelectNodes('child::*', XNodeList);
-            for i := 1 to XNodeList.Count do begin
-                XNodeList.Get(i, XNode);
+            foreach XNode in XNodeList do begin
                 XElement := XNode.AsXmlElement();
                 AddGenericBufferElement(XElement, LineNo, 1, '', TempGenericSetupBuffer);
             end;
@@ -368,8 +366,7 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
             XmlDoc.SelectSingleNode(RootNodePath, XNodeRoot);
         if not IsLeafNode(XNodeRoot) then begin
             XNodeRoot.SelectNodes('child::*', XNodeList);
-            for i := 1 to XNodeList.Count do begin
-                XNodeList.Get(i, XNode);
+            foreach XNode in XNodeList do begin
                 XElement := XNode.AsXmlElement();
                 AddGenericBufferElement(XElement, LineNo, 1, '', TempGenericSetupBuffer);
             end;
@@ -461,8 +458,7 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         if not XNode.SelectNodes('child::*', XNodeList) then
             exit(true);
 
-        for i := 1 to XNodeList.Count do begin
-            XNodeList.Get(i, XNode);
+        foreach XNode in XNodeList do begin
             XElement := XNode.AsXmlElement();
             if XElement.Name <> '#text' then
                 exit(false);

@@ -1,8 +1,5 @@
 xmlport 6151142 "NPR M2 Get Budget Entries"
 {
-    // NPR5.50/TSA /20190515 CASE 353714 Initial Version
-    // NPR5.52/TSA /20191007 CASE 354183 Added SalespersonCode to filter and response
-
     Caption = 'Get Budget Entries';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -132,14 +129,11 @@ xmlport 6151142 "NPR M2 Get Budget Entries"
                                 var
                                     Customer: Record Customer;
                                 begin
-
-                                    //-NPR5.52 [354183]
                                     BudgetSalespersonCode := SalesPersonCode;
                                     if (BudgetSalespersonCode = '') then
                                         if (TmpItemBudgetEntryResponse."Source Type" = TmpItemBudgetEntryResponse."Source Type"::Customer) then
                                             if (Customer.Get(TmpItemBudgetEntryResponse."Source No.")) then
                                                 BudgetSalespersonCode := Customer."Salesperson Code";
-                                    //+NPR5.52 [354183]
                                 end;
                             }
                             fieldattribute(Description; TmpItemBudgetEntryResponse.Description)
@@ -185,18 +179,6 @@ xmlport 6151142 "NPR M2 Get Budget Entries"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     trigger OnInitXmlPort()
     begin
         StartTime := Time;
@@ -225,7 +207,6 @@ xmlport 6151142 "NPR M2 Get Budget Entries"
         TmpItemBudgetNameResponse.TransferFields(ItemBudgetName, true);
         TmpItemBudgetNameResponse.Insert();
 
-        //-NPR5.52 [354183] Refactored, moved coded to a function
         if (FromDate = '') then
             FromDate := '1900-01-01';
 
@@ -242,26 +223,22 @@ xmlport 6151142 "NPR M2 Get Budget Entries"
             exit;
         end;
 
-        with TmpItemBudgetEntryRequest do
-            if (SalesPersonCode = '') then begin
-                GetBudgetEntriesWorker("Budget Name", "Source No.", "Item No.", "Location Code",
-                                        "Global Dimension 1 Code", "Global Dimension 2 Code",
-                                        "Budget Dimension 1 Code", "Budget Dimension 2 Code", "Budget Dimension 3 Code",
-                                        BudgetFromDate, BudgetUntilDate);
-            end else begin
-                Customer.SetFilter("Salesperson Code", '=%1', SalesPersonCode);
-                if (Customer.FindSet()) then begin
-                    repeat
-                        GetBudgetEntriesWorker("Budget Name", Customer."No.", "Item No.", "Location Code",
-                                        "Global Dimension 1 Code", "Global Dimension 2 Code",
-                                        "Budget Dimension 1 Code", "Budget Dimension 2 Code", "Budget Dimension 3 Code",
-                                        BudgetFromDate, BudgetUntilDate);
-                    until (Customer.Next() = 0);
-                end;
+        if (SalesPersonCode = '') then begin
+            GetBudgetEntriesWorker(TmpItemBudgetEntryRequest."Budget Name", TmpItemBudgetEntryRequest."Source No.", TmpItemBudgetEntryRequest."Item No.", TmpItemBudgetEntryRequest."Location Code",
+                                    TmpItemBudgetEntryRequest."Global Dimension 1 Code", TmpItemBudgetEntryRequest."Global Dimension 2 Code",
+                                    TmpItemBudgetEntryRequest."Budget Dimension 1 Code", TmpItemBudgetEntryRequest."Budget Dimension 2 Code", TmpItemBudgetEntryRequest."Budget Dimension 3 Code",
+                                    BudgetFromDate, BudgetUntilDate);
+        end else begin
+            Customer.SetFilter("Salesperson Code", '=%1', SalesPersonCode);
+            if (Customer.FindSet()) then begin
+                repeat
+                    GetBudgetEntriesWorker(TmpItemBudgetEntryRequest."Budget Name", Customer."No.", TmpItemBudgetEntryRequest."Item No.", TmpItemBudgetEntryRequest."Location Code",
+                                    TmpItemBudgetEntryRequest."Global Dimension 1 Code", TmpItemBudgetEntryRequest."Global Dimension 2 Code",
+                                    TmpItemBudgetEntryRequest."Budget Dimension 1 Code", TmpItemBudgetEntryRequest."Budget Dimension 2 Code", TmpItemBudgetEntryRequest."Budget Dimension 3 Code",
+                                    BudgetFromDate, BudgetUntilDate);
+                until (Customer.Next() = 0);
             end;
-
-        //+NPR5.52 [354183]
-
+        end;
 
         ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
         ResponseCode := 'OK';
@@ -273,8 +250,6 @@ xmlport 6151142 "NPR M2 Get Budget Entries"
     var
         ItemBudgetEntry: Record "Item Budget Entry";
     begin
-
-        //-NPR5.52 [354183]
         ItemBudgetEntry.SetFilter("Budget Name", '=%1', BudgetName);
 
         if (CustomerNo <> '') then begin
@@ -313,7 +288,6 @@ xmlport 6151142 "NPR M2 Get Budget Entries"
         end;
 
         exit;
-        //+NPR5.52 [354183]
     end;
 
     local procedure SetError(ErrorId: Integer; ErrorText: Text)
@@ -325,4 +299,3 @@ xmlport 6151142 "NPR M2 Get Budget Entries"
         ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
     end;
 }
-

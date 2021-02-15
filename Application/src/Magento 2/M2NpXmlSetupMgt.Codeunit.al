@@ -3,7 +3,9 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
     var
         NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
 
-    local procedure AddNpXmlTemplate(var XmlDoc: DotNet "NPRNetXmlDocument"; NodePath: Text; UpdateCode: Code[20]; DeleteCode: Code[20])
+    #region Generic Setup
+
+    local procedure AddNpXmlTemplate(var XmlDoc: XmlDocument; NodePath: Text; UpdateCode: Code[20]; DeleteCode: Code[20])
     var
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
     begin
@@ -22,7 +24,7 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
     procedure InitNpXmlTemplateSetup(var TempBlob: Codeunit "Temp Blob")
     var
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
-        XmlDoc: DotNet "NPRNetXmlDocument";
+        XmlDoc: XmlDocument;
         OutStream: OutStream;
         NodePath: Text;
     begin
@@ -96,8 +98,12 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
 
         Clear(TempBlob);
         TempBlob.CreateOutStream(OutStream);
-        XmlDoc.Save(OutStream);
+        OutStream.Write(XmlDoc);
     end;
+
+    #endregion
+
+    #region Magento Template Setup
 
     local procedure SetupTemplate(var TempBlob: Codeunit "Temp Blob"; TemplateCode: Code[20]; Enabled: Boolean)
     var
@@ -253,13 +259,11 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
         NodePath: Text;
     begin
         NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.ItemGroup" + '/';
-        //-MAG2.26 [404580]
         if MagentoSetupMgt.HasSetupBrands() then begin
             RemoveNpXmlTemplate(MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"));
             RemoveNpXmlTemplate(MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"));
             exit;
         end;
-        //+MAG2.26 [404580]
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
     end;
@@ -270,7 +274,6 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
         MagentoSetup: Record "NPR Magento Setup";
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         MagentoItemMgt: Codeunit "NPR Magento Item Mgt.";
-        String: DotNet NPRNetString;
         NodePath: Text;
         TemplateCode: Text;
     begin
@@ -278,18 +281,15 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
         TemplateCode := MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update");
         SetupTemplate(TempBlob, TemplateCode, Enabled);
         NpXmlTemplate.Get(TemplateCode);
-        String := NpXmlTemplate."API Url";
-        NpXmlTemplate."API Url" := String.Replace('stock_updates', 'stock');
+        NpXmlTemplate."API Url" := NpXmlTemplate."API Url".Replace('stock_updates', 'stock');
         NpXmlTemplate.Modify;
 
-        //-MAG2.26 [402488]
         MagentoSetup.Get;
         if TemplateCode <> MagentoSetup."Stock NpXml Template" then begin
             MagentoSetup.Validate("Stock NpXml Template", TemplateCode);
             MagentoSetup.Modify(true);
         end;
         MagentoItemMgt.UpsertStockTriggers();
-        //+MAG2.26 [402488]
     end;
 
     procedure SetupTemplateBrand(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
@@ -299,13 +299,11 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
         NodePath: Text;
     begin
         NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.Brand" + '/';
-        //-MAG2.26 [404580]
         if MagentoSetupMgt.HasSetupBrands() then begin
             RemoveNpXmlTemplate(MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"));
             RemoveNpXmlTemplate(MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"));
             exit;
         end;
-        //+MAG2.26 [404580]
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
     end;
@@ -355,10 +353,8 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        //-MAG2.02
         NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.Ticket" + '/';
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
-        //+MAG2.02
     end;
 
     procedure SetupTemplateMember(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
@@ -366,10 +362,8 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        //-MAG2.02
         NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.Membership" + '/';
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
-        //+MAG2.02
     end;
 
     procedure SetupTemplateCollectStore(var TempBlob: Codeunit "Temp Blob"; Enabled: Boolean)
@@ -377,16 +371,14 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         NodePath: Text;
     begin
-        //-MAG2.22 [352201]
         NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.CollectStore" + '/';
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Update"), Enabled);
         SetupTemplate(TempBlob, MagentoGenericSetupMgt.GetValueText(TempBlob, NodePath + "ElementName.Delete"), Enabled);
-        //+MAG2.22 [352201]
     end;
 
-    procedure "--- Template Element Setup"()
-    begin
-    end;
+    #endregion
+
+    #region Template Element Setup
 
     procedure AddItemDiscGroupCodeElement(var TempBlob: Codeunit "Temp Blob")
     var
@@ -398,7 +390,6 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
         TemplateCode: Code[20];
         LineNo: Integer;
     begin
-        //-MAG2.09 [295656]
         TemplateCode := MagentoGenericSetupMgt.GetValueText(TempBlob, "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.Item" + '/' + "ElementName.Update");
         if TemplateCode = '' then
             exit;
@@ -435,14 +426,12 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
         NpXmlElement2."Element Name" := 'item_disc_group';
         NpXmlElement2."Field No." := Item.FieldNo("Item Disc. Group");
         NpXmlElement2.Insert;
-        //+MAG2.09 [295656]
     end;
 
     local procedure DeleteNpXmlElement(NpXmlElement: Record "NPR NpXml Element")
     var
         NpXmlElement2: Record "NPR NpXml Element";
     begin
-        //-MAG2.09 [295656]
         NpXmlElement2.SetRange("Xml Template Code", NpXmlElement."Xml Template Code");
         NpXmlElement2.SetRange("Parent Line No.", NpXmlElement."Line No.");
         if NpXmlElement2.FindSet then
@@ -451,7 +440,6 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
             until NpXmlElement2.Next = 0;
 
         NpXmlElement.Delete(true);
-        //+MAG2.09 [295656]
     end;
 
     procedure SetItemElementEnabled(var TempBlob: Codeunit "Temp Blob"; NodePath: Text; CommentFilter: Text; Enabled: Boolean)
@@ -477,7 +465,6 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
         TemplateCode: Code[20];
     begin
-        //-MAG2.09 [295656]
         TemplateCode := MagentoGenericSetupMgt.GetValueText(TempBlob, "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.ItemStore" + '/' + "ElementName.Update");
         if TemplateCode = '' then
             exit;
@@ -503,7 +490,6 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
             end;
             NpXmlTemplateMgt.SetChildNpXmlElementsActive(NpXmlElement, Enabled);
         until NpXmlElement.Next = 0;
-        //+MAG2.09 [295656]
     end;
 
     procedure SetItemFilterValue(var TempBlob: Codeunit "Temp Blob"; ParentNodePath: Text; ParentCommentFilter: Text; NodePath: Text; CommentFilter: Text; FilterFieldNo: Integer; FilterValue: Text)
@@ -533,9 +519,9 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
         NpXmlTemplateMgt.SetNpXmlElementActive(TemplateCode, NodePath, CommentFilter, Enabled);
     end;
 
-    procedure "--- Enum"()
-    begin
-    end;
+    #endregion
+
+    #region Enum
 
     local procedure "ElementName.B2B"(): Text
     begin
@@ -644,23 +630,18 @@ codeunit 6151461 "NPR M2 NpXml Setup Mgt."
 
     procedure "ElementName.Ticket"(): Text
     begin
-        //-MAG2.02
         exit('ticket');
-        //+MAG2.02
     end;
 
     procedure "ElementName.Membership"(): Text
     begin
-        //-MAG2.02
         exit('membership');
-        //+MAG2.02
     end;
 
     procedure "ElementName.CollectStore"(): Text
     begin
-        //-MAG2.22 [352201]
         exit('collect_store');
-        //+MAG2.22 [352201]
     end;
-}
 
+    #endregion
+}

@@ -1,19 +1,5 @@
 codeunit 6151150 "NPR M2 Account WebService"
 {
-    // MAG2.20/TSA /20181210 CASE 320424 Initial Version
-    // MAG2.20/JAVA/20190205  CASE 320425 Transport NPR5.48 - 5 February 2019
-    // MAG2.21/TSA /20190306 CASE 320425 Changed response message when contact was not found
-    // MAG2.21/JAKUBV/20190402  CASE 320424-01 Transport NPR5.49 - 1 April 2019
-    // MAG2.21.01/TSA /20190426 CASE 350001 Added GetExtendedAccountDetails
-    // MAG2.21.01/TSA /20190506 CASE 353964 Refactored to not use try functions
-    // NPR5.51/TSA /20190724 CASE 362020 Adding actions for contact / mail group management
-    // MAG2.24/TSA /20191126 CASE 378812 Added ShopperRecognition service
-
-
-    trigger OnRun()
-    begin
-    end;
-
     procedure AuthenticateAccountPassword(var M2Authenticate: XMLport "NPR M2 Authenticate")
     var
         TmpOneTimePassword: Record "NPR M2 One Time Password" temporary;
@@ -250,8 +236,6 @@ codeunit 6151150 "NPR M2 Account WebService"
         TmpBillToCustomer: Record Customer temporary;
         TmpShipToAddress: Record "Ship-to Address" temporary;
     begin
-
-        //-NPR5.51 [350001]
         SelectLatestVersion;
 
         GetExtendedAccount.Import;
@@ -264,34 +248,18 @@ codeunit 6151150 "NPR M2 Account WebService"
             GetExtendedAccount.SetErrorResponse(GetLastErrorText());
 
         end;
-        //+NPR5.51 [350001]
-    end;
-
-    procedure ListAllMailGroups(var ListMailingGroups: XMLport "NPR M2 List Mailing Groups")
-    begin
-
-        //-NPR5.51 [362020]
-        // Implicit export
-        //+NPR5.51 [362020]
     end;
 
     procedure ListMailGroupsForAccount(ContactNo: Code[20]; var ListMailingGroups: XMLport "NPR M2 List Mailing Groups")
     begin
-
-        //-NPR5.51 [362020]
         SelectLatestVersion;
         ListMailingGroups.CreateListForContact(ContactNo);
-        // Implicit export
-
-        //+NPR5.51 [362020]
     end;
 
     procedure AddAccountToMailGroup(ContactNo: Code[20]; MailGroupCode: Code[10]; var ListMailingGroups: XMLport "NPR M2 List Mailing Groups")
     var
         ContactMailingGroup: Record "Contact Mailing Group";
     begin
-
-        //-NPR5.51 [362020]
         SelectLatestVersion;
 
         if (not ContactMailingGroup.Get(ContactNo, MailGroupCode)) then begin
@@ -301,17 +269,12 @@ codeunit 6151150 "NPR M2 Account WebService"
         end;
 
         ListMailingGroups.CreateListForContact(ContactNo);
-        // Implicit export
-
-        //+NPR5.51 [362020]
     end;
 
     procedure RemoveAccountFromMailGroup(ContactNo: Code[20]; MailGroupCode: Code[10]; var ListMailingGroups: XMLport "NPR M2 List Mailing Groups")
     var
         ContactMailingGroup: Record "Contact Mailing Group";
     begin
-
-        //-NPR5.51 [362020]
         SelectLatestVersion;
 
         if (ContactMailingGroup.Get(ContactNo, MailGroupCode)) then begin
@@ -319,9 +282,6 @@ codeunit 6151150 "NPR M2 Account WebService"
         end;
 
         ListMailingGroups.CreateListForContact(ContactNo);
-        // Implicit export
-
-        //+NPR5.51 [362020]
     end;
 
     procedure GetShopperRecognition(var ShopperRecognition: XMLport "NPR M2 Shopper Recognition")
@@ -329,8 +289,6 @@ codeunit 6151150 "NPR M2 Account WebService"
         TmpEFTShopperRecognition: Record "NPR EFT Shopper Recognition" temporary;
         EFTShopperRecognition: Codeunit "NPR EFT Shopper Recognition";
     begin
-
-        //-MAG2.24 [378812]
         SelectLatestVersion;
         ShopperRecognition.Import;
         ShopperRecognition.GetRequest(TmpEFTShopperRecognition);
@@ -342,11 +300,6 @@ codeunit 6151150 "NPR M2 Account WebService"
                     TmpEFTShopperRecognition."Integration Type", Format(TmpEFTShopperRecognition."Entity Type"), TmpEFTShopperRecognition."Entity Key"));
 
         ShopperRecognition.SetResponse(TmpEFTShopperRecognition);
-        //+MAG2.24 [378812]
-    end;
-
-    local procedure "--"()
-    begin
     end;
 
     local procedure DoAuthenticatePassword(var TmpOneTimePassword: Record "NPR M2 One Time Password" temporary; var TmpContact: Record Contact temporary): Boolean
@@ -447,9 +400,7 @@ codeunit 6151150 "NPR M2 Account WebService"
         exit(AccountManager.DeleteShiptoAddress(TmpAccount, TmpShiptoAddressRequest, ReasonText));
     end;
 
-    local procedure "--Testers"()
-    begin
-    end;
+    #region Testers
 
     local procedure TestAuthenticate(EMail: Text[80]; PasswordMD5: Text[40])
     var
@@ -594,5 +545,6 @@ codeunit 6151150 "NPR M2 Account WebService"
 
         Message(xmltext);
     end;
-}
 
+    #endregion
+}

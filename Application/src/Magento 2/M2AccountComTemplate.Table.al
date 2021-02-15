@@ -1,7 +1,5 @@
 table 6151152 "NPR M2 Account Com. Template"
 {
-    // NPR5.48/TSA /20181211 CASE 320425 Initial Version
-
     Caption = 'Account Com. Template';
     DataClassification = CustomerContent;
 
@@ -13,12 +11,10 @@ table 6151152 "NPR M2 Account Com. Template"
             Caption = 'Entry No.';
             DataClassification = CustomerContent;
         }
-        field(5; Type; Option)
+        field(5; Type; Enum "NPR M2 Acc. Com. Template Type")
         {
             Caption = 'Type';
             DataClassification = CustomerContent;
-            OptionCaption = ' ,Welcome,Password Reset';
-            OptionMembers = NA,WELCOME,PW_RESET;
         }
         field(10; "Company Name"; Text[100])
         {
@@ -63,9 +59,4 @@ table 6151152 "NPR M2 Account Com. Template"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

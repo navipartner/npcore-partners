@@ -46,8 +46,7 @@ codeunit 6151414 "NPR Magento Lookup SalesOrder"
         if not XmlDoc.SelectNodes('.//*[local-name()="sales_order"]', XmlNodeList) then
             exit(false);
 
-        for i := 1 to XmlNodeList.Count do begin
-            XmlNodeList.Get(i, Node);
+        foreach Node in XmlNodeList do begin
             if Node.AsXmlElement().Attributes().Get('order_no', OrderNoAttribute) then
                 OrderNo := OrderNoAttribute.Value;
             if (OrderNo <> '') and (StrLen(OrderNo) <= MaxStrLen(SalesHeader."NPR External Order No.")) then begin

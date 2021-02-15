@@ -1,9 +1,5 @@
 xmlport 6151156 "NPR M2 Update Account"
 {
-    // NPR5.49/TSA /20190328 CASE 320424 Initial Version
-    // NPR5.51/TSA /20190812 CASE 364644 Added Person section
-    // MAG2.23/TSA /20191015 CASE 373151 Move Person to address, removed CompanyName, Ean added Name, PricesIncludeVat, Contact
-
     Caption = 'Update Account';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -217,18 +213,6 @@ xmlport 6151156 "NPR M2 Update Account"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     var
         StartTime: Time;
 
@@ -277,4 +261,3 @@ xmlport 6151156 "NPR M2 Update Account"
         ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime), 0, 9);
     end;
 }
-

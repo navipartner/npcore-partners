@@ -1,11 +1,5 @@
 xmlport 6151147 "NPR M2 Item Availab. By Period"
 {
-    // NPR5.49/TSA /20190305 CASE 345373 Initial Version
-    // NPR5.50/TSA /20190528 CASE 345373 Fixed Location Code Filter
-    // MAG2.25/TSA /20200303 CASE 380946 Changed request params to lessen data set, increase performance
-    // MAG2.26/TSA /20200428 CASE 401839 Added PlannedReleases and ProjectedInventory for working with reservations
-    // MAG2.26/TSA /20200430 CASE 402599 Added EstimateDateFromVendor, FromVendorCode, EstimatedDateFromLocation, FromLocationCode to the list section as well
-
     Caption = 'Item Availability By Period';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -179,7 +173,7 @@ xmlport 6151147 "NPR M2 Item Availab. By Period"
 
                                         trigger OnBeforePassVariable()
                                         begin
-                                            TxtPlannedReleasesStart := Format(PlannedOrderReleases, 0, 9); //-+MAG2.26 [401839]
+                                            TxtPlannedReleasesStart := Format(PlannedOrderReleases, 0, 9);
                                         end;
                                     }
                                     textattribute(txtplannedreceiptsstart)
@@ -188,7 +182,7 @@ xmlport 6151147 "NPR M2 Item Availab. By Period"
 
                                         trigger OnBeforePassVariable()
                                         begin
-                                            TxtPlannedReceiptsStart := Format(PlannedOrderRcpt, 0, 9); //-+MAG2.26 [401839]
+                                            TxtPlannedReceiptsStart := Format(PlannedOrderRcpt, 0, 9);
                                         end;
                                     }
                                     textattribute(txtavailableinventorystart)
@@ -215,7 +209,7 @@ xmlport 6151147 "NPR M2 Item Availab. By Period"
 
                                         trigger OnBeforePassVariable()
                                         begin
-                                            TxtProjectedInventoryStart := Format(ProjAvailableBalance, 0, 9); //-+MAG2.26 [401839]
+                                            TxtProjectedInventoryStart := Format(ProjAvailableBalance, 0, 9);
                                         end;
                                     }
                                     textattribute(txtinventorystart)
@@ -304,7 +298,6 @@ xmlport 6151147 "NPR M2 Item Availab. By Period"
                                           QtyAvailable);
 
 
-                                        //-MAG2.25 [380946]
                                         M2ServiceLibrary.GetEstimatedDeliveryDate(
                                           TmpItemResponse."Item No.",
                                           CustomerNumberIn,
@@ -313,7 +306,6 @@ xmlport 6151147 "NPR M2 Item Availab. By Period"
                                           FromVendorCodeStart,
                                           EstimatedDateFromLocationStart,
                                           FromLocationCodeStart);
-                                        //+MAG2.25 [380946]
                                     end;
                                 }
                             }
@@ -358,7 +350,7 @@ xmlport 6151147 "NPR M2 Item Availab. By Period"
 
                                         trigger OnBeforePassVariable()
                                         begin
-                                            TxtPlannedReleases := Format(PlannedOrderReleases, 0, 9); //-+MAG2.26 [401839]
+                                            TxtPlannedReleases := Format(PlannedOrderReleases, 0, 9);
                                         end;
                                     }
                                     textattribute(txtplannedreceipts)
@@ -367,7 +359,7 @@ xmlport 6151147 "NPR M2 Item Availab. By Period"
 
                                         trigger OnBeforePassVariable()
                                         begin
-                                            TxtPlannedReceipts := Format(PlannedOrderRcpt, 0, 9); //-+MAG2.26 [401839]
+                                            TxtPlannedReceipts := Format(PlannedOrderRcpt, 0, 9);
                                         end;
                                     }
                                     textattribute(txtavailableinventory)
@@ -394,7 +386,7 @@ xmlport 6151147 "NPR M2 Item Availab. By Period"
 
                                         trigger OnBeforePassVariable()
                                         begin
-                                            TxtProjectedInventory := Format(ProjAvailableBalance, 0, 9); //-+MAG2.26 [401839]
+                                            TxtProjectedInventory := Format(ProjAvailableBalance, 0, 9);
                                         end;
                                     }
                                     textattribute(txtinventory)
@@ -480,7 +472,6 @@ xmlport 6151147 "NPR M2 Item Availab. By Period"
                                           ExpectedInventory,
                                           QtyAvailable);
 
-                                        //-MAG2.26 [402599]
                                         M2ServiceLibrary.GetEstimatedDeliveryDate(
                                           TmpItemResponse."Item No.",
                                           CustomerNumberIn,
@@ -489,7 +480,6 @@ xmlport 6151147 "NPR M2 Item Availab. By Period"
                                           FromVendorCode,
                                           EstimatedDateFromLocation,
                                           FromLocationCode);
-                                        //+MAG2.26 [402599]
                                     end;
                                 }
                             }
@@ -506,18 +496,6 @@ xmlport 6151147 "NPR M2 Item Availab. By Period"
                     }
                 }
             }
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 
@@ -553,14 +531,11 @@ xmlport 6151147 "NPR M2 Item Availab. By Period"
         PeriodStart: Date;
         PeriodEnd: Date;
     begin
-
-        //-MAG2.25 [380946]
         if (CustomerNumberIn <> '') then
             if (Customer.Get(CustomerNumberIn)) then
                 if (Customer."Location Code" <> '') then
                     if (LocationCodeIn = '') then
                         LocationCodeIn := Customer."Location Code";
-        //+MAG2.25 [380946]
 
         TmpItemRequest.Reset;
         TmpItemRequest.FindSet();
@@ -584,10 +559,8 @@ xmlport 6151147 "NPR M2 Item Availab. By Period"
         InvalidDate := (TmpDateRequest."Period Start" = 0D) or (TmpDateRequest."Period End" = 0D);
         if (not InvalidDate) then begin
 
-            //-MAG2.25 [380946]
             ItemAvailabilityByPeriodStart.SetFilter("Period Start", '%1..%1', TmpDateRequest."Period Start");
             ItemAvailabilityByPeriodStart.SetFilter("Period Type", '=%1', TmpDateRequest."Period Type"::Date);
-            //+MAG2.25 [380946]
 
             // Align to first & last date within period
             case TmpDateRequest."Period Type" of
@@ -667,9 +640,4 @@ xmlport 6151147 "NPR M2 Item Availab. By Period"
         if (StartTime <> 0T) then
             ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
     end;
-
-    local procedure SetErrorResponse()
-    begin
-    end;
 }
-

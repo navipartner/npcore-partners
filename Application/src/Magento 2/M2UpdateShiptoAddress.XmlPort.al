@@ -162,18 +162,6 @@ xmlport 6151155 "NPR M2 Update Shipto Address"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     var
         StartTime: Time;
 
@@ -220,4 +208,3 @@ xmlport 6151155 "NPR M2 Update Shipto Address"
         ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime), 0, 9);
     end;
 }
-
