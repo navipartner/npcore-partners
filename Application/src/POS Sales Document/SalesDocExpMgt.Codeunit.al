@@ -1199,7 +1199,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
     var
         CustCheckCrLimit: Codeunit "Cust-Check Cr. Limit";
     begin
-        if not CustCheckCrLimit.SalesHeaderCheck(SalesHeader) then
+        if CustCheckCrLimit.SalesHeaderCheck(SalesHeader) then
             error(CUSTOMER_CREDIT_CHECK_FAILED);
     end;
 
