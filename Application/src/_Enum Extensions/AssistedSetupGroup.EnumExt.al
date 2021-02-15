@@ -2,6 +2,6 @@
 {
     value(6014400; "NP Retail")
     {
-        Caption = 'Set up NP Retail';
+        Caption = 'NP Retail';
     }
 }
