@@ -1,18 +1,7 @@
 codeunit 6150865 "NPR POS Action: Cust. Select"
 {
-    // NPR5.50/MMV /20181105 CASE 300557 Created object
-    // NPR5.53/ALPO/20200203 CASE 388777 Sales View status bar was not updated after customer had been selected or removed
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'Attach or remove customer from POS sale.';
-        ERRDOCTYPE: Label 'Wrong Document Type. Document Type is set to %1. It must be one of %2, %3, %4 or %5';
-        ERRPARSED: Label 'SalesDocumentToPOS and SalesDocumentAmountToPOS can not be used simultaneously. This is an error in parameter setting on menu button for action %1.';
-        ERRPARSEDCOMB: Label 'Import of amount is only supported for Document Type Order. This is an error in parameter setting on menu button for action %1.';
         CAPTION_OPERATION: Label 'Operation';
         CAPTION_TABLEVIEW: Label 'Customer Table View';
         CAPTION_CUSTOMERPAGE: Label 'Customer Lookup Page';
@@ -28,7 +17,7 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.0');
+        exit('1.1');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -47,6 +36,7 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
                 RegisterOptionParameter('Operation', 'Attach,Remove', 'Attach');
                 RegisterTextParameter('CustomerTableView', '');
                 RegisterIntegerParameter('CustomerLookupPage', 0);
+                RegisterTextParameter('customerNo', '');
             end;
         end;
     end;
@@ -58,6 +48,7 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
         JSON: Codeunit "NPR POS JSON Management";
         CustomerTableView: Text;
         CustomerLookupPage: Integer;
+        SpecificCustomerNo: Text;
     begin
         if not Action.IsThisAction(ActionCode) then
             exit;
@@ -68,9 +59,11 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
         CustomerTableView := JSON.GetStringParameter('CustomerTableView', true);
         CustomerLookupPage := JSON.GetIntegerParameter('CustomerLookupPage', true);
         Operation := JSON.GetIntegerParameter('Operation', true);
+        SpecificCustomerNo := JSON.GetStringParameter('customerNo', true);
+
         case Operation of
             Operation::Attach:
-                AttachCustomer(POSSession, CustomerTableView, CustomerLookupPage);
+                AttachCustomer(POSSession, CustomerTableView, CustomerLookupPage, SpecificCustomerNo);
             Operation::Remove:
                 RemoveCustomer(POSSession);
         end;
@@ -78,7 +71,7 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
         POSSession.RequestRefreshData();
     end;
 
-    procedure AttachCustomer(var POSSession: Codeunit "NPR POS Session"; CustomerTableView: Text; CustomerLookupPage: Integer)
+    procedure AttachCustomer(var POSSession: Codeunit "NPR POS Session"; CustomerTableView: Text; CustomerLookupPage: Integer; SpecificCustomerNo: Text)
     var
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR Sale POS";
@@ -87,16 +80,20 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
-        if CustomerTableView <> '' then
-            Customer.SetView(CustomerTableView);
+        if SpecificCustomerNo = '' then begin
+            if CustomerTableView <> '' then
+                Customer.SetView(CustomerTableView);
 
-        if PAGE.RunModal(CustomerLookupPage, Customer) <> ACTION::LookupOK then
-            exit;
+            if PAGE.RunModal(CustomerLookupPage, Customer) <> ACTION::LookupOK then
+                exit;
+        end else begin
+            Customer."No." := SpecificCustomerNo;
+        end;
 
         SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
         SalePOS.Validate("Customer No.", Customer."No.");
         SalePOS.Modify(true);
-        POSSale.SetModified();  //NPR5.53 [388777]
+        POSSale.SetModified();
         POSSale.RefreshCurrent();
     end;
 
@@ -111,7 +108,7 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
         SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
         SalePOS.Validate("Customer No.", '');
         SalePOS.Modify(true);
-        POSSale.SetModified();  //NPR5.53 [388777]
+        POSSale.SetModified();
         POSSale.RefreshCurrent();
     end;
 
@@ -209,6 +206,55 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
                         Customer.SetView(POSParameterValue.Value);
                 end;
         end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6060105, 'DiscoverEanBoxEvents', '', true, true)]
+    local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
+    var
+        Customer: Record Customer;
+        CustLedgerEntry: Record "Cust. Ledger Entry";
+    begin
+        if not EanBoxEvent.Get(EventCodeCustNo()) then begin
+            EanBoxEvent.Init;
+            EanBoxEvent.Code := EventCodeCustNo();
+            EanBoxEvent."Module Name" := Customer.TableCaption;
+            EanBoxEvent.Description := CopyStr(CustLedgerEntry.FieldCaption("Customer No."), 1, MaxStrLen(EanBoxEvent.Description));
+            EanBoxEvent."Action Code" := ActionCode();
+            EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
+            EanBoxEvent."Event Codeunit" := CODEUNIT::"NPR POS Action: Cust. Select";
+            EanBoxEvent.Insert(true);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6060105, 'OnInitEanBoxParameters', '', true, true)]
+    local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR Ean Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
+    begin
+        case EanBoxEvent.Code of
+            EventCodeCustNo():
+                begin
+                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'customerNo', true, '');
+                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'Operation', false, 'Attach');
+                end;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6060107, 'SetEanBoxEventInScope', '', true, true)]
+    local procedure SetEanBoxEventInScopeCustNo(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
+    var
+        Customer: Record Customer;
+    begin
+        if EanBoxSetupEvent."Event Code" <> EventCodeCustNo() then
+            exit;
+        if StrLen(EanBoxValue) > MaxStrLen(Customer."No.") then
+            exit;
+
+        if Customer.Get(UpperCase(EanBoxValue)) then
+            InScope := true;
+    end;
+
+    local procedure EventCodeCustNo(): Code[20]
+    begin
+        exit('CUSTOMERNO');
     end;
 }
 
