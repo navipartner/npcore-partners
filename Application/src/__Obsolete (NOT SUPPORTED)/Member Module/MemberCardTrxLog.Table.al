@@ -2,10 +2,9 @@ table 6059773 "NPR Member Card Trx Log"
 {
 
     Caption = 'Point Card - Transaction Log';
-    DrillDownPageID = "NPR Member Card Trx Logs";
-    LookupPageID = "NPR Member Card Trx Logs";
     DataClassification = CustomerContent;
-
+    ObsoleteReason = 'Not used.';
+    ObsoleteState = Removed;
     fields
     {
         field(1; "Transaction No."; BigInteger)
@@ -17,7 +16,6 @@ table 6059773 "NPR Member Card Trx Log"
         field(2; "Card Code"; Code[20])
         {
             Caption = 'Card Code';
-            TableRelation = "NPR Member Card Issued Cards";
             DataClassification = CustomerContent;
         }
         field(3; "Item No."; Code[20])
@@ -99,24 +97,5 @@ table 6059773 "NPR Member Card Trx Log"
     {
     }
 
-    trigger OnInsert()
-    var
-        PointCardIssuedCards: Record "NPR Member Card Issued Cards";
-    begin
-        if "Posting Date" = 0D then
-            Validate("Posting Date", WorkDate);
-    end;
-
-    trigger OnModify()
-    begin
-
-        //RecRef.GETTABLE(Rec);
-        //xRecRef.GETTABLE(xRec);
-        //Changelog.OnModify(RecRef,xRecRef);
-
-    end;
-
-    var
-        TxtIllegalBalance: Label 'Balance for card %1 becomes negative. Aborting.';
 }
 
