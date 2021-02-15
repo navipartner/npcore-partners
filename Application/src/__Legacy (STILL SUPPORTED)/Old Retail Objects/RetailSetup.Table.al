@@ -447,34 +447,52 @@ table 6014400 "NPR Retail Setup"
             Caption = 'Credit Card Extension';
             DataClassification = CustomerContent;
             Description = 'Parametre til dankortprogram';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(999; "Credit Card Program"; Text[50])
         {
             Caption = 'Credit Card Program';
             DataClassification = CustomerContent;
             Description = 'Lokation af dankortprogram';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(1000; "Credit Card Path"; Text[50])
         {
             Caption = 'Credit Card Path';
             DataClassification = CustomerContent;
             Description = 'Sti til dankortprogram';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(1001; "Create New Customer"; Boolean)
         {
             Caption = 'Create New Customer';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(1015; "Company No."; Code[20])
         {
             Caption = 'Company No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(1016; "Use deposit in Retail Doc"; Boolean)
         {
             Caption = 'Use Deposit In Retail Doc';
             DataClassification = CustomerContent;
             Description = 'Benyt depositum ved reservation?';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(1019; "Popup Gift Voucher Quantity"; Boolean)
         {
@@ -492,6 +510,9 @@ table 6014400 "NPR Retail Setup"
             Description = 'Angiver om fakturanummer eller debitornummer bruges i fik.';
             OptionCaption = 'Invoice,Customer';
             OptionMembers = Invoice,Customer;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(3009; "Item Group on Creation"; Boolean)
         {

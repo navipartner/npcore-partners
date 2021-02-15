@@ -14,15 +14,7 @@ page 6014424 "NPR Retail Setup"
             group(Generelt)
             {
                 Caption = 'General';
-                group("Company Infomation")
-                {
-                    Caption = 'Company Information';
-                    field("Company No."; "Company No.")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Company No. field';
-                    }
-                }
+
                 group(Security)
                 {
                     Caption = 'Security';
@@ -259,11 +251,6 @@ page 6014424 "NPR Retail Setup"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Invoice Printout Option field';
                     }
-                    field("Base for FIK-71"; "Base for FIK-71")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Base Of FIK-71 field';
-                    }
                     field("FIK No."; "FIK No.")
                     {
                         ApplicationArea = All;
@@ -389,11 +376,6 @@ page 6014424 "NPR Retail Setup"
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Warning - Sale With No Lines field';
-                    }
-                    field("Use deposit in Retail Doc"; "Use deposit in Retail Doc")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Use Deposit In Retail Doc field';
                     }
                     field("Customer Credit Level Warning"; "Customer Credit Level Warning")
                     {
@@ -560,11 +542,6 @@ page 6014424 "NPR Retail Setup"
                 group("Security 2")
                 {
                     Caption = 'Security';
-                    field("Create New Customer"; "Create New Customer")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Create New Customer field';
-                    }
                     field("Allow Customer Cash Sale"; "Allow Customer Cash Sale")
                     {
                         ApplicationArea = All;
