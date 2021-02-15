@@ -1,7 +1,5 @@
 xmlport 6184507 "NPR M2 Shopper Recognition"
 {
-    // MAG2.24/TSA /20191126 CASE 378812 Initial Version
-
     Caption = 'M2 Shopper Recognition';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -124,18 +122,6 @@ xmlport 6184507 "NPR M2 Shopper Recognition"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     trigger OnInitXmlPort()
     begin
         StartTime := Time;
@@ -180,4 +166,3 @@ xmlport 6184507 "NPR M2 Shopper Recognition"
         ResponseMessage := ResponseMessageIn;
     end;
 }
-

@@ -1,17 +1,5 @@
 xmlport 6151152 "NPR M2 Get Account"
 {
-    // NPR5.49/TSA /20181213 CASE 320424 Initial Version
-    // NPR5.49/JAKUBV/20190402  CASE 320425-01 Transport NPR5.49 - 1 April 2019
-    // MAG2.20/TSA /20190411 CASE 320424 City returned TmpContactResponse::Address 2 - fixed TmpContactResponse::City
-    // MAG2.20/TSA /20190423 CASE 345373 Adding Balance LCY and Credit Limit
-    // MAG2.20/MHA /20190501  CASE 320423 Mapped <CustomerGroup>
-    // MAG2.22/TSA /20190531 CASE 349994 Added Terms subsection for sell-to and bill-to
-    // NPR5.51/TSA /20190812 CASE 364644 Added Person section
-    // NPR5.51/JAKUBV/20190904  CASE 364282 Transport NPR5.51 - 3 September 2019
-    // MAG2.23/TSA /20191015 CASE 373151 Move Person to address, removed CompanyName, added Name, PricesIncludeVat, Contact
-    // MAG2.24/TSA /20191119 CASE 372304 Added Membership section
-    // NPR5.55/TJ  /20200707 CASE 402814 Postcode node in Shipto is now properly pointing to "Post Code" field
-
     Caption = 'Get Account';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -513,20 +501,7 @@ xmlport 6151152 "NPR M2 Get Account"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     var
-        NPRDocLocalizationProxy: Codeunit "NPR Doc. Localization Proxy";
         StartTime: Time;
 
     procedure GetRequest() ContactNumber: Code[20]
@@ -546,14 +521,12 @@ xmlport 6151152 "NPR M2 Get Account"
         Contact: Record Contact;
         MembershipRole: Record "NPR MM Membership Role";
     begin
-
         ResponseMessage := 'Contact Id is unknown.';
 
         if (TmpContactIn.FindFirst()) then begin
             TmpContactResponse.TransferFields(TmpContactIn, true);
             TmpContactResponse.Insert();
 
-            //-MAG2.24 [372304]
             if (not MembershipRole.SetCurrentKey("Contact No.")) then;
             MembershipRole.SetFilter("Contact No.", '=%1', TmpContactIn."No.");
             MembershipRole.SetFilter(Blocked, '=%1', false);
@@ -562,7 +535,6 @@ xmlport 6151152 "NPR M2 Get Account"
                 TmpMembershipRoleResponse.TransferFields(MembershipRole, true);
                 TmpMembershipRoleResponse.Insert();
             end;
-            //+MAG2.24 [372304]
 
             if (TmpSellToCustomerIn.FindFirst()) then begin
                 TmpSellToCustomer.TransferFields(TmpSellToCustomerIn, true);
@@ -581,7 +553,6 @@ xmlport 6151152 "NPR M2 Get Account"
                 until (TmpShipToAddressIn.Next() = 0);
             end;
 
-            //-MAG2.23 [373151]
             if (TmpSellToCustomer."No." <> '') then begin
                 ContactBusinessRelation.SetFilter("Link to Table", '=%1', ContactBusinessRelation."Link to Table"::Customer);
                 ContactBusinessRelation.SetFilter("No.", '=%1', TmpSellToCustomer."No.");
@@ -603,7 +574,6 @@ xmlport 6151152 "NPR M2 Get Account"
                     end;
                 end;
             end;
-            //+MAG2.23 [373151]
 
             ResponseCode := 'OK';
             ResponseMessage := ''; //STRSUBSTNO ('%1 %2', TmpBillToCustomer.COUNT, TmpSellToCustomer.count);
@@ -619,15 +589,4 @@ xmlport 6151152 "NPR M2 Get Account"
         ResponseCode := 'ERROR';
         ResponseMessage := ReasonText;
     end;
-
-    [TryFunction]
-    local procedure TryGetEanNo(Customer: Record Customer temporary; var EanNo: Text)
-    var
-        TmpEan: Variant;
-    begin
-
-        //NPRDocLocalizationProxy.T18_GetFieldValue (Customer, 'Ean No.', TmpEan);
-        EanNo := 'NOT IN W1';
-    end;
 }
-

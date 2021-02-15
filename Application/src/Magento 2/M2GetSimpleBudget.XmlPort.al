@@ -1,7 +1,5 @@
 xmlport 6151143 "NPR M2 Get Simple Budget"
 {
-    // MAG2.24/TSA /20191022 CASE 354183 Initial Version
-
     Caption = 'Get Simple Budget';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -185,18 +183,6 @@ xmlport 6151143 "NPR M2 Get Simple Budget"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     var
         StartTime: Time;
 
@@ -238,7 +224,6 @@ xmlport 6151143 "NPR M2 Get Simple Budget"
     var
         Customer: Record Customer;
     begin
-
         TmpBillAgingBandBufferY2D.DeleteAll;
         TmpBillAgingBandBufferCQ.DeleteAll;
         TmpBillAgingBandBufferCM.DeleteAll;
@@ -413,4 +398,3 @@ xmlport 6151143 "NPR M2 Get Simple Budget"
         exit(0);
     end;
 }
-

@@ -1,7 +1,5 @@
 table 6151145 "NPR M2 Price Calc. Buffer"
 {
-    // NPR5.48/TSA /20181207 CASE 320426 First Version
-
     Caption = 'Sales Price';
     DataClassification = CustomerContent;
     LookupPageID = "Sales Prices";
@@ -70,12 +68,10 @@ table 6151145 "NPR M2 Price Calc. Buffer"
             DataClassification = CustomerContent;
             TableRelation = "VAT Product Posting Group";
         }
-        field(13; "Source Type"; Option)
+        field(13; "Source Type"; Enum "NPR M2 Price Calc. Buffer Type")
         {
             Caption = 'Sales Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Unit Price,Customer,Customer Price Group,All Customers,Campaign,Item Discount,Item Discount Group,Customer Discount Group';
-            OptionMembers = "Unit Price",Customer,"Customer Price Group","All Customers",Campaign,"Item Discount","Item Discount Group","Customer Discount Group";
         }
         field(14; "Minimum Quantity"; Decimal)
         {
@@ -167,10 +163,6 @@ table 6151145 "NPR M2 Price Calc. Buffer"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     var
         CustPriceGr: Record "Customer Price Group";
         Text000: Label '%1 cannot be after %2';
@@ -179,9 +171,4 @@ table 6151145 "NPR M2 Price Calc. Buffer"
         Campaign: Record Campaign;
         Item: Record Item;
         Text002: Label 'If Sales Type = %1, then you can only change Starting Date and Ending Date from the Campaign Card.';
-
-    local procedure UpdateValuesFromItem()
-    begin
-    end;
 }
-

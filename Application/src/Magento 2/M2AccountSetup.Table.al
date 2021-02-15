@@ -1,7 +1,5 @@
 table 6151150 "NPR M2 Account Setup"
 {
-    // NPR5.48/TSA /20181211 CASE 320425 Initial Version
-
     Caption = 'Account Setup';
     DataClassification = CustomerContent;
 
@@ -43,9 +41,4 @@ table 6151150 "NPR M2 Account Setup"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

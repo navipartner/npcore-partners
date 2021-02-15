@@ -45,7 +45,7 @@ codeunit 6151419 "NPR Magento Picture Mgt."
         MagentoSetupEventSub: Record "NPR Magento Setup Event Sub.";
         MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
     begin
-        if not MagentoSetupMgt.IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"DragDrop Picture".AsInteger(), CurrCodeunitId(), 'UploadMagentoPicture') then
+        if not MagentoSetupMgt.IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"DragDrop Picture", CurrCodeunitId(), 'UploadMagentoPicture') then
             exit;
 
         Handled := true;

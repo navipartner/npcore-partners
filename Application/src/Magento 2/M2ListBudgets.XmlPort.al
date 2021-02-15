@@ -1,7 +1,5 @@
 xmlport 6151140 "NPR M2 List Budgets"
 {
-    // NPR5.50/JAKUBV/20190603  CASE 353714 Transport NPR5.50 - 3 June 2019
-
     Caption = 'List Budgets';
     Direction = Export;
     Encoding = UTF8;
@@ -96,17 +94,4 @@ xmlport 6151140 "NPR M2 List Budgets"
             }
         }
     }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
 }
-

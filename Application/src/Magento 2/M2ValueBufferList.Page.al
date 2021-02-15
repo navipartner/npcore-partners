@@ -1,7 +1,5 @@
 page 6151486 "NPR M2 Value Buffer List"
 {
-    // MAG2.20/MHA /20190425  CASE 320423 Object created - Buffer used with M2 GET Apis
-
     Caption = 'M2 Values';
     DataCaptionFields = Value;
     Editable = false;
@@ -19,19 +17,19 @@ page 6151486 "NPR M2 Value Buffer List"
         {
             repeater(Group)
             {
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = All;
                     Visible = ShowValue;
                     ToolTip = 'Specifies the value of the Value field';
                 }
-                field("Label"; Label)
+                field("Label"; Rec.Label)
                 {
                     ApplicationArea = All;
                     Visible = ShowLabel;
                     ToolTip = 'Specifies the value of the Label field';
                 }
-                field(Position; Position)
+                field(Position; Rec.Position)
                 {
                     ApplicationArea = All;
                     Visible = ShowPosition;
@@ -39,10 +37,6 @@ page 6151486 "NPR M2 Value Buffer List"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 
     var
@@ -80,4 +74,3 @@ page 6151486 "NPR M2 Value Buffer List"
         Rec.Copy(M2ValueBuffer2, true);
     end;
 }
-

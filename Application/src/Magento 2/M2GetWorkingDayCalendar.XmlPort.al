@@ -1,7 +1,5 @@
 xmlport 6151137 "NPR M2 Get WorkingDay Calendar"
 {
-    // MAG2.25/TSA /20200214 CASE 349999 Initial Version
-
     Caption = 'Get WorkingDay Calendar';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
@@ -92,18 +90,6 @@ xmlport 6151137 "NPR M2 Get WorkingDay Calendar"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     procedure PrepareResponse()
     var
         CompanyInformation: Record "Company Information";
@@ -134,4 +120,3 @@ xmlport 6151137 "NPR M2 Get WorkingDay Calendar"
         ResponseMessage := '';
     end;
 }
-

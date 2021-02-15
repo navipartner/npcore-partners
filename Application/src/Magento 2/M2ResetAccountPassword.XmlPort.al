@@ -1,7 +1,5 @@
 xmlport 6151151 "NPR M2 Reset Account Password"
 {
-    // NPR5.48/TSA /20181211 CASE 320425 Initial Version
-
     Caption = 'Reset Account Password';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -54,18 +52,6 @@ xmlport 6151151 "NPR M2 Reset Account Password"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     trigger OnInitXmlPort()
     begin
         RequestEntryCount := 0;
@@ -106,4 +92,3 @@ xmlport 6151151 "NPR M2 Reset Account Password"
         ResponseMessage := ReasonText;
     end;
 }
-

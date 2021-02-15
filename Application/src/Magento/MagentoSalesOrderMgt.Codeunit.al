@@ -44,8 +44,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
 
         if not XmlElement.SelectNodes('sales_order', XNodeList) then
             exit;
-        for i := 1 to XNodeList.Count do begin
-            XNodeList.Get(i, XNode);
+        foreach XNode in XNodeList do begin
             ImportSalesOrder(XNode.AsXmlElement());
         end;
     end;
@@ -176,8 +175,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         i: Integer;
     begin
         XmlElement.SelectNodes('comment_line', XNodeList);
-        for i := 1 to XNodeList.Count do begin
-            XNodeList.Get(i, XNode);
+        foreach XNode in XNodeList do begin
             InsertCommentLine(XNode.AsXmlElement(), SalesHeader);
         end;
     end;
@@ -438,8 +436,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         if XmlElement.SelectSingleNode('payments', XNode) then begin
             XNode.SelectNodes('payment_method', XNodeList);
             LineNo := 0;
-            for i := 1 to XNodeList.Count do begin
-                XNodeList.Get(i, XNode);
+            foreach XNode in XNodeList do begin
                 case LowerCase(NpXmlDomMgt.GetXmlAttributeText(XNode, 'type', true)) of
                     'payment_gateway', '':
                         InsertPaymentLinePaymentMethod(XNode.AsXmlElement(), SalesHeader, LineNo);
@@ -575,8 +572,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         end;
 
         if XmlElement.SelectNodes('payments', XNodeList) then begin
-            for i := 1 to XNodeList.Count do begin
-                XNodeList.Get(i, XNode);
+            foreach XNode in XNodeList do begin
                 XmlElement2 := XNode.AsXmlElement();
                 if (LowerCase(NpXmlDomMgt.GetXmlAttributeText(XmlElement2, 'type', true)) = 'payment_gateway')
                 and (SalesHeader."Payment Method Code" = '')
@@ -619,16 +615,14 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
 
         if XmlElement.SelectSingleNode('sales_order_lines', XNode) then begin
             XNode.SelectNodes('sales_order_line', XNodeList);
-            for i := 1 to XNodeList.Count do begin
-                XNodeList.Get(i, XNode);
+            foreach XNode in XNodeList do begin
                 InsertSalesLine(XNode.AsXmlElement(), SalesHeader, LineNo);
             end;
         end;
 
         if XmlElement.SelectSingleNode('payments', XNode) then begin
             XNode.SelectNodes('payment_method', XNodeList);
-            for i := 1 to XNodeList.Count do begin
-                XNodeList.Get(i, XNode);
+            foreach XNode in XNodeList do begin
                 InsertSalesLinePaymentFee(XNode.AsXmlElement(), SalesHeader, LineNo);
             end;
         end;
