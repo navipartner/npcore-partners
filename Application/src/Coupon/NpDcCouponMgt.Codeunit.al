@@ -33,7 +33,7 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
             NpDcExtCouponSalesLine.DeleteAll;
     end;
 
-    //--- Issue Coupon ---
+    #region Issue Coupon
 
     procedure IssueCoupons(CouponType: Record "NPR NpDc Coupon Type")
     var
@@ -58,7 +58,8 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         exit(CouponEntry.FindFirst);
     end;
 
-    //--- Validate Coupon ---
+    #endregion Issue Coupon
+    #region Validate Coupon
 
     procedure ValidateCoupon(POSSession: Codeunit "NPR POS Session"; ReferenceNo: Text; var Coupon: Record "NPR NpDc Coupon")
     var
@@ -87,7 +88,8 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         NpDcModuleValidateDefault.ValidateCoupon(SalePOS, Coupon);
     end;
 
-    //--- Apply Discount ---
+    #endregion Validate Coupon
+    #region Apply Discount
 
     procedure ApplyDiscount(SalePOS: Record "NPR Sale POS")
     var
@@ -228,7 +230,8 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         SaleLinePOSCoupon.ModifyAll("Discount Amount", 0);
     end;
 
-    //--- Archivation ---
+    #endregion Apply Discount
+    #region Archivation
 
     local procedure ApplyEntry(var CouponEntry: Record "NPR NpDc Coupon Entry")
     var
@@ -675,7 +678,8 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         ArchCouponEntry.Insert;
     end;
 
-    //--- Pos Functionality ---
+    #endregion Archivation
+    #region Pos Functionality
 
     local procedure ActionCode(): Text
     begin
@@ -687,7 +691,7 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         exit('1.0');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, true)]
     local procedure OnDiscoverActions(var Sender: Record "NPR POS Action")
     var
         FunctionOptionString: Text;
@@ -715,14 +719,14 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         Sender.RegisterTextParameter('ReferenceNo', '');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
         Captions.AddActionCaption(ActionCode, 'ScanCouponPrompt', Text001);
         Captions.AddActionCaption(ActionCode, 'CouponTitle', Text002);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', true, true)]
     local procedure OnScanCoupon("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
@@ -738,7 +742,7 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         ScanCoupon(POSSession, CouponReferenceNo);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014406, 'OnBeforeDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Sale Line POS", 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeletePOSSaleLine(var Rec: Record "NPR Sale Line POS"; RunTrigger: Boolean)
     var
         Coupon: Record "NPR NpDc Coupon";
@@ -780,7 +784,7 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         if (Rec.Find()) then;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014406, 'OnAfterDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Sale Line POS", 'OnAfterDeleteEvent', '', true, true)]
     local procedure OnAfterDeletePOSSaleLine(var Rec: Record "NPR Sale Line POS"; RunTrigger: Boolean)
     var
         SalePOS: Record "NPR Sale POS";
@@ -845,9 +849,10 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         POSSession.RequestRefreshData();
     end;
 
-    //--- Sale Document Functionality ---
+    #endregion Pos Functionality
+    #region Sale Document Functionality
 
-    [EventSubscriber(ObjectType::Table, 36, 'OnBeforeDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeleteSalesHeader(var Rec: Record "Sales Header"; RunTrigger: Boolean)
     var
         Coupon: Record "NPR NpDc Coupon";
@@ -866,19 +871,16 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         NpDcExtCouponSalesLine.DeleteAll;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 80, 'OnBeforePostCommitSalesDoc', '', true, true)]
-    local procedure OnBeforePostCommitSalesDoc(var SalesHeader: Record "Sales Header"; PreviewMode: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesLines', '', true, false)]
+    local procedure OnAfterPostSalesLines(var SalesHeader: Record "Sales Header")
     begin
-        if PreviewMode then
-            exit;
-
         if not SalesHeader.Invoice then
             exit;
 
         PostExtCouponReservations(SalesHeader);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 80, 'OnAfterPostSalesDoc', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', true, true)]
     local procedure OnAfterPostSalesDoc(var SalesHeader: Record "Sales Header"; SalesInvHdrNo: Code[20]; SalesCrMemoHdrNo: Code[20])
     begin
         if not SalesHeader.Invoice then
@@ -887,9 +889,10 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         UpdatePostedDocInfo(SalesHeader, SalesInvHdrNo, SalesCrMemoHdrNo);
     end;
 
-    //--- Ean Box Event Handling ---
+    #endregion Sale Document Functionality
+    #region Ean Box Event Handling
 
-    [EventSubscriber(ObjectType::Codeunit, 6060105, 'DiscoverEanBoxEvents', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Ean Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
     local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
     var
         NpDcCoupon: Record "NPR NpDc Coupon";
@@ -905,7 +908,7 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060105, 'OnInitEanBoxParameters', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Ean Box Setup Mgt.", 'OnInitEanBoxParameters', '', true, true)]
     local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR Ean Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
     begin
         case EanBoxEvent.Code of
@@ -916,7 +919,7 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060107, 'SetEanBoxEventInScope', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Ean Box Event Handler", 'SetEanBoxEventInScope', '', true, true)]
     local procedure SetEanBoxEventInScopeRefNo(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
     var
         NpDcCoupon: Record "NPR NpDc Coupon";
@@ -941,7 +944,8 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         exit(CODEUNIT::"NPR NpDc Coupon Mgt.");
     end;
 
-    //--- Generate Reference No ---
+    #endregion Ean Box Event Handling
+    #region Generate Reference No
 
     local procedure GetAmountPerQty(Coupon: Record "NPR NpDc Coupon") AmountPerQty: Decimal
     var
@@ -1049,7 +1053,8 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         exit(RandomChar);
     end;
 
-    //--- Init ---
+    #endregion Generate Reference No
+    #region Init
 
     procedure InitCouponType(var CouponType: Record "NPR NpDc Coupon Type")
     var
@@ -1063,7 +1068,8 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         CouponType."Print on Issue" := CouponSetup."Print on Issue";
     end;
 
-    //--- Print ---
+    #endregion Init
+    #region Print
 
     procedure PrintCoupon(Coupon: Record "NPR NpDc Coupon")
     var
@@ -1073,4 +1079,6 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         Coupon.SetRecFilter;
         RPTemplateMgt.PrintTemplate(Coupon."Print Template Code", Coupon, 0);
     end;
+
+    #endregion Print
 }

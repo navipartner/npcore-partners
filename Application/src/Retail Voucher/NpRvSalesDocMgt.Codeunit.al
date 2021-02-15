@@ -156,7 +156,7 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
         NpRvModulePaymentDefault.ApplyPaymentSalesDoc(NpRvVoucherType, SalesHeader, NpRvSalesLine);
     end;
 
-    [EventSubscriber(ObjectType::Table, 37, 'OnBeforeDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeleteSalesLine(var Rec: Record "Sales Line"; RunTrigger: Boolean)
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
@@ -174,7 +174,7 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
             NpRvSalesLine.DeleteAll(true);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151409, 'OnBeforeDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Payment Line", 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeleteMagentoPaymentLine(var Rec: Record "NPR Magento Payment Line"; RunTrigger: Boolean)
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
@@ -196,7 +196,7 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
             NpRvSalesLine.DeleteAll(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 414, 'OnBeforeReleaseSalesDoc', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Release Sales Document", 'OnBeforeReleaseSalesDoc', '', true, true)]
     local procedure OnBeforeReleaseSalesDoc(var SalesHeader: Record "Sales Header")
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
@@ -218,7 +218,7 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
         until NpRvSalesLine.Next = 0;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 80, 'OnBeforePostSalesDoc', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostSalesDoc', '', true, true)]
     local procedure OnBeforePostSalesDoc(var SalesHeader: Record "Sales Header")
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
@@ -254,7 +254,7 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
             Error(Text003, TotalAmtInclVat, SalesHeader."NPR Magento Payment Amount");
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 80, 'OnBeforePostCommitSalesDoc', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostCommitSalesDoc', '', true, false)]
     local procedure OnBeforePostCommitSalesDoc(var SalesHeader: Record "Sales Header")
     var
         NoSeriesLine: Record "No. Series Line";
@@ -264,8 +264,8 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
         NoSeriesMgt: Codeunit NoSeriesManagement;
         PostingNo: Code[20];
     begin
-        if (not SalesHeader.Invoice) and
-          (not (SalesHeader."Document Type" in [SalesHeader."Document Type"::Invoice, SalesHeader."Document Type"::"Credit Memo"]))
+        if not SalesHeader.Invoice and
+           not (SalesHeader."Document Type" in [SalesHeader."Document Type"::Invoice, SalesHeader."Document Type"::"Credit Memo"])
         then
             exit;
 
@@ -283,6 +283,24 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
             PostingNo := NoSeriesLine."Last No. Used";
         end;
         NpRvSalesLine.ModifyAll("Posting No.", PostingNo);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesLines', '', true, false)]
+    local procedure OnAfterPostSalesLines(var SalesHeader: Record "Sales Header")
+    var
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+    begin
+        if not SalesHeader.Invoice and
+           not (SalesHeader."Document Type" in [SalesHeader."Document Type"::Invoice, SalesHeader."Document Type"::"Credit Memo"])
+        then
+            exit;
+
+        NpRvSalesLine.SetFilter("Document Source", '%1|%2',
+          NpRvSalesLine."Document Source"::"Sales Document", NpRvSalesLine."Document Source"::"Payment Line");
+        NpRvSalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        NpRvSalesLine.SetRange("Document No.", SalesHeader."No.");
+        if NpRvSalesLine.IsEmpty then
+            exit;
 
         IssueNewVouchers(SalesHeader);
         PostVoucherPayments(SalesHeader);
@@ -290,7 +308,7 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
         NpRvSalesLine.ModifyAll("Posting No.", '');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 80, 'OnAfterPostSalesDoc', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', true, false)]
     local procedure OnAfterPostSalesDoc(var SalesHeader: Record "Sales Header"; SalesInvHdrNo: Code[20])
     var
         NpRvVoucher: Record "NPR NpRv Voucher";
