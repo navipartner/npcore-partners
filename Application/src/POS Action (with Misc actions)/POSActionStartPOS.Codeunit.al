@@ -43,8 +43,6 @@ codeunit 6150858 "NPR POS Action: Start POS"
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
-    var
-        RetailSetup: Record "NPR Retail Setup";
     begin
         Captions.AddActionCaption(ActionCode, 'title', Title);
         Captions.AddActionCaption(ActionCode, 'balancenow', BalanceNow);

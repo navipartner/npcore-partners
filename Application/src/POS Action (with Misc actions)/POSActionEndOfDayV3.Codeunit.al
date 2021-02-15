@@ -195,11 +195,8 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
     begin
     end;
 
-    procedure ValidateRequirements(RegisterNo: Code[10]; SalesTicketNo: Code[20]): Boolean
+    procedure ValidateRequirements(POSUnitCode: Code[10]; SalesTicketNo: Code[20]): Boolean
     var
-        RetailSetup: Record "NPR Retail Setup";
-        NPRetailSetup: Record "NPR NP Retail Setup";
-        Register: Record "NPR Register";
         POSUnit: Record "NPR POS Unit";
         SalePOS: Record "NPR Sale POS";
         POSQuoteMgt: Codeunit "NPR POS Quote Mgt.";
@@ -209,27 +206,14 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
             exit(true);
 
         // TODO - Needs to verified for UNITS / BINS
-        RetailSetup.Get;
-        POSUnit.Get(RegisterNo);
-        if (POSUnit.Status = POSUnit.Status::CLOSED) then
-            Error(t001);
+        POSUnit.Get(POSUnitCode);
 
-        SalePOS.Get(RegisterNo, SalesTicketNo);
+        SalePOS.Get(POSUnitCode, SalesTicketNo);
         if (LineExists(SalePOS)) then
             Error(t002);
 
         if not POSQuoteMgt.CleanupPOSQuotesBeforeBalancing(SalePOS) then
             Error('');
-
-        if (RetailSetup."Balancing Posting Type" = RetailSetup."Balancing Posting Type"::TOTAL) then begin
-            if (Register.FindSet()) then
-                repeat
-                    if (Register."Register No." <> RegisterNo) then begin
-                        Message(t003, Register."Register No.");
-                        exit(false);
-                    end;
-                until Register.Next = 0;
-        end;
 
         exit(true);
     end;
