@@ -1,8 +1,5 @@
 table 6014640 "NPR Tax Free Request"
 {
-    // NPR5.30/NPKNAV/20170310  CASE 261964 Transport NPR5.30 - 26 January 2017
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
-
     Caption = 'Tax Free Request';
     DataClassification = CustomerContent;
 
@@ -61,6 +58,8 @@ table 6014640 "NPR Tax Free Request"
         }
         field(15; "Handler ID"; Text[30])
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaced with "Enum Handler ID Enum"';
             Caption = 'Handler ID';
             DataClassification = CustomerContent;
         }
@@ -153,6 +152,11 @@ table 6014640 "NPR Tax Free Request"
             Caption = 'Service ID';
             DataClassification = CustomerContent;
         }
+        field(40; "Handler ID Enum"; Enum "NPR Tax Free Handler ID")
+        {
+            Caption = 'Handler ID';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -161,14 +165,5 @@ table 6014640 "NPR Tax Free Request"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
-
-    procedure IsThisHandler(HandlerID: Text): Boolean
-    begin
-        exit("Handler ID" = HandlerID);
-    end;
 }
 

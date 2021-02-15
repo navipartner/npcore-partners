@@ -1,7 +1,5 @@
 page 6014572 "NPR Tax Free Vouch. Sale Links"
 {
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
-
     Caption = 'Tax Free Voucher Sale Links';
     DeleteAllowed = false;
     Editable = false;
@@ -9,23 +7,21 @@ page 6014572 "NPR Tax Free Vouch. Sale Links"
     LinksAllowed = false;
     ModifyAllowed = false;
     PageType = List;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR Tax Free Voucher Sale Link";
-
+    UsageCategory = None;
     layout
     {
         area(content)
         {
             repeater(Group)
             {
-                field("Sales Ticket No."; "Sales Ticket No.")
+                field("Sales Ticket No."; Rec."Sales Ticket No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Sales Ticket No. field';
                 }
-                field("Voucher External No."; "Voucher External No.")
+                field("Voucher External No."; Rec."Voucher External No.")
                 {
                     ApplicationArea = All;
                     Caption = 'Linked to Voucher';
@@ -35,10 +31,6 @@ page 6014572 "NPR Tax Free Vouch. Sale Links"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

@@ -1,9 +1,5 @@
 page 6014565 "NPR Tax Free Voucher"
 {
-    // NPR4.18/JDH/20160209 CASE 224257 Object Created - Found duriong release - done by MMV
-    // NPR5.30/MMV /20170131 CASE 261964 Refactored tax free.
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
-
     Caption = 'Tax Free Voucher';
     DeleteAllowed = false;
     Editable = false;
@@ -13,89 +9,88 @@ page 6014565 "NPR Tax Free Voucher"
     SourceTable = "NPR Tax Free Voucher";
     UsageCategory = Lists;
     ApplicationArea = All;
-
     layout
     {
         area(content)
         {
             repeater(Group)
             {
-                field("External Voucher No."; "External Voucher No.")
+                field("External Voucher No."; Rec."External Voucher No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Voucher No. field';
                 }
-                field("External Voucher Barcode"; "External Voucher Barcode")
+                field("External Voucher Barcode"; Rec."External Voucher Barcode")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the External Voucher Barcode field';
                 }
-                field("Issued Date"; "Issued Date")
+                field("Issued Date"; Rec."Issued Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Created Date field';
                 }
-                field("Issued Time"; "Issued Time")
+                field("Issued Time"; Rec."Issued Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Created Time field';
                 }
-                field("Salesperson Code"; "Salesperson Code")
+                field("Salesperson Code"; Rec."Salesperson Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
-                field("Issued By User"; "Issued By User")
+                field("Issued By User"; Rec."Issued By User")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Issued By User field';
                 }
-                field("Total Amount Incl. VAT"; "Total Amount Incl. VAT")
+                field("Total Amount Incl. VAT"; Rec."Total Amount Incl. VAT")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount Including VAT field';
                 }
-                field("Refund Amount"; "Refund Amount")
+                field("Refund Amount"; Rec."Refund Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Refund Amount field';
                 }
-                field("POS Unit No."; "POS Unit No.")
+                field("POS Unit No."; Rec."POS Unit No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
-                field("Handler ID"; "Handler ID")
+                field("Handler ID Enum"; Rec."Handler ID Enum")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Handler ID field';
                 }
-                field("Service ID"; "Service ID")
+                field("Service ID"; Rec."Service ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Service ID field';
                 }
-                field(Mode; Mode)
+                field(Mode; Rec.Mode)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Mode field';
                 }
-                field(Void; Void)
+                field(Void; Rec.Void)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Voided field';
                 }
-                field("Voided By User"; "Voided By User")
+                field("Voided By User"; Rec."Voided By User")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Voided By User field';
                 }
-                field("Voided Date"; "Voided Date")
+                field("Voided Date"; Rec."Voided Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Voided Date field';
                 }
-                field("Voided Time"; "Voided Time")
+                field("Voided Time"; Rec."Voided Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Voided Time field';
@@ -113,7 +108,7 @@ page 6014565 "NPR Tax Free Voucher"
                 Caption = 'Void Voucher';
                 Image = VoidCheck;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -134,7 +129,7 @@ page 6014565 "NPR Tax Free Voucher"
                 Caption = 'Print Voucher';
                 Image = PrintCheck;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -155,7 +150,7 @@ page 6014565 "NPR Tax Free Voucher"
                 Caption = 'Reissue Voucher';
                 Image = StaleCheck;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -176,7 +171,7 @@ page 6014565 "NPR Tax Free Voucher"
                 Caption = 'Search Sale Links';
                 Image = SplitChecks;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -188,7 +183,7 @@ page 6014565 "NPR Tax Free Voucher"
                     TaxFreeVoucherSaleLinks: Page "NPR Tax Free Vouch. Sale Links";
                 begin
                     if PAGE.RunModal(PAGE::"NPR Tax Free Vouch. Sale Links", TaxFreeVoucherSaleLink) = ACTION::LookupOK then begin
-                        Get(TaxFreeVoucherSaleLink."Voucher Entry No.");
+                        Rec.Get(TaxFreeVoucherSaleLink."Voucher Entry No.");
                     end;
                 end;
             }

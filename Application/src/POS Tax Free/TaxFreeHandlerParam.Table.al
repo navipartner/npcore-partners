@@ -1,7 +1,5 @@
 table 6014642 "NPR Tax Free Handler Param."
 {
-    // NPR5.30/NPKNAV/20170310  CASE 261964 Transport NPR5.30 - 26 January 2017
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
 
     Caption = 'Tax Free Handler Parameters';
     DataClassification = CustomerContent;
@@ -45,28 +43,20 @@ table 6014642 "NPR Tax Free Handler Param."
         }
     }
 
-    fieldgroups
-    {
-    }
-
     procedure SerializeParameterBLOB(var TaxFreeUnit: Record "NPR Tax Free POS Unit")
     var
         OutStream: OutStream;
         JSON: Text;
-        JObject: DotNet JObject;
-        JProperty: DotNet NPRNetJProperty;
+        JObject: JsonObject;
     begin
         if not FindSet then
             exit;
 
-        JObject := JObject.JObject();
-
         repeat
-            JProperty := JProperty.JProperty(Parameter, Value);
-            JObject.Add(JProperty);
+            JObject.Add(Parameter, Value);
         until Next = 0;
 
-        JSON := JObject.ToString();
+        JObject.WriteTo(JSON);
 
         Clear(TaxFreeUnit."Handler Parameters");
         TaxFreeUnit."Handler Parameters".CreateOutStream(OutStream, TEXTENCODING::UTF8);
@@ -77,10 +67,10 @@ table 6014642 "NPR Tax Free Handler Param."
     var
         Buffer: Text;
         JSON: Text;
-        JObject: DotNet JObject;
-        JProperty: DotNet NPRNetJProperty;
         InStream: InStream;
-        i: Integer;
+        JsonTextReadWrite: Codeunit "Json Text Reader/Writer";
+        JsonBuffer: Record "JSON Buffer" temporary;
+        JsonPropertyValue: Text;
     begin
         TaxFreeUnit.CalcFields("Handler Parameters");
         TaxFreeUnit."Handler Parameters".CreateInStream(InStream, TEXTENCODING::UTF8);
@@ -89,21 +79,16 @@ table 6014642 "NPR Tax Free Handler Param."
             JSON += Buffer;
         end;
 
-        JObject := JObject.Parse(JSON);
-        if JObject.Count() = 0 then
-            exit;
-
-        for i := 0 to JObject.Count - 1 do begin
-            if i = 0 then
-                JProperty := JObject.First
-            else
-                JProperty := JProperty.Next;
-
-            if Get(JProperty.Name) then begin
-                Value := Format(JProperty.Value);
-                Modify;
-            end;
-        end;
+        JsonTextReadWrite.ReadJSonToJSonBuffer(JSON, JsonBuffer);
+        JsonBuffer.SetRange("Token type", JsonBuffer."Token type"::"Property Name");
+        if JsonBuffer.FindSet() then
+            repeat
+                if JsonBuffer.GetPropertyValue(JsonPropertyValue, JsonBuffer.Value) then
+                    if Get(JsonBuffer.Value) then begin
+                        Value := JsonPropertyValue;
+                        Modify()
+                    end;
+            until JsonBuffer.Next() = 0;
     end;
 
     [TryFunction]

@@ -1,51 +1,49 @@
 page 6014644 "NPR Tax Free POS Units"
 {
-    // NPR5.30/NPKNAV/20170310  CASE 261964 Transport NPR5.30 - 26 January 2017
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
 
     Caption = 'Tax Free POS Units';
     PageType = List;
     SourceTable = "NPR Tax Free POS Unit";
     UsageCategory = Administration;
     ApplicationArea = All;
-
     layout
     {
         area(content)
         {
             repeater(Group)
             {
-                field("POS Unit No."; "POS Unit No.")
+                field("POS Unit No."; Rec."POS Unit No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
-                field("Handler ID"; "Handler ID")
+                field("Handler ID Enum"; Rec."Handler ID Enum")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Handler ID field';
+                    ValuesAllowed = PREMIER_PI, GLOBALBLUE_I2;
                 }
-                field(Mode; Mode)
+                field(Mode; Rec.Mode)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Mode field';
                 }
-                field("Log Level"; "Log Level")
+                field("Log Level"; Rec."Log Level")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Log Level field';
                 }
-                field("Check POS Terminal IIN"; "Check POS Terminal IIN")
+                field("Check POS Terminal IIN"; Rec."Check POS Terminal IIN")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Check POS Terminal IIN field';
                 }
-                field("Request Timeout (ms)"; "Request Timeout (ms)")
+                field("Request Timeout (ms)"; Rec."Request Timeout (ms)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Request Timeout (ms) field';
                 }
-                field("Store Voucher Prints"; "Store Voucher Prints")
+                field("Store Voucher Prints"; Rec."Store Voucher Prints")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Store Voucher Prints field';
@@ -63,7 +61,7 @@ page 6014644 "NPR Tax Free POS Units"
                 Caption = 'Set Parameters';
                 Image = Answers;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -73,7 +71,6 @@ page 6014644 "NPR Tax Free POS Units"
                 var
                     TaxFreeManagement: Codeunit "NPR Tax Free Handler Mgt.";
                 begin
-                    //TaxFreeManagement.SetGenericHandlerParameters(Rec);
                     TaxFreeManagement.SetParameters(Rec);
                 end;
             }
@@ -82,7 +79,7 @@ page 6014644 "NPR Tax Free POS Units"
                 Caption = 'Test Connection';
                 Image = Process;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -100,7 +97,7 @@ page 6014644 "NPR Tax Free POS Units"
                 Caption = 'Auto Configure';
                 Image = TestDatabase;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -118,7 +115,7 @@ page 6014644 "NPR Tax Free POS Units"
                 Caption = 'View Log';
                 Image = Log;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Tax Free Requests";

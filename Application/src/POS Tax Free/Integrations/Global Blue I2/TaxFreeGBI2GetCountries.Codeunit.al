@@ -2,8 +2,6 @@ codeunit 6014617 "NPR TaxFree GBI2 GetCountries"
 {
     // Codeunit is intended to be scheduled for NAS for customers running a Global Blue I2 Tax Free integration, for monthly execution.
     // It retrieves and stores a list of enduser countries for use in the I2 integration flow.
-    // 
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
 
 
     trigger OnRun()
@@ -35,7 +33,7 @@ codeunit 6014617 "NPR TaxFree GBI2 GetCountries"
         GlobalBlueHandler: Codeunit "NPR Tax Free GB I2";
         GlobalBlueParameters: Record "NPR Tax Free GB I2 Param.";
     begin
-        TaxFreeUnit.SetRange("Handler ID", GlobalBlueHandler.HandlerID);
+        TaxFreeUnit.SetRange("Handler ID Enum", TaxFreeUnit."Handler ID Enum"::GLOBALBLUE_I2);
         TaxFreeUnit.FindSet;
         repeat
             GlobalBlueParameters.SetFilter("Shop ID", '<>%1', '');

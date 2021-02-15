@@ -467,10 +467,17 @@ page 6150652 "NPR POS Entry List"
                     {
                         Caption = 'Issued';
                         Image = PostedPayableVoucher;
-                        RunObject = Page "NPR Tax Free Voucher";
-                        RunPageLink = "Sales Receipt No." = FIELD("Document No.");
                         ApplicationArea = All;
                         ToolTip = 'Executes the Issued action';
+                        trigger OnAction()
+                        var
+                            TaxFree: Codeunit "NPR Tax Free Handler Mgt.";
+                            TaxFreeVoucher: Record "NPR Tax Free Voucher";
+                        begin
+                            if Rec."Entry Type" = Rec."Entry Type"::"Direct Sale" then
+                                if TaxFree.TryGetActiveVoucherFromReceiptNo(Rec."Document No.", TaxFreeVoucher) then
+                                    Page.Run(0, TaxFreeVoucher);
+                        end;
                     }
                 }
             }

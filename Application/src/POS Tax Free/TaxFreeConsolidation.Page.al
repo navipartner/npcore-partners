@@ -1,17 +1,14 @@
 page 6014571 "NPR Tax Free Consolidation"
 {
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
 
     Caption = 'Tax Free Consolidation';
     InsertAllowed = false;
     LinksAllowed = false;
     ModifyAllowed = false;
     PageType = List;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR Tax Free Consolidation";
     SourceTableTemporary = true;
-
+    UsageCategory = None;
     layout
     {
         area(content)
@@ -19,12 +16,12 @@ page 6014571 "NPR Tax Free Consolidation"
             repeater(Group)
             {
                 InstructionalText = 'Use add/remove actions to specify which sales receipts should be consolidated.';
-                field("Sales Ticket No."; "Sales Ticket No.")
+                field("Sales Ticket No."; Rec."Sales Ticket No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Ticket No. field';
                 }
-                field("Sale Date"; "Sale Date")
+                field("Sale Date"; Rec."Sale Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sale Date field';
@@ -50,33 +47,34 @@ page 6014571 "NPR Tax Free Consolidation"
 
                 trigger OnAction()
                 var
-                    POSEntry: Record "NPR POS Entry";
-                    POSEntryPage: Page "NPR POS Entry List";
+                    PosEntry: Record "NPR POS Entry";
                     TaxFreeMgt: Codeunit "NPR Tax Free Handler Mgt.";
                     TaxFreeVoucher: Record "NPR Tax Free Voucher";
                 begin
-                    POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
-                    if Page.RunModal(0, POSEntry) = Action::LookupOK then begin
-                        Rec.SetRange("Sales Ticket No.", POSEntry."Document No.");
-                        if Rec.FindFirst then
-                            Error(Error_AlreadySelected, POSEntry."Document No.");
-                        Rec.SetRange("Sales Ticket No.");
+                    PosEntry.SetFilter("Entry Type", '<>%1', PosEntry."Entry Type"::"Cancelled Sale");
+                    if Page.RunModal(0, PosEntry) <> ACTION::LookupOK then
+                        exit;
 
-                        if TaxFreeMgt.TryGetActiveVoucherFromReceiptNo(POSEntry."Document No.", TaxFreeVoucher) then begin
-                            if not Confirm(Caption_VoidExisting) then
-                                exit;
+                    Rec.SetRange("Sales Ticket No.", PosEntry."Document No.");
+                    if Rec.FindFirst then
+                        Error(Error_AlreadySelected, PosEntry."Document No.");
+                    Rec.SetRange("Sales Ticket No.");
 
-                            TaxFreeMgt.VoucherVoid(TaxFreeVoucher);
+                    if TaxFreeMgt.TryGetActiveVoucherFromReceiptNo(PosEntry."Document No.", TaxFreeVoucher) then begin
+                        if not Confirm(Caption_VoidExisting) then
+                            exit;
 
-                            if not TaxFreeVoucher.Void then //Void attempt failed, don't add to consolidation list.
-                                exit;
-                        end;
+                        TaxFreeMgt.VoucherVoid(TaxFreeVoucher);
 
-                        Rec."Entry No." += 1;
-                        Rec."Sales Ticket No." := POSEntry."Document No.";
-                        Rec."Sale Date" := POSEntry."Document Date";
-                        Rec.Insert;
+                        if not TaxFreeVoucher.Void then //Void attempt failed, don't add to consolidation list.
+                            exit;
                     end;
+
+                    Rec."Entry No." := "Entry No." + 1;
+                    Rec."Sales Ticket No." := PosEntry."Document No.";
+                    Rec."Sale Date" := PosEntry."Entry Date";
+                    Rec.Insert;
+
                 end;
             }
             action("Remove Receipt")
@@ -93,7 +91,7 @@ page 6014571 "NPR Tax Free Consolidation"
                 trigger OnAction()
                 begin
                     if Confirm(Caption_DeleteSelected) then
-                        Delete;
+                        Rec.Delete;
                 end;
             }
             action("Consolidate Receipts")
@@ -111,7 +109,7 @@ page 6014571 "NPR Tax Free Consolidation"
                 var
                     TaxFreeMgt: Codeunit "NPR Tax Free Handler Mgt.";
                 begin
-                    if FindSet then begin
+                    if Rec.FindSet then begin
                         TaxFreeMgt.VoucherConsolidate(TaxFreeUnit, Rec);
                         CurrPage.Close;
                     end;

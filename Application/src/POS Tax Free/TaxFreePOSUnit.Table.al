@@ -1,7 +1,5 @@
 table 6014641 "NPR Tax Free POS Unit"
 {
-    // NPR5.30/NPKNAV/20170310  CASE 261964 Transport NPR5.30 - 26 January 2017
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
 
     Caption = 'Tax Free POS Unit';
     LookupPageID = "NPR Tax Free POS Units";
@@ -17,28 +15,10 @@ table 6014641 "NPR Tax Free POS Unit"
         }
         field(2; "Handler ID"; Text[30])
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaced with "Enum Handler ID Enum"';
             Caption = 'Handler ID';
             DataClassification = CustomerContent;
-
-            trigger OnLookup()
-            var
-                TaxFreeManagement: Codeunit "NPR Tax Free Handler Mgt.";
-                ID: Text;
-            begin
-                if TaxFreeManagement.TryLookupHandler(ID) then
-                    Validate("Handler ID", ID);
-            end;
-
-            trigger OnValidate()
-            begin
-                if StrLen(xRec."Handler ID") > 0 then
-                    if ("Handler ID" <> xRec."Handler ID") then
-                        if "Handler Parameters".HasValue then
-                            if not Confirm(Confirm_ClearParameter, false, xRec."Handler ID") then
-                                Error('');
-
-                Clear("Handler Parameters");
-            end;
         }
         field(3; "Handler Parameters"; BLOB)
         {
@@ -80,6 +60,20 @@ table 6014641 "NPR Tax Free POS Unit"
             Caption = 'Store Voucher Prints';
             DataClassification = CustomerContent;
         }
+        field(40; "Handler ID Enum"; Enum "NPR Tax Free Handler ID")
+        {
+            Caption = 'Handler ID';
+            DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                if ("Handler ID Enum" <> xRec."Handler ID Enum") then
+                    if "Handler Parameters".HasValue then
+                        if not Confirm(Confirm_ClearParameter, false, xRec."Handler ID Enum") then
+                            Error('');
+
+                Clear("Handler Parameters");
+            end;
+        }
     }
 
     keys
@@ -87,10 +81,6 @@ table 6014641 "NPR Tax Free POS Unit"
         key(Key1; "POS Unit No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnInsert()
@@ -105,10 +95,5 @@ table 6014641 "NPR Tax Free POS Unit"
 
     var
         Confirm_ClearParameter: Label 'This will delete any parameters set for handler %1.\Are you sure you want to Continue?';
-
-    procedure IsThisHandler(HandlerID: Text): Boolean
-    begin
-        exit("Handler ID" = HandlerID);
-    end;
 }
 

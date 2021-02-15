@@ -5,20 +5,13 @@ codeunit 6014619 "NPR TaxFree LastVouch.Print"
     // PrintType:
     //  0: Thermal
     //  1: PDF
-    // 
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
-
     SingleInstance = true;
 
-    trigger OnRun()
-    begin
-    end;
-
     var
-        VoucherEntryNo: Integer;
         PrintBlob: Codeunit "Temp Blob";
-        PrintType: Integer;
         Stored: Boolean;
+        PrintType: Integer;
+        VoucherEntryNo: Integer;
 
     procedure SetVoucher(VoucherEntryNoIn: Integer; var PrintBlobIn: Codeunit "Temp Blob"; PrintTypeIn: Integer)
     begin

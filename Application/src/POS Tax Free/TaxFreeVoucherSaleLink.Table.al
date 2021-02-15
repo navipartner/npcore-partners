@@ -1,6 +1,5 @@
 table 6014644 "NPR Tax Free Voucher Sale Link"
 {
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
 
     Caption = 'Tax Free Voucher Sale Link';
     LookupPageID = "NPR Tax Free Vouch. Sale Links";
@@ -54,10 +53,6 @@ table 6014644 "NPR Tax Free Voucher Sale Link"
         key(Key2; "Sales Ticket No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 
