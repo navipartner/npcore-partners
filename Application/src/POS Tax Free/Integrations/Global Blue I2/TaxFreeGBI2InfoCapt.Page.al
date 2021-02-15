@@ -1,6 +1,5 @@
 page 6014573 "NPR Tax Free GB I2 Info Capt."
 {
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
 
     UsageCategory = None;
     Caption = 'Tax Free GB I2 Info Capture';
@@ -17,7 +16,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
             group(Control6014403)
             {
                 ShowCaption = false;
-                field("Passport Number"; "Passport Number")
+                field("Passport Number"; Rec."Passport Number")
                 {
                     ApplicationArea = All;
                     Editable = PassportNumberEditable;
@@ -25,7 +24,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Visible = PassportNumberMode <> PassportNumberMode::Hide;
                     ToolTip = 'Specifies the value of the Passport Number field';
                 }
-                field("First Name"; "First Name")
+                field("First Name"; Rec."First Name")
                 {
                     ApplicationArea = All;
                     Editable = FirstNameEditable;
@@ -33,7 +32,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Visible = FirstNameMode <> FirstNameMode::Hide;
                     ToolTip = 'Specifies the value of the First Name field';
                 }
-                field("Last Name"; "Last Name")
+                field("Last Name"; Rec."Last Name")
                 {
                     ApplicationArea = All;
                     Editable = LastNameEditable;
@@ -41,7 +40,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Visible = LastNameMode <> LastNameMode::Hide;
                     ToolTip = 'Specifies the value of the Last Name field';
                 }
-                field(Street; Street)
+                field(Street; Rec.Street)
                 {
                     ApplicationArea = All;
                     Editable = StreetEditable;
@@ -57,7 +56,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Visible = PostalCodeMode <> PostalCodeMode::Hide;
                     ToolTip = 'Specifies the value of the Postal Code field';
                 }
-                field(Town; Town)
+                field(Town; Rec.Town)
                 {
                     ApplicationArea = All;
                     Editable = TownEditable;
@@ -65,7 +64,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Visible = TownMode <> TownMode::Hide;
                     ToolTip = 'Specifies the value of the Town field';
                 }
-                field("E-mail"; "E-mail")
+                field("E-mail"; Rec."E-mail")
                 {
                     ApplicationArea = All;
                     Editable = EmailEditable;
@@ -73,7 +72,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Visible = EmailMode <> EmailMode::Hide;
                     ToolTip = 'Specifies the value of the E-mail field';
                 }
-                field("Country Of Residence"; "Country Of Residence")
+                field("Country Of Residence"; Rec."Country Of Residence")
                 {
                     ApplicationArea = All;
                     Editable = CountryCodeEditable;
@@ -81,7 +80,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Visible = CountryCodeMode <> CountryCodeMode::Hide;
                     ToolTip = 'Specifies the value of the Country Of Residence field';
                 }
-                field("Passport Country"; "Passport Country")
+                field("Passport Country"; Rec."Passport Country")
                 {
                     ApplicationArea = All;
                     Editable = PassportCountryCodeEditable;
@@ -89,7 +88,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Visible = PassportCountryCodeMode <> PassportCountryCodeMode::Hide;
                     ToolTip = 'Specifies the value of the Passport Country field';
                 }
-                field("Date Of Birth"; "Date Of Birth")
+                field("Date Of Birth"; Rec."Date Of Birth")
                 {
                     ApplicationArea = All;
                     Editable = DateOfBirthEditable;
@@ -97,7 +96,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Visible = DateOfBirthMode <> DateOfBirthMode::Hide;
                     ToolTip = 'Specifies the value of the Date Of Birth field';
                 }
-                field("Departure Date"; "Departure Date")
+                field("Departure Date"; Rec."Departure Date")
                 {
                     ApplicationArea = All;
                     Editable = DepartureEditable;
@@ -105,7 +104,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Visible = DepartureDateMode <> DepartureDateMode::Hide;
                     ToolTip = 'Specifies the value of the Departure Date field';
                 }
-                field("Arrival Date"; "Arrival Date")
+                field("Arrival Date"; Rec."Arrival Date")
                 {
                     ApplicationArea = All;
                     Editable = ArrivalEditable;
@@ -113,7 +112,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Visible = ArrivalDateMode <> ArrivalDateMode::Hide;
                     ToolTip = 'Specifies the value of the Arrival Date field';
                 }
-                field("Final Destination Country"; "Final Destination Country")
+                field("Final Destination Country"; Rec."Final Destination Country")
                 {
                     ApplicationArea = All;
                     Editable = FinalDestinationCountryCodeEditable;
@@ -153,9 +152,6 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
         }
     }
 
-    actions
-    {
-    }
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
@@ -164,7 +160,6 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
     end;
 
     var
-        "-- Input Mode": Integer;
         PassportNumberMode: Option Hide,Optional,Required;
         LastNameMode: Option Hide,Optional,Required;
         FirstNameMode: Option Hide,Optional,Required;
@@ -180,7 +175,6 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
         ArrivalDateMode: Option Hide,Optional,Required;
         FinalDestinationCountryCodeMode: Option Hide,Optional,Required;
         Error_MissingRequiredParam: Label 'Missing required parameter: %1';
-        "-- Input Editable": Integer;
         PassportNumberEditable: Boolean;
         LastNameEditable: Boolean;
         FirstNameEditable: Boolean;
@@ -196,7 +190,6 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
         ArrivalEditable: Boolean;
         FinalDestinationCountryCodeEditable: Boolean;
         Error_NotEditable: Label 'Field %1 is not editable';
-        "-- Input ShowMandatory": Integer;
         PassportNumberMandatory: Boolean;
         LastNameMandatory: Boolean;
         FirstNameMandatory: Boolean;
@@ -250,59 +243,59 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
     local procedure ValidateInputs()
     begin
         if PassportNumberMode = PassportNumberMode::Required then
-            if "Passport Number" = '' then
+            if Rec."Passport Number" = '' then
                 Error(Error_MissingRequiredParam, FieldCaption("Passport Number"));
 
         if FirstNameMode = FirstNameMode::Required then
-            if "First Name" = '' then
+            if Rec."First Name" = '' then
                 Error(Error_MissingRequiredParam, FieldCaption("First Name"));
 
         if LastNameMode = LastNameMode::Required then
-            if "Last Name" = '' then
+            if Rec."Last Name" = '' then
                 Error(Error_MissingRequiredParam, FieldCaption("Last Name"));
 
         if StreetMode = StreetMode::Required then
-            if Street = '' then
+            if Rec.Street = '' then
                 Error(Error_MissingRequiredParam, FieldCaption(Street));
 
         if PostalCodeMode = PostalCodeMode::Required then
-            if "Postal Code" = '' then
+            if Rec."Postal Code" = '' then
                 Error(Error_MissingRequiredParam, FieldCaption("Postal Code"));
 
         if TownMode = TownMode::Required then
-            if Town = '' then
+            if Rec.Town = '' then
                 Error(Error_MissingRequiredParam, FieldCaption(Town));
 
         if CountryCodeMode = CountryCodeMode::Required then
-            if "Country Of Residence" = '' then
+            if Rec."Country Of Residence" = '' then
                 Error(Error_MissingRequiredParam, FieldCaption("Country Of Residence"));
 
         if EmailMode = EmailMode::Required then
-            if "E-mail" = '' then
+            if Rec."E-mail" = '' then
                 Error(Error_MissingRequiredParam, FieldCaption("E-mail"));
 
         if MobileNumberMode = MobileNumberMode::Required then
-            if "Mobile No." = '' then
+            if Rec."Mobile No." = '' then
                 Error(Error_MissingRequiredParam, FieldCaption("Mobile No."));
 
         if PassportCountryCodeMode = PassportCountryCodeMode::Required then
-            if "Passport Country" = '' then
+            if Rec."Passport Country" = '' then
                 Error(Error_MissingRequiredParam, FieldCaption("Passport Country"));
 
         if DateOfBirthMode = DateOfBirthMode::Required then
-            if "Date Of Birth" = 0D then
+            if Rec."Date Of Birth" = 0D then
                 Error(Error_MissingRequiredParam, FieldCaption("Date Of Birth"));
 
         if DepartureDateMode = DepartureDateMode::Required then
-            if "Departure Date" = 0D then
+            if Rec."Departure Date" = 0D then
                 Error(Error_MissingRequiredParam, FieldCaption("Departure Date"));
 
         if ArrivalDateMode = ArrivalDateMode::Required then
-            if "Arrival Date" = 0D then
+            if Rec."Arrival Date" = 0D then
                 Error(Error_MissingRequiredParam, FieldCaption("Arrival Date"));
 
         if FinalDestinationCountryCodeMode = FinalDestinationCountryCodeMode::Required then
-            if "Final Destination Country" = '' then
+            if Rec."Final Destination Country" = '' then
                 Error(Error_MissingRequiredParam, FieldCaption("Final Destination Country"));
     end;
 

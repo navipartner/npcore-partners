@@ -360,10 +360,8 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
                     if TryGetField(RecRef, FieldRef, 705, 'Tax Free Check Terminal Prefix') then
                         CheckPrefix := FieldRef.Value;
 
-                    if CountryCode = '234' then
-                        TaxFreeUnit."Handler ID" := 'PREMIER_OFFLINE'
-                    else
-                        TaxFreeUnit."Handler ID" := 'PREMIER_PI';
+
+                    TaxFreeUnit."Handler ID Enum" := Enum::"NPR Tax Free Handler ID"::PREMIER_PI;
 
                     if (CountryCode = '208') and (MerchantID = '999001') and (VATNumber = 'DK0999001') then
                         TaxFreeUnit.Mode := TaxFreeUnit.Mode::TEST;

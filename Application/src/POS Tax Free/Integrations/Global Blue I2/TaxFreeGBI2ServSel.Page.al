@@ -1,7 +1,5 @@
 page 6059948 "NPR Tax Free GB I2 Serv. Sel."
 {
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
-
     Caption = 'Tax Free GB I2 Service Select';
     DeleteAllowed = false;
     Editable = false;
@@ -10,28 +8,22 @@ page 6059948 "NPR Tax Free GB I2 Serv. Sel."
     LinksAllowed = false;
     ModifyAllowed = false;
     PageType = List;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR Tax Free GB I2 Service";
     SourceTableTemporary = true;
-
+    UsageCategory = None;
     layout
     {
         area(content)
         {
             repeater(Group)
             {
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

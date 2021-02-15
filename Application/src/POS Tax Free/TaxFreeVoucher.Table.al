@@ -1,11 +1,5 @@
 table 6014477 "NPR Tax Free Voucher"
 {
-    // NPR4.18/MMV/20160113 CASE 224257 Created table
-    // NPR4.21/MMV/20160223 CASE 224257 Added missing danish captions
-    // NPR5.30/MMV /20170127 CASE 261964 Added fields 14, 15, 16.
-    //                                   Renamed field 10.
-    //                                   Added LookupPageID.
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
 
     Caption = 'Tax Free Voucher';
     LookupPageID = "NPR Tax Free Voucher";
@@ -92,6 +86,8 @@ table 6014477 "NPR Tax Free Voucher"
         }
         field(15; "Handler ID"; Text[30])
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Replaced with Enum "Handler ID Enum"';
             Caption = 'Handler ID';
             DataClassification = CustomerContent;
         }
@@ -134,6 +130,11 @@ table 6014477 "NPR Tax Free Voucher"
             OptionMembers = Thermal,PDF;
             DataClassification = CustomerContent;
         }
+        field(40; "Handler ID Enum"; Enum "NPR Tax Free Handler ID")
+        {
+            Caption = 'Handler ID';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -147,10 +148,6 @@ table 6014477 "NPR Tax Free Voucher"
         key(Key3; "External Voucher Barcode")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

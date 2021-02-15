@@ -2,8 +2,6 @@ codeunit 6014616 "NPR TaxFree GBI2 GetBlockedIIN"
 {
     // Codeunit is intended to be scheduled for NAS for customers running a Global Blue I2 Tax Free integration, for monthly execution.
     // It retrieves and stores a list of EFT IIN numbers that identify ineligible card hold countries.
-    // 
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
 
 
     trigger OnRun()
@@ -42,7 +40,7 @@ codeunit 6014616 "NPR TaxFree GBI2 GetBlockedIIN"
         TaxFreeUnit: Record "NPR Tax Free POS Unit";
         tmpInteger: Record "Integer" temporary;
     begin
-        TaxFreeUnit.SetRange("Handler ID", GlobalBlueHandler.HandlerID);
+        TaxFreeUnit.SetRange("Handler ID Enum", TaxFreeUnit."Handler ID Enum"::GLOBALBLUE_I2);
         TaxFreeUnit.FindSet;
         repeat
             GlobalBlueParameters.SetFilter("Shop ID", '<>%1', '');
