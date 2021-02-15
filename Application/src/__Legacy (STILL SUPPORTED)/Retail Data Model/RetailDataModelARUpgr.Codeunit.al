@@ -8,6 +8,7 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
     trigger OnRun()
     begin
         UpgradeAuditRollStep1;
+        OnActivatePosEntryPosting();
     end;
 
     var
@@ -19,6 +20,9 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
         NoOfPOSEntriesCreated: Integer;
         StartDateTime: DateTime;
         Counter: Integer;
+        CHECKPOINT_PROGRESS: Label 'Creating checkpoints for: %1 %2\\@1@@@@@@@@';
+        ALL_REGISTERS_MUST_BE_BALANCED: Label 'Not all %1 have %2 %3! Only %1 with %2 %3 will have their balance transfered. Do you want to continue anyway?';
+        NOT_ALL_CR_HAVE_POS_UNIT: Label 'All %1 must have a %2 when activating POS Entry posting. %1 %3 is missing its %2.';
 
     procedure UpgradeAuditRollStep1()
     var
@@ -1112,4 +1116,232 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
                 until Next = 0;
         end;
     end;
+
+    #region **************** Upgrade from AuditRoll to POS Entry
+    procedure OnActivatePosEntryPosting()
+    begin
+
+        ActivationValidationCheck();
+        MigrateOpenBalance();
+
+        CreatePOSSystemEntry('', UserId, 'POS Entry postings is activated.');
+    end;
+
+    procedure OnDeactivatePosEntryPosting()
+    begin
+
+        CreatePOSSystemEntry('', UserId, 'POS Entry postings is deactivated.');
+    end;
+
+    local procedure ActivationValidationCheck()
+    var
+        CacheRegister: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
+    begin
+
+        CacheRegister.SetFilter(Status, '<>%1', CacheRegister.Status::Afsluttet);
+        if (not CacheRegister.IsEmpty()) then
+            if (not Confirm(ALL_REGISTERS_MUST_BE_BALANCED, false, CacheRegister.TableCaption, CacheRegister.FieldCaption(Status), Format(CacheRegister.Status::Afsluttet))) then
+                Error('POS Entry posting is not activated.');
+
+        CacheRegister.Reset;
+        if (CacheRegister.FindSet()) then begin
+            repeat
+                if (not POSUnit.Get(CacheRegister."Register No.")) then
+                    Error(NOT_ALL_CR_HAVE_POS_UNIT, CacheRegister.TableCaption(), POSUnit.TableCaption, CacheRegister."Register No.");
+            until (CacheRegister.Next() = 0);
+        end;
+    end;
+
+    local procedure MigrateOpenBalance()
+    var
+        POSUnit: Record "NPR POS Unit";
+        CashRegister: Record "NPR Register";
+        POSOpenPOSUnit: Codeunit "NPR POS Manage POS Unit";
+        POSCreateEntry: Codeunit "NPR POS Create Entry";
+        OpeningEntryNo: Integer;
+    begin
+
+        if (POSUnit.FindSet()) then begin
+            repeat
+
+                POSOpenPOSUnit.ClosePOSUnitOpenPeriods(POSUnit."No."); // make sure pos period register is correct
+                POSOpenPOSUnit.OpenPOSUnit(POSUnit);
+                OpeningEntryNo := POSCreateEntry.InsertUnitOpenEntry(POSUnit."No.", CopyStr(UserId, 1, 20));
+                POSOpenPOSUnit.SetOpeningEntryNo(POSUnit."No.", OpeningEntryNo);
+
+                CreateFirstCheckpointForUnit(POSUnit."No.", 'POS Entry Activation - Checkpoint.');
+                CreatePOSSystemEntry(POSUnit."No.", UserId, 'Initial Workshift Checkpoint Created.');
+
+            until (POSUnit.Next() = 0);
+        end;
+
+        CashRegister.ModifyAll(Status, CashRegister.Status::Ekspedition);
+
+    end;
+
+    local procedure CreatePOSSystemEntry(POSUnitNo: Code[10]; SalespersonCode: Code[10]; Description: Text[80]) EntryNo: Integer
+    var
+        POSEntry: Record "NPR POS Entry";
+        POSPeriodRegister: Record "NPR POS Period Register";
+    begin
+
+        POSEntry.Init;
+
+        POSEntry."Entry No." := 0;
+        POSEntry."Entry Type" := POSEntry."Entry Type"::Other;
+        POSEntry."System Entry" := true;
+
+        POSEntry."POS Period Register No." := 0;
+        POSEntry."POS Store Code" := '';
+        POSEntry."POS Unit No." := POSUnitNo;
+
+        POSEntry."Entry Date" := Today;
+        POSEntry."Starting Time" := Time;
+        POSEntry."Ending Time" := Time;
+        POSEntry."Salesperson Code" := SalespersonCode;
+
+        POSEntry.Description := Description;
+        POSEntry."Post Item Entry Status" := POSEntry."Post Item Entry Status"::"Not To Be Posted";
+        POSEntry."Post Entry Status" := POSEntry."Post Entry Status"::"Not To Be Posted";
+
+        POSEntry.Insert();
+
+        exit(POSEntry."Entry No.");
+    end;
+
+    procedure CreateFirstCheckpointForUnit(POSUnitNo: Code[10]; Comment: Text[50])
+    var
+        BinEntry: Record "NPR POS Bin Entry";
+        POSUnit: Record "NPR POS Unit";
+        POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
+        POSEntry: Record "NPR POS Entry";
+        CashRegister: Record "NPR Register";
+        PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
+        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        Window: Dialog;
+        CurrentCurrent: Integer;
+        MaxCount: Integer;
+        ClosingEntryNo: Integer;
+        POSCreateEntry: Codeunit "NPR POS Create Entry";
+        POSManagePOSUnit: Codeunit "NPR POS Manage POS Unit";
+    begin
+
+        if (not POSEntry.FindLast()) then
+            exit;
+
+        POSUnit.Get(POSUnitNo);
+
+        POSWorkshiftCheckpoint.Init();
+        POSWorkshiftCheckpoint."Entry No." := 0;
+        POSWorkshiftCheckpoint."POS Unit No." := POSUnitNo;
+        POSWorkshiftCheckpoint."Created At" := CurrentDateTime();
+        POSWorkshiftCheckpoint.Open := false;
+        POSWorkshiftCheckpoint.Type := POSWorkshiftCheckpoint.Type::ZREPORT;
+        POSWorkshiftCheckpoint."POS Entry No." := POSEntry."Entry No.";
+        POSWorkshiftCheckpoint.Insert();
+
+        if (CashRegister.Get(POSUnitNo)) then begin
+
+            if (GuiAllowed) then
+                Window.Open(StrSubstNo(CHECKPOINT_PROGRESS, POSUnit.TableCaption, POSUnitNo));
+            MaxCount := POSPaymentMethod.Count();
+
+            POSCreateEntry.InsertUnitCloseBeginEntry(POSUnitNo, UserId);
+
+            POSPaymentMethod.FindSet();
+            repeat
+
+                BinEntry.Init();
+                BinEntry."Entry No." := 0;
+                BinEntry."Created At" := CurrentDateTime();
+
+                BinEntry.Type := BinEntry.Type::CHECKPOINT;
+                BinEntry."Payment Bin No." := POSUnit."Default POS Payment Bin";
+
+                BinEntry."Transaction Date" := Today;
+                BinEntry."Transaction Time" := Time;
+                BinEntry.Comment := Comment;
+
+                BinEntry."Register No." := POSUnitNo;
+                BinEntry."POS Unit No." := POSUnitNo;
+                BinEntry."POS Store Code" := POSUnit."POS Store Code";
+
+                BinEntry."Payment Type Code" := POSPaymentMethod.Code;
+                BinEntry."Payment Method Code" := POSPaymentMethod.Code;
+
+                BinEntry.Insert();
+
+                PaymentBinCheckpoint.Init;
+                PaymentBinCheckpoint."Entry No." := 0;
+                PaymentBinCheckpoint."Checkpoint Bin Entry No." := BinEntry."Entry No.";
+                PaymentBinCheckpoint."Workshift Checkpoint Entry No." := POSWorkshiftCheckpoint."Entry No.";
+                PaymentBinCheckpoint.Status := PaymentBinCheckpoint.Status::TRANSFERED;
+                PaymentBinCheckpoint.Type := PaymentBinCheckpoint.Type::ZREPORT;
+
+                PaymentBinCheckpoint."Created On" := CurrentDateTime();
+                PaymentBinCheckpoint."Checkpoint Date" := Today;
+                PaymentBinCheckpoint."Checkpoint Time" := Time;
+                PaymentBinCheckpoint.Comment := BinEntry.Comment;
+
+                PaymentBinCheckpoint."Payment Type No." := BinEntry."Payment Type Code";
+                PaymentBinCheckpoint."Payment Method No." := BinEntry."Payment Method Code";
+                PaymentBinCheckpoint."Currency Code" := POSPaymentMethod."Currency Code";
+                PaymentBinCheckpoint."Payment Bin No." := POSUnit."Default POS Payment Bin";
+                PaymentBinCheckpoint."Include In Counting" := POSPaymentMethod."Include In Counting"::YES;
+
+                PaymentBinCheckpoint.Description := POSPaymentMethod.Code;
+                PaymentTypePOS.SetFilter("No.", '=%1', POSPaymentMethod.Code);
+                if (PaymentTypePOS.FindFirst()) then
+                    PaymentBinCheckpoint.Description := PaymentTypePOS.Description;
+
+                if (CashRegister."Primary Payment Type" = PaymentTypePOS."No.") and (CashRegister.Status = CashRegister.Status::Afsluttet) then begin
+                    PaymentBinCheckpoint."Calculated Amount Incl. Float" := CashRegister."Closing Cash";
+                    PaymentBinCheckpoint."New Float Amount" := CashRegister."Closing Cash";
+                end;
+
+                PaymentBinCheckpoint.Insert();
+
+                // Update checkpoint and make total balance on bin entry zero
+                PaymentBinCheckpoint.CalcFields("Payment Bin Entry Amount", "Payment Bin Entry Amount (LCY)");
+                BinEntry."Transaction Amount" := -1 * PaymentBinCheckpoint."Payment Bin Entry Amount";
+                BinEntry."Transaction Amount (LCY)" := -1 * PaymentBinCheckpoint."Payment Bin Entry Amount (LCY)";
+                BinEntry."Bin Checkpoint Entry No." := PaymentBinCheckpoint."Entry No.";
+                BinEntry.Modify();
+
+                // Create the required bin entry for float
+                BinEntry."Entry No." := 0;
+                BinEntry."Payment Type Code" := PaymentBinCheckpoint."Payment Type No.";
+                BinEntry."Transaction Amount" := 0;
+                BinEntry."Transaction Amount (LCY)" := 0;
+
+                if (CashRegister."Primary Payment Type" = PaymentTypePOS."No.") and (CashRegister.Status = CashRegister.Status::Afsluttet) then begin
+                    BinEntry."Transaction Amount" := CashRegister."Closing Cash";
+                    BinEntry."Transaction Amount (LCY)" := CashRegister."Closing Cash";
+                end;
+
+                BinEntry.Type := BinEntry.Type::FLOAT;
+                BinEntry.Insert();
+
+                if (GuiAllowed) then
+                    Window.Update(1, Round(CurrentCurrent / MaxCount * 10000, 1));
+
+                CurrentCurrent += 1;
+
+            until (POSPaymentMethod.Next() = 0);
+
+            ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry(POSUnitNo, UserId);
+            POSManagePOSUnit.ClosePOSUnitNo(POSUnitNo, ClosingEntryNo);
+
+            if (GuiAllowed) then
+                Window.Close();
+
+        end;
+    end;
+
+
+
+    #endregion    
+
 }

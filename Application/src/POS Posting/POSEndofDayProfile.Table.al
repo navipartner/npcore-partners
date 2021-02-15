@@ -101,6 +101,14 @@ table 6150652 "NPR POS End of Day Profile"
             OptionCaption = 'With Message,With Error,Silent';
             OptionMembers = WITH_MESSAGE,WITH_ERROR,SILENT;
         }
+        field(75; "End of Day Frequency"; Option)
+        {
+            Caption = 'End of Day Frequency';
+            DataClassification = CustomerContent;
+            OptionCaption = 'Never,Daily';
+            OptionMembers = NEVER,DAILY;
+            InitValue = DAILY;
+        }
     }
 
     keys
