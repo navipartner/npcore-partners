@@ -1,7 +1,5 @@
 table 6014654 "NPR Tax Free GB I2 Param."
 {
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
-    // NPR5.41/MMV /20180426 CASE 310624 Changed dialog field captions.
 
     Caption = 'Tax Free GB I2 Parameter';
     DataClassification = CustomerContent;
@@ -175,10 +173,6 @@ table 6014654 "NPR Tax Free GB I2 Param."
         key(Key1; "Tax Free Unit")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

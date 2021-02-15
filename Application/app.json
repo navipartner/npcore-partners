@@ -32,6 +32,13 @@
       "to": 6185470
     }
   ],
+  "internalsVisibleTo": [
+    {
+      "id": "51104d36-8375-4914-9e14-ee07a10ff455",
+      "name": "NP Retail Tests",
+      "publisher": "NaviPartner"
+    }
+  ],
   "contextSensitiveHelpUrl": "https://support.navipartner.com/",
   "showMyCode": true,
   "runtime": "6.0",

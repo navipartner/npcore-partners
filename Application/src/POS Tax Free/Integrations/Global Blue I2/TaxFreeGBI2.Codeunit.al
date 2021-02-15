@@ -1,4 +1,4 @@
-codeunit 6014613 "NPR Tax Free GB I2"
+codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface"
 {
     // Consumes Global Blue I2 solution, GRIPS MX API v16.06
     // 
@@ -8,42 +8,36 @@ codeunit 6014613 "NPR Tax Free GB I2"
     // Desk ID: 103661 //Thermal voucher
     // Username: TEST_SHOPID_92179
     // Password: TEST_SHOPID_92179
-
     var
-        Error_MissingPrintSetup: Label 'Missing object output setup';
-        Error_MissingParameters: Label 'Missing parameters for handler %1 on tax free unit %2';
-        Error_NotSupported: Label 'Operation is not supported by tax free handler %1';
-        GlobalTaxFreeUnit: Record "NPR Tax Free POS Unit";
         GlobalBlueParameters: Record "NPR Tax Free GB I2 Param.";
         GlobalBlueServices: Record "NPR Tax Free GB I2 Service";
-        Error_InvalidResponse: Label 'Invalid response received from tax free server for:\Handler: %1\Request: %2';
-        Error_AutoConfigureFailure: Label 'Automatic desk configuration failed for handler %1. Cancelling tax free operation.';
-        Error_Unknown: Label 'Unknown handler error. Could not retrieve error message from response.';
-        Error_Ineligible: Label 'Sale is not eligible. VAT or issue date is outside the allowed range.';
-        Error_ConsolidationEligible: Label 'Consolidation is not eligible. VAT or issue date is outside the allowed range.';
-        Error_VoidLimit: Label 'Voucher %1 cannot be voided. The time limit has passed (%2 days).';
-        Error_UserCancel: Label 'Operation was cancelled by user.';
-        Error_PrintFail: Label 'Printing of tax free voucher %1 failed with error "%2".\NOTE: The voucher is correctly issued and active. Please attempt using ''Reprint Last'' or reissuing the voucher if the print error persists.';
-        Error_MinimumParameters: Label 'Global Blue Shop ID, Desk ID, Username and Password must be specified before auto desk configure can be performed.';
-        Caption_CancelOperation: Label 'Cancel tax free operation?';
-        Caption_VoidConfirm: Label 'Are you sure you want to proceed with void of tax free voucher:\\%1: %2\%3: %4\%5: %6\\It will no longer be valid for tax free refund!';
+        GlobalTaxFreeUnit: Record "NPR Tax Free POS Unit";
         Caption_ReissueConfirm: Label 'Are you sure you want to proceed with reissue of tax free voucher:\\%1: %2\%3: %4\%5: %6\\Reissuing a tax free voucher voids the current voucher and issues a new one in its place.\The current voucher will no longer be valid for tax free refunding.\\Please proceed only if the customer is present in the store!';
+        Caption_VoidConfirm: Label 'Are you sure you want to proceed with void of tax free voucher:\\%1: %2\%3: %4\%5: %6\\It will no longer be valid for tax free refund!';
+        Error_AutoConfigureFailure: Label 'Automatic desk configuration failed for handler %1. Cancelling tax free operation.';
+        Caption_CancelOperation: Label 'Cancel tax free operation?';
+        Error_ConsolidationEligible: Label 'Consolidation is not eligible. VAT or issue date is outside the allowed range.';
         Caption_UseID: Label 'Does the customer have Global Blue Tax Free identification available?';
         Caption_GlobalBlueIdentifier: Label 'Global Blue Card:';
-        Caption_InvalidIdentifier: Label 'Invalid identifier: %1. Global Blue card number must be at least 10 characters.';
-        Caption_PassportDetected: Label 'Passport no. detected. Please select Passport Country.';
-        Caption_ConfirmIdentity: Label 'I have checked the travellers identity and eligibility by verifying both passport AND country of residence.\\Traveller Name: %1\Passport Number: %2\Country Of Residence: %3';
-        Caption_TravellerLookupFail: Label 'Identifier lookup failed.';
-        Caption_PrefillCaptureWithNAVCustomer: Label 'Pre-fill tax free customer data with NAV customer data?';
-        Caption_IdentifierType: Label 'Please select a Global Blue identifier type:';
         Caption_MemberCard: Label 'Global Blue Member Card';
+        Error_MinimumParameters: Label 'Global Blue Shop ID, Desk ID, Username and Password must be specified before auto desk configure can be performed.';
+        Caption_TravellerLookupFail: Label 'Identifier lookup failed.';
+        Caption_ConfirmIdentity: Label 'I have checked the travellers identity and eligibility by verifying both passport AND country of residence.\\Traveller Name: %1\Passport Number: %2\Country Of Residence: %3';
+        Caption_InvalidIdentifier: Label 'Invalid identifier: %1. Global Blue card number must be at least 10 characters.';
+        Error_InvalidResponse: Label 'Invalid response received from tax free server for:\Handler: %1\Request: %2';
+        Error_MissingPrintSetup: Label 'Missing object output setup';
+        Error_MissingParameters: Label 'Missing parameters for handler %1 on tax free unit %2';
         Caption_MobileNo: Label 'Mobile Phone No.';
+        Error_NotSupported: Label 'Operation is not supported by tax free handler %1';
+        Error_UserCancel: Label 'Operation was cancelled by user.';
         Caption_Passport: Label 'Passport Information';
-
-    procedure HandlerID(): Text
-    begin
-        exit('GLOBALBLUE_I2')
-    end;
+        Caption_PassportDetected: Label 'Passport no. detected. Please select Passport Country.';
+        Caption_IdentifierType: Label 'Please select a Global Blue identifier type:';
+        Caption_PrefillCaptureWithNAVCustomer: Label 'Pre-fill tax free customer data with NAV customer data?';
+        Error_PrintFail: Label 'Printing of tax free voucher %1 failed with error "%2".\NOTE: The voucher is correctly issued and active. Please attempt using ''Reprint Last'' or reissuing the voucher if the print error persists.';
+        Error_Ineligible: Label 'Sale is not eligible. VAT or issue date is outside the allowed range.';
+        Error_Unknown: Label 'Unknown handler error. Could not retrieve error message from response.';
+        Error_VoidLimit: Label 'Voucher %1 cannot be voided. The time limit has passed (%2 days).';
 
     local procedure ServicePROD(): Text
     begin
@@ -66,7 +60,7 @@ codeunit 6014613 "NPR Tax Free GB I2"
             TaxFreeInterface.UnitAutoConfigure(GlobalTaxFreeUnit, true); //Will silently run desk config & verify that NAS jobs are configured.
             GlobalBlueParameters.Get(TaxFreeRequest."POS Unit No.");
             if GlobalBlueParameters."Date Last Auto Configured" <> Today then
-                Error(Error_AutoConfigureFailure, TaxFreeRequest."Handler ID");
+                Error(Error_AutoConfigureFailure, TaxFreeRequest."Handler ID Enum");
         end;
 
         GlobalBlueServices.SetRange("Tax Free Unit", TaxFreeRequest."POS Unit No.");
@@ -74,41 +68,45 @@ codeunit 6014613 "NPR Tax Free GB I2"
     end;
 
     #region Actions
-
     local procedure DownloadDeskConfiguration(var TaxFreeRequest: Record "NPR Tax Free Request")
     var
-        XMLDoc: DotNet "NPRNetXmlDocument";
-        IsError: Boolean;
+        XMLDoc: XmlDocument;
+    begin
+        GetDeskConfiguration(TaxFreeRequest);
+
+        ParseDesktopConfiguration(TaxFreeRequest, XMLDoc);
+    end;
+
+    procedure ParseDesktopConfiguration(var TaxFreeRequest: Record "NPR Tax Free Request"; XMLDoc: XmlDocument)
+    var
         Value: Text;
         i: Integer;
         ServiceID: Integer;
-        Services: DotNet NPRNetXmlNodeList;
+        Services: XmlNodeList;
         ServiceCount: Integer;
-        Service: DotNet NPRNetXmlNode;
+        Service: XmlNode;
         ServiceIDFilterString: Text;
+        IsError: Boolean;
     begin
-        if (GlobalBlueParameters."Shop ID" = '') or (GlobalBlueParameters."Desk ID" = '') or (GlobalBlueParameters.Username = '') or (GlobalBlueParameters.Password = '') then
-            Error(Error_MinimumParameters);
-
-        GetDeskConfiguration(TaxFreeRequest);
         HandleResponse(TaxFreeRequest, 'GetDeskConfiguration', XMLDoc, IsError);
+
         if IsError then
             Error(TaxFreeRequest."Error Message");
 
         if not TrySelectSingleNodeText(XMLDoc, '//ClientIdentification/ShopCountryCode', Value) then
-            Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID Enum", TaxFreeRequest."Request Type");
         Evaluate(GlobalBlueParameters."Shop Country Code", Value, 9);
 
-        Services := XMLDoc.GetElementsByTagName('Service');
+        Services := XMLDoc.GetDescendantElements('Service');
         ServiceCount := Services.Count;
         if not (ServiceCount > 0) then
-            Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID Enum", TaxFreeRequest."Request Type");
 
-        for i := 0 to (ServiceCount - 1) do begin //Update or create service records
-            Service := Services.ItemOf(i);
+        for i := 1 to (ServiceCount) do begin //Update or create service records
+            Services.Get(i, Service);
 
             if not TryGetItemInnerText(Service, 'ServiceID', Value) then
-                Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID", TaxFreeRequest."Request Type");
+                Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID Enum", TaxFreeRequest."Request Type");
             Evaluate(ServiceID, Value, 9);
 
             if not GlobalBlueServices.Get(GlobalTaxFreeUnit."POS Unit No.", ServiceID) then begin
@@ -151,37 +149,41 @@ codeunit 6014613 "NPR Tax Free GB I2"
 
     procedure DownloadCountries(var TaxFreeRequest: Record "NPR Tax Free Request")
     var
-        XMLDoc: DotNet "NPRNetXmlDocument";
+        GlobalBlueCountries: Record "NPR Tax Free GB Country";
         IsError: Boolean;
-        Countries: DotNet NPRNetXmlNodeList;
         CountryCount: Integer;
         i: Integer;
-        Country: DotNet NPRNetXmlNode;
-        GlobalBlueCountries: Record "NPR Tax Free GB Country";
         Value: Text;
+        XMLDoc: XmlDocument;
+        Country: XmlNode;
+        Countries: XmlNodeList;
     begin
         GetCountries(TaxFreeRequest);
         HandleResponse(TaxFreeRequest, 'GetCountries', XMLDoc, IsError);
         if IsError then
             Error(TaxFreeRequest."Error Message");
 
-        Countries := XMLDoc.GetElementsByTagName('Country');
+        Countries := XMLDoc.GetDescendantElements('Country');
         CountryCount := Countries.Count();
         if not (CountryCount > 0) then
-            Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID Enum", TaxFreeRequest."Request Type");
 
         GlobalBlueCountries.DeleteAll(false);
-        for i := 0 to (CountryCount - 1) do begin
-            Country := Countries.ItemOf(i);
+        for i := 1 to (CountryCount) do begin
+            Countries.Get(i, Country);
 
             GlobalBlueCountries.Init;
-            Evaluate(GlobalBlueCountries."Country Code", Country.Item('CountryCode').InnerText(), 9);
-            GlobalBlueCountries.Name := Country.Item('Name').InnerText();
+            TryGetItemInnerText(Country, 'CountryCode', Value);
+            Evaluate(GlobalBlueCountries."Country Code", Value);
+
+            TryGetItemInnerText(Country, 'Name', Value);
+            GlobalBlueCountries.Name := Value;
+
             if TryGetItemInnerText(Country, 'PhonePrefix', Value) then
                 Evaluate(GlobalBlueCountries."Phone Prefix", Value, 9);
             if TryGetItemInnerText(Country, 'PassportCode', Value) then
                 Evaluate(GlobalBlueCountries."Passport Code", Value, 9);
-            GlobalBlueCountries.Insert(false);
+            if GlobalBlueCountries.Insert(false) then;
         end;
         Commit;
 
@@ -192,34 +194,34 @@ codeunit 6014613 "NPR Tax Free GB I2"
 
     procedure DownloadBlockedCountries(var TaxFreeRequest: Record "NPR Tax Free Request")
     var
-        XMLDoc: DotNet "NPRNetXmlDocument";
+        GlobalBlueBlockedCountries: Record "NPR TaxFree GB BlockedCountry";
         IsError: Boolean;
-        Countries: DotNet NPRNetXmlNodeList;
         CountryCount: Integer;
         i: Integer;
-        Country: DotNet NPRNetXmlNode;
-        GlobalBlueBlockedCountries: Record "NPR TaxFree GB BlockedCountry";
+        XMLDoc: XmlDocument;
+        Country: XmlNode;
+        Countries: XmlNodeList;
     begin
         GetBlockedCountries(TaxFreeRequest);
         HandleResponse(TaxFreeRequest, 'GetBlockedCountries', XMLDoc, IsError);
         if IsError then
             Error(TaxFreeRequest."Error Message");
 
-        Countries := XMLDoc.SelectNodes('//CountryCode');
+        Countries := XMLDoc.GetDescendantElements('CountryCode');
         CountryCount := Countries.Count();
         if not (CountryCount > 0) then
-            Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID Enum", TaxFreeRequest."Request Type");
 
         GlobalBlueBlockedCountries.SetRange("Shop Country Code", GlobalBlueParameters."Shop Country Code");
         GlobalBlueBlockedCountries.DeleteAll(false);
         GlobalBlueBlockedCountries.Reset;
-        for i := 0 to (CountryCount - 1) do begin
-            Country := Countries.ItemOf(i);
+        for i := 1 to (CountryCount) do begin
+            Countries.Get(i, Country);
 
             GlobalBlueBlockedCountries.Init;
             GlobalBlueBlockedCountries."Shop Country Code" := GlobalBlueParameters."Shop Country Code";
-            Evaluate(GlobalBlueBlockedCountries."Country Code", Country.InnerText(), 9);
-            GlobalBlueBlockedCountries.Insert(false);
+            Evaluate(GlobalBlueBlockedCountries."Country Code", Country.AsXmlElement().InnerText, 9);
+            if GlobalBlueBlockedCountries.Insert(false) then;
         end;
         Commit;
 
@@ -230,35 +232,39 @@ codeunit 6014613 "NPR Tax Free GB I2"
 
     procedure DownloadCondensedTred(var TaxFreeRequest: Record "NPR Tax Free Request")
     var
-        XMLDoc: DotNet "NPRNetXmlDocument";
-        IsError: Boolean;
-        Ranges: DotNet NPRNetXmlNodeList;
-        RangeCount: Integer;
-        i: Integer;
-        Range: DotNet NPRNetXmlNode;
         GlobalBlueIINBlacklist: Record "NPR Tax Free GB IIN Blacklist";
+        IsError: Boolean;
+        i: Integer;
+        RangeCount: Integer;
+        Value: Text;
+        XMLDoc: XmlDocument;
+        Range: XmlNode;
+        Ranges: XmlNodeList;
     begin
         GetCondensedTred(TaxFreeRequest);
         HandleResponse(TaxFreeRequest, 'GetCondensedTred', XMLDoc, IsError);
         if IsError then
             Error(TaxFreeRequest."Error Message");
 
-        Ranges := XMLDoc.GetElementsByTagName('Range');
+        Ranges := XMLDoc.GetDescendantElements('Range');
         RangeCount := Ranges.Count();
         if not (RangeCount > 0) then
-            Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID Enum", TaxFreeRequest."Request Type");
 
         GlobalBlueIINBlacklist.SetRange("Shop Country Code", GlobalBlueParameters."Shop Country Code");
         GlobalBlueIINBlacklist.DeleteAll(false);
         GlobalBlueIINBlacklist.Reset;
-        for i := 0 to (RangeCount - 1) do begin
-            Range := Ranges.ItemOf(i);
+        for i := 1 to (RangeCount) do begin
+            Ranges.Get(1, Range);
 
             GlobalBlueIINBlacklist.Init;
             GlobalBlueIINBlacklist."Shop Country Code" := GlobalBlueParameters."Shop Country Code";
-            Evaluate(GlobalBlueIINBlacklist."Range Inclusive Start", Range.Item('PrefixFrom').InnerText(), 9);
-            Evaluate(GlobalBlueIINBlacklist."Range Exclusive End", Range.Item('PrefixTo').InnerText(), 9);
-            GlobalBlueIINBlacklist.Insert(false);
+            TryGetItemInnerText(Range, 'PrefixFrom', Value);
+            Evaluate(GlobalBlueIINBlacklist."Range Inclusive Start", Value, 9);
+            TryGetItemInnerText(Range, 'PrefixTo', Value);
+            Evaluate(GlobalBlueIINBlacklist."Range Exclusive End", Value, 9);
+
+            if GlobalBlueIINBlacklist.Insert(false) then;
         end;
         Commit;
 
@@ -269,15 +275,12 @@ codeunit 6014613 "NPR Tax Free GB I2"
 
     local procedure IssueVoucher(var TaxFreeRequest: Record "NPR Tax Free Request"; var tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary; var tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary)
     var
-        ServiceID: Text;
+        XMLDoc: XmlDocument;
         CustomerXML: Text;
-        PurchaseXML: Text;
         PaymentXML: Text;
-        XMLDoc: DotNet "NPRNetXmlDocument";
-        IsError: Boolean;
-        Value: Text;
-        TempBlob: Codeunit "Temp Blob";
-        RecRef: RecordRef;
+        PurchaseXML: Text;
+        ServiceID: Text;
+        Handeled: Boolean;
     begin
         //tmpTaxFreeConsolidation carries the sales receipts/documents to be consolidated into one tax free voucher.
         //In a normal flow with a single sale, it only holds one record.
@@ -287,37 +290,51 @@ codeunit 6014613 "NPR Tax Free GB I2"
         PurchaseXML := GetPurchaseDetailsXML(tmpTaxFreeConsolidation);
         PaymentXML := GetPurchasePaymentMethodsXML(tmpTaxFreeConsolidation);
 
+        OnBeforeIssueVoucher(TaxFreeRequest, CustomerXML, PaymentXML, PurchaseXML, Handeled);
+        if Handeled then
+            exit;
+
         IssueRenderedCheque(TaxFreeRequest, PurchaseXML, PaymentXML, CustomerXML);
+        ParseIssueVoucher(TaxFreeRequest, XmlDoc);
+    end;
+
+    procedure ParseIssueVoucher(var TaxFreeRequest: Record "NPR Tax Free Request"; XMLDoc: xmlDocument)
+    var
+        TempBlob: Codeunit "Temp Blob";
+        RecRef: RecordRef;
+        IsError: Boolean;
+        Value: Text;
+    begin
         HandleResponse(TaxFreeRequest, 'IssueRenderedCheque', XMLDoc, IsError);
         if IsError then
             Error(TaxFreeRequest."Error Message");
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/NumericDocIdentifier', Value) then
-            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
         TaxFreeRequest."External Voucher No." := Value;
         TaxFreeRequest."External Voucher Barcode" := Value;
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/TotalGrossAmount', Value) then
-            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
         Evaluate(TaxFreeRequest."Total Amount Incl. VAT", Value, 9);
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/TotalRefundAmount', Value) then
-            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
         Evaluate(TaxFreeRequest."Refund Amount", Value, 9);
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/@mimetype', Value) then
-            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
         case true of
             Value = 'application/pdf':
                 TaxFreeRequest."Print Type" := TaxFreeRequest."Print Type"::PDF;
             Value = 'text/plain':
                 TaxFreeRequest."Print Type" := TaxFreeRequest."Print Type"::Thermal;
             else
-                Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+                Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
         end;
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/BinaryData/Value', Value) then
-            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
         Base64ToBlob(Value, TempBlob);
 
         RecRef.GetTable(TaxFreeRequest);
@@ -328,11 +345,7 @@ codeunit 6014613 "NPR Tax Free GB I2"
     local procedure ReissueVoucher(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher")
     var
         VoucherService: Record "NPR Tax Free GB I2 Service";
-        XMLDoc: DotNet "NPRNetXmlDocument";
-        IsError: Boolean;
-        Value: Text;
-        TempBlob: Codeunit "Temp Blob";
-        RecRef: RecordRef;
+        XMLDoc: XmlDocument;
     begin
         if VoucherService.Get(TaxFreeVoucher."POS Unit No.", TaxFreeVoucher."Service ID") then
             if VoucherService."Void Limit In Days" <> 0 then
@@ -352,36 +365,46 @@ codeunit 6014613 "NPR Tax Free GB I2"
 
         TaxFreeRequest."Service ID" := TaxFreeVoucher."Service ID"; //Reuse service ID.
         ReissueRenderedCheque(TaxFreeRequest, TaxFreeVoucher."External Voucher No.", Format(TaxFreeVoucher."Total Amount Incl. VAT", 0, 9));
+        ParseReissueVoucher(TaxFreeRequest, XMLDoc);
+    end;
+
+    local procedure ParseReissueVoucher(var TaxFreeRequest: Record "NPR Tax Free Request"; XMLDoc: XmlDocument)
+    var
+        TempBlob: Codeunit "Temp Blob";
+        RecRef: RecordRef;
+        IsError: Boolean;
+        Value: Text;
+    begin
         HandleResponse(TaxFreeRequest, 'ReissueRenderedCheque', XMLDoc, IsError);
         if IsError then
             Error(TaxFreeRequest."Error Message");
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/NumericDocIdentifier', Value) then
-            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
         TaxFreeRequest."External Voucher No." := Value;
         TaxFreeRequest."External Voucher Barcode" := Value;
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/TotalGrossAmount', Value) then
-            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
         Evaluate(TaxFreeRequest."Total Amount Incl. VAT", Value, 9);
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/TotalRefundAmount', Value) then
-            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
         Evaluate(TaxFreeRequest."Refund Amount", Value, 9);
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/@mimetype', Value) then
-            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
         case true of
             Value = 'application/pdf':
                 TaxFreeRequest."Print Type" := TaxFreeRequest."Print Type"::PDF;
             Value = 'text/plain':
                 TaxFreeRequest."Print Type" := TaxFreeRequest."Print Type"::Thermal;
             else
-                Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+                Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
         end;
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/BinaryData/Value', Value) then
-            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
         Base64ToBlob(Value, TempBlob);
 
         RecRef.GetTable(TaxFreeRequest);
@@ -392,8 +415,7 @@ codeunit 6014613 "NPR Tax Free GB I2"
     local procedure VoidVoucher(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher")
     var
         VoucherService: Record "NPR Tax Free GB I2 Service";
-        XMLDoc: DotNet "NPRNetXmlDocument";
-        IsError: Boolean;
+        XMLDoc: XmlDocument;
     begin
         if VoucherService.Get(TaxFreeVoucher."POS Unit No.", TaxFreeVoucher."Service ID") then
             if VoucherService."Void Limit In Days" <> 0 then
@@ -412,6 +434,13 @@ codeunit 6014613 "NPR Tax Free GB I2"
             Error(Error_UserCancel);
 
         VoidCheque(TaxFreeRequest, TaxFreeVoucher."External Voucher No.", Format(TaxFreeVoucher."Total Amount Incl. VAT", 0, 9));
+        ParseVoidVoucher(TaxFreeRequest, XMLDoc);
+    end;
+
+    procedure ParseVoidVoucher(var TaxFreeRequest: Record "NPR Tax Free Request"; XMLDoc: XmlDocument)
+    var
+        IsError: Boolean;
+    begin
         HandleResponse(TaxFreeRequest, 'VoidCheque', XMLDoc, IsError);
         if IsError then
             Error(TaxFreeRequest."Error Message");
@@ -444,9 +473,9 @@ codeunit 6014613 "NPR Tax Free GB I2"
     var
         TaxFreeRequest: Record "NPR Tax Free Request";
         IsError: Boolean;
-        XMLDoc: DotNet "NPRNetXmlDocument";
-        Value: Text;
         DateTime: DateTime;
+        Value: Text;
+        XMLDoc: XmlDocument;
     begin
         TaxFreeRequest.Init;
         TaxFreeRequest."Request Type" := 'LOOKUP_TRAVELLER';
@@ -462,23 +491,23 @@ codeunit 6014613 "NPR Tax Free GB I2"
 
         //Necessary data for UI confirm
         if not TrySelectSingleNodeText(XMLDoc, '//TravellerRes/FirstName', Value) then
-            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
         tmpCustomerInfoCapture."First Name" := Value;
 
         if not TrySelectSingleNodeText(XMLDoc, '//TravellerRes/LastName', Value) then
-            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
         tmpCustomerInfoCapture."Last Name" := Value;
 
         if not TrySelectSingleNodeText(XMLDoc, '//TravellerRes/Passport/PassportNumber', Value) then
-            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
         tmpCustomerInfoCapture."Passport Number" := Value;
 
         if not TrySelectSingleNodeText(XMLDoc, '//TravellerRes/Address/CountryCode', Value) then
-            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
         Evaluate(tmpCustomerInfoCapture."Country Of Residence Code", Value, 9);
 
         if not TrySelectSingleNodeText(XMLDoc, '//TravellerRes/Address/CountryName', Value) then
-            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID Enum", TaxFreeRequest."Request Type");
         tmpCustomerInfoCapture."Country Of Residence" := Value;
 
         //Non-essential data:
@@ -541,10 +570,10 @@ codeunit 6014613 "NPR Tax Free GB I2"
     local procedure PrintThermal(TaxFreeRequest: Record "NPR Tax Free Request")
     var
         ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
-        Output: Text;
         Printer: Codeunit "NPR RP Line Print Mgt.";
         InStream: InStream;
         Line: Text;
+        Output: Text;
     begin
         Output := ObjectOutputMgt.GetCodeunitOutputPath(CODEUNIT::"NPR Tax Free Receipt");
         if Output = '' then
@@ -566,17 +595,17 @@ codeunit 6014613 "NPR Tax Free GB I2"
 
     local procedure PrintThermalLine(var Printer: Codeunit "NPR RP Line Print Mgt."; Line: Text)
     var
-        Center: Boolean;
-        Inverse: Boolean;
-        HFont: Boolean;
-        Bold: Boolean;
         Barcode: Boolean;
+        Bold: Boolean;
+        Center: Boolean;
+        HFont: Boolean;
         Img: Boolean;
-        TearOff: Boolean;
+        Inverse: Boolean;
         ShopCopy: Boolean;
+        TearOff: Boolean;
+        String: Text;
+        StringUpper: Text;
         Value: Text;
-        String: DotNet NPRNetString;
-        StringUpper: DotNet NPRNetString;
     begin
         String := Line;
         StringUpper := UpperCase(Line);
@@ -673,15 +702,16 @@ codeunit 6014613 "NPR Tax Free GB I2"
         end;
     end;
 
+    [Obsolete('Need to refractor "NPR Print Method Mgt."')]
     local procedure PrintPDF(TaxFreeRequest: Record "NPR Tax Free Request")
     var
+        ObjectOutputSelection: Record "NPR Object Output Selection";
+        ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
+        PrintMethodMgt: Codeunit "NPR Print Method Mgt.";
         MemoryStream: DotNet NPRNetMemoryStream;
         InStream: InStream;
-        ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
-        Output: Text;
         OutputType: Integer;
-        PrintMethodMgt: Codeunit "NPR Print Method Mgt.";
-        ObjectOutputSelection: Record "NPR Object Output Selection";
+        Output: Text;
     begin
         MemoryStream := MemoryStream.MemoryStream();
         TaxFreeRequest.Print.CreateInStream(InStream);
@@ -703,14 +733,11 @@ codeunit 6014613 "NPR Tax Free GB I2"
 
     local procedure Base64ToBlob(base64: Text; var TempBlobOut: Codeunit "Temp Blob")
     var
+        Base64Convert: Codeunit "Base64 Convert";
         OutStream: OutStream;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Convert: DotNet NPRNetConvert;
     begin
-        MemoryStream := MemoryStream.MemoryStream(Convert.FromBase64String(base64));
-
         TempBlobOut.CreateOutStream(OutStream);
-        CopyStream(OutStream, MemoryStream);
+        Base64Convert.FromBase64(base64, OutStream);
     end;
 
     #endregion
@@ -1000,56 +1027,66 @@ codeunit 6014613 "NPR Tax Free GB I2"
 
     local procedure InvokeService(XMLRequest: Text; var TaxFreeRequest: Record "NPR Tax Free Request"): Text
     var
-        BaseAddress: Text;
-        HttpClient: DotNet NPRNetHttpClient;
-        Uri: DotNet NPRNetUri;
-        TimeSpan: DotNet NPRNetTimeSpan;
-        StringContent: DotNet NPRNetStringContent;
-        Encoding: DotNet NPRNetEncoding;
-        HttpResponseMessage: DotNet NPRNetHttpResponseMessage;
+        HttpClient: HttpClient;
+        HttpContent: HttpContent;
+        HttpResponseMessage: HttpResponseMessage;
+        HttpRequestMessage: HttpRequestMessage;
         OutStream: OutStream;
+        BaseAddress: Text;
         Result: Text;
+        HttpHeaders: HttpHeaders;
     begin
+        if (GlobalBlueParameters."Shop ID" = '') or (GlobalBlueParameters."Desk ID" = '') or (GlobalBlueParameters.Username = '') or (GlobalBlueParameters.Password = '') then
+            Error(Error_MinimumParameters);
+
         TaxFreeRequest.Request.CreateOutStream(OutStream, TEXTENCODING::UTF8);
         OutStream.Write(XMLRequest);
         Clear(OutStream);
 
-        HttpClient := HttpClient.HttpClient();
         HttpClient.DefaultRequestHeaders.Clear();
 
         if TaxFreeRequest.Mode = TaxFreeRequest.Mode::PROD then
-            HttpClient.BaseAddress := Uri.Uri(ServicePROD)
+            HttpRequestMessage.SetRequestUri(ServicePROD())
         else
-            HttpClient.BaseAddress := Uri.Uri(ServiceTEST);
+            HttpRequestMessage.SetRequestUri(ServiceTEST());
 
         if TaxFreeRequest."Timeout (ms)" > 0 then
-            HttpClient.Timeout := TimeSpan.TimeSpan(0, 0, 0, TaxFreeRequest."Timeout (ms)")
+            HttpClient.Timeout := TaxFreeRequest."Timeout (ms)"
         else
-            HttpClient.Timeout := TimeSpan.TimeSpan(0, 0, 10);
+            HttpClient.Timeout := 10000;
 
-        StringContent := StringContent.StringContent(XMLRequest, Encoding.UTF8, 'text/xml');
-        HttpResponseMessage := HttpClient.PostAsync('', StringContent).Result();
+        HttpContent.WriteFrom(XMLRequest);
+        HttpContent.GetHeaders(HttpHeaders);
+
+        HttpHeaders.Remove('Content-Type');
+        HttpHeaders.Add('Content-Type', 'text/xml; charset="utf-8"');
+
+        HttpRequestMessage.Method('POST');
+        HttpRequestMessage.Content := HttpContent;
+
+        if not HttpClient.Send(HttpRequestMessage, HttpResponseMessage) then
+            error('%1 - %2', HttpResponseMessage.HttpStatusCode, HttpResponseMessage.ReasonPhrase);
 
         TaxFreeRequest.Response.CreateOutStream(OutStream, TEXTENCODING::UTF8);
-        Result := HttpResponseMessage.Content.ReadAsStringAsync().Result();
+        HttpResponseMessage.Content.ReadAs(Result);
         OutStream.Write(Result);
     end;
 
-    local procedure HandleResponse(var TaxFreeRequest: Record "NPR Tax Free Request"; ExpectedOperation: Text; var XMLDoc: DotNet "NPRNetXmlDocument"; var IsError: Boolean)
+    local procedure HandleResponse(var TaxFreeRequest: Record "NPR Tax Free Request"; ExpectedOperation: Text; var XMLDoc: XmlDocument; var IsError: Boolean)
     var
-        InStream: InStream;
-        Value: Text;
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        MemoryStream: DotNet NPRNetMemoryStream;
+        XMLDOMMtg: Codeunit "XML DOM Management";
+        InStream: InStream;
+        OutStream: OutStream;
+        Value: Text;
+        XMLMessage: Text;
     begin
         TaxFreeRequest.Response.CreateInStream(InStream);
-        MemoryStream := MemoryStream.MemoryStream();
-        CopyStream(MemoryStream, InStream);
-        MemoryStream.Position := 0;
-        XMLDoc := XMLDoc.XmlDocument();
-        XMLDoc.Load(MemoryStream);
+        InStream.Read(XMLMessage);
 
-        NpXmlDomMgt.RemoveNameSpaces(XMLDoc);
+        XMLMessage := XMLDOMMtg.RemoveNamespaces(XMLMessage);
+
+        XmlDocument.ReadFrom(XMLMessage, XMLDoc);
 
         if not (TrySelectSingleNodeText(XMLDoc, '//Header/Operation', Value)) then begin
             //Undocumented critical error
@@ -1087,17 +1124,10 @@ codeunit 6014613 "NPR Tax Free GB I2"
 
     local procedure EscapeSpecialChars(Value: Text): Text
     var
-        CALText: Text;
-        String: DotNet NPRNetString;
+        TypeHelper: Codeunit "Type Helper";
     begin
-        String := Value;
-        String := String.Replace('&', '&amp;');
-        String := String.Replace('"', '&quot;');
-        String := String.Replace('''', '&apos;');
-        String := String.Replace('<', '&lt;');
-        String := String.Replace('>', '&qt;');
-        CALText := String;
-        exit(CALText);
+        TypeHelper.HtmlEncode(Value);
+        exit(Value);
     end;
 
     local procedure SenderID(): Text
@@ -1120,18 +1150,47 @@ codeunit 6014613 "NPR Tax Free GB I2"
         exit(Format(CurrentDateTime, 0, 9));
     end;
 
+    var
+        ParsingHandlerErr: Label 'Parsing Error TrySelectSingleNodeText';
+
     [TryFunction]
-    local procedure TrySelectSingleNodeText(var XMLDoc: DotNet "NPRNetXmlDocument"; XPath: Text; var Value: Text)
+    local procedure TrySelectSingleNodeText(var XMLDoc: XmlDocument; XPath: Text; var Value: Text)
+    var
+        XMLNode: XmlNode;
+        XMLNodeLst: XmlNodeList;
+        XmlAttributeColl: XmlAttributeCollection;
+        XMLNamesp: XmlProcessingInstruction;
+        XMLDom: Codeunit "XML DOM Management";
+        XMLMessage: Text;
+        XMLDocNoNamespace: XmlDocument;
+
     begin
-        Value := XMLDoc.SelectSingleNode(XPath).InnerText();
+        XMLDoc.SelectSingleNode(XPath, XMLNode);
+        case true of
+            XMLNode.IsXmlElement:
+                Value := XMLNode.AsXmlElement().InnerText;
+            XMLNode.IsXmlAttribute:
+                Value := XMLNode.AsXmlAttribute().Value;
+            else
+                Error(ParsingHandlerErr);
+        end
     end;
 
     [TryFunction]
-    local procedure TryGetItemInnerText(var XmlNode: DotNet NPRNetXmlNode; ItemName: Text; var Value: Text)
+    local procedure TryGetItemInnerText(var XmlNode: XmlNode; ItemName: Text; var Value: Text)
+    var
+        InnerTextNode: XmlNode;
     begin
-        Value := XmlNode.Item(ItemName).InnerText;
+        XmlNode.SelectSingleNode(ItemName, InnerTextNode);
+        case true of
+            XMLNode.IsXmlElement:
+                Value := InnerTextNode.AsXmlElement().InnerText;
+            XMLNode.IsXmlAttribute:
+                Value := InnerTextNode.AsXmlAttribute().Value;
+            else
+                Error(ParsingHandlerErr);
+        end
     end;
-
     #endregion
 
     #region Aux
@@ -1166,8 +1225,8 @@ codeunit 6014613 "NPR Tax Free GB I2"
 
     local procedure ScanCustomerID(var tmpCustomerInfoCapture: Record "NPR TaxFree GB I2 Info Capt." temporary): Boolean
     var
-        IDType: Integer;
         Captured: Boolean;
+        IDType: Integer;
     begin
         IDType := StrMenu(StrSubstNo('%1,%2,%3', Caption_MemberCard, Caption_MobileNo, Caption_Passport), 1, Caption_IdentifierType);
 
@@ -1388,9 +1447,9 @@ codeunit 6014613 "NPR Tax Free GB I2"
     local procedure IsConsolidationEligibleSeperate(var tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary; var tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary): Boolean
     var
         tmpSharedEligibleServices: Record "NPR Tax Free GB I2 Service" temporary;
+        Eligible: Boolean;
         First: Boolean;
         FilterString: Text;
-        Eligible: Boolean;
     begin
         //Check each sale seperately and make sure they share an eligible service
 
@@ -1437,38 +1496,45 @@ codeunit 6014613 "NPR Tax Free GB I2"
 
     local procedure IsConsolidationEligibleShared(var tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary; var tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary): Boolean
     var
-        AuditRoll: Record "NPR Audit Roll";
-        SalesAmount: Decimal;
         Item: Record Item;
+        POSSalesLine: Record "NPR POS Sales Line";
+        SalesAmount: Decimal;
+        POSEntry: Record "NPR POS Entry";
     begin
         repeat
-            AuditRoll.Reset;
-            Clear(AuditRoll);
+            POSSalesLine.Reset;
+            Clear(POSSalesLine);
 
-            AuditRoll.SetRange("Sales Ticket No.", tmpTaxFreeConsolidation."Sales Ticket No.");
-            AuditRoll.SetRange(Type, AuditRoll.Type::Item);
-            AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
-            AuditRoll.SetFilter(Quantity, '>0');
-            AuditRoll.SetFilter("VAT %", '>0');
+            POSSalesLine.SetCurrentKey("Document No.", "Line No.");
+            POSSalesLine.SetRange("Document No.", tmpTaxFreeConsolidation."Sales Ticket No.");
+            POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
+            POSSalesLine.SetFilter(Quantity, '>0');
+            POSSalesLine.SetFilter("VAT %", '>0');
 
-            if not AuditRoll.FindSet then
+            if not POSSalesLine.FindSet then
                 exit(false);
 
-            if CalcDate(GlobalBlueParameters."Voucher Issue Date Limit", AuditRoll."Sale Date") < Today then
+            POSEntry.Get(POSSalesLine."POS Entry No.");
+
+            if POSEntry."Entry Type" <> POSEntry."Entry Type"::"Direct Sale" then
+                exit;
+
+            POSSalesLine.CalcFields("Entry Date");
+            if CalcDate(GlobalBlueParameters."Voucher Issue Date Limit", POSSalesLine."Entry Date") < Today then
                 exit(false);
 
             if GlobalBlueParameters."Count Zero VAT Goods For Limit" then
-                AuditRoll.SetRange("VAT %");
+                POSSalesLine.SetRange("VAT %");
 
             if GlobalBlueParameters."Services Eligible" then begin
-                AuditRoll.CalcSums("Amount Including VAT");
-                SalesAmount += AuditRoll."Amount Including VAT";
+                POSSalesLine.CalcSums("Amount Incl. VAT");
+                SalesAmount += POSSalesLine."Amount Incl. VAT";
             end else begin
                 repeat
-                    Item.Get(AuditRoll."No.");
+                    Item.Get(POSSalesLine."No.");
                     if Item.Type = Item.Type::Inventory then
-                        SalesAmount += AuditRoll."Amount Including VAT";
-                until AuditRoll.Next = 0;
+                        SalesAmount += POSSalesLine."Amount Incl. VAT";
+                until POSSalesLine.Next = 0;
             end;
         until tmpTaxFreeConsolidation.Next = 0;
 
@@ -1478,35 +1544,41 @@ codeunit 6014613 "NPR Tax Free GB I2"
 
     local procedure IsStoredSaleEligible(SalesTicketNo: Text; var tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary): Boolean
     var
-        AuditRoll: Record "NPR Audit Roll";
-        SaleAmount: Decimal;
         Item: Record Item;
-        AuditRoll2: Record "NPR Audit Roll";
+        POSSalesLine: Record "NPR POS Sales Line";
+        SaleAmount: Decimal;
+        POSEntry: Record "NPR POS Entry";
     begin
-        AuditRoll.SetRange("Sales Ticket No.", SalesTicketNo);
-        AuditRoll.SetRange(Type, AuditRoll.Type::Item);
-        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
-        AuditRoll.SetFilter(Quantity, '>0');
-        AuditRoll.SetFilter("VAT %", '>0');
+        POSSalesLine.SetCurrentKey("Document No.", "Line No.");
+        POSSalesLine.SetRange("Document No.", SalesTicketNo);
+        POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
+        POSSalesLine.SetFilter(Quantity, '>0');
+        POSSalesLine.SetFilter("VAT %", '>0');
 
-        if not AuditRoll.FindSet then
+        if not POSSalesLine.FindSet() then
             exit(false);
 
-        if CalcDate(GlobalBlueParameters."Voucher Issue Date Limit", AuditRoll."Sale Date") < Today then
+        POSEntry.Get(POSSalesLine."POS Entry No.");
+
+        if POSEntry."Entry Type" <> POSEntry."Entry Type"::"Direct Sale" then
+            exit;
+
+        POSSalesLine.CalcFields("Entry Date");
+        if CalcDate(GlobalBlueParameters."Voucher Issue Date Limit", POSSalesLine."Entry Date") < Today then
             exit(false);
 
         if GlobalBlueParameters."Count Zero VAT Goods For Limit" then
-            AuditRoll.SetRange("VAT %");
+            POSSalesLine.SetRange("VAT %");
 
         if GlobalBlueParameters."Services Eligible" then begin
-            AuditRoll.CalcSums("Amount Including VAT");
-            SaleAmount := AuditRoll."Amount Including VAT";
+            POSSalesLine.CalcSums("Amount Incl. VAT");
+            SaleAmount := POSSalesLine."Amount Incl. VAT";
         end else begin
             repeat
-                Item.Get(AuditRoll."No.");
+                Item.Get(POSSalesLine."No.");
                 if Item.Type = Item.Type::Inventory then
-                    SaleAmount += AuditRoll."Amount Including VAT";
-            until AuditRoll.Next = 0;
+                    SaleAmount += POSSalesLine."Amount Incl. VAT";
+            until POSSalesLine.Next = 0;
         end;
 
         GetEligibleServices(SaleAmount, tmpEligibleServices);
@@ -1515,10 +1587,10 @@ codeunit 6014613 "NPR Tax Free GB I2"
 
     local procedure IsActiveSaleEligible(SalesTicketNo: Text; var tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary): Boolean
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
         Item: Record Item;
-        SaleAmount: Decimal;
+        SaleLinePOS: Record "NPR Sale Line POS";
         SalePOS: Record "NPR Sale POS";
+        SaleAmount: Decimal;
     begin
         SaleLinePOS.SetRange("Sales Ticket No.", SalesTicketNo);
         SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
@@ -1596,40 +1668,40 @@ codeunit 6014613 "NPR Tax Free GB I2"
 
     local procedure GetPurchaseDetailsXML(var tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary): Text
     var
-        AuditRoll: Record "NPR Audit Roll";
-        ReceiptXML: Text;
-        ItemXML: Text;
-        XML: Text;
         Item: Record Item;
+        PosSalesLine: Record "NPR POS Sales Line";
+        ItemXML: Text;
+        ReceiptXML: Text;
+        XML: Text;
     begin
         XML := '<PurchaseDetails>';
         tmpTaxFreeConsolidation.FindSet;
         repeat
-            AuditRoll.Reset;
-            Clear(AuditRoll);
-            AuditRoll.SetRange("Sales Ticket No.", tmpTaxFreeConsolidation."Sales Ticket No.");
-            AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
-            AuditRoll.SetRange(Type, AuditRoll.Type::Item);
-            AuditRoll.SetFilter(Quantity, '>0');
-            AuditRoll.FindSet;
+            PosSalesLine.Reset;
+            Clear(PosSalesLine);
+            PosSalesLine.SetRange("Document No.", tmpTaxFreeConsolidation."Sales Ticket No.");
+            PosSalesLine.SetRange(Type, PosSalesLine.Type::Item);
+            PosSalesLine.SetFilter(Quantity, '>0');
+            PosSalesLine.FindSet;
+            POSSalesLine.CalcFields("Entry Date", "Ending Time");
 
             XML += '<Receipt>';
-            XML += StrSubstNo('<ReceiptDateTime>%1</ReceiptDateTime>', Format(CreateDateTime(AuditRoll."Sale Date", AuditRoll."Closing Time"), 0, 9));
-            XML += StrSubstNo('<ReceiptNumber>%1</ReceiptNumber>', Format(AuditRoll."Sales Ticket No.", 0, 9));
+            XML += StrSubstNo('<ReceiptDateTime>%1</ReceiptDateTime>', Format(CreateDateTime(PosSalesLine."Entry Date", PosSalesLine."Ending Time"), 0, 9));
+            XML += StrSubstNo('<ReceiptNumber>%1</ReceiptNumber>', Format(PosSalesLine."Document No.", 0, 9));
             XML += '<PurchaseItems>';
             repeat
-                Item.Get(AuditRoll."No.");
+                Item.Get(PosSalesLine."No.");
                 if (Item.Type = Item.Type::Inventory) or (GlobalBlueParameters."Services Eligible") then
                     XML +=
                     '<PurchaseItem>' +
-                      '<VATRate>' + Format(AuditRoll."VAT %", 0, '<Precision,2:2><Standard Format,2>') + '</VATRate>' +
-                      '<GrossAmount>' + Format(AuditRoll."Amount Including VAT", 0, '<Precision,2:2><Standard Format,2>') + '</GrossAmount>' +
-                      '<VATAmount>' + Format(AuditRoll."Amount Including VAT" - AuditRoll.Amount, 0, '<Precision,2:2><Standard Format,2>') + '</VATAmount>' +
-                      '<NetAmount>' + Format(AuditRoll.Amount, 0, '<Precision,2:2><Standard Format,2>') + '</NetAmount>' +
-                      '<Quantity>' + Format(Round(AuditRoll.Quantity, 1, '>')) + '</Quantity>' + //Round up - They only accept integer quantity
-                      '<GoodDescription>' + Format(CopyStr(EscapeSpecialChars(AuditRoll.Description), 1, 50)) + '</GoodDescription>' +
+                      '<VATRate>' + Format(PosSalesLine."VAT %", 0, '<Precision,2:2><Standard Format,2>') + '</VATRate>' +
+                      '<GrossAmount>' + Format(PosSalesLine."Amount Incl. VAT", 0, '<Precision,2:2><Standard Format,2>') + '</GrossAmount>' +
+                      '<VATAmount>' + Format(PosSalesLine."Amount Incl. VAT" - PosSalesLine."Amount Excl. VAT", 0, '<Precision,2:2><Standard Format,2>') + '</VATAmount>' +
+                      '<NetAmount>' + Format(PosSalesLine."Amount Excl. VAT", 0, '<Precision,2:2><Standard Format,2>') + '</NetAmount>' +
+                      '<Quantity>' + Format(Round(PosSalesLine.Quantity, 1, '>')) + '</Quantity>' + //Round up - They only accept integer quantity
+                      '<GoodDescription>' + Format(CopyStr(EscapeSpecialChars(PosSalesLine.Description), 1, 50)) + '</GoodDescription>' +
                     '</PurchaseItem>';
-            until AuditRoll.Next = 0;
+            until PosSalesLine.Next = 0;
             XML += '</PurchaseItems>';
             XML += '</Receipt>';
         until tmpTaxFreeConsolidation.Next = 0;
@@ -1725,32 +1797,18 @@ codeunit 6014613 "NPR Tax Free GB I2"
 
     #endregion
 
-    #region Event subscribers
+    #region Interface integration
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnLookupHandler', '', false, false)]
-    local procedure OnLookupHandler(var HashSet: DotNet NPRNetHashSet_Of_T)
+    procedure OnLookupHandlerParameter(TaxFreeUnit: Record "NPR Tax Free POS Unit"; var Handled: Boolean; var tmpHandlerParameters: Record "NPR Tax Free Handler Param." temporary)
     begin
-        HashSet.Add(HandlerID);
+        Error(Error_NotSupported, TaxFreeUnit."Handler ID Enum");
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnLookupHandlerParameters', '', false, false)]
-    local procedure OnLookupHandlerParameter(TaxFreeUnit: Record "NPR Tax Free POS Unit"; var Handled: Boolean; var tmpHandlerParameters: Record "NPR Tax Free Handler Param." temporary)
-    begin
-        if not TaxFreeUnit.IsThisHandler(HandlerID) then
-            exit;
-
-        Error(Error_NotSupported, TaxFreeUnit."Handler ID");
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnSetUnitParameters', '', false, false)]
-    local procedure OnSetUnitParameters(TaxFreeUnit: Record "NPR Tax Free POS Unit"; var Handled: Boolean)
+    procedure OnSetUnitParameters(TaxFreeUnit: Record "NPR Tax Free POS Unit"; var Handled: Boolean)
     var
         GlobalBlueParameters: Record "NPR Tax Free GB I2 Param.";
         GlobalBlueParameterPage: Page "NPR Tax Free GB I2 Param.";
     begin
-        if not TaxFreeUnit.IsThisHandler(HandlerID) then
-            exit;
-
         Handled := true;
 
         if not GlobalBlueParameters.Get(TaxFreeUnit."POS Unit No.") then begin
@@ -1765,18 +1823,12 @@ codeunit 6014613 "NPR Tax Free GB I2"
         GlobalBlueParameterPage.RunModal();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnUnitAutoConfigure', '', false, false)]
-    local procedure OnUnitAutoConfigure(var TaxFreeRequest: Record "NPR Tax Free Request"; Silent: Boolean; var Handled: Boolean)
+    procedure OnUnitAutoConfigure(var TaxFreeRequest: Record "NPR Tax Free Request"; Silent: Boolean)
     var
         GetCountriesJob: Codeunit "NPR TaxFree GBI2 GetCountries";
         GetBlockedCountriesJob: Codeunit "NPR TaxFree GBI2 GetBCountries";
         GetIINBlacklistJob: Codeunit "NPR TaxFree GBI2 GetBlockedIIN";
     begin
-        if not TaxFreeRequest.IsThisHandler(HandlerID) then
-            exit;
-
-        Handled := true;
-
         GlobalTaxFreeUnit.Get(TaxFreeRequest."POS Unit No.");
         GlobalBlueParameters.Get(TaxFreeRequest."POS Unit No.");
         DownloadDeskConfiguration(TaxFreeRequest);
@@ -1791,29 +1843,18 @@ codeunit 6014613 "NPR Tax Free GB I2"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnUnitTestConnection', '', false, false)]
-    local procedure OnUnitTestConnection(var TaxFreeRequest: Record "NPR Tax Free Request"; var Handled: Boolean)
+    procedure OnUnitTestConnection(var TaxFreeRequest: Record "NPR Tax Free Request")
     begin
-        if not TaxFreeRequest.IsThisHandler(HandlerID) then
-            exit;
-
-        Handled := true;
-
         GlobalTaxFreeUnit.Get(TaxFreeRequest."POS Unit No.");
         GlobalBlueParameters.Get(TaxFreeRequest."POS Unit No.");
         DownloadDeskConfiguration(TaxFreeRequest);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherIssueFromPOSSale', '', false, false)]
-    local procedure OnVoucherIssueFromPOSSale(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesReceiptNo: Code[20]; var Handled: Boolean; var SkipRecordHandling: Boolean)
+    procedure OnVoucherIssueFromPOSSale(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesReceiptNo: Code[20]; var SkipRecordHandling: Boolean)
     var
         tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary;
         tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary;
     begin
-        if not TaxFreeRequest.IsThisHandler(HandlerID) then
-            exit;
-
-        Handled := true;
         InitializeHandler(TaxFreeRequest);
 
         if not IsStoredSaleEligible(SalesReceiptNo, tmpEligibleServices) then
@@ -1828,62 +1869,37 @@ codeunit 6014613 "NPR Tax Free GB I2"
         IssueVoucher(TaxFreeRequest, tmpTaxFreeConsolidation, tmpEligibleServices);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherVoid', '', false, false)]
-    local procedure OnVoucherVoid(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher"; var Handled: Boolean)
+    procedure OnVoucherVoid(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher")
     begin
-        if not TaxFreeRequest.IsThisHandler(HandlerID) then
-            exit;
-
-        Handled := true;
         InitializeHandler(TaxFreeRequest);
         VoidVoucher(TaxFreeRequest, TaxFreeVoucher);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherReissue', '', false, false)]
-    local procedure OnVoucherReissue(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher"; var Handled: Boolean)
+    procedure OnVoucherReissue(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher")
     begin
-        if not TaxFreeRequest.IsThisHandler(HandlerID) then
-            exit;
-
-        Handled := true;
         InitializeHandler(TaxFreeRequest);
         ReissueVoucher(TaxFreeRequest, TaxFreeVoucher);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherLookup', '', false, false)]
-    local procedure OnVoucherLookup(var TaxFreeRequest: Record "NPR Tax Free Request"; VoucherNo: Text; var Handled: Boolean)
+    procedure OnVoucherLookup(var TaxFreeRequest: Record "NPR Tax Free Request"; VoucherNo: Text)
     begin
-        if not TaxFreeRequest.IsThisHandler(HandlerID) then
-            exit;
-
-        Handled := true;
-        Error(Error_NotSupported, TaxFreeRequest."Handler ID");
+        Error(Error_NotSupported, TaxFreeRequest."Handler ID Enum");
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherPrint', '', false, false)]
-    local procedure OnVoucherPrint(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher"; IsRecentVoucher: Boolean; var Handled: Boolean)
+    procedure OnVoucherPrint(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher"; IsRecentVoucher: Boolean)
     begin
-        if not TaxFreeRequest.IsThisHandler(HandlerID) then
-            exit;
-
-        Handled := true;
         if not IsRecentVoucher then //I2 only allows for reprint of recent voucher which is stored for the session. This can either be a just-issued voucher or a print-last attempt.
-            Error(Error_NotSupported, TaxFreeRequest."Handler ID");
+            Error(Error_NotSupported, TaxFreeRequest."Handler ID Enum");
 
         ClearLastError;
         if not TryPrintVoucher(TaxFreeRequest) then
             Error(Error_PrintFail, TaxFreeVoucher."External Voucher No.", GetLastErrorText);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherConsolidate', '', false, false)]
-    local procedure OnVoucherConsolidate(var TaxFreeRequest: Record "NPR Tax Free Request"; var tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary; var Handled: Boolean)
+    procedure OnVoucherConsolidate(var TaxFreeRequest: Record "NPR Tax Free Request"; var tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary)
     var
         tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary;
     begin
-        if not TaxFreeRequest.IsThisHandler(HandlerID) then
-            exit;
-
-        Handled := true;
         InitializeHandler(TaxFreeRequest);
 
         if not IsConsolidationEligible(tmpTaxFreeConsolidation, tmpEligibleServices) then
@@ -1894,44 +1910,29 @@ codeunit 6014613 "NPR Tax Free GB I2"
         IssueVoucher(TaxFreeRequest, tmpTaxFreeConsolidation, tmpEligibleServices);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnIsValidTerminalIIN', '', false, false)]
-    local procedure OnIsValidTerminalIIN(var TaxFreeRequest: Record "NPR Tax Free Request"; MaskedCardNo: Text; var IsForeignIIN: Boolean; var Handled: Boolean)
+    procedure OnIsValidTerminalIIN(var TaxFreeRequest: Record "NPR Tax Free Request"; MaskedCardNo: Text; var IsForeignIIN: Boolean)
     begin
-        if not TaxFreeRequest.IsThisHandler(HandlerID) then
-            exit;
-
-        Handled := true;
         InitializeHandler(TaxFreeRequest);
         IsForeignIIN := CheckIIN(MaskedCardNo);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnIsActiveSaleEligible', '', false, false)]
-    local procedure OnIsActiveSaleEligible(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean; var Handled: Boolean)
+    procedure OnIsActiveSaleEligible(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean)
     var
         tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary;
     begin
-        if not TaxFreeRequest.IsThisHandler(HandlerID) then
-            exit;
-
-        Handled := true;
         InitializeHandler(TaxFreeRequest);
         Eligible := IsActiveSaleEligible(SalesTicketNo, tmpEligibleServices);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnIsStoredSaleEligible', '', false, false)]
-    local procedure OnIsStoredSaleEligible(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean; var Handled: Boolean)
+    procedure OnIsStoredSaleEligible(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean)
     var
         tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary;
     begin
-        if not TaxFreeRequest.IsThisHandler(HandlerID) then
-            exit;
-
-        Handled := true;
         InitializeHandler(TaxFreeRequest);
         Eligible := IsStoredSaleEligible(SalesTicketNo, tmpEligibleServices);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014641, 'OnAfterDeleteEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Tax Free POS Unit", 'OnAfterDeleteEvent', '', false, false)]
     local procedure OnAfterTaxFreeUnitDelete(var Rec: Record "NPR Tax Free POS Unit"; RunTrigger: Boolean)
     var
         GlobalBlueParameters: Record "NPR Tax Free GB I2 Param.";
@@ -1940,7 +1941,8 @@ codeunit 6014613 "NPR Tax Free GB I2"
         if Rec.IsTemporary or (not RunTrigger) then
             exit;
 
-        if not Rec.IsThisHandler(HandlerID) then
+
+        if not (Rec."Handler ID Enum" = Rec."Handler ID Enum"::GLOBALBLUE_I2) then
             exit;
 
         GlobalBlueParameters.SetRange("Tax Free Unit", Rec."POS Unit No.");
@@ -1951,4 +1953,8 @@ codeunit 6014613 "NPR Tax Free GB I2"
     end;
 
     #endregion
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeIssueVoucher(var TaxFreeRequest: Record "NPR Tax Free Request"; CustomerXML: Text; PaymentXML: Text; PurchaseXML: Text; var Handeled: Boolean)
+    begin
+    end;
 }

@@ -1,26 +1,21 @@
-codeunit 6014611 "NPR Tax Free PTF PI"
+codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interface"
 {
     var
-        Error_Ineligible: Label 'Sale is not eligible.';
-        Error_PrintFail: Label 'Printing of tax free voucher %1 failed with error "%2".\NOTE: The voucher is correctly issued and active. Please recreate the tax free voucher if the problem persists.';
+        POSUnitNo: Code[10];
+        MinimumAmountLimit: Decimal;
+        CountryCode: Integer;
+        Error_PrintData: Label 'Invalid print data returned from service';
+        Error_InvalidResponse: Label 'Invalid webservice XML response';
+        Error_MissingPrintSetup: Label 'Missing object output setup';
         Error_MissingParameters: Label 'Missing parameters for handler %1 on tax free unit %2';
+        Error_NotSupported: Label 'Operation is not supported by tax free handler: %1';
+        Error_PrintFail: Label 'Printing of tax free voucher %1 failed with error "%2".\NOTE: The voucher is correctly issued and active. Please recreate the tax free voucher if the problem persists.';
+        Error_Ineligible: Label 'Sale is not eligible.';
+        Error_WrongIINDecision: Label 'The tax free service responded but it returned invalid data. Please double check the setup.';
+        Error_MissingPrint: Label 'The voucher cannot be reprinted. Please void and create a new one.';
+        Error_RequestFailed: Label 'Webservice request failed';
         MerchantID: Text;
         VATNumber: Text;
-        CountryCode: Integer;
-        POSUnitNo: Code[10];
-        Error_RequestFailed: Label 'Webservice request failed';
-        Error_InvalidResponse: Label 'Invalid webservice XML response';
-        Error_PrintData: Label 'Invalid print data returned from service';
-        Error_MissingPrintSetup: Label 'Missing object output setup';
-        Error_WrongIINDecision: Label 'The tax free service responded but it returned invalid data. Please double check the setup.';
-        MinimumAmountLimit: Decimal;
-        Error_NotSupported: Label 'Operation is not supported by tax free handler: %1';
-        Error_MissingPrint: Label 'The voucher cannot be reprinted. Please void and create a new one.';
-
-    local procedure HandlerID(): Text
-    begin
-        exit('PREMIER_PI')
-    end;
 
     local procedure ServicePROD(): Text
     begin
@@ -35,14 +30,14 @@ codeunit 6014611 "NPR Tax Free PTF PI"
     [TryFunction]
     local procedure InitializeHandler(TaxFreeRequest: Record "NPR Tax Free Request")
     var
-        TaxFreeUnit: Record "NPR Tax Free POS Unit";
         tmpHandlerParameters: Record "NPR Tax Free Handler Param." temporary;
+        TaxFreeUnit: Record "NPR Tax Free POS Unit";
         Variant: Variant;
     begin
         TaxFreeUnit.Get(TaxFreeRequest."POS Unit No.");
 
         if not TaxFreeUnit."Handler Parameters".HasValue then
-            Error(Error_MissingParameters, TaxFreeUnit."Handler ID", TaxFreeUnit."POS Unit No.");
+            Error(Error_MissingParameters, TaxFreeUnit."Handler ID Enum", TaxFreeUnit."POS Unit No.");
 
         AddParameters(tmpHandlerParameters);
         tmpHandlerParameters.DeserializeParameterBLOB(TaxFreeUnit);
@@ -62,7 +57,7 @@ codeunit 6014611 "NPR Tax Free PTF PI"
         POSUnitNo := TaxFreeUnit."POS Unit No.";
 
         if (StrLen(MerchantID) = 0) or (StrLen(VATNumber) = 0) or (CountryCode = 0) then
-            Error(Error_MissingParameters, TaxFreeUnit."Handler ID", TaxFreeUnit."POS Unit No.");
+            Error(Error_MissingParameters, TaxFreeUnit."Handler ID Enum", TaxFreeUnit."POS Unit No.");
     end;
 
     local procedure AddParameters(var tmpHandlerParameters: Record "NPR Tax Free Handler Param.")
@@ -73,9 +68,7 @@ codeunit 6014611 "NPR Tax Free PTF PI"
         tmpHandlerParameters.AddParameter('Minimum Amount Limit', tmpHandlerParameters."Data Type"::Decimal);
     end;
 
-    local procedure "// Commands"()
-    begin
-    end;
+    #region Commands
 
     local procedure VoucherIssue(var TaxFreeRequest: Record "NPR Tax Free Request"; var RecRef: RecordRef)
     var
@@ -88,10 +81,14 @@ codeunit 6014611 "NPR Tax Free PTF PI"
         ErrorDescription: Text;
         Number: Code[20];
         Type: Integer;
+        Handeled: Boolean;
     begin
         RecRef.FindSet;
 
         //This is done with 2 external calls, so requesttype is set before each to make sure the log is specific in case of error.
+        OnBeforeIssueVoucher(TaxFreeRequest, RecRef, Handeled);
+        if Handeled then
+            exit;
 
         TaxFreeRequest."Request Type" := 'INSERT_INVOICE';
         InsertInvoice(TaxFreeRequest, RecRef);
@@ -104,7 +101,7 @@ codeunit 6014611 "NPR Tax Free PTF PI"
     var
         ErrorText: Text;
         ErrorNo: Text;
-        XMLDoc: DotNet "NPRNetXmlDocument";
+        XMLDoc: XmlDocument;
     begin
         VoidVoucherRequest(TaxFreeRequest, ExternalVoucherNo);
         HandleResponse(TaxFreeRequest, 'VoidVoucherResult', XMLDoc);
@@ -136,7 +133,7 @@ codeunit 6014611 "NPR Tax Free PTF PI"
         ResponseMessage: Text;
         Value: Text;
         Eligible: Text;
-        XMLDoc: DotNet "NPRNetXmlDocument";
+        XMLDoc: XmlDocument;
         IIN: Text;
         ErrorNo: Text;
     begin
@@ -153,16 +150,14 @@ codeunit 6014611 "NPR Tax Free PTF PI"
             Error(GetFirstNodeContent(XMLDoc, 'error_text', false));
         end;
     end;
-
-    local procedure "// Aux functions"()
-    begin
-    end;
+    #endregion
+    #region Aux functions
 
     local procedure InsertInvoice(var TaxFreeRequest: Record "NPR Tax Free Request"; var RecRef: RecordRef): Boolean
     var
         ResponseMessage: Text;
         ErrorNo: Text;
-        XMLDoc: DotNet "NPRNetXmlDocument";
+        XMLDoc: XmlDocument;
     begin
         InsertInvoiceRequest(TaxFreeRequest, RecRef);
         HandleResponse(TaxFreeRequest, 'InsertInvoiceResult', XMLDoc);
@@ -184,7 +179,7 @@ codeunit 6014611 "NPR Tax Free PTF PI"
         VoucherRefundAmount: Text;
         TempBlob: Codeunit "Temp Blob";
         OutStream: OutStream;
-        XMLDoc: DotNet "NPRNetXmlDocument";
+        XMLDoc: XmlDocument;
         Decimal: Decimal;
         PrintXML: Text;
     begin
@@ -219,55 +214,57 @@ codeunit 6014611 "NPR Tax Free PTF PI"
         end;
     end;
 
-    local procedure GetCDataXML(XMLDoc: DotNet "NPRNetXmlDocument"; CDATATagName: Text)
+    local procedure GetCDataXML(var XMLDoc: XmlDocument; CDATATagName: Text)
     var
-        XMLNode: DotNet NPRNetXmlNode;
-        XMLNodeList: DotNet NPRNetXmlNodeList;
-        HtmlDecoder: DotNet NPRNetHttpUtility;
+        XMLNode: XmlNode;
+        XMLNodeList: XmlNodeList;
+        TypeHelper: Codeunit "Type Helper";
+        XMLMessage: Text;
     begin
-        XMLNodeList := XMLDoc.GetElementsByTagName(CDATATagName);
-        XMLNode := XMLNodeList.ItemOf(0);
-        HtmlDecoder := HtmlDecoder.HttpUtility;
-        XMLDoc.LoadXml(HtmlDecoder.HtmlDecode(XMLNode.InnerXml));
+        XMLNodeList := XMLDoc.GetDescendantElements(CDATATagName);
+        XMLNodeList.Get(1, XMLNode);
+        XMLMessage := XMLNode.AsXmlElement().InnerText;
+        XmlDocument.ReadFrom(TypeHelper.HtmlDecode(XMLMessage), XMLDoc);
     end;
 
-    local procedure GetFirstNodeContent(XMLDoc: DotNet "NPRNetXmlDocument"; ElementName: Text; XMLInContent: Boolean): Text
+    local procedure GetFirstNodeContent(XMLDoc: XmlDocument; ElementName: Text; XMLInContent: Boolean): Text
     var
-        XMLNode: DotNet NPRNetXmlNode;
-        XMLNodeList: DotNet NPRNetXmlNodeList;
+        XMLNode: XmlNode;
+        XMLNodeList: XmlNodeList;
+        XMLMessage: Text;
     begin
-        XMLNodeList := XMLDoc.GetElementsByTagName(ElementName);
-        XMLNode := XMLNodeList.ItemOf(0);
-        if XMLInContent then
-            exit(XMLNode.OuterXml)
-        else
-            exit(XMLNode.InnerText);
+        XMLNodeList := XMLDoc.GetDescendantElements(ElementName);
+        XMLNodeList.Get(1, XMLNode);
+        if XMLInContent then begin
+            XMLNode.WriteTo(XMLMessage);
+            exit(XMLMessage)
+        end else
+            exit(XMLNode.AsXmlElement().InnerText());
     end;
 
     [TryFunction]
     local procedure GetBarcodeFromPrintXML(PrintXML: Text; var Barcode: Text)
     var
-        XMLNode: DotNet NPRNetXmlNode;
-        PrintLines: DotNet NPRNetXmlNodeList;
+        XMLNode: XmlNode;
+        PrintLines: XmlNodeList;
         i: Integer;
         Line: Text;
-        XMLDoc: DotNet "NPRNetXmlDocument";
+        XMLDoc: XmlDocument;
     begin
-        XMLDoc := XMLDoc.XmlDocument;
-        XMLDoc.LoadXml(PrintXML);
-        PrintLines := XMLDoc.GetElementsByTagName('print_line');
+        XmlDocument.ReadFrom(PrintXML, XMLDoc);
+        PrintLines := XMLDoc.GetDescendantElements('print_line');
         if PrintLines.Count < 1 then
             Error(Error_PrintData);
 
-        i := 0;
+        i := 1;
         Barcode := '';
         repeat
-            XMLNode := PrintLines.ItemOf(i);
-            Line := XMLNode.InnerText;
+            PrintLines.Get(i, XMLNode);
+            Line := XMLNode.AsXmlElement().InnerText();
             if CopyStr(Line, 1, 2) = '11' then
                 Barcode := CopyStr(Line, 3);
             i += 1;
-        until (i >= (PrintLines.Count - 1)) or (Barcode <> '');
+        until (i >= (PrintLines.Count)) or (Barcode <> '');
 
         if Barcode = '' then
             Error(Error_PrintData);
@@ -275,52 +272,63 @@ codeunit 6014611 "NPR Tax Free PTF PI"
 
     local procedure GetSaleInfo(RecRef: RecordRef; Parameter: Text): Text
     var
-        AuditRoll: Record "NPR Audit Roll";
+        POSEntry: Record "NPR POS Entry";
+        POSSalesLine: Record "NPR POS Sales Line";
         SalePOS: Record "NPR Sale POS";
         SalesHeader: Record "Sales Header";
         Quantity: Decimal;
         DateTime: DateTime;
     begin
         case RecRef.Number of
-            DATABASE::"NPR Audit Roll":
-                RecRef.SetTable(AuditRoll);
             DATABASE::"NPR Sale POS":
                 RecRef.SetTable(SalePOS);
             DATABASE::"Sales Header":
                 RecRef.SetTable(SalesHeader);
+            Database::"NPR POS Sales Line":
+                RecRef.SetTable(POSSalesLine);
         end;
 
         case Parameter of
             'operator_id':
                 case RecRef.Number of
-                    DATABASE::"NPR Audit Roll":
-                        exit(ReplaceSpecialChars(AuditRoll."Salesperson Code"))
+                    Database::"NPR POS Sales Line":
+                        begin
+                            POSEntry.Get(POSSalesLine."POS Entry No.");
+                            exit(ReplaceSpecialChars(POSEntry."Salesperson Code"));
+                        end;
                 end;
             'transaction_type':
                 exit('1');
             'transaction_date':
                 case RecRef.Number of
-                    DATABASE::"NPR Audit Roll":
-                        exit(Format(AuditRoll."Sale Date", 0, 9));
+                    Database::"NPR POS Sales Line":
+                        begin
+                            POSSalesLine.CalcFields("Entry Date");
+                            exit(Format(POSSalesLine."Entry Date"));
+                        end;
+
                 end;
             'transaction_time':
                 case RecRef.Number of
-                    DATABASE::"NPR Audit Roll":
-                        exit(Format(AuditRoll."Closing Time"));
+                    Database::"NPR POS Sales Line":
+                        begin
+                            POSSalesLine.CalcFields("Ending Time");
+                            exit(Format(POSSalesLine."Ending Time"));
+                        end;
+
                 end;
             'invoice_number',
           'barcode_data':
                 case RecRef.Number of
-                    DATABASE::"NPR Audit Roll":
-                        exit(ReplaceSpecialChars(AuditRoll."Sales Ticket No."))
+                    Database::"NPR POS Sales Line":
+                        exit(ReplaceSpecialChars(POSSalesLine."Document No."))
                 end;
             'number_of_items':
                 case RecRef.Number of
-                    DATABASE::"NPR Audit Roll":
+                    Database::"NPR POS Sales Line":
                         begin
-                            AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
-                            AuditRoll.SetRange(Type, AuditRoll.Type::Item);
-                            exit(Format(AuditRoll.Count));
+                            POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
+                            exit(Format(POSSalesLine.Count));
                         end;
                 end;
             'invoice_line_items':
@@ -336,10 +344,9 @@ codeunit 6014611 "NPR Tax Free PTF PI"
 
     local procedure GetSaleItemInfo(var RecRef: RecordRef): Text
     var
-        AuditRoll: Record "NPR Audit Roll";
+        POSSalesLine: Record "NPR POS Sales Line";
         SalePOS: Record "NPR Sale POS";
         SalesHeader: Record "Sales Header";
-        "---": Integer;
         ItemNo: Integer;
         ItemDesc: Text;
         ItemVATRate: Text;
@@ -352,25 +359,24 @@ codeunit 6014611 "NPR Tax Free PTF PI"
         ItemXML: Text;
     begin
         case RecRef.Number of
-            DATABASE::"NPR Audit Roll":
+            Database::"NPR POS Sales Line":
                 begin
-                    RecRef.SetTable(AuditRoll);
-                    AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
-                    AuditRoll.SetRange(Type, AuditRoll.Type::Item);
-                    AuditRoll.SetFilter(Quantity, '>0');
-                    if AuditRoll.FindSet then
+                    RecRef.SetTable(POSSalesLine);
+                    POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
+                    POSSalesLine.SetFilter(Quantity, '>0');
+                    if POSSalesLine.FindSet then
                         repeat
 
                             ItemNo += 1;
 
-                            ItemDesc := ReplaceSpecialChars(AuditRoll.Description);
-                            ItemVATRate := Format(AuditRoll."VAT %", 0, '<Precision,2:2><Standard Format,2>');
-                            ItemGrossAmount := Format(AuditRoll."Amount Including VAT", 0, '<Precision,2:2><Standard Format,2>');
-                            ItemNetAmount := Format(AuditRoll.Amount, 0, '<Precision,2:2><Standard Format,2>');
-                            ItemVATAmount := Format(AuditRoll."Amount Including VAT" - AuditRoll.Amount, 0, '<Precision,2:2><Standard Format,2>');
-                            ItemUnitPrice := Format(AuditRoll."Unit Price", 0, '<Precision,2:2><Standard Format,2>');
-                            ItemDepartmentID := ReplaceSpecialChars(AuditRoll."No.");
-                            ItemQuantity := Format(Round(AuditRoll.Quantity, 1, '>')); //Round up - They only accept integer quantity
+                            ItemDesc := ReplaceSpecialChars(POSSalesLine.Description);
+                            ItemVATRate := Format(POSSalesLine."VAT %", 0, '<Precision,2:2><Standard Format,2>');
+                            ItemGrossAmount := Format(POSSalesLine."Amount Incl. VAT", 0, '<Precision,2:2><Standard Format,2>');
+                            ItemNetAmount := Format(POSSalesLine."Amount Excl. VAT", 0, '<Precision,2:2><Standard Format,2>');
+                            ItemVATAmount := Format(POSSalesLine."Amount Incl. VAT" - POSSalesLine."Amount Excl. VAT", 0, '<Precision,2:2><Standard Format,2>');
+                            ItemUnitPrice := Format(POSSalesLine."Unit Price", 0, '<Precision,2:2><Standard Format,2>');
+                            ItemDepartmentID := ReplaceSpecialChars(POSSalesLine."No.");
+                            ItemQuantity := Format(Round(POSSalesLine.Quantity, 1, '>')); //Round up - They only accept integer quantity
 
                             ItemXML += '<line_item>' +
                                        '  <item_number>' + Format(ItemNo) + '</item_number>' +
@@ -384,7 +390,7 @@ codeunit 6014611 "NPR Tax Free PTF PI"
                                        '  <item_quantity>' + ItemQuantity + '</item_quantity>' +
                                        '</line_item>';
 
-                        until AuditRoll.Next = 0;
+                        until POSSalesLine.Next = 0;
                 end;
             DATABASE::"NPR Sale POS":
                 begin
@@ -401,10 +407,10 @@ codeunit 6014611 "NPR Tax Free PTF PI"
 
     local procedure GetSalePaymentInfo(var RecRef: RecordRef): Text
     var
-        AuditRoll: Record "NPR Audit Roll";
+        POSSalesLine: Record "NPR POS Sales Line";
+        POSPaymentLine: Record "NPR POS Payment Line";
         SalePOS: Record "NPR Sale POS";
         SalesHeader: Record "Sales Header";
-        "--": Integer;
         PaymentMethod: Text;
         PaymentAmount: Text;
         CardType: Text;
@@ -415,14 +421,13 @@ codeunit 6014611 "NPR Tax Free PTF PI"
         //See page 51 of doc. for payment methods
 
         case RecRef.Number of
-            DATABASE::"NPR Audit Roll":
+            Database::"NPR POS Sales Line":
                 begin
-                    RecRef.SetTable(AuditRoll);
-                    AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Payment);
-
-                    if AuditRoll.FindSet then
+                    RecRef.SetTable(POSSalesLine);
+                    POSPaymentLine.SetRange("POS Entry No.", POSSalesLine."POS Entry No.");
+                    if POSPaymentLine.FindSet then
                         repeat
-                            if PaymentTypePOS.Get(AuditRoll."No.") then begin
+                            if PaymentTypePOS.Get(POSPaymentLine."POS Payment Method Code") then begin
                                 case PaymentTypePOS."Processing Type" of
                                     PaymentTypePOS."Processing Type"::Cash:
                                         PaymentMethod := '1';
@@ -438,14 +443,14 @@ codeunit 6014611 "NPR Tax Free PTF PI"
                                     else
                                         PaymentMethod := '13';
                                 end;
-                                PaymentAmount := Format(AuditRoll."Amount Including VAT", 0, '<Precision,2:2><Standard Format,2>');
+                                PaymentAmount := Format(POSPaymentLine.Amount, 0, '<Precision,2:2><Standard Format,2>');
 
                                 PaymentsXML += '<payment_method_detail>' +
                                                 '<payment_method>' + PaymentMethod + '</payment_method>' +
                                                 '<amount>' + PaymentAmount + '</amount>' +
                                               '</payment_method_detail>';
                             end;
-                        until AuditRoll.Next = 0;
+                        until POSPaymentLine.Next = 0;
                 end;
             DATABASE::"NPR Sale POS":
                 RecRef.SetTable(SalePOS);
@@ -458,28 +463,26 @@ codeunit 6014611 "NPR Tax Free PTF PI"
 
     local procedure GetSaleTotals(var RecRef: RecordRef): Text
     var
-        AuditRoll: Record "NPR Audit Roll";
+        POSSalesLine: Record "NPR POS Sales Line";
         SalePOS: Record "NPR Sale POS";
         SalesHeader: Record "Sales Header";
-        "--": Integer;
         TotalNetAmount: Decimal;
         TotalGrossAmount: Decimal;
         TotalVATAmount: Decimal;
         TotalsXML: Text;
     begin
         case RecRef.Number of
-            DATABASE::"NPR Audit Roll":
+            DATABASE::"NPR POS Sales Line":
                 begin
-                    RecRef.SetTable(AuditRoll);
-                    AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
-                    AuditRoll.SetRange(Type, AuditRoll.Type::Item);
-                    AuditRoll.SetFilter(Quantity, '>0');
-                    if AuditRoll.FindSet then
+                    RecRef.SetTable(POSSalesLine);
+                    POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
+                    POSSalesLine.SetFilter(Quantity, '>0');
+                    if POSSalesLine.FindSet then
                         repeat
-                            TotalGrossAmount += AuditRoll."Amount Including VAT";
-                            TotalNetAmount += AuditRoll.Amount;
-                            TotalVATAmount += (AuditRoll."Amount Including VAT" - AuditRoll.Amount);
-                        until AuditRoll.Next = 0;
+                            TotalGrossAmount += POSSalesLine."Amount Incl. VAT";
+                            TotalNetAmount += POSSalesLine."Amount Excl. VAT";
+                            TotalVATAmount += (POSSalesLine."Amount Incl. VAT" - POSSalesLine."Amount Excl. VAT");
+                        until POSSalesLine.Next = 0;
 
                     TotalsXML := '<transaction_net_amount>' + Format(TotalNetAmount, 0, '<Precision,2:2><Standard Format,2>') + '</transaction_net_amount>' +
                                  '<transaction_gross_amount>' + Format(TotalGrossAmount, 0, '<Precision,2:2><Standard Format,2>') + '</transaction_gross_amount>' +
@@ -495,38 +498,30 @@ codeunit 6014611 "NPR Tax Free PTF PI"
     end;
 
     [TryFunction]
-    local procedure TryGetFirstNodeContent(XMLDoc: DotNet "NPRNetXmlDocument"; ElementName: Text; XMLInContent: Boolean; var Value: Text)
+    local procedure TryGetFirstNodeContent(XMLDoc: XmlDocument; ElementName: Text; XMLInContent: Boolean; var Value: Text)
     begin
         Value := GetFirstNodeContent(XMLDoc, ElementName, XMLInContent);
     end;
 
     local procedure ReplaceSpecialChars(Text: Text): Text
     var
-        CALText: Text;
-        String: DotNet NPRNetString;
+        TypeHelper: Codeunit "Type Helper";
     begin
-        String := Text;
-        String := String.Replace('&', '&amp;');
-        String := String.Replace('"', '&quot;');
-        String := String.Replace('''', '&apos;');
-        String := String.Replace('<', '&lt;');
-        String := String.Replace('>', '&qt;');
-        CALText := String;
-        exit(CALText);
+        TypeHelper.HtmlEncode(Text);
+        exit(Text);
     end;
 
     local procedure IsStoredSaleEligible(SalesTicketNo: Text): Boolean
     var
-        AuditRoll: Record "NPR Audit Roll";
+        POSSalesLine: Record "NPR POS Sales Line";
     begin
-        AuditRoll.SetRange("Sales Ticket No.", SalesTicketNo);
-        AuditRoll.SetRange(Type, AuditRoll.Type::Item);
-        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
-        AuditRoll.SetFilter(Quantity, '>0');
-        AuditRoll.SetFilter("VAT %", '>0');
-        AuditRoll.CalcSums("Amount Including VAT");
+        POSSalesLine.SetRange("Document No.", SalesTicketNo);
+        POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
+        POSSalesLine.SetFilter(Quantity, '>0');
+        POSSalesLine.SetFilter("VAT %", '>0');
+        POSSalesLine.CalcSums("Amount Incl. VAT");
 
-        exit(AuditRoll."Amount Including VAT" >= MinimumAmountLimit);
+        exit(POSSalesLine."Amount Incl. VAT" >= MinimumAmountLimit);
     end;
 
     local procedure IsActiveSaleEligible(SalesTicketNo: Text): Boolean
@@ -542,25 +537,22 @@ codeunit 6014611 "NPR Tax Free PTF PI"
 
         exit(SaleLinePOS."Amount Including VAT" >= MinimumAmountLimit);
     end;
-
-    local procedure "// Print functions"()
-    begin
-    end;
+    #endregion
+    #region Print functions
 
     local procedure PrintThermalReceipt(var TaxFreeRequest: Record "NPR Tax Free Request")
     var
+        ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
         Printer: Codeunit "NPR RP Line Print Mgt.";
-        XMLNode: DotNet NPRNetXmlNode;
+        InStream: InStream;
         i: Integer;
+        OutputType: Integer;
         Line: Text;
         LineBuffer: Text;
-        ObjectOutputMgt: Codeunit "NPR Object Output Mgt.";
         Output: Text;
-        OutputType: Integer;
-        XMLDoc: DotNet "NPRNetXmlDocument";
-        InStream: InStream;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        PrintLines: DotNet NPRNetXmlNodeList;
+        XMLDoc: XmlDocument;
+        XMLNode: XmlNode;
+        PrintLines: XmlNodeList;
     begin
         //See page 55 of doc. for print line prefix explanations.
         Output := ObjectOutputMgt.GetCodeunitOutputPath(CODEUNIT::"NPR Tax Free Receipt");
@@ -570,23 +562,19 @@ codeunit 6014611 "NPR Tax Free PTF PI"
             Error(Error_MissingPrintSetup);
 
         TaxFreeRequest.Print.CreateInStream(InStream, TEXTENCODING::UTF8);
-        MemoryStream := MemoryStream.MemoryStream();
-        CopyStream(MemoryStream, InStream);
-        MemoryStream.Position := 0;
 
-        XMLDoc := XMLDoc.XmlDocument;
-        XMLDoc.Load(MemoryStream);
-        PrintLines := XMLDoc.GetElementsByTagName('print_line'); //Thermal Receipt Data
+        XmlDocument.ReadFrom(InStream, XMLDoc);
+
+        PrintLines := XMLDoc.GetDescendantElements('print_line');//Thermal Receipt Data
         if PrintLines.Count < 1 then
             Error(Error_PrintData);
 
         Printer.SetThreeColumnDistribution(0.33, 0.33, 0.33);
         Printer.SetAutoLineBreak(false);
 
-        for i := 0 to (PrintLines.Count - 1) do begin
-            XMLNode := PrintLines.ItemOf(i);
-            Line := XMLNode.InnerText;
-
+        for i := 1 to (PrintLines.Count) do begin
+            PrintLines.Get(i, XMLNode);
+            Line := XMLNode.AsXmlElement().InnerText();
             case CopyStr(Line, 1, 2) of
                 '01':
                     PrintThermalLine(Printer, 'm', 'Control', false, 'LEFT', true, false); //Tax free logo bitmap
@@ -666,6 +654,7 @@ codeunit 6014611 "NPR Tax Free PTF PI"
             Printer.NewLine;
     end;
 
+    [Obsolete('PrintMethodMgt: Codeunit "NPR Print Method Mgt." needs to be refractored ')]
     local procedure PrintPDF(var TaxFreeRequest: Record "NPR Tax Free Request")
     var
         XMLNode: DotNet NPRNetXmlNode;
@@ -711,8 +700,8 @@ codeunit 6014611 "NPR Tax Free PTF PI"
                 PrintMethodMgt.PrintFileLocal(Output, MemoryStream, 'pdf');
         end;
     end;
-
-    #region Web Service Request functions"
+    #endregion
+    #region Web Service Request functions
 
     local procedure BRTSearchRequest(var TaxFreeRequest: Record "NPR Tax Free Request"; IIN: Text)
     var
@@ -887,13 +876,11 @@ codeunit 6014611 "NPR Tax Free PTF PI"
 
     local procedure InvokeService(RequestMessage: Text; var TaxFreeRequest: Record "NPR Tax Free Request")
     var
-        BaseAddress: Text;
-        HttpClient: DotNet NPRNetHttpClient;
-        Uri: DotNet NPRNetUri;
-        TimeSpan: DotNet NPRNetTimeSpan;
-        StringContent: DotNet NPRNetStringContent;
-        Encoding: DotNet NPRNetEncoding;
-        HttpResponseMessage: DotNet NPRNetHttpResponseMessage;
+        HttpClient: HttpClient;
+        HttpContent: HttpContent;
+        HttpHeaders: HttpHeaders;
+        HttpResponseMessage: HttpResponseMessage;
+        HttpRequestMessage: HttpRequestMessage;
         OutStream: OutStream;
         Result: Text;
     begin
@@ -903,93 +890,77 @@ codeunit 6014611 "NPR Tax Free PTF PI"
         TaxFreeRequest.Request.CreateOutStream(OutStream);
         OutStream.Write(RequestMessage);
 
-        HttpClient := HttpClient.HttpClient();
         HttpClient.DefaultRequestHeaders.Clear();
 
         if TaxFreeRequest.Mode = TaxFreeRequest.Mode::PROD then
-            HttpClient.BaseAddress := Uri.Uri(ServicePROD)
+            HttpRequestMessage.SetRequestUri(ServicePROD())
         else
-            HttpClient.BaseAddress := Uri.Uri(ServiceTEST);
+            HttpRequestMessage.SetRequestUri(ServiceTEST());
 
         if TaxFreeRequest."Timeout (ms)" > 0 then
-            HttpClient.Timeout := TimeSpan.TimeSpan(0, 0, 0, TaxFreeRequest."Timeout (ms)")
+            HttpClient.Timeout := TaxFreeRequest."Timeout (ms)"
         else
-            HttpClient.Timeout := TimeSpan.TimeSpan(0, 0, 10);
+            HttpClient.Timeout := 1000;
 
-        StringContent := StringContent.StringContent(RequestMessage, Encoding.UTF8, 'application/soap+xml');
-        HttpResponseMessage := HttpClient.PostAsync('', StringContent).Result();
+        HttpContent.WriteFrom(RequestMessage);
+        HttpContent.GetHeaders(HttpHeaders);
+
+        HttpHeaders.Remove('Content-Type');
+        HttpHeaders.Add('Content-Type', 'application/soap+xml; charset="utf-8"');
+
+        HttpRequestMessage.Method('POST');
+        HttpRequestMessage.Content := HttpContent;
+
+        if not HttpClient.Send(HttpRequestMessage, HttpResponseMessage) then
+            error('%1 - %2', HttpResponseMessage.HttpStatusCode, HttpResponseMessage.ReasonPhrase);
 
         TaxFreeRequest.Response.CreateOutStream(OutStream, TEXTENCODING::UTF8);
-        Result := HttpResponseMessage.Content.ReadAsStringAsync().Result();
+        HttpResponseMessage.Content.ReadAs(Result);
         OutStream.Write(Result);
     end;
 
-    local procedure HandleResponse(var TaxFreeRequest: Record "NPR Tax Free Request"; ResponseTagName: Text; var XMLDoc: DotNet "NPRNetXmlDocument")
+    local procedure HandleResponse(var TaxFreeRequest: Record "NPR Tax Free Request"; ResponseTagName: Text; var XMLDoc: XmlDocument)
     var
         InStream: InStream;
-        MemoryStream: DotNet NPRNetMemoryStream;
+        OutStream: OutStream;
+        XMLMessage: Text;
+        XMLDOMManagement: Codeunit "XML DOM Management";
     begin
         TaxFreeRequest.Response.CreateInStream(InStream);
-        MemoryStream := MemoryStream.MemoryStream();
-        CopyStream(MemoryStream, InStream);
-        MemoryStream.Position := 0;
+        InStream.Read(XMLMessage);
 
-        XMLDoc := XMLDoc.XmlDocument;
-        XMLDoc.Load(MemoryStream);
+        XMLMessage := XMLDOMManagement.RemoveNamespaces(XMLMessage);
+
+        XmlDocument.ReadFrom(XMLMessage, XMLDoc);
         GetCDataXML(XMLDoc, ResponseTagName);
     end;
-
     #endregion
 
-    #region Event subscribers
-
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnLookupHandler', '', false, false)]
-    local procedure OnLookupHandler(var HashSet: DotNet NPRNetHashSet_Of_T)
+    #region Interface integration
+    procedure OnLookupHandlerParameter(TaxFreeUnit: Record "NPR Tax Free POS Unit"; var Handled: Boolean; var tmpHandlerParameters: Record "NPR Tax Free Handler Param." temporary)
     begin
-        HashSet.Add(HandlerID);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnLookupHandlerParameters', '', false, false)]
-    local procedure OnLookupHandlerParameter(TaxFreeUnit: Record "NPR Tax Free POS Unit"; var Handled: Boolean; var tmpHandlerParameters: Record "NPR Tax Free Handler Param." temporary)
-    begin
-        if not TaxFreeUnit.IsThisHandler(HandlerID) then
-            exit;
 
         Handled := true;
         AddParameters(tmpHandlerParameters);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnSetUnitParameters', '', false, false)]
-    local procedure OnSetUnitParameters(TaxFreeUnit: Record "NPR Tax Free POS Unit"; var Handled: Boolean)
+    procedure OnSetUnitParameters(TaxFreeUnit: Record "NPR Tax Free POS Unit"; var Handled: Boolean)
     var
         TaxFreeMgt: Codeunit "NPR Tax Free Handler Mgt.";
     begin
-        if not TaxFreeUnit.IsThisHandler(HandlerID) then
-            exit;
-
         Handled := true;
         TaxFreeMgt.SetGenericHandlerParameters(TaxFreeUnit); //Use the built-in support for storing parameters in the unit BLOB instead of externally.
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnUnitAutoConfigure', '', false, false)]
-    local procedure OnUnitAutoConfigure(var TaxFreeRequest: Record "NPR Tax Free Request"; Silent: Boolean; var Handled: Boolean)
+    procedure OnUnitAutoConfigure(var TaxFreeRequest: Record "NPR Tax Free Request"; Silent: Boolean)
     begin
-        if not TaxFreeRequest.IsThisHandler(HandlerID) then
-            exit;
-
-        Handled := true;
-        Error(Error_NotSupported, HandlerID);
+        Error(Error_NotSupported, Enum::"NPR Tax Free Handler ID"::PREMIER_PI);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnUnitTestConnection', '', false, false)]
-    local procedure OnUnitTestConnection(var TaxFreeRequest: Record "NPR Tax Free Request"; var Handled: Boolean)
+    procedure OnUnitTestConnection(var TaxFreeRequest: Record "NPR Tax Free Request")
     var
         Valid: Boolean;
     begin
-        if not TaxFreeRequest.IsThisHandler(HandlerID) then
-            exit;
-
-        Handled := true;
 
         InitializeHandler(TaxFreeRequest);
         //498692 is a random IIN number from some japanese card type. Here we use it to test that the service works as expected by verifying that the response for validity is TRUE.
@@ -999,67 +970,41 @@ codeunit 6014611 "NPR Tax Free PTF PI"
             Error(Error_WrongIINDecision);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherIssueFromPOSSale', '', false, false)]
-    local procedure OnVoucherIssueFromPOSSale(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesReceiptNo: Code[20]; var Handled: Boolean; var SkipRecordHandling: Boolean)
+    procedure OnVoucherIssueFromPOSSale(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesReceiptNo: Code[20]; var SkipRecordHandling: Boolean)
     var
-        AuditRoll: Record "NPR Audit Roll";
+        POSSalesLine: Record "NPR POS Sales Line";
         RecRef: RecordRef;
     begin
-        if not TaxFreeRequest.IsThisHandler(HandlerID) then
-            exit;
-
-        Handled := true;
         InitializeHandler(TaxFreeRequest);
 
         if not IsStoredSaleEligible(SalesReceiptNo) then
             Error(Error_Ineligible);
 
-        AuditRoll.SetRange("Sales Ticket No.", SalesReceiptNo);
-        AuditRoll.FindSet;
-        RecRef.GetTable(AuditRoll);
+        POSSalesLine.SetRange("Document No.", SalesReceiptNo);
+        POSSalesLine.FindSet;
+        RecRef.GetTable(POSSalesLine);
 
         VoucherIssue(TaxFreeRequest, RecRef);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherVoid', '', false, false)]
-    local procedure OnVoucherVoid(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher"; var Handled: Boolean)
+    procedure OnVoucherVoid(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher")
     begin
-        if not TaxFreeRequest.IsThisHandler(HandlerID) then
-            exit;
-
-        Handled := true;
         InitializeHandler(TaxFreeRequest);
         VoucherVoid(TaxFreeRequest, TaxFreeVoucher."External Voucher No.");
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherReissue', '', false, false)]
-    local procedure OnVoucherReissue(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher"; var Handled: Boolean)
+    procedure OnVoucherReissue(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher")
     begin
-        if not TaxFreeRequest.IsThisHandler(HandlerID) then
-            exit;
-
-        Handled := true;
-        Error(Error_NotSupported, HandlerID);
+        Error(Error_NotSupported, Enum::"NPR Tax Free Handler ID"::PREMIER_PI);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherLookup', '', false, false)]
-    local procedure OnVoucherLookup(var TaxFreeRequest: Record "NPR Tax Free Request"; VoucherNo: Text; var Handled: Boolean)
+    procedure OnVoucherLookup(var TaxFreeRequest: Record "NPR Tax Free Request"; VoucherNo: Text)
     begin
-        if not TaxFreeRequest.IsThisHandler(HandlerID) then
-            exit;
-
-        Handled := true;
-        Error(Error_NotSupported, TaxFreeRequest."Handler ID");
+        Error(Error_NotSupported, TaxFreeRequest."Handler ID Enum");
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherPrint', '', false, false)]
-    local procedure OnVoucherPrint(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher"; IsRecentVoucher: Boolean; var Handled: Boolean)
+    procedure OnVoucherPrint(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher"; IsRecentVoucher: Boolean)
     begin
-        if not TaxFreeRequest.IsThisHandler(HandlerID) then
-            exit;
-
-        Handled := true;
-
         if not IsRecentVoucher then
             if not TaxFreeVoucher.Print.HasValue then
                 Error(Error_MissingPrint);
@@ -1069,55 +1014,38 @@ codeunit 6014611 "NPR Tax Free PTF PI"
             Error(Error_PrintFail, TaxFreeVoucher."External Voucher No.", GetLastErrorText);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherConsolidate', '', false, false)]
-    local procedure OnVoucherConsolidate(var TaxFreeRequest: Record "NPR Tax Free Request"; var tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary; var Handled: Boolean)
+    procedure OnVoucherConsolidate(var TaxFreeRequest: Record "NPR Tax Free Request"; var tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary)
     var
         tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary;
     begin
-        if not TaxFreeRequest.IsThisHandler(HandlerID) then
-            exit;
-
-        Handled := true;
         InitializeHandler(TaxFreeRequest);
-        Error(Error_NotSupported, HandlerID);
+        Error(Error_NotSupported, Enum::"NPR Tax Free Handler ID"::PREMIER_PI);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnIsValidTerminalIIN', '', false, false)]
-    local procedure OnIsValidTerminalIIN(var TaxFreeRequest: Record "NPR Tax Free Request"; MaskedCardNo: Text; var IsForeignIIN: Boolean; var Handled: Boolean)
+    procedure OnIsValidTerminalIIN(var TaxFreeRequest: Record "NPR Tax Free Request"; MaskedCardNo: Text; var IsForeignIIN: Boolean)
     begin
-        if not TaxFreeRequest.IsThisHandler(HandlerID) then
-            exit;
-
-        Handled := true;
         InitializeHandler(TaxFreeRequest);
         IsForeignIIN := IsValidTerminalIIN(TaxFreeRequest, MaskedCardNo);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnIsActiveSaleEligible', '', false, false)]
-    local procedure OnIsActiveSaleEligible(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean; var Handled: Boolean)
+    procedure OnIsActiveSaleEligible(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean)
     var
         tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary;
     begin
-        if not TaxFreeRequest.IsThisHandler(HandlerID) then
-            exit;
-
-        Handled := true;
         InitializeHandler(TaxFreeRequest);
         Eligible := IsActiveSaleEligible(SalesTicketNo);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnIsStoredSaleEligible', '', false, false)]
-    local procedure OnIsStoredSaleEligible(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean; var Handled: Boolean)
+    procedure OnIsStoredSaleEligible(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean)
     var
         tmpEligibleServices: Record "NPR Tax Free GB I2 Service" temporary;
     begin
-        if not TaxFreeRequest.IsThisHandler(HandlerID) then
-            exit;
-
-        Handled := true;
         InitializeHandler(TaxFreeRequest);
         Eligible := IsStoredSaleEligible(SalesTicketNo);
     end;
-
     #endregion
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeIssueVoucher(var TaxFreeRequest: Record "NPR Tax Free Request"; var RecRef: RecordRef; var Handeled: Boolean)
+    begin
+    end;
 }

@@ -1,7 +1,5 @@
 table 6014652 "NPR Tax Free GB IIN Blacklist"
 {
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
-
     Caption = 'Tax Free GB IIN Blacklist';
     DataClassification = CustomerContent;
 
@@ -31,8 +29,5 @@ table 6014652 "NPR Tax Free GB IIN Blacklist"
         }
     }
 
-    fieldgroups
-    {
-    }
 }
 

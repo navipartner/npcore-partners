@@ -1,7 +1,5 @@
 table 6014643 "NPR Tax Free Consolidation"
 {
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
-
     Caption = 'Tax Free Consolidation';
     LookupPageID = "NPR Tax Free Consolidation";
     DataClassification = CustomerContent;
@@ -43,10 +41,6 @@ table 6014643 "NPR Tax Free Consolidation"
         key(Key1; "Entry No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

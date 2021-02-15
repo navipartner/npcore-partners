@@ -1,6 +1,5 @@
 table 6014655 "NPR TaxFree GB I2 Info Capt."
 {
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
 
     Caption = 'Tax Free GB I2 Info Capture';
     DataClassification = CustomerContent;
@@ -265,9 +264,6 @@ table 6014655 "NPR TaxFree GB I2 Info Capt."
         }
     }
 
-    fieldgroups
-    {
-    }
 
     var
         Error_InvalidValue: Label 'Invalid %1: %2';

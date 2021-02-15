@@ -1,6 +1,5 @@
 table 6014653 "NPR Tax Free GB I2 Service"
 {
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
 
     Caption = 'Tax Free GB I2 Service';
     DataClassification = CustomerContent;
@@ -45,10 +44,6 @@ table 6014653 "NPR Tax Free GB I2 Service"
         key(Key1; "Tax Free Unit", "Service ID")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 
