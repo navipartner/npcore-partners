@@ -2,9 +2,9 @@ table 6059774 "NPR Member Card Issued Cards"
 {
 
     Caption = 'Point Card - Issued Cards';
-    LookupPageID = "NPR Member Card Issued Cards";
     DataClassification = CustomerContent;
-
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Not used.';
     fields
     {
         field(1; "No."; Code[20])
@@ -59,8 +59,6 @@ table 6059774 "NPR Member Card Issued Cards"
         {
             Caption = 'Point card type';
             NotBlank = true;
-            TableRelation = "NPR Member Card Types";
-            ValidateTableRelation = true;
             DataClassification = CustomerContent;
         }
         field(6; Salesperson; Code[20])
@@ -68,14 +66,6 @@ table 6059774 "NPR Member Card Issued Cards"
             Caption = 'Salesperson';
             TableRelation = "Salesperson/Purchaser".Code;
             DataClassification = CustomerContent;
-        }
-        field(7; "Points (Total)"; Decimal)
-        {
-            CalcFormula = Sum("NPR Member Card Trx Log"."Remaining Points" WHERE("Card Code" = FIELD("No."),
-                                                                                      "Posting Date" = FIELD("Expiration Date Filter")));
-            Caption = 'Points (Total)';
-            FieldClass = FlowField;
-            MaxValue = 9999999;
         }
         field(8; Status; Option)
         {
@@ -203,50 +193,5 @@ table 6059774 "NPR Member Card Issued Cards"
     {
     }
 
-    trigger OnInsert()
-    var
-        PointCardIssuedCards: Record "NPR Member Card Issued Cards";
-        NoSeriesManagement: Codeunit NoSeriesManagement;
-        ErrPointCardLimit: Label 'Error, a customer can only have one Loyaltycard attached. (%1)';
-    begin
-        PointCardTypes.Get("Card Type");
-        PointCardIssuedCards.SetRange("Customer No", "Customer No");
-        if PointCardIssuedCards.Find('-') then
-            exit;
-
-        if "No." = '' then begin
-            PointCardTypes.TestField("Card No. Series");
-
-            /*
-              IF PointCardTypes."Sync Cards To Company" <> '' THEN
-                NoSeriesManagement.SetCompany(PointCardTypes."Sync Cards To Company");
-            */
-
-            NoSeriesManagement.InitSeries(PointCardTypes."Card No. Series",
-                                          PointCardTypes."Card No. Series",
-                                          0D,
-                                          "No.",
-                                          PointCardTypes."Card No. Series");
-        end;
-
-        "Date Created" := CurrentDateTime;
-
-        "Primary Key Length" := StrLen("No.");
-
-    end;
-
-    var
-        PointCardTypes: Record "NPR Member Card Types";
-        NoSeriesManagement: Codeunit NoSeriesManagement;
-        Utility: Codeunit "NPR Receipt Footer Mgt.";
-
-    procedure GenerateSecretCode()
-    begin
-        Randomize;
-        "Secret Code" := Format(Random(999999));
-
-        while StrLen("Secret Code") < 6 do
-            "Secret Code" := '0' + "Secret Code";
-    end;
 }
 

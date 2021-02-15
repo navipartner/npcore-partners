@@ -3,9 +3,9 @@ table 6059771 "NPR Member Card Types"
 
     Caption = 'Point Card';
     DataCaptionFields = "Code";
-    LookupPageID = "NPR Member Card Types";
     DataClassification = CustomerContent;
-
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Not used.';
     fields
     {
         field(1; "Code"; Code[20])
@@ -181,22 +181,5 @@ table 6059771 "NPR Member Card Types"
     {
     }
 
-    trigger OnDelete()
-    var
-        PointCardIssuedCards: Record "NPR Member Card Issued Cards";
-        txtCannotDelete: Label 'You are not allowed to delete the card type %1, since issued cards wtih this type exists.';
-    begin
-        PointCardIssuedCards.SetRange("Card Type", Code);
-        if PointCardIssuedCards.Find('-') then
-            Error(txtCannotDelete, Code);
-    end;
-
-    trigger OnInsert()
-    begin
-        TestField(Code);
-    end;
-
-    var
-        noSeriesManagement: Codeunit NoSeriesManagement;
 }
 
