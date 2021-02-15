@@ -744,19 +744,15 @@ table 6014405 "NPR Sale POS"
 
     procedure LookUpShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
-        RetailSetup.Get;
-        if RetailSetup."Use Adv. dimensions" then
-            NPRDimMgt.LookupDimValueCode(FieldNumber, ShortcutDimCode);
+        NPRDimMgt.LookupDimValueCode(FieldNumber, ShortcutDimCode);
     end;
 
     procedure CreateDim(Type1: Integer; No1: Code[20]; Type2: Integer; No2: Code[20]; Type3: Integer; No3: Code[20]; Type4: Integer; No4: Code[20]; Type5: Integer; No5: Code[20])
     var
-        RetailConfiguration: Record "NPR Retail Setup";
         TableID: array[10] of Integer;
         No: array[10] of Code[20];
         OldDimSetID: Integer;
     begin
-        RetailConfiguration.Get;
         TableID[1] := Type1;
         No[1] := No1;
         TableID[2] := Type2;
@@ -771,13 +767,25 @@ table 6014405 "NPR Sale POS"
         "Shortcut Dimension 2 Code" := '';
         OldDimSetID := "Dimension Set ID";
         "Dimension Set ID" :=
-          DimMgt.GetDefaultDimID(TableID, No, RetailConfiguration."Posting Source Code", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
+          DimMgt.GetDefaultDimID(TableID, No, GetPOSSourceCode, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
 
         if (OldDimSetID <> "Dimension Set ID") then begin
             Modify;
             if SalesLinesExist then
                 UpdateAllLineDim("Dimension Set ID", OldDimSetID);
         end;
+    end;
+
+    procedure GetPOSSourceCode() SourceCode: Code[10]
+    var
+        POSUnit: Record "NPR Pos Unit";
+        POSPostingProfile: Record "NPR POS Posting Profile";
+    begin
+        SourceCode := '';
+
+        if POSUnit.Get("Register No.") then
+            if POSPostingProfile.Get(POSUnit."POS Posting Profile") then
+                SourceCode := POSPostingProfile."Source Code";
     end;
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])

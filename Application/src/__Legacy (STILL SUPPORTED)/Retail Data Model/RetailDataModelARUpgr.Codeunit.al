@@ -80,10 +80,8 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
                    ((AuditRoll."Sale Type" = AuditRoll."Sale Type"::Comment) and (AuditRoll.Type = AuditRoll.Type::"Open/Close")) then begin
                     if NoOfPOSEntriesCreated > 0 then begin
                         FinalizePOSEntry(POSEntry, AuditRoll);
-                        //-NPR5.55 [404019]
                         CalcVATAmountLines(POSEntry, VATAmountLine, POSSalesLine);
                         PersistVATAmountLines(POSEntry, VATAmountLine);
-                        //+NPR5.55 [404019]
                     end;
 
                     if POSUnit."No." <> AuditRoll."Register No." then
@@ -216,7 +214,6 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
         if GuiAllowed then
             ProgressDialog.Close;
     end;
-
 
     local procedure InsertPOSSaleLine(var AuditRoll: Record "NPR Audit Roll"; var POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Sales Line")
     var
@@ -823,7 +820,6 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
                         POSPaymentMethod."Rounding Gains Account" := POSPostingProfile."POS Sales Rounding Account";
                         POSPaymentMethod."Rounding Losses Account" := POSPostingProfile."POS Sales Rounding Account";
                     end;
-
                     POSPaymentMethod.Insert(true);
                 end;
             until PaymentTypePOS.Next = 0;
@@ -851,7 +847,6 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
                 //Default POS Payment Bin
                 CreateDefaultBins(POSUnit."No.");
             until POSUnit.Next = 0;
-
 
         POSPostingSetupCheck.Reset;
         if POSPostingSetupCheck.Count < 1 then begin

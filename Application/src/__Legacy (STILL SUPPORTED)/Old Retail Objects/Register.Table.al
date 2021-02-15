@@ -1160,42 +1160,16 @@ table 6014401 "NPR Register"
 
     procedure setThisRegisterNo(RegNo: Code[10])
     var
-        Register: Record "NPR Register";
-        Fil: File;
-        TextLinie: Text[30];
-        Text10600002: Label '\npk.dll';
-        Text10600003: Label 'An error occured during setup';
-        Text10600005: Label '%1 is not implemented!';
         UserSetup: Record "User Setup";
-        Int: Integer;
     begin
-        RetailSetup.Get;
-        case RetailSetup."Get register no. using" of
-            RetailSetup."Get register no. using"::USERPROFILE,
-            RetailSetup."Get register no. using"::COMPUTERNAME,
-            RetailSetup."Get register no. using"::CLIENTNAME,
-            RetailSetup."Get register no. using"::SESSIONNAME,
-            RetailSetup."Get register no. using"::USERNAME,
-            RetailSetup."Get register no. using"::USERDOMAINID:
-                Error(Text10600005, RetailSetup."Get register no. using");
-            RetailSetup."Get register no. using"::USERID:
-                begin
-                    Register.Get(RegNo);
-                    Register."Logon-User Name" := UserId;
-                    Register.Modify;
-                end;
-            RetailSetup."Get register no. using"::"USER SETUP TABLE":
-                begin
-                    if UserSetup.Get(UserId) then begin
-                        UserSetup."NPR Backoffice Register No." := RegNo;
-                        UserSetup.Modify;
-                    end else begin
-                        UserSetup.Init;
-                        UserSetup."User ID" := UserId;
-                        UserSetup."NPR Backoffice Register No." := RegNo;
-                        UserSetup.Insert;
-                    end;
-                end;
+        if UserSetup.Get(UserId) then begin
+            UserSetup."NPR Backoffice Register No." := RegNo;
+            UserSetup.Modify;
+        end else begin
+            UserSetup.Init;
+            UserSetup."User ID" := UserId;
+            UserSetup."NPR Backoffice Register No." := RegNo;
+            UserSetup.Insert;
         end;
     end;
 

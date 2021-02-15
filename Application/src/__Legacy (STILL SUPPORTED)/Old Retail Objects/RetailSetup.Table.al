@@ -83,6 +83,9 @@ table 6014400 "NPR Retail Setup"
             DataClassification = CustomerContent;
             Description = 'Kildespor til bogf¢ring';
             TableRelation = "Source Code";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore. "NPR NP Retail Setup"."Source Code" used instead.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(51; "Posting No. Management"; Code[10])
         {
@@ -191,6 +194,9 @@ table 6014400 "NPR Retail Setup"
             DataClassification = CustomerContent;
             OptionCaption = 'USERPROFILE,COMPUTERNAME,CLIENTNAME,SESSIONNAME,USERNAME,USERID,USERDOMAINID,USER SETUP TABLE,SALESPERSON TABLE';
             OptionMembers = USERPROFILE,COMPUTERNAME,CLIENTNAME,SESSIONNAME,USERNAME,USERID,USERDOMAINID,"USER SETUP TABLE",SALESPERSON;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore. "User Setup"."NPR Backoffice Register No." is used allways.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(90; "Gift and Credit Valid Period"; Integer)
         {
@@ -205,24 +211,36 @@ table 6014400 "NPR Retail Setup"
             Caption = 'Sales Line Description Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR Description Control";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(105; "Purchase Line Description Code"; Code[20])
         {
             Caption = 'Purchase Line Description Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR Description Control";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(110; "Transfer Line Description Code"; Code[20])
         {
             Caption = 'Transfer Line Description Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR Description Control";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(115; "POS Line Description Code"; Code[20])
         {
             Caption = 'POS Line Description Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR Description Control";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(350; "Sale Doc. Type On Post. Pstv."; Option)
         {
@@ -230,6 +248,9 @@ table 6014400 "NPR Retail Setup"
             DataClassification = CustomerContent;
             OptionCaption = 'Invoice,Order';
             OptionMembers = Invoice,"Order";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore. Only order is supported.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(351; "Sale Doc. Type On Post. Negt."; Option)
         {
@@ -237,6 +258,9 @@ table 6014400 "NPR Retail Setup"
             DataClassification = CustomerContent;
             OptionCaption = 'Return Order,Credit Memo';
             OptionMembers = "Return Order","Credit Memo";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore. Only order is supported.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(352; "Sale Doc. Post. On Order"; Option)
         {
@@ -244,6 +268,9 @@ table 6014400 "NPR Retail Setup"
             DataClassification = CustomerContent;
             OptionCaption = 'Ask,Ship,Ship and Invoice,Dont Post';
             OptionMembers = Ask,Ship,"Ship and Invoice","Dont Post";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(353; "Sale Doc. Post. On Invoice"; Option)
         {
@@ -251,6 +278,9 @@ table 6014400 "NPR Retail Setup"
             DataClassification = CustomerContent;
             OptionCaption = 'Ask,Yes,No';
             OptionMembers = Ask,Yes,No;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(354; "Sale Doc. Post. On Cred. Memo"; Option)
         {
@@ -258,6 +288,9 @@ table 6014400 "NPR Retail Setup"
             DataClassification = CustomerContent;
             OptionCaption = 'Ask,Yes,No';
             OptionMembers = Ask,Yes,No;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(355; "Sale Doc. Post. On Ret. Order"; Option)
         {
@@ -265,17 +298,26 @@ table 6014400 "NPR Retail Setup"
             DataClassification = CustomerContent;
             OptionCaption = 'Ask,Receive,Receive and Invoice,Dont Post';
             OptionMembers = Ask,Receive,"Receive and Invoice","Dont Post";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(356; "Sale Doc. Print On Post"; Boolean)
         {
             Caption = 'Send Document On Post';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore. Defaults to true.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(450; "Use Adv. dimensions"; Boolean)
         {
             Caption = 'Use Dimensioncontrol';
             DataClassification = CustomerContent;
             InitValue = true;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore. Defaults to true.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(501; "Variance No. Management"; Code[10])
         {
@@ -284,6 +326,9 @@ table 6014400 "NPR Retail Setup"
             Description = 'nummerstyring til variation';
             InitValue = '0';
             TableRelation = "No. Series";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(502; "Mixed Discount No. Management"; Code[10])
         {
@@ -318,6 +363,9 @@ table 6014400 "NPR Retail Setup"
             Caption = 'Use NAV Lookup In POS';
             DataClassification = CustomerContent;
             Description = 'NPR5.23.01';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(655; "Posting Audit Roll"; Option)
         {
@@ -326,6 +374,9 @@ table 6014400 "NPR Retail Setup"
             Description = 'Opsætning for revisionsrulle bogf¢ring';
             OptionCaption = 'Manual,Automatic';
             OptionMembers = Manual,Automatic;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(700; "Selection No. Series"; Code[10])
         {
