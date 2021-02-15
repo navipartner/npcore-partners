@@ -1,9 +1,5 @@
 xmlport 6151145 "NPR M2 POS Quote Price Req."
 {
-    // NPR5.48/TSA /20181009 CASE 320429 Initial Version
-    // MAG2.21/TSA /20190423 CASE 350006 Added optional request field OrderDate
-    // MAG2.25/TSA /20200226 CASE 391299 Removed NPR version tag
-
     Caption = 'POS Price Quote';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -52,10 +48,7 @@ xmlport 6151145 "NPR M2 POS Quote Price Req."
                             TmpSaleLinePOSRequest."Sales Ticket No." := TicketNumber;
                             TmpSaleLinePOSRequest.Type := TmpSaleLinePOSRequest.Type::Item;
 
-                            //-MAG2.21 [350006]
-                            // TmpSaleLinePOSRequest.Date := TODAY;
                             TmpSaleLinePOSRequest.Date := TmpSalePOSRequest.Date
-                            //+MAG2.21 [350006]
                         end;
                     }
 
@@ -63,11 +56,8 @@ xmlport 6151145 "NPR M2 POS Quote Price Req."
                     begin
 
                         TmpSalePOSRequest."Sales Ticket No." := TicketNumber;
-                        //-MAG2.21 [350006]
-                        // TmpSalePOSRequest.Date := TODAY;
                         if (TmpSalePOSRequest.Date < Today) then
                             TmpSalePOSRequest.Date := Today;
-                        //+MAG2.21 [350006]
                     end;
                 }
             }
@@ -164,18 +154,6 @@ xmlport 6151145 "NPR M2 POS Quote Price Req."
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     trigger OnInitXmlPort()
     begin
         TicketNumber := DelChr(Format(CurrentDateTime(), 0, 9), '<=>', DelChr(Format(CurrentDateTime(), 0, 9), '<=>', '0123456789'));
@@ -183,7 +161,6 @@ xmlport 6151145 "NPR M2 POS Quote Price Req."
 
     var
         TicketNumber: Code[20];
-        LineNo: Integer;
         StartTime: Time;
 
     procedure GetRequest(var TmpSalesHeader: Record "NPR Sale POS" temporary; var TmpSalesLine: Record "NPR Sale Line POS" temporary)
@@ -222,7 +199,6 @@ xmlport 6151145 "NPR M2 POS Quote Price Req."
 
             ResponseCode := 'OK';
             ResponseDescription := '';
-
         end;
     end;
 
@@ -233,4 +209,3 @@ xmlport 6151145 "NPR M2 POS Quote Price Req."
         ResponseDescription := ErrorDescription;
     end;
 }
-

@@ -1,15 +1,5 @@
 codeunit 6151462 "NPR M2 Picture Mgt."
 {
-    // MAG2.08/MHA /20171016  CASE 292926 Object created - M2 Integration
-    // MAG2.09/TS  /20171113  CASE 296169 Magento Urls can be https
-    // MAG2.22/MHA /20190705  CASE 361164 Updated Exception Message parsing in MagentoApiPost()
-    // MAG2.22/MHA /20190716  CASE 361234 Added function GetMagentoType()
-
-
-    trigger OnRun()
-    begin
-    end;
-
     procedure DragDropPicture(PictureName: Text; PictureType: Text; PictureDataUri: Text)
     var
         Handled: Boolean;
@@ -25,26 +15,20 @@ codeunit 6151462 "NPR M2 Picture Mgt."
     var
         MagentoSetup: Record "NPR Magento Setup";
         MagentoMgt: Codeunit "NPR Magento Mgt.";
-        XmlDoc: DotNet "NPRNetXmlDocument";
+        XmlDoc: XmlDocument;
     begin
         MagentoSetup.Get;
         MagentoSetup.TestField("Api Url");
-        if not IsNull(XmlDoc) then
-            Clear(XmlDoc);
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml('<?xml version="1.0" encoding="UTF-8"?>' +
+        XmlDocument.ReadFrom('<?xml version="1.0" encoding="UTF-8"?>' +
                        '<images>' +
                          '<image image_name="' + PictureName + '" type="' + PictureType + '">' +
                            '<image_data>' +
                              '<![CDATA[' + PictureDataUri + ']]>' +
                            '</image_data>' +
                          '</image>' +
-                       '</images>');
-        MagentoApiPost(MagentoSetup."Api Url", 'images', XmlDoc);
-    end;
+                       '</images>', XmlDoc);
 
-    local procedure "--- Publishers"()
-    begin
+        MagentoApiPost(MagentoSetup."Api Url", 'images', XmlDoc);
     end;
 
     [IntegrationEvent(false, false)]
@@ -52,17 +36,12 @@ codeunit 6151462 "NPR M2 Picture Mgt."
     begin
     end;
 
-    local procedure "--- Subscribers"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Table, 6151411, 'OnGetMagentoUrl', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Magento Picture", 'OnGetMagentoUrl', '', true, true)]
     local procedure GetM2PictureUrl(var Sender: Record "NPR Magento Picture"; var MagentoUrl: Text; var Handled: Boolean)
     var
         MagentoSetup: Record "NPR Magento Setup";
         MagentoSetupEventSub: Record "NPR Magento Setup Event Sub.";
         MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
-        String: DotNet NPRNetString;
     begin
         if not MagentoSetupMgt.IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Magento Picture Url", CurrCodeunitId(), 'GetM2PictureUrl') then
             exit;
@@ -73,14 +52,11 @@ codeunit 6151462 "NPR M2 Picture Mgt."
             exit;
 
         MagentoSetup.Get;
-        //-MAG2.22 [361234]
         MagentoUrl := MagentoSetup."Magento Url" + 'pub/media/catalog/' + GetMagentoType(Sender) + '/api/' + Sender.Name;
-        //+MAG2.22 [361234]
     end;
 
     local procedure GetMagentoType(MagentoPicture: Record "NPR Magento Picture"): Text
     begin
-        //-MAG2.22 [361234]
         case MagentoPicture.Type of
             MagentoPicture.Type::Item:
                 begin
@@ -101,10 +77,9 @@ codeunit 6151462 "NPR M2 Picture Mgt."
         end;
 
         exit('');
-        //+MAG2.22 [361234]
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151419, 'OnDragDropPicture', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Picture Mgt.", 'OnDragDropPicture', '', true, true)]
     local procedure UploadM2Picture(PictureName: Text; PictureType: Text; PictureDataUri: Text; var Handled: Boolean)
     var
         MagentoSetupEventSub: Record "NPR Magento Setup Event Sub.";
@@ -122,43 +97,40 @@ codeunit 6151462 "NPR M2 Picture Mgt."
         exit(CODEUNIT::"NPR M2 Picture Mgt.");
     end;
 
-    local procedure "--- Aux"()
-    begin
-    end;
-
-    procedure MagentoApiPost(MagentoApiUrl: Text; Method: Text; var XmlDoc: DotNet "NPRNetXmlDocument") Result: Boolean
+    procedure MagentoApiPost(MagentoApiUrl: Text; Method: Text; var XmlDoc: XmlDocument) Result: Boolean
     var
         MagentoSetup: Record "NPR Magento Setup";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        WebException: DotNet NPRNetWebException;
-        ErrorMessage: Text;
+        XmlMgt: Codeunit "XML DOM Management";
+        HttpWebRequest: HttpRequestMessage;
+        HttpWebResponse: HttpResponseMessage;
+        Content: HttpContent;
+        Headers: HttpHeaders;
+        Client: HttpClient;
         Response: Text;
     begin
         if MagentoApiUrl = '' then
             exit(false);
 
-        if not IsNull(HttpWebRequest) then
-            Clear(HttpWebRequest);
-        HttpWebRequest := HttpWebRequest.Create(MagentoApiUrl + Method);
-        HttpWebRequest.Timeout := 1000 * 60 * 5;
+        HttpWebRequest.SetRequestUri(MagentoApiUrl + Method);
+        HttpWebRequest.Method('POST');
+        Content.GetHeaders(Headers);
+        if Headers.Contains('Content-Type') then
+            Headers.Remove('Content-Type');
+        Headers.Add('Content-Type', 'naviconnect/xml');
+        HttpWebRequest.Content(Content);
 
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentType := 'naviconnect/xml';
-        HttpWebRequest.Accept('naviconnect/xml');
+        HttpWebRequest.GetHeaders(Headers);
+        Headers.Add('Accept', 'naviconnect/xml');
 
         MagentoSetup.Get;
-        HttpWebRequest.Headers.Add('Authorization', MagentoSetup."Api Authorization");
+        Headers.Add('Authorization', MagentoSetup."Api Authorization");
 
-        if not NpXmlDomMgt.SendWebRequest(XmlDoc, HttpWebRequest, HttpWebResponse, WebException) then begin
-            //-MAG2.22 [361164]
-            ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-            Error(CopyStr(ErrorMessage, 1, 1000));
-            //+MAG2.22 [361164]
-        end;
+        Client.Timeout := 300000;
+        Client.Send(HttpWebRequest, HttpWebResponse);
+        HttpWebResponse.Content.ReadAs(Response);
+        if not HttpWebResponse.IsSuccessStatusCode() then
+            Error(StrSubstNo('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response));
 
-        exit(NpXmlDomMgt.TryLoadXml(Response, XmlDoc));
+        exit(XmlDocument.ReadFrom(Response, XmlDoc));
     end;
 }
-

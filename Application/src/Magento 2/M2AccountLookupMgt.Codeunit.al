@@ -1,19 +1,9 @@
 codeunit 6151463 "NPR M2 Account Lookup Mgt."
 {
-    // MAG2.20/MHA /20190425  CASE 320423 Object created - Buffer used with M2 GET Apis
-    // MAG2.22/MHA /20190712  CASE 361786 Updated DotNet Type of System.Collections.IList to System.Collections.IEnumerable
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label '%1 %2 does not exist ';
 
-    local procedure "--- Display Group"()
-    begin
-    end;
+    #region Display Group
 
     procedure LookupDisplayGroup(var Customer: Record Customer)
     var
@@ -46,23 +36,24 @@ codeunit 6151463 "NPR M2 Account Lookup Mgt."
             exit;
 
         M2ValueBufferList.GetRecord(M2ValueBuffer);
-        Customer."NPR Magento Display Group" := UpperCase(CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Customer."NPR Magento Display Group")));
+        Customer."NPR Magento Display Group" := CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Customer."NPR Magento Display Group"));
     end;
 
     local procedure SetupDisplayGroups(var M2ValueBuffer: Record "NPR M2 Value Buffer" temporary)
     var
-        Result: DotNet JToken;
-        DisplayGroups: DotNet NPRNetIEnumerable;
-        DisplayGroup: DotNet JToken;
+        Result: JsonToken;
+        DisplayGroups: JsonArray;
+        DisplayGroup: JsonToken;
         i: Integer;
-        NetConvHelper: Variant;
     begin
         Clear(M2ValueBuffer);
         M2ValueBuffer.DeleteAll;
 
         MagentoApiGet('display_groups', Result);
-        NetConvHelper := Result.SelectTokens('$[*].[''display_group''].[*]');
-        DisplayGroups := NetConvHelper;
+        Result.SelectToken('$..display_group', Result);
+        if Result.IsArray then
+            DisplayGroups := Result.AsArray();
+
         foreach DisplayGroup in DisplayGroups do begin
             i += 1;
 
@@ -100,9 +91,9 @@ codeunit 6151463 "NPR M2 Account Lookup Mgt."
         Customer."NPR Magento Display Group" := CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Customer."NPR Magento Display Group"));
     end;
 
-    local procedure "--- Shipping Group"()
-    begin
-    end;
+    #endregion
+
+    #region Shipping Group
 
     procedure LookupShippingGroup(var Customer: Record Customer)
     var
@@ -129,18 +120,21 @@ codeunit 6151463 "NPR M2 Account Lookup Mgt."
 
     local procedure SetupShippingGroups(var M2ValueBuffer: Record "NPR M2 Value Buffer" temporary)
     var
-        Result: DotNet JToken;
-        ShippingGroups: DotNet NPRNetIEnumerable;
-        ShippingGroup: DotNet JToken;
+        Result: JsonToken;
+        ShippingGroups: JsonArray;
+        ShippingGroup: JsonToken;
         i: Integer;
-        NetConvHelper: Variant;
     begin
         Clear(M2ValueBuffer);
         M2ValueBuffer.DeleteAll;
 
         MagentoApiGet('shipping_groups', Result);
-        NetConvHelper := Result.SelectTokens('$[*].[''shipping_group''].[*]');
-        ShippingGroups := NetConvHelper;
+        if not Result.SelectToken('$..shipping_group', Result) then
+            exit;
+
+        if Result.IsArray then
+            ShippingGroups := Result.AsArray();
+
         foreach ShippingGroup in ShippingGroups do begin
             i += 1;
 
@@ -169,9 +163,9 @@ codeunit 6151463 "NPR M2 Account Lookup Mgt."
         Customer."NPR Magento Shipping Group" := CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Customer."NPR Magento Shipping Group"));
     end;
 
-    local procedure "--- Payment Group"()
-    begin
-    end;
+    #endregion
+
+    #region Payment Group
 
     procedure LookupPaymentGroup(var Customer: Record Customer)
     var
@@ -197,18 +191,21 @@ codeunit 6151463 "NPR M2 Account Lookup Mgt."
 
     local procedure SetupPaymentGroups(var M2ValueBuffer: Record "NPR M2 Value Buffer" temporary)
     var
-        Result: DotNet JToken;
-        PaymentGroups: DotNet NPRNetIEnumerable;
-        PaymentGroup: DotNet JToken;
+        Result: JsonToken;
+        PaymentGroups: JsonArray;
+        PaymentGroup: JsonToken;
         i: Integer;
-        NetConvHelper: Variant;
     begin
         Clear(M2ValueBuffer);
         M2ValueBuffer.DeleteAll;
 
         MagentoApiGet('payment_groups', Result);
-        NetConvHelper := Result.SelectTokens('[*].[''payment_group''].[*]');
-        PaymentGroups := NetConvHelper;
+        if not Result.SelectToken('$..payment_group', Result) then
+            exit;
+
+        if Result.IsArray then
+            PaymentGroups := Result.AsArray();
+
         foreach PaymentGroup in PaymentGroups do begin
             i += 1;
 
@@ -237,9 +234,9 @@ codeunit 6151463 "NPR M2 Account Lookup Mgt."
         Customer."NPR Magento Payment Group" := CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Customer."NPR Magento Payment Group"));
     end;
 
-    local procedure "--- Customer Group"()
-    begin
-    end;
+    #endregion
+
+    #region Customer Group
 
     procedure LookupCustomerGroup(var Contact: Record Contact)
     var
@@ -277,18 +274,21 @@ codeunit 6151463 "NPR M2 Account Lookup Mgt."
 
     local procedure SetupCustomerGroups(var M2ValueBuffer: Record "NPR M2 Value Buffer" temporary)
     var
-        Result: DotNet JToken;
-        CustomerGroups: DotNet NPRNetIEnumerable;
-        CustomerGroup: DotNet JToken;
+        Result: JsonToken;
+        CustomerGroups: JsonArray;
+        CustomerGroup: JsonToken;
         i: Integer;
-        NetConvHelper: Variant;
     begin
         Clear(M2ValueBuffer);
         M2ValueBuffer.DeleteAll;
 
         MagentoApiGet('customer_groups', Result);
-        NetConvHelper := Result.SelectTokens('$[*].[''customer_group''].[*]');
-        CustomerGroups := NetConvHelper;
+        if not Result.SelectToken('$..customer_group', Result) then
+            exit;
+
+        if Result.IsArray then
+            CustomerGroups := Result.AsArray();
+
         foreach CustomerGroup in CustomerGroups do begin
             i += 1;
 
@@ -326,9 +326,9 @@ codeunit 6151463 "NPR M2 Account Lookup Mgt."
         Contact."NPR Magento Customer Group" := CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Contact."NPR Magento Customer Group"));
     end;
 
-    local procedure "--- Magento Store"()
-    begin
-    end;
+    #endregion
+
+    #region Magento Store
 
     procedure LookupMagentoStore(var Customer: Record Customer)
     var
@@ -366,32 +366,44 @@ codeunit 6151463 "NPR M2 Account Lookup Mgt."
 
     local procedure SetupMagentoStores(var M2ValueBuffer: Record "NPR M2 Value Buffer" temporary)
     var
-        Result: DotNet JToken;
-        MagentoWebsites: DotNet NPRNetIEnumerable;
-        MagentoWebsite: DotNet JToken;
-        MagentoStores: DotNet NPRNetIEnumerable;
-        MagentoStore: DotNet JToken;
+        Result: JsonToken;
+        MagentoWebsites: JsonArray;
+        MagentoWebsite: JsonToken;
+        StoreGroups: JsonArray;
+        StoreGroup: JsonToken;
+        MagentoStores: JsonArray;
+        MagentoStore: JsonToken;
         i: Integer;
-        NetConvHelper: Variant;
-        NetConvHelper2: Variant;
     begin
         Clear(M2ValueBuffer);
         M2ValueBuffer.DeleteAll;
 
         MagentoApiGet('websites', Result);
-        NetConvHelper := Result.SelectTokens('$[*].[''website''].[*]');
-        MagentoWebsites := NetConvHelper;
-        foreach MagentoWebsite in MagentoWebsites do begin
-            NetConvHelper2 := MagentoWebsite.SelectTokens('$[''_value''].[''store_groups''].[''store_group''].[*].[''_value''].[''stores''].[''store''].[*]');
-            MagentoStores := NetConvHelper2;
-            foreach MagentoStore in MagentoStores do begin
-                i += 1;
+        if not Result.SelectToken('$..website', Result) then
+            exit;
 
-                M2ValueBuffer.Init;
-                M2ValueBuffer.Value := GetJsonText(MagentoStore, '_attribute.code', MaxStrLen(M2ValueBuffer.Value));
-                M2ValueBuffer.Label := GetJsonText(MagentoStore, '_value', MaxStrLen(M2ValueBuffer.Label));
-                M2ValueBuffer.Position := i;
-                M2ValueBuffer.Insert;
+        if Result.IsArray then
+            MagentoWebsites := Result.AsArray();
+
+        foreach MagentoWebsite in MagentoWebsites do begin
+            MagentoWebsite.SelectToken('$.._value.store_groups.store_group', StoreGroup);
+            if StoreGroup.IsArray then
+                StoreGroups := StoreGroup.AsArray();
+
+            foreach StoreGroup in StoreGroups do begin
+                StoreGroup.SelectToken('$.._value.stores.store', MagentoStore);
+                if MagentoStore.IsArray then
+                    MagentoStores := MagentoStore.AsArray();
+
+                foreach MagentoStore in MagentoStores do begin
+                    i += 1;
+
+                    M2ValueBuffer.Init;
+                    M2ValueBuffer.Value := GetJsonText(MagentoStore, '_attribute.code', MaxStrLen(M2ValueBuffer.Value));
+                    M2ValueBuffer.Label := GetJsonText(MagentoStore, '_value', MaxStrLen(M2ValueBuffer.Label));
+                    M2ValueBuffer.Position := i;
+                    M2ValueBuffer.Insert;
+                end;
             end;
         end;
     end;
@@ -422,16 +434,17 @@ codeunit 6151463 "NPR M2 Account Lookup Mgt."
         Customer."NPR Magento Store Code" := CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Customer."NPR Magento Store Code"));
     end;
 
-    local procedure "--- Aux"()
-    begin
-    end;
+    #endregion
 
-    procedure MagentoApiGet(Method: Text; var Result: DotNet JToken)
+    #region Aux
+
+    procedure MagentoApiGet(Method: Text; var Result: JsonToken)
     var
         MagentoSetup: Record "NPR Magento Setup";
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        StreamReader: DotNet NPRNetStreamReader;
+        HttpWebRequest: HttpRequestMessage;
+        HttpWebResponse: HttpResponseMessage;
+        Client: HttpClient;
+        Headers: HttpHeaders;
         Response: Text;
     begin
         Clear(Response);
@@ -443,34 +456,35 @@ codeunit 6151463 "NPR M2 Account Lookup Mgt."
         if MagentoSetup."Api Url"[StrLen(MagentoSetup."Api Url")] <> '/' then
             MagentoSetup."Api Url" += '/';
 
-        HttpWebRequest := HttpWebRequest.Create(MagentoSetup."Api Url" + Method);
-        HttpWebRequest.Timeout := 1000 * 60;
-
-        HttpWebRequest.Method := 'GET';
-        MagentoSetup.Get;
+        HttpWebRequest.SetRequestUri(MagentoSetup."Api Url" + Method);
+        HttpWebRequest.Method('GET');
+        HttpWebRequest.GetHeaders(Headers);
         if MagentoSetup."Api Authorization" <> '' then
-            HttpWebRequest.Headers.Add('Authorization', MagentoSetup."Api Authorization")
+            Headers.Add('Authorization', MagentoSetup."Api Authorization")
         else
-            HttpWebRequest.Headers.Add('Authorization', 'Basic ' + MagentoSetup.GetBasicAuthInfo());
+            Headers.Add('Authorization', 'Basic ' + MagentoSetup.GetBasicAuthInfo());
 
-        HttpWebResponse := HttpWebRequest.GetResponse();
-        StreamReader := StreamReader.StreamReader(HttpWebResponse.GetResponseStream);
-        Response := StreamReader.ReadToEnd;
-        Result := Result.Parse(Response);
+        Client.Timeout := 60000;
+        Client.Send(HttpWebRequest, HttpWebResponse);
+        HttpWebResponse.Content.ReadAs(Response);
+        if not HttpWebResponse.IsSuccessStatusCode() then
+            Error(StrSubstNo('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response));
+
+        Result.ReadFrom(Response);
     end;
 
-    local procedure GetJsonText(JToken: DotNet JToken; JPath: Text; MaxLen: Integer) Value: Text
+    local procedure GetJsonText(JToken: JsonToken; JPath: Text; MaxLen: Integer) Value: Text
     var
-        JToken2: DotNet JToken;
+        JToken2: JsonToken;
     begin
-        JToken2 := JToken.SelectToken(JPath);
-        if IsNull(JToken2) then
+        if not JToken.SelectToken(JPath, JToken2) then
             exit('');
 
-        Value := Format(JToken2);
+        Value := JToken2.AsValue().AsText();
         if MaxLen > 0 then
             Value := CopyStr(Value, 1, MaxLen);
         exit(Value);
     end;
 }
 
+#endregion

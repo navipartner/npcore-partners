@@ -1,10 +1,5 @@
 xmlport 6151157 "NPR M2 Add Account"
 {
-    // NPR5.49/TSA /20190307 CASE 347894 Changed PasswordMD5 to PasswordHash
-    // NPR5.49/JAKUBV/20190402  CASE 320424-01 Transport NPR5.49 - 1 April 2019
-    // NPR5.51/TSA /20190812 CASE 364644 Added Person section
-    // MAG2.23/TSA /20191015 CASE 373151 Move Person to address, added Name
-
     Caption = 'Add Account';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -198,18 +193,6 @@ xmlport 6151157 "NPR M2 Add Account"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     var
         StartTime: Time;
 
@@ -252,4 +235,3 @@ xmlport 6151157 "NPR M2 Add Account"
         ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime), 0, 9);
     end;
 }
-

@@ -1,8 +1,5 @@
 xmlport 6151149 "NPR M2 Change Account Password"
 {
-    // NPR5.48/TSA /20181211 CASE 320425 Initial Version
-    // NPR5.49/TSA /20190307 CASE 347894 Changed PasswordMD5 to PasswordHash
-
     Caption = 'Change Account Password';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -83,18 +80,6 @@ xmlport 6151149 "NPR M2 Change Account Password"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     trigger OnInitXmlPort()
     begin
         RequestEntryCount := 0;
@@ -146,4 +131,3 @@ xmlport 6151149 "NPR M2 Change Account Password"
         ResponseMessage := ReasonText;
     end;
 }
-

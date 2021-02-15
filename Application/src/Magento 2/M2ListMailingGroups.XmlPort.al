@@ -1,7 +1,5 @@
 xmlport 6151139 "NPR M2 List Mailing Groups"
 {
-    // NPR5.51/TSA /20190724 CASE 362020 Initial Version
-
     Caption = 'List Mailing Groups';
     Direction = Export;
     Encoding = UTF8;
@@ -39,18 +37,6 @@ xmlport 6151139 "NPR M2 List Mailing Groups"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     var
         ContactNo: Code[20];
 
@@ -60,4 +46,3 @@ xmlport 6151139 "NPR M2 List Mailing Groups"
         ContactNo := CheckContactNo;
     end;
 }
-

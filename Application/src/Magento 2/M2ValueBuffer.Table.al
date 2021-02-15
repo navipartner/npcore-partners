@@ -1,7 +1,5 @@
 table 6151443 "NPR M2 Value Buffer"
 {
-    // MAG2.20/MHA /20190425  CASE 320423 Object created - Buffer used with M2 GET Apis
-
     Caption = 'M2 Value Buffer';
     DataClassification = CustomerContent;
 
@@ -33,9 +31,4 @@ table 6151443 "NPR M2 Value Buffer"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

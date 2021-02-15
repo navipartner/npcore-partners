@@ -1,11 +1,5 @@
 xmlport 6151153 "NPR M2 Create Corporate Acc."
 {
-    // NPR5.49/TSA /20190307 CASE 347894 Changed PasswordMD5 to PasswordHash
-    // NPR5.49/JAKUBV/20190402  CASE 320424-01 Transport NPR5.49 - 1 April 2019
-    // NPR5.51/TSA /20190812 CASE 364644 Added Person section
-    // MAG2.23/TSA /20191015 CASE 373151 Moved section person to be included in address, added name, removed company name, EAN
-    // MAG2.24/TSA /20191119 CASE 372304 Added membership opt-out feature ExcludeFromMembership field and added a membership section
-
     Caption = 'Create Corporate Account';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -252,18 +246,6 @@ xmlport 6151153 "NPR M2 Create Corporate Acc."
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     var
         StartTime: Time;
 
@@ -297,7 +279,6 @@ xmlport 6151153 "NPR M2 Create Corporate Acc."
         repeat
             TmpContactResponse.TransferFields(TmpContact, true);
             TmpContactResponse.Insert();
-            //-MAG2.24 [372304]
             if (not MembershipRole.SetCurrentKey("Contact No.")) then;
             MembershipRole.SetFilter("Contact No.", '=%1', TmpContact."No.");
             MembershipRole.SetFilter(Blocked, '=%1', false);
@@ -306,7 +287,6 @@ xmlport 6151153 "NPR M2 Create Corporate Acc."
                 TmpMembershipRoleResponse.TransferFields(MembershipRole, true);
                 TmpMembershipRoleResponse.Insert();
             end;
-        //+MAG2.24 [372304]
         until (TmpContact.Next() = 0);
 
         ResponseCode := 'OK';
@@ -322,4 +302,3 @@ xmlport 6151153 "NPR M2 Create Corporate Acc."
         ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime), 0, 9);
     end;
 }
-

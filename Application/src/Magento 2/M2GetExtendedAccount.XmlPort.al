@@ -1,7 +1,5 @@
 xmlport 6151144 "NPR M2 Get Extended Account"
 {
-    // MAG2.21/TSA /20190426 CASE 350001 Initial Version
-
     Caption = 'Get Account';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -122,18 +120,6 @@ xmlport 6151144 "NPR M2 Get Extended Account"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     var
         NPRDocLocalizationProxy: Codeunit "NPR Doc. Localization Proxy";
         StartTime: Time;
@@ -188,9 +174,6 @@ xmlport 6151144 "NPR M2 Get Extended Account"
     var
         TmpEan: Variant;
     begin
-
-        //NPRDocLocalizationProxy.T18_GetFieldValue (Customer, 'Ean No.', TmpEan);
         EanNo := 'NOT IN W1';
     end;
 }
-

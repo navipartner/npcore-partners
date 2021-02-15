@@ -1,15 +1,9 @@
 codeunit 6151465 "NPR M2 Brand Mgt."
 {
-    // MAG2.26/MHA /20200601  CASE 404580 Object created
-
-
     trigger OnRun()
     begin
         UpdateBrands();
     end;
-
-    var
-        Text000: Label 'Root Categoery is missing for Website %1';
 
     local procedure UpdateBrands()
     var
@@ -19,11 +13,13 @@ codeunit 6151465 "NPR M2 Brand Mgt."
         DataLogMgt: Codeunit "NPR Data Log Management";
         M2SetupMgt: Codeunit "NPR M2 Setup Mgt.";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        Element: DotNet NPRNetXmlElement;
+        XmlDoc: XmlDocument;
+        XNodeList: XmlNodeList;
+        XNode: XmlNode;
         BrandId: Code[20];
         PrevRec: Text;
         TypeHelper: Codeunit "Type Helper";
+        i: Integer;
     begin
         MagentoSetup.Get;
         if not MagentoSetup."Magento Enabled" then
@@ -31,8 +27,9 @@ codeunit 6151465 "NPR M2 Brand Mgt."
 
         M2SetupMgt.MagentoApiGet(MagentoSetup."Api Url", 'brands', XmlDoc);
         DataLogMgt.DisableDataLog(true);
-        foreach Element in XmlDoc.DocumentElement.SelectNodes('brand') do begin
-            BrandId := NpXmlDomMgt.GetAttributeCode(Element, '', 'id', MaxStrLen(MagentoBrand.Id), true);
+        XmlDoc.SelectNodes('//brand', XNodeList);
+        foreach XNode in XNodeList do begin
+            BrandId := NpXmlDomMgt.GetAttributeCode(XNode.AsXmlElement(), '', 'id', MaxStrLen(MagentoBrand.Id), true);
             if not MagentoBrand.Get(BrandId) then begin
                 MagentoBrand.Init;
                 MagentoBrand.Id := BrandId;
@@ -41,9 +38,9 @@ codeunit 6151465 "NPR M2 Brand Mgt."
 
             PrevRec := Format(MagentoBrand);
 
-            MagentoBrand.Name := NpXmlDomMgt.GetElementText(Element, 'name', MaxStrLen(MagentoBrand.Name), false);
+            MagentoBrand.Name := NpXmlDomMgt.GetElementText(XNode.AsXmlElement(), '//name', MaxStrLen(MagentoBrand.Name), false);
             MagentoBrand.Name := TypeHelper.HtmlDecode(MagentoBrand.Name);
-            MagentoBrand.Sorting := NpXmlDomMgt.GetElementInt(Element, 'sort_order', false);
+            MagentoBrand.Sorting := NpXmlDomMgt.GetElementInt(XNode.AsXmlElement(), '//sort_order', false);
 
             if PrevRec <> Format(MagentoBrand) then
                 MagentoBrand.Modify(true);
@@ -91,11 +88,7 @@ codeunit 6151465 "NPR M2 Brand Mgt."
         end;
     end;
 
-    local procedure "--- Subscribers"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6151401, 'OnSetupBrands', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Setup Mgt.", 'OnSetupBrands', '', true, true)]
     local procedure SetupM2Brands(var Handled: Boolean)
     var
         MagentoSetupEventSub: Record "NPR Magento Setup Event Sub.";
@@ -108,13 +101,8 @@ codeunit 6151465 "NPR M2 Brand Mgt."
         ScheduleUpdateBrands();
     end;
 
-    local procedure "--- Aux"()
-    begin
-    end;
-
     local procedure CurrCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR M2 Brand Mgt.");
     end;
 }
-

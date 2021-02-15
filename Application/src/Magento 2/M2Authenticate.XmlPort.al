@@ -1,15 +1,5 @@
 xmlport 6151150 "NPR M2 Authenticate"
 {
-    // NPR5.49/TSA /20181211 CASE 320425 Initial Version
-    // NPR5.49/TSA /20190307 CASE 347894 Changed PasswordMD5 to PasswordHash
-    // NPR5.51/TSA /20190812 CASE 364644 Added Person section
-    // MAG2.23/TSA /20191015 CASE 373151 Changed cardinality for person section, added storecode
-    // MAG2.24/TSA /20191015 CASE 373151 Added storecode
-    // MAG2.24/TSA /20191119 CASE 372304 Added Membership section
-    // MAG2.25/TSA /20200225 CASE 390083 Adding SellTo Node with customer number and search name
-    // MAG2.25/TSA /20200228 CASE 391933 Expanding the login email to match a salesperson with same email, if found, also list those accounts
-    // MAG2.25/TSA /20200414 CASE 400138 Exclude affilliated true contact when "magento contact" is false
-
     Caption = 'Authenticate';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -161,10 +151,7 @@ xmlport 6151150 "NPR M2 Authenticate"
 
                             trigger OnBeforePassVariable()
                             begin
-
-                                //-MAG2.24 [373151]
                                 StoreCode := Customer."NPR Magento Store Code";
-                                //-MAG2.24 [373151]
                             end;
                         }
                         tableelement(tmpmembershiproleresponse; "NPR MM Membership Role")
@@ -215,8 +202,6 @@ xmlport 6151150 "NPR M2 Authenticate"
                             var
                                 SalespersonPurchaser: Record "Salesperson/Purchaser";
                             begin
-
-                                //-MAG2.25 [390083]
                                 if (not Customer.Get(TmpContactBusinessRelationResp."No.")) then
                                     Clear(Customer);
 
@@ -227,7 +212,6 @@ xmlport 6151150 "NPR M2 Authenticate"
                                         Salesperson := SalespersonPurchaser.Name;
                                     SalespersonCode := Customer."Salesperson Code";
                                 end;
-                                //+MAG2.25 [390083]
                             end;
                         }
 
@@ -236,8 +220,6 @@ xmlport 6151150 "NPR M2 Authenticate"
                             ContactBusinessRelation: Record "Contact Business Relation";
                             MarketingSetup: Record "Marketing Setup";
                         begin
-
-                            //-MAG2.24 [373151]
                             if (TmpContactResponse."Company No." = '') then
                                 TmpContactResponse."Company No." := TmpContactResponse."No.";
 
@@ -245,27 +227,11 @@ xmlport 6151150 "NPR M2 Authenticate"
                                 if (ContactBusinessRelation.Get(TmpContactResponse."Company No.", MarketingSetup."Bus. Rel. Code for Customers")) then
                                     if (not Customer.Get(ContactBusinessRelation."No.")) then
                                         Clear(Customer);
-                            //-MAG2.24 [373151]
-
-                            //-#xx
                             IsAffiliated := Format((TmpOneTimePasswordRequest."E-Mail" <> TmpContactResponse."E-Mail"), 0, 9);
-                            //+#xx
                         end;
                     }
                 }
             }
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 
@@ -300,18 +266,14 @@ xmlport 6151150 "NPR M2 Authenticate"
         MembershipRole: Record "NPR MM Membership Role";
         ContactBusinessRelation: Record "Contact Business Relation";
     begin
-
         TmpContact.Reset();
 
-        //-MAG2.25 [391933]
         AppendAffiliatedContacts(TmpContact);
-        //+MAG2.25 [391933]
 
         if (TmpContact.FindSet()) then begin
             repeat
                 TmpContactResponse.TransferFields(TmpContact, true);
                 TmpContactResponse.Insert();
-                //-MAG2.24 [372304]
                 if (not MembershipRole.SetCurrentKey("Contact No.")) then;
                 MembershipRole.SetFilter("Contact No.", '=%1', TmpContact."No.");
                 MembershipRole.SetFilter(Blocked, '=%1', false);
@@ -320,9 +282,7 @@ xmlport 6151150 "NPR M2 Authenticate"
                     TmpMembershipRoleResponse.TransferFields(MembershipRole, true);
                     TmpMembershipRoleResponse.Insert();
                 end;
-                //+MAG2.24 [372304]
 
-                //-MAG2.25 [390083]
                 ContactBusinessRelation.SetFilter("Link to Table", '=%1', ContactBusinessRelation."Link to Table"::Customer);
                 ContactBusinessRelation.SetFilter("Contact No.", '=%1', TmpContact."Company No.");
                 if (ContactBusinessRelation.FindFirst()) then begin
@@ -330,7 +290,6 @@ xmlport 6151150 "NPR M2 Authenticate"
                     TmpContactBusinessRelationResp."Contact No." := TmpContact."No.";
                     if (not TmpContactBusinessRelationResp.Insert()) then;
                 end;
-            //+MAG2.25 [390083]
 
             until (TmpContact.Next() = 0);
         end;
@@ -356,8 +315,6 @@ xmlport 6151150 "NPR M2 Authenticate"
         PrimaryContact: Record Contact;
         ContactBusinessRelation: Record "Contact Business Relation";
     begin
-
-        //-MAG2.25 [391933]
         if (TmpContact.FindSet()) then begin
             TmpOneTimePasswordRequest.Reset();
             TmpOneTimePasswordRequest.FindFirst();
@@ -374,7 +331,7 @@ xmlport 6151150 "NPR M2 Authenticate"
                                 if (PrimaryContact.Get(ContactBusinessRelation."Contact No.")) then begin
                                     TmpContact.TransferFields(PrimaryContact, true);
                                     TmpContact."Company No." := TmpContact."No.";
-                                    if (TmpContact."NPR Magento Contact") then //-+MAG2.25 [400138]
+                                    if (TmpContact."NPR Magento Contact") then
                                         if (not TmpContact.Insert()) then;
                                 end;
                             end;
@@ -383,7 +340,5 @@ xmlport 6151150 "NPR M2 Authenticate"
                 until (SalespersonPurchaser.Next() = 0);
             end;
         end;
-        //+MAG2.25 [391933]
     end;
 }
-

@@ -165,24 +165,11 @@ xmlport 6151154 "NPR M2 Add Shipto Address"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     var
         StartTime: Time;
 
     procedure GetRequest(var TmpAccount: Record Contact temporary; var TmpShipToAddress: Record "Ship-to Address" temporary)
     begin
-
         StartTime := Time;
         SetErrorResponse('No response.');
 
@@ -199,7 +186,6 @@ xmlport 6151154 "NPR M2 Add Shipto Address"
 
     procedure SetResponse(var TmpShiptoAddress: Record "Ship-to Address" temporary)
     begin
-
         ResponseCode := 'OK';
         ResponseMessage := '';
         ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime), 0, 9);
@@ -217,10 +203,8 @@ xmlport 6151154 "NPR M2 Add Shipto Address"
 
     procedure SetErrorResponse(ErrorMessage: Text)
     begin
-
         ResponseCode := 'ERROR';
         ResponseMessage := ErrorMessage;
         ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime), 0, 9);
     end;
 }
-

@@ -46,8 +46,7 @@ codeunit 6151421 "NPR Magento Lookup Ret.Order"
         if not XmlDoc.SelectNodes('.//*[local-name()="sales_return_order"]', XmlNodeList) then
             exit(false);
 
-        for i := 1 to XmlNodeList.Count do begin
-            XmlNodeList.Get(i, Node);
+        foreach Node in XmlNodeList do begin
             if Node.AsXmlElement().Attributes().Get('return_order_no', ReturnOrderNoAttribute) then
                 ReturnOrderNo := ReturnOrderNoAttribute.Value;
             if (ReturnOrderNo <> '') and (StrLen(ReturnOrderNo) <= MaxStrLen(SalesHeader."NPR External Order No.")) then begin

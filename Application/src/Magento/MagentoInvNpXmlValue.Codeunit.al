@@ -141,7 +141,7 @@ codeunit 6151408 "NPR Magento Inv. NpXml Value"
 
         XmlDoc.SelectNodes('.//*[local-name()="item"]', XmlNodeList);
 
-        for i := 1 to XmlNodeList.Count do begin
+        foreach Node in XmlNodeList do begin
             XmlNodeList.Get(i, Node);
             if Node.AsXmlElement().Attributes().Get('item_no', ItemAttribute) then
                 if Node.AsXmlElement().Attributes().Get('variant_code', VariantAttribute) then

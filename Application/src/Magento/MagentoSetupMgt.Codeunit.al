@@ -29,8 +29,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
             exit;
 
         if XmlElement.SelectNodes('stores/store', XNodeList) then begin
-            for i := 1 to XNodeList.Count do begin
-                XNodeList.Get(i, XNodeChild);
+            foreach XNodeChild in XNodeList do begin
                 RootItemGroupNo := NpXmlDomMgt.GetXmlText(XmlElement, 'root_category', MaxStrLen(RootItemGroupNo), true);
                 if not XmlElement.SelectSingleNode('root_category', XNodeSibling) then
                     Error(Text000, MagentoWebsite.Code);
@@ -273,8 +272,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
         MagentoMgt.MagentoApiGet(MagentoSetup."Api Url", 'customer_groups', XmlDoc);
 
         XmlDoc.SelectNodes('//customer_group', XNodeList);
-        for i := 1 to XNodeList.Count do begin
-            XNodeList.Get(i, XNode);
+        foreach XNode in XNodeList do begin
             XNode.AsXmlElement().Attributes().Get('customer_group_code', XAttribute);
             GroupCode := CopyStr(XAttribute.Value, 1, MaxStrLen(MagentoCustomerGroup.Code));
             if GroupCode <> '' then
@@ -309,8 +307,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
         MagentoMgt.MagentoApiGet(MagentoSetup."Api Url", 'tax_classes', XmlDoc);
 
         XmlDoc.SelectNodes('//tax_class', XNodeList);
-        for i := 1 to XNodeList.Count do begin
-            XNodeList.Get(i, XNode);
+        foreach XNode in XNodeList do begin
             ClassName := CopyStr(NpXmlDomMgt.GetXmlText(XNode.AsXmlElement(), 'class_name', 0, false), 1, MaxStrLen(MagentoTaxClass.Name));
             ClassType := -1;
             case LowerCase(NpXmlDomMgt.GetXmlText(XNode.AsXmlElement(), 'class_type', 0, false)) of
@@ -349,8 +346,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
         MagentoMgt.MagentoApiGet(MagentoSetup."Api Url", 'websites', XmlDoc);
 
         XmlDoc.SelectNodes('//website', XNodeList);
-        for i := 1 to XNodeList.Count do begin
-            XNodeList.Get(i, XNode);
+        foreach XNode in XNodeList do begin
             XNode.AsXmlElement().Attributes().Get('code', XAttribute);
             if not MagentoWebsite.Get(XAttribute.Value) then begin
                 MagentoWebsite.Init;
@@ -365,7 +361,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
             end;
 
             if XNode.SelectNodes('store_groups/store_group', XNodeList) then begin
-                for i := 1 to XNodeList.Count do begin
+                foreach XNode in XNodeList do begin
                     XNodeList.Get(i, XNode);
                     CreateStores(XNode.AsXmlElement(), MagentoWebsite);
                 end;
@@ -394,8 +390,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
         MagentoMgt.MagentoApiGet(MagentoSetup."Api Url", 'payment_methods', XmlDoc);
 
         XmlDoc.SelectNodes('//payment_method', XNodeList);
-        for i := 1 to XNodeList.Count do begin
-            XNodeList.Get(i, XNode);
+        foreach XNode in XNodeList do begin
             XNode.AsXmlElement().Attributes().Get('code', XAttribute);
             PaymentCode := XAttribute.Value;
             XNode.AsXmlElement().Attributes().Get('type', XAttribute);
@@ -429,8 +424,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
         MagentoMgt.MagentoApiGet(MagentoSetup."Api Url", 'shipping_methods', XmlDoc);
 
         XmlDoc.SelectNodes('//shipping_method', XNodeList);
-        for i := 1 to XNodeList.Count do begin
-            XNodeList.Get(i, XNode);
+        foreach XNode in XNodeList do begin
             XNode.AsXmlElement().Attributes().Get('carrier', XAttribute);
             ShipmentCode := XAttribute.Value;
             if not ShipmentMapping.Get(ShipmentCode) then begin
@@ -721,7 +715,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
     var
         MagentoSetupEventSub: Record "NPR Magento Setup Event Sub.";
     begin
-        if not IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup NpXml Templates".AsInteger(), CurrCodeunitId(), 'SetupM1SetupNpXmlTemplates') then
+        if not IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup NpXml Templates", CurrCodeunitId(), 'SetupM1SetupNpXmlTemplates') then
             exit;
 
         Handled := true;
@@ -733,7 +727,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
     var
         MagentoSetupEventSub: Record "NPR Magento Setup Event Sub.";
     begin
-        if not IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup Magento Tax Classes".AsInteger(), CurrCodeunitId(), 'SetupM1MagentoTaxClasses') then
+        if not IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup Magento Tax Classes", CurrCodeunitId(), 'SetupM1MagentoTaxClasses') then
             exit;
 
         Handled := true;
@@ -745,7 +739,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
     var
         MagentoSetupEventSub: Record "NPR Magento Setup Event Sub.";
     begin
-        if not IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup Magento Api Credentials".AsInteger(), CurrCodeunitId(), 'SetupM1Credentials') then
+        if not IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup Magento Api Credentials", CurrCodeunitId(), 'SetupM1Credentials') then
             exit;
 
         Handled := true;
@@ -757,7 +751,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
     var
         MagentoSetupEventSub: Record "NPR Magento Setup Event Sub.";
     begin
-        if not IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup Magento Websites".AsInteger(), CurrCodeunitId(), 'SetupM1Websites') then
+        if not IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup Magento Websites", CurrCodeunitId(), 'SetupM1Websites') then
             exit;
 
         Handled := true;
@@ -769,7 +763,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
     var
         MagentoSetupEventSub: Record "NPR Magento Setup Event Sub.";
     begin
-        if not IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup Magento Customer Groups".AsInteger(), CurrCodeunitId(), 'SetupM1CustomerGroups') then
+        if not IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup Magento Customer Groups", CurrCodeunitId(), 'SetupM1CustomerGroups') then
             exit;
 
         Handled := true;
@@ -781,7 +775,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
     var
         MagentoSetupEventSub: Record "NPR Magento Setup Event Sub.";
     begin
-        if not IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup Payment Method Mapping".AsInteger(), CurrCodeunitId(), 'SetupM1PaymentMethodMapping') then
+        if not IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup Payment Method Mapping", CurrCodeunitId(), 'SetupM1PaymentMethodMapping') then
             exit;
 
         Handled := true;
@@ -793,7 +787,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
     var
         MagentoSetupEventSub: Record "NPR Magento Setup Event Sub.";
     begin
-        if not IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup Shipment Method Mapping".AsInteger(), CurrCodeunitId(), 'SetupM1ShipmentMethodMapping') then
+        if not IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Setup Shipment Method Mapping", CurrCodeunitId(), 'SetupM1ShipmentMethodMapping') then
             exit;
 
         Handled := true;
@@ -938,7 +932,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
 
     #region Aux
 
-    procedure IsMagentoSetupEventSubscriber(SetupSubscriptionType: Integer; CodeunitId: Integer; FunctionName: Text): Boolean
+    procedure IsMagentoSetupEventSubscriber(SetupSubscriptionType: Enum "NPR Mag. Setup Event Sub. Type"; CodeunitId: Integer; FunctionName: Text): Boolean
     var
         MagentoSetupSubscription: Record "NPR Magento Setup Event Sub.";
     begin

@@ -1,7 +1,5 @@
 xmlport 6151141 "NPR M2 Get Budget Dim. Values"
 {
-    // NPR5.50/TSA /20190515 CASE 353714 Initial Version
-
     Caption = 'Get Budget Dimension Values';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -227,18 +225,6 @@ xmlport 6151141 "NPR M2 Get Budget Dim. Values"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     trigger OnInitXmlPort()
     begin
         StartTime := Time;
@@ -308,4 +294,3 @@ xmlport 6151141 "NPR M2 Get Budget Dim. Values"
         end;
     end;
 }
-

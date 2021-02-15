@@ -116,8 +116,7 @@ codeunit 6151145 "NPR M2 POS Price WebService"
         TmpSaleLinePOS2.Reset();
         if (TmpSaleLinePOS2.FindSet()) then begin
             repeat
-                with TmpSaleLinePOS2 do
-                    TmpSaleLinePOS.Get("Register No.", "Sales Ticket No.", Date, "Sale Type", "Line No.");
+                TmpSaleLinePOS.Get(TmpSaleLinePOS2."Register No.", TmpSaleLinePOS2."Sales Ticket No.", TmpSaleLinePOS2.Date, TmpSaleLinePOS2."Sale Type", TmpSaleLinePOS2."Line No.");
 
                 TmpSaleLinePOS.TransferFields(TmpSaleLinePOS2, false);
                 TmpSaleLinePOS.UpdateAmounts(TmpSaleLinePOS);
@@ -442,8 +441,8 @@ codeunit 6151145 "NPR M2 POS Price WebService"
                     TmpQtyBracket."Unit Price Base" := SalesPrice."Unit Price";
 
                     if (not TmpQtyBracket.Insert()) then begin
-                        with TmpQtyBracket do
-                            Get("Item No.", "Source Type", "Source Code", "Starting Date", "Currency Code", "Variant Code", "Unit of Measure Code", "Minimum Quantity", "Request ID");
+                        TmpQtyBracket.Get(TmpQtyBracket."Item No.", TmpQtyBracket."Source Type", TmpQtyBracket."Source Code", TmpQtyBracket."Starting Date",
+                            TmpQtyBracket."Currency Code", TmpQtyBracket."Variant Code", TmpQtyBracket."Unit of Measure Code", TmpQtyBracket."Minimum Quantity", TmpQtyBracket."Request ID");
 
                         // This will break when VAT is included in one of the prices but not the other. (The ending date could be wrong)
                         if (TmpQtyBracket."Unit Price Base" > SalesPrice."Unit Price") then begin
@@ -463,8 +462,8 @@ codeunit 6151145 "NPR M2 POS Price WebService"
                     TmpQtyBracket."Discount End Date" := SalesLineDiscount."Ending Date";
 
                     if (not TmpQtyBracket.Insert()) then begin
-                        with TmpQtyBracket do
-                            Get("Item No.", "Source Type", "Source Code", "Starting Date", "Currency Code", "Variant Code", "Unit of Measure Code", "Minimum Quantity", "Request ID");
+                        TmpQtyBracket.Get(TmpQtyBracket."Item No.", TmpQtyBracket."Source Type", TmpQtyBracket."Source Code", TmpQtyBracket."Starting Date", TmpQtyBracket."Currency Code",
+                            TmpQtyBracket."Variant Code", TmpQtyBracket."Unit of Measure Code", TmpQtyBracket."Minimum Quantity", TmpQtyBracket."Request ID");
                         if (TmpQtyBracket."Line Discount %" < SalesLineDiscount."Line Discount %") then begin
                             TmpQtyBracket."Line Discount %" := SalesLineDiscount."Line Discount %";
                             TmpQtyBracket."Discount End Date" := SalesLineDiscount."Ending Date";
@@ -487,8 +486,8 @@ codeunit 6151145 "NPR M2 POS Price WebService"
                         TmpQtyBracket."Discount End Date" := SalesLineDiscount."Ending Date";
 
                         if (not TmpQtyBracket.Insert()) then begin
-                            with TmpQtyBracket do
-                                Get("Item No.", "Source Type", "Source Code", "Starting Date", "Currency Code", "Variant Code", "Unit of Measure Code", "Minimum Quantity", "Request ID");
+                            TmpQtyBracket.Get(TmpQtyBracket."Item No.", TmpQtyBracket."Source Type", TmpQtyBracket."Source Code", TmpQtyBracket."Starting Date",
+                                TmpQtyBracket."Currency Code", TmpQtyBracket."Variant Code", TmpQtyBracket."Unit of Measure Code", TmpQtyBracket."Minimum Quantity", TmpQtyBracket."Request ID");
                             if (TmpQtyBracket."Line Discount %" > SalesLineDiscount."Line Discount %") then begin
                                 TmpQtyBracket."Line Discount %" := SalesLineDiscount."Line Discount %";
                                 TmpQtyBracket."Discount End Date" := SalesLineDiscount."Ending Date";
@@ -532,8 +531,8 @@ codeunit 6151145 "NPR M2 POS Price WebService"
                     Clear(TmpPricePointNew);
                     TmpPricePointNew.TransferFields(TmpPricePoint, true);
 
-                    with TmpPricePoint do
-                        Get("Item No.", "Source Type", "Source Code", "Starting Date", "Currency Code", "Variant Code", "Unit of Measure Code", "Minimum Quantity", "Request ID");
+                    TmpPricePoint.Get(TmpPricePoint."Item No.", TmpPricePoint."Source Type", TmpPricePoint."Source Code", TmpPricePoint."Starting Date",
+                        TmpPricePoint."Currency Code", TmpPricePoint."Variant Code", TmpPricePoint."Unit of Measure Code", TmpPricePoint."Minimum Quantity", TmpPricePoint."Request ID");
 
                     if (TmpPricePointNew."Unit Price" < TmpPricePoint."Unit Price") then begin
                         TmpPricePoint.TransferFields(TmpPricePointNew, false);

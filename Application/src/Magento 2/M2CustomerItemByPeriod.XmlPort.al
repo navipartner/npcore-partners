@@ -1,8 +1,5 @@
 xmlport 6151148 "NPR M2 Customer Item By Period"
 {
-    // NPR5.49/TSA /20190307 CASE 345375 Initial Version
-    // MAG2.25/TSA /20200401 CASE 399020 Added a conditional filter for location code
-
     Caption = 'Customer Item By Period';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -151,24 +148,22 @@ xmlport 6151148 "NPR M2 Customer Item By Period"
 
                                         trigger OnBeforePassVariable()
                                         begin
-
-                                            with TmpSalesLine do
-                                                case TmpSalesLine."Document Type" of
-                                                    "Document Type"::Quote:
-                                                        NotShippedDocyType := 'quote';
-                                                    "Document Type"::Order:
-                                                        NotShippedDocyType := 'order';
-                                                    "Document Type"::"Return Order":
-                                                        NotShippedDocyType := 'returnorder';
-                                                    "Document Type"::Invoice:
-                                                        NotShippedDocyType := 'invoice';
-                                                    "Document Type"::"Credit Memo":
-                                                        NotShippedDocyType := 'creditmemo';
-                                                    "Document Type"::"Blanket Order":
-                                                        NotShippedDocyType := 'blanketorder';
-                                                    else
-                                                        NotShippedDocyType := 'uncategorized';
-                                                end;
+                                            case TmpSalesLine."Document Type" of
+                                                TmpSalesLine."Document Type"::Quote:
+                                                    NotShippedDocyType := 'quote';
+                                                TmpSalesLine."Document Type"::Order:
+                                                    NotShippedDocyType := 'order';
+                                                TmpSalesLine."Document Type"::"Return Order":
+                                                    NotShippedDocyType := 'returnorder';
+                                                TmpSalesLine."Document Type"::Invoice:
+                                                    NotShippedDocyType := 'invoice';
+                                                TmpSalesLine."Document Type"::"Credit Memo":
+                                                    NotShippedDocyType := 'creditmemo';
+                                                TmpSalesLine."Document Type"::"Blanket Order":
+                                                    NotShippedDocyType := 'blanketorder';
+                                                else
+                                                    NotShippedDocyType := 'uncategorized';
+                                            end;
                                         end;
                                     }
                                     textattribute(outstandingqty)
@@ -216,20 +211,18 @@ xmlport 6151148 "NPR M2 Customer Item By Period"
 
                                         trigger OnBeforePassVariable()
                                         begin
-
-                                            with TmpItemLedgerEntry do
-                                                case "Document Type" of
-                                                    "Document Type"::"Sales Shipment":
-                                                        ShippedDocType := 'shipment';
-                                                    "Document Type"::"Sales Return Receipt":
-                                                        ShippedDocType := 'return';
-                                                    "Document Type"::"Sales Invoice":
-                                                        ShippedDocType := 'invoice';
-                                                    "Document Type"::"Sales Credit Memo":
-                                                        ShippedDocType := 'creditmemo';
-                                                    else
-                                                        ShippedDocType := 'uncategorized';
-                                                end;
+                                            case TmpItemLedgerEntry."Document Type" of
+                                                TmpItemLedgerEntry."Document Type"::"Sales Shipment":
+                                                    ShippedDocType := 'shipment';
+                                                TmpItemLedgerEntry."Document Type"::"Sales Return Receipt":
+                                                    ShippedDocType := 'return';
+                                                TmpItemLedgerEntry."Document Type"::"Sales Invoice":
+                                                    ShippedDocType := 'invoice';
+                                                TmpItemLedgerEntry."Document Type"::"Sales Credit Memo":
+                                                    ShippedDocType := 'creditmemo';
+                                                else
+                                                    ShippedDocType := 'uncategorized';
+                                            end;
                                         end;
                                     }
                                     textattribute(qtyshipped)
@@ -275,16 +268,14 @@ xmlport 6151148 "NPR M2 Customer Item By Period"
 
                                         trigger OnBeforePassVariable()
                                         begin
-
-                                            with TmpValueEntry do
-                                                case "Document Type" of
-                                                    "Document Type"::"Sales Invoice":
-                                                        InvoicedDocType := 'invoice';
-                                                    "Document Type"::"Sales Credit Memo":
-                                                        InvoicedDocType := 'creditmemo';
-                                                    else
-                                                        InvoicedDocType := 'uncategorized';
-                                                end;
+                                            case TmpValueEntry."Document Type" of
+                                                TmpValueEntry."Document Type"::"Sales Invoice":
+                                                    InvoicedDocType := 'invoice';
+                                                TmpValueEntry."Document Type"::"Sales Credit Memo":
+                                                    InvoicedDocType := 'creditmemo';
+                                                else
+                                                    InvoicedDocType := 'uncategorized';
+                                            end;
                                         end;
                                     }
                                     textattribute(qtyinvoiced)
@@ -325,11 +316,9 @@ xmlport 6151148 "NPR M2 Customer Item By Period"
                                 if (ViewAsOption = ViewAsOption::BALANCEATDATE) then
                                     PeriodStart := 0D;
 
-                                with DateResponse do begin
-                                    GetNotShippedItems(PeriodStart, "Period End", TmpItemResponse."Item No.", TmpItemResponse."Variant Code", LocationCode, SellTo);
-                                    GetShippedItems(PeriodStart, "Period End", TmpItemResponse."Item No.", TmpItemResponse."Variant Code", LocationCode, SellTo);
-                                    GetInvoicedItems(PeriodStart, "Period End", TmpItemResponse."Item No.", TmpItemResponse."Variant Code", LocationCode, SellTo);
-                                end;
+                                GetNotShippedItems(PeriodStart, DateResponse."Period End", TmpItemResponse."Item No.", TmpItemResponse."Variant Code", LocationCode, SellTo);
+                                GetShippedItems(PeriodStart, DateResponse."Period End", TmpItemResponse."Item No.", TmpItemResponse."Variant Code", LocationCode, SellTo);
+                                GetInvoicedItems(PeriodStart, DateResponse."Period End", TmpItemResponse."Item No.", TmpItemResponse."Variant Code", LocationCode, SellTo);
                             end;
                         }
                     }
@@ -342,18 +331,6 @@ xmlport 6151148 "NPR M2 Customer Item By Period"
                     end;
                 }
             }
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 
@@ -502,7 +479,7 @@ xmlport 6151148 "NPR M2 Customer Item By Period"
         SalesLine.SetFilter("Sell-to Customer No.", '=%1', SellToCustomerNo);
         SalesLine.SetFilter("Planned Shipment Date", '%1..%2', PeriodStart, PeriodEnd);
         SalesLine.SetFilter("Variant Code", '=%1', VariantCode);
-        if (LocationCode <> '') then //-+MAG2.25 [399020]
+        if (LocationCode <> '') then
             SalesLine.SetFilter("Location Code", '=%1', LocationCode);
 
         if (SalesLine.FindSet()) then begin
@@ -538,7 +515,7 @@ xmlport 6151148 "NPR M2 Customer Item By Period"
         ItemLedgerEntry.SetFilter("Entry Type", '=%1', ItemLedgerEntry."Entry Type"::Sale);
         ItemLedgerEntry.SetFilter("Item No.", '=%1', ItemNo);
         ItemLedgerEntry.SetFilter("Variant Code", '=%1', VariantCode);
-        if (LocationCode <> '') then //-+MAG2.25 [399020]
+        if (LocationCode <> '') then
             ItemLedgerEntry.SetFilter("Location Code", '=%1', LocationCode);
         ItemLedgerEntry.SetFilter("Source Type", '=%1', ItemLedgerEntry."Source Type"::Customer);
         ItemLedgerEntry.SetFilter("Source No.", '=%1', SellToCustomerNo);
@@ -587,7 +564,7 @@ xmlport 6151148 "NPR M2 Customer Item By Period"
         ValueEntry.SetFilter("Item Ledger Entry Type", '=%1', ValueEntry."Item Ledger Entry Type"::Sale);
         ValueEntry.SetFilter("Item No.", '=%1', ItemNo);
         ValueEntry.SetFilter("Variant Code", '=%1', VariantCode);
-        if (LocationCode <> '') then //-+MAG2.25 [399020]
+        if (LocationCode <> '') then
             ValueEntry.SetFilter("Location Code", '=%1', LocationCode);
         ValueEntry.SetFilter("Source Type", '=%1', ValueEntry."Source Type"::Customer);
         ValueEntry.SetFilter("Source No.", '=%1', SellToCustomerNo);
@@ -619,4 +596,3 @@ xmlport 6151148 "NPR M2 Customer Item By Period"
         end;
     end;
 }
-

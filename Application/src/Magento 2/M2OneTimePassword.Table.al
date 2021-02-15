@@ -1,8 +1,5 @@
 table 6151151 "NPR M2 One Time Password"
 {
-    // NPR5.48/TSA /20181210 CASE 320425 Authenticate Web User with an One Time Password
-    // NPR5.49/TSA /20190307 CASE 347894 Changed Password Length to 80 and changed caption
-
     Caption = 'One Time Password';
     DataClassification = CustomerContent;
 
@@ -55,9 +52,4 @@ table 6151151 "NPR M2 One Time Password"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-
