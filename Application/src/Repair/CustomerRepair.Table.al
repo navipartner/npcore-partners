@@ -1232,9 +1232,7 @@ table 6014504 "NPR Customer Repair"
     var
         NprDimMgt: Codeunit "NPR Dimension Mgt.";
     begin
-        RetailSetup.Get;
-        if RetailSetup."Use Adv. dimensions" then
-            NprDimMgt.LookupDimValueCode(FieldNumber, ShortcutDimCode);
+        NprDimMgt.LookupDimValueCode(FieldNumber, ShortcutDimCode);
     end;
 
     procedure CreateSalesDocument("Document Type": Enum "Sales Document Type")

@@ -179,9 +179,7 @@ page 6014453 "NPR Campaign Discount"
                 var
                     NPRDimMgt: Codeunit "NPR Dimension Mgt.";
                 begin
-                    RetailSetup.Get;
-                    if RetailSetup."Use Adv. dimensions" then
-                        NPRDimMgt.OpenFormDefaultDimensions(DATABASE::"NPR Period Discount", Code);
+                    NPRDimMgt.OpenFormDefaultDimensions(DATABASE::"NPR Period Discount", Code);
                 end;
             }
         }

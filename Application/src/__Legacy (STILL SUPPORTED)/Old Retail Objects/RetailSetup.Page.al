@@ -49,11 +49,7 @@ page 6014424 "NPR Retail Setup"
                 group(Auxiliary)
                 {
                     Caption = 'Diverse';
-                    field("Variance No. Management"; "Variance No. Management")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Variance No. Management field';
-                    }
+
                     field("Period Discount Management"; "Period Discount Management")
                     {
                         ApplicationArea = All;
@@ -409,11 +405,6 @@ page 6014424 "NPR Retail Setup"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Global Sale POS field';
                     }
-                    field("Use NAV Lookup in POS"; "Use NAV Lookup in POS")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Use NAV Lookup In POS field';
-                    }
                 }
                 group("Buttons And Fields")
                 {
@@ -456,11 +447,6 @@ page 6014424 "NPR Retail Setup"
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Show Saved Expeditions field';
-                    }
-                    field("Get register no. using"; "Get register no. using")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Get Register No. Using field';
                     }
                     field("Path Filename to User Profile"; "Path Filename to User Profile")
                     {
@@ -707,11 +693,6 @@ page 6014424 "NPR Retail Setup"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Post Sale field';
                     }
-                    field("Posting Audit Roll"; "Posting Audit Roll")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Posting Audit Roll field';
-                    }
                     field("Debug Posting"; "Debug Posting")
                     {
                         ApplicationArea = All;
@@ -736,11 +717,6 @@ page 6014424 "NPR Retail Setup"
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Salesperson Code On Sales Documents field';
-                    }
-                    field("Posting Source Code"; "Posting Source Code")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Posting Source Code field';
                     }
                     field("Post registers compressed"; "Post registers compressed")
                     {
@@ -795,11 +771,6 @@ page 6014424 "NPR Retail Setup"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the F9 Statistics When Login field';
                     }
-                    field("Use Adv. dimensions"; "Use Adv. dimensions")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Use Dimensioncontrol field';
-                    }
                 }
                 group(Chart)
                 {
@@ -808,45 +779,6 @@ page 6014424 "NPR Retail Setup"
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Margin And Turnover By Shop field';
-                    }
-                }
-                group(SalesDocuments)
-                {
-                    Caption = 'Sales Documents';
-                    field("Sale Doc. Type On Post. Pstv."; "Sale Doc. Type On Post. Pstv.")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Sale Doc. Type On Post. Pstv. field';
-                    }
-                    field("Sale Doc. Type On Post. Negt."; "Sale Doc. Type On Post. Negt.")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Sale Doc. Type On Post. Negt. field';
-                    }
-                    field("Sale Doc. Post. On Order"; "Sale Doc. Post. On Order")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Sale Doc. Post. On Order field';
-                    }
-                    field("Sale Doc. Post. On Invoice"; "Sale Doc. Post. On Invoice")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Sale Doc. Post. On Invoice field';
-                    }
-                    field("Sale Doc. Post. On Cred. Memo"; "Sale Doc. Post. On Cred. Memo")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Sale Doc. Post. On Cred. Memo field';
-                    }
-                    field("Sale Doc. Post. On Ret. Order"; "Sale Doc. Post. On Ret. Order")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Sale Doc. Post. On Ret. Order field';
-                    }
-                    field("Sale Doc. Print On Post"; "Sale Doc. Print On Post")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Send Document On Post field';
                     }
                 }
             }
@@ -866,30 +798,6 @@ page 6014424 "NPR Retail Setup"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Fixed Price Of Denied Mending field';
                     }
-                }
-            }
-            group("Document Description")
-            {
-                Caption = 'Document Description';
-                field("Sales Line Description Code"; "Sales Line Description Code")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Sales Line Description Code field';
-                }
-                field("Purchase Line Description Code"; "Purchase Line Description Code")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Purchase Line Description Code field';
-                }
-                field("Transfer Line Description Code"; "Transfer Line Description Code")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Transfer Line Description Code field';
-                }
-                field("POS Line Description Code"; "POS Line Description Code")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the POS Line Description Code field';
                 }
             }
         }
@@ -989,7 +897,6 @@ page 6014424 "NPR Retail Setup"
                             Nummerserie: Record "No. Series";
                         begin
 
-                            TestField("Variance No. Management");
                             TestField("Period Discount Management");
                             TestField("Mixed Discount No. Management");
                             TestField("Customer Repair Management");
@@ -999,9 +906,6 @@ page 6014424 "NPR Retail Setup"
                             TestField("Cash Cust. No. Series");
                             TestField("Internal EAN No. Management");
                             TestField("External EAN-No. Management");
-
-                            if not Nummerserie.Get("Variance No. Management") then
-                                OpretNummerserie("Variance No. Management", FieldName("Variance No. Management"), false);
 
                             if not Nummerserie.Get("Period Discount Management") then
                                 OpretNummerserie("Period Discount Management", FieldName("Period Discount Management"), false);
@@ -1083,11 +987,6 @@ page 6014424 "NPR Retail Setup"
         SerieLinie."Last No. Used" := '1';
         SerieLinie.Open := true;
         SerieLinie.Insert;
-    end;
-
-    procedure "Enable/DisableFields"()
-    begin
-        //CurrPage."Warranty Standard Date".EDITABLE("Skip Warranty Voucher Dialog" <> '')
     end;
 }
 
