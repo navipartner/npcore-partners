@@ -10,8 +10,8 @@ codeunit 6014431 "NPR Assisted Setup Subs"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Assisted Setup", 'OnAfterRun', '', false, false)]
     procedure UpdateSetupStatus_OnUpdateAssistedSetupStatusp(PageID: Integer)
     begin
-        UpdateMagentoWizardStatus();
         UpdateRetailWizardStatus();
+        UpdateMagentoWizardStatus();
     end;
 
     /* MAGENTO WIZARD */
@@ -19,7 +19,7 @@ codeunit 6014431 "NPR Assisted Setup Subs"
     var
         AssistedSetup: Codeunit "Assisted Setup";
         AssistedSetupGroup: Enum "Assisted Setup Group";
-        MagentoWizardName: Label 'NP Magento Setup Wizard';
+        MagentoWizardName: Label 'Setup General information for Webshop integration';
     begin
         if AssistedSetup.Exists(Page::"NPR Magento Wizard") then
             AssistedSetup.Remove(Page::"NPR Magento Wizard");
@@ -44,7 +44,7 @@ codeunit 6014431 "NPR Assisted Setup Subs"
     var
         AssistedSetup: Codeunit "Assisted Setup";
         AssistedSetupGroup: Enum "Assisted Setup Group";
-        RetailWizardName: Label 'NP Retail Setup Wizard';
+        RetailWizardName: Label 'Setup General information for NP Retail';
     begin
         if AssistedSetup.Exists(Page::"NPR Retail Wizard") then
             AssistedSetup.Remove(Page::"NPR Retail Wizard");
