@@ -1112,9 +1112,7 @@ table 6014406 "NPR Sale Line POS"
 
             trigger OnValidate()
             begin
-                RetailSetup.Get;
-                if RetailSetup."Use Adv. dimensions" then
-                    CreateDim(
+                CreateDim(
                     NPRDimMgt.TypeToTableNPR(Type), "No.",
                     NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
                     DATABASE::"NPR NPRE Seating", "NPRE Seating Code",
@@ -2065,11 +2063,9 @@ table 6014406 "NPR Sale Line POS"
 
     procedure CreateDim(Type1: Integer; No1: Code[20]; Type2: Integer; No2: Code[20]; Type3: Integer; No3: Code[20]; Type4: Integer; No4: Code[20])
     var
-        RetailConfiguration: Record "NPR Retail Setup";
         TableID: array[10] of Integer;
         No: array[10] of Code[20];
     begin
-        RetailConfiguration.Get;
         GetPOSHeader;
 
         TableID[1] := Type1;
@@ -2088,7 +2084,7 @@ table 6014406 "NPR Sale Line POS"
 
         "Dimension Set ID" :=
           DimMgt.GetDefaultDimID(
-            TableID, No, RetailConfiguration."Posting Source Code",
+            TableID, No, SalePOS.GetPOSSourceCode(),
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code",
             SalePOS."Dimension Set ID", DATABASE::Customer);
         DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");

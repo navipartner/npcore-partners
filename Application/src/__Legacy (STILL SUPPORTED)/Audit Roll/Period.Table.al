@@ -522,8 +522,6 @@ table 6014423 "NPR Period"
 
     trigger OnInsert()
     begin
-        RetailSetup.Get();
-        RetailSetup.TestField("Use Adv. dimensions", true);
         if Period.Find('+') then
             "No." := Period."No." + 1
         else
@@ -533,17 +531,13 @@ table 6014423 "NPR Period"
     var
         Text1060000: Label 'Ending time for period %1 must be after %2 o''clock';
         Period: Record "NPR Period";
-        RetailSetup: Record "NPR Retail Setup";
         NPRDimMgt: Codeunit "NPR Dimension Mgt.";
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
-        RetailSetup.Get;
-        if RetailSetup."Use Adv. dimensions" then begin
-            NPRDimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
-            NPRDimMgt.SaveDefaultDim(DATABASE::"NPR Register", "Register No.", FieldNumber, ShortcutDimCode);
-            Modify;
-        end;
+        NPRDimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
+        NPRDimMgt.SaveDefaultDim(DATABASE::"NPR Register", "Register No.", FieldNumber, ShortcutDimCode);
+        Modify;
     end;
 
     procedure LookUpShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])

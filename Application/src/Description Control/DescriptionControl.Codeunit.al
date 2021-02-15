@@ -1,216 +1,5 @@
 codeunit 6059969 "NPR Description Control"
 {
-    procedure GetDescriptionPOS(var Rec: Record "NPR Sale Line POS"; XRec: Record "NPR Sale Line POS"; Item: Record Item)
-    var
-        RetailSetup: Record "NPR Retail Setup";
-        Language: Record Language;
-    begin
-        with Rec do begin
-            if "Custom Descr" then
-                exit;
-
-            if Type <> Type::Item then
-                exit;
-
-            InitDescriptionControl();
-
-            if RetailSetup.Get then begin
-                if RetailSetup."POS Line Description Code" = '' then begin
-                    //Do this the old way
-                    GetDescriptionPOS_OLD(Rec, XRec, Item);
-                end else begin
-                    //this is the new way
-                    //-NPR5.51 [351999]
-                    Language.SetRange("Windows Language ID", GlobalLanguage);
-                    if Language.FindFirst then;
-                    GetDescription(Description, "Description 2", "No.", "Variant Code", Language.Code, RetailSetup."POS Line Description Code");
-                    // GetDescription(Description, "Description 2", "No.", "Variant Code", '', RetailSetup."POS Line Description Code");
-                    //+NPR5.51 [351999]
-                end;
-            end;
-        end;
-    end;
-
-    local procedure GetDescriptionPurchase(PurchHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line")
-    var
-        RetailSetup: Record "NPR Retail Setup";
-    begin
-        with PurchaseLine do begin
-            if Type <> Type::Item then
-                exit;
-
-            //-NPR5.47 [332824]
-            InitDescriptionControl();
-            //+NPR5.47 [332824]
-
-            if RetailSetup.Get then begin
-                if (RetailSetup."Purchase Line Description Code" = '') then begin
-                    //Do this the old way
-                    GetDescriptionPL_OLD(PurchaseLine, PurchHeader);
-                end else begin
-                    //this is the new way
-                    GetDescription(Description, "Description 2", "No.", "Variant Code", PurchHeader."Language Code", RetailSetup."Purchase Line Description Code");
-                end;
-            end;
-        end;
-    end;
-
-    local procedure GetDescriptionSale(SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line")
-    var
-        RetailSetup: Record "NPR Retail Setup";
-    begin
-        with SalesLine do begin
-            if Type <> Type::Item then
-                exit;
-
-            //-NPR5.47 [332824]
-            InitDescriptionControl();
-            //+NPR5.47 [332824]
-
-            if RetailSetup.Get then begin
-                if (RetailSetup."Sales Line Description Code" = '') then begin
-                    //Do this the old way
-                    GetDescriptionSL_OLD(SalesLine, SalesHeader);
-                end else begin
-                    //this is the new way
-                    GetDescription(Description, "Description 2", "No.", "Variant Code", SalesHeader."Language Code", RetailSetup."Sales Line Description Code");
-                end;
-            end;
-        end;
-    end;
-
-    local procedure GetDescriptionTransfer(TransferHeader: Record "Transfer Header"; var TransferLine: Record "Transfer Line")
-    var
-        RetailSetup: Record "NPR Retail Setup";
-    begin
-        with TransferLine do begin
-
-            //-NPR5.47 [332824]
-            InitDescriptionControl();
-            //+NPR5.47 [332824]
-
-            if RetailSetup.Get then begin
-                if (RetailSetup."Transfer Line Description Code" = '') then begin
-                    //Do this the old way
-                    GetDescriptionTL_OLD(TransferLine, TransferHeader);
-                end else begin
-                    //this is the new way
-                    GetDescription(Description, "Description 2", "Item No.", "Variant Code", '', RetailSetup."Transfer Line Description Code");
-                end;
-            end;
-        end;
-    end;
-
-    local procedure GetDescription(var Desc1: Text; var Desc2: Text; ItemNo: Code[20]; VariantCode: Code[10]; LanguageCode: Code[10]; DescControlCode: Code[10])
-    var
-        Description1: Text[100];
-        Description2: Text[50];
-        Item: Record Item;
-        ItemVariant: Record "Item Variant";
-        DescriptionControl: Record "NPR Description Control";
-    begin
-        if not DescriptionControl.Get(DescControlCode) then
-            //-NPR5.47 [332824]
-            //  BEGIN
-            //    InitDescriptionControl();
-            //    IF NOT DescriptionControl.GET(DescControlCode) THEN
-            //      EXIT;
-            //  END;
-            exit;
-        //+NPR5.47 [332824]
-
-        if not DescriptionControl."Disable Item Translations" then begin
-            if GetItemTrans(ItemNo, VariantCode, LanguageCode, Description1, Description2) then begin
-                Desc1 := Description1;
-                Desc2 := Description2;
-                exit;
-            end;
-        end;
-
-        if DescriptionControl."Setup Type" = DescriptionControl."Setup Type"::Simple then begin
-            if VariantCode = '' then
-                GetDescriptionSimple(Desc1, Desc2, ItemNo, VariantCode, DescriptionControl."Description 1 Std (Simple)", DescriptionControl."Description 2 Std (Simple)")
-            else
-                GetDescriptionSimple(Desc1, Desc2, ItemNo, VariantCode, DescriptionControl."Description 1 Var (Simple)", DescriptionControl."Description 2 Var (Simple)");
-        end;
-    end;
-
-    local procedure GetDescriptionSimple(var Desc1: Text; var Desc2: Text; ItemNo: Code[20]; VariantCode: Code[10]; Desc1Setup: Option " ",ItemDescription1,ItemDescription2,VariantDescription1,VariantDescription2,VendorItemNo; Desc2Setup: Option " ",ItemDescription1,ItemDescription2,VariantDescription1,VariantDescription2,VendorItemNo)
-    var
-        Description1: Text[100];
-        Description2: Text[100];
-        Item: Record Item;
-        ItemVariant: Record "Item Variant";
-        "Field": Record "Field";
-        FieldNo: Integer;
-    begin
-        if not Item.Get(ItemNo) then
-            exit;
-
-        if VariantCode <> '' then begin
-            if not ItemVariant.Get(ItemNo, VariantCode) then
-                exit;
-        end;
-
-        case Desc1Setup of
-            Desc1Setup::ItemDescription1:
-                Description1 := Item.Description;
-            Desc1Setup::ItemDescription2:
-                Description1 := Item."Description 2";
-            Desc1Setup::VariantDescription1:
-                Description1 := ItemVariant.Description;
-            Desc1Setup::VariantDescription2:
-                Description1 := ItemVariant."Description 2";
-            Desc1Setup::VendorItemNo:
-                Description1 := Item."Vendor Item No.";
-        end;
-
-        case Desc2Setup of
-            Desc2Setup::ItemDescription1:
-                Description2 := Item.Description;
-            Desc2Setup::ItemDescription2:
-                Description2 := Item."Description 2";
-            Desc2Setup::VariantDescription1:
-                Description2 := ItemVariant.Description;
-            Desc2Setup::VariantDescription2:
-                Description2 := ItemVariant."Description 2";
-            Desc2Setup::VendorItemNo:
-                Description2 := Item."Vendor Item No.";
-        end;
-
-        //-NPR5.55 [370006]
-        // Desc1 := Description1;
-        // Desc2 := Description2;
-        case Desc1Setup of
-            Desc1Setup::ItemDescription1,
-          Desc1Setup::VariantDescription1:
-                FieldNo := Item.FieldNo(Description);
-            Desc1Setup::ItemDescription2,
-          Desc1Setup::VariantDescription2:
-                FieldNo := Item.FieldNo("Description 2");
-            Desc1Setup::VendorItemNo:
-                FieldNo := Item.FieldNo("Vendor Item No.");
-        end;
-
-        Field.Get(DATABASE::Item, FieldNo);
-        Desc1 := CopyStr(Description1, 1, Field.Len);
-
-        case Desc2Setup of
-            Desc2Setup::ItemDescription1,
-          Desc2Setup::VariantDescription1:
-                FieldNo := Item.FieldNo(Description);
-            Desc2Setup::ItemDescription2,
-          Desc2Setup::VariantDescription2:
-                FieldNo := Item.FieldNo("Description 2");
-            Desc2Setup::VendorItemNo:
-                FieldNo := Item.FieldNo("Vendor Item No.");
-        end;
-
-        Field.Get(DATABASE::Item, FieldNo);
-        Desc2 := CopyStr(Description2, 1, Field.Len);
-        //+370006# [370006]
-    end;
-
     local procedure InitDescriptionControl()
     var
         DescriptionControl: Record "NPR Description Control";
@@ -220,9 +9,9 @@ codeunit 6059969 "NPR Description Control"
             exit;
 
         with DescriptionControl do begin
-            //-NPR5.29.01
+
             LockTable;
-            //+NPR5.29.01
+
             Code := 'VAR_FIRST';
             "Setup Type" := "Setup Type"::Simple;
             "Description 1 Var (Simple)" := "Description 1 Var (Simple)"::VariantDescription1;
@@ -257,19 +46,7 @@ codeunit 6059969 "NPR Description Control"
         end;
     end;
 
-    local procedure GetItemTrans(ItemNo: Code[20]; VariantCode: Code[10]; LanguageCode: Code[10]; var Desc1: Text[100]; var Desc2: Text[50]): Boolean
-    var
-        ItemTranslation: Record "Item Translation";
-    begin
-        if not ItemTranslation.Get(ItemNo, VariantCode, LanguageCode) then
-            exit(false);
-
-        Desc1 := ItemTranslation.Description;
-        Desc2 := ItemTranslation."Description 2";
-        exit(true);
-    end;
-
-    procedure GetItemRefDescription(ItemNo: Code[20]; VariantCode: Code[10]): Text[100]
+    procedure GetItemRefDescription(ItemNo: Code[20]; VariantCode: Code[10]): Text[50]
     var
         VRTSetup: Record "NPR Variety Setup";
         Item: Record Item;
@@ -301,7 +78,7 @@ codeunit 6059969 "NPR Description Control"
         //+NPR5.48 [338542]
     end;
 
-    local procedure GetDescriptionPOS_OLD(var Rec: Record "NPR Sale Line POS"; XRec: Record "NPR Sale Line POS"; Item: Record Item)
+    procedure GetDescriptionPOS(var Rec: Record "NPR Sale Line POS"; XRec: Record "NPR Sale Line POS"; Item: Record Item)
     var
         RetailSetup: Record "NPR Retail Setup";
         ItemGroup: Record "NPR Item Group";
@@ -314,6 +91,11 @@ codeunit 6059969 "NPR Description Control"
         with Rec do begin
             if "Custom Descr" then
                 exit;
+
+            if Type <> Type::Item then
+                exit;
+
+            InitDescriptionControl();
 
             if RetailSetup.Get then begin
                 if ((XRec."No." <> "No.") or (Description = '')) and not "Custom Descr" then begin
@@ -369,7 +151,7 @@ codeunit 6059969 "NPR Description Control"
         end;
     end;
 
-    local procedure GetDescriptionSL_OLD(SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header")
+    local procedure GetDescriptionSale(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line")
     var
         Item: Record Item;
         RetailSetup: Record "NPR Retail Setup";
@@ -390,6 +172,9 @@ codeunit 6059969 "NPR Description Control"
 
             if not RetailSetup.Get then
                 exit;
+
+            InitDescriptionControl();
+
             case RetailSetup."Description control" of
                 RetailSetup."Description control"::"<Description>":
                     begin
@@ -446,7 +231,7 @@ codeunit 6059969 "NPR Description Control"
         end;
     end;
 
-    local procedure GetDescriptionPL_OLD(PurchLine: Record "Purchase Line"; PurchHeader: Record "Purchase Header")
+    local procedure GetDescriptionPurchase(PurchHeader: Record "Purchase Header"; var PurchLine: Record "Purchase Line")
     var
         Item: Record Item;
         RetailSetup: Record "NPR Retail Setup";
@@ -467,6 +252,9 @@ codeunit 6059969 "NPR Description Control"
 
             if not RetailSetup.Get then
                 exit;
+
+            InitDescriptionControl();
+
             case RetailSetup."Description control" of
                 RetailSetup."Description control"::"<Description>":
                     begin
@@ -523,7 +311,7 @@ codeunit 6059969 "NPR Description Control"
         end;
     end;
 
-    local procedure GetDescriptionTL_OLD(TransLine: Record "Transfer Line"; TransHeader: Record "Transfer Header")
+    local procedure GetDescriptionTransfer(TransHeader: Record "Transfer Header"; var TransLine: Record "Transfer Line")
     var
         Item: Record Item;
         RetailSetup: Record "NPR Retail Setup";

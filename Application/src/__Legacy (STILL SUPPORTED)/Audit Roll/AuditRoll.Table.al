@@ -1079,9 +1079,7 @@ table 6014407 "NPR Audit Roll"
 
     trigger OnDelete()
     begin
-        RetailSetup.Get;
-        if RetailSetup."Use Adv. dimensions" then
-            NPRDimMgt.DeleteNPRDim(DATABASE::"NPR Audit Roll", "Register No.", "Sales Ticket No.", "Sale Date", "Sale Type", "Line No.", "No.");
+        NPRDimMgt.DeleteNPRDim(DATABASE::"NPR Audit Roll", "Register No.", "Sales Ticket No.", "Sale Date", "Sale Type", "Line No.", "No.");
     end;
 
     trigger OnInsert()
@@ -1154,15 +1152,12 @@ table 6014407 "NPR Audit Roll"
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
-        RetailSetup.Get;
-        if RetailSetup."Use Adv. dimensions" then begin
-            if "Line No." <> 0 then
-                NPRDimMgt.SaveNPRDim(
-                  DATABASE::"NPR Audit Roll", "Register No.", "Sales Ticket No.", "Sale Date",
-                  "Sale Type", "Line No.", "No.", FieldNumber, ShortcutDimCode)
-            else
-                NPRDimMgt.SaveTempDim(FieldNumber, ShortcutDimCode);
-        end;
+        if "Line No." <> 0 then
+            NPRDimMgt.SaveNPRDim(
+                DATABASE::"NPR Audit Roll", "Register No.", "Sales Ticket No.", "Sale Date",
+                "Sale Type", "Line No.", "No.", FieldNumber, ShortcutDimCode)
+        else
+            NPRDimMgt.SaveTempDim(FieldNumber, ShortcutDimCode);
     end;
 
     procedure LookUpShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
