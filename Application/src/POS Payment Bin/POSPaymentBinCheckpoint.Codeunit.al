@@ -6,25 +6,6 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
         UNCONFIRMED_CP: Label 'Not Counted.';
         ACCOUNT_DIFFERENCE: Label 'WARNING!\\As a result of the close workshift, there needs to be a transfer of %1 to the amount of %5 from bin %2 to bin %3. These bins are configured with different G/L Accounts, and the posting needs to be handled.\\You can either:\\A) configure the bins to use the same account\\B) perform a BIN TRANSFER prior to close workshift on unit %4\\C) manually post the difference in a journal.\\If you continue, you will have to manually post the difference in a journal. Do you want to continue?';
 
-    procedure CreateAuditRollBinCheckpoint(RegisterNo: Code[10]; BinNo: Code[10]; WorkshiftCheckpointEntryNo: Integer)
-    var
-        PaymentTypePOS: Record "NPR Payment Type POS";
-        CountAsPaymentTypeCode: Code[10];
-    begin
-
-        PaymentTypePOS.SetFilter(Status, '=%1', PaymentTypePOS.Status::Active);
-        if (PaymentTypePOS.FindSet()) then begin
-            repeat
-                CountAsPaymentTypeCode := FillBinFromAuditRoll(BinNo, RegisterNo, PaymentTypePOS."No.");
-            until (PaymentTypePOS.Next() = 0);
-        end;
-
-        if (PaymentTypePOS.FindSet()) then begin
-            repeat
-                AddBinCountingCheckpoint_AR(BinNo, RegisterNo, PaymentTypePOS."No.", WorkshiftCheckpointEntryNo);
-            until (PaymentTypePOS.Next() = 0);
-        end;
-    end;
 
     procedure CreatePosEntryBinCheckpoint(UnitNo: Code[10]; BinNo: Code[10]; WorkshiftCheckpointEntryNo: Integer)
     var
@@ -37,182 +18,10 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
         until (POSPaymentMethod.Next() = 0);
     end;
 
-    local procedure FillBinFromAuditRoll(BinNo: Code[10]; RegisterNo: Code[10]; PaymentTypeNo: Code[10]) CountAsPaymentTypeCode: Code[10]
-    var
-        CashRegister: Record "NPR Register";
-        AuditRoll: Record "NPR Audit Roll";
-        PaymentTypePOS: Record "NPR Payment Type POS";
-        RetailSetup: Record "NPR Retail Setup";
-        G_ReceiptFilter: Text;
-        BinEntry: Record "NPR POS Bin Entry";
-        CurrencyCode: Code[10];
-        POSPaymentMethod: Record "NPR POS Payment Method";
-    begin
-
-        RetailSetup.Get();
-        CashRegister.Get(RegisterNo);
-
-        AuditRoll.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Type", Type);
-        AuditRoll.SetRange("Register No.", CashRegister."Register No.");
-        AuditRoll.SetFilter("Sales Ticket No.", '<>%1', '');
-
-        G_ReceiptFilter := StrSubstNo('>=%1', CashRegister."Opened on Sales Ticket");
-        AuditRoll.SetFilter("Sales Ticket No.", G_ReceiptFilter);
-
-        //find the date that the register open was done, and make that date the minimum date
-        if AuditRoll.FindFirst then
-            AuditRoll.SetFilter("Sale Date", '%1..', AuditRoll."Sale Date");
-
-        if AuditRoll.FindLast then
-            G_ReceiptFilter := StrSubstNo('..%1', AuditRoll."Sales Ticket No.");
-
-        if not AuditRoll.FindSet then
-            Error(t001)
-        else
-            G_ReceiptFilter := StrSubstNo('%1' + G_ReceiptFilter, AuditRoll."Sales Ticket No.");
-
-        if (not (AuditRoll.Next() > 0)) then
-            exit;
-
-        /* CALCULATIONS */
-        /* SET INITIAL FILTERS */
-        AuditRoll.SetFilter("Sales Ticket No.", G_ReceiptFilter);
-
-        AuditRoll.SetRange(Type, AuditRoll.Type::Payment);
-        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Payment);
-        PaymentTypePOS.SetRange(Status, PaymentTypePOS.Status::Active);
-        PaymentTypePOS.SetRange("No.", PaymentTypeNo);
-
-        if (PaymentTypePOS.FindFirst()) then begin
-            AuditRoll.SetRange("No.", PaymentTypePOS."No.");
-
-            CountAsPaymentTypeCode := GetCountAsPaymentTypeCode(PaymentTypeNo);
-            if (not POSPaymentMethod.Get(PaymentTypeNo)) then
-                Clear(POSPaymentMethod);
-
-            case PaymentTypePOS."Processing Type" of
-                PaymentTypePOS."Processing Type"::Cash:
-                    CurrencyCode := '';
-                PaymentTypePOS."Processing Type"::"Foreign Currency":
-                    begin
-                        CurrencyCode := PaymentTypeNo;
-                        if (POSPaymentMethod.Code <> '') then
-                            CurrencyCode := POSPaymentMethod."Currency Code";
-                    end;
-                PaymentTypePOS."Processing Type"::EFT,
-              PaymentTypePOS."Processing Type"::"Other Credit Cards":
-                    CurrencyCode := '';
-            end;
-
-            if (AuditRoll.FindSet()) then begin
-                repeat
-                    BinEntry.Init();
-                    BinEntry."Entry No." := 0;
-                    BinEntry."Created At" := CurrentDateTime();
-
-                    BinEntry.Type := BinEntry.Type::INPAYMENT;
-                    if (AuditRoll."Amount Including VAT" < 0) then
-                        BinEntry.Type := BinEntry.Type::OUTPAYMENT;
-
-                    BinEntry."Payment Bin No." := BinNo;
-
-                    BinEntry."Transaction Date" := AuditRoll."Sale Date";
-                    BinEntry."Transaction Time" := AuditRoll."Starting Time";
-
-                    BinEntry."Transaction Currency Code" := CurrencyCode;
-                    BinEntry."Transaction Amount (LCY)" := AuditRoll."Amount Including VAT";
-
-                    BinEntry."Transaction Amount" := AuditRoll."Currency Amount";
-                    if (CurrencyCode = '') then
-                        BinEntry."Transaction Amount" := AuditRoll."Amount Including VAT";
-
-                    BinEntry."Register No." := AuditRoll."Register No.";
-                    BinEntry."Payment Type Code" := CountAsPaymentTypeCode;
-                    BinEntry."Payment Method Code" := POSPaymentMethod.Code;
-                    BinEntry.Insert();
-
-                until (AuditRoll.Next() = 0);
-            end;
-        end;
-
-    end;
-
-    local procedure AddBinCountingCheckpoint_AR(BinNo: Code[10]; RegisterNo: Code[10]; PaymentTypeNo: Code[10]; WorkshiftCheckpointEntryNo: Integer)
-    var
-        BinEntry: Record "NPR POS Bin Entry";
-        PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
-        PaymentTypePOS: Record "NPR Payment Type POS";
-        PreviosFloat: Record "NPR POS Payment Bin Checkp.";
-        POSPaymentMethod: Record "NPR POS Payment Method";
-    begin
-
-        PaymentTypeNo := GetCountAsPaymentTypeCode(PaymentTypeNo);
-        PaymentTypePOS.SetFilter("No.", '=%1', PaymentTypeNo);
-        if (PaymentTypePOS.FindFirst()) then;
-
-        if (not POSPaymentMethod.Get(PaymentTypeNo)) then
-            Clear(POSPaymentMethod);
-
-        BinEntry.SetFilter("Payment Bin No.", '=%1', BinNo);
-        BinEntry.SetFilter("Register No.", '=%1', RegisterNo);
-        BinEntry.SetFilter("Payment Type Code", '=%1', PaymentTypeNo);
-        if (BinEntry.FindLast()) then
-            if (BinEntry.Type = BinEntry.Type::CHECKPOINT) then
-                exit;
-
-        BinEntry.Init();
-        BinEntry."Entry No." := 0;
-        BinEntry."Created At" := CurrentDateTime();
-
-        BinEntry.Type := BinEntry.Type::CHECKPOINT;
-        BinEntry."Payment Bin No." := BinNo;
-
-        BinEntry."Transaction Date" := Today;
-        BinEntry."Transaction Time" := Time;
-        BinEntry.Comment := UNCONFIRMED_CP;
-
-        BinEntry."Register No." := RegisterNo;
-        BinEntry."Payment Type Code" := PaymentTypeNo;
-        BinEntry."Payment Method Code" := POSPaymentMethod.Code;
-        BinEntry.Insert();
-
-        PaymentBinCheckpoint.Init;
-        PaymentBinCheckpoint."Payment Type No." := PaymentTypeNo;
-        PaymentBinCheckpoint."Payment Method No." := BinEntry."Payment Method Code";
-        PaymentBinCheckpoint."Currency Code" := POSPaymentMethod."Currency Code";
-        PaymentBinCheckpoint."Payment Bin No." := BinNo;
-
-        PaymentBinCheckpoint."Created On" := CurrentDateTime();
-        PaymentBinCheckpoint."Checkpoint Date" := Today;
-        PaymentBinCheckpoint."Checkpoint Time" := Time;
-        PaymentBinCheckpoint."Checkpoint Bin Entry No." := BinEntry."Entry No.";
-        PaymentBinCheckpoint.Comment := BinEntry.Comment;
-
-        PaymentBinCheckpoint.Description := PaymentTypePOS.Description;
-        PaymentBinCheckpoint."Workshift Checkpoint Entry No." := WorkshiftCheckpointEntryNo;
-        PaymentBinCheckpoint.Insert();
-
-        PaymentBinCheckpoint."Payment Bin Entry No. Filter" := BinEntry."Entry No.";
-        PaymentBinCheckpoint.CalcFields("Payment Bin Entry Amount", "Payment Bin Entry Amount (LCY)");
-        PaymentBinCheckpoint."Calculated Amount Incl. Float" := PaymentBinCheckpoint."Payment Bin Entry Amount";
-        PaymentBinCheckpoint."New Float Amount" := PaymentBinCheckpoint."Payment Bin Entry Amount";
-
-        // Find previous checkpoint outbound float
-        PreviosFloat.SetFilter("Entry No.", '<%1', PaymentBinCheckpoint."Entry No.");
-        PreviosFloat.SetFilter("Payment Bin No.", '=%1', BinNo);
-        PreviosFloat.SetFilter("Payment Method No.", '=%1', PaymentBinCheckpoint."Payment Method No.");
-        PreviosFloat.SetFilter("Payment Type No.", '=%1', PaymentTypeNo); // will be obsolete
-        if (PreviosFloat.FindLast()) then
-            PaymentBinCheckpoint."Float Amount" := PreviosFloat."New Float Amount";
-
-        PaymentBinCheckpoint.Modify();
-    end;
-
     local procedure AddBinCountingCheckpoint_PE(BinNo: Code[10]; UnitNo: Code[10]; PaymentMethodCode: Code[10]; WorkshiftCheckpointEntryNo: Integer)
     var
         BinEntry: Record "NPR POS Bin Entry";
         PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
-        PaymentTypePOS: Record "NPR Payment Type POS";
         PreviousFloat: Record "NPR POS Payment Bin Checkp.";
         PreviousZReport: Record "NPR POS Workshift Checkpoint";
         PreviousBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
@@ -233,9 +42,6 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
         if (not PaymentBinCheckpoint.IsEmpty()) then
             exit; // no need to create it again
 
-        PaymentTypePOS.SetFilter("No.", '=%1', PaymentMethodCode);
-        if (PaymentTypePOS.FindFirst()) then;
-
         if (not POSPaymentMethod.Get(PaymentMethodCode)) then
             Clear(POSPaymentMethod);
 
@@ -253,7 +59,7 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
         BinEntry."Register No." := UnitNo;
         BinEntry."POS Unit No." := UnitNo;
         BinEntry."POS Store Code" := POSUnit."POS Store Code";
-        BinEntry."Payment Type Code" := PaymentTypePOS."No.";
+        BinEntry."Payment Type Code" := PaymentMethodCode;
         BinEntry."Payment Method Code" := PaymentMethodCode;
         BinEntry.Insert();
 
@@ -268,7 +74,7 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
         PaymentBinCheckpoint."Checkpoint Time" := Time;
         PaymentBinCheckpoint."Checkpoint Bin Entry No." := BinEntry."Entry No.";
         PaymentBinCheckpoint.Comment := BinEntry.Comment;
-        PaymentBinCheckpoint.Description := CopyStr(StrSubstNo('[%1] %2', BinNo, PaymentTypePOS.Description), 1, MaxStrLen(PaymentBinCheckpoint.Description));
+        PaymentBinCheckpoint.Description := CopyStr(StrSubstNo('[%1] %2', BinNo, POSPaymentMethod.Code), 1, MaxStrLen(PaymentBinCheckpoint.Description));
         PaymentBinCheckpoint."Workshift Checkpoint Entry No." := WorkshiftCheckpointEntryNo;
         PaymentBinCheckpoint.Insert();
 
@@ -370,32 +176,6 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
             end;
         end;
 
-    end;
-
-    procedure GetCountAsPaymentTypeCode(PaymentTypeNo: Code[10]) CountAsPaymentTypeCode: Code[10]
-    var
-        PaymentTypePOS: Record "NPR Payment Type POS";
-    begin
-
-        PaymentTypePOS.SetRange("No.", PaymentTypeNo);
-        if (not PaymentTypePOS.FindFirst()) then
-            exit('');
-
-        CountAsPaymentTypeCode := PaymentTypeNo;
-
-        case PaymentTypePOS."Processing Type" of
-            PaymentTypePOS."Processing Type"::Cash:
-                CountAsPaymentTypeCode := 'K';
-
-            PaymentTypePOS."Processing Type"::EFT,
-          PaymentTypePOS."Processing Type"::"Manual Card",
-          PaymentTypePOS."Processing Type"::"Other Credit Cards":
-                CountAsPaymentTypeCode := 'T';
-        end;
-    end;
-
-    procedure FinishBinCount(POSSession: Codeunit "NPR POS Session"; WorkshiftCheckpointEntryNo: Integer)
-    begin
     end;
 
     procedure TransferToPaymentBin(FromWorkshiftCheckpointEntryNo: Integer; FromUnitNo: Code[10]; ToUnitNo: Code[10])

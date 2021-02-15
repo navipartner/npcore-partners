@@ -5,10 +5,10 @@ codeunit 6150721 "NPR POS Action - Login"
     end;
 
     var
-        ActionDescription: Label 'This is a built-in action for completing the loign request passed on from the front end.';
+        ActionDescription: Label 'This is a built-in action for completing the login request passed on from the front end.';
         Text001: Label 'Unknown login type requested by JavaScript: %1.';
         InvalidStatus: Label 'The register status states that the register cannot be opened at this time.';
-        t004: Label 'The register has not been balanced since %1 and must be balanced before selling. Do you want to balance the register now?';
+        BalancingRequired: Label 'The register has not been balanced since %1 and must be balanced before selling. Do you want to balance the register now?';
         IsEoD: Label 'The %1 %2 indicates that this %1 is being balanced and it can''t be opened at this time.';
         ContinueEoD: Label 'The %1 %2 is marked as being in balancing. Do you want to continue with balancing now?';
         ManagedPos: Label 'This POS is managed by POS Unit %1 [%2] and it is therefore required that %1 is opened prior to opening this POS.';
@@ -41,7 +41,6 @@ codeunit 6150721 "NPR POS Action - Login"
         Setup: Codeunit "NPR POS Setup";
         POSUnitIdentity: Codeunit "NPR POS Unit Identity";
         POSUnitIdentityRec: Record "NPR POS Unit Identity";
-        Register: Record "NPR Register";
         UserSetup: Record "User Setup";
         Type: Text;
         Password: Text;
@@ -62,7 +61,7 @@ codeunit 6150721 "NPR POS Action - Login"
         Type := JSON.GetString('type', true);
         POSSession.GetSetup(Setup);
 
-        // Fallback - when framwork is not providing the device identity
+        // Fallback - when framework is not providing the device identity
         POSSession.GetSessionId(HardwareId, SessionName, HostName);
         if (HardwareId = '') then begin
             UserSetup.Get(UserId);
@@ -100,7 +99,6 @@ codeunit 6150721 "NPR POS Action - Login"
     local procedure OpenPosUnit(FrontEnd: Codeunit "NPR POS Front End Management"; Setup: Codeunit "NPR POS Setup"; POSSession: Codeunit "NPR POS Session")
     var
         POSUnit: Record "NPR POS Unit";
-        Register: Record "NPR Register";
         BalanceAge: Integer;
         IsManagedPOS: Boolean;
         ManagedByPOSUnit: Record "NPR POS Unit";
@@ -112,20 +110,17 @@ codeunit 6150721 "NPR POS Action - Login"
         // But to save a roundtrip and becase nested workflows are not perfect yet, I have kept this part here
 
         Setup.GetPOSUnit(POSUnit);
-        Setup.GetRegisterRecord(Register);
-
         POSUnit.Get(POSUnit."No.");
-        Register.Get(Register."Register No.");
 
         BalanceAge := DaysSinceLastBalance(POSUnit."No.");
 
+        POSEndofDayProfile.Init();
         if (POSUnit."POS End of Day Profile" <> '') then begin
             POSEndofDayProfile.Get(POSUnit."POS End of Day Profile");
             if (POSEndofDayProfile."End of Day Type" = POSEndofDayProfile."End of Day Type"::MASTER_SLAVE) then
                 IsManagedPOS := (POSEndofDayProfile."Master POS Unit No." <> POSUnit."No.");
             if (IsManagedPOS) then begin
                 ManagedByPOSUnit.Get(POSEndofDayProfile."Master POS Unit No.");
-                Register.Get(ManagedByPOSUnit."No.");
                 BalanceAge := DaysSinceLastBalance(ManagedByPOSUnit."No.");
             end;
         end;
@@ -146,6 +141,15 @@ codeunit 6150721 "NPR POS Action - Login"
                         exit;
                     end;
 
+                    if ((POSEndofDayProfile."End of Day Frequency" = POSEndofDayProfile."End of Day Frequency"::DAILY) and (BalanceAge > 0)) then begin
+                        if (not Confirm(BalancingRequired, true, (Today - BalanceAge))) then
+                            Error(InvalidStatus);
+
+                        // Force a Z-Report or Close WorkShift
+                        StartEODWorkflow(FrontEnd, POSSession, 'BALANCE_V3', IsManagedPOS);
+                        exit;
+                    end;
+
                     POSPeriodRegister.SetFilter("POS Unit No.", '=%1', POSUnit."No.");
                     MissingPeriodRegister := not POSPeriodRegister.FindLast();
                     if (MissingPeriodRegister) or ((not MissingPeriodRegister) and (POSPeriodRegister.Status <> POSPeriodRegister.Status::OPEN)) then begin
@@ -158,16 +162,18 @@ codeunit 6150721 "NPR POS Action - Login"
 
             POSUnit.Status::CLOSED:
                 begin
-                    if (IsManagedPOS) then
-                        Error(ManagedPos, ManagedByPOSUnit."No.", ManagedByPOSUnit.Name);
+                    if ((POSEndofDayProfile."End of Day Frequency" = POSEndofDayProfile."End of Day Frequency"::DAILY) and (BalanceAge > 0)) then begin
+                        if (IsManagedPOS) then
+                            Error(ManagedPos, ManagedByPOSUnit."No.", ManagedByPOSUnit.Name);
 
-                    if (not Confirm(t004, true, Format(Today - BalanceAge))) then
-                        Error(InvalidStatus);
+                        if (not Confirm(BalancingRequired, true, Format(Today - BalanceAge))) then
+                            Error(InvalidStatus);
 
-                    StartEODWorkflow(FrontEnd, POSSession, 'BALANCE_V3', IsManagedPOS);
-                    exit;
+                        StartEODWorkflow(FrontEnd, POSSession, 'BALANCE_V3', IsManagedPOS);
+                        exit;
 
-                    StartWorkflow(FrontEnd, POSSession, 'START_POS');
+                        StartWorkflow(FrontEnd, POSSession, 'START_POS');
+                    end;
                 end;
 
             POSUnit.Status::EOD:
@@ -243,7 +249,7 @@ codeunit 6150721 "NPR POS Action - Login"
             'BALANCE_V3':
                 begin
                     if (not ManagedEOD) then POSAction.SetWorkflowInvocationParameter('Type', 1, FrontEnd);  // Z-Report, final count
-                    if (ManagedEOD) then POSAction.SetWorkflowInvocationParameter('Type', 2, FrontEnd);  // Close Workshift - for managed POS
+                    if (ManagedEOD) then POSAction.SetWorkflowInvocationParameter('Type', 2, FrontEnd);  // Close WorkShift - for managed POS
                 end;
         end;
 

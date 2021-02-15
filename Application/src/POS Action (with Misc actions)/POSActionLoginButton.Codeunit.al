@@ -1,7 +1,7 @@
 codeunit 6150860 "NPR POS Action: LoginButton"
 {
     var
-        ActionDescription: Label 'This is a built-in action for completing the loign request passed on from the front end.';
+        ActionDescription: Label 'This is a built-in action for completing the login request passed on from the front end.';
         Text001: Label 'Unknown login type requested by JavaScript: %1.';
         InvalidStatus: Label 'The register status states that the register cannot be opened at this time.';
         t004: Label 'The register has not been balanced since %1 and must be balanced before selling. Do you want to balance the register now?';
@@ -44,7 +44,6 @@ codeunit 6150860 "NPR POS Action: LoginButton"
         Setup: Codeunit "NPR POS Setup";
         POSUnitIdentity: Codeunit "NPR POS Unit Identity";
         POSUnitIdentityRec: Record "NPR POS Unit Identity";
-        Register: Record "NPR Register";
         UserSetup: Record "User Setup";
         SalespersonCode: Text;
         Type: Text;
@@ -60,13 +59,12 @@ codeunit 6150860 "NPR POS Action: LoginButton"
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        //IF (USERID = 'TSA') THEN MESSAGE ('%1', JSON.ToString ());
 
         Type := JSON.GetString('type', false);
 
         POSSession.GetSetup(Setup);
 
-        // Fallback - when framwork is not providing the device identity
+        // Fallback - when framework is not providing the device identity
         POSSession.GetSessionId(HardwareId, SessionName, HostName);
         if (HardwareId = '') then begin
             UserSetup.Get(UserId);
@@ -94,10 +92,7 @@ codeunit 6150860 "NPR POS Action: LoginButton"
 
                     if ((SalespersonPurchaser.FindFirst() and (Password <> ''))) then begin
                         Setup.SetSalesperson(SalespersonPurchaser);
-
-                        //-NPR5.46 [328338] - refactored
                         OpenPosUnit(FrontEnd, Setup, POSSession);
-                        //+NPR5.46 [328338]
 
                     end else begin
                         Error('Illegal password.');
@@ -124,17 +119,13 @@ codeunit 6150860 "NPR POS Action: LoginButton"
     local procedure OpenPosUnit(FrontEnd: Codeunit "NPR POS Front End Management"; Setup: Codeunit "NPR POS Setup"; POSSession: Codeunit "NPR POS Session")
     var
         POSUnit: Record "NPR POS Unit";
-        Register: Record "NPR Register";
         BalanceAge: Integer;
     begin
         // This should be inside the START_POS workflow
-        // But to save a roundtrip and becase nested workflows are not perfect yet, I have kept this part here
+        // But to save a roundtrip and because nested workflows are not perfect yet, I have kept this part here
 
         Setup.GetPOSUnit(POSUnit);
-        Setup.GetRegisterRecord(Register);
-
         POSUnit.Get(POSUnit."No.");
-        Register.Get(Register."Register No.");
 
         BalanceAge := DaysSinceLastBalance(POSUnit."No.");
 
@@ -142,7 +133,7 @@ codeunit 6150860 "NPR POS Action: LoginButton"
 
             POSUnit.Status::OPEN:
                 begin
-                    if (BalanceAge = -1) then begin// Has never been balanced
+                    if (BalanceAge = -1) then begin // Has never been balanced
                         StartWorkflow(FrontEnd, POSSession, 'START_POS');
                         exit;
                     end;
@@ -180,7 +171,6 @@ codeunit 6150860 "NPR POS Action: LoginButton"
                 end;
         end;
 
-        //+NPR5.46 [328338]
     end;
 
     local procedure StartPOS(POSSession: Codeunit "NPR POS Session"): Integer
