@@ -650,7 +650,6 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Loyalty Card Type';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Member Card Types";
         }
         field(318; "Global Dimension 1 Code"; Code[20])
         {

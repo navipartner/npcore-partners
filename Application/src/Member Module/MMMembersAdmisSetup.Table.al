@@ -21,7 +21,7 @@ table 6060135 "NPR MM Members. Admis. Setup"
         {
             Caption = 'Ticket No. Type';
             DataClassification = CustomerContent;
-            OptionCaption = ' ,Item,Item Cross-Reference,Alternative No.';
+            OptionCaption = ' ,Item,Item Reference,Not Used';
             OptionMembers = NA,ITEM,ITEM_CROSS_REF,ALTERNATIVE_NUMBER;
         }
         field(4; "Ticket No."; Code[50])
@@ -30,9 +30,7 @@ table 6060135 "NPR MM Members. Admis. Setup"
             DataClassification = CustomerContent;
             TableRelation = IF ("Ticket No. Type" = CONST(ITEM)) Item WHERE("No." = FIELD("Ticket No."))
             ELSE
-            IF ("Ticket No. Type" = CONST(ITEM_CROSS_REF)) "Item Reference"."Reference No." WHERE("Reference No." = FIELD("Ticket No."))
-            ELSE
-            IF ("Ticket No. Type" = CONST(ALTERNATIVE_NUMBER)) "NPR Alternative No."."Alt. No." WHERE("Alt. No." = FIELD("Ticket No."));
+            IF ("Ticket No. Type" = CONST(ITEM_CROSS_REF)) "Item Reference"."Reference No." WHERE("Reference No." = FIELD("Ticket No."));
         }
         field(10; "Cardinality Type"; Option)
         {

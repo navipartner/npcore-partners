@@ -244,15 +244,6 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Reparation action';
                 }
-                action("NPR Member Cards")
-                {
-                    Caption = 'Member Cards';
-                    Image = Card;
-                    RunObject = Page "NPR Member Card Issued Cards";
-                    RunPageLink = "Customer No" = FIELD("No.");
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Member Cards action';
-                }
                 action("NPR PrintShippingLabel")
                 {
                     Caption = 'Shipping Label';

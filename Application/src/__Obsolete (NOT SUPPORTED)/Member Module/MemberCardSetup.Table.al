@@ -3,13 +3,13 @@ table 6059772 "NPR Member Card Setup"
 
     Caption = 'Point Card Properties';
     DataClassification = CustomerContent;
-
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Not used.';
     fields
     {
         field(1; "Card Code"; Code[10])
         {
             Caption = 'Card Code';
-            TableRelation = "NPR Member Card Types";
             DataClassification = CustomerContent;
         }
         field(2; Type; Option)
