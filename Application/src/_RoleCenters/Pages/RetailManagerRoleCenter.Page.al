@@ -20,10 +20,6 @@ page 6151241 "NPR Manager"
             {
                 ApplicationArea = All;
             }
-            part(Control6150613; "NPR Retail Top 10 S.person")
-            {
-                ApplicationArea = All;
-            }
             part(NPRetailPOSEntryCue; "NPR POS Entry Cue")
             {
                 Caption = 'POS Activities';

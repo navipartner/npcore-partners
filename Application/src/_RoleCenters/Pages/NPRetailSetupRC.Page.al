@@ -37,6 +37,13 @@ page 6151245 "NPR Setup RC"
                 ApplicationArea = All;
                 ToolTip = 'Executes the POS Menus action';
             }
+            action("POS Posting Setup_top")
+            {
+                Caption = 'POS Posting Setup';
+                RunObject = Page "NPR POS Posting Setup";
+                ApplicationArea = All;
+                ToolTip = 'Executes the POS Posting Setup action';
+            }
             action("Coupon Types_top")
             {
                 Caption = 'Coupon Types';
@@ -50,13 +57,6 @@ page 6151245 "NPR Setup RC"
                 RunObject = Page "NPR E-mail Templates";
                 ApplicationArea = All;
                 ToolTip = 'Executes the E-mail Templates action';
-            }
-            action("Sales Price Maintenance Setup_top")
-            {
-                Caption = 'Sales Price Maintenance Setup';
-                RunObject = Page "NPR Sales Price Maint. Setup";
-                ApplicationArea = All;
-                ToolTip = 'Executes the Sales Price Maintenance Setup action';
             }
         }
         area(sections)
@@ -128,27 +128,6 @@ page 6151245 "NPR Setup RC"
                     ToolTip = 'Executes the POS Unit Identity action';
 
                 }
-                action("POS Posting Setup")
-                {
-                    Caption = 'POS Posting Setup';
-                    RunObject = Page "NPR POS Posting Setup";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the POS Posting Setup action';
-                }
-                action("POS Payment Method List")
-                {
-                    Caption = 'POS Payment Method List';
-                    RunObject = Page "NPR POS Payment Method List";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the POS Payment Method List action';
-                }
-                action("POS Payment Bins")
-                {
-                    Caption = 'POS Payment Bins';
-                    RunObject = Page "NPR POS Payment Bins";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the POS Payment Bins action';
-                }
                 action("POS Themes")
                 {
                     Caption = 'POS Themes';
@@ -200,6 +179,25 @@ page 6151245 "NPR Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Ean Box Setups action';
                 }
+            }
+            group(PaymentCard)
+            {
+                Caption = 'Payment';
+                Image = CostAccounting;
+                action("POS Payment Method List")
+                {
+                    Caption = 'POS Payment Method List';
+                    RunObject = Page "NPR POS Payment Method List";
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the POS Payment Method List action';
+                }
+                action("POS Payment Bins")
+                {
+                    Caption = 'POS Payment Bins';
+                    RunObject = Page "NPR POS Payment Bins";
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the POS Payment Bins action';
+                }
                 action("POS Payment view Event Setup")
                 {
                     Caption = 'POS Payment view Event Setup';
@@ -208,12 +206,6 @@ page 6151245 "NPR Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Payment view Event Setup action';
                 }
-
-            }
-            group(PaymentCard)
-            {
-                Caption = 'Payment';
-                Image = CostAccounting;
                 action("<Page Payment Type - List>")
                 {
                     Caption = 'Types';
@@ -473,12 +465,12 @@ page 6151245 "NPR Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Stargate Packages action';
                 }
-                action("Stock-Take Templates")
+                action("Item Worksheet Templates")
                 {
-                    Caption = 'Stock-Take Templates';
+                    Caption = 'Item Worksheet Templates';
                     RunObject = page "NPR Item Worksheet Templates";
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Stock-Take Templates action';
+                    ToolTip = 'Executes the item worksheet Templates action';
                 }
                 action("Task Queue")
                 {
@@ -645,52 +637,6 @@ page 6151245 "NPR Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Configuration Questionnaire action';
                 }
-                action(Users)
-                {
-                    Caption = 'Users';
-                    RunObject = page Users;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Users action';
-                }
-
-                action("User Groups")
-                {
-                    Caption = 'User Group';
-                    RunObject = page "User Groups";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the User Group action';
-                }
-                action("Permission Sets")
-                {
-                    Caption = 'Permission Sets';
-                    RunObject = page "Permission Sets";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Permission Sets action';
-                }
-                action("User Group Permission Sets")
-                {
-                    Caption = 'User Group Permission Sets';
-                    RunObject = page "User Group Permission Sets";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the User Group Permission Sets action';
-                }
-
-                action(Extensions)
-                {
-                    Caption = 'Extension';
-                    RunObject = page "Extension Management";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Extension action';
-                }
-
-                action("Setup & Extensions")
-                {
-                    Caption = 'Setup & Extensions';
-                    RunObject = page "Assisted Setup";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Setup & Extensions action';
-                }
-
                 action("NP Retail Setup")
                 {
                     Caption = 'NP Retail Setup';
@@ -716,6 +662,13 @@ page 6151245 "NPR Setup RC"
                     RunObject = page "General Posting Setup";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Gen. Posting Setup action';
+                }
+                action("POS Posting Setup")
+                {
+                    Caption = 'POS Posting Setup';
+                    RunObject = Page "NPR POS Posting Setup";
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the POS Posting Setup action';
                 }
                 action("VAT Posting Setup")
                 {

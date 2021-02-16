@@ -116,7 +116,6 @@ table 6059811 "NPR Retail Sales Cue"
         {
             Caption = 'Gift Vouchers';
             FieldClass = FlowField;
-            CalcFormula = Count("NPR Gift Voucher");
             Editable = false;
             ObsoleteState = Removed;
             ObsoleteReason = 'Gift voucher table won''t be used anymore.';
@@ -126,7 +125,6 @@ table 6059811 "NPR Retail Sales Cue"
         {
             Caption = 'Credit Vouchers';
             FieldClass = FlowField;
-            CalcFormula = Count("NPR Credit Voucher");
             Editable = false;
             ObsoleteState = Removed;
             ObsoleteReason = 'Credit voucher table won''t be used anymore.';
