@@ -10,9 +10,9 @@ page 6151248 "NPR Setup Act - POS"
     {
         area(content)
         {
-            cuegroup(Users)
+            cuegroup("Users&Salespersons")
             {
-                Caption = 'Users';
+                Caption = 'Salespersons';
                 field("User Setups"; Rec."User Setups")
                 {
                     ApplicationArea = All;
