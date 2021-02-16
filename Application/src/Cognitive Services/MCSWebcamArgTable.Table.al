@@ -1,7 +1,5 @@
 table 6059960 "NPR MCS Webcam Arg. Table"
 {
-    // NPR5.29/CLVA/20170125 CASE 264333 Added field "Image Orientation"
-    // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj -field 12
 
     Caption = 'MCS Webcam Argument Table';
     DataClassification = CustomerContent;
@@ -38,12 +36,10 @@ table 6059960 "NPR MCS Webcam Arg. Table"
             Caption = 'Allow Saving On Identifyed';
             DataClassification = CustomerContent;
         }
-        field(7; "Action"; Option)
+        field(7; "Action"; Enum "NPR MCS Faces Action")
         {
             Caption = 'Action';
             DataClassification = CustomerContent;
-            OptionCaption = 'Capture Image,Capture And Identify Faces,Identify Faces';
-            OptionMembers = CaptureImage,CaptureAndIdentifyFaces,IdentifyFaces;
         }
         field(8; "API Key 1"; Text[50])
         {
@@ -66,12 +62,10 @@ table 6059960 "NPR MCS Webcam Arg. Table"
             DataClassification = CustomerContent;
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
         }
-        field(13; "Image Orientation"; Option)
+        field(13; "Image Orientation"; enum "NPR MCS API Setup Image Orientation")
         {
             Caption = 'Image Orientation';
             DataClassification = CustomerContent;
-            OptionCaption = 'Landscape,Portrait';
-            OptionMembers = Landscape,Portrait;
         }
     }
 
@@ -80,10 +74,6 @@ table 6059960 "NPR MCS Webcam Arg. Table"
         key(Key1; "Key")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

@@ -377,11 +377,6 @@ page 6060136 "NPR MM Member Card"
         }
         area(factboxes)
         {
-            part(PersonStatistics; "NPR Person Statistics")
-            {
-                Caption = 'Facial Recognition';
-                ApplicationArea = All;
-            }
             systempart(Control6150638; Notes)
             {
                 ApplicationArea = All;
@@ -399,7 +394,7 @@ page 6060136 "NPR MM Member Card"
                 Ellipsis = true;
                 Image = PrintCheck;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Print Member Account Card action';
@@ -417,7 +412,7 @@ page 6060136 "NPR MM Member Card"
                 Ellipsis = true;
                 Image = PrintVoucher;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -441,7 +436,7 @@ page 6060136 "NPR MM Member Card"
                 Caption = 'Generate New Card';
                 Image = PostedPayableVoucher;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -494,7 +489,7 @@ page 6060136 "NPR MM Member Card"
                 Caption = 'Take Picture';
                 Image = Camera;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -512,7 +507,7 @@ page 6060136 "NPR MM Member Card"
                 Caption = 'Import Picture';
                 Image = Import;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -522,7 +517,7 @@ page 6060136 "NPR MM Member Card"
                 var
                     MCSFaceServiceAPI: Codeunit "NPR MCS Face Service API";
                 begin
-                    MCSFaceServiceAPI.ImportPersonPicture(Rec, true);
+                    MCSFaceServiceAPI.ImportMemberPicture(Rec);
                 end;
             }
             action("Member Anonymization")
@@ -552,7 +547,7 @@ page 6060136 "NPR MM Member Card"
                 Caption = 'Create Welcome Notification';
                 Image = Interaction;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Create Welcome Notification action';
@@ -584,7 +579,7 @@ page 6060136 "NPR MM Member Card"
                 Caption = 'Send Wallet Notification';
                 Image = Interaction;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Creates a wallet notification message and sends it when processing method is set to inline';
@@ -615,76 +610,6 @@ page 6060136 "NPR MM Member Card"
 
                 end;
             }
-            group("NPR FacialRecognition")
-            {
-                Caption = 'Facial Recognition';
-                Image = PersonInCharge;
-                action("NPR ImportFace")
-                {
-                    Caption = 'Import Face Image';
-                    ApplicationArea = All;
-                    Image = Picture;
-                    ToolTip = 'Executes the Import Face Image action';
-
-                    trigger OnAction()
-                    var
-                        Contact: Record Contact;
-                        FacialRecognitionSetup: Record "NPR Facial Recogn. Setup";
-                        FacialRecognitionDetect: Codeunit "NPR Detect Face";
-                        FacialRecognitionPersonGroup: Codeunit "NPR Create Person Group";
-                        FacialRecognitionPerson: Codeunit "NPR Create Person";
-                        FacialRecognitionPersonFace: Codeunit "NPR Add Person Face";
-                        FacialRecognitionTrainPersonGroup: Codeunit "NPR Train Person Group";
-                        ImageMgt: Codeunit "NPR Image Mgt.";
-                        ImageFilePath: Text;
-                        EntryNo: Integer;
-                        CalledFrom: Option Contact,Member;
-                        NotSetUp: Label 'Facial Recognition is not active. \It can be enabled from the Facial Recognition setup.';
-                        ImgCantBeProcessed: Label 'Media not supported \ \Image can''t be processed. \Please use .jpg or .png images .';
-                        ConnectionError: Label 'The API can''t be reached. \Please contact your administrator.';
-                        NoNameError: Label 'Member information is not complete. \Action aborted.';
-                    begin
-                        if not FacialRecognitionSetup.FindFirst() or not FacialRecognitionSetup.Active then begin
-                            Message(NotSetUp);
-                            exit;
-                        end;
-
-                        if not FacialRecognitionPersonGroup.GetPersonGroups() then begin
-                            Message(ConnectionError);
-                            exit;
-                        end;
-
-                        if not Contact.Get("Contact No.") then
-                            exit;
-
-                        if Contact."Name" = '' then begin
-                            Message(NoNameError);
-                            exit;
-                        end;
-
-                        FacialRecognitionPersonGroup.CreatePersonGroup(Contact, false);
-
-                        FacialRecognitionPerson.CreatePerson(Contact, false);
-
-                        FacialRecognitionDetect.DetectFace(Contact, ImageFilePath, EntryNo, false, CalledFrom::Member);
-                        case ImageFilePath of
-                            '':
-                                exit;
-                            'WrongExtension':
-                                begin
-                                    Message(ImgCantBeProcessed);
-                                    exit;
-                                end;
-                        end;
-
-                        if FacialRecognitionPersonFace.AddPersonFace(Contact, ImageFilePath, EntryNo) then begin
-                            FacialRecognitionTrainPersonGroup.TrainPersonGroup(Contact, false);
-                            ImageMgt.UpdateRecordImage("External Member No.", CalledFrom::Member, ImageFilePath);
-                        end else
-                            Message(ImgCantBeProcessed);
-                    end;
-                }
-            }
         }
         area(navigation)
         {
@@ -693,7 +618,7 @@ page 6060136 "NPR MM Member Card"
                 Caption = 'Issued Tickets';
                 Image = ShowList;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket List";
@@ -707,7 +632,7 @@ page 6060136 "NPR MM Member Card"
                 Ellipsis = true;
                 Image = ChangeDimensions;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Communication";
@@ -732,7 +657,7 @@ page 6060136 "NPR MM Member Card"
                 Ellipsis = true;
                 Image = Log;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Arrival Log";
@@ -749,7 +674,7 @@ page 6060136 "NPR MM Member Card"
                     Caption = 'Ledger E&ntries';
                     Image = CustomerLedger;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     ShortCutKey = 'Ctrl+F7';
                     ApplicationArea = All;
@@ -779,7 +704,7 @@ page 6060136 "NPR MM Member Card"
                     Caption = 'Item Ledger Entries';
                     Image = ItemLedger;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Item Ledger Entries action';
@@ -808,7 +733,7 @@ page 6060136 "NPR MM Member Card"
                     Caption = 'Statistics';
                     Image = Statistics;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     ShortCutKey = 'F7';
                     ApplicationArea = All;
@@ -840,7 +765,7 @@ page 6060136 "NPR MM Member Card"
                     Enabled = RaptorEnabled;
                     Image = ViewRegisteredOrder;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
                     ApplicationArea = All;
@@ -865,7 +790,7 @@ page 6060136 "NPR MM Member Card"
                     Enabled = RaptorEnabled;
                     Image = SuggestElectronicDocument;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
                     ApplicationArea = All;
@@ -902,17 +827,8 @@ page 6060136 "NPR MM Member Card"
     end;
 
     trigger OnAfterGetRecord()
-    var
-        FacialRecognition: Record "NPR Facial Recognition";
     begin
-        FacialRecognition.SetRange("Contact No.", "Contact No.");
-        if FacialRecognition.FindLast() then
-            CurrPage.PersonStatistics.Page.SetValues(FacialRecognition.Age, FacialRecognition.Gender)
-        else
-            CurrPage.PersonStatistics.Page.ResetValues();
-
         GetMasterDataAttributeValue();
-
     end;
 
     trigger OnOpenPage()

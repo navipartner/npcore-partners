@@ -1,6 +1,5 @@
 table 6059958 "NPR MCS Person"
 {
-    // NPR5.48/JDH /20181109 CASE 334163 Added Caption to object
 
     Caption = 'MCS Person';
     DataClassification = CustomerContent;
@@ -56,11 +55,6 @@ table 6059958 "NPR MCS Person"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
-
     var
         MCSFaceServiceAPI: Codeunit "NPR MCS Face Service API";
 }

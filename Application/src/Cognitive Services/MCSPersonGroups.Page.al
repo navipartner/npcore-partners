@@ -1,9 +1,6 @@
 page 6059957 "NPR MCS Person Groups"
 {
-    // NPR5.48/JDH /20181109 CASE 334163 Added object caption
-
     Caption = 'MCS Person Groups';
-    Editable = false;
     PageType = List;
     SourceTable = "NPR MCS Person Groups";
     UsageCategory = Administration;
@@ -15,12 +12,12 @@ page 6059957 "NPR MCS Person Groups"
         {
             repeater(Group)
             {
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field(PersonGroupId; PersonGroupId)
+                field(PersonGroupId; Rec.PersonGroupId)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Person Group Id field';
@@ -39,12 +36,12 @@ page 6059957 "NPR MCS Person Groups"
                 Image = Refresh;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Get Person Groups action';
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
-
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                Promoted = true;
                 trigger OnAction()
                 begin
-                    CognitivityFaceAPI.GetPersonGroups;
+                    MCSFaceServiceAPI.GetPersonGroups;
                     CurrPage.Update;
                 end;
             }
@@ -52,6 +49,6 @@ page 6059957 "NPR MCS Person Groups"
     }
 
     var
-        CognitivityFaceAPI: Codeunit "NPR MCS Face Service API";
+        MCSFaceServiceAPI: Codeunit "NPR MCS Face Service API";
 }
 
