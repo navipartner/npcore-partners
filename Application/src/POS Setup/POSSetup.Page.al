@@ -1,18 +1,10 @@
 page 6150707 "NPR POS Setup"
 {
-    // NPR5.37/TSA /20171024 CASE 293905 Added "Lock POS Action Code", "Unlock POS Action Code"
-    // NPR5.39/TSA /20180126 CASE 303399 Added "OnBeforePaymentView Action"
-    // NPR5.40/VB  /20180228 CASE 306347  Replacing BLOB-based parameters with phyisical-table parameters.
-    // NPR5.54/TSA /20200219 CASE 391850 Added Description
-    // NPR5.54/TSA /20200220 CASE 392121 Added "Idle Timeout Action Code"
-    // NPR5.55/TSA /20200417 CASE 400734 Added "Admin Menu Action Code"
-
     Caption = 'POS Setup';
     DeleteAllowed = false;
     PageType = Card;
     SourceTable = "NPR POS Setup";
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
 
     layout
     {
@@ -38,18 +30,7 @@ page 6150707 "NPR POS Setup"
 
                     trigger OnAssistEdit()
                     begin
-                        //-NPR5.40 [306347]
-                        //IF AssistEdit(FIELDNO("Login Action Parameters")) THEN
-                        //  CurrPage.SAVERECORD();
                         AssistEdit("Login Action Code", FieldNo("Login Action Code"));
-                        //+NPR5.40 [306347]
-                    end;
-
-                    trigger OnValidate()
-                    begin
-                        //-NPR5.40 [306347]
-                        //CurrPage.SAVERECORD();
-                        //+NPR5.40 [306347]
                     end;
                 }
                 field("Text Enter Action Code"; "Text Enter Action Code")
@@ -62,18 +43,7 @@ page 6150707 "NPR POS Setup"
 
                     trigger OnAssistEdit()
                     begin
-                        //-NPR5.40 [306347]
-                        //IF AssistEdit(FIELDNO("Text Enter Action Parameters")) THEN
-                        //  CurrPage.SAVERECORD();
                         AssistEdit("Text Enter Action Code", FieldNo("Text Enter Action Code"));
-                        //+NPR5.40 [306347]
-                    end;
-
-                    trigger OnValidate()
-                    begin
-                        //-NPR5.40 [306347]
-                        //CurrPage.SAVERECORD();
-                        //+NPR5.40 [306347]
                     end;
                 }
                 field("Item Insert Action Code"; "Item Insert Action Code")
@@ -86,18 +56,7 @@ page 6150707 "NPR POS Setup"
 
                     trigger OnAssistEdit()
                     begin
-                        //-NPR5.40 [306347]
-                        //IF AssistEdit(FIELDNO("Item Insert Action Parameters")) THEN
-                        //  CurrPage.SAVERECORD();
                         AssistEdit("Item Insert Action Code", FieldNo("Item Insert Action Code"));
-                        //+NPR5.40 [306347]
-                    end;
-
-                    trigger OnValidate()
-                    begin
-                        //-NPR5.40 [306347]
-                        //CurrPage.SAVERECORD();
-                        //+NPR5.40 [306347]
                     end;
                 }
                 field("Payment Action Code"; "Payment Action Code")
@@ -110,18 +69,7 @@ page 6150707 "NPR POS Setup"
 
                     trigger OnAssistEdit()
                     begin
-                        //-NPR5.40 [306347]
-                        //IF AssistEdit(FIELDNO("Payment Action Parameters")) THEN
-                        //  CurrPage.SAVERECORD();
                         AssistEdit("Payment Action Code", FieldNo("Payment Action Code"));
-                        //+NPR5.40 [306347]
-                    end;
-
-                    trigger OnValidate()
-                    begin
-                        //-NPR5.40 [306347]
-                        //CurrPage.SAVERECORD();
-                        //+NPR5.40 [306347]
                     end;
                 }
                 field("Customer Action Code"; "Customer Action Code")
@@ -134,18 +82,7 @@ page 6150707 "NPR POS Setup"
 
                     trigger OnAssistEdit()
                     begin
-                        //-NPR5.40 [306347]
-                        //IF AssistEdit(FIELDNO("Customer Action Parameters")) THEN
-                        //  CurrPage.SAVERECORD();
                         AssistEdit("Customer Action Code", FieldNo("Customer Action Code"));
-                        //+NPR5.40 [306347]
-                    end;
-
-                    trigger OnValidate()
-                    begin
-                        //-NPR5.40 [306347]
-                        //CurrPage.SAVERECORD();
-                        //+NPR5.40 [306347]
                     end;
                 }
                 field("Lock POS Action Code"; "Lock POS Action Code")
@@ -157,11 +94,7 @@ page 6150707 "NPR POS Setup"
 
                     trigger OnAssistEdit()
                     begin
-                        //-NPR5.40 [306347]
-                        //IF AssistEdit(FIELDNO("Lock POS Action Parameters")) THEN
-                        //  CurrPage.SAVERECORD();
                         AssistEdit("Lock POS Action Code", FieldNo("Lock POS Action Code"));
-                        //+NPR5.40 [306347]
                     end;
                 }
                 field("Unlock POS Action Code"; "Unlock POS Action Code")
@@ -173,11 +106,7 @@ page 6150707 "NPR POS Setup"
 
                     trigger OnAssistEdit()
                     begin
-                        //-NPR5.40 [306347]
-                        //IF AssistEdit(FIELDNO("Unlock POS Action Parameters")) THEN
-                        //  CurrPage.SAVERECORD();
                         AssistEdit("Unlock POS Action Code", FieldNo("Unlock POS Action Code"));
-                        //+NPR5.40 [306347]
                     end;
                 }
                 field("OnBeforePaymentView Action"; "OnBeforePaymentView Action")
@@ -189,18 +118,7 @@ page 6150707 "NPR POS Setup"
 
                     trigger OnAssistEdit()
                     begin
-                        //-NPR5.40 [306347]
-                        //IF AssistEdit(FIELDNO("OnBeforePaymentView Parameters")) THEN
-                        //  CurrPage.SAVERECORD();
                         AssistEdit("OnBeforePaymentView Action", FieldNo("OnBeforePaymentView Action"));
-                        //+NPR5.40 [306347]
-                    end;
-
-                    trigger OnValidate()
-                    begin
-                        //-NPR5.40 [306347]
-                        //CurrPage.SAVERECORD();
-                        //+NPR5.40 [306347]
                     end;
                 }
                 field("Idle Timeout Action Code"; "Idle Timeout Action Code")
@@ -210,10 +128,7 @@ page 6150707 "NPR POS Setup"
 
                     trigger OnAssistEdit()
                     begin
-
-                        //-NPR5.54 [392121]
                         AssistEdit("Idle Timeout Action Code", FieldNo("Idle Timeout Action Code"));
-                        //+NPR5.54 [392121]
                     end;
                 }
                 field("Admin Menu Action Code"; "Admin Menu Action Code")
@@ -223,10 +138,7 @@ page 6150707 "NPR POS Setup"
 
                     trigger OnAssistEdit()
                     begin
-
-                        //-NPR5.55 [400734]
                         AssistEdit("Admin Menu Action Code", FieldNo("Admin Menu Action Code"));
-                        //-NPR5.55 [400734]
                     end;
                 }
             }
@@ -243,7 +155,7 @@ page 6150707 "NPR POS Setup"
                 Enabled = RefreshEnabled;
                 Image = RefreshText;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -251,9 +163,7 @@ page 6150707 "NPR POS Setup"
 
                 trigger OnAction()
                 begin
-                    //-NPR5.40 [306347]
                     RefreshInvalidActions();
-                    //+NPR5.40 [306347]
                 end;
             }
         }
@@ -261,16 +171,12 @@ page 6150707 "NPR POS Setup"
 
     trigger OnAfterGetCurrRecord()
     begin
-        //-NPR5.40 [306347]
         UpdateActionsStyles();
-        //+NPR5.40 [306347]
     end;
 
     trigger OnAfterGetRecord()
     begin
-        //-NPR5.40 [306347]
         UpdateActionsStyles();
-        //+NPR5.40 [306347]
     end;
 
     trigger OnOpenPage()
@@ -280,9 +186,7 @@ page 6150707 "NPR POS Setup"
         if not Find then
             Insert;
 
-        //-NPR5.40 [306347]
         POSAction.DiscoverActions();
-        //+NPR5.40 [306347]
     end;
 
     var
@@ -300,7 +204,6 @@ page 6150707 "NPR POS Setup"
     var
         ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
     begin
-        //-NPR5.40 [306347]
         LoginActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId, '', FieldNo("Login Action Code"), "Login Action Code");
         TextEnterActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId, '', FieldNo("Text Enter Action Code"), "Text Enter Action Code");
         ItemInsertActionRefreshNeeded := ParamMgt.RefreshParametersRequired(RecordId, '', FieldNo("Item Insert Action Code"), "Item Insert Action Code");
@@ -313,14 +216,12 @@ page 6150707 "NPR POS Setup"
         RefreshEnabled :=
           LoginActionRefreshNeeded or TextEnterActionRefreshNeeded or ItemInsertActionRefreshNeeded or PaymentActionRefreshNeeded or CustomerActionRefreshNeeded or
           LockActionRefreshNeeded or UnlockActionRefreshNeeded or OnBeforePaymentViewActionRefreshNeeded;
-        //+NPR5.40 [306347]
     end;
 
     local procedure RefreshInvalidActions()
     var
         ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
     begin
-        //-NPR5.40 [306347]
         if LoginActionRefreshNeeded then
             ParamMgt.RefreshParameters(RecordId, '', FieldNo("Login Action Code"), "Login Action Code");
 
@@ -344,7 +245,6 @@ page 6150707 "NPR POS Setup"
 
         if OnBeforePaymentViewActionRefreshNeeded then
             ParamMgt.RefreshParameters(RecordId, '', FieldNo("OnBeforePaymentView Action"), "OnBeforePaymentView Action");
-        //+NPR5.40 [306347]
     end;
 }
 

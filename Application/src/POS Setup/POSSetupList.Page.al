@@ -1,13 +1,9 @@
 page 6150738 "NPR POS Setup List"
 {
-    // NPR5.54/TSA /20200407 CASE 391850 Initial Version
-    // NPR5.55/TSA /20200422 CASE 400734 Added "Admin Menu Action Code"
-
     Caption = 'POS Setup List';
     CardPageID = "NPR POS Setup";
     PageType = List;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "NPR POS Setup";
 
     layout
