@@ -1,12 +1,10 @@
 table 6150730 "NPR POS Sales Workflow Step"
 {
-    // NPR5.39/MHA /20180202  CASE 302779 Object created - POS Workflow
-    // NPR5.45/MHA /20180820  CASE 321266 Moved field 1 to 3 "Workflow Code" and added Field 1 "Set Code" to Primary key
 
     Caption = 'POS Sales Workflow Step';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR POS Sales WF Steps";
-    LookupPageID = "NPR POS Sales WF Steps";
+    DrillDownPageID = "NPR POS Scenarios Steps";
+    LookupPageID = "NPR POS Scenarios Steps";
 
     fields
     {

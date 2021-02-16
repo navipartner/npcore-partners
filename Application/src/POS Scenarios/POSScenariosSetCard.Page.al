@@ -1,20 +1,17 @@
-page 6150732 "NPR POS Sales Workflow Sets"
+page 6150733 "NPR POS Scenarios Set Card"
 {
-    // NPR5.45/MHA /20180820  CASE 321266 Object created
 
-    Caption = 'POS Sales Workflow Sets';
-    CardPageID = "NPR POS Sales WF Set Card";
-    Editable = false;
-    PageType = List;
-    SourceTable = "NPR POS Sales Workflow Set";
+    Caption = 'POS Scenarios Set Card';
+    PageType = Card;
     UsageCategory = Administration;
     ApplicationArea = All;
+    SourceTable = "NPR POS Sales Workflow Set";
 
     layout
     {
         area(content)
         {
-            repeater(Group)
+            group(General)
             {
                 field("Code"; Code)
                 {
@@ -26,6 +23,11 @@ page 6150732 "NPR POS Sales Workflow Sets"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
+            }
+            part(Control6014404; "NPR POS Scenarios Set Entries")
+            {
+                SubPageLink = "Set Code" = FIELD(Code);
+                ApplicationArea = All;
             }
         }
     }
