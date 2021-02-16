@@ -2,8 +2,9 @@ codeunit 6014437 "NPR Phone Lookup"
 {
     var
         IComm: Record "NPR I-Comm";
+        SMSSetup: Record "NPR SMS Setup";
         Initialized: Boolean;
-        ApplyTemplateQst: Label 'Do you wish to apply Config. Template %1?', Comment= '%1 = Config. Template Header Code';
+        ApplyTemplateQst: Label 'Do you wish to apply Config. Template %1?', Comment = '%1 = Config. Template Header Code';
 
 
     procedure RunPhoneLookup(PhoneNo: Text[30]; var TempPhoneLookupBuffer: Record "NPR Phone Lookup Buffer" temporary): Boolean
@@ -55,31 +56,6 @@ codeunit 6014437 "NPR Phone Lookup"
             UpdateCont(Rec, TempPhoneLookupBuffer);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::Contact, 'OnAfterInsertEvent', '', true, true)]
-    local procedure ContactOnAfterInsert(var Rec: Record Contact; RunTrigger: Boolean)
-    var
-        ConfigTemplateHeader: Record "Config. Template Header";
-        Cont: Record Contact;
-        RecRef: RecordRef;
-    begin
-        if not RunTrigger then
-            exit;
-
-        if not InitIComm() then
-            exit;
-
-        if IComm."Config Request (Contact)" = IComm."Config Request (Contact)"::None then
-            exit;
-
-        if not ConfigTemplateHeader.Get(IComm."Config. Template (Contact)") then
-            exit;
-
-        RecRef.GetTable(Rec);
-        ApplyConfigTemplate(RecRef, ConfigTemplateHeader, IComm."Config Request (Contact)" = IComm."Config Request (Contact)"::Ask);
-        RecRef.SetTable(Rec);
-        Rec.Modify(false);
-    end;
-
     [EventSubscriber(ObjectType::Table, Database::Contact, 'OnAfterModifyEvent', '', true, true)]
     local procedure ContactOnAfterModify(var Rec: Record Contact; RunTrigger: Boolean)
     begin
@@ -121,31 +97,6 @@ codeunit 6014437 "NPR Phone Lookup"
             UpdateCust(Rec, TempPhoneLookupBuffer);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterInsertEvent', '', true, true)]
-    local procedure CustomerOnAfterInsert(var Rec: Record Customer; RunTrigger: Boolean)
-    var
-        ConfigTemplateHeader: Record "Config. Template Header";
-        Cust: Record Customer;
-        RecRef: RecordRef;
-    begin
-        if not RunTrigger then
-            exit;
-
-        if not IComm.Get then
-            exit;
-
-        if IComm."Config Request (Customer)" = IComm."Config Request (Customer)"::None then
-            exit;
-
-        if not ConfigTemplateHeader.Get(IComm."Config. Template (Customer)") then
-            exit;
-
-        RecRef.GetTable(Rec);
-        ApplyConfigTemplate(RecRef, ConfigTemplateHeader, IComm."Config Request (Customer)" = IComm."Config Request (Customer)"::Ask);
-        RecRef.SetTable(Rec);
-        Rec.Modify(false);
-    end;
-
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterModifyEvent', '', true, true)]
     local procedure CustomerOnAfterModify(var Rec: Record Customer; RunTrigger: Boolean)
     begin
@@ -185,31 +136,6 @@ codeunit 6014437 "NPR Phone Lookup"
 
         if RunPhoneLookup(Rec."No.", TempPhoneLookupBuffer) then
             UpdateVend(Rec, TempPhoneLookupBuffer);
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::Vendor, 'OnAfterInsertEvent', '', true, true)]
-    local procedure VendorOnAfterInsert(var Rec: Record Vendor; RunTrigger: Boolean)
-    var
-        ConfigTemplateHeader: Record "Config. Template Header";
-        Vend: Record Vendor;
-        RecRef: RecordRef;
-    begin
-        if not RunTrigger then
-            exit;
-
-        if not IComm.Get() then
-            exit;
-
-        if IComm."Config Request (Vendor)" = IComm."Config Request (Vendor)"::None then
-            exit;
-
-        if not ConfigTemplateHeader.Get(IComm."Config. Template (Vendor)") then
-            exit;
-
-        RecRef.GetTable(Rec);
-        ApplyConfigTemplate(RecRef, ConfigTemplateHeader, IComm."Config Request (Vendor)" = IComm."Config Request (Vendor)"::Ask);
-        RecRef.SetTable(Rec);
-        Rec.Modify(false);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Vendor, 'OnAfterModifyEvent', '', true, true)]
@@ -430,24 +356,6 @@ codeunit 6014437 "NPR Phone Lookup"
         if (PAGE.RunModal(PAGE::"Vendor Card", Vendor) = ACTION::OK) then;
     end;
 
-    local procedure ApplyConfigTemplate(var RecRef: RecordRef; ConfigTemplateHeader: Record "Config. Template Header"; QueryConfirm: Boolean)
-    var
-        ConfigTemplateMgt: Codeunit "Config. Template Management";
-    begin
-        if ConfigTemplateHeader.Code = '' then
-            exit;
-
-        if QueryConfirm and not GuiAllowed then
-            exit;
-
-        if QueryConfirm then begin
-            if not Confirm(ApplyTemplateQst, false, ConfigTemplateHeader.Code) then
-                exit;
-        end;
-
-        ConfigTemplateMgt.UpdateRecord(ConfigTemplateHeader, RecRef);
-    end;
-
     local procedure InitIComm(): Boolean
     begin
         if not Initialized then begin
@@ -464,4 +372,3 @@ codeunit 6014437 "NPR Phone Lookup"
         exit(true);
     end;
 }
-

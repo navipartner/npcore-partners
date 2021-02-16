@@ -99,11 +99,12 @@ codeunit 6060132 "NPR MM Import Members"
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MemberInfoCapturePage: Page "NPR MM Member Info Capture";
         IComm: Record "NPR I-Comm";
+        SMSSetup: Record "NPR SMS Setup";
     begin
 
         // xxx
-        if (IComm.Get()) then
-            if (IComm."Config Request (Customer)" <> IComm."Config Request (Customer)"::None) or IComm."Use Auto. Cust. Lookup" then
+        if IComm.Get() then
+            if IComm."Use Auto. Cust. Lookup" then
                 if not Confirm('Warning: %1 is setup and may interfer with customer creation when importing members. Has the %1 been configured correctly?', false, IComm.TableCaption()) then
                     Error('');
 

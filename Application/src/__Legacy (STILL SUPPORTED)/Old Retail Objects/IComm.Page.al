@@ -146,40 +146,6 @@ page 6014516 "NPR I-Comm"
                         ToolTip = 'Specifies the value of the Number Info Codeunit Name field';
                     }
                 }
-                group(ConfigTemplate)
-                {
-                    Caption = 'Config. Template';
-                    field("Config. Template (Customer)"; "Config. Template (Customer)")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Config. Template (Customer) field';
-                    }
-                    field("Config Request (Customer)"; "Config Request (Customer)")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Config Request (Customer) field';
-                    }
-                    field("Config. Template (Vendor)"; "Config. Template (Vendor)")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Config. Template (Vendor) field';
-                    }
-                    field("Config Request (Vendor)"; "Config Request (Vendor)")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Config Request (Vendor) field';
-                    }
-                    field("Config. Template (Contact)"; "Config. Template (Contact)")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Config. Template (Contact) field';
-                    }
-                    field("Config Request (Contact)"; "Config Request (Contact)")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Config Request (Contact) field';
-                    }
-                }
             }
             group(NAS)
             {
@@ -205,11 +171,6 @@ page 6014516 "NPR I-Comm"
                 group("Document Clearing")
                 {
                     Caption = 'Document Clearing';
-                    field("Company - Clearing"; "Company - Clearing")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Company field';
-                    }
                     field("Clearing - SQL"; "Clearing - SQL")
                     {
                         ApplicationArea = All;
@@ -220,11 +181,6 @@ page 6014516 "NPR I-Comm"
             group("Virtual PDF")
             {
                 Caption = 'Virtual PDF';
-                field("VirtualPDF Name"; "VirtualPDF Name")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the VirtualPDF Name field';
-                }
                 field("Turnover - Email Addresses"; "Turnover - Email Addresses")
                 {
                     ApplicationArea = All;
