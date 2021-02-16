@@ -11,6 +11,16 @@
             "id": "AW0007",
             "action":"Warning",
             "justification": "The Web client does not support displaying Repeater controls that contain FlowFilter fields!"
+        },
+        {
+            "id": "AS0088",
+            "action": "Warning",
+            "justification": "We are not ready to block breaking changes yet"
+        },
+                {
+            "id": "AS0024",
+            "action": "Warning",
+            "justification": "We are not ready to block breaking changes yet"
         }
     ]
 }
