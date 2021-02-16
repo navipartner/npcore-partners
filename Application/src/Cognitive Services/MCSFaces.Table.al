@@ -1,7 +1,5 @@
 table 6059959 "NPR MCS Faces"
 {
-    // NPR5.48/JDH /20181109 CASE 334163 Added Caption to object
-
     Caption = 'MCS Faces';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR MCS Faces";
@@ -90,12 +88,10 @@ table 6059959 "NPR MCS Faces"
             DataClassification = CustomerContent;
             SubType = Bitmap;
         }
-        field(25; "Action"; Option)
+        field(25; "Action"; Enum "NPR MCS Faces Action")
         {
             Caption = 'Action';
             DataClassification = CustomerContent;
-            OptionCaption = 'Capture Image,Capture And Identify Faces,Identify Faces';
-            OptionMembers = CaptureImage,CaptureAndIdentifyFaces,IdentifyFaces;
         }
     }
 
@@ -104,10 +100,6 @@ table 6059959 "NPR MCS Faces"
         key(Key1; PersonId, FaceId)
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

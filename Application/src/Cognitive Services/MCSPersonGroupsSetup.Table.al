@@ -1,6 +1,5 @@
 table 6059956 "NPR MCS Person Groups Setup"
 {
-    // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj -field 1
 
     Caption = 'MCS Person Groups Setup';
     DataClassification = CustomerContent;
@@ -33,10 +32,6 @@ table 6059956 "NPR MCS Person Groups Setup"
         key(Key1; "Table Id")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

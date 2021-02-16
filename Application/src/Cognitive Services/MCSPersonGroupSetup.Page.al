@@ -1,6 +1,5 @@
 page 6059956 "NPR MCS Person Group Setup"
 {
-    // NPR5.48/JDH /20181109 CASE 334163 Added object caption
 
     Caption = 'MCS Person Group Setup';
     PageType = List;
@@ -14,27 +13,23 @@ page 6059956 "NPR MCS Person Group Setup"
         {
             repeater(Group)
             {
-                field("Table Id"; "Table Id")
+                field("Table Id"; Rec."Table Id")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table Id field';
                 }
-                field("Person Groups Id"; "Person Groups Id")
+                field("Person Groups Id"; Rec."Person Groups Id")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Person Groups Id field';
                 }
-                field("Person Groups Name"; "Person Groups Name")
+                field("Person Groups Name"; Rec."Person Groups Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Person Groups Name field';
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

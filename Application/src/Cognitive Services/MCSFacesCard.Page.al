@@ -1,13 +1,10 @@
 page 6059954 "NPR MCS Faces Card"
 {
-    // NPR5.48/JDH /20181109 CASE 334163 Added object caption
 
     Caption = 'MCS Faces Card';
     InsertAllowed = false;
     ModifyAllowed = false;
-    PageType = Card;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "NPR MCS Faces";
 
     layout
@@ -16,97 +13,93 @@ page 6059954 "NPR MCS Faces Card"
         {
             group(General)
             {
-                field(PersonId; PersonId)
+                field(PersonId; Rec.PersonId)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Person Id field';
                 }
-                field(FaceId; FaceId)
+                field(FaceId; Rec.FaceId)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Face Id field';
                 }
-                field(Gender; Gender)
+                field(Gender; Rec.Gender)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Gender field';
                 }
-                field(Age; Age)
+                field(Age; Rec.Age)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Age field';
                 }
-                field("Face Height"; "Face Height")
+                field("Face Height"; Rec."Face Height")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Face Height field';
                 }
-                field("Face Width"; "Face Width")
+                field("Face Width"; Rec."Face Width")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Face Width field';
                 }
-                field("Face Position X"; "Face Position X")
+                field("Face Position X"; Rec."Face Position X")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Face Position X field';
                 }
-                field("Face Position Y"; "Face Position Y")
+                field("Face Position Y"; Rec."Face Position Y")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Face Position Y field';
                 }
-                field(Beard; Beard)
+                field(Beard; Rec.Beard)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Beard field';
                 }
-                field(Sideburns; Sideburns)
+                field(Sideburns; Rec.Sideburns)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sideburns field';
                 }
-                field(Moustache; Moustache)
+                field(Moustache; Rec.Moustache)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Moustache field';
                 }
-                field(IsSmiling; IsSmiling)
+                field(IsSmiling; Rec.IsSmiling)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Is Smiling field';
                 }
-                field(Glasses; Glasses)
+                field(Glasses; Rec.Glasses)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Glasses field';
                 }
-                field(Identified; Identified)
+                field(Identified; Rec.Identified)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Identified field';
                 }
-                field(Created; Created)
+                field(Created; Rec.Created)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Created field';
                 }
-                field(Picture; Picture)
+                field(Picture; Rec.Picture)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Picture field';
                 }
-                field("Action"; Action)
+                field("Action"; Rec.Action)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Action field';
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

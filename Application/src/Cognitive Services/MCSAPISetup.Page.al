@@ -1,41 +1,51 @@
 page 6059955 "NPR MCS API Setup"
 {
-    // NPR5.29/CLVA/20170125 CASE 264333 Added fields "Image Orientation" and "Use Cognitive Services"
-    // NPR5.48/JDH /20181109 CASE 334163 Added object caption
 
     Caption = 'MCS API Setup';
     PageType = List;
     UsageCategory = Administration;
     ApplicationArea = All;
     SourceTable = "NPR MCS API Setup";
-
+    DelayedInsert = true;
     layout
     {
         area(content)
         {
             repeater(Group)
             {
-                field(API; API)
+                field(API; Rec.API)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the API field';
                 }
-                field("Key 1"; "Key 1")
+                field(BaseURLText; BaseURLText)
                 {
                     ApplicationArea = All;
+                    Caption = 'Base URL';
+                    ToolTip = 'Specifies the value of the BaseURL field';
+                    trigger OnValidate()
+                    begin
+                        Rec.SetBaseUrl(BaseURLText);
+                    end;
+                }
+                field("Key 1"; Rec."Key 1")
+                {
+                    ApplicationArea = All;
+                    ExtendedDatatype = Masked;
                     ToolTip = 'Specifies the value of the Key 1 field';
                 }
-                field("Key 2"; "Key 2")
+                field("Key 2"; Rec."Key 2")
                 {
                     ApplicationArea = All;
+                    ExtendedDatatype = Masked;
                     ToolTip = 'Specifies the value of the Key 2 field';
                 }
-                field("Image Orientation"; "Image Orientation")
+                field("Image Orientation"; Rec."Image Orientation")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Image Orientation field';
                 }
-                field("Use Cognitive Services"; "Use Cognitive Services")
+                field("Use Cognitive Services"; Rec."Use Cognitive Services")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Use Cognitive Services field';
@@ -44,8 +54,14 @@ page 6059955 "NPR MCS API Setup"
         }
     }
 
-    actions
-    {
-    }
+    trigger OnAfterGetRecord()
+
+    begin
+        BaseURLText := Rec.GetBaseUrl();
+    end;
+
+    var
+        BaseURLText: Text;
+
 }
 

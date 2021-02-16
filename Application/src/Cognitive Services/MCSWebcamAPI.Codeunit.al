@@ -1,22 +1,11 @@
 codeunit 6059956 "NPR MCS Webcam API"
 {
-    // NPR5.29/CLVA/20170125 CASE 264333 Added functionality to support image orientation;
-    // NPR5.33/TSA /20170629 CASE 279495 Adopted to transcendence
-    // NPR5.35/TSA /20170809 CASE 276102 Wrong table reference in CallIdentifyStart()
-
     var
         WebcamArgumentTable: Record "NPR MCS Webcam Arg. Table" temporary;
         CognitivityAPISetup: Record "NPR MCS API Setup";
         PersonGroupsSetup: Record "NPR MCS Person Groups Setup";
         PersonGroups: Record "NPR MCS Person Groups";
         OutS: OutStream;
-        Convert: DotNet NPRNetConvert;
-        Bytes: DotNet NPRNetArray;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        // TODO: CTRLUPGRADE - obsolete Standard functionality
-        //ProxyDialog: Page "Proxy Dialog";
-        // TODO: CTRLUPGRADE - obsolete Standard functionality
-        //WebcamProxy: Codeunit "MCS Webcam Proxy";
         Txt003: Label 'Salesperson does not exist';
         WebcamProxyTSD: Codeunit "NPR MCS Webcam Proxy TSD";
         RecRef: RecordRef;
@@ -28,6 +17,7 @@ codeunit 6059956 "NPR MCS Webcam API"
     var
         MemberName: Text;
         WebcamProxyTSD: Codeunit "NPR MCS Webcam Proxy TSD";
+        Base64Convert: Codeunit "Base64 Convert";
     begin
         RecRef := MMMemberInfoCapture.RecordId.GetRecord;
         WebcamArgumentTable.Action := WebcamArgumentTable.Action::CaptureImage;
@@ -35,9 +25,7 @@ codeunit 6059956 "NPR MCS Webcam API"
         WebcamArgumentTable."Table Id" := RecRef.Number;
 
         if CognitivityAPISetup.Get(CognitivityAPISetup.API::Face) then begin
-            //-NPR5.29
             WebcamArgumentTable."Image Orientation" := CognitivityAPISetup."Image Orientation";
-            //+NPR5.29
             if CognitivityAPISetup."Use Cognitive Services" then begin
 
                 MMMemberInfoCapture.TestField("Entry No.");
@@ -52,8 +40,8 @@ codeunit 6059956 "NPR MCS Webcam API"
 
                 WebcamArgumentTable.Action := WebcamArgumentTable.Action::CaptureAndIdentifyFaces;
                 WebcamArgumentTable."Allow Saving On Identifyed" := true;
-                WebcamArgumentTable."API Key 1" := CognitivityAPISetup."Key 1";
-                WebcamArgumentTable."API Key 2" := CognitivityAPISetup."Key 2";
+                WebcamArgumentTable."API Key 1" := CognitivityAPISetup.GetAPIKey1();
+                WebcamArgumentTable."API Key 2" := CognitivityAPISetup.GetAPIKey2();
                 WebcamArgumentTable."Person Group Id" := PersonGroups.PersonGroupId;
 
                 MemberName := MMMemberInfoCapture."First Name";
@@ -66,50 +54,28 @@ codeunit 6059956 "NPR MCS Webcam API"
             end;
         end;
 
-        //#-279495 [279495]
-        // WebcamProxy.InitializeProtocol();
-        // WebcamProxy.SetState(WebcamArgumentTable);
-        // ProxyDialog.RunProtocolModal(CODEUNIT::"MCS Webcam Proxy");
-        //
-        // IF WebcamProxy.GetBase64String <> '' THEN BEGIN
-        //   Bytes := Convert.FromBase64String(WebcamProxy.GetBase64String);
-        //   MemoryStream := MemoryStream.MemoryStream(Bytes);
-        //   MMMemberInfoCapture.Picture.CREATEOUTSTREAM(OutS);
-        //   MemoryStream.WriteTo(OutS);
-        //   IF ModifyVar THEN
-        //     MMMemberInfoCapture.MODIFY;
-        // END;
-
         if (POSSession.IsActiveSession(FrontEnd)) then begin
             Clear(WebcamProxyTSD);
             WebcamProxyTSD.SetState(WebcamArgumentTable);
             WebcamProxyTSD.InvokeDevice();
             Base64String := WebcamProxyTSD.GetBase64String();
-        end else begin
+        end else
             // TODO: CTRLUPGRADE - Invkoing old functionality
             ERROR('CTRLUPGRADE');
-            /*
-            WebcamProxy.InitializeProtocol();
-            WebcamProxy.SetState(WebcamArgumentTable);
-            ProxyDialog.RunProtocolModal(CODEUNIT::"MCS Webcam Proxy");
-            Base64String := WebcamProxy.GetBase64String();
-            */
-        end;
+
 
         if Base64String <> '' then begin
-            Bytes := Convert.FromBase64String(Base64String);
-            MemoryStream := MemoryStream.MemoryStream(Bytes);
             MMMemberInfoCapture.Picture.CreateOutStream(OutS);
-            MemoryStream.WriteTo(OutS);
+            OutS.Write(Base64Convert.FromBase64(Base64String));
             if ModifyVar then
                 MMMemberInfoCapture.Modify;
         end;
-        //#+279495 [279495]
     end;
 
     procedure CallCaptureStartByMMMember(var MMMember: Record "NPR MM Member"; ModifyVar: Boolean)
     var
         MemberName: Text;
+        Base64Convert: Codeunit "Base64 Convert";
     begin
         RecRef := MMMember.RecordId.GetRecord;
         WebcamArgumentTable.Action := WebcamArgumentTable.Action::CaptureImage;
@@ -117,9 +83,9 @@ codeunit 6059956 "NPR MCS Webcam API"
         WebcamArgumentTable."Table Id" := RecRef.Number;
 
         if CognitivityAPISetup.Get(CognitivityAPISetup.API::Face) then begin
-            //-NPR5.29
+
             WebcamArgumentTable."Image Orientation" := CognitivityAPISetup."Image Orientation";
-            //+NPR5.29
+
             if CognitivityAPISetup."Use Cognitive Services" then begin
 
                 MMMember.TestField("Entry No.");
@@ -134,8 +100,8 @@ codeunit 6059956 "NPR MCS Webcam API"
 
                 WebcamArgumentTable.Action := WebcamArgumentTable.Action::CaptureAndIdentifyFaces;
                 WebcamArgumentTable."Allow Saving On Identifyed" := true;
-                WebcamArgumentTable."API Key 1" := CognitivityAPISetup."Key 1";
-                WebcamArgumentTable."API Key 2" := CognitivityAPISetup."Key 2";
+                WebcamArgumentTable."API Key 1" := CognitivityAPISetup.GetAPIKey1();
+                WebcamArgumentTable."API Key 2" := CognitivityAPISetup.GetAPIKey2();
                 WebcamArgumentTable."Person Group Id" := PersonGroups.PersonGroupId;
 
                 MemberName := MMMember."First Name";
@@ -148,45 +114,21 @@ codeunit 6059956 "NPR MCS Webcam API"
             end;
         end;
 
-        //#-279495 [279495]
-        // WebcamProxy.InitializeProtocol();
-        // WebcamProxy.SetState(WebcamArgumentTable);
-        // ProxyDialog.RunProtocolModal(CODEUNIT::"MCS Webcam Proxy");
-        //
-        // IF WebcamProxy.GetBase64String <> '' THEN BEGIN
-        //  Bytes := Convert.FromBase64String(WebcamProxy.GetBase64String);
-        //  MemoryStream := MemoryStream.MemoryStream(Bytes);
-        //  MMMember.Picture.CREATEOUTSTREAM(OutS);
-        //  MemoryStream.WriteTo(OutS);
-        //  IF ModifyVar THEN
-        //    MMMember.MODIFY;
-        // END;
-
         if (POSSession.IsActiveSession(FrontEnd)) then begin
             Clear(WebcamProxyTSD);
             WebcamProxyTSD.SetState(WebcamArgumentTable);
             WebcamProxyTSD.InvokeDevice();
             Base64String := WebcamProxyTSD.GetBase64String();
-        end else begin
+        end else
             // TODO: CTRLUPGRADE - Obsolete functionality
             ERROR('CTRLUPGRADE');
-            /*
-            WebcamProxy.InitializeProtocol();
-            WebcamProxy.SetState(WebcamArgumentTable);
-            ProxyDialog.RunProtocolModal(CODEUNIT::"MCS Webcam Proxy");
-            Base64String := WebcamProxy.GetBase64String();
-            */
-        end;
 
         if Base64String <> '' then begin
-            Bytes := Convert.FromBase64String(Base64String);
-            MemoryStream := MemoryStream.MemoryStream(Bytes);
             MMMember.Picture.CreateOutStream(OutS);
-            MemoryStream.WriteTo(OutS);
+            OutS.Write(Base64Convert.FromBase64(Base64String));
             if ModifyVar then
                 MMMember.Modify;
         end;
-        //#+279495 [279495]
     end;
 
     procedure CallIdentifyStart(RecordVariant: Variant; var MCSWebcamArgumentTable: Record "NPR MCS Webcam Arg. Table"; ShowDialog: Boolean): Boolean
@@ -206,38 +148,22 @@ codeunit 6059956 "NPR MCS Webcam API"
         PersonGroups.TestField(PersonGroupId);
 
         MCSWebcamArgumentTable.Action := MCSWebcamArgumentTable.Action::IdentifyFaces;
-        MCSWebcamArgumentTable."API Key 1" := CognitivityAPISetup."Key 1";
-        MCSWebcamArgumentTable."API Key 2" := CognitivityAPISetup."Key 2";
+        MCSWebcamArgumentTable."API Key 1" := CognitivityAPISetup.GetAPIKey1();
+        MCSWebcamArgumentTable."API Key 2" := CognitivityAPISetup.GetAPIKey2();
         MCSWebcamArgumentTable."Person Group Id" := PersonGroups.PersonGroupId;
         MCSWebcamArgumentTable."Table Id" := RecRef.Number;
-        //-NPR5.29
-        WebcamArgumentTable."Image Orientation" := CognitivityAPISetup."Image Orientation";
-        //+NPR5.29
 
-        //#-279495 [279495]
-        // WebcamProxy.InitializeProtocol();
-        // WebcamProxy.SetState(MCSWebcamArgumentTable);
-        // ProxyDialog.RunProtocolModal(CODEUNIT::"MCS Webcam Proxy");
-        // WebcamProxy.GetState(MCSWebcamArgumentTable);
+        WebcamArgumentTable."Image Orientation" := CognitivityAPISetup."Image Orientation";
+
         if (POSSession.IsActiveSession(FrontEnd)) then begin
             Clear(WebcamProxyTSD);
-            //-NPR5.35 [276102]
-            //WebcamProxyTSD.SetState(WebcamArgumentTable);
             WebcamProxyTSD.SetState(MCSWebcamArgumentTable);
-            //+NPR5.35 [276102]
             WebcamProxyTSD.InvokeDevice();
             WebcamProxyTSD.GetState(MCSWebcamArgumentTable);
-        end else begin
+        end else
             // TODO: CTRLUPGRADE - Obsolete functionality
             ERROR('CTRLUPGRADE');
-            /*
-            WebcamProxy.InitializeProtocol();
-            WebcamProxy.SetState(MCSWebcamArgumentTable);
-            ProxyDialog.RunProtocolModal(CODEUNIT::"MCS Webcam Proxy");
-            WebcamProxy.GetState(MCSWebcamArgumentTable);
-            */
-        end;
-        //#-279495 [279495]
+
 
         if MCSWebcamArgumentTable."Is Identified" then
             exit(true)

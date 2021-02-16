@@ -47,14 +47,15 @@ pageextension 6014453 "NPR Contact List" extends "Contact List"
                         FacialRecognitionPerson: Codeunit "NPR Create Person";
                         FacialRecognitionPersonFace: Codeunit "NPR Add Person Face";
                         FacialRecognitionTrainPersonGroup: Codeunit "NPR Train Person Group";
-                        ImageMgt: Codeunit "NPR Image Mgt.";
-                        ImageFilePath: Text;
+                        ImageMgt: Codeunit "NPR Face Image Mgt.";
+                        ImageFileStream: InStream;
                         EntryNo: Integer;
                         CalledFrom: Option Contact,Member;
                         NotSetUp: Label 'Facial Recognition is not active. \It can be enabled from the Facial Recognition setup.';
-                        ImgCantBeProcessed: Label 'Media not supported. \Image can''t be processed. \Please use .jpg or .png images .';
                         ConnectionError: Label 'The API can''t be reached. \Please contact your administrator.';
                         NoNameError: Label 'Contact information is not complete. \Action aborted.';
+                        IsError: Boolean;
+                        ErroMessage: Text;
                     begin
                         if not FacialRecognitionSetup.FindFirst() or not FacialRecognitionSetup.Active then begin
                             Message(NotSetUp);
@@ -75,22 +76,18 @@ pageextension 6014453 "NPR Contact List" extends "Contact List"
 
                         FacialRecognitionPerson.CreatePerson(Rec, false);
 
-                        FacialRecognitionDetect.DetectFace(Rec, ImageFilePath, EntryNo, false, CalledFrom::Contact);
-                        case ImageFilePath of
-                            '':
-                                exit;
-                            'WrongExtension':
-                                begin
-                                    Message(ImgCantBeProcessed);
-                                    exit;
-                                end;
+                        FacialRecognitionDetect.DetectFace(Rec, ImageFileStream, EntryNo, false, CalledFrom::Contact, IsError, ErroMessage);
+
+                        if IsError then begin
+                            Message(ErroMessage);
+                            exit;
                         end;
 
-                        if FacialRecognitionPersonFace.AddPersonFace(Rec, ImageFilePath, EntryNo) then begin
+                        if FacialRecognitionPersonFace.AddPersonFace(Rec, ImageFileStream, EntryNo) then begin
                             FacialRecognitionTrainPersonGroup.TrainPersonGroup(Rec, false);
-                            ImageMgt.UpdateRecordImage("No.", CalledFrom::Contact, ImageFilePath);
+                            ImageMgt.UpdateRecordImage("No.", CalledFrom::Contact, ImageFileStream);
                         end else
-                            Message(ImgCantBeProcessed);
+                            Message(ErroMessage);
                     end;
                 }
 

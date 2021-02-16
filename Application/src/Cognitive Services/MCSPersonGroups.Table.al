@@ -1,6 +1,5 @@
 table 6059957 "NPR MCS Person Groups"
 {
-    // NPR5.48/JDH /20181109 CASE 334163 Added Caption to object
 
     Caption = 'MCS Person Groups';
     DataClassification = CustomerContent;
@@ -32,16 +31,11 @@ table 6059957 "NPR MCS Person Groups"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnInsert()
     begin
+        Id := 10000;
         if PersonGroups.FindLast then
-            Id := PersonGroups.Id + 10000
-        else
-            Id := 10000;
+            Id += PersonGroups.Id;
 
         TestField(Name);
     end;

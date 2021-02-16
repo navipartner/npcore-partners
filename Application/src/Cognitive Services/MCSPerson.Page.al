@@ -1,6 +1,5 @@
 page 6059958 "NPR MCS Person"
 {
-    // NPR5.48/JDH /20181109 CASE 334163 Added object caption
 
     Caption = 'MCS Person';
     PageType = List;
@@ -14,37 +13,33 @@ page 6059958 "NPR MCS Person"
         {
             repeater(Group)
             {
-                field(PersonId; PersonId)
+                field(PersonId; Rec.PersonId)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Person Id field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field(UserData; UserData)
+                field(UserData; Rec.UserData)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the User Data field';
                 }
-                field(PersonGroupId; PersonGroupId)
+                field(PersonGroupId; Rec.PersonGroupId)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Person Group Id field';
                 }
-                field(Faces; Faces)
+                field(Faces; Rec.Faces)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Faces field';
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

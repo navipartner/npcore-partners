@@ -262,7 +262,7 @@ page 6060126 "NPR MM Members"
                 Ellipsis = true;
                 Image = NewCustomer;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Create Membership action';
@@ -291,7 +291,7 @@ page 6060126 "NPR MM Members"
                 Caption = 'Register Arrival';
                 Image = Approve;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -329,7 +329,7 @@ page 6060126 "NPR MM Members"
                 Caption = 'Set Client Attribute Filter';
                 Image = "Filter";
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 Visible = NPRAttrVisible01 OR NPRAttrVisible02 OR NPRAttrVisible03 OR NPRAttrVisible04 OR NPRAttrVisible05 OR NPRAttrVisible06 OR NPRAttrVisible07 OR NPRAttrVisible08 OR NPRAttrVisible09 OR NPRAttrVisible10;
@@ -348,99 +348,6 @@ page 6060126 "NPR MM Members"
 
                 end;
             }
-            group("NPR FacialRecognition")
-            {
-                Caption = 'Facial Recognition';
-                Image = PersonInCharge;
-                action("NPR ImportFace")
-                {
-                    Caption = 'Import Face Image';
-                    ApplicationArea = All;
-                    Image = Picture;
-                    ToolTip = 'Executes the Import Face Image action';
-
-                    trigger OnAction()
-                    var
-                        Contact: Record Contact;
-                        FacialRecognitionSetup: Record "NPR Facial Recogn. Setup";
-                        FacialRecognitionDetect: Codeunit "NPR Detect Face";
-                        FacialRecognitionPersonGroup: Codeunit "NPR Create Person Group";
-                        FacialRecognitionPerson: Codeunit "NPR Create Person";
-                        FacialRecognitionPersonFace: Codeunit "NPR Add Person Face";
-                        FacialRecognitionTrainPersonGroup: Codeunit "NPR Train Person Group";
-                        ImageMgt: Codeunit "NPR Image Mgt.";
-                        ImageFilePath: Text;
-                        EntryNo: Integer;
-                        CalledFrom: Option Contact,Member;
-                        NotSetUp: Label 'Facial Recognition is not active. \It can be enabled from the Facial Recognition setup.';
-                        ImgCantBeProcessed: Label 'Media not supported \ \Image can''t be processed. \Please use .jpg or .png images .';
-                        ConnectionError: Label 'The API can''t be reached. \Please contact your administrator.';
-                        NoNameError: Label 'Member information is not complete. \Action aborted.';
-                    begin
-                        if not FacialRecognitionSetup.FindFirst() or not FacialRecognitionSetup.Active then begin
-                            Message(NotSetUp);
-                            exit;
-                        end;
-
-                        if not FacialRecognitionPersonGroup.GetPersonGroups() then begin
-                            Message(ConnectionError);
-                            exit;
-                        end;
-
-                        if not Contact.Get("Contact No.") then
-                            exit;
-
-                        if Contact."Name" = '' then begin
-                            Message(NoNameError);
-                            exit;
-                        end;
-
-                        FacialRecognitionPersonGroup.CreatePersonGroup(Contact, false);
-
-                        FacialRecognitionPerson.CreatePerson(Contact, false);
-
-                        FacialRecognitionDetect.DetectFace(Contact, ImageFilePath, EntryNo, false, CalledFrom::Member);
-                        case ImageFilePath of
-                            '':
-                                exit;
-                            'WrongExtension':
-                                begin
-                                    Message(ImgCantBeProcessed);
-                                    exit;
-                                end;
-                        end;
-
-                        if FacialRecognitionPersonFace.AddPersonFace(Contact, ImageFilePath, EntryNo) then begin
-                            FacialRecognitionTrainPersonGroup.TrainPersonGroup(Contact, false);
-                            ImageMgt.UpdateRecordImage("External Member No.", CalledFrom::Member, ImageFilePath);
-                        end else
-                            Message(ImgCantBeProcessed);
-                    end;
-                }
-
-                action("NPR IdentifyFace")
-                {
-                    Caption = 'Identify Person';
-                    ApplicationArea = All;
-                    Image = AnalysisView;
-                    ToolTip = 'Executes the Identify Person action';
-
-                    trigger OnAction()
-                    var
-                        FacialRecognitionSetup: Record "NPR Facial Recogn. Setup";
-                        FacialRecognitionIdentify: Codeunit "NPR Identify Person";
-                        NotSetUp: Label 'Facial Recognition is not active. \It can be enabled from the Facial Recognition setup.';
-                        CalledFrom: Option Contact,Member;
-                    begin
-                        if not FacialRecognitionSetup.FindFirst() or not FacialRecognitionSetup.Active then begin
-                            Message(NotSetUp);
-                            exit;
-                        end;
-
-                        FacialRecognitionIdentify.IdentifyPersonFace(CalledFrom::Member);
-                    end;
-                }
-            }
         }
         area(navigation)
         {
@@ -450,7 +357,7 @@ page 6060126 "NPR MM Members"
                 Ellipsis = true;
                 Image = ChangeDimensions;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Communication";
@@ -464,7 +371,7 @@ page 6060126 "NPR MM Members"
                 Ellipsis = true;
                 Image = Log;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Arrival Log";
@@ -481,7 +388,7 @@ page 6060126 "NPR MM Members"
                     Enabled = RaptorEnabled;
                     Image = ViewRegisteredOrder;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
                     ApplicationArea = All;
@@ -506,7 +413,7 @@ page 6060126 "NPR MM Members"
                     Enabled = RaptorEnabled;
                     Image = SuggestElectronicDocument;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
                     ApplicationArea = All;
