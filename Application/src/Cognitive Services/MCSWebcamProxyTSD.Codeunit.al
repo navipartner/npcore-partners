@@ -1,14 +1,6 @@
 codeunit 6059958 "NPR MCS Webcam Proxy TSD"
 {
-    // NPR5.29/CLVA/20170125 CASE 264333 Added functionality to support image orientation;
-    // NPR5.33/TSA/20170628  CASE 279495 Adjusted to stargate 2.0
-    // NPR5.52/TILA/20190924CASE 361782DeserializeState function removed
-
     SingleInstance = true;
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         WebcamArgumentTable: Record "NPR MCS Webcam Arg. Table";
@@ -18,14 +10,16 @@ codeunit 6059958 "NPR MCS Webcam Proxy TSD"
         FormClosed: Boolean;
 
     procedure InvokeDevice()
+    var
+        CaptureQst: label 'Click Yes to continue or No to take a new picture.';
     begin
 
         Start();
-        if (not Confirm('Click Yes to continue or No to take a new picture.', true)) then
+        if (not Confirm(CaptureQst, true)) then
             InvokeDevice();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnDeviceResponse', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Stargate Management", 'OnDeviceResponse', '', true, true)]
     local procedure OnDeviceResponse(ActionName: Text; Step: Text; Envelope: DotNet NPRNetResponseEnvelope0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
 
@@ -33,7 +27,7 @@ codeunit 6059958 "NPR MCS Webcam Proxy TSD"
             exit;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnAppGatewayProtocol', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Stargate Management", 'OnAppGatewayProtocol', '', true, true)]
     local procedure OnDeviceEvent(ActionName: Text; EventName: Text; Data: Text; ResponseRequired: Boolean; var ReturnData: Text; var Handled: Boolean)
     begin
 
@@ -49,7 +43,6 @@ codeunit 6059958 "NPR MCS Webcam Proxy TSD"
 
     local procedure Start()
     var
-        VoidResponse: DotNet NPRNetVoidResponse;
         State: DotNet NPRNetState3;
         WebcamCaptureRequest: DotNet NPRNetWebcamCaptureRequest0;
         ActionEnum: DotNet NPRNetState_Action1;
@@ -78,9 +71,7 @@ codeunit 6059958 "NPR MCS Webcam Proxy TSD"
         State.AllowSavingOnIdentifyedFaces := WebcamArgumentTable."Allow Saving On Identifyed";
         State.Person := PersonEntity;
 
-        //-NPR5.29
-        State.OrientationType := WebcamArgumentTable."Image Orientation";
-        //+NPR5.29
+        State.OrientationType := WebcamArgumentTable."Image Orientation".AsInteger();
 
         case WebcamArgumentTable.Action of
             WebcamArgumentTable.Action::CaptureAndIdentifyFaces:
@@ -121,9 +112,7 @@ codeunit 6059958 "NPR MCS Webcam Proxy TSD"
         end;
     end;
 
-    local procedure "--- Protocol Events"()
-    begin
-    end;
+    #region Protocol Events
 
     local procedure CloseForm(Data: Text)
     var
@@ -143,7 +132,6 @@ codeunit 6059958 "NPR MCS Webcam Proxy TSD"
         State := State.Deserialize(Data);
 
         Base64String := State.OutBase64Value;
-        //MESSAGE ('Back with %1', STRLEN (Base64String));
 
         if Base64String <> '' then begin
             PersonEntity := PersonEntity.PersonEntity;
@@ -184,7 +172,6 @@ codeunit 6059958 "NPR MCS Webcam Proxy TSD"
                     end;
                 end;
 
-                //MESSAGE(JsonConvert.SerializeObject(State.Faces));
                 FaceEntity := FaceEntity.FaceEntity;
 
                 foreach FaceEntity in State.Faces do begin
@@ -221,34 +208,23 @@ codeunit 6059958 "NPR MCS Webcam Proxy TSD"
 
         FormClosed := true;
     end;
-
-    local procedure "--- Protocol Event Handling"()
-    begin
-    end;
-
+    #endregion
+    #region Protocol Event Handling
     local procedure SerializeJson("Object": Variant): Text
     var
         JsonConvert: DotNet JsonConvert;
     begin
         exit(JsonConvert.SerializeObject(Object));
     end;
-
-    local procedure "-- Set Functions"()
-    begin
-    end;
+    #endregion
+    #region Set Functions
 
     procedure SetState(var WebcamArgumentTableIn: Record "NPR MCS Webcam Arg. Table")
     begin
         WebcamArgumentTable := WebcamArgumentTableIn;
     end;
-
-    local procedure "-- Get Functions"()
-    begin
-    end;
-
-    procedure GetStatus(): Integer
-    begin
-    end;
+    #endregion
+    #region Get Functions
 
     procedure GetState(var WebcamArgumentTableOut: Record "NPR MCS Webcam Arg. Table")
     begin
@@ -259,5 +235,6 @@ codeunit 6059958 "NPR MCS Webcam Proxy TSD"
     begin
         exit(Base64String);
     end;
+    #endregion
 }
 

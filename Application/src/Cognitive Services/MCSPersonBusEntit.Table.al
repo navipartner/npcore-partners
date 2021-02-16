@@ -1,6 +1,5 @@
 table 6059961 "NPR MCS Person Bus. Entit."
 {
-    // NPR5.48/JAVA/20190205  CASE 334163 Transport NPR5.48 - 5 February 2019
 
     Caption = 'MCS Person Business Entities';
     DataClassification = CustomerContent;
@@ -33,10 +32,6 @@ table 6059961 "NPR MCS Person Bus. Entit."
         key(Key2; "Key")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 
