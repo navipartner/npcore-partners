@@ -1,12 +1,10 @@
 table 6150729 "NPR POS Sales Workflow"
 {
-    // NPR5.39/MHA /20180202  CASE 302779 Object created - POS Workflow
-    // NPR5.45/MHA /20180820  CASE 321266 Updated Calcformula of field 100 "Workflow Steps"
 
     Caption = 'POS Sales Workflow';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR POS Sales Workflows";
-    LookupPageID = "NPR POS Sales Workflows";
+    DrillDownPageID = "NPR POS Scenarios";
+    LookupPageID = "NPR POS Scenarios";
 
     fields
     {

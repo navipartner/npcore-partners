@@ -97,13 +97,13 @@ page 6151245 "NPR Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS View List action';
                 }
-                action("POS Sales Workflows")
+                action("POS Scenarios")
                 {
-                    Caption = 'POS Sales Workflows';
+                    Caption = 'POS Scenarios';
                     Image = Allocate;
-                    RunObject = Page "NPR POS Sales Workflows";
+                    RunObject = Page "NPR POS Scenarios";
                     ApplicationArea = All;
-                    ToolTip = 'Executes the POS Sales Workflows action';
+                    ToolTip = 'Executes the POS Scenarios action';
                 }
                 action("POS Store List")
                 {
@@ -149,19 +149,12 @@ page 6151245 "NPR Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Display Setup action';
                 }
-                action(Action6014418)
+                action("POS Scenarios Sets")
                 {
-                    Caption = 'POS Sales Workflows';
-                    RunObject = Page "NPR POS Sales Workflows";
+                    Caption = 'POS Scenarios Sets';
+                    RunObject = Page "NPR POS Scenarios Sets";
                     ApplicationArea = All;
-                    ToolTip = 'Executes the POS Sales Workflows action';
-                }
-                action("POS Sales Workflow Sets")
-                {
-                    Caption = 'POS Sales Workflow Sets';
-                    RunObject = Page "NPR POS Sales Workflow Sets";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the POS Sales Workflow Sets action';
+                    ToolTip = 'Executes the POS Scenarios Sets action';
                 }
                 action("Ean Box Events")
                 {

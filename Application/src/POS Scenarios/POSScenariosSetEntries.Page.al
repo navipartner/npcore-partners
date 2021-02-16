@@ -1,8 +1,7 @@
-page 6150734 "NPR POS Sales WF Set Entries"
+page 6150734 "NPR POS Scenarios Set Entries"
 {
-    // NPR5.45/MHA /20180820  CASE 321266 Object created
 
-    Caption = 'POS Sales Workflows';
+    Caption = 'POS Scenarios set entries';
     PageType = ListPart;
     UsageCategory = Administration;
     ApplicationArea = All;
@@ -38,15 +37,15 @@ page 6150734 "NPR POS Sales WF Set Entries"
     {
         area(processing)
         {
-            action("Workflow Steps")
+            action("POS Scenarios Steps")
             {
-                Caption = 'Workflow Steps';
+                Caption = 'POS Scenarios Steps';
                 Image = List;
                 Promoted = true;
 				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                RunObject = Page "NPR POS Sales WF Steps";
+                RunObject = Page "NPR POS Scenarios Steps";
                 RunPageLink = "Set Code" = FIELD("Set Code"),
                               "Workflow Code" = FIELD("Workflow Code");
                 ApplicationArea = All;
