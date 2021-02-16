@@ -2,6 +2,9 @@ table 6151081 "NPR ExRv Voucher"
 {
     Caption = 'External Retail Voucher';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed; 
+    ObsoleteReason = 'Table not used anymore';
+    ObsoleteTag = 'Depcrecating 16/02/2021';
 
     fields
     {
@@ -10,7 +13,6 @@ table 6151081 "NPR ExRv Voucher"
             Caption = 'Voucher Type';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = "NPR ExRv Voucher Type";
         }
         field(5; "No."; Code[20])
         {

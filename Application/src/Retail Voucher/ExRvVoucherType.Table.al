@@ -2,6 +2,9 @@ table 6151080 "NPR ExRv Voucher Type"
 {
     Caption = 'External Retail Voucher Type';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed; 
+    ObsoleteReason = 'Table not used anymore';
+    ObsoleteTag = 'Depcrecating 16/02/2021';
     fields
     {
         field(1; "Code"; Code[20])
@@ -84,8 +87,6 @@ table 6151080 "NPR ExRv Voucher Type"
         }
         field(1000; Amount; Decimal)
         {
-            CalcFormula = Sum("NPR ExRv Voucher".Amount WHERE("Voucher Type" = FIELD(Code),
-                                                           "Posting Date" = FIELD("Date Filter")));
             Caption = 'Amount';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -93,8 +94,6 @@ table 6151080 "NPR ExRv Voucher Type"
         }
         field(1005; "Remaining Amount"; Decimal)
         {
-            CalcFormula = Sum("NPR ExRv Voucher"."Remaining Amount" WHERE("Voucher Type" = FIELD(Code),
-                                                                       "Posting Date" = FIELD("Date Filter")));
             Caption = 'Remaining Amount';
             DecimalPlaces = 0 : 5;
             Editable = false;
