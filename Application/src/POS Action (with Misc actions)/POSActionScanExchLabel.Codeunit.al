@@ -205,6 +205,7 @@ codeunit 6150830 "NPR POS Action: ScanExchLabel"
         ExchangeLabel: Record "NPR Exchange Label";
         IComm: Record "NPR I-Comm";
         RetailConfiguration: Record "NPR Retail Setup";
+        SMSSetup: Record "NPR SMS Setup";
         ExchangeLabelManagement: Codeunit "NPR Exchange Label Mgt.";
     begin
         //-NPR5.45 [319706]
@@ -226,11 +227,9 @@ codeunit 6150830 "NPR POS Action: ScanExchLabel"
 
         if not RetailConfiguration."Use I-Comm" then
             exit(false);
-        if not IComm.Get then
+        if not (IComm.Get) and not (SMSSetup.Get()) then
             exit(false);
         if IComm."Exchange Label Center Company" = '' then
-            exit(false);
-        if ExchangeLabel.ChangeCompany(IComm."Company - Clearing") then
             exit(false);
 
         ExchangeLabel.SetRange(Barcode, Barcode);

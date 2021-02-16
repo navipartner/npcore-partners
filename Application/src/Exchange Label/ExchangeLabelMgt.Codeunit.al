@@ -213,7 +213,6 @@ codeunit 6014498 "NPR Exchange Label Mgt."
     procedure ScanExchangeLabel(var SalePOS: Record "NPR Sale POS"; var Validering: Code[20]; var CopyValidering: Code[20]) Found: Boolean
     var
         ExchangeLabel: Record "NPR Exchange Label";
-        IComm: Record "NPR I-Comm";
         Item: Record Item;
         RetailConfiguration: Record "NPR Retail Setup";
         SaleLinePOS: Record "NPR Sale Line POS";
@@ -225,11 +224,6 @@ codeunit 6014498 "NPR Exchange Label Mgt."
         if CheckPrefix(CopyValidering, RetailConfiguration."EAN Prefix Exhange Label") then begin
             ExchangeLabel.SetCurrentKey(Barcode);
             ExchangeLabel.SetRange(Barcode, CopyValidering);
-
-            if not ExchangeLabel.FindFirst and RetailConfiguration."Use I-Comm" and IComm.Get
-              and (IComm."Exchange Label Center Company" <> '') then begin
-                ExchangeLabel.ChangeCompany(IComm."Company - Clearing");
-            end;
 
             if ExchangeLabel.FindFirst then begin
                 if ExchangeLabel."Packaged Batch" then begin
