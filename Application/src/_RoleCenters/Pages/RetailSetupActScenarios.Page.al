@@ -13,10 +13,10 @@ page 6151247 "NPR Setup Act - Scenarios"
             cuegroup("POS Scenarios")
             {
                 Caption = 'Pos Scenarios';
-                field("NPR POS Sales Scenarios"; Rec."NPR POS Sales Workflow")
+                field("NPR POS Scenarios"; Rec."NPR POS Sales Workflow")
                 {
                     ApplicationArea = All;
-                    Caption = 'POS Sales Scenarios';
+                    Caption = 'POS Scenarios';
                     ShowCaption = true;
                     ToolTip = 'Specifies the value of the POS Sales Scenarios field';
                 }

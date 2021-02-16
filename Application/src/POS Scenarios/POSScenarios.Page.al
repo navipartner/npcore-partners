@@ -1,9 +1,7 @@
-page 6150729 "NPR POS Sales Workflows"
+page 6150729 "NPR POS Scenarios"
 {
-    // NPR5.39/MHA /20180202  CASE 302779 Object created - POS Workflow
-    // NPR5.45/MHA /20180820  CASE 321266 Update Link on Action "Workflow Steps" to consider new Primary Key
 
-    Caption = 'POS Sales Workflows';
+    Caption = 'POS Scenarios';
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
@@ -56,15 +54,15 @@ page 6150729 "NPR POS Sales Workflows"
     {
         area(navigation)
         {
-            action("Workflow Steps")
+            action("POS Scenario Steps")
             {
-                Caption = 'Workflow Steps';
+                Caption = 'POS Scenario Steps';
                 Image = List;
                 Promoted = true;
 				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                RunObject = Page "NPR POS Sales WF Steps";
+                RunObject = Page "NPR POS Scenarios Steps";
                 RunPageLink = "Set Code" = CONST(''),
                               "Workflow Code" = FIELD(Code);
                 ApplicationArea = All;

@@ -1,7 +1,5 @@
 page 6151054 "NPR POS Paym. View Event Setup"
 {
-    // NPR5.51/MHA /20190723  CASE 351688 Object created
-    // NPR5.51/MHA /20190823  CASE 359601 Added field 80 "Skip Popup on Dimension Value"
 
     Caption = 'POS Payment View Event Setup';
     PageType = Card;
@@ -76,13 +74,13 @@ page 6151054 "NPR POS Paym. View Event Setup"
                 ApplicationArea = All;
                 ToolTip = 'Executes the POS Payment View Log Entries action';
             }
-            action("POS Sales Workflows")
+            action("POS Scenarios")
             {
-                Caption = 'POS Sales Workflows';
+                Caption = 'POS Scenarios';
                 Image = Setup;
-                RunObject = Page "NPR POS Sales Workflows";
+                RunObject = Page "NPR POS Scenarios";
                 ApplicationArea = All;
-                ToolTip = 'Executes the POS Sales Workflows action';
+                ToolTip = 'Executes the POS Scenarios action';
             }
         }
     }

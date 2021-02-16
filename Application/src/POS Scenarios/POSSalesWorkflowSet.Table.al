@@ -1,11 +1,10 @@
 table 6150731 "NPR POS Sales Workflow Set"
 {
-    // NPR5.45/MHA /20180820  CASE 321266 Object created
 
     Caption = 'POS Sales Workflow Set';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR POS Sales Workflow Sets";
-    LookupPageID = "NPR POS Sales Workflow Sets";
+    DrillDownPageID = "NPR POS Scenarios Sets";
+    LookupPageID = "NPR POS Scenarios Sets";
 
     fields
     {
