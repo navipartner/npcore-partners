@@ -116,14 +116,12 @@ table 6059811 "NPR Retail Sales Cue"
         {
             Caption = 'Gift Vouchers';
             FieldClass = FlowField;
-            CalcFormula = Count("NPR Gift Voucher");
             Editable = false;
         }
         field(104; "Credit Vouchers"; Integer)
         {
             Caption = 'Credit Vouchers';
             FieldClass = FlowField;
-            CalcFormula = Count("NPR Credit Voucher");
             Editable = false;
         }
         field(105; "Task List"; Integer)
