@@ -749,18 +749,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 ToolTip = 'Executes the POS Sales Entries action';
             }
         }
-        addafter("Return Orders")
-        {
-            action("NPR NPR_RecommendedItems")
-            {
-                Caption = 'Recommended Items';
-                Image = SuggestLines;
-                RunObject = Page "NPR MCS Recomm. Lines";
-                RunPageLink = "Seed Item No." = field("No."), "Table No." = const(27);
-                ApplicationArea = All;
-                ToolTip = 'Executes the Recommended Items action';
-            }
-        }
 
         addafter("Item Journal")
         {
