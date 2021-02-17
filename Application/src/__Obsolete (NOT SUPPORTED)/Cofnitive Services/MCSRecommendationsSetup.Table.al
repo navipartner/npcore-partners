@@ -1,6 +1,5 @@
 table 6060080 "NPR MCS Recommendations Setup"
 {
-    // NPR5.30/BR  /20170215  CASE 252646 Object Created
     ObsoleteState = Pending;
     ObsoleteReason = 'On February 15, 2018, “Recommendations API is no longer under active development”';
     Caption = 'MCS Recommendations Setup';
@@ -24,7 +23,6 @@ table 6060080 "NPR MCS Recommendations Setup"
         {
             Caption = 'Online Recommendations Model';
             DataClassification = CustomerContent;
-            TableRelation = "NPR MCS Recomm. Model" WHERE(Enabled = CONST(true));
         }
         field(30; "Background Send POS Lines"; Boolean)
         {
@@ -50,10 +48,6 @@ table 6060080 "NPR MCS Recommendations Setup"
         key(Key1; "Primary Key")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 
