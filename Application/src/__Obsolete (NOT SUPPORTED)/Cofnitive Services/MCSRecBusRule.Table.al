@@ -1,12 +1,9 @@
 table 6060082 "NPR MCS Rec. Bus. Rule"
 {
-    // NPR5.30/BR  /20170220  CASE 252646 Object Created
     ObsoleteState = Pending;
     ObsoleteReason = 'On February 15, 2018, “Recommendations API is no longer under active development”';
     Caption = 'MCS Rec. Business Rule';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR MCS Rec. Business Rules";
-    LookupPageID = "NPR MCS Rec. Business Rules";
 
     fields
     {
@@ -14,7 +11,6 @@ table 6060082 "NPR MCS Rec. Bus. Rule"
         {
             Caption = 'Model No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR MCS Recomm. Model";
         }
         field(20; "Rule No."; Integer)
         {
@@ -55,14 +51,6 @@ table 6060082 "NPR MCS Rec. Bus. Rule"
             Caption = 'Block Seed Item No.';
             DataClassification = CustomerContent;
             TableRelation = Item."No.";
-
-            trigger OnValidate()
-            begin
-                if "Block Seed Item No." <> '' then begin
-                    TestField(Type, Type::Item);
-                    TestField("Rule Type", "Rule Type"::Block);
-                end;
-            end;
         }
         field(100; "Last Sent Date Time"; DateTime)
         {
@@ -78,16 +66,5 @@ table 6060082 "NPR MCS Rec. Bus. Rule"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
-
-    trigger OnModify()
-    begin
-        if (Type <> Type::Item) or
-           ("Rule Type" <> "Rule Type"::Block) then
-            "Block Seed Item No." := '';
-    end;
 }
 

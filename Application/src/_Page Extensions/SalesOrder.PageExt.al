@@ -80,22 +80,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 ApplicationArea = All;
             }
         }
-        addafter(WorkflowStatus)
-        {
-            part("NPR MCS Recom. Sales Factbox"; "NPR MCS Recom. Sales Factbox")
-            {
-                Caption = 'Recommendations';
-                Provider = SalesLines;
-                SubPageLink = "Document No." = FIELD("Document No."),
-                              "Document Line No." = FIELD("Line No.");
-                SubPageView = SORTING("Table No.", "Document Type", "Document No.", "Document Line No.", Rating)
-                              ORDER(Ascending)
-                              WHERE("Table No." = CONST(37),
-                                    "Document Type" = CONST(1));
-                UpdatePropagation = Both;
-                ApplicationArea = All;
-            }
-        }
     }
     actions
     {
@@ -139,7 +123,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 Caption = 'Import From Scanner';
                 Image = Import;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Import From Scanner action';
             }
@@ -191,7 +175,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 Caption = 'Post and Pdf2Nav';
                 Image = PostSendTo;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Post and handle as set up in ''Document Processing''';
@@ -205,7 +189,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 Caption = 'Consignor Label';
                 ApplicationArea = All;
                 ToolTip = 'Executes the Consignor Label action';
-                Image = Print; 
+                Image = Print;
             }
             action("NPR PrintShippingLabel")
             {
@@ -252,7 +236,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                     ShortCutKey = 'Ctrl+Alt+V';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Variety action';
-                    Image = Edit; 
+                    Image = Edit;
 
                     trigger OnAction()
                     var

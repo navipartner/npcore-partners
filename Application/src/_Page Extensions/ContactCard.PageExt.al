@@ -48,14 +48,6 @@ pageextension 6014452 "NPR Contact Card" extends "Contact Card"
                 }
             }
         }
-        addfirst(FactBoxes)
-        {
-            part("NPR PersonStatistics"; "NPR Person Statistics")
-            {
-                Caption = 'Facial Recognition';
-                ApplicationArea = All;
-            }
-        }
     }
     actions
     {
@@ -94,83 +86,6 @@ pageextension 6014452 "NPR Contact Card" extends "Contact Card"
                 }
             }
         }
-        addfirst(Processing)
-        {
-            group("NPR FacialRecognition")
-            {
-                Caption = 'Facial Recognition';
-                Image = PersonInCharge;
-                action("NPR ImportFace")
-                {
-                    Caption = 'Import Face Image';
-                    ApplicationArea = All;
-                    Image = Picture;
-                    ToolTip = 'Executes the Import Face Image action';
-
-                    trigger OnAction()
-                    var
-                        FacialRecognitionSetup: Record "NPR Facial Recogn. Setup";
-                        FacialRecognitionDetect: Codeunit "NPR Detect Face";
-                        FacialRecognitionPersonGroup: Codeunit "NPR Create Person Group";
-                        FacialRecognitionPerson: Codeunit "NPR Create Person";
-                        FacialRecognitionPersonFace: Codeunit "NPR Add Person Face";
-                        FacialRecognitionTrainPersonGroup: Codeunit "NPR Train Person Group";
-                        ImageMgt: Codeunit "NPR Face Image Mgt.";
-                        ImageFileStream: InStream;
-                        EntryNo: Integer;
-                        CalledFrom: Option Contact,Member;
-                        NotSetUp: Label 'Facial Recognition is not active. \It can be enabled from the Facial Recognition setup.';
-                        ConnectionError: Label 'The API can''t be reached. \Please contact your administrator.';
-                        NoNameError: Label 'Contact information is not complete. \Action aborted.';
-                        IsError: Boolean;
-                        ErrorMessage: Text;
-                    begin
-                        if not FacialRecognitionSetup.FindFirst() or not FacialRecognitionSetup.Active then begin
-                            Message(NotSetUp);
-                            exit;
-                        end;
-
-                        if not FacialRecognitionPersonGroup.GetPersonGroups() then begin
-                            Message(ConnectionError);
-                            exit;
-                        end;
-
-                        if Rec."Name" = '' then begin
-                            Message(NoNameError);
-                            exit;
-                        end;
-
-                        FacialRecognitionPersonGroup.CreatePersonGroup(Rec, false);
-
-                        FacialRecognitionPerson.CreatePerson(Rec, false);
-
-                        FacialRecognitionDetect.DetectFace(Rec, ImageFileStream, EntryNo, false, CalledFrom::Contact, IsError, ErrorMessage);
-
-                        if IsError then begin
-                            Message(ErrorMessage);
-                            exit;
-                        end;
-
-                        if FacialRecognitionPersonFace.AddPersonFace(Rec, ImageFileStream, EntryNo) then begin
-                            FacialRecognitionTrainPersonGroup.TrainPersonGroup(Rec, false);
-                            ImageMgt.UpdateRecordImage("No.", CalledFrom::Contact, ImageFileStream);
-                        end else
-                            Message(ErrorMessage);
-                    end;
-                }
-            }
-        }
     }
-
-    trigger OnAfterGetRecord()
-    var
-        FacialRecognition: Record "NPR Facial Recognition";
-    begin
-        FacialRecognition.SetRange("Contact No.", "No.");
-        if FacialRecognition.FindLast() then
-            CurrPage."NPR PersonStatistics".Page.SetValues(FacialRecognition.Age, FacialRecognition.Gender)
-        else
-            CurrPage."NPR PersonStatistics".Page.ResetValues();
-    end;
 }
 

@@ -326,20 +326,6 @@ pageextension 6014433 "NPR Item List" extends "Item List"
             }
         }
 
-        addafter("Returns Orders")
-        {
-            action("NPR Recommended Items")
-            {
-                Caption = 'Recommended Items';
-                Image = SuggestLines;
-                RunObject = Page "NPR MCS Recomm. Lines";
-                RunPageLink = "Seed Item No." = FIELD("No."),
-                                  "Table No." = CONST(27);
-                ApplicationArea = All;
-                ToolTip = 'Executes the Recommended Items action';
-            }
-        }
-
         addafter("Adjust Cost - Item Entries")
         {
             action("NPR NPR_SearchItem")

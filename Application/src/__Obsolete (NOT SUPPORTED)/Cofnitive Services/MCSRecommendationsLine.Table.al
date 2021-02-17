@@ -1,12 +1,9 @@
 table 6060084 "NPR MCS Recommendations Line"
 {
-    // NPR5.30/BR  /20170220  CASE 252646 Object Created
     ObsoleteState = Pending;
     ObsoleteReason = 'On February 15, 2018, “Recommendations API is no longer under active development”';
     Caption = 'MCS Recommendations Line';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR MCS Recomm. Lines";
-    LookupPageID = "NPR MCS Recomm. Lines";
 
     fields
     {
@@ -20,7 +17,6 @@ table 6060084 "NPR MCS Recommendations Line"
         {
             Caption = 'Model No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR MCS Recomm. Model";
         }
         field(30; "Log Entry No."; Integer)
         {
@@ -106,33 +102,5 @@ table 6060084 "NPR MCS Recommendations Line"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
-
-    procedure LogSelectRecommendedItem()
-    var
-        MCSRecommendationsLog: Record "NPR MCS Recommendations Log";
-    begin
-        MCSRecommendationsLog.Init;
-        MCSRecommendationsLog."Entry No." := 0;
-        MCSRecommendationsLog.Type := MCSRecommendationsLog.Type::SelectRecommendation;
-        MCSRecommendationsLog."Start Date Time" := CurrentDateTime;
-        MCSRecommendationsLog."End Date Time" := CurrentDateTime;
-        MCSRecommendationsLog.Success := true;
-        MCSRecommendationsLog."Model No." := "Model No.";
-        MCSRecommendationsLog."Seed Item No." := "Seed Item No.";
-        MCSRecommendationsLog."Selected Item" := "Item No.";
-        MCSRecommendationsLog."Selected Rating" := Rating;
-        MCSRecommendationsLog."Table No." := "Table No.";
-        MCSRecommendationsLog."Document Type" := "Document Type";
-        MCSRecommendationsLog."Document No." := "Document No.";
-        MCSRecommendationsLog."Document Line No." := "Document Line No.";
-        MCSRecommendationsLog."Register No." := "Register No.";
-        MCSRecommendationsLog."Customer No." := "Customer No.";
-        MCSRecommendationsLog."Document Date" := "Document Date";
-        MCSRecommendationsLog.Insert(true);
-    end;
 }
 

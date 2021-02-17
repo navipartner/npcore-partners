@@ -1,12 +1,9 @@
 table 6060083 "NPR MCS Recommendations Log"
 {
-    // NPR5.30/BR  /20170220  CASE 252646 Object Created
     ObsoleteState = Pending;
     ObsoleteReason = 'On February 15, 2018, “Recommendations API is no longer under active development”';
     Caption = 'MCS Recommendations Log';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR MCS Recommendations Log";
-    LookupPageID = "NPR MCS Recommendations Log";
 
     fields
     {
@@ -48,7 +45,6 @@ table 6060083 "NPR MCS Recommendations Log"
         {
             Caption = 'Model No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR MCS Recomm. Model";
         }
         field(110; "Seed Item No."; Code[20])
         {
@@ -110,10 +106,6 @@ table 6060083 "NPR MCS Recommendations Log"
         key(Key1; "Entry No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 
