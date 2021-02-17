@@ -38,7 +38,7 @@ table 6059896 "NPR Data Log Subscriber"
             TableRelation = Company;
             DataClassification = CustomerContent;
         }
-        field(5; "Table Name"; Text[30])
+        field(5; "Table Name"; Text[250])
         {
             CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
                                                                            "Object ID" = FIELD("Table ID")));
@@ -63,7 +63,7 @@ table 6059896 "NPR Data Log Subscriber"
             Description = 'DL1.01';
             DataClassification = CustomerContent;
         }
-        field(115; "Data Processing Codeunit Name"; Text[30])
+        field(115; "Data Processing Codeunit Name"; Text[250])
         {
             CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Codeunit),
                                                                            "Object ID" = FIELD("Data Processing Codeunit ID")));
