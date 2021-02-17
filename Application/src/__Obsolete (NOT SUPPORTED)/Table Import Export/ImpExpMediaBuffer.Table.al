@@ -8,6 +8,7 @@ table 6014450 "NPR Imp. Exp. Media Buffer"
     {
         field(1; "Primary Key"; Integer)
         {
+            AutoIncrement = true;
             Caption = 'Primary Key';
             DataClassification = CustomerContent;
         }
