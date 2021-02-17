@@ -3,6 +3,11 @@
     "description": "These rules must be respected by all the AL code written within the company.",
     "rules": [
         {
+            "id": "AA0072",
+            "action":"Hidden",
+            "justification": "The name of variables and parameters must be suffixed with the type or object name."
+        },
+        {
             "id": "AS0018",
             "action":"Hidden",
             "justification": "A procedure belonging to the public API should not be removed."
@@ -122,6 +127,11 @@
             "action":"Hidden",
             "justification": "It is not allowed to delete a value from an enum."
         },
+        {
+            "id": "AS0086",
+            "action":"Hidden",
+            "justification": "Fields must not increase in length."
+        },        
         {
             "id": "AS0088",
             "action":"Hidden",
