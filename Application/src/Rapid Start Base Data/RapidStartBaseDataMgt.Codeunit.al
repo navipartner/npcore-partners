@@ -1,5 +1,40 @@
 codeunit 6014594 "NPR RapidStart Base Data Mgt."
 {
+    EventSubscriberInstance = Manual;
+    [EventSubscriber(ObjectType::Table, Database::"Config. Package Table", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure OnBeforeInsertConfigPackageTable(RunTrigger: Boolean; var Rec: Record "Config. Package Table")
+    begin
+        if (not TableObjectExists(Rec."Table ID")) then begin
+            PreprocessNonExistingTable(Rec."Table ID", Rec."Package Code");
+        end;
+    end;
+
+    local procedure TableObjectExists(TableID: Integer): Boolean
+    var
+        tableMetadata: Record "Table Metadata";
+        configXmlExc: Codeunit "Config. XML Exchange";
+    begin
+        exit(configXmlExc.TableObjectExists(TableID));
+    end;
+
+    local procedure PreprocessNonExistingTable(TableId: Integer; PackageCode: Code[20])
+    var
+        ConfigPackageField: Record "Config. Package Field";
+        Field: Record Field;
+        FCounter: Integer;
+    begin
+        Field.SetRange(TableNo, TableId);
+        if Field.FindSet() then begin
+            repeat
+                ConfigPackageField.Init();
+                ConfigPackageField."Package Code" := PackageCode;
+                ConfigPackageField."Table ID" := Field.TableNo;
+                ConfigPackageField."Field ID" := Field."No.";
+                if not ConfigPackageField.insert then;
+            until Field.Next() = 0;
+        end;
+    end;
+
     procedure GetAllPackagesInBlobStorage(URL: Text; var Packages: List of [Text])
     var
         httpClient: HttpClient;
