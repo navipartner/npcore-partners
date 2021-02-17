@@ -37,6 +37,11 @@
       "id": "51104d36-8375-4914-9e14-ee07a10ff455",
       "name": "NP Retail Tests",
       "publisher": "NaviPartner"
+    },
+    {
+      "id": "f15dfd3b-4489-4616-923f-9e5902395f40",
+      "name": "NP OIOUBL extension",
+      "publisher": "NaviPartner"
     }
   ],
   "contextSensitiveHelpUrl": "https://support.navipartner.com/",
