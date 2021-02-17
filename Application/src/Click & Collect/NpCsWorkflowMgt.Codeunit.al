@@ -11,38 +11,24 @@ codeunit 6151196 "NPR NpCs Workflow Mgt."
         RunWorkflowStep: Codeunit "NPR NpCs Run Workflow Step";
         WorkflowFunctionType: Option " ","Send Order","Order Status","Post Processing","Send Notification to Store","Send Notification to Customer";
 
-    //--- Init ---
-
     [IntegrationEvent(false, false)]
     procedure OnInitWorkflowModules(var NpCsWorkflowModule: Record "NPR NpCs Workflow Module")
     begin
     end;
 
-    local procedure "--- Run"()
-    begin
-    end;
-
     procedure ScheduleRunWorkflow(var NpCsDocument: Record "NPR NpCs Document")
-    var
-        NewSessionId: Integer;
     begin
         TASKSCHEDULER.CreateTask(CurrCodeunitId(), 0, true, CompanyName, CurrentDateTime, NpCsDocument.RecordId);
-        SESSION.StartSession(NewSessionId, CurrCodeunitId(), CompanyName, NpCsDocument);
     end;
 
     procedure ScheduleRunWorkflowDelay(var NpCsDocument: Record "NPR NpCs Document"; DelayMS: Integer)
-    var
-        NewSessionId: Integer;
     begin
-        //-NPR10.00.00.NPR5.54 [390590]
-        //TASKSCHEDULER.CREATETASK(CurrCodeunitId(),0,TRUE,COMPANYNAME,CURRENTDATETIME + DelayMS,NpCsDocument.RECORDID);
-        //+NPR10.00.00.NPR5.54 [390590]
+        TASKSCHEDULER.CREATETASK(CurrCodeunitId(), 0, TRUE, COMPANYNAME, CURRENTDATETIME + DelayMS, NpCsDocument.RECORDID);
     end;
 
     local procedure RunWorkflow(var NpCsDocument: Record "NPR NpCs Document")
     var
         NpCsArchCollectMgt: Codeunit "NPR NpCs Arch. Collect Mgt.";
-        PrevWorkflowStep: Integer;
     begin
         if NpCsDocument.Type = NpCsDocument.Type::"Collect in Store" then begin
             if IsReadyForArchivation(NpCsDocument) then
@@ -51,22 +37,15 @@ codeunit 6151196 "NPR NpCs Workflow Mgt."
             exit;
         end;
 
-        if not NpCsDocument.Find then
+        if not NpCsDocument.Find() then
             exit;
-        PrevWorkflowStep := NpCsDocument."Next Workflow Step";
         case NpCsDocument."Next Workflow Step" of
             NpCsDocument."Next Workflow Step"::"Send Order":
-                begin
-                    RunWorkflowSendOrder(NpCsDocument);
-                end;
+                RunWorkflowSendOrder(NpCsDocument);
             NpCsDocument."Next Workflow Step"::"Order Status":
-                begin
-                    RunWorkflowOrderStatus(NpCsDocument);
-                end;
+                RunWorkflowOrderStatus(NpCsDocument);
             NpCsDocument."Next Workflow Step"::"Post Processing":
-                begin
-                    RunWorkflowPostProcessing(NpCsDocument);
-                end;
+                RunWorkflowPostProcessing(NpCsDocument);
         end;
     end;
 
@@ -115,7 +94,6 @@ codeunit 6151196 "NPR NpCs Workflow Mgt."
     procedure RunWorkflowPostProcessing(var NpCsDocument: Record "NPR NpCs Document")
     var
         NpCsWorkflowModule: Record "NPR NpCs Workflow Module";
-        LogMessage: Text;
         LastErrorText: Text;
     begin
         if NpCsDocument.Type <> NpCsDocument.Type::"Send to Store" then
@@ -142,7 +120,6 @@ codeunit 6151196 "NPR NpCs Workflow Mgt."
     procedure SendNotificationToStore(NpCsDocument: Record "NPR NpCs Document")
     var
         NpCsWorkflowModule: Record "NPR NpCs Workflow Module";
-        LogMessage: Text;
     begin
         Commit();
         ClearLastError();
@@ -166,26 +143,21 @@ codeunit 6151196 "NPR NpCs Workflow Mgt."
     procedure SendNotificationToCustomer(NpCsDocument: Record "NPR NpCs Document")
     var
         NpCsWorkflowModule: Record "NPR NpCs Workflow Module";
-        LastErrorText: Text;
     begin
         case NpCsDocument.Type of
             NpCsDocument.Type::"Send to Store":
-                begin
-                    if NpCsDocument."Send Notification from Store" then
-                        exit;
-                end;
+                if NpCsDocument."Send Notification from Store" then
+                    exit;
             NpCsDocument.Type::"Collect in Store":
-                begin
-                    if not NpCsDocument."Send Notification from Store" then
-                        exit;
-                end;
+                if not NpCsDocument."Send Notification from Store" then
+                    exit;
         end;
 
         NpCsDocument.CalcFields("Order Status Module");
-        NpCsWorkflowModule.Init;
+        NpCsWorkflowModule.Init();
         NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Order Status";
         NpCsWorkflowModule.Code := NpCsDocument."Order Status Module";
-        if NpCsWorkflowModule.Find then;
+        if NpCsWorkflowModule.Find() then;
 
         Commit();
         ClearLastError();
@@ -243,7 +215,7 @@ codeunit 6151196 "NPR NpCs Workflow Mgt."
         if NpCsStore."Service Url" = '' then
             exit;
 
-        if not NpCsDocument.Find then begin
+        if not NpCsDocument.Find() then begin
             NpCsArchDocument.SetRange(Type, NpCsDocument.Type);
             case NpCsDocument.Type of
                 NpCsDocument.Type::"Send to Store":
@@ -258,7 +230,7 @@ codeunit 6151196 "NPR NpCs Workflow Mgt."
                     end;
             end;
             NpCsArchDocument.SetRange("From Store Code", NpCsDocument."From Store Code");
-            if not NpCsArchDocument.FindLast then
+            if not NpCsArchDocument.FindLast() then
                 exit;
             if not NpCsArchDocument."Callback Data".HasValue then
                 exit;
@@ -283,9 +255,9 @@ codeunit 6151196 "NPR NpCs Workflow Mgt."
 
         Document.SelectNodes('//headers/header', NodeList);
         foreach Node in NodeList do begin
-            AttributeCollection := Node.AsXmlElement.Attributes();
+            AttributeCollection := Node.AsXmlElement().Attributes();
             AttributeCollection.Get('name', Attribute);
-            Headers.Add(Attribute.Value, Node.AsXmlElement.InnerText);
+            Headers.Add(Attribute.Value, Node.AsXmlElement().InnerText);
         end;
 
         RequestMessage.Content(Content);
@@ -296,10 +268,9 @@ codeunit 6151196 "NPR NpCs Workflow Mgt."
 
         if not Response.IsSuccessStatusCode then begin
             ExceptionMessage := Response.ReasonPhrase;
-            if XmlDocument.ReadFrom(ExceptionMessage, Document) then begin
+            if XmlDocument.ReadFrom(ExceptionMessage, Document) then
                 if NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//faultstring', Node) then
-                    ExceptionMessage := Node.AsXmlElement.InnerText();
-            end;
+                    ExceptionMessage := Node.AsXmlElement().InnerText();
 
             Error(CopyStr(ExceptionMessage, 1, 1020));
         end;
@@ -310,7 +281,7 @@ codeunit 6151196 "NPR NpCs Workflow Mgt."
         NpCsDocumentLogEntry: Record "NPR NpCs Document Log Entry";
         OutStr: OutStream;
     begin
-        NpCsDocumentLogEntry.Init;
+        NpCsDocumentLogEntry.Init();
         NpCsDocumentLogEntry."Entry No." := 0;
         NpCsDocumentLogEntry."Log Date" := CurrentDateTime;
         NpCsDocumentLogEntry."Document Entry No." := NpCsDocument."Entry No.";
@@ -323,8 +294,6 @@ codeunit 6151196 "NPR NpCs Workflow Mgt."
         NpCsDocumentLogEntry.Insert(true);
     end;
 
-    //--- Aux ---
-
     local procedure CurrCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR NpCs Workflow Mgt.");
@@ -332,21 +301,17 @@ codeunit 6151196 "NPR NpCs Workflow Mgt."
 
     local procedure IsReadyForArchivation(NpCsDocument: Record "NPR NpCs Document"): Boolean
     begin
-        if not NpCsDocument.Find then
+        if not NpCsDocument.FindFirst() then
             exit(false);
 
         case NpCsDocument."Delivery Status" of
             NpCsDocument."Delivery Status"::Delivered, NpCsDocument."Delivery Status"::Expired:
-                begin
-                    exit(NpCsDocument."Archive on Delivery");
-                end;
+                exit(NpCsDocument."Archive on Delivery");
         end;
 
         case NpCsDocument."Processing Status" of
             NpCsDocument."Processing Status"::Rejected, NpCsDocument."Processing Status"::Expired:
-                begin
-                    exit(NpCsDocument."Archive on Delivery");
-                end;
+                exit(NpCsDocument."Archive on Delivery");
         end;
 
         exit(false);
