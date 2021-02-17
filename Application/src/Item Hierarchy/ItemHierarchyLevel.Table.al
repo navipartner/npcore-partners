@@ -262,7 +262,7 @@ table 6151051 "NPR Item Hierarchy Level"
                 // "Ext. Filter" := '';
             end;
         }
-        field(32; "Link Table Name"; Text[50])
+        field(32; "Link Table Name"; Text[250])
         {
             Caption = 'Link Table Name';
             DataClassification = CustomerContent;

@@ -40,9 +40,9 @@ table 6151502 "NPR Nc Task"
             Description = 'NC1.07';
             Editable = false;
         }
-        field(4; "Table Name"; Text[50])
+        field(4; "Table Name"; Text[250])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
                                                                            "Object ID" = FIELD("Table No.")));
             Caption = 'Table Name';
             Description = 'NC1.14';

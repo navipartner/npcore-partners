@@ -96,17 +96,17 @@ table 6059900 "NPR Task Template"
                 end;
             end;
         }
-        field(15; "Test Report Name"; Text[80])
+        field(15; "Test Report Name"; Text[250])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
                                                                            "Object ID" = FIELD("Test Report ID")));
             Caption = 'Test Report Name';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(16; "Page Name"; Text[80])
+        field(16; "Page Name"; Text[250])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Page),
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Page),
                                                                            "Object ID" = FIELD("Page ID")));
             Caption = 'Form Name';
             Editable = false;

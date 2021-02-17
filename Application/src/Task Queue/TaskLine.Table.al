@@ -140,9 +140,9 @@ table 6059902 "NPR Task Line"
             Caption = 'Call Object With Task Record';
             DataClassification = CustomerContent;
         }
-        field(13; "Report Name"; Text[80])
+        field(13; "Report Name"; Text[250])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
                                                                            "Object ID" = FIELD("Object No.")));
             Caption = 'Report Name';
             FieldClass = FlowField;
@@ -383,7 +383,7 @@ table 6059902 "NPR Task Line"
         }
         field(91; "Abbreviated Name"; Text[3])
         {
-            CalcFormula = Lookup ("Windows Language"."Abbreviated Name" WHERE("Language ID" = FIELD("Language ID")));
+            CalcFormula = Lookup("Windows Language"."Abbreviated Name" WHERE("Language ID" = FIELD("Language ID")));
             Caption = 'Abbreviated Name';
             Editable = false;
             FieldClass = FlowField;
@@ -412,7 +412,7 @@ table 6059902 "NPR Task Line"
         }
         field(140; "Task Parameters"; Integer)
         {
-            CalcFormula = Count ("NPR Task Line Parameters" WHERE("Journal Template Name" = FIELD("Journal Template Name"),
+            CalcFormula = Count("NPR Task Line Parameters" WHERE("Journal Template Name" = FIELD("Journal Template Name"),
                                                               "Journal Batch Name" = FIELD("Journal Batch Name"),
                                                               "Journal Line No." = FIELD("Line No."),
                                                               "Field No." = CONST(0)));
@@ -446,7 +446,7 @@ table 6059902 "NPR Task Line"
         }
         field(171; "No. of E-Mail (On Start)"; Integer)
         {
-            CalcFormula = Count ("NPR Task Line Parameters" WHERE("Journal Template Name" = FIELD("Journal Template Name"),
+            CalcFormula = Count("NPR Task Line Parameters" WHERE("Journal Template Name" = FIELD("Journal Template Name"),
                                                               "Journal Batch Name" = FIELD("Journal Batch Name"),
                                                               "Journal Line No." = FIELD("Line No."),
                                                               "Field No." = CONST(171)));
@@ -460,7 +460,7 @@ table 6059902 "NPR Task Line"
         }
         field(176; "No. of E-Mail (On Error)"; Integer)
         {
-            CalcFormula = Count ("NPR Task Line Parameters" WHERE("Journal Template Name" = FIELD("Journal Template Name"),
+            CalcFormula = Count("NPR Task Line Parameters" WHERE("Journal Template Name" = FIELD("Journal Template Name"),
                                                               "Journal Batch Name" = FIELD("Journal Batch Name"),
                                                               "Journal Line No." = FIELD("Line No."),
                                                               "Field No." = CONST(176)));
@@ -484,7 +484,7 @@ table 6059902 "NPR Task Line"
         }
         field(181; "No. of E-Mail (On Success)"; Integer)
         {
-            CalcFormula = Count ("NPR Task Line Parameters" WHERE("Journal Template Name" = FIELD("Journal Template Name"),
+            CalcFormula = Count("NPR Task Line Parameters" WHERE("Journal Template Name" = FIELD("Journal Template Name"),
                                                               "Journal Batch Name" = FIELD("Journal Batch Name"),
                                                               "Journal Line No." = FIELD("Line No."),
                                                               "Field No." = CONST(181)));
@@ -504,7 +504,7 @@ table 6059902 "NPR Task Line"
         }
         field(185; "No. of E-Mail (On Run)"; Integer)
         {
-            CalcFormula = Count ("NPR Task Line Parameters" WHERE("Journal Template Name" = FIELD("Journal Template Name"),
+            CalcFormula = Count("NPR Task Line Parameters" WHERE("Journal Template Name" = FIELD("Journal Template Name"),
                                                               "Journal Batch Name" = FIELD("Journal Batch Name"),
                                                               "Journal Line No." = FIELD("Line No."),
                                                               "Field No." = CONST(185)));
@@ -513,7 +513,7 @@ table 6059902 "NPR Task Line"
         }
         field(186; "No. of E-Mail CC (On Run)"; Integer)
         {
-            CalcFormula = Count ("NPR Task Line Parameters" WHERE("Journal Template Name" = FIELD("Journal Template Name"),
+            CalcFormula = Count("NPR Task Line Parameters" WHERE("Journal Template Name" = FIELD("Journal Template Name"),
                                                               "Journal Batch Name" = FIELD("Journal Batch Name"),
                                                               "Journal Line No." = FIELD("Line No."),
                                                               "Field No." = CONST(186)));
@@ -522,7 +522,7 @@ table 6059902 "NPR Task Line"
         }
         field(187; "No. of E-Mail BCC (On Run)"; Integer)
         {
-            CalcFormula = Count ("NPR Task Line Parameters" WHERE("Journal Template Name" = FIELD("Journal Template Name"),
+            CalcFormula = Count("NPR Task Line Parameters" WHERE("Journal Template Name" = FIELD("Journal Template Name"),
                                                               "Journal Batch Name" = FIELD("Journal Batch Name"),
                                                               "Journal Line No." = FIELD("Line No."),
                                                               "Field No." = CONST(187)));
