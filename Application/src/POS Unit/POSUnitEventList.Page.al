@@ -26,20 +26,4 @@ page 6150739 "NPR POS Unit Event List"
             }
         }
     }
-
-    actions
-    {
-        area(Processing)
-        {
-            action(ActionName)
-            {
-                ApplicationArea = All;
-
-                trigger OnAction();
-                begin
-
-                end;
-            }
-        }
-    }
 }
