@@ -110,6 +110,7 @@ page 6014615 "NPR RapidStart Base Data Imp."
                     BaseUri := AzureKeyVaultMgt.GetSecret('NpRetailBaseDataBaseUrl');
                     Secret := AzureKeyVaultMgt.GetSecret('NpRetailBaseDataSecret');
 
+                    BindSubscription(rapidStartBaseDataMgt);
                     rapidstartBaseDataMgt.ImportPackage(
                         BaseUri + '/pos-test-data/' + package
                         + '?sv=2019-10-10&ss=b&srt=co&sp=rlx&se=2050-06-23T00:45:22Z&st=2020-06-22T16:45:22Z&spr=https&sig=' + Secret, packageName, AdjustTableNames);
