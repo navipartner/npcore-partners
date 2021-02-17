@@ -1,9 +1,5 @@
 codeunit 6150787 "NPR POS Action: Print Receipt"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is a built-in action for printing a receipt for the current or selected transaction.';
         TxtNoReceiptFound: Label 'No receipts has been printed from this register today.';

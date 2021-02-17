@@ -136,9 +136,6 @@ table 6014401 "NPR Register"
         {
             Caption = 'Balance Account';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Balanced Type" = CONST(Finans)) "G/L Account"
-            ELSE
-            IF ("Balanced Type" = CONST(Bank)) "Bank Account";
             ObsoleteState = Removed;
             ObsoleteReason = 'This table won''t be used anymore';
             ObsoleteTag = 'NPR Register';
@@ -472,6 +469,9 @@ table 6014401 "NPR Register"
         {
             Caption = 'Logon-User Name';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(271; "Sales Ticket Print Output"; Option)
         {
@@ -479,6 +479,9 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             OptionCaption = 'STANDARD,ASK LARGE,NEVER,CUSTOMER,DEVELOPMENT';
             OptionMembers = STANDARD,"ASK LARGE",NEVER,CUSTOMER,DEVELOPMENT;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(273; "Sales Ticket Email Output"; Option)
         {
@@ -486,6 +489,9 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             OptionCaption = 'None,Auto,Prompt,Prompt With Print Overrule';
             OptionMembers = "None",Auto,Prompt,"Prompt With Print Overrule";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(274; Website; Text[50])
         {
@@ -613,7 +619,7 @@ table 6014401 "NPR Register"
             TableRelation = "Customer Discount Group";
             ObsoleteState = Removed;
             ObsoleteReason = 'This table won''t be used anymore.';
-            ObsoleteTag = 'NPR Register -> NPR POS Unit -> NPR POS Pricing Profile';            
+            ObsoleteTag = 'NPR Register -> NPR POS Unit -> NPR POS Pricing Profile';
         }
         field(328; "Customer Price Group"; Code[10])
         {
@@ -622,7 +628,7 @@ table 6014401 "NPR Register"
             TableRelation = "Customer Price Group";
             ObsoleteState = Removed;
             ObsoleteReason = 'This table won''t be used anymore.';
-            ObsoleteTag = 'NPR Register -> NPR POS Unit -> NPR POS Pricing Profile';            
+            ObsoleteTag = 'NPR Register -> NPR POS Unit -> NPR POS Pricing Profile';
         }
         field(329; "Balanced Type"; Option)
         {
@@ -630,6 +636,9 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             OptionCaption = 'Finance,Bank';
             OptionMembers = Finans,Bank;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(330; "Receipt Printer Type"; Option)
         {
@@ -767,6 +776,9 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             OptionCaption = ' ,Auto,Ask payment,Ask debit';
             OptionMembers = " ",Auto,AskPayment,AskDebit;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(515; "Money drawer attached"; Boolean)
         {
@@ -1012,6 +1024,9 @@ table 6014401 "NPR Register"
         {
             Caption = 'Shop id';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore';
+            ObsoleteTag = 'NPR Register -> NPR POS Unit';
         }
         field(900; "Active Event No."; Code[20])
         {
@@ -1019,6 +1034,9 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             Description = 'NPR5.52 [368673]';
             TableRelation = Job WHERE("NPR Event" = CONST(true));
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore';
+            ObsoleteTag = 'NPR Register -> NPR POS Unit';
         }
         field(6184471; "MobilePay Payment Type"; Code[10])
         {
@@ -1095,6 +1113,9 @@ table 6014401 "NPR Register"
         }
         key(Key2; "Logon-User Name")
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore';
+            ObsoleteTag = 'NPR Register';
         }
         key(Key3; Status)
         {

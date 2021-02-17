@@ -86,6 +86,18 @@ page 6150617 "NPR POS Unit Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit Serial No field';
                 }
+                field(ActiveEventNo; ActiveEventNo)
+                {
+                    Caption = 'Active Event No.';
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Unit Active Event No.';
+
+                    trigger OnValidate()
+                    begin
+                        Rec.SetActiveEventForCurrPOSUnit(ActiveEventNo);
+                        CurrPage.Update();
+                    end;
+                }
             }
             group(Profiles)
             {
@@ -218,5 +230,13 @@ page 6150617 "NPR POS Unit Card"
             }
         }
     }
+
+    var
+        ActiveEventNo: Code[20];
+
+    trigger OnAfterGetRecord()
+    begin
+        ActiveEventNo := Rec.FindActiveEventFromCurrPOSUnit();
+    end;
 }
 
