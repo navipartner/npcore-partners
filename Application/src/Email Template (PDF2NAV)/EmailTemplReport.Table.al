@@ -27,7 +27,7 @@ table 6014461 "NPR E-mail Templ. Report"
             Caption = 'Filename';
             DataClassification = CustomerContent;
         }
-        field(100; "Report Name"; Text[80])
+        field(100; "Report Name"; Text[250])
         {
             CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
                                                                            "Object ID" = FIELD("Report ID")));

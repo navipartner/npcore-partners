@@ -135,7 +135,7 @@ table 6014510 "NPR I-Comm"
             TableRelation = AllObj."Object ID" WHERE("Object Type" = FILTER(Codeunit));
             DataClassification = CustomerContent;
         }
-        field(171; "Number Info Codeunit Name"; Text[50])
+        field(171; "Number Info Codeunit Name"; Text[250])
         {
             CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Codeunit),
                                                                            "Object ID" = FIELD("Number Info Codeunit ID")));
