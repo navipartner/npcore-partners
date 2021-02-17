@@ -1,14 +1,5 @@
 codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
 {
-    // NPR5.52/ALPO/20190926 CASE 368673 New POS action to change current event on POS register with dimension update on both POS register and current sale
-    // NPR5.53/ALPO/20191030 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
-    // NPR5.53/ALPO/20191105 CASE 376035 Save active event on Sale POS, copy event's dimensions directly to the sale instead of overwriting pos unit dimensions
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'Set an event from Event Management module as active for current POS register and sale';
         EventNoLbl: Label 'Event No.';
@@ -27,21 +18,13 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
               Sender.Type::Generic,
               Sender."Subscriber Instances Allowed"::Multiple)
             then begin
-                //-NPR5.53 [376035]-revoked
-                //RegisterWorkflowStep('textfield','if (param.DialogType == param.DialogType["TextField"]) {input({title: labels.Title, caption: context.CaptionText, value: ""}).cancel(abort);}');
-                //RegisterWorkflowStep('GetEventID',' {respond();}');
-                //+NPR5.53 [376035]-revoked
-                //-NPR5.53 [376035]
                 RegisterWorkflowStep('textfield',
                   'if ((!param.ClearEvent) && (param.DialogType == param.DialogType["TextField"])) ' +
                   '{input({title: labels.Title, caption: context.CaptionText, value: ""}).cancel(abort);}');
                 RegisterWorkflowStep('ProcessChange', ' {respond();}');
-                //+NPR5.53 [376035]
                 RegisterOptionParameter('DialogType', 'TextField,List', 'List');
-                //-NPR5.53 [376035]
                 RegisterBooleanParameter('ClearEvent', false);
                 RegisterBooleanParameter('OnlyCurrentSale', false);
-                //+NPR5.53 [376035]
                 RegisterWorkflow(false);
                 RegisterDataSourceBinding(ThisDataSource);
             end;
@@ -55,8 +38,7 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.1');  //NPR5.53 [376035]
-        exit('1.0');
+        exit('1.2');
     end;
 
     local procedure ActionCode(): Text
@@ -67,7 +49,7 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        CashRegister: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         SalePOS: Record "NPR Sale POS";
         JSON: Codeunit "NPR POS JSON Management";
         POSSale: Codeunit "NPR POS Sale";
@@ -84,37 +66,30 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
         DialogType := JSON.GetIntegerParameter('DialogType', true);
         if not (DialogType in [DialogType::TextField, DialogType::List]) then
             DialogType := DialogType::List;
-        //-NPR5.53 [376035]
         ClearEvent := JSON.GetBooleanParameter('ClearEvent', false);
         if ClearEvent then
             EventNo := '';
         OnlyCurrentSale := JSON.GetBooleanParameter('OnlyCurrentSale', false);
 
         if not ClearEvent then begin
-            //+NPR5.53 [376035]
             POSSession.GetSale(POSSale);
             POSSale.GetCurrentSale(SalePOS);
             SalePOS.TestField("Register No.");
-            CashRegister.Get(SalePOS."Register No.");
+            POSUnit.get(SalePOS."Register No.");
 
             case DialogType of
                 DialogType::TextField:
                     EventNo := CopyStr(GetInput(JSON, 'textfield'), 1, MaxStrLen(EventNo));
                 DialogType::List:
                     begin
-                        EventNo := CashRegister."Active Event No.";
+                        EventNo := POSUnit.FindActiveEventFromCurrPOSUnit();
                         if not SelectEventFromList(EventNo) then
                             Error('');
                     end;
             end;
-        end;  //NPR5.53 [376035]
+        end;
 
-        //UpdateCurrentEvent(Context,POSSession,FrontEnd,EventNo);  //NPR5.53 [376035]-revoked
-        UpdateCurrentEvent(Context, POSSession, FrontEnd, EventNo, not OnlyCurrentSale);  //NPR5.53 [376035]
-    end;
-
-    local procedure "---DataSourceExtension"()
-    begin
+        UpdateCurrentEvent(Context, POSSession, FrontEnd, EventNo, not OnlyCurrentSale);
     end;
 
     local procedure ThisDataSource(): Text
@@ -165,15 +140,9 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        //-NPR5.53 [376035]-revoked
-        //IF NOT CashRegister.GET(SalePOS."Register No.") THEN
-        //  CashRegister.INIT;
-        //IF NOT Job.GET(CashRegister."Active Event No.") THEN
-        //+NPR5.53 [376035]-revoked
-        if not Job.Get(SalePOS."Event No.") then  //NPR5.53 [376035]
+        if not Job.Get(SalePOS."Event No.") then
             Job.Init;
-        //DataRow.Add(DataSourceField_EventNo(),CashRegister."Active Event No.");  //NPR5.53 [376035]-revoked
-        DataRow.Add(DataSourceField_EventNo(), SalePOS."Event No.");  //NPR5.53 [376035]
+        DataRow.Add(DataSourceField_EventNo(), SalePOS."Event No.");
         DataRow.Add(DataSourceField_EventDescription(), Job.Description);
     end;
 
@@ -185,10 +154,6 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
     local procedure DataSourceField_EventDescription(): Text
     begin
         exit('EventDescription');
-    end;
-
-    local procedure "---Auxiliary"()
-    begin
     end;
 
     local procedure GetInput(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
@@ -226,59 +191,31 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
         NewDimSetEntryTmp: Record "Dimension Set Entry" temporary;
         OldDimSetEntryTmp: Record "Dimension Set Entry" temporary;
         Job: Record Job;
-        CashRegister: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         SalePOS: Record "NPR Sale POS";
         DimMgt: Codeunit DimensionManagement;
         POSSale: Codeunit "NPR POS Sale";
         OldDimeSetID: Integer;
     begin
-        if EventNo <> '' then begin  //NPR5.53 [376035]
+        if EventNo <> '' then begin
             FilterJobs(Job);
             Job."No." := EventNo;
             Job.Find;
-        end;  //NPR5.53 [376035]
+        end;
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        if UpdateRegister then begin  //NPR5.53 [376035]
+        if UpdateRegister then begin
             SalePOS.TestField("Register No.");
-            CashRegister.Get(SalePOS."Register No.");
-            //-NPR5.53 [376035]
-            CashRegister."Active Event No." := EventNo;
-            CashRegister.Modify;
+            POSUnit.Get(SalePOS."Register No.");
+            POSUnit.SetActiveEventForCurrPOSUnit(EventNo);
         end;
-        //+NPR5.53 [376035]
-        //-NPR5.53 [376035]-revoked
-        /*
-        IF CashRegister."Active Event No." = EventNo THEN
-          ERROR(IsAlreadyAssigned,EventNo,CashRegister.FIELDCAPTION("Register No."),CashRegister."Register No.");
-        
-        //Set active event on cash register
-        //GetDimSetEntryFromDefDim(OldDimSetEntryTmp,DATABASE::Register,CashRegister."Register No.");  //NPR5.53 [371956]-revoked
-        GetDimSetEntryFromDefDim(OldDimSetEntryTmp,DATABASE::"POS Unit",SalePOS."Register No.");  //NPR5.53 [371956]
-        CashRegister.VALIDATE("Active Event No.",EventNo);
-        CashRegister.MODIFY;
-        //GetDimSetEntryFromDefDim(NewDimSetEntryTmp,DATABASE::Register,CashRegister."Register No.");  //NPR5.53 [371956]-revoked
-        GetDimSetEntryFromDefDim(NewDimSetEntryTmp,DATABASE::"POS Unit",SalePOS."Register No.");  //NPR5.53 [371956]
-        
-        //Update current sale dimensions from cash register (update only those dimension values which has been actually changed on the cash register)
-        OldDimeSetID := SalePOS."Dimension Set ID";
-        SalePOS."Dimension Set ID" :=
-          DimMgt.GetDeltaDimSetID(SalePOS."Dimension Set ID", DimMgt.GetDimensionSetID(NewDimSetEntryTmp), DimMgt.GetDimensionSetID(OldDimSetEntryTmp));
-        DimMgt.UpdateGlobalDimFromDimSetID(SalePOS."Dimension Set ID", SalePOS."Shortcut Dimension 1 Code", SalePOS."Shortcut Dimension 2 Code");
-        */
-        //+NPR5.53 [376035]-revoked
-        //-NPR5.53 [376035]
+
         if SalePOS."Event No." = EventNo then
             Error(IsAlreadyAssigned, EventNo, SalePOS.FieldCaption("Sales Ticket No."), SalePOS."Sales Ticket No.");
         SalePOS.Validate("Event No.", EventNo);
-        //+NPR5.53 [376035]
         POSSale.Refresh(SalePOS);
         POSSale.Modify(true, true);
-        //-NPR5.53 [376035]-revoked
-        //IF SalePOS.SalesLinesExist AND (OldDimeSetID <> SalePOS."Dimension Set ID") THEN
-        //  SalePOS.UpdateAllLineDim(SalePOS."Dimension Set ID",OldDimeSetID);
-        //+NPR5.53 [376035]-revoked
         POSSession.RequestRefreshData();
 
     end;

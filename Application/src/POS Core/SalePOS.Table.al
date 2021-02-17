@@ -718,6 +718,7 @@ table 6014405 "NPR Sale POS"
     begin
         RetailSetup.Get();
         GetPOSStore();
+        GetPOSUnit();
 
         Register.Get("Register No.");
         GetPOSUnit();
@@ -725,7 +726,7 @@ table 6014405 "NPR Sale POS"
         "Location Code" := POSStore."Location Code";
         "Customer Disc. Group" := POSPricingProfile."Customer Disc. Group";
         "POS Sale ID" := 0;
-        "Event No." := Register."Active Event No.";
+        "Event No." := POSUnit.FindActiveEventFromCurrPOSUnit();
 
         if IsNullGuid("Retail ID") then begin
             "Retail ID" := CreateGuid();

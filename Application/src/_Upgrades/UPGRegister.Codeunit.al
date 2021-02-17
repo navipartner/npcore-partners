@@ -52,6 +52,7 @@ codeunit 6150925 "NPR UPG Register"
                         end;
                 end;
                 POSUnit.Modify();
+                UpsertPOSUnitActiveEvent(Register, POSUnit);
             end;
             POSPostingProfile.Code := POSUnit."POS Posting Profile";
             if POSPostingProfile.Code <> '' then begin
@@ -64,5 +65,10 @@ codeunit 6150925 "NPR UPG Register"
                 POSPostingProfile.Modify();
             end;
         until Register.Next() = 0;
+    end;
+
+    local procedure UpsertPOSUnitActiveEvent(Register: Record "NPR Register"; POSUnit: Record "NPR POS Unit")
+    begin
+        POSUnit.SetActiveEventForCurrPOSUnit(Register."Active Event No.");
     end;
 }

@@ -17,26 +17,6 @@ page 6014406 "NPR Register Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field("Logon-User Name"; Rec."Logon-User Name")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Logon-User Name field';
-                }
-                field("Shop id"; Rec."Shop id")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Shop id field';
-                }
-                field("Sales Ticket Print Output"; Rec."Sales Ticket Print Output")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Sales Ticket Print-Out field';
-                }
-                field("Sales Ticket Email Output"; Rec."Sales Ticket Email Output")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Sales Ticket Email Output field';
-                }
                 field("Primary Payment Type"; Rec."Primary Payment Type")
                 {
                     ApplicationArea = All;
@@ -63,26 +43,6 @@ page 6014406 "NPR Register Card"
                         StyleExpr = TRUE;
                         ToolTip = 'Specifies the value of the End of Day Balancing field';
                     }
-                    field("Balanced Type"; Rec."Balanced Type")
-                    {
-                        ApplicationArea = All;
-                        Importance = Promoted;
-                        ToolTip = 'Specifies the value of the Balanced Type field';
-                    }
-                }
-            }
-            group(Sale)
-            {
-                Caption = 'Sale';
-                field("Customer No. auto debit sale"; Rec."Customer No. auto debit sale")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Ask for customer field';
-                }
-                field("Active Event No."; Rec."Active Event No.")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Active Event No. field';
                 }
             }
         }
