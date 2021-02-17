@@ -12,92 +12,67 @@ page 6150903 "NPR HC Register List"
         {
             repeater(Group)
             {
-                field("Register No."; "Register No.")
+                field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field("Opening Cash"; "Opening Cash")
+                field("Opening Cash"; Rec."Opening Cash")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Opening Cash field';
                 }
-                field("Location Code"; "Location Code")
+                field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Location Code field';
                 }
-                field(Account; Account)
+                field(Account; Rec.Account)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Account field';
                 }
-                field("Difference Account"; "Difference Account")
+                field("Difference Account"; Rec."Difference Account")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Difference Account field';
                 }
-                field("Balanced Type"; "Balanced Type")
+                field("Balanced Type"; Rec."Balanced Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Balanced Type field';
                 }
-                field("Balance Account"; "Balance Account")
+                field("Balance Account"; Rec."Balance Account")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Balance Account field';
                 }
-                field("Difference Account - Neg."; "Difference Account - Neg.")
+                field("Difference Account - Neg."; Rec."Difference Account - Neg.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Difference Account - Neg. field';
                 }
-                field(Rounding; Rounding)
+                field(Rounding; Rec.Rounding)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Rounding field';
                 }
-                field("Register Change Account"; "Register Change Account")
+                field("Register Change Account"; Rec."Register Change Account")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Change G/L Account No. field';
                 }
-                field("Date Filter"; "Date Filter")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Date Filter field';
-                }
-                field("Global Dimension 1 Filter"; "Global Dimension 1 Filter")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Global Dimension 1 Filter field';
-                }
-                field("Global Dimension 2 Filter"; "Global Dimension 2 Filter")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Global Dimension 2 Filter field';
-                }
-                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                 }
-                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
-                field("Sales Ticket Filter"; "Sales Ticket Filter")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Sales Ticket Filter field';
-                }
-                field("Sales Person Filter"; "Sales Person Filter")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Sales Person Filter field';
-                }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
@@ -137,4 +112,3 @@ page 6150903 "NPR HC Register List"
         }
     }
 }
-
