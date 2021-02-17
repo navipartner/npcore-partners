@@ -10,24 +10,23 @@ codeunit 6151572 "NPR AF API WebService"
             WebService.Init;
             WebService."Object Type" := WebService."Object Type"::Codeunit;
             WebService."Service Name" := 'azurefunction_service';
-            WebService."Object ID" := 6151572;
+            WebService."Object ID" := Codeunit::"NPR AF API WebService";
             WebService.Published := true;
             WebService.Insert;
         end;
     end;
 
     var
-        TaskHandled: Label 'Task is assigned to register %1 : %2';
-        TaskIsHandled: Label 'Task is already assigned to register %1 : %2';
+        TaskHandledMsg: Label 'Task is assigned to POS Unit %1 : %2';
+        TaskIsHandledMsg: Label 'Task is already assigned to POS Unit %1 : %2';
         TaskCancelled: Label 'Task is cancelled by %1';
         TaskIsCancelled: Label 'Task was cancelled by %1';
         TaskCompleted: Label 'Task is completed by %1';
         TaskIsCompleted: Label 'Task was completed by %1';
 
-
-    procedure SetNotificationFlag(CurrentUser: Code[50]; RegisterId: Code[10]; "Key": Code[10]): Text
+    procedure SetNotificationFlag(CurrentUser: Code[50]; PosUnitNo: Code[10]; "Key": Code[10]): Text
     var
-        Register: Record "NPR Register";
+        PosUnit: Record "NPR POS Unit";
         AFNotificationHub: Record "NPR AF Notification Hub";
         KeyInt: Integer;
     begin
@@ -37,7 +36,7 @@ codeunit 6151572 "NPR AF API WebService"
         if CurrentUser = '' then
             exit;
 
-        if not Register.Get(RegisterId) then
+        if not PosUnit.Get(PosUnitNo) then
             exit;
 
         if not Evaluate(KeyInt, Key) then
@@ -49,20 +48,20 @@ codeunit 6151572 "NPR AF API WebService"
         if (AFNotificationHub.Handled = 0DT) and (AFNotificationHub.Cancelled = 0DT) then begin
             AFNotificationHub.Handled := CurrentDateTime;
             AFNotificationHub."Handled By" := CurrentUser;
-            AFNotificationHub."Handled Register" := RegisterId;
+            AFNotificationHub."Handled Pos Unit No." := PosUnitNo;
             AFNotificationHub.Modify(true);
-            exit(StrSubstNo(TaskHandled, AFNotificationHub."Handled Register", AFNotificationHub."Handled By"));
+            exit(StrSubstNo(TaskHandledMsg, AFNotificationHub."Handled Pos Unit No.", AFNotificationHub."Handled By"));
         end else begin
             if AFNotificationHub.Handled <> 0DT then
-                exit(StrSubstNo(TaskIsHandled, AFNotificationHub."Handled Register", AFNotificationHub."Handled By"));
+                exit(StrSubstNo(TaskHandledMsg, AFNotificationHub."Handled Pos Unit No.", AFNotificationHub."Handled By"));
             if AFNotificationHub.Cancelled <> 0DT then
                 exit(StrSubstNo(TaskIsCancelled, AFNotificationHub."Handled By"));
         end;
     end;
 
-    procedure SetNotificationHandledFlag(CurrentUser: Code[50]; RegisterId: Code[10]; "Key": Code[10]): Text
+    procedure SetNotificationHandledFlag(CurrentUser: Code[50]; PosUnitNo: Code[10]; "Key": Code[10]): Text
     var
-        Register: Record "NPR Register";
+        PosUnit: Record "NPR POS Unit";
         AFNotificationHub: Record "NPR AF Notification Hub";
         KeyInt: Integer;
     begin
@@ -72,7 +71,7 @@ codeunit 6151572 "NPR AF API WebService"
         if CurrentUser = '' then
             exit;
 
-        if not Register.Get(RegisterId) then
+        if not PosUnit.Get(PosUnitNo) then
             exit;
 
         if not Evaluate(KeyInt, Key) then
@@ -84,20 +83,20 @@ codeunit 6151572 "NPR AF API WebService"
         if (AFNotificationHub.Handled = 0DT) and (AFNotificationHub.Cancelled = 0DT) then begin
             AFNotificationHub.Handled := CurrentDateTime;
             AFNotificationHub."Handled By" := CurrentUser;
-            AFNotificationHub."Handled Register" := RegisterId;
+            AFNotificationHub."Handled Pos Unit No." := PosUnitNo;
             AFNotificationHub.Modify(true);
-            exit(BuildNotificationStatusResponse(AFNotificationHub, true, StrSubstNo(TaskHandled, AFNotificationHub."Handled Register", AFNotificationHub."Handled By")));
+            exit(BuildNotificationStatusResponse(AFNotificationHub, true, StrSubstNo(TaskHandledMsg, AFNotificationHub."Handled Pos Unit No.", AFNotificationHub."Handled By")));
         end else begin
             if AFNotificationHub.Handled <> 0DT then
-                exit(BuildNotificationStatusResponse(AFNotificationHub, false, StrSubstNo(TaskIsHandled, AFNotificationHub."Handled Register", AFNotificationHub."Handled By")));
+                exit(BuildNotificationStatusResponse(AFNotificationHub, false, StrSubstNo(TaskIsHandledMsg, AFNotificationHub."Handled Pos Unit No.", AFNotificationHub."Handled By")));
             if AFNotificationHub.Cancelled <> 0DT then
                 exit(BuildNotificationStatusResponse(AFNotificationHub, false, StrSubstNo(TaskIsCancelled, AFNotificationHub."Cancelled By")));
         end;
     end;
 
-    procedure SetNotificationCancelledFlag(CurrentUser: Code[50]; RegisterId: Code[10]; "Key": Code[10]): Text
+    procedure SetNotificationCancelledFlag(CurrentUser: Code[50]; PosUnitNo: Code[10]; "Key": Code[10]): Text
     var
-        Register: Record "NPR Register";
+        PosUnit: Record "NPR POS Unit";
         AFNotificationHub: Record "NPR AF Notification Hub";
         KeyInt: Integer;
     begin
@@ -107,7 +106,7 @@ codeunit 6151572 "NPR AF API WebService"
         if CurrentUser = '' then
             exit;
 
-        if not Register.Get(RegisterId) then
+        if not PosUnit.Get(PosUnitNo) then
             exit;
 
         if not Evaluate(KeyInt, Key) then
@@ -119,7 +118,7 @@ codeunit 6151572 "NPR AF API WebService"
         if (AFNotificationHub.Cancelled = 0DT) then begin
             AFNotificationHub.Cancelled := CurrentDateTime;
             AFNotificationHub."Cancelled By" := CurrentUser;
-            AFNotificationHub."Cancelled Register" := RegisterId;
+            AFNotificationHub."Cancelled Pos Unit No." := PosUnitNo;
             AFNotificationHub.Modify(true);
             exit(BuildNotificationStatusResponse(AFNotificationHub, true, StrSubstNo(TaskCancelled, AFNotificationHub."Cancelled By")));
         end;
@@ -127,9 +126,9 @@ codeunit 6151572 "NPR AF API WebService"
         exit(BuildNotificationStatusResponse(AFNotificationHub, false, StrSubstNo(TaskIsCancelled, AFNotificationHub."Cancelled By")));
     end;
 
-    procedure SetNotificationCompletedFlag(CurrentUser: Code[50]; RegisterId: Code[10]; "Key": Code[10]): Text
+    procedure SetNotificationCompletedFlag(CurrentUser: Code[50]; PosUnitNo: Code[10]; "Key": Code[10]): Text
     var
-        Register: Record "NPR Register";
+        PosUnit: Record "NPR POS Unit";
         AFNotificationHub: Record "NPR AF Notification Hub";
         KeyInt: Integer;
     begin
@@ -139,7 +138,7 @@ codeunit 6151572 "NPR AF API WebService"
         if CurrentUser = '' then
             exit;
 
-        if not Register.Get(RegisterId) then
+        if not PosUnit.Get(PosUnitNo) then
             exit;
 
         if not Evaluate(KeyInt, Key) then
@@ -151,7 +150,7 @@ codeunit 6151572 "NPR AF API WebService"
         if (AFNotificationHub.Cancelled = 0DT) and (AFNotificationHub.Completed = 0DT) then begin
             AFNotificationHub.Completed := CurrentDateTime;
             AFNotificationHub."Completed By" := CurrentUser;
-            AFNotificationHub."Completed Register" := RegisterId;
+            AFNotificationHub."Completed Pos Unit No." := PosUnitNo;
             AFNotificationHub.Modify(true);
             exit(BuildNotificationStatusResponse(AFNotificationHub, true, StrSubstNo(TaskCompleted, AFNotificationHub."Completed By")));
         end;
@@ -165,7 +164,6 @@ codeunit 6151572 "NPR AF API WebService"
 
     procedure GetNotificationStatus("Key": Code[10]): Text
     var
-        Register: Record "NPR Register";
         AFNotificationHub: Record "NPR AF Notification Hub";
         KeyInt: Integer;
         JSON: Text;
@@ -186,12 +184,10 @@ codeunit 6151572 "NPR AF API WebService"
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
-        JObject: DotNet JObject;
-        JTokenWriter: DotNet NPRNetJTokenWriter;
-        CodeCommaString: Text;
-        Variant1CommaString: Text;
-        Variant2CommaString: Text;
-        Variant3CommaString: Text;
+        JsonObj: JsonObject;
+        JsonObjChld: JsonObject;
+        JsonArr: JsonArray;
+        JsonText: Text;
         AFHelperFunctions: Codeunit "NPR AF Helper Functions";
         Base64String: Text;
         PictureFilename: Text;
@@ -213,68 +209,44 @@ codeunit 6151572 "NPR AF API WebService"
 
         ItemVariant.SetFilter("Item No.", Item."No.");
         ItemVariant.SetFilter("NPR Blocked", '=%1', false);
-        if ItemVariant.IsEmpty then
+        if not ItemVariant.FindSet() then
             exit;
 
-        JTokenWriter := JTokenWriter.JTokenWriter;
-        with JTokenWriter do begin
-            WriteStartObject;
-            WritePropertyName('Base64Image');
-            WriteValue(Base64String);
-            WritePropertyName('ImageName');
-            WriteValue(PictureFilename);
-            WritePropertyName('ItemVariants');
-            WriteStartArray;
-            if ItemVariant.FindSet then begin
-                repeat
+        repeat
+            JsonObjChld.Add('ItemNo', ItemVariant."Item No.");
+            JsonObjChld.Add('Code', ItemVariant.Code);
+            JsonObjChld.Add('Description', ItemVariant.Description);
+            JsonObjChld.Add('Variety1', ItemVariant."NPR Variety 1");
+            JsonObjChld.Add('Variety1Value', ItemVariant."NPR Variety 1 Value");
 
-                    CodeCommaString += ItemVariant.Code + ',';
-                    Variant1CommaString += ItemVariant."NPR Variety 1 Value" + ',';
+            JsonObjChld.Add('Variety2', ItemVariant."NPR Variety 2");
+            JsonObjChld.Add('Variety2Value', ItemVariant."NPR Variety 2 Value");
 
-                    WriteStartObject();
-                    WritePropertyName('ItemNo');
-                    WriteValue(ItemVariant."Item No.");
-                    WritePropertyName('Code');
-                    WriteValue(ItemVariant.Code);
-                    WritePropertyName('Description');
-                    WriteValue(ItemVariant.Description);
-                    WritePropertyName('Variety1');
-                    WriteValue(ItemVariant."NPR Variety 1");
-                    WritePropertyName('Variety1Value');
-                    WriteValue(ItemVariant."NPR Variety 1 Value");
-                    WritePropertyName('Variety2');
-                    WriteValue(ItemVariant."NPR Variety 2");
-                    WritePropertyName('Variety2Value');
-                    WriteValue(ItemVariant."NPR Variety 2 Value");
-                    WritePropertyName('Variety3');
-                    WriteValue(ItemVariant."NPR Variety 3");
-                    WritePropertyName('Variety3Value');
-                    WriteValue(ItemVariant."NPR Variety 3 Value");
-                    WritePropertyName('Variety4');
-                    WriteValue(ItemVariant."NPR Variety 4");
-                    WritePropertyName('Variety4Value');
-                    WriteValue(ItemVariant."NPR Variety 4 Value");
-                    WriteEndObject();
+            JsonObjChld.Add('Variety3', ItemVariant."NPR Variety 3");
+            JsonObjChld.Add('Variety3Value', ItemVariant."NPR Variety 3 Value");
 
-                until ItemVariant.Next = 0;
-            end;
+            JsonObjChld.Add('Variety4', ItemVariant."NPR Variety 4");
+            JsonObjChld.Add('Variety4Value', ItemVariant."NPR Variety 4 Value");
+            JsonArr.Add(JsonObjChld);
+        until ItemVariant.Next = 0;
 
-            WriteEndArray;
+        JsonObj.Add('Base64Image', Base64String);
+        JsonObj.Add('ImageName', PictureFilename);
+        JsonObj.Add('ItemVariants', JsonArr);
 
-            WriteEndObject;
+        JsonObj.WriteTo(JsonText);
 
-            JObject := Token;
-        end;
-
-        exit(JObject.ToString);
+        exit(JsonText);
     end;
 
     procedure GetVariantByBarcode(Barcode: Code[20]): Text
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
-        JObject: DotNet JObject;
-        JTokenWriter: DotNet NPRNetJTokenWriter;
+        JsonObj: JsonObject;
+        JsonObjChld: JsonObject;
+        JsonArr: JsonArray;
+        JsonText: Text;
         CodeCommaString: Text;
         Variant1CommaString: Text;
         Variant2CommaString: Text;
@@ -300,74 +272,46 @@ codeunit 6151572 "NPR AF API WebService"
 
         ItemVariant.SetFilter("Item No.", Item."No.");
         ItemVariant.SetFilter("NPR Blocked", '=%1', false);
-        if ItemVariant.IsEmpty then
+        if not ItemVariant.FindSet() then
             exit;
 
-        JTokenWriter := JTokenWriter.JTokenWriter;
-        with JTokenWriter do begin
-            WriteStartObject;
-            WritePropertyName('Base64Image');
-            WriteValue(Base64String);
-            WritePropertyName('ImageName');
-            WriteValue(PictureFilename);
-            WritePropertyName('ItemVariants');
-            WriteStartArray;
-            if ItemVariant.FindSet then begin
-                repeat
+        repeat
+            JsonObjChld.Add('ItemNo', ItemVariant."Item No.");
+            JsonObjChld.Add('Code', ItemVariant.Code);
+            JsonObjChld.Add('Description', ItemVariant.Description);
+            JsonObjChld.Add('Variety1', ItemVariant."NPR Variety 1");
+            JsonObjChld.Add('Variety1Value', ItemVariant."NPR Variety 1 Value");
 
-                    CodeCommaString += ItemVariant.Code + ',';
-                    Variant1CommaString += ItemVariant."NPR Variety 1 Value" + ',';
+            JsonObjChld.Add('Variety2', ItemVariant."NPR Variety 2");
+            JsonObjChld.Add('Variety2Value', ItemVariant."NPR Variety 2 Value");
 
-                    WriteStartObject();
-                    WritePropertyName('ItemNo');
-                    WriteValue(ItemVariant."Item No.");
-                    WritePropertyName('Code');
-                    WriteValue(ItemVariant.Code);
-                    WritePropertyName('Description');
-                    WriteValue(ItemVariant.Description);
-                    WritePropertyName('Variety1');
-                    WriteValue(ItemVariant."NPR Variety 1");
-                    WritePropertyName('Variety1Value');
-                    WriteValue(ItemVariant."NPR Variety 1 Value");
-                    WritePropertyName('Variety2');
-                    WriteValue(ItemVariant."NPR Variety 2");
-                    WritePropertyName('Variety2Value');
-                    WriteValue(ItemVariant."NPR Variety 2 Value");
-                    WritePropertyName('Variety3');
-                    WriteValue(ItemVariant."NPR Variety 3");
-                    WritePropertyName('Variety3Value');
-                    WriteValue(ItemVariant."NPR Variety 3 Value");
-                    WritePropertyName('Variety4');
-                    WriteValue(ItemVariant."NPR Variety 4");
-                    WritePropertyName('Variety4Value');
-                    WriteValue(ItemVariant."NPR Variety 4 Value");
+            JsonObjChld.Add('Variety3', ItemVariant."NPR Variety 3");
+            JsonObjChld.Add('Variety3Value', ItemVariant."NPR Variety 3 Value");
 
-                    WriteEndObject();
+            JsonObjChld.Add('Variety4', ItemVariant."NPR Variety 4");
+            JsonObjChld.Add('Variety4Value', ItemVariant."NPR Variety 4 Value");
+            JsonArr.Add(JsonObjChld);
+        until ItemVariant.Next = 0;
 
-                until ItemVariant.Next = 0;
-            end;
+        JsonObj.Add('Base64Image', Base64String);
+        JsonObj.Add('ImageName', PictureFilename);
+        JsonObj.Add('ItemVariants', JsonArr);
 
-            WriteEndArray;
-            WriteEndObject;
+        JsonObj.WriteTo(JsonText);
 
-            JObject := Token;
-        end;
-
-        exit(JObject.ToString);
+        exit(JsonText);
     end;
 
     procedure GetReceiptAsPDF(SalesTicketNo: Code[20]; ReportId: Integer): Text
     var
-        AuditRoll: Record "NPR Audit Roll";
-        TempFile: File;
-        Filename: Text[1024];
+        RecRef: RecordRef;
+        FRef: FieldRef;
+        OStream: OutStream;
         Istream: InStream;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Bytes: DotNet NPRNetArray;
-        Convert: DotNet NPRNetConvert;
         NPRetailSetup: Record "NPR NP Retail Setup";
         POSEntry: Record "NPR POS Entry";
-        ReportBasedOn: Option "None",POSEntry,AuditRoll;
+        TempBlob: Codeunit "Temp Blob";
+        Base64Convert: Codeunit "Base64 Convert";
     begin
         if SalesTicketNo = '' then
             exit;
@@ -375,72 +319,42 @@ codeunit 6151572 "NPR AF API WebService"
         if ReportId = 0 then
             exit;
 
-        ReportBasedOn := ReportBasedOn::None;
-        if NPRetailSetup.Get then begin
-            POSEntry.SetRange("Document No.", SalesTicketNo);
-            if not POSEntry.IsEmpty then
-                ReportBasedOn := ReportBasedOn::POSEntry;
-        end;
-        if ReportBasedOn = ReportBasedOn::None then begin
-            AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
-            AuditRoll.SetRange("Sales Ticket No.", SalesTicketNo);
-            if not AuditRoll.IsEmpty then
-                ReportBasedOn := ReportBasedOn::AuditRoll;
-        end;
-
-        if ReportBasedOn = ReportBasedOn::None then
+        RecRef.GetTable(POSEntry);
+        FRef := RecRef.Field(5);
+        FRef.SetRange(SalesTicketNo);
+        if RecRef.IsEmpty then
             exit;
 
-        TempFile.CreateTempFile;
-        Filename := TempFile.Name;
-        TempFile.Close();
-        case ReportBasedOn of
-            ReportBasedOn::AuditRoll:
-                REPORT.SaveAsPdf(ReportId, Filename, AuditRoll);
-            ReportBasedOn::POSEntry:
-                REPORT.SaveAsPdf(ReportId, Filename, POSEntry);
-        end;
+        TempBlob.CreateInStream(Istream);
+        TempBlob.CreateOutStream(OStream);
 
-        if Exists(Filename) then begin
-            TempFile.Open(Filename);
-            TempFile.CreateInStream(Istream);
-            MemoryStream := MemoryStream.MemoryStream();
-            CopyStream(MemoryStream, Istream);
-            Bytes := MemoryStream.GetBuffer();
+        Report.SaveAs(ReportId, '', ReportFormat::Pdf, OStream, RecRef);
 
-            TempFile.Close;
-            FILE.Erase(Filename);
-
-            exit(Convert.ToBase64String(Bytes));
-        end;
-
+        exit(Base64Convert.ToBase64(Istream))
     end;
 
     procedure GetReportByJObjectAsBase64(JObjectTxt: Text): Text
     var
-        TempFile: File;
-        Filename: Text[1024];
         Istream: InStream;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Bytes: DotNet NPRNetArray;
-        Convert: DotNet NPRNetConvert;
+        OStream: OutStream;
         ReportID: Integer;
         RecID: RecordID;
         RecRef: RecordRef;
         VarRecRef: Variant;
-        JToken: DotNet JToken;
-        JObject: DotNet JObject;
+        JsonObj: JsonObject;
         AFHelperFunctions: Codeunit "NPR AF Helper Functions";
         AllObjWithCaption: Record AllObjWithCaption;
+        TempBlob: Codeunit "Temp Blob";
+        Base64Convert: Codeunit "Base64 Convert";
     begin
         if JObjectTxt = '' then
             exit;
-        JToken := JObject.Parse(JObjectTxt);
+        JsonObj.ReadFrom(JObjectTxt);
 
-        if not Evaluate(ReportID, AFHelperFunctions.GetValueAsText(JToken, 'reportID')) then
+        if not Evaluate(ReportID, AFHelperFunctions.GetValueAsText(JsonObj, 'reportID')) then
             exit;
 
-        if not Evaluate(RecID, AFHelperFunctions.GetValueAsText(JToken, 'recordID'), 9) then
+        if not Evaluate(RecID, AFHelperFunctions.GetValueAsText(JsonObj, 'recordID'), 9) then
             exit;
 
         if not AllObjWithCaption.Get(OBJECTTYPE::Report, ReportID) then
@@ -450,83 +364,48 @@ codeunit 6151572 "NPR AF API WebService"
         RecRef.SetRecFilter;
         VarRecRef := RecRef;
 
-        TempFile.CreateTempFile;
-        Filename := TempFile.Name;
-        TempFile.Close();
+        TempBlob.CreateInStream(Istream);
+        TempBlob.CreateOutStream(OStream);
 
-        REPORT.SaveAsPdf(ReportID, Filename, VarRecRef);
+        Report.SaveAs(ReportId, '', ReportFormat::Pdf, OStream, VarRecRef);
 
-        if Exists(Filename) then begin
-            TempFile.Open(Filename);
-            TempFile.CreateInStream(Istream);
-            MemoryStream := MemoryStream.MemoryStream();
-            CopyStream(MemoryStream, Istream);
-            Bytes := MemoryStream.GetBuffer();
-
-            TempFile.Close;
-            FILE.Erase(Filename);
-
-            exit(Convert.ToBase64String(Bytes));
-        end;
+        exit(Base64Convert.ToBase64(Istream))
     end;
 
 
     local procedure BuildNotificationStatusResponse(AFNotificationHub: Record "NPR AF Notification Hub"; RequestStatus: Boolean; RequestMessages: Text): Text
     var
-        JObject: DotNet JObject;
-        JTokenWriter: DotNet NPRNetJTokenWriter;
+
+        JsonObj: JsonObject;
+        JsonObjChld: JsonObject;
         AFHelperFunctions: Codeunit "NPR AF Helper Functions";
+        JsonText: Text;
     begin
-        JTokenWriter := JTokenWriter.JTokenWriter;
-        with JTokenWriter do begin
-            WriteStartObject;
-            WritePropertyName('Status');
-            WriteStartObject();
-            WritePropertyName('Key');
-            WriteValue(AFNotificationHub.Id);
-            WritePropertyName('RequestStatus');
-            WriteValue(AFHelperFunctions.GetBooleanAsText(RequestStatus));
-            WritePropertyName('RequestMessages');
-            WriteValue(RequestMessages);
+        JsonObjChld.Add('Key', AFNotificationHub.Id);
+        JsonObjChld.Add('RequestStatus', AFHelperFunctions.GetBooleanAsText(RequestStatus));
+        JsonObjChld.Add('RequestMessages', RequestMessages);
 
-            WritePropertyName('Createddatetime');
-            WriteValue(AFHelperFunctions.GetDateTimeAsText(AFNotificationHub.Created));
-            WritePropertyName('Createdby');
-            WriteValue(AFNotificationHub."Created By");
-            WritePropertyName('Createdregister');
-            WriteValue(AFNotificationHub."From Register No.");
+        JsonObjChld.Add('Createddatetime', AFHelperFunctions.GetDateTimeAsText(AFNotificationHub.Created));
+        JsonObjChld.Add('Createdby', AFNotificationHub."Created By");
+        JsonObjChld.Add('Createdregister', AFNotificationHub."From POS Unit No.");
 
-            WritePropertyName('Handled');
-            WriteValue(AFHelperFunctions.GetBooleanAsText(AFNotificationHub.Handled <> 0DT));
-            WritePropertyName('HandledDatetime');
-            WriteValue(AFHelperFunctions.GetDateTimeAsText(AFNotificationHub.Handled));
-            WritePropertyName('HandledBy');
-            WriteValue(AFNotificationHub."Handled By");
-            WritePropertyName('HandledRegister');
-            WriteValue(AFNotificationHub."Handled Register");
+        JsonObjChld.Add('Handled', AFHelperFunctions.GetBooleanAsText(AFNotificationHub.Handled <> 0DT));
+        JsonObjChld.Add('HandledDatetime', AFHelperFunctions.GetDateTimeAsText(AFNotificationHub.Handled));
+        JsonObjChld.Add('HandledBy', AFNotificationHub."Handled By");
+        JsonObjChld.Add('HandledRegister', AFNotificationHub."Handled Pos Unit No.");
 
-            WritePropertyName('Cancelled');
-            WriteValue(AFHelperFunctions.GetBooleanAsText(AFNotificationHub.Cancelled <> 0DT));
-            WritePropertyName('CancelledDatetime');
-            WriteValue(AFHelperFunctions.GetDateTimeAsText(AFNotificationHub.Cancelled));
-            WritePropertyName('CancelledBy');
-            WriteValue(AFNotificationHub."Cancelled By");
-            WritePropertyName('CancelledRegister');
-            WriteValue(AFNotificationHub."Cancelled Register");
+        JsonObjChld.Add('Cancelled', AFHelperFunctions.GetBooleanAsText(AFNotificationHub.Cancelled <> 0DT));
+        JsonObjChld.Add('CancelledDatetime', AFHelperFunctions.GetDateTimeAsText(AFNotificationHub.Completed));
+        JsonObjChld.Add('CancelledBy', AFNotificationHub."Cancelled By");
+        JsonObjChld.Add('CancelledRegister', AFNotificationHub."Cancelled Pos Unit No.");
 
-            WritePropertyName('Completed');
-            WriteValue(AFHelperFunctions.GetBooleanAsText(AFNotificationHub.Completed <> 0DT));
-            WritePropertyName('CompleteDatetime');
-            WriteValue(AFHelperFunctions.GetDateTimeAsText(AFNotificationHub.Completed));
-            WritePropertyName('CompletedBy');
-            WriteValue(AFNotificationHub."Completed By");
-            WritePropertyName('CompletedRegister');
-            WriteValue(AFNotificationHub."Completed Register");
-            WriteEndObject();
-            WriteEndObject;
-            JObject := Token;
-        end;
+        JsonObjChld.Add('Completed', AFHelperFunctions.GetBooleanAsText(AFNotificationHub.Completed <> 0DT));
+        JsonObjChld.Add('CompleteDatetime', AFHelperFunctions.GetDateTimeAsText(AFNotificationHub.Completed));
+        JsonObjChld.Add('CompletedBy', AFNotificationHub."Completed By");
+        JsonObjChld.Add('CompletedRegister', AFNotificationHub."Completed Pos Unit No.");
 
-        exit(JObject.ToString);
+        JsonObj.Add('Status', JsonObjChld);
+        JsonObj.WriteTo(JsonText);
+        exit(JsonText);
     end;
 }

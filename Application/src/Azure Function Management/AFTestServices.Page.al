@@ -14,52 +14,52 @@ page 6151572 "NPR AF Test Services"
             group("Spire Barcode")
             {
                 Caption = 'Spire Barcode';
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Value field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Show Checksum"; "Show Checksum")
+                field("Show Checksum"; Rec."Show Checksum")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Show Checksum field';
                 }
-                field("Barcode Height"; "Barcode Height")
+                field("Barcode Height"; Rec."Barcode Height")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Barcode Height field';
                 }
-                field("Barcode Size"; "Barcode Size")
+                field("Barcode Size"; Rec."Barcode Size")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Barcode Size field';
                 }
-                field("Include Text"; "Include Text")
+                field("Include Text"; Rec."Include Text")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Include Text field';
                 }
-                field(Border; Border)
+                field(Border; Rec.Border)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Border field';
                 }
-                field("Reverse Colors"; "Reverse Colors")
+                field("Reverse Colors"; Rec."Reverse Colors")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reverse Colors field';
                 }
-                field("Image Type"; "Image Type")
+                field("Image Type"; Rec."Image Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Image Type field';
                 }
-                field(Image; Image)
+                field(Image; Rec.Image)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Image field';

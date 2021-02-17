@@ -1,7 +1,5 @@
 page 6151571 "NPR AF Test Objects"
 {
-    // NPR5.36/NPKNAV/20171003  CASE 269792 Transport NPR5.36 - 3 October 2017
-
     Caption = 'AF Test Objects';
     PageType = List;
     UsageCategory = Administration;
@@ -14,17 +12,17 @@ page 6151571 "NPR AF Test Objects"
         {
             repeater(Group)
             {
-                field("Object Type"; "Object Type")
+                field("Object Type"; Rec."Object Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Object Type field';
                 }
-                field("Object ID"; "Object ID")
+                field("Object ID"; Rec."Object ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Object ID field';
                 }
-                field("Object Name"; "Object Name")
+                field("Object Name"; Rec."Object Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Object Name field';
@@ -42,7 +40,7 @@ page 6151571 "NPR AF Test Objects"
                 Caption = 'Run Test';
                 Image = TaskList;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -50,9 +48,9 @@ page 6151571 "NPR AF Test Objects"
 
                 trigger OnAction()
                 begin
-                    case "Object Type" of
-                        "Object Type"::Page:
-                            PAGE.Run("Object ID");
+                    case Rec."Object Type" of
+                        Rec."Object Type"::Page:
+                            PAGE.Run(Rec."Object ID");
                     end;
                 end;
             }

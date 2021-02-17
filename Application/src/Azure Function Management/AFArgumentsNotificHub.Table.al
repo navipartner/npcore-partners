@@ -1,6 +1,5 @@
 table 6151573 "NPR AF Arguments - Notific.Hub"
 {
-    // NPR5.36/CLVA/20170710 CASE 269792 AF Argument Table - Spire
 
     Caption = 'AF Arguments - NotificationHub';
     DataClassification = CustomerContent;
@@ -56,6 +55,8 @@ table 6151573 "NPR AF Arguments - Notific.Hub"
         }
         field(17; "To Register No."; Code[10])
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Table ''NPR Register'' is marked for removal. Reason: Replaced with POS Unit, POS store, POS unit profiles.';
             Caption = 'To Register No.';
             DataClassification = CustomerContent;
             TableRelation = "NPR Register";
@@ -81,6 +82,8 @@ table 6151573 "NPR AF Arguments - Notific.Hub"
         }
         field(21; "From Register No."; Code[10])
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Table ''NPR Register'' is marked for removal. Reason: Replaced with POS Unit, POS store, POS unit profiles.';
             Caption = 'From Register No.';
             DataClassification = CustomerContent;
             TableRelation = "NPR Register";
@@ -94,6 +97,18 @@ table 6151573 "NPR AF Arguments - Notific.Hub"
         {
             Caption = 'Location';
             DataClassification = CustomerContent;
+        }
+        field(24; "To POS Unit No."; Code[10])
+        {
+            Caption = 'To POS Unit No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Unit";
+        }
+        field(25; "From POS Unit No."; Code[10])
+        {
+            Caption = 'From POS Unit No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Unit";
         }
         field(100; "API Key"; Text[100])
         {
@@ -132,10 +147,6 @@ table 6151573 "NPR AF Arguments - Notific.Hub"
         key(Key1; "Primary Key")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 
