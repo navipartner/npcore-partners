@@ -26,7 +26,7 @@ jobs:
   parameters:
     timeoutInMinutes: 180
     containerImageName: mcr.microsoft.com/dynamicsnav:10.0.17763.1397-generic
-    artifactUrl: https://bcartifacts.blob.core.windows.net/onprem/17.0.16993.0/w1
+    pipelineConfig: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/PipelineConfig-Insider.json'
     containerName: $(containerName)
     serverInstanceName: $(serverInstanceName)
     containerAdminUsername: $(containerAdminUsername) 
