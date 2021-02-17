@@ -121,10 +121,11 @@ page 6014603 "NPR CleanCash Transactions"
             {
                 Caption = 'CleanCash Transaction Card';
                 Promoted = true;
+                PromotedOnly = true;
                 Ellipsis = true;
                 ToolTip = 'Open Transaction Card';
                 ApplicationArea = All;
-                Image = Open; 
+                Image = Open;
 
                 trigger OnAction()
                 var
@@ -142,7 +143,7 @@ page 6014603 "NPR CleanCash Transactions"
                 Caption = 'Send All';
                 ToolTip = 'This action will attempt to send all selected pending or failed transactions';
                 ApplicationArea = All;
-                Image = SendTo; 
+                Image = SendTo;
                 trigger OnAction()
                 var
                     CleanCashTransaction: Record "NPR CleanCash Trans. Request";
