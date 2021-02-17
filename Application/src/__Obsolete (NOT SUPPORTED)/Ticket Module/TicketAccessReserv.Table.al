@@ -8,6 +8,7 @@ table 6059788 "NPR Ticket Access Reserv."
     {
         field(1; "Entry No."; Integer)
         {
+            AutoIncrement = true;
             Caption = 'Entry No.';
             DataClassification = CustomerContent;
         }
