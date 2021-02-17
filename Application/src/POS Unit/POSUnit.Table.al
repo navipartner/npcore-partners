@@ -200,6 +200,7 @@ table 6150615 "NPR POS Unit"
             Description = 'NPR5.52';
             TableRelation = "NPR NpGp POS Sales Setup";
         }
+
         field(500; "POS Audit Profile"; Code[20])
         {
             Caption = 'POS Audit Profile';
@@ -282,6 +283,7 @@ table 6150615 "NPR POS Unit"
     trigger OnDelete()
     begin
         DimMgt.DeleteDefaultDim(DATABASE::"NPR POS Unit", "No.");
+        DeleteActiveEventForCurrPOSUnit();
     end;
 
     trigger OnInsert()
@@ -350,6 +352,27 @@ table 6150615 "NPR POS Unit"
         if not UserSetup.Get(UserId) then
             exit('?'); //Old syntax - kept in case anyone matches on question mark.
         exit(UserSetup."NPR Backoffice Register No.");
+    end;
+
+    procedure FindActiveEventFromCurrPOSUnit(): Code[20]
+    var
+        POSUnitEvent: Record "NPR POS Unit Event";
+    begin
+        exit(POSUnitEvent.FindActiveEvent(Rec."No."));
+    end;
+
+    procedure SetActiveEventForCurrPOSUnit(EventNo: Code[20])
+    var
+        POSUnitEvent: Record "NPR POS Unit Event";
+    begin
+        POSUnitEvent.SetActiveEvent(Rec."No.", EventNo);
+    end;
+
+    procedure DeleteActiveEventForCurrPOSUnit()
+    var
+        POSUnitEvent: Record "NPR POS Unit Event";
+    begin
+        POSUnitEvent.DeleteActiveEvent(Rec."No.");
     end;
 }
 

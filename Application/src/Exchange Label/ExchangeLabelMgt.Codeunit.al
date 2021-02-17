@@ -20,10 +20,10 @@ codeunit 6014498 "NPR Exchange Label Mgt."
 
         if Register.Get(POSUnit.GetCurrentPOSUnit()) then;
 
-        if StrLen(Register."Shop id") <> 3 then
-            Register."Shop id" := String.PadStrLeft(Register."Shop id", 3, ' ', false);
+        if StrLen(POSUnit."POS Store Code") <> 3 then
+            POSUnit."POS Store Code" := String.PadStrLeft(POSUnit."POS Store Code", 3, ' ', false);
 
-        ExchangeLabel."Store ID" := Register."Shop id";
+        ExchangeLabel."Store ID" := POSUnit."POS Store Code";
         ExchangeLabel."Register No." := Register."Register No.";
 
         ExchangeLabel."Company Name" := CompanyName;
@@ -475,12 +475,11 @@ codeunit 6014498 "NPR Exchange Label Mgt."
         POSUnit: Record "NPR POS Unit";
         INVALID_EAN_VALUE: Label 'Only digits are allowed when creating EAN: %1';
     begin
-        if StrLen(Prefix) + StrLen(Register."Shop id") + StrLen(Format(Unique)) > 12 then
+        if Register.Get(POSUnit.GetCurrentPOSUnit()) then;
+        if StrLen(Prefix) + StrLen(POSUnit."POS Store Code") + StrLen(Format(Unique)) > 12 then
             Error(ErrLength);
 
         RetailSetup.Get;
-
-        if Register.Get(POSUnit.GetCurrentPOSUnit()) then;
 
         if StrLen(DelChr(LowerCase(Unique), '=', 'abcdefghijklmnopqrstuvwyz')) <> StrLen(Unique) then
             Error(INVALID_EAN_VALUE, Unique);
@@ -494,8 +493,8 @@ codeunit 6014498 "NPR Exchange Label Mgt."
                         EAN := Format(Prefix) + PadStr('', 10 - StrLen(Format(Unique)), '0') + Format(Unique);
                     end;
                 else begin
-                        EAN := Format(Prefix) + Format(Register."Shop id") +
-                               PadStr('', 12 - StrLen(Prefix) - (StrLen(Register."Shop id") + StrLen(Format(Unique))), '0') + Format(Unique);
+                        EAN := Format(Prefix) + Format(POSUnit."POS Store Code") +
+                               PadStr('', 12 - StrLen(Prefix) - (StrLen(POSUnit."POS Store Code") + StrLen(Format(Unique))), '0') + Format(Unique);
                     end;
             end;
             EAN := EAN + Format(StrCheckSum(EAN, '131313131313'));

@@ -135,7 +135,7 @@ codeunit 6151494 "NPR Raptor Send Data"
 
     local procedure GenerateParameters(var Parameters: Record "Name/Value Buffer"; ItemLedger: Record "Item Ledger Entry"; SessionGUID: Guid)
     var
-        CashRegister: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         Item: Record Item;
         RaptorMgt: Codeunit "NPR Raptor Management";
     begin
@@ -164,8 +164,9 @@ codeunit 6151494 "NPR Raptor Send Data"
         modules/subscribers. Those are not sent to Raptor.
         */
 
-        if not CashRegister.Get(ItemLedger."NPR Register Number") then
-            CashRegister.Init;
+        if not POSUnit.Get(ItemLedger."NPR Register Number") then
+            POSUnit.Init();
+
         if not Item.Get(ItemLedger."Item No.") then
             Item.Init;
         Parameters.DeleteAll;
@@ -174,7 +175,7 @@ codeunit 6151494 "NPR Raptor Send Data"
         AddParameter(Parameters, 1002, 'p2', ItemLedger."Item No.");
         AddParameter(Parameters, 1003, 'p3', Item.Description);
         AddParameter(Parameters, 1007, 'p7', ItemLedger."Source No.");
-        AddParameter(Parameters, 1012, 'p12', CashRegister."Shop id");
+        AddParameter(Parameters, 1012, 'p12', POSUnit."POS Store Code");
         AddParameter(Parameters, 1021, 'p21', ItemLedger."Document No.");
 
         AddParameter(Parameters, 5000, 'sid', SessionGUID);
