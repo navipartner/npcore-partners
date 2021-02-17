@@ -1,6 +1,5 @@
 page 6151041 "NPR Notification List"
 {
-    // NPR5.38/NPKNAV/20180126  CASE 269792-01 Transport NPR5.38 - 26 January 2018
 
     Caption = 'Notification List';
     CardPageID = "NPR Notification Card";
@@ -16,22 +15,22 @@ page 6151041 "NPR Notification List"
         {
             repeater(Group)
             {
-                field(Id; Id)
+                field(Id; Rec.Id)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Id field';
                 }
-                field(Title; Title)
+                field(Title; Rec.Title)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Title field';
                 }
-                field(Handled; Handled)
+                field(Handled; Rec.Handled)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Handled field';
                 }
-                field("Handled By"; "Handled By")
+                field("Handled By"; Rec."Handled By")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Handled By field';
@@ -49,7 +48,7 @@ page 6151041 "NPR Notification List"
                 Caption = 'Complete';
                 Image = Close;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -57,7 +56,7 @@ page 6151041 "NPR Notification List"
 
                 trigger OnAction()
                 begin
-                    AFAPIWebService.SetNotificationCompletedFlag(UserId, gRegisterNo, Format(Id));
+                    AFAPIWebService.SetNotificationCompletedFlag(UserId, gPOSNo, Format(Rec.Id));
                     CurrPage.Update;
                 end;
             }
@@ -66,7 +65,7 @@ page 6151041 "NPR Notification List"
                 Caption = 'Cancel';
                 Image = Cancel;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -74,7 +73,7 @@ page 6151041 "NPR Notification List"
 
                 trigger OnAction()
                 begin
-                    AFAPIWebService.SetNotificationCancelledFlag(UserId, gRegisterNo, Format(Id));
+                    AFAPIWebService.SetNotificationCancelledFlag(UserId, gPOSNo, Format(Rec.Id));
                     CurrPage.Update;
                 end;
             }
@@ -83,26 +82,26 @@ page 6151041 "NPR Notification List"
 
     trigger OnAfterGetCurrRecord()
     begin
-        "Temp Current Register" := gRegisterNo;
-        Modify;
+        Rec."Temp Current Pos Unit No." := gPOSNo;
+        Rec.Modify;
     end;
 
     trigger OnOpenPage()
     begin
-        FilterGroup(2);
-        SetRange(Cancelled, 0DT);
-        SetRange(Completed, 0DT);
-        SetRange("Notification Delivered to Hub", true);
-        FilterGroup(0);
+        Rec.FilterGroup(2);
+        Rec.SetRange(Cancelled, 0DT);
+        Rec.SetRange(Completed, 0DT);
+        Rec.SetRange("Notification Delivered to Hub", true);
+        Rec.FilterGroup(0);
     end;
 
     var
         AFAPIWebService: Codeunit "NPR AF API WebService";
-        gRegisterNo: Code[10];
+        gPOSNo: Code[10];
 
-    procedure SetRegister(RegisterNo: Code[10])
+    procedure SetRegister(PosNo: Code[10])
     begin
-        gRegisterNo := RegisterNo;
+        gPOSNo := PosNo;
     end;
 }
 

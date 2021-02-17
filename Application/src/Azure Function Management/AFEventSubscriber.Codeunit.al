@@ -1,10 +1,6 @@
 codeunit 6151575 "NPR AF Event Subscriber"
 {
-    trigger OnRun()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Table, 6151574, 'OnAfterInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR AF Notification Hub", 'OnAfterInsertEvent', '', true, true)]
     local procedure T6151574OnAfterInsert(var Rec: Record "NPR AF Notification Hub"; RunTrigger: Boolean)
     var
         AFArgumentsNotificationHub: Record "NPR AF Arguments - Notific.Hub" temporary;
@@ -17,8 +13,8 @@ codeunit 6151575 "NPR AF Event Subscriber"
         AFArgumentsNotificationHub."Action Type" := Rec."Action Type";
         AFArgumentsNotificationHub."Action Value" := Rec."Action Value";
         AFArgumentsNotificationHub."Created By" := Rec."Created By";
-        AFArgumentsNotificationHub."From Register No." := Rec."From Register No.";
-        AFArgumentsNotificationHub."To Register No." := Rec."To Register No.";
+        AFArgumentsNotificationHub."From POS Unit No." := Rec."From POS Unit No.";
+        AFArgumentsNotificationHub."To POS Unit No." := Rec."To POS Unit No.";
         AFArgumentsNotificationHub.Title := Rec.Title;
 
         if Rec.Body = '' then

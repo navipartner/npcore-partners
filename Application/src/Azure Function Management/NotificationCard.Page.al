@@ -1,7 +1,5 @@
 page 6151042 "NPR Notification Card"
 {
-    // NPR5.38/NPKNAV/20180126  CASE 269792-01 Transport NPR5.38 - 26 January 2018
-
     UsageCategory = None;
     Caption = 'Notification Card';
     Editable = false;
@@ -13,35 +11,35 @@ page 6151042 "NPR Notification Card"
         {
             group(General)
             {
-                field(Id; Id)
+                field(Id; Rec.Id)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Id field';
                 }
-                field(Title; Title)
+                field(Title; Rec.Title)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Title field';
                 }
-                field(Body; Body)
+                field(Body; Rec.Body)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Body field';
                 }
-                field(Handled; Handled)
+                field(Handled; Rec.Handled)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Handled field';
                 }
-                field("Handled By"; "Handled By")
+                field("Handled By"; Rec."Handled By")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Handled By field';
                 }
-                field("Handled Register"; "Handled Register")
+                field("Handled Register"; Rec."Handled Pos Unit No.")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Handled Register field';
+                    ToolTip = 'Specifies the value of the Handled Pos Unit No. field';
                 }
             }
         }
@@ -56,7 +54,7 @@ page 6151042 "NPR Notification Card"
                 Caption = 'Complete';
                 Image = Close;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -64,7 +62,7 @@ page 6151042 "NPR Notification Card"
 
                 trigger OnAction()
                 begin
-                    AFAPIWebService.SetNotificationCompletedFlag(UserId, "Temp Current Register", Format(Id));
+                    AFAPIWebService.SetNotificationCompletedFlag(UserId, Rec."Temp Current Pos Unit No.", Format(Rec.Id));
                     CurrPage.Close;
                 end;
             }
@@ -73,7 +71,7 @@ page 6151042 "NPR Notification Card"
                 Caption = 'Cancel';
                 Image = Cancel;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -81,7 +79,7 @@ page 6151042 "NPR Notification Card"
 
                 trigger OnAction()
                 begin
-                    AFAPIWebService.SetNotificationCancelledFlag(UserId, "Temp Current Register", Format(Id));
+                    AFAPIWebService.SetNotificationCancelledFlag(UserId, Rec."Temp Current Pos Unit No.", Format(Rec.Id));
                     CurrPage.Close;
                 end;
             }

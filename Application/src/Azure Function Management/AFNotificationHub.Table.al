@@ -1,8 +1,5 @@
 table 6151574 "NPR AF Notification Hub"
 {
-    // NPR5.36/NPKNAV/20171003  CASE 269792 Transport NPR5.36 - 3 October 2017
-    // NPR5.38/NPKNAV/20180126  CASE 269792-01 Transport NPR5.38 - 26 January 2018
-
     Caption = 'AF Notification Hub';
     DataClassification = CustomerContent;
     DataCaptionFields = Id, Title;
@@ -47,12 +44,16 @@ table 6151574 "NPR AF Notification Hub"
         }
         field(14; "From Register No."; Code[10])
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Table ''NPR Register'' is marked for removal. Reason: Replaced with POS Unit, POS store, POS unit profiles.';
             Caption = 'From Register No.';
             DataClassification = CustomerContent;
             TableRelation = "NPR Register";
         }
         field(15; "To Register No."; Code[10])
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Table ''NPR Register'' is marked for removal. Reason: Replaced with POS Unit, POS store, POS unit profiles.';
             Caption = 'To Register No.';
             DataClassification = CustomerContent;
             TableRelation = "NPR Register";
@@ -74,6 +75,18 @@ table 6151574 "NPR AF Notification Hub"
         {
             Caption = 'Location';
             DataClassification = CustomerContent;
+        }
+        field(24; "To POS Unit No."; Code[10])
+        {
+            Caption = 'To POS Unit No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Unit";
+        }
+        field(25; "From POS Unit No."; Code[10])
+        {
+            Caption = 'From POS Unit No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Unit";
         }
         field(100; Created; DateTime)
         {
@@ -107,6 +120,8 @@ table 6151574 "NPR AF Notification Hub"
         }
         field(106; "Handled Register"; Code[10])
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Table ''NPR Register'' is marked for removal. Reason: Replaced with POS Unit, POS store, POS unit profiles.';
             Caption = 'Handled Register';
             DataClassification = CustomerContent;
             TableRelation = "NPR Register";
@@ -124,6 +139,8 @@ table 6151574 "NPR AF Notification Hub"
         }
         field(109; "Cancelled Register"; Code[10])
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Table ''NPR Register'' is marked for removal. Reason: Replaced with POS Unit, POS store, POS unit profiles.';
             Caption = 'Cancelled Register';
             DataClassification = CustomerContent;
             TableRelation = "NPR Register";
@@ -141,6 +158,8 @@ table 6151574 "NPR AF Notification Hub"
         }
         field(112; "Completed Register"; Code[10])
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Table ''NPR Register'' is marked for removal. Reason: Replaced with POS Unit, POS store, POS unit profiles.';
             Caption = 'Completed Register';
             DataClassification = CustomerContent;
             TableRelation = "NPR Register";
@@ -157,9 +176,35 @@ table 6151574 "NPR AF Notification Hub"
         }
         field(202; "Temp Current Register"; Code[10])
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Table ''NPR Register'' is marked for removal. Reason: Replaced with POS Unit, POS store, POS unit profiles.';
             Caption = 'Temp Current Register';
             DataClassification = CustomerContent;
             TableRelation = "NPR Register";
+        }
+        field(220; "Handled Pos Unit No."; Code[10])
+        {
+            Caption = 'Handled Pos Unit No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Pos Unit";
+        }
+        field(221; "Cancelled Pos Unit No."; Code[10])
+        {
+            Caption = 'Cancelled Pos Unit No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Pos Unit";
+        }
+        field(222; "Completed Pos Unit No."; Code[10])
+        {
+            Caption = 'Completed Pos Unit No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Pos Unit";
+        }
+        field(223; "Temp Current Pos Unit No."; Code[10])
+        {
+            Caption = 'Temp Current Pos Unit No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Pos Unit";
         }
     }
 
