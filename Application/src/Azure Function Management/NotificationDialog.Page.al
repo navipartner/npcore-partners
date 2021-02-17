@@ -1,12 +1,8 @@
 page 6151040 "NPR Notification Dialog"
 {
-    // NPR5.36/NPKNAV/20171003  CASE 269792 Transport NPR5.36 - 3 October 2017
-
     Caption = 'Notification Dialog';
     PageType = StandardDialog;
-    UsageCategory = Administration;
-    ApplicationArea = All;
-
+    UsageCategory = None;
     layout
     {
         area(content)
@@ -49,10 +45,6 @@ page 6151040 "NPR Notification Dialog"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnInit()
     begin
         NotificationColor := NotificationColor::Blue;
@@ -72,7 +64,7 @@ page 6151040 "NPR Notification Dialog"
         ToRegisterNo: Code[10];
         ActionType: Option Message,"Phone Call","Facetime Video","Facetime Audio";
         ActionValue: Text[100];
-        gRegisterNo: Code[10];
+        gPOSNo: Code[10];
 
     local procedure OKOnPush()
     var
@@ -87,13 +79,13 @@ page 6151040 "NPR Notification Dialog"
         AFNotificationHub."Notification Color" := NotificationColor;
         AFNotificationHub."Action Type" := ActionType;
         AFNotificationHub."Action Value" := ActionValue;
-        AFNotificationHub."From Register No." := gRegisterNo;
+        AFNotificationHub."From POS Unit No." := gPOSNo;
         AFNotificationHub.Insert(true);
     end;
 
-    procedure SetRegister("Register No.": Code[10])
+    procedure SetRegister("POS Unit No.": Code[10])
     begin
-        gRegisterNo := "Register No.";
+        gPOSNo := "POS Unit No.";
     end;
 }
 

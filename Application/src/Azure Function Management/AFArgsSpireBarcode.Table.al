@@ -1,7 +1,5 @@
 table 6151572 "NPR AF Args: Spire Barcode"
 {
-    // NPR5.36/CLVA/20170710 CASE 269792 AF Argument Table - Spire
-
     Caption = 'AF Arguments - Spire';
     DataClassification = CustomerContent;
 
@@ -106,10 +104,6 @@ table 6151572 "NPR AF Args: Spire Barcode"
         key(Key1; "Primary Key")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

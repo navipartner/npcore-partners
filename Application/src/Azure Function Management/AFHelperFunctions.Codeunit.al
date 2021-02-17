@@ -1,17 +1,24 @@
 codeunit 6151571 "NPR AF Helper Functions"
 {
-    trigger OnRun()
-    begin
-    end;
 
     var
         TXT001: Label 'Clear the customer tag and disable notifications?';
 
+    [Obsolete('Use native Business Central objects')]
     procedure GetValueAsText(JObject: DotNet JObject; PropertyName: Text) ReturnValue: Text
     begin
         ReturnValue := JObject.GetValue(PropertyName).ToString;
     end;
 
+    procedure GetValueAsText(JObject: JsonObject; PropertyName: Text) ReturnValue: Text
+    var
+        Jtoken: JsonToken;
+    begin
+        JObject.Get(PropertyName, Jtoken);
+        ReturnValue := Jtoken.AsValue().AsText();
+    end;
+
+    [Obsolete('Use native Business Central objects')]
     procedure GetValueAsInteger(JObject: DotNet JObject; PropertyName: Text) ReturnValue: Integer
     var
         DotNetInteger: DotNet NPRNetInt32;
@@ -19,6 +26,15 @@ codeunit 6151571 "NPR AF Helper Functions"
         ReturnValue := DotNetInteger.Parse(JObject.GetValue(PropertyName).ToString);
     end;
 
+    procedure GetValueAsInteger(JObject: JsonObject; PropertyName: Text) ReturnValue: Integer
+    var
+        Jtoken: JsonToken;
+    begin
+        JObject.Get(PropertyName, Jtoken);
+        ReturnValue := Jtoken.AsValue().AsInteger();
+    end;
+
+    [Obsolete('Use native Business Central objects')]
     procedure GetValueAsDecimal(JObject: DotNet JObject; PropertyName: Text) ReturnValue: Decimal
     var
         DotNetDecimal: DotNet NPRNetDecimal;
@@ -27,6 +43,15 @@ codeunit 6151571 "NPR AF Helper Functions"
         ReturnValue := DotNetDecimal.Parse(JObject.GetValue(PropertyName).ToString, CultureInfo.InvariantCulture);
     end;
 
+    procedure GetValueAsDecimal(JObject: JsonObject; PropertyName: Text) ReturnValue: Decimal
+    var
+        Jtoken: JsonToken;
+    begin
+        JObject.Get(PropertyName, Jtoken);
+        ReturnValue := Jtoken.AsValue().AsDecimal();
+    end;
+
+    [Obsolete('Use native Business Central objects')]
     procedure GetValueAsDate(JObject: DotNet JObject; PropertyName: Text) ReturnValue: Date
     var
         DotNetDateTime: DotNet NPRNetDateTime;
@@ -38,6 +63,15 @@ codeunit 6151571 "NPR AF Helper Functions"
         ReturnValue := DT2Date(DotNetDateTime);
     end;
 
+    procedure GetValueAsDate(JObject: JsonObject; PropertyName: Text) ReturnValue: Date
+    var
+        Jtoken: JsonToken;
+    begin
+        JObject.Get(PropertyName, Jtoken);
+        ReturnValue := Jtoken.AsValue().AsDate();
+    end;
+
+    [Obsolete('Use native Business Central objects')]
     procedure GetValueAsTime(JObject: DotNet JObject; PropertyName: Text) ReturnValue: Time
     var
         DotNetDateTime: DotNet NPRNetDateTime;
@@ -49,6 +83,15 @@ codeunit 6151571 "NPR AF Helper Functions"
         ReturnValue := DT2Time(DotNetDateTime);
     end;
 
+    procedure GetValueAsTime(JObject: JsonObject; PropertyName: Text) ReturnValue: Time
+    var
+        Jtoken: JsonToken;
+    begin
+        JObject.Get(PropertyName, Jtoken);
+        ReturnValue := Jtoken.AsValue().AsTime();
+    end;
+
+    [Obsolete('Use native Business Central objects')]
     procedure GetValueAsDateTime(JObject: DotNet JObject; PropertyName: Text) ReturnValue: DateTime
     var
         DotNetDateTime: DotNet NPRNetDateTime;
@@ -60,11 +103,28 @@ codeunit 6151571 "NPR AF Helper Functions"
         ReturnValue := DotNetDateTime;
     end;
 
+    procedure GetValueAsDateTime(JObject: JsonObject; PropertyName: Text) ReturnValue: DateTime
+    var
+        Jtoken: JsonToken;
+    begin
+        JObject.Get(PropertyName, Jtoken);
+        ReturnValue := Jtoken.AsValue().AsDateTime();
+    end;
+
+    [Obsolete('Use native Business Central objects')]
     procedure GetValueAsBoolean(JObject: DotNet JObject; PropertyName: Text) ReturnValue: Boolean
     var
         DotNetBoolean: DotNet NPRNetBoolean;
     begin
         ReturnValue := DotNetBoolean.Parse(JObject.GetValue(PropertyName).ToString);
+    end;
+
+    procedure GetValueAsBoolean(JObject: JsonObject; PropertyName: Text) ReturnValue: Boolean
+    var
+        Jtoken: JsonToken;
+    begin
+        JObject.Get(PropertyName, Jtoken);
+        ReturnValue := Jtoken.AsValue().AsBoolean();
     end;
 
     procedure GetBooleanAsText(BooleanState: Boolean): Text
@@ -76,43 +136,44 @@ codeunit 6151571 "NPR AF Helper Functions"
     end;
 
     procedure GetDateTimeAsText(DateTimeNow: DateTime): Text
-    var
-        DotNetDateTime: DotNet NPRNetDateTime;
     begin
-        DotNetDateTime := DateTimeNow;
-        exit(DotNetDateTime.ToString('yyyy-MM-dd hh:mm:ss'));
+        exit(Format(DateTimeNow, 0, '<Year4>-<Month,2>-<Day,2> <Hours24>:<Minutes,2>:<Seconds,2>'));
     end;
 
 
     procedure RemoveLastIndexOf(TextToTrim: Text; CharToTrim: Text): Text
     var
-        DotNetString: DotNet NPRNetString;
         Index: Integer;
     begin
         if (TextToTrim = '') or (CharToTrim = '') then
             exit;
 
-        DotNetString := TextToTrim;
-        Index := DotNetString.LastIndexOf(CharToTrim);
+        Index := TextToTrim.LastIndexOf(CharToTrim);
         if Index > 0 then
-            TextToTrim := DotNetString.Remove(Index, StrLen(CharToTrim));
+            TextToTrim := TextToTrim.Remove(Index, StrLen(CharToTrim));
 
         exit(TextToTrim);
     end;
 
+    [Obsolete('Use native Business Central objects')]
     [TryFunction]
     procedure TryParse(json: Text; var JToken: DotNet JToken)
     begin
         JToken := JToken.Parse(json);
     end;
 
+    [TryFunction]
+    procedure TryParse(json: Text; var JToken: JsonToken)
+    begin
+        JToken.ReadFrom(json);
+    end;
+
     procedure GetOptionStringValue(OptionInt: Integer; FieldNoInt: Integer; RecordVariant: Variant): Text
     var
         RecRef: RecordRef;
         FldRef: FieldRef;
-        OptionString: DotNet NPRNetString;
-        Options: DotNet NPRNetArray;
-        Separator: DotNet NPRNetString;
+        OptionString: Text;
+
     begin
         if not RecordVariant.IsRecord then
             exit;
@@ -121,9 +182,7 @@ codeunit 6151571 "NPR AF Helper Functions"
         FldRef := RecRef.Field(FieldNoInt);
         OptionString := FldRef.OptionMembers;
 
-        Separator := ',';
-        Options := OptionString.Split(Separator.ToCharArray());
-        exit(Options.GetValue(OptionInt));
+        exit(SelectStr(OptionInt, OptionString));
     end;
 
     procedure GetMagentoItemImage(var Item: Record Item; var PictureFileName: Text) Base64String: Text
@@ -131,9 +190,7 @@ codeunit 6151571 "NPR AF Helper Functions"
         TmpMagentoPicture: Record "NPR Magento Picture" temporary;
         MagentoPicture: Record "NPR Magento Picture";
         MagentoPictureLink: Record "NPR Magento Picture Link";
-        BinaryReader: DotNet NPRNetBinaryReader;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Convert: DotNet NPRNetConvert;
+        Base64Convert: codeunit "Base64 Convert";
         InStr: InStream;
     begin
         MagentoPictureLink.SetRange("Item No.", Item."No.");
@@ -146,14 +203,8 @@ codeunit 6151571 "NPR AF Helper Functions"
 
         if MagentoPicture.DownloadPicture(TmpMagentoPicture) then begin
             TmpMagentoPicture.Picture.CreateInStream(InStr);
-            MemoryStream := InStr;
-            BinaryReader := BinaryReader.BinaryReader(InStr);
 
-            Base64String := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
-
-            MemoryStream.Dispose;
-            Clear(MemoryStream);
-
+            Base64String := Base64Convert.ToBase64(InStr);
             PictureFileName := MagentoPicture.Name;
 
             exit(Base64String);
@@ -166,26 +217,24 @@ codeunit 6151571 "NPR AF Helper Functions"
 
     procedure ConvertValueFromBase64(base64Value: Text) stringValue: Text
     var
-        Convert: DotNet NPRNetConvert;
-        Encoding: DotNet NPRNetEncoding;
+        Base64Convert: codeunit "Base64 Convert";
     begin
         if base64Value = '' then
             exit('');
 
-        stringValue := Encoding.UTF8.GetString(Convert.FromBase64String(base64Value));
+        stringValue := Base64Convert.FromBase64(base64Value, TextEncoding::UTF8);
         exit(stringValue);
     end;
 
     procedure ConvertValueToBase64(stringValue: Text) base64Value: Text
     var
-        Convert: DotNet NPRNetConvert;
-        Encoding: DotNet NPRNetEncoding;
+        Base64Convert: codeunit "Base64 Convert";
     begin
-        if stringValue = '' then
+        if base64Value = '' then
             exit('');
 
-        base64Value := Convert.ToBase64String(Encoding.UTF8.GetBytes(stringValue));
-        exit(base64Value);
+        stringValue := Base64Convert.ToBase64(base64Value, TextEncoding::UTF8);
+        exit(stringValue);
     end;
 }
 
