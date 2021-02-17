@@ -114,6 +114,12 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         NpCsWorkflow.Get(MagentoSetup."NpCs Workflow Code");
         NpCsCollectMgt.InitSendToStoreDocument(SalesHeader, NpCsStoreTo, NpCsWorkflow, NpCsDocument);
 
+        SalesHeader.CalcFields("NPR Magento Payment Amount");
+        if SalesHeader."NPR Magento Payment Amount" <> 0 then
+            NpCsDocument."Bill via" := NpCsDocument."Bill via"::"Sales Document"
+        else
+            NpCsDocument."Bill via" := NpCsDocument."Bill via"::POS;
+
         NpCsStoreFrom.Get(MagentoSetup."NpCs From Store Code");
         NpCsDocument."From Store Code" := NpCsStoreFrom.Code;
         NpCsDocument."To Document Type" := NpCsDocument."To Document Type"::Order;
