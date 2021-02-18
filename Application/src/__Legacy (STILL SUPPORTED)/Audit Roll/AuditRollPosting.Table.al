@@ -486,13 +486,13 @@ table 6014424 "NPR Audit Roll Posting"
             Caption = 'Sales Document Ship';
             DataClassification = CustomerContent;
         }
-        field(200; "Salesperson Code"; Code[10])
+        field(200; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             TableRelation = "Salesperson/Purchaser";
             DataClassification = CustomerContent;
         }
-        field(201; "Reversed by Salesperson Code"; Code[10])
+        field(201; "Reversed by Salesperson Code"; Code[20])
         {
             Caption = 'Reversed by Salesperson Code';
             Description = 'Udfyldes med sælgerkoden der tilbagef¢rer bon''en';

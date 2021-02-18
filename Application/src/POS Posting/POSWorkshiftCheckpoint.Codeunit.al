@@ -179,22 +179,20 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
 
             case Mode of
                 EodWorkshiftMode::ZREPORT:
-                    with POSEndofDayProfile do
-                        case POSEndofDayProfile."Z-Report UI" of
-                            "Z-Report UI"::SUMMARY_BALANCING:
-                                UIOption := EndOfDayUIOption::SUMMARY;
-                            "Z-Report UI"::BALANCING:
-                                UIOption := EndOfDayUIOption::BALANCING;
-                        end;
+                    case POSEndofDayProfile."Z-Report UI" of
+                        POSEndofDayProfile."Z-Report UI"::SUMMARY_BALANCING:
+                            UIOption := EndOfDayUIOption::SUMMARY;
+                        POSEndofDayProfile."Z-Report UI"::BALANCING:
+                            UIOption := EndOfDayUIOption::BALANCING;
+                    end;
 
                 EodWorkshiftMode::XREPORT:
-                    with POSEndofDayProfile do
-                        case POSEndofDayProfile."X-Report UI" of
-                            "X-Report UI"::SUMMARY_PRINT:
-                                UIOption := EndOfDayUIOption::SUMMARY;
-                            "X-Report UI"::PRINT:
-                                UIOption := EndOfDayUIOption::NONE;
-                        end;
+                    case POSEndofDayProfile."X-Report UI" of
+                        POSEndofDayProfile."X-Report UI"::SUMMARY_PRINT:
+                            UIOption := EndOfDayUIOption::SUMMARY;
+                        POSEndofDayProfile."X-Report UI"::PRINT:
+                            UIOption := EndOfDayUIOption::NONE;
+                    end;
 
                 EodWorkshiftMode::CLOSEWORKSHIFT:
                     UIOption := EndOfDayUIOption::NONE;
@@ -676,74 +674,70 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         if (not POSWorkshiftCheckpoint.Get(WorkshiftEntryNo)) then
             exit;
 
-        with TargetPOSWorkshiftCheckpoint do begin
+        TargetPOSWorkshiftCheckpoint."Debtor Payment (LCY)" += POSWorkshiftCheckpoint."Debtor Payment (LCY)";
+        TargetPOSWorkshiftCheckpoint."GL Payment (LCY)" += POSWorkshiftCheckpoint."GL Payment (LCY)";
+        TargetPOSWorkshiftCheckpoint."Rounding (LCY)" += POSWorkshiftCheckpoint."Rounding (LCY)";
+        TargetPOSWorkshiftCheckpoint."Credit Item Sales (LCY)" += POSWorkshiftCheckpoint."Credit Item Sales (LCY)";
+        TargetPOSWorkshiftCheckpoint."Credit Item Quantity Sum" += POSWorkshiftCheckpoint."Credit Item Quantity Sum";
+        TargetPOSWorkshiftCheckpoint."Credit Net Sales Amount (LCY)" += POSWorkshiftCheckpoint."Credit Net Sales Amount (LCY)";
+        TargetPOSWorkshiftCheckpoint."Credit Sales Count" += POSWorkshiftCheckpoint."Credit Sales Count";
+        TargetPOSWorkshiftCheckpoint."Credit Sales Amount (LCY)" += POSWorkshiftCheckpoint."Credit Sales Amount (LCY)";
+        TargetPOSWorkshiftCheckpoint."Issued Vouchers (LCY)" += POSWorkshiftCheckpoint."Issued Vouchers (LCY)";
+        TargetPOSWorkshiftCheckpoint."Redeemed Vouchers (LCY)" += POSWorkshiftCheckpoint."Redeemed Vouchers (LCY)";
+        TargetPOSWorkshiftCheckpoint."Local Currency (LCY)" += POSWorkshiftCheckpoint."Local Currency (LCY)";
+        TargetPOSWorkshiftCheckpoint."Foreign Currency (LCY)" += POSWorkshiftCheckpoint."Foreign Currency (LCY)";
+        TargetPOSWorkshiftCheckpoint."EFT (LCY)" += POSWorkshiftCheckpoint."EFT (LCY)";
 
-            "Debtor Payment (LCY)" += POSWorkshiftCheckpoint."Debtor Payment (LCY)";
-            "GL Payment (LCY)" += POSWorkshiftCheckpoint."GL Payment (LCY)";
-            "Rounding (LCY)" += POSWorkshiftCheckpoint."Rounding (LCY)";
-            "Credit Item Sales (LCY)" += POSWorkshiftCheckpoint."Credit Item Sales (LCY)";
-            "Credit Item Quantity Sum" += POSWorkshiftCheckpoint."Credit Item Quantity Sum";
-            "Credit Net Sales Amount (LCY)" += POSWorkshiftCheckpoint."Credit Net Sales Amount (LCY)";
-            "Credit Sales Count" += POSWorkshiftCheckpoint."Credit Sales Count";
-            "Credit Sales Amount (LCY)" += POSWorkshiftCheckpoint."Credit Sales Amount (LCY)";
-            "Issued Vouchers (LCY)" += POSWorkshiftCheckpoint."Issued Vouchers (LCY)";
-            "Redeemed Vouchers (LCY)" += POSWorkshiftCheckpoint."Redeemed Vouchers (LCY)";
-            "Local Currency (LCY)" += POSWorkshiftCheckpoint."Local Currency (LCY)";
-            "Foreign Currency (LCY)" += POSWorkshiftCheckpoint."Foreign Currency (LCY)";
-            "EFT (LCY)" += POSWorkshiftCheckpoint."EFT (LCY)";
+        TargetPOSWorkshiftCheckpoint."Manual Card (LCY)" += POSWorkshiftCheckpoint."Manual Card (LCY)";
+        TargetPOSWorkshiftCheckpoint."Other Credit Card (LCY)" += POSWorkshiftCheckpoint."Other Credit Card (LCY)";
+        TargetPOSWorkshiftCheckpoint."Cash Terminal (LCY)" += POSWorkshiftCheckpoint."Cash Terminal (LCY)";
+        TargetPOSWorkshiftCheckpoint."Redeemed Credit Voucher (LCY)" += POSWorkshiftCheckpoint."Redeemed Credit Voucher (LCY)";
+        TargetPOSWorkshiftCheckpoint."Created Credit Voucher (LCY)" += POSWorkshiftCheckpoint."Created Credit Voucher (LCY)";
 
-            "Manual Card (LCY)" += POSWorkshiftCheckpoint."Manual Card (LCY)";
-            "Other Credit Card (LCY)" += POSWorkshiftCheckpoint."Other Credit Card (LCY)";
-            "Cash Terminal (LCY)" += POSWorkshiftCheckpoint."Cash Terminal (LCY)";
-            "Redeemed Credit Voucher (LCY)" += POSWorkshiftCheckpoint."Redeemed Credit Voucher (LCY)";
-            "Created Credit Voucher (LCY)" += POSWorkshiftCheckpoint."Created Credit Voucher (LCY)";
+        TargetPOSWorkshiftCheckpoint."Direct Item Sales (LCY)" += POSWorkshiftCheckpoint."Direct Item Sales (LCY)";
+        TargetPOSWorkshiftCheckpoint."Direct Sales - Staff (LCY)" += POSWorkshiftCheckpoint."Direct Sales - Staff (LCY)";
+        TargetPOSWorkshiftCheckpoint."Direct Item Net Sales (LCY)" += POSWorkshiftCheckpoint."Direct Item Net Sales (LCY)";
+        TargetPOSWorkshiftCheckpoint."Direct Sales Count" += POSWorkshiftCheckpoint."Direct Sales Count";
+        TargetPOSWorkshiftCheckpoint."Cancelled Sales Count" += POSWorkshiftCheckpoint."Cancelled Sales Count";
+        TargetPOSWorkshiftCheckpoint."Net Turnover (LCY)" += POSWorkshiftCheckpoint."Net Turnover (LCY)";
+        TargetPOSWorkshiftCheckpoint."Turnover (LCY)" += POSWorkshiftCheckpoint."Turnover (LCY)";
+        TargetPOSWorkshiftCheckpoint."Direct Turnover (LCY)" += POSWorkshiftCheckpoint."Direct Turnover (LCY)";
+        TargetPOSWorkshiftCheckpoint."Direct Negative Turnover (LCY)" += POSWorkshiftCheckpoint."Direct Negative Turnover (LCY)";
+        TargetPOSWorkshiftCheckpoint."Direct Net Turnover (LCY)" += POSWorkshiftCheckpoint."Direct Net Turnover (LCY)";
+        TargetPOSWorkshiftCheckpoint."Net Cost (LCY)" += POSWorkshiftCheckpoint."Net Cost (LCY)";
+        TargetPOSWorkshiftCheckpoint."Profit Amount (LCY)" += POSWorkshiftCheckpoint."Profit Amount (LCY)";
 
-            "Direct Item Sales (LCY)" += POSWorkshiftCheckpoint."Direct Item Sales (LCY)";
-            "Direct Sales - Staff (LCY)" += POSWorkshiftCheckpoint."Direct Sales - Staff (LCY)";
-            "Direct Item Net Sales (LCY)" += POSWorkshiftCheckpoint."Direct Item Net Sales (LCY)";
-            "Direct Sales Count" += POSWorkshiftCheckpoint."Direct Sales Count";
-            "Cancelled Sales Count" += POSWorkshiftCheckpoint."Cancelled Sales Count";
-            "Net Turnover (LCY)" += POSWorkshiftCheckpoint."Net Turnover (LCY)";
-            "Turnover (LCY)" += POSWorkshiftCheckpoint."Turnover (LCY)";
-            "Direct Turnover (LCY)" += POSWorkshiftCheckpoint."Direct Turnover (LCY)";
-            "Direct Negative Turnover (LCY)" += POSWorkshiftCheckpoint."Direct Negative Turnover (LCY)";
-            "Direct Net Turnover (LCY)" += POSWorkshiftCheckpoint."Direct Net Turnover (LCY)";
-            "Net Cost (LCY)" += POSWorkshiftCheckpoint."Net Cost (LCY)";
-            "Profit Amount (LCY)" += POSWorkshiftCheckpoint."Profit Amount (LCY)";
+        TargetPOSWorkshiftCheckpoint."Direct Item Returns (LCY)" += POSWorkshiftCheckpoint."Direct Item Returns (LCY)";
+        TargetPOSWorkshiftCheckpoint."Direct Item Returns Line Count" += POSWorkshiftCheckpoint."Direct Item Returns Line Count";
+        TargetPOSWorkshiftCheckpoint."Credit Real. Sale Amt. (LCY)" += POSWorkshiftCheckpoint."Credit Real. Sale Amt. (LCY)";
+        TargetPOSWorkshiftCheckpoint."Credit Unreal. Sale Amt. (LCY)" += POSWorkshiftCheckpoint."Credit Unreal. Sale Amt. (LCY)";
+        TargetPOSWorkshiftCheckpoint."Credit Real. Return Amt. (LCY)" += POSWorkshiftCheckpoint."Credit Real. Return Amt. (LCY)";
+        TargetPOSWorkshiftCheckpoint."Credit Unreal. Ret. Amt. (LCY)" += POSWorkshiftCheckpoint."Credit Unreal. Ret. Amt. (LCY)";
+        TargetPOSWorkshiftCheckpoint."Credit Turnover (LCY)" += POSWorkshiftCheckpoint."Credit Turnover (LCY)";
+        TargetPOSWorkshiftCheckpoint."Credit Net Turnover (LCY)" += POSWorkshiftCheckpoint."Credit Net Turnover (LCY)";
 
-            "Direct Item Returns (LCY)" += POSWorkshiftCheckpoint."Direct Item Returns (LCY)";
-            "Direct Item Returns Line Count" += POSWorkshiftCheckpoint."Direct Item Returns Line Count";
-            "Credit Real. Sale Amt. (LCY)" += POSWorkshiftCheckpoint."Credit Real. Sale Amt. (LCY)";
-            "Credit Unreal. Sale Amt. (LCY)" += POSWorkshiftCheckpoint."Credit Unreal. Sale Amt. (LCY)";
-            "Credit Real. Return Amt. (LCY)" += POSWorkshiftCheckpoint."Credit Real. Return Amt. (LCY)";
-            "Credit Unreal. Ret. Amt. (LCY)" += POSWorkshiftCheckpoint."Credit Unreal. Ret. Amt. (LCY)";
-            "Credit Turnover (LCY)" += POSWorkshiftCheckpoint."Credit Turnover (LCY)";
-            "Credit Net Turnover (LCY)" += POSWorkshiftCheckpoint."Credit Net Turnover (LCY)";
+        TargetPOSWorkshiftCheckpoint."Total Discount (LCY)" += POSWorkshiftCheckpoint."Total Discount (LCY)";
+        TargetPOSWorkshiftCheckpoint."Total Net Discount (LCY)" += POSWorkshiftCheckpoint."Total Net Discount (LCY)";
+        TargetPOSWorkshiftCheckpoint."Campaign Discount (LCY)" += POSWorkshiftCheckpoint."Campaign Discount (LCY)";
+        TargetPOSWorkshiftCheckpoint."Mix Discount (LCY)" += POSWorkshiftCheckpoint."Mix Discount (LCY)";
+        TargetPOSWorkshiftCheckpoint."Quantity Discount (LCY)" += POSWorkshiftCheckpoint."Quantity Discount (LCY)";
+        TargetPOSWorkshiftCheckpoint."Custom Discount (LCY)" += POSWorkshiftCheckpoint."Custom Discount (LCY)";
+        TargetPOSWorkshiftCheckpoint."BOM Discount (LCY)" += POSWorkshiftCheckpoint."BOM Discount (LCY)";
+        TargetPOSWorkshiftCheckpoint."Customer Discount (LCY)" += POSWorkshiftCheckpoint."Customer Discount (LCY)";
+        TargetPOSWorkshiftCheckpoint."Line Discount (LCY)" += POSWorkshiftCheckpoint."Line Discount (LCY)";
+        TargetPOSWorkshiftCheckpoint."Calculated Diff (LCY)" += POSWorkshiftCheckpoint."Calculated Diff (LCY)";
 
-            "Total Discount (LCY)" += POSWorkshiftCheckpoint."Total Discount (LCY)";
-            "Total Net Discount (LCY)" += POSWorkshiftCheckpoint."Total Net Discount (LCY)";
-            "Campaign Discount (LCY)" += POSWorkshiftCheckpoint."Campaign Discount (LCY)";
-            "Mix Discount (LCY)" += POSWorkshiftCheckpoint."Mix Discount (LCY)";
-            "Quantity Discount (LCY)" += POSWorkshiftCheckpoint."Quantity Discount (LCY)";
-            "Custom Discount (LCY)" += POSWorkshiftCheckpoint."Custom Discount (LCY)";
-            "BOM Discount (LCY)" += POSWorkshiftCheckpoint."BOM Discount (LCY)";
-            "Customer Discount (LCY)" += POSWorkshiftCheckpoint."Customer Discount (LCY)";
-            "Line Discount (LCY)" += POSWorkshiftCheckpoint."Line Discount (LCY)";
-            "Calculated Diff (LCY)" += POSWorkshiftCheckpoint."Calculated Diff (LCY)";
+        TargetPOSWorkshiftCheckpoint."Direct Item Quantity Sum" += POSWorkshiftCheckpoint."Direct Item Quantity Sum";
+        TargetPOSWorkshiftCheckpoint."Direct Item Sales Line Count" += POSWorkshiftCheckpoint."Direct Item Sales Line Count";
+        TargetPOSWorkshiftCheckpoint."Receipts Count" += POSWorkshiftCheckpoint."Receipts Count";
+        TargetPOSWorkshiftCheckpoint."Cash Drawer Open Count" += POSWorkshiftCheckpoint."Cash Drawer Open Count";
+        TargetPOSWorkshiftCheckpoint."Receipt Copies Count" += POSWorkshiftCheckpoint."Receipt Copies Count";
+        TargetPOSWorkshiftCheckpoint."Receipt Copies Sales (LCY)" += POSWorkshiftCheckpoint."Receipt Copies Sales (LCY)";
 
-            "Direct Item Quantity Sum" += POSWorkshiftCheckpoint."Direct Item Quantity Sum";
-            "Direct Item Sales Line Count" += POSWorkshiftCheckpoint."Direct Item Sales Line Count";
-            "Receipts Count" += POSWorkshiftCheckpoint."Receipts Count";
-            "Cash Drawer Open Count" += POSWorkshiftCheckpoint."Cash Drawer Open Count";
-            "Receipt Copies Count" += POSWorkshiftCheckpoint."Receipt Copies Count";
-            "Receipt Copies Sales (LCY)" += POSWorkshiftCheckpoint."Receipt Copies Sales (LCY)";
+        TargetPOSWorkshiftCheckpoint."Bin Transfer Out Amount (LCY)" += POSWorkshiftCheckpoint."Bin Transfer Out Amount (LCY)";
+        TargetPOSWorkshiftCheckpoint."Bin Transfer In Amount (LCY)" += POSWorkshiftCheckpoint."Bin Transfer In Amount (LCY)";
 
-            "Bin Transfer Out Amount (LCY)" += POSWorkshiftCheckpoint."Bin Transfer Out Amount (LCY)";
-            "Bin Transfer In Amount (LCY)" += POSWorkshiftCheckpoint."Bin Transfer In Amount (LCY)";
-
-            "Opening Cash (LCY)" += POSWorkshiftCheckpoint."Opening Cash (LCY)";
-
-        end;
+        TargetPOSWorkshiftCheckpoint."Opening Cash (LCY)" += POSWorkshiftCheckpoint."Opening Cash (LCY)";
         POSWorkshiftCheckpoint."Consolidated With Entry No." := TargetWorkshiftEntryNo;
         POSWorkshiftCheckpoint.Modify();
 
@@ -759,41 +753,38 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         POSWorkshiftTaxCheckpoint: Record "NPR POS Worksh. Tax Checkp.";
     begin
 
-        with POSWorkshiftTaxCheckpoint do begin
+        POSWorkshiftTaxCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', WorkshiftEntryNo);
+        POSWorkshiftTaxCheckpoint.SetFilter("Consolidated With Entry No.", '=%1', 0); // not yet consolidated.
 
-            SetFilter("Workshift Checkpoint Entry No.", '=%1', WorkshiftEntryNo);
-            SetFilter("Consolidated With Entry No.", '=%1', 0); // not yet consolidated.
+        if (POSWorkshiftTaxCheckpoint.FindSet()) then begin
 
-            if (FindSet()) then begin
+            repeat
+                // consolidation key: "Workshift Checkpoint Entry No.","Tax Area Code","VAT Identifier","Tax Calculation Type"
+                TargetWorkshiftTaxCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.", "Tax Area Code", "VAT Identifier", "Tax Calculation Type");
+                TargetWorkshiftTaxCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', TargetWorkshiftEntryNo);
+                TargetWorkshiftTaxCheckpoint.SetFilter("Tax Area Code", '=%1', POSWorkshiftTaxCheckpoint."Tax Area Code");
+                TargetWorkshiftTaxCheckpoint.SetFilter("VAT Identifier", '=%1', POSWorkshiftTaxCheckpoint."VAT Identifier");
+                TargetWorkshiftTaxCheckpoint.SetFilter("Tax Calculation Type", '=%1', POSWorkshiftTaxCheckpoint."Tax Calculation Type");
+                TargetWorkshiftTaxCheckpoint.SetFilter("Tax Jurisdiction Code", '=%1', POSWorkshiftTaxCheckpoint."Tax Jurisdiction Code");
+                TargetWorkshiftTaxCheckpoint.SetFilter("Tax Group Code", '=%1', POSWorkshiftTaxCheckpoint."Tax Group Code");
 
-                repeat
-                    // consolidation key: "Workshift Checkpoint Entry No.","Tax Area Code","VAT Identifier","Tax Calculation Type"
-                    TargetWorkshiftTaxCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.", "Tax Area Code", "VAT Identifier", "Tax Calculation Type");
-                    TargetWorkshiftTaxCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', TargetWorkshiftEntryNo);
-                    TargetWorkshiftTaxCheckpoint.SetFilter("Tax Area Code", '=%1', "Tax Area Code");
-                    TargetWorkshiftTaxCheckpoint.SetFilter("VAT Identifier", '=%1', "VAT Identifier");
-                    TargetWorkshiftTaxCheckpoint.SetFilter("Tax Calculation Type", '=%1', "Tax Calculation Type");
-                    TargetWorkshiftTaxCheckpoint.SetFilter("Tax Jurisdiction Code", '=%1', "Tax Jurisdiction Code");
-                    TargetWorkshiftTaxCheckpoint.SetFilter("Tax Group Code", '=%1', "Tax Group Code");
+                if (TargetWorkshiftTaxCheckpoint.FindFirst()) then begin
+                    TargetWorkshiftTaxCheckpoint."Tax Base Amount" += POSWorkshiftTaxCheckpoint."Tax Base Amount";
+                    TargetWorkshiftTaxCheckpoint."Tax Amount" += POSWorkshiftTaxCheckpoint."Tax Amount";
+                    TargetWorkshiftTaxCheckpoint."Amount Including Tax" += POSWorkshiftTaxCheckpoint."Amount Including Tax";
+                    TargetWorkshiftTaxCheckpoint."Line Amount" += POSWorkshiftTaxCheckpoint."Line Amount";
+                    TargetWorkshiftTaxCheckpoint.Modify();
+                end else begin
+                    TargetWorkshiftTaxCheckpoint.TransferFields(POSWorkshiftTaxCheckpoint, false);
+                    TargetWorkshiftTaxCheckpoint."Entry No." := 0;
+                    TargetWorkshiftTaxCheckpoint."Workshift Checkpoint Entry No." := TargetWorkshiftEntryNo;
+                    TargetWorkshiftTaxCheckpoint.Insert();
+                end;
 
-                    if (TargetWorkshiftTaxCheckpoint.FindFirst()) then begin
-                        TargetWorkshiftTaxCheckpoint."Tax Base Amount" += "Tax Base Amount";
-                        TargetWorkshiftTaxCheckpoint."Tax Amount" += "Tax Amount";
-                        TargetWorkshiftTaxCheckpoint."Amount Including Tax" += "Amount Including Tax";
-                        TargetWorkshiftTaxCheckpoint."Line Amount" += "Line Amount";
-                        TargetWorkshiftTaxCheckpoint.Modify();
-                    end else begin
-                        TargetWorkshiftTaxCheckpoint.TransferFields(POSWorkshiftTaxCheckpoint, false);
-                        TargetWorkshiftTaxCheckpoint."Entry No." := 0;
-                        TargetWorkshiftTaxCheckpoint."Workshift Checkpoint Entry No." := TargetWorkshiftEntryNo;
-                        TargetWorkshiftTaxCheckpoint.Insert();
-                    end;
+                POSWorkshiftTaxCheckpoint."Consolidated With Entry No." := TargetWorkshiftTaxCheckpoint."Entry No.";
+                POSWorkshiftTaxCheckpoint.Modify();
 
-                    POSWorkshiftTaxCheckpoint."Consolidated With Entry No." := TargetWorkshiftTaxCheckpoint."Entry No.";
-                    POSWorkshiftTaxCheckpoint.Modify();
-
-                until (POSWorkshiftTaxCheckpoint.Next() = 0);
-            end;
+            until (POSWorkshiftTaxCheckpoint.Next() = 0);
         end;
 
     end;
@@ -807,18 +798,16 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         LastPOSEntry.Reset;
         LastPOSEntry.FindLast;
 
-        with POSPostingLog do begin
-            Init;
-            "Entry No." := 0;
-            "User ID" := UserId;
-            "Posting Timestamp" := CurrentDateTime;
-            "With Error" := true;
-            "Error Description" := CopyStr(ErrorReason, 1, MaxStrLen("Error Description"));
-            "POS Entry View" := CopyStr(POSEntry.GetView, 1, MaxStrLen("POS Entry View"));
-            "Last POS Entry No. at Posting" := LastPOSEntry."Entry No.";
-            Insert(true);
-            exit("Entry No.");
-        end;
+        POSPostingLog.Init;
+        POSPostingLog."Entry No." := 0;
+        POSPostingLog."User ID" := UserId;
+        POSPostingLog."Posting Timestamp" := CurrentDateTime;
+        POSPostingLog."With Error" := true;
+        POSPostingLog."Error Description" := CopyStr(ErrorReason, 1, MaxStrLen(POSPostingLog."Error Description"));
+        POSPostingLog."POS Entry View" := CopyStr(POSEntry.GetView, 1, MaxStrLen(POSPostingLog."POS Entry View"));
+        POSPostingLog."Last POS Entry No. at Posting" := LastPOSEntry."Entry No.";
+        POSPostingLog.Insert(true);
+        exit(POSPostingLog."Entry No.");
 
     end;
 
@@ -1066,159 +1055,152 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         DocDeleted: Boolean;
     begin
 
-        with POSSalesLine do begin
+        //Total turnover must not include POS sales transfered to ERP as unposted.
+        if (POSEntry."Entry Type" = POSEntry."Entry Type"::"Credit Sale") then begin
 
-            //Total turnover must not include POS sales transfered to ERP as unposted.
-            if (POSEntry."Entry Type" = POSEntry."Entry Type"::"Credit Sale") then begin
+            if (CheckIsPosted(POSEntry."Sales Document Type", POSEntry."Sales Document No.", DocDeleted) and
+                (POSSalesLine.Type <> POSSalesLine.Type::Voucher) and
+                (POSSalesLine.Type <> POSSalesLine.Type::Payout) and
+                (POSSalesLine.Type <> POSSalesLine.Type::"G/L Account")) then begin
 
-                if (CheckIsPosted(POSEntry."Sales Document Type", POSEntry."Sales Document No.", DocDeleted) and
-                    (Type <> Type::Voucher) and
-                    (Type <> Type::Payout) and
-                    (Type <> Type::"G/L Account")) then begin
+                case (POSEntry."Sales Document Type") of
+                    POSEntry."Sales Document Type"::Invoice:
+                        POSWorkshiftCheckpoint."Credit Real. Sale Amt. (LCY)" += POSSalesLine."Amount Excl. VAT (LCY)";
+                    POSEntry."Sales Document Type"::Order:
+                        POSWorkshiftCheckpoint."Credit Real. Sale Amt. (LCY)" += POSSalesLine."Amount Excl. VAT (LCY)";
+                    POSEntry."Sales Document Type"::"Credit Memo":
+                        POSWorkshiftCheckpoint."Credit Real. Return Amt. (LCY)" += POSSalesLine."Amount Excl. VAT (LCY)";
+                    POSEntry."Sales Document Type"::"Return Order":
+                        POSWorkshiftCheckpoint."Credit Real. Return Amt. (LCY)" += POSSalesLine."Amount Excl. VAT (LCY)";
+                end;
 
+                POSWorkshiftCheckpoint."Turnover (LCY)" += POSSalesLine."Amount Incl. VAT (LCY)";
+                POSWorkshiftCheckpoint."Net Turnover (LCY)" += POSSalesLine."Amount Excl. VAT (LCY)";
+                POSWorkshiftCheckpoint."Credit Turnover (LCY)" += POSSalesLine."Amount Incl. VAT (LCY)";
+                POSWorkshiftCheckpoint."Credit Net Turnover (LCY)" += POSSalesLine."Amount Excl. VAT (LCY)";
+                POSWorkshiftCheckpoint."Net Cost (LCY)" += POSSalesLine."Unit Cost (LCY)" * POSSalesLine.Quantity;
+
+            end else begin
+                if not DocDeleted then
                     case (POSEntry."Sales Document Type") of
                         POSEntry."Sales Document Type"::Invoice:
-                            POSWorkshiftCheckpoint."Credit Real. Sale Amt. (LCY)" += "Amount Excl. VAT (LCY)";
+                            POSWorkshiftCheckpoint."Credit Unreal. Sale Amt. (LCY)" += POSSalesLine."Amount Excl. VAT (LCY)";
                         POSEntry."Sales Document Type"::Order:
-                            POSWorkshiftCheckpoint."Credit Real. Sale Amt. (LCY)" += "Amount Excl. VAT (LCY)";
+                            POSWorkshiftCheckpoint."Credit Unreal. Sale Amt. (LCY)" += POSSalesLine."Amount Excl. VAT (LCY)";
                         POSEntry."Sales Document Type"::"Credit Memo":
-                            POSWorkshiftCheckpoint."Credit Real. Return Amt. (LCY)" += "Amount Excl. VAT (LCY)";
+                            POSWorkshiftCheckpoint."Credit Unreal. Ret. Amt. (LCY)" += POSSalesLine."Amount Excl. VAT (LCY)";
                         POSEntry."Sales Document Type"::"Return Order":
-                            POSWorkshiftCheckpoint."Credit Real. Return Amt. (LCY)" += "Amount Excl. VAT (LCY)";
+                            POSWorkshiftCheckpoint."Credit Unreal. Ret. Amt. (LCY)" += POSSalesLine."Amount Excl. VAT (LCY)";
                     end;
-
-                    POSWorkshiftCheckpoint."Turnover (LCY)" += "Amount Incl. VAT (LCY)";
-                    POSWorkshiftCheckpoint."Net Turnover (LCY)" += "Amount Excl. VAT (LCY)";
-                    POSWorkshiftCheckpoint."Credit Turnover (LCY)" += "Amount Incl. VAT (LCY)";
-                    POSWorkshiftCheckpoint."Credit Net Turnover (LCY)" += "Amount Excl. VAT (LCY)";
-                    POSWorkshiftCheckpoint."Net Cost (LCY)" += "Unit Cost (LCY)" * Quantity;
-
-                end else begin
-                    if not DocDeleted then
-                        case (POSEntry."Sales Document Type") of
-                            POSEntry."Sales Document Type"::Invoice:
-                                POSWorkshiftCheckpoint."Credit Unreal. Sale Amt. (LCY)" += "Amount Excl. VAT (LCY)";
-                            POSEntry."Sales Document Type"::Order:
-                                POSWorkshiftCheckpoint."Credit Unreal. Sale Amt. (LCY)" += "Amount Excl. VAT (LCY)";
-                            POSEntry."Sales Document Type"::"Credit Memo":
-                                POSWorkshiftCheckpoint."Credit Unreal. Ret. Amt. (LCY)" += "Amount Excl. VAT (LCY)";
-                            POSEntry."Sales Document Type"::"Return Order":
-                                POSWorkshiftCheckpoint."Credit Unreal. Ret. Amt. (LCY)" += "Amount Excl. VAT (LCY)";
-                        end;
-                end;
-
-                if not DocDeleted then begin
-                    POSWorkshiftCheckpoint."Credit Sales Amount (LCY)" += "Amount Incl. VAT (LCY)";
-                    POSWorkshiftCheckpoint."Credit Net Sales Amount (LCY)" += "Amount Excl. VAT (LCY)";
-                end;
             end;
 
-
-            if (POSEntry."Entry Type" <> POSEntry."Entry Type"::"Credit Sale") then begin
-                if ((Type <> Type::Voucher) and
-                    (Type <> Type::Payout) and
-                    (Type <> Type::"G/L Account")) then begin
-
-                    POSWorkshiftCheckpoint."Turnover (LCY)" += "Amount Incl. VAT (LCY)";
-                    POSWorkshiftCheckpoint."Net Turnover (LCY)" += "Amount Excl. VAT (LCY)";
-                    POSWorkshiftCheckpoint."Net Cost (LCY)" += "Unit Cost (LCY)" * Quantity;
-                end;
+            if not DocDeleted then begin
+                POSWorkshiftCheckpoint."Credit Sales Amount (LCY)" += POSSalesLine."Amount Incl. VAT (LCY)";
+                POSWorkshiftCheckpoint."Credit Net Sales Amount (LCY)" += POSSalesLine."Amount Excl. VAT (LCY)";
             end;
+        end;
 
-            if POSEntry."Entry Type" in [POSEntry."Entry Type"::"Direct Sale"] then begin
-                if ((Type <> Type::Voucher) and
-                    (Type <> Type::Payout) and
-                    (Type <> Type::"G/L Account")) then begin
-                    POSWorkshiftCheckpoint."Direct Net Turnover (LCY)" += "Amount Excl. VAT (LCY)";
-                    POSWorkshiftCheckpoint."Direct Turnover (LCY)" += "Amount Incl. VAT (LCY)";
-                    if "Amount Incl. VAT (LCY)" < 0 then
-                        POSWorkshiftCheckpoint."Direct Negative Turnover (LCY)" += "Amount Incl. VAT (LCY)";
-                end;
+
+        if (POSEntry."Entry Type" <> POSEntry."Entry Type"::"Credit Sale") then begin
+            if ((POSSalesLine.Type <> POSSalesLine.Type::Voucher) and
+                (POSSalesLine.Type <> POSSalesLine.Type::Payout) and
+                (POSSalesLine.Type <> POSSalesLine.Type::"G/L Account")) then begin
+
+                POSWorkshiftCheckpoint."Turnover (LCY)" += POSSalesLine."Amount Incl. VAT (LCY)";
+                POSWorkshiftCheckpoint."Net Turnover (LCY)" += POSSalesLine."Amount Excl. VAT (LCY)";
+                POSWorkshiftCheckpoint."Net Cost (LCY)" += POSSalesLine."Unit Cost (LCY)" * POSSalesLine.Quantity;
             end;
+        end;
 
-            case Type of
-                Type::Item:
-                    begin
-                        if (POSEntry."Entry Type" = POSEntry."Entry Type"::"Direct Sale") then begin
-                            if (Quantity > 0) then begin
-                                POSWorkshiftCheckpoint."Direct Item Sales (LCY)" += "Amount Incl. VAT (LCY)";
-                                POSWorkshiftCheckpoint."Direct Item Net Sales (LCY)" += "Amount Excl. VAT (LCY)";
-                                POSWorkshiftCheckpoint."Direct Item Sales Line Count" += 1;
-                                POSWorkshiftCheckpoint."Direct Item Sales Quantity" += Quantity;
-                            end;
+        if POSEntry."Entry Type" in [POSEntry."Entry Type"::"Direct Sale"] then begin
+            if ((POSSalesLine.Type <> POSSalesLine.Type::Voucher) and
+                (POSSalesLine.Type <> POSSalesLine.Type::Payout) and
+                (POSSalesLine.Type <> POSSalesLine.Type::"G/L Account")) then begin
+                POSWorkshiftCheckpoint."Direct Net Turnover (LCY)" += POSSalesLine."Amount Excl. VAT (LCY)";
+                POSWorkshiftCheckpoint."Direct Turnover (LCY)" += POSSalesLine."Amount Incl. VAT (LCY)";
+                if POSSalesLine."Amount Incl. VAT (LCY)" < 0 then
+                    POSWorkshiftCheckpoint."Direct Negative Turnover (LCY)" += POSSalesLine."Amount Incl. VAT (LCY)";
+            end;
+        end;
 
-                            if (Quantity < 0) then begin
-                                POSWorkshiftCheckpoint."Direct Item Returns (LCY)" += "Amount Incl. VAT (LCY)";
-                                POSWorkshiftCheckpoint."Direct Item Returns Line Count" += 1;
-                                POSWorkshiftCheckpoint."Direct Item Returns Quantity" += Quantity;
-                            end;
-
-                            POSWorkshiftCheckpoint."Direct Item Quantity Sum" += Quantity;
+        case POSSalesLine.Type of
+            POSSalesLine.Type::Item:
+                begin
+                    if (POSEntry."Entry Type" = POSEntry."Entry Type"::"Direct Sale") then begin
+                        if (POSSalesLine.Quantity > 0) then begin
+                            POSWorkshiftCheckpoint."Direct Item Sales (LCY)" += POSSalesLine."Amount Incl. VAT (LCY)";
+                            POSWorkshiftCheckpoint."Direct Item Net Sales (LCY)" += POSSalesLine."Amount Excl. VAT (LCY)";
+                            POSWorkshiftCheckpoint."Direct Item Sales Line Count" += 1;
+                            POSWorkshiftCheckpoint."Direct Item Sales Quantity" += POSSalesLine.Quantity;
                         end;
 
-                        if (POSEntry."Entry Type" = POSEntry."Entry Type"::"Credit Sale") then begin
-                            POSWorkshiftCheckpoint."Credit Item Sales (LCY)" += "Amount Incl. VAT (LCY)";
-                            POSWorkshiftCheckpoint."Credit Item Quantity Sum" += Quantity;
+                        if (POSSalesLine.Quantity < 0) then begin
+                            POSWorkshiftCheckpoint."Direct Item Returns (LCY)" += POSSalesLine."Amount Incl. VAT (LCY)";
+                            POSWorkshiftCheckpoint."Direct Item Returns Line Count" += 1;
+                            POSWorkshiftCheckpoint."Direct Item Returns Quantity" += POSSalesLine.Quantity;
                         end;
+
+                        POSWorkshiftCheckpoint."Direct Item Quantity Sum" += POSSalesLine.Quantity;
                     end;
 
-                Type::Customer:
-                    begin
-                        POSWorkshiftCheckpoint."Debtor Payment (LCY)" += "Amount Incl. VAT (LCY)";
+                    if (POSEntry."Entry Type" = POSEntry."Entry Type"::"Credit Sale") then begin
+                        POSWorkshiftCheckpoint."Credit Item Sales (LCY)" += POSSalesLine."Amount Incl. VAT (LCY)";
+                        POSWorkshiftCheckpoint."Credit Item Quantity Sum" += POSSalesLine.Quantity;
                     end;
+                end;
 
-                Type::"G/L Account":
-                    begin
-                        POSWorkshiftCheckpoint."GL Payment (LCY)" += "Amount Incl. VAT (LCY)";
-                    end;
+            POSSalesLine.Type::Customer:
+                begin
+                    POSWorkshiftCheckpoint."Debtor Payment (LCY)" += POSSalesLine."Amount Incl. VAT (LCY)";
+                end;
 
-                Type::Payout:
-                    begin
-                        // Net value, a "Payin" has reversed sign
-                        POSWorkshiftCheckpoint."GL Payment (LCY)" += "Amount Incl. VAT (LCY)";
-                    end;
+            POSSalesLine.Type::"G/L Account":
+                begin
+                    POSWorkshiftCheckpoint."GL Payment (LCY)" += POSSalesLine."Amount Incl. VAT (LCY)";
+                end;
 
-                Type::Rounding:
-                    begin
-                        POSWorkshiftCheckpoint."Rounding (LCY)" += "Amount Incl. VAT (LCY)";
-                    end;
+            POSSalesLine.Type::Payout:
+                begin
+                    // Net value, a "Payin" has reversed sign
+                    POSWorkshiftCheckpoint."GL Payment (LCY)" += POSSalesLine."Amount Incl. VAT (LCY)";
+                end;
 
-                Type::Voucher:
-                    begin
-                        POSWorkshiftCheckpoint."Issued Vouchers (LCY)" += "Amount Incl. VAT (LCY)";
-                    end;
+            POSSalesLine.Type::Rounding:
+                begin
+                    POSWorkshiftCheckpoint."Rounding (LCY)" += POSSalesLine."Amount Incl. VAT (LCY)";
+                end;
 
-                else
-                    ;
-            end;
+            POSSalesLine.Type::Voucher:
+                begin
+                    POSWorkshiftCheckpoint."Issued Vouchers (LCY)" += POSSalesLine."Amount Incl. VAT (LCY)";
+                end;
 
+            else
+                ;
         end;
     end;
 
     local procedure SetDiscounts(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; POSSalesLine: Record "NPR POS Sales Line")
     begin
 
-        with POSSalesLine do begin
+        POSWorkshiftCheckpoint."Total Discount (LCY)" += POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)";
+        POSWorkshiftCheckpoint."Total Net Discount (LCY)" += POSSalesLine."Line Dsc. Amt. Excl. VAT (LCY)";
 
-            POSWorkshiftCheckpoint."Total Discount (LCY)" += "Line Dsc. Amt. Incl. VAT (LCY)";
-            POSWorkshiftCheckpoint."Total Net Discount (LCY)" += "Line Dsc. Amt. Excl. VAT (LCY)";
-
-            case "Discount Type" of
-                "Discount Type"::"BOM List":
-                    POSWorkshiftCheckpoint."BOM Discount (LCY)" += "Line Dsc. Amt. Incl. VAT (LCY)";
-                "Discount Type"::Campaign:
-                    POSWorkshiftCheckpoint."Campaign Discount (LCY)" += "Line Dsc. Amt. Incl. VAT (LCY)";
-                "Discount Type"::Customer:
-                    POSWorkshiftCheckpoint."Customer Discount (LCY)" += "Line Dsc. Amt. Incl. VAT (LCY)";
-                "Discount Type"::Manual:
-                    POSWorkshiftCheckpoint."Custom Discount (LCY)" += "Line Dsc. Amt. Incl. VAT (LCY)";
-                "Discount Type"::Mix:
-                    POSWorkshiftCheckpoint."Mix Discount (LCY)" += "Line Dsc. Amt. Incl. VAT (LCY)";
-                "Discount Type"::Quantity:
-                    POSWorkshiftCheckpoint."Quantity Discount (LCY)" += "Line Dsc. Amt. Incl. VAT (LCY)";
-                else
-                    POSWorkshiftCheckpoint."Line Discount (LCY)" += "Line Dsc. Amt. Incl. VAT (LCY)";
-            end;
+        case POSSalesLine."Discount Type" of
+            POSSalesLine."Discount Type"::"BOM List":
+                POSWorkshiftCheckpoint."BOM Discount (LCY)" += POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)";
+            POSSalesLine."Discount Type"::Campaign:
+                POSWorkshiftCheckpoint."Campaign Discount (LCY)" += POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)";
+            POSSalesLine."Discount Type"::Customer:
+                POSWorkshiftCheckpoint."Customer Discount (LCY)" += POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)";
+            POSSalesLine."Discount Type"::Manual:
+                POSWorkshiftCheckpoint."Custom Discount (LCY)" += POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)";
+            POSSalesLine."Discount Type"::Mix:
+                POSWorkshiftCheckpoint."Mix Discount (LCY)" += POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)";
+            POSSalesLine."Discount Type"::Quantity:
+                POSWorkshiftCheckpoint."Quantity Discount (LCY)" += POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)";
+            else
+                POSWorkshiftCheckpoint."Line Discount (LCY)" += POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)";
         end;
     end;
 
@@ -1228,33 +1210,30 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         IsLCY: Boolean;
     begin
 
-        with POSPaymentLine do begin
-            POSPaymentMethod.Get(POSPaymentLine."POS Payment Method Code");
-            IsLCY := (("Currency Code" = '') or ("Currency Code" = LCYCode));
+        POSPaymentMethod.Get(POSPaymentLine."POS Payment Method Code");
+        IsLCY := ((POSPaymentLine."Currency Code" = '') or (POSPaymentLine."Currency Code" = LCYCode));
 
-            case POSPaymentMethod."Processing Type" of
-                POSPaymentMethod."Processing Type"::CASH:
-                    begin
-                        if (IsLCY) then POSWorkshiftCheckpoint."Local Currency (LCY)" += "Amount (LCY)";
-                        if (not IsLCY) then POSWorkshiftCheckpoint."Foreign Currency (LCY)" += "Amount (LCY)";
-                    end;
+        case POSPaymentMethod."Processing Type" of
+            POSPaymentMethod."Processing Type"::CASH:
+                begin
+                    if (IsLCY) then POSWorkshiftCheckpoint."Local Currency (LCY)" += POSPaymentLine."Amount (LCY)";
+                    if (not IsLCY) then POSWorkshiftCheckpoint."Foreign Currency (LCY)" += POSPaymentLine."Amount (LCY)";
+                end;
 
-                POSPaymentMethod."Processing Type"::CHECK:
-                    begin
-                        if (IsLCY) then POSWorkshiftCheckpoint."Local Currency (LCY)" += "Amount (LCY)";
-                        if (not IsLCY) then POSWorkshiftCheckpoint."Foreign Currency (LCY)" += "Amount (LCY)";
-                    end;
+            POSPaymentMethod."Processing Type"::CHECK:
+                begin
+                    if (IsLCY) then POSWorkshiftCheckpoint."Local Currency (LCY)" += POSPaymentLine."Amount (LCY)";
+                    if (not IsLCY) then POSWorkshiftCheckpoint."Foreign Currency (LCY)" += POSPaymentLine."Amount (LCY)";
+                end;
 
-                POSPaymentMethod."Processing Type"::CUSTOMER:
-                    POSWorkshiftCheckpoint."Debtor Payment (LCY)" += "Amount (LCY)";
-                POSPaymentMethod."Processing Type"::EFT:
-                    POSWorkshiftCheckpoint."EFT (LCY)" += "Amount (LCY)";
-                POSPaymentMethod."Processing Type"::PAYOUT:
-                    ; // PAYOUT is recorded on Sales Line POSWorkshiftCheckpoint."GL Payment (LCY)" += "Amount (LCY)";
-                POSPaymentMethod."Processing Type"::VOUCHER:
-                    POSWorkshiftCheckpoint."Redeemed Vouchers (LCY)" += "Amount (LCY)";
-
-            end;
+            POSPaymentMethod."Processing Type"::CUSTOMER:
+                POSWorkshiftCheckpoint."Debtor Payment (LCY)" += POSPaymentLine."Amount (LCY)";
+            POSPaymentMethod."Processing Type"::EFT:
+                POSWorkshiftCheckpoint."EFT (LCY)" += POSPaymentLine."Amount (LCY)";
+            POSPaymentMethod."Processing Type"::PAYOUT:
+                ; // PAYOUT is recorded on Sales Line POSWorkshiftCheckpoint."GL Payment (LCY)" += "Amount (LCY)";
+            POSPaymentMethod."Processing Type"::VOUCHER:
+                POSWorkshiftCheckpoint."Redeemed Vouchers (LCY)" += POSPaymentLine."Amount (LCY)";
 
         end;
     end;
@@ -1262,33 +1241,29 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
     local procedure FinalizeCheckpoint(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     begin
 
-        with POSWorkshiftCheckpoint do begin
+        POSWorkshiftCheckpoint."Profit Amount (LCY)" := POSWorkshiftCheckpoint."Net Turnover (LCY)" - POSWorkshiftCheckpoint."Net Cost (LCY)";
 
-            "Profit Amount (LCY)" := "Net Turnover (LCY)" - "Net Cost (LCY)";
+        if (POSWorkshiftCheckpoint."Net Turnover (LCY)" <> 0) then
+            POSWorkshiftCheckpoint."Profit %" := POSWorkshiftCheckpoint."Profit Amount (LCY)" * 100 / POSWorkshiftCheckpoint."Net Turnover (LCY)";
 
-            if ("Net Turnover (LCY)" <> 0) then
-                "Profit %" := "Profit Amount (LCY)" * 100 / "Net Turnover (LCY)";
+        if (POSWorkshiftCheckpoint."Profit Amount (LCY)" < 0) and (POSWorkshiftCheckpoint."Profit %" > 0) then
+            POSWorkshiftCheckpoint."Profit %" := -POSWorkshiftCheckpoint."Profit %";
 
-            if ("Profit Amount (LCY)" < 0) and ("Profit %" > 0) then
-                "Profit %" := -"Profit %";
+        POSWorkshiftCheckpoint."Calculated Diff (LCY)" := 0;
 
-            "Calculated Diff (LCY)" := 0;
-
-            if ("Turnover (LCY)" <> 0) then begin
-                "Custom Discount %" := Round("Custom Discount (LCY)" * 100 / "Turnover (LCY)", 0.01);
-                "Quantity Discount %" := Round("Quantity Discount (LCY)" * 100 / "Turnover (LCY)", 0.01);
-                "Mix Discount %" := Round("Mix Discount (LCY)" * 100 / "Turnover (LCY)", 0.01);
-                "Campaign Discount %" := Round("Campaign Discount (LCY)" * 100 / "Turnover (LCY)", 0.01);
-                "Line Discount %" := Round("Line Discount (LCY)" * 100 / "Turnover (LCY)", 0.01);
-                "Total Discount %" := Round("Total Discount (LCY)" * 100 / "Turnover (LCY)", 0.01);
-                "BOM Discount %" := Round("BOM Discount (LCY)" * 100 / "Turnover (LCY)", 0.01);
-                "Customer Discount %" := Round("Customer Discount (LCY)" * 100 / "Turnover (LCY)", 0.01);
-            end;
-
+        if (POSWorkshiftCheckpoint."Turnover (LCY)" <> 0) then begin
+            POSWorkshiftCheckpoint."Custom Discount %" := Round(POSWorkshiftCheckpoint."Custom Discount (LCY)" * 100 / POSWorkshiftCheckpoint."Turnover (LCY)", 0.01);
+            POSWorkshiftCheckpoint."Quantity Discount %" := Round(POSWorkshiftCheckpoint."Quantity Discount (LCY)" * 100 / POSWorkshiftCheckpoint."Turnover (LCY)", 0.01);
+            POSWorkshiftCheckpoint."Mix Discount %" := Round(POSWorkshiftCheckpoint."Mix Discount (LCY)" * 100 / POSWorkshiftCheckpoint."Turnover (LCY)", 0.01);
+            POSWorkshiftCheckpoint."Campaign Discount %" := Round(POSWorkshiftCheckpoint."Campaign Discount (LCY)" * 100 / POSWorkshiftCheckpoint."Turnover (LCY)", 0.01);
+            POSWorkshiftCheckpoint."Line Discount %" := Round(POSWorkshiftCheckpoint."Line Discount (LCY)" * 100 / POSWorkshiftCheckpoint."Turnover (LCY)", 0.01);
+            POSWorkshiftCheckpoint."Total Discount %" := Round(POSWorkshiftCheckpoint."Total Discount (LCY)" * 100 / POSWorkshiftCheckpoint."Turnover (LCY)", 0.01);
+            POSWorkshiftCheckpoint."BOM Discount %" := Round(POSWorkshiftCheckpoint."BOM Discount (LCY)" * 100 / POSWorkshiftCheckpoint."Turnover (LCY)", 0.01);
+            POSWorkshiftCheckpoint."Customer Discount %" := Round(POSWorkshiftCheckpoint."Customer Discount (LCY)" * 100 / POSWorkshiftCheckpoint."Turnover (LCY)", 0.01);
         end;
     end;
 
-    local procedure TryGetSalesperson(): Code[10]
+    local procedure TryGetSalesperson(): Code[20]
     var
         POSSession: Codeunit "NPR POS Session";
         POSFrontEnd: Codeunit "NPR POS Front End Management";
@@ -1337,58 +1312,55 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         PeriodWorkshiftCheckpoint.Insert();
 
         repeat
-            with ZReportWorkshiftCheckpoint do begin
-                PeriodWorkshiftCheckpoint."Debtor Payment (LCY)" += "Debtor Payment (LCY)";
-                PeriodWorkshiftCheckpoint."GL Payment (LCY)" += "GL Payment (LCY)";
-                PeriodWorkshiftCheckpoint."Rounding (LCY)" += "Rounding (LCY)";
-                PeriodWorkshiftCheckpoint."Credit Item Sales (LCY)" += "Credit Item Sales (LCY)";
-                PeriodWorkshiftCheckpoint."Credit Item Quantity Sum" += "Credit Item Quantity Sum";
-                PeriodWorkshiftCheckpoint."Credit Net Sales Amount (LCY)" += "Credit Net Sales Amount (LCY)";
-                PeriodWorkshiftCheckpoint."Credit Sales Count" += "Credit Sales Count";
-                PeriodWorkshiftCheckpoint."Issued Vouchers (LCY)" += "Issued Vouchers (LCY)";
-                PeriodWorkshiftCheckpoint."Redeemed Vouchers (LCY)" += "Redeemed Vouchers (LCY)";
-                PeriodWorkshiftCheckpoint."Local Currency (LCY)" += "Local Currency (LCY)";
-                PeriodWorkshiftCheckpoint."Foreign Currency (LCY)" += "Foreign Currency (LCY)";
-                PeriodWorkshiftCheckpoint."EFT (LCY)" += "EFT (LCY)";
-                PeriodWorkshiftCheckpoint."Manual Card (LCY)" += "Manual Card (LCY)";
-                PeriodWorkshiftCheckpoint."Other Credit Card (LCY)" += "Other Credit Card (LCY)";
-                PeriodWorkshiftCheckpoint."Cash Terminal (LCY)" += "Cash Terminal (LCY)";
-                PeriodWorkshiftCheckpoint."Redeemed Credit Voucher (LCY)" += "Redeemed Credit Voucher (LCY)";
-                PeriodWorkshiftCheckpoint."Created Credit Voucher (LCY)" += "Created Credit Voucher (LCY)";
-                PeriodWorkshiftCheckpoint."Direct Item Sales (LCY)" += "Direct Item Sales (LCY)";
-                PeriodWorkshiftCheckpoint."Direct Sales - Staff (LCY)" += "Direct Sales - Staff (LCY)";
-                PeriodWorkshiftCheckpoint."Direct Sales Count" += "Direct Sales Count";
-                PeriodWorkshiftCheckpoint."Cancelled Sales Count" += "Cancelled Sales Count";
-                PeriodWorkshiftCheckpoint."Net Turnover (LCY)" += "Net Turnover (LCY)";
-                PeriodWorkshiftCheckpoint."Turnover (LCY)" += "Turnover (LCY)";
-                PeriodWorkshiftCheckpoint."Net Cost (LCY)" += "Net Cost (LCY)";
-                PeriodWorkshiftCheckpoint."Profit Amount (LCY)" += "Profit Amount (LCY)";
-                PeriodWorkshiftCheckpoint."Direct Item Returns (LCY)" += "Direct Item Returns (LCY)";
-                PeriodWorkshiftCheckpoint."Direct Item Returns Line Count" += "Direct Item Returns Line Count";
-                PeriodWorkshiftCheckpoint."Total Discount (LCY)" += "Total Discount (LCY)";
-                PeriodWorkshiftCheckpoint."Campaign Discount (LCY)" += "Campaign Discount (LCY)";
-                PeriodWorkshiftCheckpoint."Mix Discount (LCY)" += "Mix Discount (LCY)";
-                PeriodWorkshiftCheckpoint."Quantity Discount (LCY)" += "Quantity Discount (LCY)";
-                PeriodWorkshiftCheckpoint."Custom Discount (LCY)" += "Custom Discount (LCY)";
-                PeriodWorkshiftCheckpoint."BOM Discount (LCY)" += "BOM Discount (LCY)";
-                PeriodWorkshiftCheckpoint."Customer Discount (LCY)" += "Customer Discount (LCY)";
-                PeriodWorkshiftCheckpoint."Line Discount (LCY)" += "Line Discount (LCY)";
-                PeriodWorkshiftCheckpoint."Calculated Diff (LCY)" += "Calculated Diff (LCY)";
-                PeriodWorkshiftCheckpoint."Direct Item Quantity Sum" += "Direct Item Quantity Sum";
-                PeriodWorkshiftCheckpoint."Direct Item Sales Line Count" += "Direct Item Sales Line Count";
-                PeriodWorkshiftCheckpoint."Receipts Count" += "Receipts Count";
-                PeriodWorkshiftCheckpoint."Cash Drawer Open Count" += "Cash Drawer Open Count";
-                PeriodWorkshiftCheckpoint."Receipt Copies Count" += "Receipt Copies Count";
-                PeriodWorkshiftCheckpoint."Receipt Copies Sales (LCY)" += "Receipt Copies Sales (LCY)";
-                PeriodWorkshiftCheckpoint."Bin Transfer Out Amount (LCY)" += "Bin Transfer Out Amount (LCY)";
-                PeriodWorkshiftCheckpoint."Bin Transfer In Amount (LCY)" += "Bin Transfer In Amount (LCY)";
-                PeriodWorkshiftCheckpoint."Opening Cash (LCY)" += "Opening Cash (LCY)";
-                PeriodWorkshiftCheckpoint."Direct Negative Turnover (LCY)" += "Direct Negative Turnover (LCY)";
-                PeriodWorkshiftCheckpoint."Direct Turnover (LCY)" += "Direct Turnover (LCY)";
+            PeriodWorkshiftCheckpoint."Debtor Payment (LCY)" += ZReportWorkshiftCheckpoint."Debtor Payment (LCY)";
+            PeriodWorkshiftCheckpoint."GL Payment (LCY)" += ZReportWorkshiftCheckpoint."GL Payment (LCY)";
+            PeriodWorkshiftCheckpoint."Rounding (LCY)" += ZReportWorkshiftCheckpoint."Rounding (LCY)";
+            PeriodWorkshiftCheckpoint."Credit Item Sales (LCY)" += ZReportWorkshiftCheckpoint."Credit Item Sales (LCY)";
+            PeriodWorkshiftCheckpoint."Credit Item Quantity Sum" += ZReportWorkshiftCheckpoint."Credit Item Quantity Sum";
+            PeriodWorkshiftCheckpoint."Credit Net Sales Amount (LCY)" += ZReportWorkshiftCheckpoint."Credit Net Sales Amount (LCY)";
+            PeriodWorkshiftCheckpoint."Credit Sales Count" += ZReportWorkshiftCheckpoint."Credit Sales Count";
+            PeriodWorkshiftCheckpoint."Issued Vouchers (LCY)" += ZReportWorkshiftCheckpoint."Issued Vouchers (LCY)";
+            PeriodWorkshiftCheckpoint."Redeemed Vouchers (LCY)" += ZReportWorkshiftCheckpoint."Redeemed Vouchers (LCY)";
+            PeriodWorkshiftCheckpoint."Local Currency (LCY)" += ZReportWorkshiftCheckpoint."Local Currency (LCY)";
+            PeriodWorkshiftCheckpoint."Foreign Currency (LCY)" += ZReportWorkshiftCheckpoint."Foreign Currency (LCY)";
+            PeriodWorkshiftCheckpoint."EFT (LCY)" += ZReportWorkshiftCheckpoint."EFT (LCY)";
+            PeriodWorkshiftCheckpoint."Manual Card (LCY)" += ZReportWorkshiftCheckpoint."Manual Card (LCY)";
+            PeriodWorkshiftCheckpoint."Other Credit Card (LCY)" += ZReportWorkshiftCheckpoint."Other Credit Card (LCY)";
+            PeriodWorkshiftCheckpoint."Cash Terminal (LCY)" += ZReportWorkshiftCheckpoint."Cash Terminal (LCY)";
+            PeriodWorkshiftCheckpoint."Redeemed Credit Voucher (LCY)" += ZReportWorkshiftCheckpoint."Redeemed Credit Voucher (LCY)";
+            PeriodWorkshiftCheckpoint."Created Credit Voucher (LCY)" += ZReportWorkshiftCheckpoint."Created Credit Voucher (LCY)";
+            PeriodWorkshiftCheckpoint."Direct Item Sales (LCY)" += ZReportWorkshiftCheckpoint."Direct Item Sales (LCY)";
+            PeriodWorkshiftCheckpoint."Direct Sales - Staff (LCY)" += ZReportWorkshiftCheckpoint."Direct Sales - Staff (LCY)";
+            PeriodWorkshiftCheckpoint."Direct Sales Count" += ZReportWorkshiftCheckpoint."Direct Sales Count";
+            PeriodWorkshiftCheckpoint."Cancelled Sales Count" += ZReportWorkshiftCheckpoint."Cancelled Sales Count";
+            PeriodWorkshiftCheckpoint."Net Turnover (LCY)" += ZReportWorkshiftCheckpoint."Net Turnover (LCY)";
+            PeriodWorkshiftCheckpoint."Turnover (LCY)" += ZReportWorkshiftCheckpoint."Turnover (LCY)";
+            PeriodWorkshiftCheckpoint."Net Cost (LCY)" += ZReportWorkshiftCheckpoint."Net Cost (LCY)";
+            PeriodWorkshiftCheckpoint."Profit Amount (LCY)" += ZReportWorkshiftCheckpoint."Profit Amount (LCY)";
+            PeriodWorkshiftCheckpoint."Direct Item Returns (LCY)" += ZReportWorkshiftCheckpoint."Direct Item Returns (LCY)";
+            PeriodWorkshiftCheckpoint."Direct Item Returns Line Count" += ZReportWorkshiftCheckpoint."Direct Item Returns Line Count";
+            PeriodWorkshiftCheckpoint."Total Discount (LCY)" += ZReportWorkshiftCheckpoint."Total Discount (LCY)";
+            PeriodWorkshiftCheckpoint."Campaign Discount (LCY)" += ZReportWorkshiftCheckpoint."Campaign Discount (LCY)";
+            PeriodWorkshiftCheckpoint."Mix Discount (LCY)" += ZReportWorkshiftCheckpoint."Mix Discount (LCY)";
+            PeriodWorkshiftCheckpoint."Quantity Discount (LCY)" += ZReportWorkshiftCheckpoint."Quantity Discount (LCY)";
+            PeriodWorkshiftCheckpoint."Custom Discount (LCY)" += ZReportWorkshiftCheckpoint."Custom Discount (LCY)";
+            PeriodWorkshiftCheckpoint."BOM Discount (LCY)" += ZReportWorkshiftCheckpoint."BOM Discount (LCY)";
+            PeriodWorkshiftCheckpoint."Customer Discount (LCY)" += ZReportWorkshiftCheckpoint."Customer Discount (LCY)";
+            PeriodWorkshiftCheckpoint."Line Discount (LCY)" += ZReportWorkshiftCheckpoint."Line Discount (LCY)";
+            PeriodWorkshiftCheckpoint."Calculated Diff (LCY)" += ZReportWorkshiftCheckpoint."Calculated Diff (LCY)";
+            PeriodWorkshiftCheckpoint."Direct Item Quantity Sum" += ZReportWorkshiftCheckpoint."Direct Item Quantity Sum";
+            PeriodWorkshiftCheckpoint."Direct Item Sales Line Count" += ZReportWorkshiftCheckpoint."Direct Item Sales Line Count";
+            PeriodWorkshiftCheckpoint."Receipts Count" += ZReportWorkshiftCheckpoint."Receipts Count";
+            PeriodWorkshiftCheckpoint."Cash Drawer Open Count" += ZReportWorkshiftCheckpoint."Cash Drawer Open Count";
+            PeriodWorkshiftCheckpoint."Receipt Copies Count" += ZReportWorkshiftCheckpoint."Receipt Copies Count";
+            PeriodWorkshiftCheckpoint."Receipt Copies Sales (LCY)" += ZReportWorkshiftCheckpoint."Receipt Copies Sales (LCY)";
+            PeriodWorkshiftCheckpoint."Bin Transfer Out Amount (LCY)" += ZReportWorkshiftCheckpoint."Bin Transfer Out Amount (LCY)";
+            PeriodWorkshiftCheckpoint."Bin Transfer In Amount (LCY)" += ZReportWorkshiftCheckpoint."Bin Transfer In Amount (LCY)";
+            PeriodWorkshiftCheckpoint."Opening Cash (LCY)" += ZReportWorkshiftCheckpoint."Opening Cash (LCY)";
+            PeriodWorkshiftCheckpoint."Direct Negative Turnover (LCY)" += ZReportWorkshiftCheckpoint."Direct Negative Turnover (LCY)";
+            PeriodWorkshiftCheckpoint."Direct Turnover (LCY)" += ZReportWorkshiftCheckpoint."Direct Turnover (LCY)";
 
-                AggregateTaxCheckpoint(TmpPeriodWorkshiftTaxCheckpoint, PeriodWorkshiftCheckpoint."Entry No.", ZReportWorkshiftCheckpoint."Entry No.", TmpTaxEntryNo);
-
-            end;
+            AggregateTaxCheckpoint(TmpPeriodWorkshiftTaxCheckpoint, PeriodWorkshiftCheckpoint."Entry No.", ZReportWorkshiftCheckpoint."Entry No.", TmpTaxEntryNo);
         until (ZReportWorkshiftCheckpoint.Next() = 0);
 
         PeriodWorkshiftCheckpoint."Perpetual Dir. Item Sales(LCY)" := ZReportWorkshiftCheckpoint."Perpetual Dir. Item Sales(LCY)";
@@ -1427,51 +1399,41 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         if (POSWorkshiftTaxCheckpoint.FindSet()) then begin
             repeat
 
-                with TmpPeriodTaxWorkshiftCheckpoint do begin
-                    Reset();
-                    SetFilter("Workshift Checkpoint Entry No.", '=%1', PeriodEntryNo);
-                    SetFilter("Tax Area Code", '=%1', POSWorkshiftTaxCheckpoint."Tax Area Code");
-                    SetFilter("Tax Calculation Type", '=%1', POSWorkshiftTaxCheckpoint."Tax Calculation Type");
-                    SetFilter("VAT Identifier", '=%1', POSWorkshiftTaxCheckpoint."VAT Identifier");
-                    SetFilter("Tax Jurisdiction Code", '=%1', POSWorkshiftTaxCheckpoint."Tax Jurisdiction Code");
-                    SetFilter("Tax Group Code", '=%1', POSWorkshiftTaxCheckpoint."Tax Group Code");
+                TmpPeriodTaxWorkshiftCheckpoint.Reset();
+                TmpPeriodTaxWorkshiftCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', PeriodEntryNo);
+                TmpPeriodTaxWorkshiftCheckpoint.SetFilter("Tax Area Code", '=%1', POSWorkshiftTaxCheckpoint."Tax Area Code");
+                TmpPeriodTaxWorkshiftCheckpoint.SetFilter("Tax Calculation Type", '=%1', POSWorkshiftTaxCheckpoint."Tax Calculation Type");
+                TmpPeriodTaxWorkshiftCheckpoint.SetFilter("VAT Identifier", '=%1', POSWorkshiftTaxCheckpoint."VAT Identifier");
+                TmpPeriodTaxWorkshiftCheckpoint.SetFilter("Tax Jurisdiction Code", '=%1', POSWorkshiftTaxCheckpoint."Tax Jurisdiction Code");
+                TmpPeriodTaxWorkshiftCheckpoint.SetFilter("Tax Group Code", '=%1', POSWorkshiftTaxCheckpoint."Tax Group Code");
 
-                    if (not FindFirst()) then begin
-                        TempEntryNo += 1;
-                        "Entry No." := TempEntryNo;
+                if (not TmpPeriodTaxWorkshiftCheckpoint.FindFirst()) then begin
+                    TempEntryNo += 1;
+                    TmpPeriodTaxWorkshiftCheckpoint."Entry No." := TempEntryNo;
 
-                        Init();
-                        "Workshift Checkpoint Entry No." := PeriodEntryNo;
+                    TmpPeriodTaxWorkshiftCheckpoint.Init();
+                    TmpPeriodTaxWorkshiftCheckpoint."Workshift Checkpoint Entry No." := PeriodEntryNo;
 
-                        "Tax Calculation Type" := POSWorkshiftTaxCheckpoint."Tax Calculation Type";
-                        "VAT Identifier" := POSWorkshiftTaxCheckpoint."VAT Identifier";
-                        "Tax Area Code" := POSWorkshiftTaxCheckpoint."Tax Area Code";
-                        "Tax Jurisdiction Code" := POSWorkshiftTaxCheckpoint."Tax Jurisdiction Code";
-                        "Tax Group Code" := POSWorkshiftTaxCheckpoint."Tax Group Code";
-                        "Tax %" := POSWorkshiftTaxCheckpoint."Tax %";
-                        "Tax Type" := POSWorkshiftTaxCheckpoint."Tax Type";
-                        Insert();
-                    end;
-
-                    "Tax Base Amount" += POSWorkshiftTaxCheckpoint."Tax Base Amount";
-                    "Tax Amount" += POSWorkshiftTaxCheckpoint."Tax Amount";
-                    "Line Amount" += POSWorkshiftTaxCheckpoint."Line Amount";
-                    "Amount Including Tax" += POSWorkshiftTaxCheckpoint."Amount Including Tax";
-                    Modify();
+                    TmpPeriodTaxWorkshiftCheckpoint."Tax Calculation Type" := POSWorkshiftTaxCheckpoint."Tax Calculation Type";
+                    TmpPeriodTaxWorkshiftCheckpoint."VAT Identifier" := POSWorkshiftTaxCheckpoint."VAT Identifier";
+                    TmpPeriodTaxWorkshiftCheckpoint."Tax Area Code" := POSWorkshiftTaxCheckpoint."Tax Area Code";
+                    TmpPeriodTaxWorkshiftCheckpoint."Tax Jurisdiction Code" := POSWorkshiftTaxCheckpoint."Tax Jurisdiction Code";
+                    TmpPeriodTaxWorkshiftCheckpoint."Tax Group Code" := POSWorkshiftTaxCheckpoint."Tax Group Code";
+                    TmpPeriodTaxWorkshiftCheckpoint."Tax %" := POSWorkshiftTaxCheckpoint."Tax %";
+                    TmpPeriodTaxWorkshiftCheckpoint."Tax Type" := POSWorkshiftTaxCheckpoint."Tax Type";
+                    TmpPeriodTaxWorkshiftCheckpoint.Insert();
                 end;
+
+                TmpPeriodTaxWorkshiftCheckpoint."Tax Base Amount" += POSWorkshiftTaxCheckpoint."Tax Base Amount";
+                TmpPeriodTaxWorkshiftCheckpoint."Tax Amount" += POSWorkshiftTaxCheckpoint."Tax Amount";
+                TmpPeriodTaxWorkshiftCheckpoint."Line Amount" += POSWorkshiftTaxCheckpoint."Line Amount";
+                TmpPeriodTaxWorkshiftCheckpoint."Amount Including Tax" += POSWorkshiftTaxCheckpoint."Amount Including Tax";
+                TmpPeriodTaxWorkshiftCheckpoint.Modify();
             until (POSWorkshiftTaxCheckpoint.Next() = 0);
 
         end;
     end;
 
-
-
-    #region ***************** Original AuditRoll Balancing Functions 
-
-
-
-
-    #endregion
 
     local procedure AggregateVat_PE(WorkshiftCheckpointEntryNo: Integer; PosUnitNo: Code[10]; var FromPosEntryNo: Integer)
     var
@@ -1495,40 +1457,38 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
             if (POSTaxAmountLine.FindSet()) then begin
                 repeat
 
-                    with TmpPOSWorkshiftTaxCheckpoint do begin
-                        Reset();
-                        SetFilter("Workshift Checkpoint Entry No.", '=%1', WorkshiftCheckpointEntryNo);
-                        SetFilter("Tax Area Code", '=%1', POSTaxAmountLine."Tax Area Code");
-                        SetFilter("Tax Calculation Type", '=%1', POSTaxAmountLine."Tax Calculation Type");
+                    TmpPOSWorkshiftTaxCheckpoint.Reset();
+                    TmpPOSWorkshiftTaxCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', WorkshiftCheckpointEntryNo);
+                    TmpPOSWorkshiftTaxCheckpoint.SetFilter("Tax Area Code", '=%1', POSTaxAmountLine."Tax Area Code");
+                    TmpPOSWorkshiftTaxCheckpoint.SetFilter("Tax Calculation Type", '=%1', POSTaxAmountLine."Tax Calculation Type");
 
-                        SetFilter("VAT Identifier", '=%1', POSTaxAmountLine."VAT Identifier");
-                        SetFilter("Tax Jurisdiction Code", '=%1', POSTaxAmountLine."Tax Jurisdiction Code");
-                        SetFilter("Tax Group Code", '=%1', POSTaxAmountLine."Tax Group Code");
+                    TmpPOSWorkshiftTaxCheckpoint.SetFilter("VAT Identifier", '=%1', POSTaxAmountLine."VAT Identifier");
+                    TmpPOSWorkshiftTaxCheckpoint.SetFilter("Tax Jurisdiction Code", '=%1', POSTaxAmountLine."Tax Jurisdiction Code");
+                    TmpPOSWorkshiftTaxCheckpoint.SetFilter("Tax Group Code", '=%1', POSTaxAmountLine."Tax Group Code");
 
-                        if (not FindFirst()) then begin
-                            TempEntryNo += 1;
-                            "Entry No." := TempEntryNo;
+                    if (not TmpPOSWorkshiftTaxCheckpoint.FindFirst()) then begin
+                        TempEntryNo += 1;
+                        TmpPOSWorkshiftTaxCheckpoint."Entry No." := TempEntryNo;
 
-                            Init();
-                            "Workshift Checkpoint Entry No." := WorkshiftCheckpointEntryNo;
+                        TmpPOSWorkshiftTaxCheckpoint.Init();
+                        TmpPOSWorkshiftTaxCheckpoint."Workshift Checkpoint Entry No." := WorkshiftCheckpointEntryNo;
 
-                            "Tax Calculation Type" := POSTaxAmountLine."Tax Calculation Type";
+                        TmpPOSWorkshiftTaxCheckpoint."Tax Calculation Type" := POSTaxAmountLine."Tax Calculation Type";
 
-                            "VAT Identifier" := POSTaxAmountLine."VAT Identifier";
-                            "Tax Jurisdiction Code" := POSTaxAmountLine."Tax Jurisdiction Code";
-                            "Tax Group Code" := POSTaxAmountLine."Tax Group Code";
+                        TmpPOSWorkshiftTaxCheckpoint."VAT Identifier" := POSTaxAmountLine."VAT Identifier";
+                        TmpPOSWorkshiftTaxCheckpoint."Tax Jurisdiction Code" := POSTaxAmountLine."Tax Jurisdiction Code";
+                        TmpPOSWorkshiftTaxCheckpoint."Tax Group Code" := POSTaxAmountLine."Tax Group Code";
 
-                            "Tax Area Code" := POSTaxAmountLine."Tax Area Code";
-                            "Tax %" := POSTaxAmountLine."Tax %";
-                            Insert();
-                        end;
-
-                        "Tax Base Amount" += POSTaxAmountLine."Tax Base Amount";
-                        "Tax Amount" += POSTaxAmountLine."Tax Amount";
-                        "Line Amount" += POSTaxAmountLine."Line Amount";
-                        "Amount Including Tax" += POSTaxAmountLine."Amount Including Tax";
-                        Modify();
+                        TmpPOSWorkshiftTaxCheckpoint."Tax Area Code" := POSTaxAmountLine."Tax Area Code";
+                        TmpPOSWorkshiftTaxCheckpoint."Tax %" := POSTaxAmountLine."Tax %";
+                        TmpPOSWorkshiftTaxCheckpoint.Insert();
                     end;
+
+                    TmpPOSWorkshiftTaxCheckpoint."Tax Base Amount" += POSTaxAmountLine."Tax Base Amount";
+                    TmpPOSWorkshiftTaxCheckpoint."Tax Amount" += POSTaxAmountLine."Tax Amount";
+                    TmpPOSWorkshiftTaxCheckpoint."Line Amount" += POSTaxAmountLine."Line Amount";
+                    TmpPOSWorkshiftTaxCheckpoint."Amount Including Tax" += POSTaxAmountLine."Amount Including Tax";
+                    TmpPOSWorkshiftTaxCheckpoint.Modify();
 
                 until (POSTaxAmountLine.Next() = 0);
             end;

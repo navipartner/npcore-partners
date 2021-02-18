@@ -145,7 +145,7 @@ table 6014500 "NPR Used Goods Registration"
             Caption = 'Serial No.';
             DataClassification = CustomerContent;
         }
-        field(40; "Salesperson Code"; Code[10])
+        field(40; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;

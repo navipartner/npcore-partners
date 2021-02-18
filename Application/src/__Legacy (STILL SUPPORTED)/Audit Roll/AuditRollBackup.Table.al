@@ -438,13 +438,13 @@ table 6014538 "NPR Audit Roll Backup"
             Caption = 'No.';
             DataClassification = CustomerContent;
         }
-        field(200; "Salesperson Code"; Code[10])
+        field(200; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             TableRelation = "Salesperson/Purchaser";
             DataClassification = CustomerContent;
         }
-        field(201; "Reversed by Salesperson Code"; Code[10])
+        field(201; "Reversed by Salesperson Code"; Code[20])
         {
             Caption = 'Reversed by Salesperson Code';
             Description = 'Udfyldes med sælgerkoden der tilbagef¢rer bon''en';

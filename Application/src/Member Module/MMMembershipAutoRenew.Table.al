@@ -55,7 +55,7 @@ table 6060148 "NPR MM Membership Auto Renew"
             DataClassification = CustomerContent;
             TableRelation = "Payment Method";
         }
-        field(115; "Salesperson Code"; Code[10])
+        field(115; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;

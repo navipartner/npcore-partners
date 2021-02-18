@@ -326,7 +326,7 @@ table 6151202 "NPR NpCs Arch. Document"
             Description = 'NPR5.51';
             TableRelation = "NPR RP Template Header" WHERE("Table ID" = CONST(6151198));
         }
-        field(315; "Salesperson Code"; Code[10])
+        field(315; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;

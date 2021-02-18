@@ -1,11 +1,9 @@
 tableextension 6014408 "NPR Sales Cr.Memo Line" extends "Sales Cr.Memo Line"
 {
-    // NPR7.100.000/LS/220114  : Retail Merge
-    //                                        Added Fields 6014408..6014604
-    // VRT1.00/JDH/20150304 CASE 201022 Added Variety Fields for grouping
+
     fields
     {
-        field(6014408; "NPR Salesperson Code"; Code[10])
+        field(6014408; "NPR Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             Description = 'NPR7.100.000';

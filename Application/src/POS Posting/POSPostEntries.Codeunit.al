@@ -1015,43 +1015,39 @@ codeunit 6150615 "NPR POS Post Entries"
     begin
         LastPOSEntry.Reset;
         LastPOSEntry.FindLast;
-        with POSPostingLog do begin
-            Init;
-            "Entry No." := 0;
-            "User ID" := UserId;
-            "Posting Timestamp" := CurrentDateTime;
-            "With Error" := true;
-            "Error Description" := TextUnknownError;
-            "POS Entry View" := CopyStr(POSEntry.GetView, 1, MaxStrLen("POS Entry View"));
-            "Last POS Entry No. at Posting" := LastPOSEntry."Entry No.";
-            "Parameter Posting Date" := PostingDate;
-            "Parameter Replace Posting Date" := ReplacePostingDate;
-            "Parameter Replace Doc. Date" := ReplaceDocumentDate;
-            "Parameter Post Item Entries" := PostItemEntriesVar;
-            "Parameter Post POS Entries" := PostPOSEntriesVar;
-            "Parameter Post Compressed" := PostCompressedVar;
-            "Parameter Stop On Error" := StopOnErrorVar;
-            Insert(true);
-            exit("Entry No.");
-        end;
+        POSPostingLog.Init;
+        POSPostingLog."Entry No." := 0;
+        POSPostingLog."User ID" := UserId;
+        POSPostingLog."Posting Timestamp" := CurrentDateTime;
+        POSPostingLog."With Error" := true;
+        POSPostingLog."Error Description" := TextUnknownError;
+        POSPostingLog."POS Entry View" := CopyStr(POSEntry.GetView, 1, MaxStrLen(POSPostingLog."POS Entry View"));
+        POSPostingLog."Last POS Entry No. at Posting" := LastPOSEntry."Entry No.";
+        POSPostingLog."Parameter Posting Date" := PostingDate;
+        POSPostingLog."Parameter Replace Posting Date" := ReplacePostingDate;
+        POSPostingLog."Parameter Replace Doc. Date" := ReplaceDocumentDate;
+        POSPostingLog."Parameter Post Item Entries" := PostItemEntriesVar;
+        POSPostingLog."Parameter Post POS Entries" := PostPOSEntriesVar;
+        POSPostingLog."Parameter Post Compressed" := PostCompressedVar;
+        POSPostingLog."Parameter Stop On Error" := StopOnErrorVar;
+        POSPostingLog.Insert(true);
+        exit(POSPostingLog."Entry No.");
     end;
 
     local procedure UpdatePOSPostingLogEntry(POSPostingLogEntryNo: Integer; WithError: Boolean)
     var
         POSPostingLog: Record "NPR POS Posting Log";
     begin
-        with POSPostingLog do begin
-            Get(POSPostingLogEntryNo);
-            if WithError then begin
-                "With Error" := true;
-                "Error Description" := CopyStr(ErrorText, 1, MaxStrLen("Error Description"));
-            end else begin
-                "With Error" := false;
-                "Error Description" := '';
-            end;
-            "Posting Duration" := CurrentDateTime - "Posting Timestamp";
-            Modify(true);
+        POSPostingLog.Get(POSPostingLogEntryNo);
+        if WithError then begin
+            POSPostingLog."With Error" := true;
+            POSPostingLog."Error Description" := CopyStr(ErrorText, 1, MaxStrLen(POSPostingLog."Error Description"));
+        end else begin
+            POSPostingLog."With Error" := false;
+            POSPostingLog."Error Description" := '';
         end;
+        POSPostingLog."Posting Duration" := CurrentDateTime - POSPostingLog."Posting Timestamp";
+        POSPostingLog.Modify(true);
     end;
 
     local procedure GetCompressionMethod(POSPeriodRegister: Record "NPR POS Period Register"; PostCompressed: Boolean): Integer
@@ -1094,39 +1090,37 @@ codeunit 6150615 "NPR POS Post Entries"
         LocPOSPostingSetup: Record "NPR POS Posting Setup";
         POSEntryManagement: Codeunit "NPR POS Entry Management";
     begin
-        with LocPOSPostingSetup do begin
-            //All three match
-            if Get(POSStoreCode, POSPaymentMethodCode, POSPaymentBinCode) then begin
-                POSEntryManagement.CheckPostingSetupLine(LocPOSPostingSetup);
-                POSPostingSetup := LocPOSPostingSetup;
-                exit(true);
-            end;
-            //Store and Method
-            if Get(POSStoreCode, POSPaymentMethodCode, '') then begin
-                POSEntryManagement.CheckPostingSetupLine(LocPOSPostingSetup);
-                POSPostingSetup := LocPOSPostingSetup;
-                exit(true);
-            end;
-            //Store and Bin
-            if Get(POSStoreCode, '', POSPaymentBinCode) then begin
-                POSEntryManagement.CheckPostingSetupLine(LocPOSPostingSetup);
-                POSPostingSetup := LocPOSPostingSetup;
-                exit(true);
-            end;
-            //Method and Bin
-            if Get('', POSPaymentMethodCode, POSPaymentBinCode) then begin
-                POSEntryManagement.CheckPostingSetupLine(LocPOSPostingSetup);
-                POSPostingSetup := LocPOSPostingSetup;
-                exit(true);
-            end;
-            //Method only
-            if Get('', POSPaymentMethodCode, '') then begin
-                POSEntryManagement.CheckPostingSetupLine(LocPOSPostingSetup);
-                POSPostingSetup := LocPOSPostingSetup;
-                exit(true);
-            end;
-            exit(false);
+        //All three match
+        if LocPOSPostingSetup.Get(POSStoreCode, POSPaymentMethodCode, POSPaymentBinCode) then begin
+            POSEntryManagement.CheckPostingSetupLine(LocPOSPostingSetup);
+            POSPostingSetup := LocPOSPostingSetup;
+            exit(true);
         end;
+        //Store and Method
+        if LocPOSPostingSetup.Get(POSStoreCode, POSPaymentMethodCode, '') then begin
+            POSEntryManagement.CheckPostingSetupLine(LocPOSPostingSetup);
+            POSPostingSetup := LocPOSPostingSetup;
+            exit(true);
+        end;
+        //Store and Bin
+        if LocPOSPostingSetup.Get(POSStoreCode, '', POSPaymentBinCode) then begin
+            POSEntryManagement.CheckPostingSetupLine(LocPOSPostingSetup);
+            POSPostingSetup := LocPOSPostingSetup;
+            exit(true);
+        end;
+        //Method and Bin
+        if LocPOSPostingSetup.Get('', POSPaymentMethodCode, POSPaymentBinCode) then begin
+            POSEntryManagement.CheckPostingSetupLine(LocPOSPostingSetup);
+            POSPostingSetup := LocPOSPostingSetup;
+            exit(true);
+        end;
+        //Method only
+        if LocPOSPostingSetup.Get('', POSPaymentMethodCode, '') then begin
+            POSEntryManagement.CheckPostingSetupLine(LocPOSPostingSetup);
+            POSPostingSetup := LocPOSPostingSetup;
+            exit(true);
+        end;
+        exit(false);
     end;
 
     local procedure GetGLAccountType(POSPostingSetup: Record "NPR POS Posting Setup"): Enum "Gen. Journal Account Type"
@@ -1299,77 +1293,75 @@ codeunit 6150615 "NPR POS Post Entries"
         OnAfterInsertPOSBalancingLineToGenJnl(POSBalancingLine, GenJournalLine, false);
     end;
 
-    local procedure MakeGenJournalLine(AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; BalancingAccountType: Enum "Gen. Journal Account Type"; BalancingAccountNo: Code[20]; GenPostingType: Enum "General Posting Type"; PostingDate: Date; DocumentNo: Code[20]; PostingDescription: Text; VATPerc: Decimal; PostingCurrencyCode: Code[10]; PostingAmount: Decimal; PostingAmountLCY: Decimal; PostingGroup: Code[10]; GenBusPostingGroup: Code[10]; GenProdPostingGroup: Code[10]; VATBusPostingGroup: Code[10]; VATProdPostingGroup: Code[10]; ShortcutDim1: Code[20]; ShortcutDim2: Code[20]; DimSetID: Integer; SalespersonCode: Code[10]; ReasonCode: Code[10]; ExternalDocNo: Code[35]; TaxAreaCode: Code[20]; TaxLiable: Boolean; TaxGroupCode: Code[35]; Usetax: Boolean; VATAmount: Decimal; VATAmountLCY: Decimal; VATCustomerNo: Code[20]; SourceCode: Code[10]; var GenJournalLine: Record "Gen. Journal Line")
+    local procedure MakeGenJournalLine(AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; BalancingAccountType: Enum "Gen. Journal Account Type"; BalancingAccountNo: Code[20]; GenPostingType: Enum "General Posting Type"; PostingDate: Date; DocumentNo: Code[20]; PostingDescription: Text; VATPerc: Decimal; PostingCurrencyCode: Code[10]; PostingAmount: Decimal; PostingAmountLCY: Decimal; PostingGroup: Code[10]; GenBusPostingGroup: Code[10]; GenProdPostingGroup: Code[10]; VATBusPostingGroup: Code[10]; VATProdPostingGroup: Code[10]; ShortcutDim1: Code[20]; ShortcutDim2: Code[20]; DimSetID: Integer; SalespersonCode: Code[20]; ReasonCode: Code[10]; ExternalDocNo: Code[35]; TaxAreaCode: Code[20]; TaxLiable: Boolean; TaxGroupCode: Code[35]; Usetax: Boolean; VATAmount: Decimal; VATAmountLCY: Decimal; VATCustomerNo: Code[20]; SourceCode: Code[10]; var GenJournalLine: Record "Gen. Journal Line")
     begin
         LineNumber := LineNumber + 10000;
-        with GenJournalLine do begin
-            Init;
-            "Journal Template Name" := '';
-            "Journal Batch Name" := '';
-            "Line No." := LineNumber;
-            "System-Created Entry" := true;
-            "Account Type" := AccountType;
-            if "Account Type" = "Account Type"::Customer then
-                if PostingAmount <= 0 then
-                    "Document Type" := "Document Type"::Payment
-                else
-                    "Document Type" := "Document Type"::Refund;
-            "Account No." := AccountNo;
-            "Gen. Posting Type" := GenPostingType;
-            "Posting Date" := PostingDate;
-            "Document Date" := "Posting Date";
-            "Document No." := DocumentNo;
-            "External Document No." := ExternalDocNo;
-            Description := CopyStr(PostingDescription, 1, MaxStrLen(Description));
-            if StrLen(PostingDescription) > MaxStrLen(Description) then
-                Comment := CopyStr(PostingDescription, 1, MaxStrLen(Comment));
+        GenJournalLine.Init;
+        GenJournalLine."Journal Template Name" := '';
+        GenJournalLine."Journal Batch Name" := '';
+        GenJournalLine."Line No." := LineNumber;
+        GenJournalLine."System-Created Entry" := true;
+        GenJournalLine."Account Type" := AccountType;
+        if GenJournalLine."Account Type" = GenJournalLine."Account Type"::Customer then
+            if PostingAmount <= 0 then
+                GenJournalLine."Document Type" := GenJournalLine."Document Type"::Payment
+            else
+                GenJournalLine."Document Type" := GenJournalLine."Document Type"::Refund;
+        GenJournalLine."Account No." := AccountNo;
+        GenJournalLine."Gen. Posting Type" := GenPostingType;
+        GenJournalLine."Posting Date" := PostingDate;
+        GenJournalLine."Document Date" := GenJournalLine."Posting Date";
+        GenJournalLine."Document No." := DocumentNo;
+        GenJournalLine."External Document No." := ExternalDocNo;
+        GenJournalLine.Description := CopyStr(PostingDescription, 1, MaxStrLen(GenJournalLine.Description));
+        if StrLen(PostingDescription) > MaxStrLen(GenJournalLine.Description) then
+            GenJournalLine.Comment := CopyStr(PostingDescription, 1, MaxStrLen(GenJournalLine.Comment));
 
-            "Currency Code" := PostingCurrencyCode;
-            if (PostingCurrencyCode <> '') then
-                if (PostingAmountLCY <> 0) then
-                    Validate("Currency Factor", PostingAmount / PostingAmountLCY)
-                else
-                    Validate("Currency Code");
-            if PostingAmount <> 0 then
-                Validate(Amount, PostingAmount);
-            if PostingAmountLCY <> 0 then
-                Validate("Amount (LCY)", PostingAmountLCY);
-            "Source Currency Code" := PostingCurrencyCode;
-            "Source Currency Amount" := PostingAmount;
+        GenJournalLine."Currency Code" := PostingCurrencyCode;
+        if (PostingCurrencyCode <> '') then
+            if (PostingAmountLCY <> 0) then
+                GenJournalLine.Validate("Currency Factor", PostingAmount / PostingAmountLCY)
+            else
+                GenJournalLine.Validate("Currency Code");
+        if PostingAmount <> 0 then
+            GenJournalLine.Validate(Amount, PostingAmount);
+        if PostingAmountLCY <> 0 then
+            GenJournalLine.Validate("Amount (LCY)", PostingAmountLCY);
+        GenJournalLine."Source Currency Code" := PostingCurrencyCode;
+        GenJournalLine."Source Currency Amount" := PostingAmount;
 
-            if GenPostingType in ["Gen. Posting Type"::Sale, "Gen. Posting Type"::Purchase] then begin
-                if TaxAreaCode = '' then begin
-                    "VAT %" := VATPerc;
-                    "Source Curr. VAT Amount" := VATAmount;
-                    "Source Curr. VAT Base Amount" := PostingAmount;
-                    "Use Tax" := Usetax;
-                    "VAT Posting" := "VAT Posting"::"Manual VAT Entry";
-                    "VAT Amount" := VATAmount;
-                    "VAT Amount (LCY)" := VATAmountLCY;
-                    "Tax Area Code" := TaxAreaCode;
-                    "Tax Liable" := TaxLiable;
-                    "Tax Group Code" := TaxGroupCode;
-                    "VAT Bus. Posting Group" := VATBusPostingGroup;
-                    "VAT Prod. Posting Group" := VATProdPostingGroup;
+        if GenPostingType in [GenJournalLine."Gen. Posting Type"::Sale, GenJournalLine."Gen. Posting Type"::Purchase] then begin
+            if TaxAreaCode = '' then begin
+                GenJournalLine."VAT %" := VATPerc;
+                GenJournalLine."Source Curr. VAT Amount" := VATAmount;
+                GenJournalLine."Source Curr. VAT Base Amount" := PostingAmount;
+                GenJournalLine."Use Tax" := Usetax;
+                GenJournalLine."VAT Posting" := GenJournalLine."VAT Posting"::"Manual VAT Entry";
+                GenJournalLine."VAT Amount" := VATAmount;
+                GenJournalLine."VAT Amount (LCY)" := VATAmountLCY;
+                GenJournalLine."Tax Area Code" := TaxAreaCode;
+                GenJournalLine."Tax Liable" := TaxLiable;
+                GenJournalLine."Tax Group Code" := TaxGroupCode;
+                GenJournalLine."VAT Bus. Posting Group" := VATBusPostingGroup;
+                GenJournalLine."VAT Prod. Posting Group" := VATProdPostingGroup;
 
-                    if GenPostingType = "Gen. Posting Type"::Sale then
-                        "Bill-to/Pay-to No." := VATCustomerNo;
+                if GenPostingType = GenJournalLine."Gen. Posting Type"::Sale then
+                    GenJournalLine."Bill-to/Pay-to No." := VATCustomerNo;
 
-                end else
-                    "VAT Calculation Type" := "VAT Calculation Type"::"Sales Tax";
-            end;
-
-            "Posting Group" := PostingGroup;
-            "Gen. Bus. Posting Group" := GenBusPostingGroup;
-            "Gen. Prod. Posting Group" := GenProdPostingGroup;
-            "Shortcut Dimension 1 Code" := ShortcutDim1;
-            "Shortcut Dimension 2 Code" := ShortcutDim2;
-            "Dimension Set ID" := DimSetID;
-            "Salespers./Purch. Code" := SalespersonCode;
-            "Reason Code" := ReasonCode;
-            "Source Code" := SourceCode;
-            Insert;
+            end else
+                GenJournalLine."VAT Calculation Type" := GenJournalLine."VAT Calculation Type"::"Sales Tax";
         end;
+
+        GenJournalLine."Posting Group" := PostingGroup;
+        GenJournalLine."Gen. Bus. Posting Group" := GenBusPostingGroup;
+        GenJournalLine."Gen. Prod. Posting Group" := GenProdPostingGroup;
+        GenJournalLine."Shortcut Dimension 1 Code" := ShortcutDim1;
+        GenJournalLine."Shortcut Dimension 2 Code" := ShortcutDim2;
+        GenJournalLine."Dimension Set ID" := DimSetID;
+        GenJournalLine."Salespers./Purch. Code" := SalespersonCode;
+        GenJournalLine."Reason Code" := ReasonCode;
+        GenJournalLine."Source Code" := SourceCode;
+        GenJournalLine.Insert;
     end;
 
     local procedure CreateGenJournalLinesFromSalesTax(var POSEntry: Record "NPR POS Entry"; var GenJnlLine: Record "Gen. Journal Line")

@@ -135,7 +135,7 @@ table 6151195 "NPR NpCs Store"
             DecimalPlaces = 0 : 5;
             Description = 'NPR5.52';
         }
-        field(200; "Salesperson Code"; Code[10])
+        field(200; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;

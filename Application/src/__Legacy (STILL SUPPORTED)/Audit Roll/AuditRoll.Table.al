@@ -554,13 +554,13 @@ table 6014407 "NPR Audit Roll"
             DataClassification = CustomerContent;
             Description = 'NPR5.31';
         }
-        field(200; "Salesperson Code"; Code[10])
+        field(200; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;
             TableRelation = "Salesperson/Purchaser";
         }
-        field(201; "Reversed by Salesperson Code"; Code[10])
+        field(201; "Reversed by Salesperson Code"; Code[20])
         {
             Caption = 'Reversed by Salesperson Code';
             DataClassification = CustomerContent;

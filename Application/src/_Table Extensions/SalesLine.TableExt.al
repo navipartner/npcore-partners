@@ -1,10 +1,6 @@
 tableextension 6014433 "NPR Sales Line" extends "Sales Line"
 {
-    // NPR7.100.000/LS/220114  : Retail Merge
-    // NPR70.00.01.00/MH/20150216  CASE 204110 Removed NaviShop References (WS).
-    // VRT1.00/JDH/20150304 CASE 201022 Added Variety Fields for grouping
-    // NPR4.04/JDH/20150427  CASE 212229  Removed references to old Variant solution "Color Size"
-    // NPR5.22/TJ/20160407 CASE 238601 Removing unused variables
+
     fields
     {
         field(6014404; "NPR Discount Type"; Option)
@@ -29,7 +25,7 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             Caption = 'Internal';
             DataClassification = CustomerContent;
         }
-        field(6014408; "NPR Salesperson Code"; Code[10])
+        field(6014408; "NPR Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;

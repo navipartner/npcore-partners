@@ -28,7 +28,7 @@ table 6014409 "NPR Gift Voucher"
             Caption = 'Issue Date';
             DataClassification = CustomerContent;
         }
-        field(5; "Salesperson Code"; Code[10])
+        field(5; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;
@@ -90,7 +90,7 @@ table 6014409 "NPR Gift Voucher"
             Caption = 'Cashed Date';
             DataClassification = CustomerContent;
         }
-        field(25; "Cashed Salesperson"; Code[10])
+        field(25; "Cashed Salesperson"; Code[20])
         {
             Caption = 'Cashed Salesperson';
             DataClassification = CustomerContent;

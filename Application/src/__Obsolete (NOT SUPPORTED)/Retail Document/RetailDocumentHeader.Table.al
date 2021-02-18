@@ -58,7 +58,7 @@ table 6014425 "NPR Retail Document Header"
             Caption = 'Date';
             DataClassification = CustomerContent;
         }
-        field(11; "Salesperson Code"; Code[10])
+        field(11; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;
@@ -79,7 +79,7 @@ table 6014425 "NPR Retail Document Header"
             Caption = 'Time';
             DataClassification = CustomerContent;
         }
-        field(15; "Rent Salesperson"; Code[10])
+        field(15; "Rent Salesperson"; Code[20])
         {
             Caption = 'Rent Salesperson';
             DataClassification = CustomerContent;
@@ -104,7 +104,7 @@ table 6014425 "NPR Retail Document Header"
             Caption = 'Return Time';
             DataClassification = CustomerContent;
         }
-        field(20; "Return Salesperson"; Code[10])
+        field(20; "Return Salesperson"; Code[20])
         {
             Caption = 'Return Salesperson';
             DataClassification = CustomerContent;

@@ -54,7 +54,7 @@ table 6014423 "NPR Period"
             TableRelation = "NPR Register"."Register No.";
             DataClassification = CustomerContent;
         }
-        field(7; "Salesperson Code"; Code[10])
+        field(7; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             Editable = false;

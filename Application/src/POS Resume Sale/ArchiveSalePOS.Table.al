@@ -3,9 +3,6 @@ table 6014418 "NPR Archive Sale POS"
     // The purpose of this table:
     //   All existing unfinished sale transactions have been moved here for possible future reference (6014418 - header, 6014419 - lines).
     //   The table may be deleted later, when it is no longer relevant.
-    // 
-    // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
-    // NPR5.55/ALPO/20200423 CASE 401611 5.54 upgrade performace optimization
 
     Caption = 'Sale';
     DrillDownPageID = "NPR Archive POS Sale";
@@ -31,7 +28,7 @@ table 6014418 "NPR Archive Sale POS"
             Caption = 'POS Store Code';
             DataClassification = CustomerContent;
         }
-        field(4; "Salesperson Code"; Code[10])
+        field(4; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             NotBlank = true;

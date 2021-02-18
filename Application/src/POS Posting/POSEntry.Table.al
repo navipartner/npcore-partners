@@ -93,7 +93,7 @@ table 6150621 "NPR POS Entry"
             DataClassification = CustomerContent;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
         }
-        field(43; "Salesperson Code"; Code[10])
+        field(43; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;

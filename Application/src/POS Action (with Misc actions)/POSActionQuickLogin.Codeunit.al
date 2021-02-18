@@ -1,12 +1,5 @@
 codeunit 6150845 "NPR POS Action: Quick Login"
 {
-    // NPR5.39/MHA /20180129  CASE 302237 Object created - Quick Login on current POS Sale
-    // NPR5.43/MHA /20180607  CASE 313123 Renamed function from -Reasons- to -Salesperson- and added filter on "Locked-to Register No."
-
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         Text000: Label 'Quick Login - change Salesperson on current POS Sale';
@@ -14,20 +7,19 @@ codeunit 6150845 "NPR POS Action: Quick Login"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode(),
-              Text000,
-              ActionVersion(),
-              Type::Generic,
-              "Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('FixedSalespersonCode', 'if (param.FixedSalespersonCode != "")  {respond()}');
-                RegisterWorkflowStep('LookupSalespersonCode', 'if (param.LookupSalespersonCode)  {respond()}');
+        if Sender.DiscoverAction(
+            ActionCode(),
+            Text000,
+            ActionVersion(),
+            Sender.Type::Generic,
+            Sender."Subscriber Instances Allowed"::Multiple)
+                then begin
+            Sender.RegisterWorkflowStep('FixedSalespersonCode', 'if (param.FixedSalespersonCode != "")  {respond()}');
+            Sender.RegisterWorkflowStep('LookupSalespersonCode', 'if (param.LookupSalespersonCode)  {respond()}');
 
-                RegisterTextParameter('FixedSalespersonCode', '');
-                RegisterBooleanParameter('LookupSalespersonCode', true);
-                RegisterWorkflow(false);
+            Sender.RegisterTextParameter('FixedSalespersonCode', '');
+            Sender.RegisterBooleanParameter('LookupSalespersonCode', true);
+            Sender.RegisterWorkflow(false);
             end;
     end;
 
@@ -44,19 +36,14 @@ codeunit 6150845 "NPR POS Action: Quick Login"
             'FixedSalespersonCode':
                 begin
                     Handled := true;
-                    //-NPR5.43 [313123]
-                    //OnActionFixedReasonCode(JSON,POSSession);
                     OnActionFixedSalespersonCode(JSON, POSSession);
-                    //+NPR5.43 [313123]
+
                     exit;
                 end;
             'LookupSalespersonCode':
                 begin
                     Handled := true;
-                    //-NPR5.43 [313123]
-                    //OnActionLookupReasonCode(JSON,POSSession);
                     OnActionLookupSalespersonCode(JSON, POSSession);
-                    //+NPR5.43 [313123]
                     exit;
                 end;
         end;
@@ -64,7 +51,7 @@ codeunit 6150845 "NPR POS Action: Quick Login"
 
     local procedure OnActionFixedSalespersonCode(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
-        SalespersonCode: Code[10];
+        SalespersonCode: Code[20];
     begin
         JSON.SetScope('parameters', true);
         SalespersonCode := JSON.GetString('FixedSalespersonCode', true);
@@ -86,11 +73,9 @@ codeunit 6150845 "NPR POS Action: Quick Login"
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.Find;
         if SalespersonPurchaser.Get(SalePOS."Salesperson Code") then;
-        //-NPR5.43 [313123]
         SalespersonPurchaser.FilterGroup(2);
         SalespersonPurchaser.SetFilter("NPR Locked-to Register No.", '%1|%2', '', SalePOS."Register No.");
         SalespersonPurchaser.FilterGroup(0);
-        //+NPR5.43 [313123]
         if PAGE.RunModal(0, SalespersonPurchaser) <> ACTION::LookupOK then
             exit;
 
@@ -98,11 +83,7 @@ codeunit 6150845 "NPR POS Action: Quick Login"
         POSSession.RequestRefreshData();
     end;
 
-    local procedure "-- Locals --"()
-    begin
-    end;
-
-    local procedure ApplySalespersonCode(SalespersonCode: Code[10]; var POSSession: Codeunit "NPR POS Session")
+    local procedure ApplySalespersonCode(SalespersonCode: Code[20]; var POSSession: Codeunit "NPR POS Session")
     var
         SalePOS: Record "NPR Sale POS";
         POSSale: Codeunit "NPR POS Sale";

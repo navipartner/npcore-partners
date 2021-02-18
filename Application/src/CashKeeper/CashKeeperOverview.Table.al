@@ -1,7 +1,5 @@
 table 6059947 "NPR CashKeeper Overview"
 {
-    // NPR5.43/CLVA/20180620 CASE 319764 Object created
-
     Caption = 'CashKeeper Overview';
     DataClassification = CustomerContent;
 
@@ -28,7 +26,7 @@ table 6059947 "NPR CashKeeper Overview"
             Caption = 'Value In Cents';
             DataClassification = CustomerContent;
         }
-        field(14; Salesperson; Code[10])
+        field(14; Salesperson; Code[20])
         {
             Caption = 'Salesperson';
             DataClassification = CustomerContent;

@@ -29,7 +29,7 @@ table 6059986 "NPR Sale POS Cue"
             Caption = 'Cash Register Filter';
             FieldClass = FlowFilter;
         }
-        field(26; "Salesperson Filter"; Code[10])
+        field(26; "Salesperson Filter"; Code[20])
         {
             Caption = 'Salesperson Filter';
             FieldClass = FlowFilter;

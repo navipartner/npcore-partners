@@ -35,7 +35,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         NoDiscTargetFound: Label 'System couldn''t find lines the discount to be applied to.\The POS action is preset for discounts to be applied to %1.';
         AddDimensionCode: Code[20];
         AddDimensionValueCode: Code[20];
-        ApprovedBySalespersonCode: Code[10];
+        ApprovedBySalespersonCode: Code[20];
         DiscountReasonCode: Code[10];
 
     local procedure ActionCode(): Text
@@ -51,64 +51,63 @@ codeunit 6150792 "NPR POS Action - Discount"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode,
-              ActionDescription,
-              ActionVersion,
-              Type::Generic,
-              "Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('SalespersonPassword',
-                  'if(param.Security == 1) {passwordpad({title: labels.DiscountAuthorisationTitle,caption: labels.SalespersonPasswordLabel,notBlank: true}).respond("SalespersonPassword").cancel(abort);}');
-                RegisterWorkflowStep('CurrentSalespersonPassword',
-                  'if(param.Security == 2) {passwordpad({title: labels.DiscountAuthorisationTitle,caption: labels.CurrentSalespersonPasswordLabel,notBlank: true}).respond("CurrentSalespersonPassword").cancel(abort);}');
-                RegisterWorkflowStep('SupervisorPassword',
-                  'if(param.Security == 3) {passwordpad({title: labels.DiscountAuthorisationTitle,caption: labels.SupervisorPasswordLabel,notBlank: true}).respond("SupervisorPassword").cancel(abort);}');
-                RegisterWorkflowStep('FixedReasonCode', 'if (param.FixedReasonCode != "")  {respond()}');
-                RegisterWorkflowStep('LookupReasonCode', 'if (param.LookupReasonCode)  {respond()}');
-                RegisterWorkflowStep('AddDimensionValue', 'respond();');
-                RegisterWorkflowStep('fixed_input', 'if (param.FixedDiscountNumber != 0) { context.quantity = param.FixedDiscountNumber; }');
-                RegisterWorkflowStep('discount_input',
-                  'switch(param.DiscountType + "") {' +
-                  '  case "0":' +
-                  '  case "1":' +
-                  '  case "2":' +
-                  '  case "3":' +
-                  '  case "4":' +
-                  '  case "5":' +
-                  '  case "6":' +
-                  '  case "7":' +
-                  '  case "8":' +
-                  '  case "11":' +
-                  '  case "12":' +
-                  '    if (param.FixedDiscountNumber == 0){' +
-                  '      numpad(labels["DiscountLabel" + param.DiscountType]).respond("quantity");' +
-                  '    } else {' +
-                  '      context.quantity = param.FixedDiscountNumber;' +
-                  '      respond("quantity");' +
-                  '    }' +
-                  '    break;' +
-                  '  default:' +
-                  '    context.quantity = param.FixedDiscountNumber;' +
-                  '    respond("quantity");' +
-                  '}');
+        if Sender.DiscoverAction(
+  ActionCode,
+  ActionDescription,
+  ActionVersion,
+  Sender.Type::Generic,
+  Sender."Subscriber Instances Allowed"::Multiple)
+then begin
+            Sender.RegisterWorkflowStep('SalespersonPassword',
+              'if(param.Security == 1) {passwordpad({title: labels.DiscountAuthorisationTitle,caption: labels.SalespersonPasswordLabel,notBlank: true}).respond("SalespersonPassword").cancel(abort);}');
+            Sender.RegisterWorkflowStep('CurrentSalespersonPassword',
+              'if(param.Security == 2) {passwordpad({title: labels.DiscountAuthorisationTitle,caption: labels.CurrentSalespersonPasswordLabel,notBlank: true}).respond("CurrentSalespersonPassword").cancel(abort);}');
+            Sender.RegisterWorkflowStep('SupervisorPassword',
+              'if(param.Security == 3) {passwordpad({title: labels.DiscountAuthorisationTitle,caption: labels.SupervisorPasswordLabel,notBlank: true}).respond("SupervisorPassword").cancel(abort);}');
+            Sender.RegisterWorkflowStep('FixedReasonCode', 'if (param.FixedReasonCode != "")  {respond()}');
+            Sender.RegisterWorkflowStep('LookupReasonCode', 'if (param.LookupReasonCode)  {respond()}');
+            Sender.RegisterWorkflowStep('AddDimensionValue', 'respond();');
+            Sender.RegisterWorkflowStep('fixed_input', 'if (param.FixedDiscountNumber != 0) { context.quantity = param.FixedDiscountNumber; }');
+            Sender.RegisterWorkflowStep('discount_input',
+              'switch(param.DiscountType + "") {' +
+              '  case "0":' +
+              '  case "1":' +
+              '  case "2":' +
+              '  case "3":' +
+              '  case "4":' +
+              '  case "5":' +
+              '  case "6":' +
+              '  case "7":' +
+              '  case "8":' +
+              '  case "11":' +
+              '  case "12":' +
+              '    if (param.FixedDiscountNumber == 0){' +
+              '      numpad(labels["DiscountLabel" + param.DiscountType]).respond("quantity");' +
+              '    } else {' +
+              '      context.quantity = param.FixedDiscountNumber;' +
+              '      respond("quantity");' +
+              '    }' +
+              '    break;' +
+              '  default:' +
+              '    context.quantity = param.FixedDiscountNumber;' +
+              '    respond("quantity");' +
+              '}');
 
-                RegisterOptionParameter('Security', 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', 'None');
-                RegisterOptionParameter('DiscountType',
-                  'TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,' +
-                  'LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra',
-                  'TotalDiscountAmount');
-                RegisterDecimalParameter('FixedDiscountNumber', 0);
-                RegisterTextParameter('FixedReasonCode', '');
-                RegisterBooleanParameter('LookupReasonCode', false);
-                RegisterTextParameter('DimensionCode', '');
-                RegisterTextParameter('DimensionValue', '');
-                RegisterTextParameter('DiscountGroupFilter', '');
-                RegisterOptionParameter('TotalDiscTargetLines', 'Auto,Positive,Negative,All,Ask', 'Positive');
-                RegisterDataBinding();
-                RegisterWorkflow(true);
-            end;
+            Sender.RegisterOptionParameter('Security', 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', 'None');
+            Sender.RegisterOptionParameter('DiscountType',
+              'TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,' +
+              'LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra',
+              'TotalDiscountAmount');
+            Sender.RegisterDecimalParameter('FixedDiscountNumber', 0);
+            Sender.RegisterTextParameter('FixedReasonCode', '');
+            Sender.RegisterBooleanParameter('LookupReasonCode', false);
+            Sender.RegisterTextParameter('DimensionCode', '');
+            Sender.RegisterTextParameter('DimensionValue', '');
+            Sender.RegisterTextParameter('DiscountGroupFilter', '');
+            Sender.RegisterOptionParameter('TotalDiscTargetLines', 'Auto,Positive,Negative,All,Ask', 'Positive');
+            Sender.RegisterDataBinding();
+            Sender.RegisterWorkflow(true);
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', false, false)]

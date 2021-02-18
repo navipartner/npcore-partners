@@ -68,7 +68,7 @@ table 6014426 "NPR Retail Document Lines"
             Caption = 'Unit Cost (LCY)';
             DataClassification = CustomerContent;
         }
-        field(13; "Salesperson Code"; Code[10])
+        field(13; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;

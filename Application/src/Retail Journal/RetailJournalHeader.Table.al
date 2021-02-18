@@ -21,7 +21,7 @@ table 6014451 "NPR Retail Journal Header"
             Caption = 'Date';
             DataClassification = CustomerContent;
         }
-        field(4; "Salesperson Code"; Code[10])
+        field(4; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson';
             TableRelation = "Salesperson/Purchaser".Code;
@@ -117,15 +117,13 @@ table 6014451 "NPR Retail Journal Header"
     var
         this: Record "NPR Retail Journal Header";
     begin
-        with this do begin
-            this := Rec;
-            RetailSetup.Get;
-            RetailSetup.TestField("Retail Journal No. Series");
-            if NoSeriesMgt.SelectSeries(RetailSetup."Retail Journal No. Series", old."No. Series", "No. Series") then begin
-                NoSeriesMgt.SetSeries("No.");
-                Rec := this;
-                exit(true);
-            end;
+        this := Rec;
+        RetailSetup.Get;
+        RetailSetup.TestField("Retail Journal No. Series");
+        if NoSeriesMgt.SelectSeries(RetailSetup."Retail Journal No. Series", old."No. Series", this."No. Series") then begin
+            NoSeriesMgt.SetSeries(this."No.");
+            Rec := this;
+            exit(true);
         end;
     end;
 
