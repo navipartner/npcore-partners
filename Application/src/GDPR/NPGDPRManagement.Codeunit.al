@@ -4,7 +4,8 @@ codeunit 6151060 "NPR NP GDPR Management"
                   TableData "Sales Invoice Header" = rm,
                   TableData "Sales Cr.Memo Header" = rm,
                   TableData "Return Receipt Header" = rm,
-                  TableData "Job Queue Entry" = rm;
+                  TableData "Job Queue Entry" = rm,
+                  TableData "Issued Reminder Header" = rm;
     TableNo = "Job Queue Entry";
 
     trigger OnRun()
