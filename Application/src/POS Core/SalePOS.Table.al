@@ -33,7 +33,7 @@ table 6014405 "NPR Sale POS"
                   DATABASE::"Salesperson/Purchaser", "Salesperson Code");
             end;
         }
-        field(4; "Salesperson Code"; Code[10])
+        field(4; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;

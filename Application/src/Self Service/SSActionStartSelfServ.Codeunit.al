@@ -36,7 +36,7 @@ codeunit 6151286 "NPR SS Action: Start SelfServ."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', false, false)]
     local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        SalesPersonCode: Code[10];
+        SalespersonCode: Code[20];
         LanguageCode: Code[10];
     begin
         if not Action.IsThisAction(ActionCode) then
@@ -50,7 +50,7 @@ codeunit 6151286 "NPR SS Action: Start SelfServ."
         StartSelfService(POSSession, SalesPersonCode, LanguageCode);
     end;
 
-    procedure StartSelfService(POSSession: Codeunit "NPR POS Session"; SalespersonCode: Code[10]; LanguageCode: Code[10])
+    procedure StartSelfService(POSSession: Codeunit "NPR POS Session"; SalespersonCode: Code[20]; LanguageCode: Code[10])
     var
         POSUnit: Record "NPR POS Unit";
         Register: Record "NPR Register";
@@ -91,7 +91,6 @@ codeunit 6151286 "NPR SS Action: Start SelfServ."
         // possetup might have a stale version
         POSUnit.Get(POSUnit."No.");
         POSSetup.SetPOSUnit(POSUnit);
-        //+NPR5.55 [405186]
 
         case POSUnit.Status of
             POSUnit.Status::OPEN:

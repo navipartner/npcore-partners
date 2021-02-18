@@ -313,7 +313,7 @@ table 6150905 "NPR HC Payment Type POS"
             Description = 'Tæller alle linier m. type <>Afbrudt &<>Åben/Luk';
             FieldClass = FlowField;
         }
-        field(43; "Salesperson Filter"; Code[10])
+        field(43; "Salesperson Filter"; Code[20])
         {
             Caption = 'Salesperson filter';
             FieldClass = FlowFilter;

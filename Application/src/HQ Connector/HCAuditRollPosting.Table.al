@@ -298,7 +298,7 @@ table 6150903 "NPR HC Audit Roll Posting"
             Caption = 'Sales Document Ship';
             DataClassification = CustomerContent;
         }
-        field(200; "Salesperson Code"; Code[10])
+        field(200; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;

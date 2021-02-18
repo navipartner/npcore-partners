@@ -30,7 +30,7 @@ table 6151002 "NPR POS Quote Entry"
             DataClassification = CustomerContent;
             NotBlank = true;
         }
-        field(20; "Salesperson Code"; Code[10])
+        field(20; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;

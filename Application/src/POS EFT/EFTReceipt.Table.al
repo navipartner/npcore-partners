@@ -43,7 +43,7 @@ table 6014403 "NPR EFT Receipt"
             Caption = 'Sales Ticket No.';
             DataClassification = CustomerContent;
         }
-        field(8; "Salesperson Code"; Code[10])
+        field(8; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;
