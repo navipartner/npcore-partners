@@ -147,7 +147,10 @@ table 6014405 "NPR Sale POS"
                     Validate("Country Code", '');
                 end;
 
-                "Prices Including VAT" := true;
+                if Cust."No." <> '' then
+                    "Prices Including VAT" := Cust."Prices Including VAT"
+                else
+                    "Prices Including VAT" := true;
 
                 if not Modify then;
 
