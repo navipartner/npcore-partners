@@ -74,6 +74,12 @@ table 6014417 "NPR Discount Priority"
             Editable = false;
             DataClassification = CustomerContent;
         }
+        field(40; "Discount No. Series"; Code[10])
+        {
+            Caption = 'Discount No. Series';
+            TableRelation = "No. Series";
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -110,6 +116,35 @@ table 6014417 "NPR Discount Priority"
                 TempObject.Insert;
             end;
         end;
+    end;
+
+    procedure CreateNoSeries(NoSeriesCode: Code[10]; FieldDescr: Text[50]; ManualNoSeries: Boolean)
+    var
+        NoSeries: Record "No. Series";
+        NoSeriesLine: Record "No. Series Line";
+    begin
+        if ("Discount No. Series" <> '') or (NoSeries.Get(NoSeriesCode)) then
+            exit;
+
+        NoSeries.Init();
+        NoSeries.Code := NoSeriesCode;
+        NoSeries.Description := FieldDescr;
+        NoSeries."Default Nos." := true;
+        NoSeries."Manual Nos." := ManualNoSeries;
+        NoSeries.Insert();
+
+        NoSeriesLine.Init();
+        NoSeriesLine."Series Code" := NoSeriesCode;
+        NoSeriesLine."Line No." := 10000;
+        NoSeriesLine."Starting Date" := Today();
+        NoSeriesLine."Last Date Used" := Today();
+        NoSeriesLine."Starting No." := '1';
+        NoSeriesLine."Last No. Used" := '1';
+        NoSeriesLine.Open := true;
+        NoSeriesLine.Insert();
+
+        "Discount No. Series" := NoSeriesCode;
+        Modify();
     end;
 }
 

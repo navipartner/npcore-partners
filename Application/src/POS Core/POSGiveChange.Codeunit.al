@@ -109,17 +109,13 @@ codeunit 6150634 "NPR POS Give Change"
     local procedure GetReturnPaymentType(SalePOS: Record "NPR Sale POS"): Code[10]
     var
         PaymentTypePOS: Record "NPR Payment Type POS";
-        RetailSetup: Record "NPR Retail Setup";
         Register: Record "NPR Register";
     begin
-        RetailSetup.Get;
         Register.Get(SalePOS."Register No.");
         with PaymentTypePOS do begin
             Reset;
             SetRange("Processing Type", "Processing Type"::Cash);
             SetRange(Status, Status::Active);
-            if RetailSetup."Payment Type By Register" then
-                SetRange("Register No.", SalePOS."Register No.");
             SetRange("No.", Register."Return Payment Type");
             if FindFirst then
                 exit("No.");

@@ -52,7 +52,7 @@ codeunit 6150836 "NPR POS Action: UnlockPOS"
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         POSSale: Codeunit "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
-        RetailSetup: Record "NPR Retail Setup";
+        RetailSetup: Record "NPR NP Retail Setup";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         PasswordValid: Boolean;
         SalePOS: Record "NPR Sale POS";
@@ -79,11 +79,8 @@ codeunit 6150836 "NPR POS Action: UnlockPOS"
                     if (not PasswordValid) then
                         PasswordValid := (Password = RetailSetup."Open Register Password");
 
-                    //-NPR5.39 [305106]
                     if (DelChr(Password, '<=>', ' ') = '') then
                         PasswordValid := false;
-                    //+NPR5.39 [305106]
-
                 end;
             else
                 PasswordValid := false;
@@ -99,14 +96,12 @@ codeunit 6150836 "NPR POS Action: UnlockPOS"
 
                 POSSetup.SetSalesperson(SalespersonPurchaser);
 
-                //-NPR5.39 [305106]
                 POSSale.GetCurrentSale(SalePOS);
                 SalePOS.Find;
 
                 SalePOS.Validate("Salesperson Code", SalespersonPurchaser.Code);
                 SalePOS.Modify(true);
                 POSSale.RefreshCurrent();
-                //+NPR5.39 [305106]
 
                 POSSale.Modify(false, false);
                 POSSession.RequestRefreshData();
@@ -117,10 +112,8 @@ codeunit 6150836 "NPR POS Action: UnlockPOS"
         if (not PasswordValid) then
             Error(IllegalPassword);
 
-        //+NPR5.38 [297087]
         POSSession.GetSetup(POSSetup);
         POSCreateEntry.InsertUnitUnlockEntry(POSSetup.Register(), POSSetup.Salesperson());
-        //-NPR5.38 [297087]
 
         POSSession.ChangeViewSale();
     end;

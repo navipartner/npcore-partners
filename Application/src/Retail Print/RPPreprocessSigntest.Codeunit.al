@@ -14,7 +14,7 @@ codeunit 6014533 "NPR RP Preprocess: Sign. test"
         AuditRollSale.SetFilter(Quantity, '<%1', 0);
         if not AuditRollSale.IsEmpty then begin
             AuditRollTotals.CalcSums("Amount Including VAT");
-            if RetailSetup."Return Receipt Positive Amount" or (AuditRollTotals."Amount Including VAT" < 0) then
+            if AuditRollTotals."Amount Including VAT" < 0 then
                 exit;
         end;
         AuditRollSale.SetRange(Quantity);
@@ -44,7 +44,6 @@ codeunit 6014533 "NPR RP Preprocess: Sign. test"
         AuditRollTotals: Record "NPR Audit Roll";
         AuditRollCustomerPayments: Record "NPR Audit Roll";
         POSUnit: Record "NPR POS Unit";
-        RetailSetup: Record "NPR Retail Setup";
         POSSetup: Codeunit "NPR POS Setup";
 
     local procedure SetGlobals()
@@ -71,12 +70,8 @@ codeunit 6014533 "NPR RP Preprocess: Sign. test"
         AuditRollCustomerPayments.SetRange("Sale Type", AuditRollCustomerPayments."Sale Type"::Deposit);
         AuditRollCustomerPayments.SetRange(Type, AuditRollCustomerPayments.Type::Customer);
 
-        RetailSetup.Get();
-        //Register.GET(AuditRoll."Register No.");  //NPR5.53 [371955]-revoked
-        //-NPR5.53 [371955]
         POSUnit.Get(AuditRoll."Register No.");
         POSSetup.SetPOSUnit(POSUnit);
-        //+NPR5.53 [371955]
     end;
 }
 

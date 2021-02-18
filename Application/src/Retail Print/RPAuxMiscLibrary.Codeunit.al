@@ -2,13 +2,13 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
 {
     procedure ApplyCipher(var "Proccesing Value": Text[30]; HandleDecimals: Boolean) CifferCodeValue: Code[10]
     var
-        RetailConfiguration: Record "NPR Retail Setup";
+        ExchangeLabelSetup: Record "NPR Exchange Label Setup";
         CifferCode: Code[10];
         Index: Integer;
         Itt: Integer;
     begin
-        RetailConfiguration.Get;
-        CifferCode := RetailConfiguration."Purchace Price Code";
+        ExchangeLabelSetup.Get();
+        CifferCode := ExchangeLabelSetup."Purchace Price Code";
 
         for Itt := 1 to StrLen("Proccesing Value") do begin
             if Evaluate(Index, Format("Proccesing Value"[Itt])) and (Format("Proccesing Value"[Itt]) <> '.') then begin
@@ -55,12 +55,12 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
 
     procedure ApplyExchangeDeadline(var "Processing Value": Text[30])
     var
-        RetailSetup: Record "NPR Retail Setup";
+        ExchangeLabelSetup: Record "NPR Exchange Label Setup";
         Date: Date;
     begin
-        RetailSetup.Get();
+        ExchangeLabelSetup.Get();
         if Evaluate(Date, "Processing Value") then
-            "Processing Value" := Format(CalcDate(RetailSetup."Exchange Label Exchange Period", Date));
+            "Processing Value" := Format(CalcDate(ExchangeLabelSetup."Exchange Label Exchange Period", Date));
     end;
 
     procedure FormatNumberNoDecimal(var "Processing Value": Text[30])

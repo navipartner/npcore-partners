@@ -3,7 +3,6 @@ codeunit 6059969 "NPR Description Control"
     local procedure InitDescriptionControl()
     var
         DescriptionControl: Record "NPR Description Control";
-        RetailSetup: Record "NPR Retail Setup";
     begin
         if not DescriptionControl.IsEmpty then
             exit;
@@ -52,7 +51,6 @@ codeunit 6059969 "NPR Description Control"
         Item: Record Item;
         ItemVariant: Record "Item Variant";
     begin
-        //-NPR5.48 [338542]
         VRTSetup.Get;
         Item.Get(ItemNo);
         if VariantCode = '' then begin
@@ -75,12 +73,11 @@ codeunit 6059969 "NPR Description Control"
                     exit(ItemVariant."Description 2");
             end;
         end;
-        //+NPR5.48 [338542]
     end;
 
     procedure GetDescriptionPOS(var Rec: Record "NPR Sale Line POS"; XRec: Record "NPR Sale Line POS"; Item: Record Item)
     var
-        RetailSetup: Record "NPR Retail Setup";
+        RetailItemSetup: Record "NPR Retail Item Setup";
         ItemGroup: Record "NPR Item Group";
         Vendor: Record Vendor;
         Pos: Integer;
@@ -97,14 +94,14 @@ codeunit 6059969 "NPR Description Control"
 
             InitDescriptionControl();
 
-            if RetailSetup.Get then begin
+            if RetailItemSetup.Get then begin
                 if ((XRec."No." <> "No.") or (Description = '')) and not "Custom Descr" then begin
-                    case RetailSetup."Description control" of
-                        RetailSetup."Description control"::"<Description>":
+                    case RetailItemSetup."Description control" of
+                        RetailItemSetup."Description control"::"<Description>":
                             Description := CopyStr(Item.Description, 1, 50);
-                        RetailSetup."Description control"::"<Description 2>":
+                        RetailItemSetup."Description control"::"<Description 2>":
                             Description := CopyStr(Item."Description 2", 1, 50);
-                        RetailSetup."Description control"::"<Vendor Name><Item Group><Vendor Item No.>":
+                        RetailItemSetup."Description control"::"<Vendor Name><Item Group><Vendor Item No.>":
                             begin
                                 if ItemGroup.Get(Item."NPR Item Group") then begin
                                     if Vendor.Get(Item."Vendor No.") then
@@ -124,17 +121,17 @@ codeunit 6059969 "NPR Description Control"
                                         Description := CopyStr(VendorName + ' ' + ItemGroupName + ' ' + Item."Vendor Item No.", 1, 30);
                                 end;
                             end;
-                        RetailSetup."Description control"::"<Description 2><Item group name>":
+                        RetailItemSetup."Description control"::"<Description 2><Item group name>":
                             begin
                                 if ItemGroup.Get(Item."NPR Item Group") and (Item."Description 2" <> '') then
                                     Description := CopyStr(Item."Description 2" + ' ' + ItemGroup.Description, 1, 30);
                             end;
-                        RetailSetup."Description control"::"<Description><Variant Info>":
+                        RetailItemSetup."Description control"::"<Description><Variant Info>":
                             begin
                                 if ItemVariant.Get(Rec."No.", Rec."Variant Code") then
                                     Description := CopyStr(Item.Description + ' ' + ItemVariant.Description, 1, MaxStrLen(Description));
                             end;
-                        RetailSetup."Description control"::"<Desc Item>:<Desc2 Variant>":
+                        RetailItemSetup."Description control"::"<Desc Item>:<Desc2 Variant>":
                             begin
                                 Description := Item.Description;
                                 if ItemVariant.Get(Rec."No.", Rec."Variant Code") then
@@ -154,7 +151,7 @@ codeunit 6059969 "NPR Description Control"
     local procedure GetDescriptionSale(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line")
     var
         Item: Record Item;
-        RetailSetup: Record "NPR Retail Setup";
+        RetailItemSetup: Record "NPR Retail Item Setup";
         Desc: Text[100];
         Desc2: Text[50];
         ItemGroup: Record "NPR Item Group";
@@ -170,23 +167,23 @@ codeunit 6059969 "NPR Description Control"
             if not Item.Get("No.") then
                 exit;
 
-            if not RetailSetup.Get then
+            if not RetailItemSetup.Get then
                 exit;
 
             InitDescriptionControl();
 
-            case RetailSetup."Description control" of
-                RetailSetup."Description control"::"<Description>":
+            case RetailItemSetup."Description control" of
+                RetailItemSetup."Description control"::"<Description>":
                     begin
                         GetItemTranslation_OLD("No.", '', SalesHeader."Language Code", Desc, Desc2);
                         Description := CopyStr(Desc, 1, MaxStrLen(Description));
                     end;
-                RetailSetup."Description control"::"<Description 2>":
+                RetailItemSetup."Description control"::"<Description 2>":
                     begin
                         GetItemTranslation_OLD("No.", '', SalesHeader."Language Code", Desc, Desc2);
                         Description := CopyStr(Desc2, 1, MaxStrLen(Description));
                     end;
-                RetailSetup."Description control"::"<Vendor Name><Item Group><Vendor Item No.>":
+                RetailItemSetup."Description control"::"<Vendor Name><Item Group><Vendor Item No.>":
                     begin
                         if ItemGroup.Get(Item."NPR Item Group") then begin
                             if Vendor.Get(Item."Vendor No.") then
@@ -206,13 +203,13 @@ codeunit 6059969 "NPR Description Control"
                                 Description := CopyStr(VendorName + ' ' + ItemGroupName + ' ' + Item."Vendor Item No.", 1, MaxStrLen(Description));
                         end;
                     end;
-                RetailSetup."Description control"::"<Description 2><Item group name>":
+                RetailItemSetup."Description control"::"<Description 2><Item group name>":
                     begin
                         GetItemTranslation_OLD("No.", '', SalesHeader."Language Code", Desc, Desc2);
                         if ItemGroup.Get(Item."NPR Item Group") and (Desc2 <> '') then
                             Description := CopyStr(Desc2 + ' ' + ItemGroup.Description, 1, MaxStrLen(Description));
                     end;
-                RetailSetup."Description control"::"<Description><Variant Info>":
+                RetailItemSetup."Description control"::"<Description><Variant Info>":
                     begin
                         GetItemTranslation_OLD("No.", '', SalesHeader."Language Code", Desc, Desc2);
                         Description := Desc;
@@ -220,7 +217,7 @@ codeunit 6059969 "NPR Description Control"
                         GetItemTranslation_OLD("No.", "Variant Code", SalesHeader."Language Code", Desc, Desc2);
                         Description := CopyStr(Description + ' ' + Desc, 1, MaxStrLen(Description));
                     end;
-                RetailSetup."Description control"::"<Desc Item>:<Desc2 Variant>":
+                RetailItemSetup."Description control"::"<Desc Item>:<Desc2 Variant>":
                     begin
                         GetItemTranslation_OLD("No.", '', SalesHeader."Language Code", Desc, Desc2);
                         Description := Desc;
@@ -234,7 +231,7 @@ codeunit 6059969 "NPR Description Control"
     local procedure GetDescriptionPurchase(PurchHeader: Record "Purchase Header"; var PurchLine: Record "Purchase Line")
     var
         Item: Record Item;
-        RetailSetup: Record "NPR Retail Setup";
+        RetailItemSetup: Record "NPR Retail Item Setup";
         Desc: Text[100];
         Desc2: Text[50];
         ItemGroup: Record "NPR Item Group";
@@ -250,23 +247,23 @@ codeunit 6059969 "NPR Description Control"
             if not Item.Get("No.") then
                 exit;
 
-            if not RetailSetup.Get then
+            if not RetailItemSetup.Get then
                 exit;
 
             InitDescriptionControl();
 
-            case RetailSetup."Description control" of
-                RetailSetup."Description control"::"<Description>":
+            case RetailItemSetup."Description control" of
+                RetailItemSetup."Description control"::"<Description>":
                     begin
                         GetItemTranslation_OLD("No.", '', PurchHeader."Language Code", Desc, Desc2);
                         Description := CopyStr(Desc, 1, MaxStrLen(Description));
                     end;
-                RetailSetup."Description control"::"<Description 2>":
+                RetailItemSetup."Description control"::"<Description 2>":
                     begin
                         GetItemTranslation_OLD("No.", '', PurchHeader."Language Code", Desc, Desc2);
                         Description := CopyStr(Desc2, 1, MaxStrLen(Description));
                     end;
-                RetailSetup."Description control"::"<Vendor Name><Item Group><Vendor Item No.>":
+                RetailItemSetup."Description control"::"<Vendor Name><Item Group><Vendor Item No.>":
                     begin
                         if ItemGroup.Get(Item."NPR Item Group") then begin
                             if Vendor.Get(Item."Vendor No.") then
@@ -286,13 +283,13 @@ codeunit 6059969 "NPR Description Control"
                                 Description := CopyStr(VendorName + ' ' + ItemGroupName + ' ' + Item."Vendor Item No.", 1, MaxStrLen(Description));
                         end;
                     end;
-                RetailSetup."Description control"::"<Description 2><Item group name>":
+                RetailItemSetup."Description control"::"<Description 2><Item group name>":
                     begin
                         GetItemTranslation_OLD("No.", '', PurchHeader."Language Code", Desc, Desc2);
                         if ItemGroup.Get(Item."NPR Item Group") and (Desc2 <> '') then
                             Description := CopyStr(Desc2 + ' ' + ItemGroup.Description, 1, MaxStrLen(Description));
                     end;
-                RetailSetup."Description control"::"<Description><Variant Info>":
+                RetailItemSetup."Description control"::"<Description><Variant Info>":
                     begin
                         GetItemTranslation_OLD("No.", '', PurchHeader."Language Code", Desc, Desc2);
                         Description := Desc;
@@ -300,7 +297,7 @@ codeunit 6059969 "NPR Description Control"
                         GetItemTranslation_OLD("No.", "Variant Code", PurchHeader."Language Code", Desc, Desc2);
                         Description := CopyStr(Description + ' ' + Desc, 1, MaxStrLen(Description));
                     end;
-                RetailSetup."Description control"::"<Desc Item>:<Desc2 Variant>":
+                RetailItemSetup."Description control"::"<Desc Item>:<Desc2 Variant>":
                     begin
                         GetItemTranslation_OLD("No.", '', PurchHeader."Language Code", Desc, Desc2);
                         Description := Desc;
@@ -314,7 +311,7 @@ codeunit 6059969 "NPR Description Control"
     local procedure GetDescriptionTransfer(TransHeader: Record "Transfer Header"; var TransLine: Record "Transfer Line")
     var
         Item: Record Item;
-        RetailSetup: Record "NPR Retail Setup";
+        RetailItemSetup: Record "NPR Retail Item Setup";
         Desc: Text[100];
         Desc2: Text[50];
         ItemGroup: Record "NPR Item Group";
@@ -327,20 +324,20 @@ codeunit 6059969 "NPR Description Control"
             if not Item.Get("Item No.") then
                 exit;
 
-            if not RetailSetup.Get then
+            if not RetailItemSetup.Get then
                 exit;
-            case RetailSetup."Description control" of
-                RetailSetup."Description control"::"<Description>":
+            case RetailItemSetup."Description control" of
+                RetailItemSetup."Description control"::"<Description>":
                     begin
                         GetItemTranslation_OLD("Item No.", '', '', Desc, Desc2);
                         Description := CopyStr(Desc, 1, MaxStrLen(Description));
                     end;
-                RetailSetup."Description control"::"<Description 2>":
+                RetailItemSetup."Description control"::"<Description 2>":
                     begin
                         GetItemTranslation_OLD("Item No.", '', '', Desc, Desc2);
                         Description := CopyStr(Desc2, 1, MaxStrLen(Description));
                     end;
-                RetailSetup."Description control"::"<Vendor Name><Item Group><Vendor Item No.>":
+                RetailItemSetup."Description control"::"<Vendor Name><Item Group><Vendor Item No.>":
                     begin
                         if ItemGroup.Get(Item."NPR Item Group") then begin
                             if Vendor.Get(Item."Vendor No.") then
@@ -360,13 +357,13 @@ codeunit 6059969 "NPR Description Control"
                                 Description := CopyStr(VendorName + ' ' + ItemGroupName + ' ' + Item."Vendor Item No.", 1, MaxStrLen(Description));
                         end;
                     end;
-                RetailSetup."Description control"::"<Description 2><Item group name>":
+                RetailItemSetup."Description control"::"<Description 2><Item group name>":
                     begin
                         GetItemTranslation_OLD("Item No.", '', '', Desc, Desc2);
                         if ItemGroup.Get(Item."NPR Item Group") and (Desc2 <> '') then
                             Description := CopyStr(Desc2 + ' ' + ItemGroup.Description, 1, MaxStrLen(Description));
                     end;
-                RetailSetup."Description control"::"<Description><Variant Info>":
+                RetailItemSetup."Description control"::"<Description><Variant Info>":
                     begin
                         GetItemTranslation_OLD("Item No.", '', '', Desc, Desc2);
                         Description := Desc;
@@ -374,7 +371,7 @@ codeunit 6059969 "NPR Description Control"
                         GetItemTranslation_OLD("Item No.", "Variant Code", '', Desc, Desc2);
                         Description := CopyStr(Description + ' ' + Desc, 1, MaxStrLen(Description));
                     end;
-                RetailSetup."Description control"::"<Desc Item>:<Desc2 Variant>":
+                RetailItemSetup."Description control"::"<Desc Item>:<Desc2 Variant>":
                     begin
                         GetItemTranslation_OLD("Item No.", '', '', Desc, Desc2);
                         Description := Desc;

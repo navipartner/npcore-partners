@@ -94,6 +94,46 @@ table 6059970 "NPR Variety Setup"
             DataClassification = CustomerContent;
             Description = 'VRT1.11';
         }
+        field(53; "Internal EAN No. Series"; Code[10])
+        {
+            Caption = 'Internal EAN No. Series';
+            DataClassification = CustomerContent;
+            Description = 'Nummerserie til EAN numre';
+            TableRelation = "No. Series";
+
+            trigger OnValidate()
+            begin
+                if xRec."Internal EAN No. Series" <> '' then
+                    Error(NoSeriesChangeErr);
+            end;
+        }
+        field(54; "EAN-Internal"; Integer)
+        {
+            Caption = 'EAN-Internal';
+            DataClassification = CustomerContent;
+            Description = 'Intern ean nummer start';
+            MaxValue = 29;
+            MinValue = 27;
+        }
+        field(56; "External EAN No. Series"; Code[10])
+        {
+            Caption = 'External EAN-No. Series';
+            DataClassification = CustomerContent;
+            Description = 'Nummerserie til eksterne EAN numre';
+            TableRelation = "No. Series";
+
+            trigger OnValidate()
+            begin
+                if xRec."Internal EAN No. Series" <> '' then
+                    Error(NoSeriesChangeErr);
+            end;
+        }
+        field(57; "EAN-External"; Integer)
+        {
+            Caption = 'EAN-External';
+            DataClassification = CustomerContent;
+            Description = 'ekstern eannummer';
+        }
         field(60; "Variant Description"; Option)
         {
             Caption = 'Variant Description';
@@ -131,6 +171,13 @@ table 6059970 "NPR Variety Setup"
                 //+NPR5.43 [317108]
             end;
         }
+        field(750; "Variant No. Series"; Code[10])
+        {
+            Caption = 'Variant Std. No. Serie';
+            DataClassification = CustomerContent;
+            Description = 'Nummerserie til 10-code variantkode (ikke EAN)';
+            TableRelation = "No. Series";
+        }
     }
 
     keys
@@ -143,5 +190,8 @@ table 6059970 "NPR Variety Setup"
     fieldgroups
     {
     }
+
+    var
+        NoSeriesChangeErr: Label 'No. Series cannot be changed!';
 }
 

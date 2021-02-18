@@ -38,6 +38,11 @@ page 6059970 "NPR Variety Setup"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Create Variant Code From field';
                 }
+                field("Variant No. Series"; "Variant No. Series")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variant Std. No. Serie field';
+                }
             }
             group("Barcode (Item Cross Ref.)")
             {
@@ -80,6 +85,26 @@ page 6059970 "NPR Variety Setup"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item Cross Ref. Description (Variant) field';
+                }
+                field("Internal EAN No. Series"; Rec."Internal EAN No. Series")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Internal EAN No. Series field';
+                }
+                field("External EAN No. Series"; Rec."External EAN No. Series")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the External EAN No. Series field';
+                }
+                field("EAN-Internal"; "EAN-Internal")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the EAN-Internal field';
+                }
+                field("EAN-External"; "EAN-External")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the EAN-External field';
                 }
             }
             group(View)

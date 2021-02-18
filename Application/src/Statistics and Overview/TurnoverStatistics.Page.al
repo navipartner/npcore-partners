@@ -1,11 +1,5 @@
 page 6014411 "NPR Turnover Statistics"
 {
-    // NPR4.18/MMV/20151228 CASE 230380 Updated week calculation, since NAV implementation of DWY2DATE has been changed since 6.2.
-    //                                  Also added missing handling of LY containing 53 weeks. (has been removed compared to 6.2 form?)
-    // NPR5.35/TJ /20170816 CASE 286283 Renamed variables/function into english and into proper naming terminology
-    //                                  Removed unused variables
-    // NPR5.41/TS  /20180105 NPR5.41 Removed Caption on Container
-
     Caption = 'Turnover Statistics';
     PageType = CardPart;
     UsageCategory = Administration;
@@ -27,18 +21,15 @@ page 6014411 "NPR Turnover Statistics"
         Year: Integer;
         LastDay: Date;
     begin
-        //-NPR4.18
         Year := Date2DWY(CalcDate('<-1Y>', Today), 3);
         LastDay := DMY2Date(31, 12, Year);
         LastYear_W53 := Date2DWY(LastDay, 2) = 53;
-        //+NPR4.18
     end;
 
     var
         Text10600000: Label '-1W+1D';
         Text10600001: Label '-1M+1D';
         Text10600002: Label '-1Y+1D';
-        RetailSetup: Record "NPR Retail Setup";
         DepartmentFilter: Code[50];
         DateFilter: Text[30];
         DateFilterLast: Text[30];
@@ -85,9 +76,6 @@ page 6014411 "NPR Turnover Statistics"
                         D := Date2DWY(Today, 1);
                         W := Date2DWY(Today, 2);
                         Y := Date2DWY(Today, 3) - 1;
-                        //-NPR4.18
-                        //IF Weeks53 THEN
-                        //  W += 1;
                         if LastYear_W53 then
                             W += 1;
 
@@ -95,7 +83,6 @@ page 6014411 "NPR Turnover Statistics"
                             W := 1;
                             Y += 1;
                         end;
-                        //+NPR4.18
                         DateFilterLast := StrSubstNo('%1', DWY2Date(D, W, Y));
                     end;
                 7:
@@ -107,10 +94,6 @@ page 6014411 "NPR Turnover Statistics"
                         StartDate := DWY2Date(1, Week, Year);
                         DateFilter := StrSubstNo('%1..%2', StartDate, EndDate);
                         Year := Year - 1;
-                        //-NPR3.0o
-                        //-NPR4.18
-                        //IF Weeks53 THEN
-                        //   Uge += 1;
                         if LastYear_W53 then
                             Week += 1;
 
@@ -118,7 +101,6 @@ page 6014411 "NPR Turnover Statistics"
                             Week := 1;
                             Year += 1;
                         end;
-                        //+NPR4.18
                         EndDateLast := DWY2Date(Weekday, Week, Year);
                         StartDateLast := DWY2Date(1, Week, Year);
                         DateFilterLast := StrSubstNo('%1..%2', StartDateLast, EndDateLast);
@@ -159,9 +141,6 @@ page 6014411 "NPR Turnover Statistics"
                         Year := Date2DWY(EndDate, 3);
                         StartDate := DWY2Date(1, Week, Year);
                         Year := Year - 1;
-                        //-NPR4.18
-                        //IF Weeks53 THEN
-                        //   Uge += 1;
                         if LastYear_W53 then
                             Week += 1;
 
@@ -169,7 +148,6 @@ page 6014411 "NPR Turnover Statistics"
                             Week := 1;
                             Year += 1;
                         end;
-                        //+NPR4.18
                         EndDateLast := DWY2Date(Weekday, Week, Year);
                         StartDateLast := CalcDate(Text10600000, EndDateLast);
                         ;
@@ -301,11 +279,6 @@ page 6014411 "NPR Turnover Statistics"
         W := Date2DWY(Today, 2);
         Y := Date2DWY(Today, 3) - 1;
 
-        //-NPR4.18
-        //-NPR3.0o
-        //IF Weeks53 THEN
-        // W += 1;
-        //+NPR3.0o
         if LastYear_W53 then
             W += 1;
 
@@ -313,12 +286,7 @@ page 6014411 "NPR Turnover Statistics"
             W := 1;
             Y += 1;
         end;
-        //+NPR4.18
         DateFilterLast := StrSubstNo('%1', DWY2Date(D, W, Y));
-
-        RetailSetup.Get;
-        if RetailSetup."Internal Dept. Code" <> '' then
-            DepartmentFilter := StrSubstNo('<>%1', RetailSetup."Internal Dept. Code");
 
         CalculateYear(DateFilter, DepartmentFilter);
         CalculateLastYear(DateFilterLast, DepartmentFilter);

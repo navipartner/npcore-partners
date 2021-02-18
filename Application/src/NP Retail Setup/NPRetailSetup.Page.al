@@ -14,20 +14,20 @@ page 6150613 "NPR NP Retail Setup"
             group("System")
             {
                 Caption = 'System';
-                field("Data Model Build"; "Data Model Build")
+                field("Data Model Build"; Rec."Data Model Build")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Retail Data Model Upg.Log";
                     Editable = false;
                     ToolTip = 'Specifies the value of the Data Model Build field';
                 }
-                field("Last Data Model Build Upgrade"; "Last Data Model Build Upgrade")
+                field("Last Data Model Build Upgrade"; Rec."Last Data Model Build Upgrade")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Last Data Model Build Upgrade field';
                 }
-                field("Prev. Data Model Build"; "Prev. Data Model Build")
+                field("Prev. Data Model Build"; Rec."Prev. Data Model Build")
                 {
                     ApplicationArea = All;
                     Editable = false;

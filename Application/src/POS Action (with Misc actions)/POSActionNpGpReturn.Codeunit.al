@@ -72,14 +72,14 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        RetailSetup: Record "NPR Retail Setup";
+        RetailItemSetup: Record "NPR Retail Item Setup";
         Context: Codeunit "NPR POS JSON Management";
     begin
         if not Action.IsThisAction(ActionCode) then
             exit;
 
-        RetailSetup.Get;
-        Context.SetContext('PromptForReason', RetailSetup."Reason for Return Mandatory");
+        RetailItemSetup.Get();
+        Context.SetContext('PromptForReason', RetailItemSetup."Reason for Return Mandatory");
 
         FrontEnd.SetActionContext(ActionCode, Context);
 
@@ -133,7 +133,6 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
 
     local procedure SelectReturnReason(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Code[20]
     var
-        RetailSetup: Record "NPR Retail Setup";
         ReturnReason: Record "Return Reason";
     begin
         if (PAGE.RunModal(PAGE::"NPR TouchScreen: Ret. Reasons", ReturnReason) = ACTION::LookupOK) then
@@ -369,7 +368,7 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
     var
         SalePOS: Record "NPR Sale POS";
         SaleLinePOS: Record "NPR Sale Line POS";
-        RetailSetup: Record "NPR Retail Setup";
+        RetailItemSetup: Record "NPR Retail Item Setup";
         RetailCrossReference: Record "NPR Retail Cross Reference";
         Item: Record Item;
         JSON: Codeunit "NPR POS JSON Management";
@@ -395,8 +394,8 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
 
         POSSession.GetSaleLine(POSSaleLine);
 
-        RetailSetup.Get;
-        if (RetailSetup."Reason for Return Mandatory") then begin
+        RetailItemSetup.Get();
+        if (RetailItemSetup."Reason for Return Mandatory") then begin
             JSON.SetScope('/', true);
             ReturnReasonCode := JSON.GetString('ReturnReasonCode', true);
         end;

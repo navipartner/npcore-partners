@@ -10,12 +10,12 @@ codeunit 6014498 "NPR Exchange Label Mgt."
     local procedure CreateExchLabelLineFromRecRef(var RecRef: RecordRef; ValidFromDate: Date; LabelBatchNumber: Integer; PackagedBatch: Boolean): Code[7]
     var
         ExchangeLabel: Record "NPR Exchange Label";
-        RetailConfiguration: Record "NPR Retail Setup";
+        ExchangeLabelSetup: Record "NPR Exchange Label Setup";
         Register: Record "NPR Register";
         String: Codeunit "NPR String Library";
         POSUnit: Record "NPR POS Unit";
     begin
-        RetailConfiguration.Get;
+        ExchangeLabelSetup.Get();
         ExchangeLabel.Init;
 
         if Register.Get(POSUnit.GetCurrentPOSUnit()) then;
@@ -31,7 +31,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
         ExchangeLabel."Valid From" := ValidFromDate;
         ExchangeLabel."Unit Price" := GetUnitPriceInclVat(RecRef);
         ExchangeLabel."Sales Price Incl. Vat" := GetSalesPriceInclVat(RecRef);
-        ExchangeLabel."Valid To" := CalcDate(RetailConfiguration."Exchange Label Exchange Period", ValidFromDate);
+        ExchangeLabel."Valid To" := CalcDate(ExchangeLabelSetup."Exchange Label Exchange Period", ValidFromDate);
         ExchangeLabel."Batch No." := LabelBatchNumber;
         ExchangeLabel."Packaged Batch" := PackagedBatch;
 
@@ -71,16 +71,16 @@ codeunit 6014498 "NPR Exchange Label Mgt."
 
     procedure GetLabelBarcode(var ExchangeLabel: Record "NPR Exchange Label"): Code[13]
     var
-        RetailConfiguration: Record "NPR Retail Setup";
+        ExchangeLabelSetup: Record "NPR Exchange Label Setup";
         String: Codeunit "NPR String Library";
         StoreCode: Code[3];
         LabelCode: Code[7];
     begin
-        RetailConfiguration.Get;
+        ExchangeLabelSetup.Get();
 
         with ExchangeLabel do begin
             LabelCode := String.PadStrLeft("No.", 7, '0', false);
-            exit(CreateEAN(StoreCode + LabelCode, RetailConfiguration."EAN Prefix Exhange Label"));
+            exit(CreateEAN(StoreCode + LabelCode, ExchangeLabelSetup."EAN Prefix Exhange Label"));
         end;
     end;
 
@@ -214,14 +214,14 @@ codeunit 6014498 "NPR Exchange Label Mgt."
     var
         ExchangeLabel: Record "NPR Exchange Label";
         Item: Record Item;
-        RetailConfiguration: Record "NPR Retail Setup";
+        ExchangeLabelSetup: record "NPR Exchange Label Setup";
         SaleLinePOS: Record "NPR Sale Line POS";
         LineNo: Integer;
         SalesPrice: Decimal;
     begin
-        RetailConfiguration.Get;
+        ExchangeLabelSetup.Get();
 
-        if CheckPrefix(CopyValidering, RetailConfiguration."EAN Prefix Exhange Label") then begin
+        if CheckPrefix(CopyValidering, ExchangeLabelSetup."EAN Prefix Exhange Label") then begin
             ExchangeLabel.SetCurrentKey(Barcode);
             ExchangeLabel.SetRange(Barcode, CopyValidering);
 
@@ -470,7 +470,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
         ErrEAN: Label 'Check No. is invalid for EAN-No.';
         ErrLength: Label 'EAN Creation number is too long.';
         Register: Record "NPR Register";
-        RetailSetup: Record "NPR Retail Setup";
+        VarietySetup: Record "NPR Variety Setup";
         EAN1: Code[20];
         POSUnit: Record "NPR POS Unit";
         INVALID_EAN_VALUE: Label 'Only digits are allowed when creating EAN: %1';
@@ -479,7 +479,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
         if StrLen(Prefix) + StrLen(POSUnit."POS Store Code") + StrLen(Format(Unique)) > 12 then
             Error(ErrLength);
 
-        RetailSetup.Get;
+        VarietySetup.Get();
 
         if StrLen(DelChr(LowerCase(Unique), '=', 'abcdefghijklmnopqrstuvwyz')) <> StrLen(Unique) then
             Error(INVALID_EAN_VALUE, Unique);
@@ -488,7 +488,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
             case Prefix of
                 '':
                     begin
-                        Prefix := Format(RetailSetup."EAN-Internal");
+                        Prefix := Format(VarietySetup."EAN-Internal");
                         EAN1 := PadStr('', 10 - StrLen(Format(Unique)), '0');
                         EAN := Format(Prefix) + PadStr('', 10 - StrLen(Format(Unique)), '0') + Format(Unique);
                     end;

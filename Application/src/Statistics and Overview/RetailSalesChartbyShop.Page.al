@@ -1,9 +1,5 @@
 page 6059818 "NPR Retail Sales Chart by Shop"
 {
-    // NPR5.29/BHR/20170104 CASE 262439 Chart of sales by store
-    // NPR5.31/TJ  /20170328 CASE 269797 Switched control addin to use version 10.0.0.0 instead of 9.0.0.0
-    // NPR5.50/JAVA/20190619 CASE 359388 Update addins references to point to the correct version (13.0.0.0 => 14.0.0.0).
-
     Caption = 'Margin/Turnover by Shop';
     PageType = CardPart;
     UsageCategory = Administration;
@@ -158,7 +154,7 @@ page 6059818 "NPR Retail Sales Chart by Shop"
         OrderCount: array[5] of Decimal;
         StartDate: Date;
         Enddate: Date;
-        RetailSetup: Record "NPR Retail Setup";
+        RetailSetup: Record "NPR NP Retail Setup";
 
     local procedure UpdateChart()
     begin
