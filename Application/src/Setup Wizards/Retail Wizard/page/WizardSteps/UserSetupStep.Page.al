@@ -164,7 +164,7 @@ page 6014690 "NPR User Setup Step"
         TempAllUser: Record User temporary;
         TempAllPOSUnit: Record "NPR POS Unit" temporary;
         UserId: Text;
-        SalespersonCode: Code[10];
+        SalespersonCode: Code[20];
 
     procedure SetGlobals(var TempSalespersonAll: Record "NPR Salesperson Buffer"; var TempUserAll: Record User; var TempPOSUnit: Record "NPR POS Unit")
     begin

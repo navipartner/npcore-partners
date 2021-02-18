@@ -640,7 +640,7 @@ codeunit 6150614 "NPR POS Create Entry"
         POSBinEntry.Insert();
     end;
 
-    procedure InsertUnitOpenEntry(POSUnitNo: Code[10]; SalespersonCode: Code[10]) EntryNo: Integer
+    procedure InsertUnitOpenEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]) EntryNo: Integer
     var
         POSEntry: Record "NPR POS Entry";
         POSLedgerRegister: Record "NPR POS Period Register";
@@ -654,7 +654,7 @@ codeunit 6150614 "NPR POS Create Entry"
         POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::SIGN_IN, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
     end;
 
-    procedure InsertUnitLoginEntry(POSUnitNo: Code[10]; SalespersonCode: Code[10]) EntryNo: Integer
+    procedure InsertUnitLoginEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]) EntryNo: Integer
     var
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSAuditLog: Record "NPR POS Audit Log";
@@ -666,17 +666,17 @@ codeunit 6150614 "NPR POS Create Entry"
         POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::SIGN_IN, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
     end;
 
-    procedure InsertUnitCloseBeginEntry(POSUnitNo: Code[10]; SalespersonCode: Code[10]) EntryNo: Integer
+    procedure InsertUnitCloseBeginEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]) EntryNo: Integer
     begin
         EntryNo := CreatePOSSystemEntry(POSUnitNo, SalespersonCode, '[System Event] Unit Close (Balancing Begin)');
     end;
 
-    procedure InsertUnitCloseEndEntry(POSUnitNo: Code[10]; SalespersonCode: Code[10]) EntryNo: Integer
+    procedure InsertUnitCloseEndEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]) EntryNo: Integer
     begin
         EntryNo := CreatePOSSystemEntry(POSUnitNo, SalespersonCode, '[System Event] Unit Close (Balancing End)');
     end;
 
-    procedure InsertUnitLogoutEntry(POSUnitNo: Code[10]; SalespersonCode: Code[10]) EntryNo: Integer
+    procedure InsertUnitLogoutEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]) EntryNo: Integer
     var
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSAuditLog: Record "NPR POS Audit Log";
@@ -687,7 +687,7 @@ codeunit 6150614 "NPR POS Create Entry"
         POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::SIGN_OUT, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
     end;
 
-    procedure InsertUnitLockEntry(POSUnitNo: Code[10]; SalespersonCode: Code[10]) EntryNo: Integer
+    procedure InsertUnitLockEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]) EntryNo: Integer
     var
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSAuditLog: Record "NPR POS Audit Log";
@@ -699,7 +699,7 @@ codeunit 6150614 "NPR POS Create Entry"
 
     end;
 
-    procedure InsertUnitUnlockEntry(POSUnitNo: Code[10]; SalespersonCode: Code[10]) EntryNo: Integer
+    procedure InsertUnitUnlockEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]) EntryNo: Integer
     var
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSAuditLog: Record "NPR POS Audit Log";
@@ -711,12 +711,12 @@ codeunit 6150614 "NPR POS Create Entry"
 
     end;
 
-    procedure InsertBinOpenEntry(POSUnitNo: Code[10]; SalespersonCode: Code[10])
+    procedure InsertBinOpenEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20])
     begin
         CreatePOSSystemEntry(POSUnitNo, SalespersonCode, '[System Event] Unit Bin Open');
     end;
 
-    procedure InsertParkSaleEntry(POSUnitNo: Code[10]; SalespersonCode: Code[10]) EntryNo: Integer
+    procedure InsertParkSaleEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]) EntryNo: Integer
     var
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSAuditLog: Record "NPR POS Audit Log";
@@ -727,7 +727,7 @@ codeunit 6150614 "NPR POS Create Entry"
         POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::SALE_PARK, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
     end;
 
-    procedure InsertParkedSaleRetrievalEntry(POSUnitNo: Code[10]; SalespersonCode: Code[10]; ParkedSalesTicketNo: Code[20]; NewSalesTicketNo: Code[20]) EntryNo: Integer
+    procedure InsertParkedSaleRetrievalEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]; ParkedSalesTicketNo: Code[20]; NewSalesTicketNo: Code[20]) EntryNo: Integer
     var
         POSAuditLog: Record "NPR POS Audit Log";
         POSEntry: Record "NPR POS Entry";
@@ -742,7 +742,7 @@ codeunit 6150614 "NPR POS Create Entry"
 
     end;
 
-    procedure InsertResumeSaleEntry(POSUnitNo: Code[10]; SalespersonCode: Code[10]; UnfinishedTicketNo: Code[20]; NewSalesTicketNo: Code[20]) EntryNo: Integer
+    procedure InsertResumeSaleEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]; UnfinishedTicketNo: Code[20]; NewSalesTicketNo: Code[20]) EntryNo: Integer
     var
         POSAuditLog: Record "NPR POS Audit Log";
         POSEntry: Record "NPR POS Entry";
@@ -757,7 +757,7 @@ codeunit 6150614 "NPR POS Create Entry"
           StrSubstNo(ResumeSaleMsg, UnfinishedTicketNo, NewSalesTicketNo), '');
     end;
 
-    procedure InsertTransferLocation(POSUnitNo: Code[10]; SalespersonCode: Code[10]; OldDocumentNo: Code[20]; NewDocumentNo: Code[20])
+    procedure InsertTransferLocation(POSUnitNo: Code[10]; SalespersonCode: Code[20]; OldDocumentNo: Code[20]; NewDocumentNo: Code[20])
     var
         POSEntry: Record "NPR POS Entry";
         CreatedEntryNo: Integer;
@@ -765,7 +765,7 @@ codeunit 6150614 "NPR POS Create Entry"
         CreatedEntryNo := CreatePOSSystemEntry(POSUnitNo, SalespersonCode, CopyStr(StrSubstNo('[System Event] %1 transferred to location receipt %2', OldDocumentNo, NewDocumentNo), 1, MaxStrLen(POSEntry.Description)));
     end;
 
-    local procedure CreatePOSSystemEntry(POSUnitNo: Code[10]; SalespersonCode: Code[10]; Description: Text[80]) EntryNo: Integer
+    local procedure CreatePOSSystemEntry(POSUnitNo: Code[10]; SalespersonCode: Code[20]; Description: Text[80]) EntryNo: Integer
     var
         POSEntry: Record "NPR POS Entry";
         POSPeriodRegister: Record "NPR POS Period Register";
@@ -1430,16 +1430,14 @@ codeunit 6150614 "NPR POS Create Entry"
         if (DocNoOfRecords = 0) then
             exit(DocNoOfRecords);
 
-        with DocumentEntry do begin
-            Init;
-            "Entry No." := "Entry No." + 1;
-            "Table ID" := DocTableID;
-            "Document Type" := DocType;
-            "Document No." := DocNoFilter;
-            "Table Name" := CopyStr(DocTableName, 1, MaxStrLen("Table Name"));
-            "No. of Records" := DocNoOfRecords;
-            Insert;
-        end;
+        DocumentEntry.Init;
+        DocumentEntry."Entry No." := DocumentEntry."Entry No." + 1;
+        DocumentEntry."Table ID" := DocTableID;
+        DocumentEntry."Document Type" := DocType;
+        DocumentEntry."Document No." := DocNoFilter;
+        DocumentEntry."Table Name" := CopyStr(DocTableName, 1, MaxStrLen(DocumentEntry."Table Name"));
+        DocumentEntry."No. of Records" := DocNoOfRecords;
+        DocumentEntry.Insert;
 
         exit(DocNoOfRecords);
 

@@ -1,32 +1,5 @@
 table 6014504 "NPR Customer Repair"
 {
-    // //-NPR3.0m ved Nikolai Pedersen
-    //   Afdelingskode indsat på onInsert
-    // 
-    // //-NPR3.0p  Henrik Ohm
-    //   customer.onInsert has NameAndNumbers lookup, so not needed here
-    // 
-    // NPR7.000.000  TS 17-01 13 : Added an Option Field called Type to choose the Type of customer which was before a Radio Button
-    // NPR70.00.01.00/MH/20150113  CASE 199932 Removed Web references (WEB1.00).
-    // NPK70.00.01.01/BHR/20150130 CASE 204899 Created new field 120 'Finalized'
-    // NPR70.00.01.02/MH/20150223  CASE 206395 Removed reference to deprecated field Contact."Internet Number"
-    // NPR5.26/TS  /20160809  CASE 248351 Added Picture Path for Pictures.Removed Unused Variables and Added Table Relation to Invoice To. Removed function SendMail()
-    // NPR5.26/TS  /20160913  CASE 251086 Added Field Related to Invoice No.
-    // NPR5.27/TS  /20161017  CASE 254715 Added Field Item Description
-    // NPR5.27/MHA /20161025  CASE 255580 Deleted Unused function: SendStatus. Renamed Danish Variables to English. Moved Global Variables to Locals
-    // NPR5.29/TS  /20161110  CASE 257937 Populate Global Dimension  and Location base on Users register
-    // NPR5.29/TS  /20161221  CASE 253270 Email Copied from Customer.Email
-    // NPR5.30/TS  /20170203  CASE 264915 Removed field Mandatory Customer No.
-    // NPR5.30/BHR /20170203  CASE 262923 Add field Bag No, 'CreateSalesLine' function to generate Sales Document
-    // NPR5.30/TJ  /20170215  CASE 265504 Changed ENU captions on fields with word Register in their name
-    // NPR5.32/LS  /20170522  CASE 276203 Added code on field Status
-    // NPR5.36/TJ  /20170918  CASE 286283 Renamed variables/function into english and into proper naming terminology
-    //                                    Removed unused variables
-    //                                    Renamed all the danish OptionString properties to english
-    // NPR5.38/TJ  /20171218  CASE 225415 Renumbered fields from range 50xxx to range below 50000
-    // NPR5.41/TS  /20180403  CASE 309631 Corrected Captions
-    // NPR5.53/ALPO/20191025  CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
-
     Caption = 'Customer Repair';
     LookupPageID = "NPR Customer Repair List";
     DataClassification = CustomerContent;
@@ -63,12 +36,8 @@ table 6014504 "NPR Customer Repair"
                         "Phone No." := Customer."Phone No.";
                         "Post Code" := Customer."Post Code";
                         "Fax No." := Customer."Fax No.";
-                        //-NPR5.26
                         Validate("Invoice To", Customer."No.");
-                        //+NPR5.26
-                        //-NPR5.29
                         "E-mail" := Customer."E-Mail";
-                        //+NPR5.29
                     end else begin
                         Contact.Get("Customer No.");
                         Name := Contact.Name;
@@ -79,7 +48,6 @@ table 6014504 "NPR Customer Repair"
                         "Post Code" := Contact."Post Code";
                         "Fax No." := Contact."Fax No.";
                         "Mobile Phone No." := Contact."Mobile Phone No.";
-                        //-NPR5.26
                         ContactBusinessRelation.Reset;
                         ContactBusinessRelation.SetRange("Link to Table", ContactBusinessRelation."Link to Table"::Customer);
                         ContactBusinessRelation.SetRange("Contact No.", "Customer No.");
@@ -88,7 +56,6 @@ table 6014504 "NPR Customer Repair"
                         if not Customer.Get(ContactBusinessRelation."No.") then
                             exit;
                         Validate("Invoice To", Customer."No.");
-                        //+NPR5.26
                     end;
                 end else begin
                     "Customer No." := '';
@@ -113,11 +80,8 @@ table 6014504 "NPR Customer Repair"
                 Contact: Record Contact;
                 Customer: Record Customer;
             begin
-                //-NPR5.30
-                //IF RetailSetup."Mandatory Customer No." THEN BEGIN
                 if "Customer No." = '' then
                     exit;
-                //+NPR5.30
                 TestField("Customer No.");
                 if (Name <> xRec.Name) then begin
                     if "Customer Type" = "Customer Type"::Ordinary then begin
@@ -140,9 +104,6 @@ table 6014504 "NPR Customer Repair"
                             Name := Contact.Name;
                     end;
                 end;
-                //-NPR5.30
-                //END;
-                //+NPR5.30
             end;
         }
         field(4; Address; Text[100])
@@ -155,11 +116,8 @@ table 6014504 "NPR Customer Repair"
                 Contact: Record Contact;
                 Customer: Record Customer;
             begin
-                //-NPR5.30
-                //IF RetailSetup."Mandatory Customer No." THEN BEGIN
                 if "Customer No." = '' then
                     exit;
-                //+NPR5.30
                 TestField("Customer No.");
                 if (Address <> xRec.Address) then begin
                     if "Customer Type" = "Customer Type"::Ordinary then begin
@@ -182,9 +140,6 @@ table 6014504 "NPR Customer Repair"
                             Address := Contact.Address;
                     end;
                 end;
-                //-NPR5.30
-                //END;
-                //+NPR5.30
             end;
         }
         field(5; "Address 2"; Text[50])
@@ -197,12 +152,9 @@ table 6014504 "NPR Customer Repair"
                 Contact: Record Contact;
                 Customer: Record Customer;
             begin
-                //-NPR5.30
-                //IF RetailSetup."Mandatory Customer No." THEN BEGIN
                 if "Customer No." = '' then
                     exit;
 
-                //+NPR5.30
                 TestField("Customer No.");
                 if ("Address 2" <> xRec."Address 2") then begin
                     if "Customer Type" = "Customer Type"::Ordinary then begin
@@ -225,9 +177,6 @@ table 6014504 "NPR Customer Repair"
                             "Address 2" := Contact."Address 2";
                     end;
                 end;
-                //-NPR5.30
-                //END;
-                //+NPR5.30
             end;
         }
         field(6; "Post Code"; Code[20])
@@ -242,12 +191,9 @@ table 6014504 "NPR Customer Repair"
                 Customer: Record Customer;
                 PostCode: Record "Post Code";
             begin
-                //-NPR5.30
-                //IF RetailSetup."Mandatory Customer No." THEN BEGIN
                 if "Customer No." = '' then
                     exit;
 
-                //+NPR5.30
                 TestField("Invoice To");
                 if ("Post Code" <> xRec."Post Code") then begin
                     if "Customer Type" = "Customer Type"::Ordinary then begin
@@ -270,9 +216,6 @@ table 6014504 "NPR Customer Repair"
                             "Post Code" := Contact."Post Code";
                     end;
                 end;
-                //-NPR5.30
-                //END;
-                //+NPR5.30
 
                 PostCode.Reset;
                 PostCode.SetRange(Code, "Post Code");
@@ -290,12 +233,9 @@ table 6014504 "NPR Customer Repair"
                 Contact: Record Contact;
                 Customer: Record Customer;
             begin
-                //-NPR5.30
-                //IF RetailSetup."Mandatory Customer No." THEN BEGIN
                 if "Customer No." = '' then
                     exit;
 
-                //+NPR5.30
                 TestField("Customer No.");
                 if (City <> xRec.City) then begin
                     if "Customer Type" = "Customer Type"::Ordinary then begin
@@ -318,9 +258,6 @@ table 6014504 "NPR Customer Repair"
                             City := Contact.City;
                     end;
                 end;
-                //-NPR5.30
-                //END;
-                //+NPR5.30
             end;
         }
         field(8; "Invoice To"; Code[20])
@@ -344,13 +281,6 @@ table 6014504 "NPR Customer Repair"
                         "Customer Post Code" := Customer."Post Code";
                         "Customer City" := Customer.City;
                     end else begin
-                        //-NPR5.26
-                        //contact.GET("Invoice To");
-                        //"Customer Name" := contact.Name;
-                        //"Customer Address" := contact.Address;
-                        //"Customer Address 2" := contact."Address 2";
-                        //"Customer Post Code" := contact."Post Code";
-                        //"Customer City" := contact.City;
                         ContactBusinessRelation.Reset;
                         ContactBusinessRelation.SetRange("Link to Table", ContactBusinessRelation."Link to Table"::Customer);
                         ContactBusinessRelation.SetRange("Contact No.", "Customer No.");
@@ -363,7 +293,6 @@ table 6014504 "NPR Customer Repair"
                         "Customer Address 2" := Customer."Address 2";
                         "Customer Post Code" := Customer."Post Code";
                         "Customer City" := Customer.City;
-                        //-NPR5.26
                     end;
                 end else begin
                     "Customer Name" := '';
@@ -663,12 +592,8 @@ table 6014504 "NPR Customer Repair"
                     end else
                         "Repairer Post Code" := Vendor."Post Code";
                 end;
-
-                //-NPR5.27 [255580]
-                //IF PostCode.GET("Repairer Post Code") THEN
                 PostCode.SetRange(Code, "Repairer Post Code");
                 if PostCode.FindFirst then
-                    //+NPR5.27 [255580]
                     "Repairer City" := PostCode.City;
             end;
         }
@@ -729,7 +654,7 @@ table 6014504 "NPR Customer Repair"
             Caption = 'Expected Completion Date';
             DataClassification = CustomerContent;
         }
-        field(27; "Salesperson Code"; Code[10])
+        field(27; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             TableRelation = "Salesperson/Purchaser";
@@ -767,20 +692,9 @@ table 6014504 "NPR Customer Repair"
             var
                 RetailContractMgt: Codeunit "NPR Retail Contract Mgt.";
             begin
-                //-NPR5.27 [255580]
-                // "I-Comm".GET;
-                // RetailSetup.GET;
-                // IF ( "Mobile No." <> '' ) AND RetailSetup."Repair Msg." THEN BEGIN
-                //  SMSMessage := STRSUBSTNO( "I-Comm"."Repair Message", "No.", Status );
-                //  SMS.SendSMS( "Mobile No.", SMSMessage );
-                // END;
-                //+NPR5.27 [255580]
-
-                //-NPR5.32 [276203]
                 CustomerRepairSetup.Get;
                 if (Status = Status::"Awaits Claiming") and CustomerRepairSetup."Repair Msg." then
                     RetailContractMgt.SendStatusSms(Rec);
-                //+NPR5.32 [276203]
             end;
         }
         field(33; Brand; Text[50])
@@ -1083,10 +997,8 @@ table 6014504 "NPR Customer Repair"
             var
                 Item: Record Item;
             begin
-                //-NPR5.27
                 if Item.Get("Item No.") then
                     "Item Description" := Item.Description;
-                //+NPR5.27
             end;
         }
         field(175; "Customer Type1"; Option)
@@ -1185,15 +1097,13 @@ table 6014504 "NPR Customer Repair"
         CustomerRepair: Record "NPR Customer Repair";
         NoSeriesMgt: Codeunit NoSeriesManagement;
     begin
-        with CustomerRepair do begin
-            CustomerRepair := Rec;
-            CustomerRepairSetup.Get;
-            CustomerRepairSetup.TestField("Customer Repair No. Series");
-            if NoSeriesMgt.SelectSeries(CustomerRepairSetup."Customer Repair No. Series", xCustomerRepair."No. Series", "No. Series") then begin
-                NoSeriesMgt.SetSeries("No.");
-                Rec := CustomerRepair;
-                exit(true);
-            end;
+        CustomerRepair := Rec;
+        CustomerRepairSetup.Get;
+        CustomerRepairSetup.TestField("Customer Repair No. Series");
+        if NoSeriesMgt.SelectSeries(CustomerRepairSetup."Customer Repair No. Series", xCustomerRepair."No. Series", CustomerRepair."No. Series") then begin
+            NoSeriesMgt.SetSeries(CustomerRepair."No.");
+            Rec := CustomerRepair;
+            exit(true);
         end;
     end;
 
@@ -1272,7 +1182,6 @@ table 6014504 "NPR Customer Repair"
             Status := Status::Claimed;
             "Date Delivered" := Today;
             "Related to Invoice No." := SalesHeader."No.";
-
             case "Document Type" of
                 "Document Type"::Invoice:
                     Message(TxtInvCreated, SalesHeader."No.");

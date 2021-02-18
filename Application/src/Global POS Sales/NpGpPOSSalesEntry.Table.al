@@ -69,7 +69,7 @@ table 6151167 "NPR NpGp POS Sales Entry"
             Caption = 'Fiscal No.';
             DataClassification = CustomerContent;
         }
-        field(125; "Salesperson Code"; Code[10])
+        field(125; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;

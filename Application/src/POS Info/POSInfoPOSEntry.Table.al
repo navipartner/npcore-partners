@@ -1,8 +1,5 @@
 table 6150647 "NPR POS Info POS Entry"
 {
-    // NPR5.38/BR  /20171222 CASE 295503 Object Created
-    // NPR5.41/THRO/20180416 CASE 311499 Added field 3 Sales Line No.
-    // NPR5.53/ALPO/20200204 CASE 387750 Added fields: 2 "Document No.", 4 "Entry Date", 26 "POS Unit No.", 27 "Salesperson Code"
 
     Caption = 'POS Info POS Entry';
     DataClassification = CustomerContent;
@@ -92,7 +89,7 @@ table 6150647 "NPR POS Info POS Entry"
             Description = 'NPR5.53';
             TableRelation = "NPR POS Unit";
         }
-        field(27; "Salesperson Code"; Code[10])
+        field(27; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;

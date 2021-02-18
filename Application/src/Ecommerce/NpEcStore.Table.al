@@ -18,7 +18,7 @@ table 6151300 "NPR NpEc Store"
             Caption = 'Name';
             DataClassification = CustomerContent;
         }
-        field(100; "Salesperson/Purchaser Code"; Code[10])
+        field(100; "Salesperson/Purchaser Code"; Code[20])
         {
             Caption = 'Salesperson/Purchaser Code';
             DataClassification = CustomerContent;

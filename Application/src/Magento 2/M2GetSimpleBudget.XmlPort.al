@@ -207,8 +207,7 @@ xmlport 6151143 "NPR M2 Get Simple Budget"
         CalculateStatistics(TmpCustomerRequest."Salesperson Code", TmpCustomerRequest."No.");
 
         ResponseCode := 'OK';
-        ResponseMessage := ''; //STRSUBSTNO ('%1 %2', TmpBillToCustomer.COUNT, TmpSellToCustomer.count);
-
+        ResponseMessage := '';
         ExecutionTime := StrSubstNo('%1 (ms)', Format(Time - StartTime, 0, 9));
     end;
 
@@ -220,7 +219,7 @@ xmlport 6151143 "NPR M2 Get Simple Budget"
         ResponseMessage := ReasonText;
     end;
 
-    local procedure CalculateStatistics(SalesPersonCode: Code[10]; CustomerNo: Code[20])
+    local procedure CalculateStatistics(SalespersonCode: Code[20]; CustomerNo: Code[20])
     var
         Customer: Record Customer;
     begin

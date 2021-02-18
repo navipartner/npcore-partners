@@ -36,7 +36,7 @@ table 6150636 "NPR POS Entry Output Log"
             DataClassification = CustomerContent;
             TableRelation = User."User Name";
         }
-        field(31; "Salesperson Code"; Code[10])
+        field(31; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;

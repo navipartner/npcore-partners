@@ -65,7 +65,7 @@ table 6150710 "NPR POS View"
         OutStream.Write(Text);
     end;
 
-    procedure FindViewByType(ViewType: Option; SalespersonCode: Code[10]; RegisterCode: Code[10]): Boolean
+    procedure FindViewByType(ViewType: Option; SalespersonCode: Code[20]; RegisterCode: Code[10]): Boolean
     var
         DefaultView: Record "NPR POS Default View";
         DefaultUserView: Record "NPR POS Default User View";
@@ -165,7 +165,7 @@ table 6150710 "NPR POS View"
         exit(true);
     end;
 
-    local procedure FilterApplicableView(var DefaultView: Record "NPR POS Default View"; SalespersonCode: Code[10]; RegisterCode: Code[10]): Boolean
+    local procedure FilterApplicableView(var DefaultView: Record "NPR POS Default View"; SalespersonCode: Code[20]; RegisterCode: Code[10]): Boolean
     var
         Register: Record "NPR Register";
         Salesperson: Record "Salesperson/Purchaser";

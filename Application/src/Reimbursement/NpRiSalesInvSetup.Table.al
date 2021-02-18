@@ -46,7 +46,7 @@ table 6151110 "NPR NpRi Sales Inv. Setup"
             OptionCaption = 'Reimbursement,Document';
             OptionMembers = Reimbursement,Document;
         }
-        field(40; "Salesperson Code"; Code[10])
+        field(40; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;

@@ -108,7 +108,7 @@ table 6014509 "NPR Warranty Directory"
             OptionMembers = No,"By Phone 1","By Phone 2","By Fax","By E-Mail";
             DataClassification = CustomerContent;
         }
-        field(39; "Salesperson Code"; Code[10])
+        field(39; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;

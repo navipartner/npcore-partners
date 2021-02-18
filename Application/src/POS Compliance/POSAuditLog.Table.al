@@ -59,7 +59,7 @@ table 6150637 "NPR POS Audit Log"
             DataClassification = CustomerContent;
             Editable = false;
         }
-        field(9; "Active Salesperson Code"; Code[10])
+        field(9; "Active Salesperson Code"; Code[20])
         {
             Caption = 'Active Salesperson Code';
             DataClassification = CustomerContent;

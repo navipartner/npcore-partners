@@ -81,7 +81,7 @@ table 6150634 "NPR POS Posting Buffer"
             DataClassification = CustomerContent;
             TableRelation = "VAT Product Posting Group";
         }
-        field(14; "Salesperson Code"; Code[10])
+        field(14; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;

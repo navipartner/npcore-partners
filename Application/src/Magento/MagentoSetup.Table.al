@@ -392,7 +392,7 @@ table 6151401 "NPR Magento Setup"
             DataClassification = CustomerContent;
             TableRelation = "G/L Account";
         }
-        field(530; "Salesperson Code"; Code[10])
+        field(530; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;

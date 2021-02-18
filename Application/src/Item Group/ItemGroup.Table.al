@@ -254,7 +254,7 @@ table 6014410 "NPR Item Group"
             Caption = 'Consumption (Amount)';
             FieldClass = FlowField;
         }
-        field(61; "Salesperson Filter"; Code[10])
+        field(61; "Salesperson Filter"; Code[20])
         {
             Caption = 'Salesperson Filter';
             FieldClass = FlowFilter;
@@ -763,27 +763,25 @@ table 6014410 "NPR Item Group"
     var
         ItemGroupParent: Record "NPR Item Group";
     begin
-        with ItemGroup do begin
-            if (ItemGroupParent.Get("Parent Item Group No.")) then begin
-                Level := ItemGroupParent.Level + 1;
-                "VAT Prod. Posting Group" := ItemGroupParent."VAT Prod. Posting Group";
-                "VAT Bus. Posting Group" := ItemGroupParent."VAT Bus. Posting Group";
-                "Gen. Prod. Posting Group" := ItemGroupParent."Gen. Prod. Posting Group";
-                "Gen. Bus. Posting Group" := ItemGroupParent."Gen. Bus. Posting Group";
-                "Inventory Posting Group" := ItemGroupParent."Inventory Posting Group";
-                "Base Unit of Measure" := ItemGroupParent."Base Unit of Measure";
-                "Sales Unit of Measure" := ItemGroupParent."Sales Unit of Measure";
-                "Purch. Unit of Measure" := ItemGroupParent."Purch. Unit of Measure";
-                "No. Series" := ItemGroupParent."No. Series";
-                "Location Code" := ItemGroupParent."Location Code";
-                "Global Dimension 1 Code" := ItemGroupParent."Global Dimension 1 Code";
-                "Global Dimension 2 Code" := ItemGroupParent."Global Dimension 2 Code";
-                "Item Discount Group" := ItemGroupParent."Item Discount Group";
-                "Size Dimension" := ItemGroupParent."Size Dimension";
-                "Color Dimension" := ItemGroupParent."Color Dimension";
-                "Tax Group Code" := ItemGroupParent."Tax Group Code";
-                Type := ItemGroupParent.Type;
-            end;
+        if (ItemGroupParent.Get(ItemGroup."Parent Item Group No.")) then begin
+            ItemGroup.Level := ItemGroupParent.Level + 1;
+            ItemGroup."VAT Prod. Posting Group" := ItemGroupParent."VAT Prod. Posting Group";
+            ItemGroup."VAT Bus. Posting Group" := ItemGroupParent."VAT Bus. Posting Group";
+            ItemGroup."Gen. Prod. Posting Group" := ItemGroupParent."Gen. Prod. Posting Group";
+            ItemGroup."Gen. Bus. Posting Group" := ItemGroupParent."Gen. Bus. Posting Group";
+            ItemGroup."Inventory Posting Group" := ItemGroupParent."Inventory Posting Group";
+            ItemGroup."Base Unit of Measure" := ItemGroupParent."Base Unit of Measure";
+            ItemGroup."Sales Unit of Measure" := ItemGroupParent."Sales Unit of Measure";
+            ItemGroup."Purch. Unit of Measure" := ItemGroupParent."Purch. Unit of Measure";
+            ItemGroup."No. Series" := ItemGroupParent."No. Series";
+            ItemGroup."Location Code" := ItemGroupParent."Location Code";
+            ItemGroup."Global Dimension 1 Code" := ItemGroupParent."Global Dimension 1 Code";
+            ItemGroup."Global Dimension 2 Code" := ItemGroupParent."Global Dimension 2 Code";
+            ItemGroup."Item Discount Group" := ItemGroupParent."Item Discount Group";
+            ItemGroup."Size Dimension" := ItemGroupParent."Size Dimension";
+            ItemGroup."Color Dimension" := ItemGroupParent."Color Dimension";
+            ItemGroup."Tax Group Code" := ItemGroupParent."Tax Group Code";
+            ItemGroup.Type := ItemGroupParent.Type;
         end;
     end;
 
