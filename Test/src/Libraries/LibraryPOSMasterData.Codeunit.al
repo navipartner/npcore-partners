@@ -339,8 +339,6 @@ codeunit 85002 "NPR Library - POS Master Data"
     begin
         CreateDefaultPostingProfile(POSPostingProfile);
 
-        CreateDefaultNPRetailSetup();
-
         CreateDefaultRetailSetup();
     end;
 
@@ -371,22 +369,16 @@ codeunit 85002 "NPR Library - POS Master Data"
         POSPostingProfile.Modify;
     end;
 
-    local procedure CreateDefaultNPRetailSetup()
-    var
-        NPRetailSetup: Record "NPR NP Retail Setup";
-    begin
-        if not NPRetailSetup.Get then
-            NPRetailSetup.Insert;
-    end;
-
     local procedure CreateDefaultRetailSetup()
     var
-        RetailSetup: Record "NPR Retail Setup";
+        RetailSetup: Record "NPR NP Retail Setup";
+        RetailItemSetup: Record "NPR Retail Item Setup";
     begin
         if not RetailSetup.Get then
             RetailSetup.Insert;
-        RetailSetup."Prices incl. VAT" := true;
-        RetailSetup.Modify;
+
+        if not RetailItemSetup.Get() then
+            RetailItemSetup.Insert();
     end;
 
     procedure CreateItemForPOSSaleUsage(var Item: Record Item; POSUnit: Record "NPR POS Unit"; POSStore: Record "NPR POS Store")

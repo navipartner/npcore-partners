@@ -479,7 +479,6 @@ page 6014453 "NPR Campaign Discount"
 
     var
         Text10600000: Label 'Enter cost savings in % ';
-        RetailSetup: Record "NPR Retail Setup";
         Item: Record Item;
         ReportSelectionRetail: Record "NPR Report Selection Retail";
         PeriodDiscountLineGlobal: Record "NPR Period Discount Line";

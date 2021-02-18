@@ -138,8 +138,6 @@ table 6014439 "NPR Quantity Discount Header"
         QtyDiscLine: Record "NPR Quantity Discount Line";
         RetailComment: Record "NPR Retail Comment";
     begin
-        RetailSetup.Get;
-
         QtyDiscLine.SetRange("Item No.", "Item No.");
         QtyDiscLine.SetRange("Main no.", "Main No.");
         QtyDiscLine.DeleteAll;
@@ -158,18 +156,13 @@ table 6014439 "NPR Quantity Discount Header"
     begin
         "Creating Date" := Today;
 
-        if "Main No." = '' then begin
-            RetailSetup.Get;
-            RetailSetup.TestField("Quantity Discount Nos.");
-            NoSeriesMgt.InitSeries(RetailSetup."Quantity Discount Nos.", xRec."No. Series", 0D, "Main No.", "No. Series");
-        end;
+        if "Main No." = '' then
+            NoSeriesMgt.InitSeries(GetNoSeries(), xRec."No. Series", 0D, "Main No.", "No. Series");
 
         Date.SetRange("Period Type", Date."Period Type"::Date);
         "Starting Date" := Today;
         if Date.FindLast then
             "Closing Date" := Date."Period Start";
-
-        RetailSetup.Get;
 
         DimMgt.UpdateDefaultDim(
           DATABASE::"NPR Quantity Discount Header", "Main No.",
@@ -182,7 +175,6 @@ table 6014439 "NPR Quantity Discount Header"
     end;
 
     var
-        RetailSetup: Record "NPR Retail Setup";
         DimMgt: Codeunit DimensionManagement;
         NoSeriesMgt: Codeunit NoSeriesManagement;
 
@@ -197,16 +189,19 @@ table 6014439 "NPR Quantity Discount Header"
     var
         QtyDiscHeader2: Record "NPR Quantity Discount Header";
     begin
-        with QtyDiscHeader2 do begin
-            QtyDiscHeader2 := Rec;
-            RetailSetup.Get;
-            RetailSetup.TestField("Quantity Discount Nos.");
-            if NoSeriesMgt.SelectSeries(RetailSetup."Period Discount Management", QtyDiscHeader."No. Series", "No. Series") then begin
-                NoSeriesMgt.SetSeries("Main No.");
-                Rec := QtyDiscHeader2;
-                exit(true);
-            end;
+        QtyDiscHeader2 := Rec;
+        if NoSeriesMgt.SelectSeries(GetNoSeries(), QtyDiscHeader."No. Series", QtyDiscHeader2."No. Series") then begin
+            NoSeriesMgt.SetSeries(QtyDiscHeader2."Main No.");
+            Rec := QtyDiscHeader2;
+            exit(true);
         end;
+    end;
+
+    local procedure GetNoSeries(): Code[10]
+    var
+        QuantityDiscountMgt: Codeunit "NPR Quantity Discount Mgt.";
+    begin
+        exit(QuantityDiscountMgt.GetNoSeries());
     end;
 }
 

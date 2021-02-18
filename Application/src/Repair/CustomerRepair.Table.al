@@ -777,8 +777,8 @@ table 6014504 "NPR Customer Repair"
                 //+NPR5.27 [255580]
 
                 //-NPR5.32 [276203]
-                RetailSetup.Get;
-                if (Status = Status::"Awaits Claiming") and RetailSetup."Repair Msg." then
+                CustomerRepairSetup.Get;
+                if (Status = Status::"Awaits Claiming") and CustomerRepairSetup."Repair Msg." then
                     RetailContractMgt.SendStatusSms(Rec);
                 //+NPR5.32 [276203]
             end;
@@ -1133,17 +1133,17 @@ table 6014504 "NPR Customer Repair"
         RecRegister: Record "NPR Register";
         UserSetup: Record "User Setup";
     begin
-        RetailSetup.Get;
+        CustomerRepairSetup.Get;
 
         "Handed In Date" := Today;
-        "Prices Including VAT" := RetailSetup."Fixed Price of Mending";
-        "Price when Not Accepted" := RetailSetup."Fixed Price of Denied Mending";
+        "Prices Including VAT" := CustomerRepairSetup."Fixed Price of Mending";
+        "Price when Not Accepted" := CustomerRepairSetup."Fixed Price of Denied Mending";
 
         if "No." = '' then begin
-            RetailSetup.TestField("Customer Repair Management");
-            NoSeriesMgt.InitSeries(RetailSetup."Customer Repair Management", xRec."No. Series", 0D, "No.", "No. Series");
+            CustomerRepairSetup.TestField("Customer Repair No. Series");
+            NoSeriesMgt.InitSeries(CustomerRepairSetup."Customer Repair No. Series", xRec."No. Series", 0D, "No.", "No. Series");
         end else begin
-            NoSeriesMgt.TestManual(RetailSetup."Customer Repair Management");
+            NoSeriesMgt.TestManual(CustomerRepairSetup."Customer Repair No. Series");
         end;
 
         if UserSetup.Get(UserId) then begin
@@ -1178,7 +1178,7 @@ table 6014504 "NPR Customer Repair"
         Text1060014: Label 'Do you want to change creditor post code from %1 to %2?';
         Text1060015: Label 'Do you want to change creditor city from %1 to %2?';
         Text1060020: Label 'For Repair : ';
-        RetailSetup: Record "NPR Retail Setup";
+        CustomerRepairSetup: Record "NPR Customer Repair Setup";
 
     procedure AssistEdit(xCustomerRepair: Record "NPR Customer Repair"): Boolean
     var
@@ -1187,13 +1187,9 @@ table 6014504 "NPR Customer Repair"
     begin
         with CustomerRepair do begin
             CustomerRepair := Rec;
-            RetailSetup.Get;
-            RetailSetup.TestField("Customer Repair Management");
-            if NoSeriesMgt.SelectSeries(RetailSetup."Customer Repair Management", xCustomerRepair."No. Series", "No. Series") then begin
-                //-NPR5.27 [255580]
-                //RetailSetup.GET;
-                //RetailSetup.TESTFIELD("Customer Repair Management");
-                //+NPR5.27 [255580]
+            CustomerRepairSetup.Get;
+            CustomerRepairSetup.TestField("Customer Repair No. Series");
+            if NoSeriesMgt.SelectSeries(CustomerRepairSetup."Customer Repair No. Series", xCustomerRepair."No. Series", "No. Series") then begin
                 NoSeriesMgt.SetSeries("No.");
                 Rec := CustomerRepair;
                 exit(true);
@@ -1201,24 +1197,11 @@ table 6014504 "NPR Customer Repair"
         end;
     end;
 
-    procedure TransferFromAuditRoll(var AuditRoll: Record "NPR Audit Roll")
-    begin
-        //TransferFromAuditRoll()
-        Status := Status::Claimed;
-        "Date Delivered" := Today;
-        "Delivering Salespers." := AuditRoll."Salesperson Code";
-        "Delivering Sales Ticket No." := AuditRoll."Sales Ticket No.";
-        "Delivered Register No." := AuditRoll."Register No.";
-        "Audit Roll Line No." := AuditRoll."Line No.";
-        "Audit Roll Trans. Type" := AuditRoll."Sale Type";
-    end;
-
     procedure Navigate()
     var
         AuditRoll: Record "NPR Audit Roll";
         NavigatePage: Page Navigate;
     begin
-        //Navigate()
         AuditRoll.SetRange("Register No.", "Delivered Register No.");
         AuditRoll.SetRange("Sales Ticket No.", "Delivering Sales Ticket No.");
         AuditRoll.SetRange("Sale Type", "Audit Roll Trans. Type");
@@ -1244,10 +1227,7 @@ table 6014504 "NPR Customer Repair"
         SalesLine: Record "Sales Line";
         SalesLine2: Record "Sales Line";
     begin
-        //CreateInvoice()
-        //-NPR5.26
         if "Related to Invoice No." = '' then begin
-            //+NPR5.26
             if "Customer Type" = "Customer Type"::Cash then
                 Validate("Customer Type", "Customer Type"::Ordinary);
 
@@ -1261,59 +1241,37 @@ table 6014504 "NPR Customer Repair"
             SalesHeader."External Document No." := "No.";
             SalesHeader.Modify;
 
-            //-NPR5.27
             SalesLine2.Init;
             SalesLine2."Document Type" := SalesHeader."Document Type";
             SalesLine2."Document No." := SalesHeader."No.";
             SalesLine2."Line No." := 10000;
             SalesLine2.Description := Text1060020;
             SalesLine2.Insert(true);
-            //+NPR5.27
             SalesLine.Init;
             SalesLine."Document Type" := SalesHeader."Document Type";
             SalesLine."Document No." := SalesHeader."No.";
             SalesLine."Line No." := 20000;
             SalesLine.Insert(true);
-            //LineNo += 10000;
             RetailContractSetup.Get;
             SalesLine.Type := SalesLine.Type::Item;
-            //-NPR5.26
-            //IF  "Item No." = '' THEN
-            //  SalesLine.VALIDATE( SalesLine."No.", PhotoSetup.Reparationsvarenummer )
-            //ELSE
-            //  SalesLine.VALIDATE( "No.", "Item No.");
 
             SalesLine.Validate(SalesLine."No.", RetailContractSetup."Repair Item No.");
-            //+NPR5.26
 
             SalesLine.Validate("Sell-to Customer No.", "Customer No.");
 
-            //-NPR5.27
-            //IF  Brand <> '' THEN
-            //  SalesLine.VALIDATE( SalesLine.Description,  Brand );
-            //IF PhotoSetup.Reparationsvarenummer  <>'' THEN
-            //  IF Item.GET(PhotoSetup.Reparationsvarenummer) THEN
-            //    "Item Description" := Item.Description;
             SalesLine.Validate(SalesLine.Description, "Item Description");
-            //-NPR5.27
             SalesLine.Validate(SalesLine.Quantity, 1);
-            //-NPR5.30 [262923]
             if not SalesHeader."Prices Including VAT" then begin
                 SalesLine.Validate(SalesLine."Unit Price", ("Prices Including VAT" * 100) / (100 + SalesLine."VAT %"));
             end else
-                //+NPR5.30 [262923]
                 SalesLine.Validate(SalesLine."Unit Price", "Prices Including VAT");
             SalesLine.Modify;
 
-            //-NPR5.30 [262923]
             CreateSalesLine(SalesHeader, Rec);
-            //+NPR5.30 [262923]
 
             Status := Status::Claimed;
             "Date Delivered" := Today;
-            //-NPR5.26
             "Related to Invoice No." := SalesHeader."No.";
-            //+NPR5.26
 
             case "Document Type" of
                 "Document Type"::Invoice:
@@ -1321,9 +1279,7 @@ table 6014504 "NPR Customer Repair"
                 "Document Type"::Order:
                     Message(TxtOrderCreated, SalesHeader."No.");
             end;
-            //-NPR5.26
         end;
-        //+NPR5.26
     end;
 
     procedure PostItemPart(var CustRepair: Record "NPR Customer Repair")
@@ -1337,12 +1293,8 @@ table 6014504 "NPR Customer Repair"
         if CustRepair.Finalized = false then begin
             CustRepairItemParts.SetRange("Customer Repair No.", CustRepair."No.");
             CustRepairItemParts.SetFilter("Item Part No.", '<>%1', '');
-            //-NPR5.26
             CustRepairItemParts.SetFilter(Quantity, '<>%1', 0);
-            //+NPR5.26
-            //-NPR5.30 [262923]
             CustRepairItemParts.SetRange("Expenses to be charged", false);
-            //+NPR5.30 [262923]
             if CustRepairItemParts.FindSet then begin
                 Window.Open('Processing Item #1#################################');
                 repeat
@@ -1350,32 +1302,24 @@ table 6014504 "NPR Customer Repair"
                     Window.Update(1, StrSubstNo('%1', CustRepairItemParts."Item Part No."));
                     ItemJnlLine.Init;
                     ItemJnlLine.Validate("Posting Date", Today);
-                    //-NPR5.26
                     if CustRepairItemParts.Quantity < 0 then
                         ItemJnlLine.Validate("Entry Type", ItemJnlLine."Entry Type"::"Positive Adjmt.")
                     else
                         ItemJnlLine.Validate("Entry Type", ItemJnlLine."Entry Type"::"Negative Adjmt.");
-                    //+NPR5.26
                     ItemJnlLine.Validate("Document No.", CustRepairItemParts."Customer Repair No.");
 
                     ItemJnlLine.Validate("Item No.", CustRepairItemParts."Item Part No.");
                     ItemJnlLine.Validate(Quantity, CustRepairItemParts.Quantity);
-                    //-NPR5.26
                     ItemJnlLine.Validate("Location Code", Location);
                     ItemJnlLine.Validate("Line No.", CustRepairItemParts."Line No.");
-                    //+NPR5.26
                     ItemJnlPostLine.RunWithCheck(ItemJnlLine);
-                    //-NPR5.26
                     CustRepairItemParts.Quantity := 0;
                     CustRepairItemParts.Modify();
-                //+NPR5.26
                 until CustRepairItemParts.Next = 0;
                 Window.Close;
             end;
-            //-NPR5.26
             CustRepair.Finalized := true;
             CustRepair.Modify;
-            //+NPR5.26
         end;
     end;
 
@@ -1387,13 +1331,10 @@ table 6014504 "NPR Customer Repair"
         Window: Dialog;
         LineNo: Integer;
     begin
-        //-NPR5.26
         CustRepairItemParts.SetRange("Customer Repair No.", CustRepair."No.");
         CustRepairItemParts.SetFilter("Item Part No.", '<>%1', '');
         CustRepairItemParts.SetFilter(Quantity, '<>%1', 0);
-        //-NPR5.30 [262923]
         CustRepairItemParts.SetRange("Expenses to be charged", false);
-        //+NPR5.30 [262923]
         if CustRepairItemParts.FindSet then begin
             Window.Open('Processing Item #1#################################');
             repeat
@@ -1415,7 +1356,6 @@ table 6014504 "NPR Customer Repair"
             until CustRepairItemParts.Next = 0;
             Window.Close;
         end;
-        //+NPR5.26
     end;
 
     procedure CreateSalesLine(SalesHeader: Record "Sales Header"; CustomerRepair: Record "NPR Customer Repair")
@@ -1425,7 +1365,6 @@ table 6014504 "NPR Customer Repair"
         PhotoSetup: Record "NPR Retail Contr. Setup";
         LineNo: Integer;
     begin
-        //-NPR5.30 [262923]
         LineNo := 20000;
         PhotoSetup.Get;
         CustomerRepairJournal.SetRange("Customer Repair No.", CustomerRepair."No.");
@@ -1456,7 +1395,6 @@ table 6014504 "NPR Customer Repair"
                 end;
                 SalesLine.Modify;
             until CustomerRepairJournal.Next = 0;
-        //+NPR5.30 [262923]
     end;
 
     local procedure GetStoreLocationCode(): Code[10]

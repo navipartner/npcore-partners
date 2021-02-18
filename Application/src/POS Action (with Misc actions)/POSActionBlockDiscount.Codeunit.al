@@ -50,7 +50,7 @@ codeunit 6150838 "NPR POS Action: Block Discount"
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     var
-        RetailSetup: Record "NPR Retail Setup";
+        RetailSetup: Record "NPR NP Retail Setup";
     begin
 
         Captions.AddActionCaption(ActionCode, 'title', Title);
@@ -61,7 +61,7 @@ codeunit 6150838 "NPR POS Action: Block Discount"
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         Setup: Codeunit "NPR POS Setup";
-        RetailSetup: Record "NPR Retail Setup";
+        RetailSetup: Record "NPR NP Retail Setup";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         Context: Codeunit "NPR POS JSON Management";
     begin
@@ -110,7 +110,7 @@ codeunit 6150838 "NPR POS Action: Block Discount"
     local procedure VerifyPassword(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         JSON: Codeunit "NPR POS JSON Management";
-        RetailSetup: Record "NPR Retail Setup";
+        RetailSetup: Record "NPR NP Retail Setup";
         Password: Text;
     begin
 

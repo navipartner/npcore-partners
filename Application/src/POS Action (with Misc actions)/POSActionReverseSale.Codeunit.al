@@ -56,7 +56,7 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         Setup: Codeunit "NPR POS Setup";
-        RetailSetup: Record "NPR Retail Setup";
+        RetailItemSetup: Record "NPR Retail Item Setup";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         Context: Codeunit "NPR POS JSON Management";
     begin
@@ -67,8 +67,8 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
         POSSession.GetSetup(Setup);
         SalespersonPurchaser.Get(Setup.Salesperson);
 
-        RetailSetup.Get();
-        Context.SetContext('PromptForReason', RetailSetup."Reason for Return Mandatory");
+        RetailItemSetup.Get();
+        Context.SetContext('PromptForReason', RetailItemSetup."Reason for Return Mandatory");
 
         case SalespersonPurchaser."NPR Reverse Sales Ticket" of
             SalespersonPurchaser."NPR Reverse Sales Ticket"::No:
@@ -153,7 +153,7 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SalePOS: Record "NPR Sale POS";
         SaleLinePOS: Record "NPR Sale Line POS";
-        RetailSetup: Record "NPR Retail Setup";
+        RetailItemSetup: Record "NPR Retail Item Setup";
         SalesTicketNo: Code[20];
         ReturnReasonCode: Code[20];
     begin
@@ -171,9 +171,9 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
 
         SetCustomerOnReverseSale(SalePOS, SalesTicketNo);
 
-        RetailSetup.Get();
+        RetailItemSetup.Get();
         JSON.SetScope('/', true);
-        ReturnReasonCode := JSON.GetString('ReturnReasonCode', RetailSetup."Reason for Return Mandatory");
+        ReturnReasonCode := JSON.GetString('ReturnReasonCode', RetailItemSetup."Reason for Return Mandatory");
 
         //This function heavily used audit roll and tried to do too much. It should just reverse the simple types like Item, GL. Any aux module needs to subscribe and handle itself like retail voucher etc.
         //RetailSalesCode.ReverseSalesTicket2(SalePOS, SalesTicketNo, ReturnReasonCode);     
@@ -201,7 +201,6 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
 
     local procedure SelectReturnReason(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Code[20]
     var
-        RetailSetup: Record "NPR Retail Setup";
         ReturnReason: Record "Return Reason";
     begin
 

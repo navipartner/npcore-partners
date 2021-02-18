@@ -14,7 +14,6 @@ codeunit 6150708 "NPR POS Setup"
 
     var
         Setup: Record "NPR POS Setup";
-        RetailSetup: Record "NPR Retail Setup";
         UserSetup: Record "User Setup";
         SalespersonRec: Record "Salesperson/Purchaser";
         RegisterRec: Record "NPR Register";
@@ -40,8 +39,6 @@ codeunit 6150708 "NPR POS Setup"
         if UserCode = '' then
             UserCode := UserId;
 
-        RetailSetup.Get();
-
         // Setup is initialied twice, first when the page has been initialized and then when framework send the the hardware ID
         UserSetup.Get(UserId);
         UserSetup.TestField("NPR Backoffice Register No.");
@@ -65,7 +62,6 @@ codeunit 6150708 "NPR POS Setup"
 
         POSUnitIdentityGlobal := POSUnitIdentity;
 
-        RetailSetup.Get();
         Initialized := true;
     end;
 
@@ -116,9 +112,18 @@ codeunit 6150708 "NPR POS Setup"
         exit(SalespersonRec.Code);
     end;
 
-    procedure ShowDiscountFieldsInSaleView(): Boolean
+    procedure ShowDiscountFieldsInSaleView(POSUnitNo: Code[10]): Boolean
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSVieWProfile: Record "NPR POS View Profile";
     begin
-        exit(RetailSetup."POS - Show discount fields");
+        if not POSUnit.Get(POSUnitNo) then
+            Clear(POSUnit);
+
+        if not POSVieWProfile.Get(POSUnit."POS View Profile") then
+            Clear(POSVieWProfile);
+
+        exit(POSVieWProfile."POS - Show discount fields");
     end;
 
     procedure AmountRoundingPrecision(): Decimal
@@ -139,12 +144,18 @@ codeunit 6150708 "NPR POS Setup"
     end;
 
     procedure ExchangeLabelDefaultDate(): Code[10]
+    var
+        ExchangeLabelSetup: Record "NPR Exchange Label Setup";
     begin
-        exit(RetailSetup."Exchange label default date");
+        ExchangeLabelSetup.Get();
+        exit(ExchangeLabelSetup."Exchange label default date");
     end;
 
     procedure CashDrawerPassword(CashDrawerNo: Text): Text
+    var
+        RetailSetup: Record "NPR NP Retail Setup";
     begin
+        RetailSetup.Get();
         exit(RetailSetup."Open Register Password");
     end;
 

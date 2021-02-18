@@ -43,6 +43,11 @@ page 6150636 "NPR POS View Profile Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the After End-of-Sale View field';
                 }
+                field("POS - Show discount fields"; "POS - Show discount fields")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Show Discount field';
+                }
             }
             group("Number and Date Formatting")
             {

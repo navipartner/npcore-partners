@@ -28,7 +28,6 @@ codeunit 6150705 "NPR POS Sale"
     var
         Rec: Record "NPR Sale POS";
         Register: Record "NPR Register";
-        RetailSetup: Record "NPR Retail Setup";
         This: Codeunit "NPR POS Sale";
         Setup: Codeunit "NPR POS Setup";
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -73,8 +72,6 @@ codeunit 6150705 "NPR POS Sale"
         Register := RegisterIn;
         Setup := SetupIn;
         This := ThisIn;
-
-        RetailSetup.Get();
 
         Clear(Rec);
         Clear(LastSaleRetrieved);
@@ -623,8 +620,6 @@ codeunit 6150705 "NPR POS Sale"
         Setup := SetupIn;
         This := ThisIn;
 
-        RetailSetup.Get();
-
         Clear(Rec);
         Clear(LastSaleRetrieved);
 
@@ -809,8 +804,8 @@ codeunit 6150705 "NPR POS Sale"
     begin
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014400, 'OnAfterInsertEvent', '', true, true)]
-    local procedure OnAfterInsertRetailSetup(var Rec: Record "NPR Retail Setup"; RunTrigger: Boolean)
+    [EventSubscriber(ObjectType::Table, Database::"NPR NP Retail Setup", 'OnAfterInsertEvent', '', true, true)]
+    local procedure OnAfterInsertRetailSetup(var Rec: Record "NPR NP Retail Setup"; RunTrigger: Boolean)
     var
         POSSalesWorkflow: Record "NPR POS Sales Workflow";
     begin

@@ -188,16 +188,11 @@ table 6014402 "NPR Payment Type POS"
 
             trigger OnValidate()
             var
-                ErrNotAllowed: Label 'This Account Type isn''t allowed, without Immediate Posting of Payments.';
                 Cust: Record Customer;
                 ErrCustomer: Label 'A deptor must be chosen for this accounttype';
                 CustomerList: Page "Customer List";
             begin
-                RetailSetup.Get();
                 if ("Account Type" = "Account Type"::Customer) then begin
-                    if (not RetailSetup."Post Payouts imme.") then
-                        Error(ErrNotAllowed);
-
                     Clear(CustomerList);
                     CustomerList.LookupMode(true);
                     if (CustomerList.RunModal <> ACTION::LookupOK) then
@@ -856,7 +851,6 @@ table 6014402 "NPR Payment Type POS"
     var
         Register: Record "NPR Register";
         PaymentTypePOS: Record "NPR Payment Type POS";
-        RetailSetup: Record "NPR Retail Setup";
         GLAccount: Record "G/L Account";
         AuditRoll: Record "NPR Audit Roll";
         Customer: Record Customer;
@@ -872,15 +866,7 @@ table 6014402 "NPR Payment Type POS"
 
     procedure GetByRegister(PaymentCodeNo: Code[10]; RegisterNo: Code[10])
     begin
-
-        RetailSetup.Get();
-
-        if (RetailSetup."Payment Type By Register") then begin
-            if (not Get(PaymentCodeNo, RegisterNo)) then
-                Get(PaymentCodeNo, '');
-        end else
-            Get(PaymentCodeNo, '');
-
+        Get(PaymentCodeNo, '');
     end;
 }
 
