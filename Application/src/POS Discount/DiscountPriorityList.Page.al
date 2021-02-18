@@ -58,6 +58,11 @@ page 6014407 "NPR Discount Priority List"
                     Editable = false;
                     ToolTip = 'Specifies the value of the Cross Line Calculation field';
                 }
+                field("Discount No. Series"; "Discount No. Series")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Discount No. Series field';
+                }
             }
         }
     }

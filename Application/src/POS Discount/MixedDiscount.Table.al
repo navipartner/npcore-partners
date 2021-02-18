@@ -309,17 +309,13 @@ table 6014411 "NPR Mixed Discount"
         NoSeriesMgt: Codeunit NoSeriesManagement;
     begin
         "Created the" := Today;
-        RetailSetup.Get;
         DatePeriod.SetRange("Period Type", DatePeriod."Period Type"::Date);
         "Starting date" := Today;
         if DatePeriod.FindLast then
             "Ending date" := DatePeriod."Period Start";
 
-        if Code = '' then begin
-            RetailSetup.Get;
-            RetailSetup.TestField("Mixed Discount No. Management");
-            NoSeriesMgt.InitSeries(RetailSetup."Mixed Discount No. Management", xRec."No. Serie", 0D, Code, "No. Serie");
-        end;
+        if Code = '' then
+            NoSeriesMgt.InitSeries(GetNoSeries(), xRec."No. Serie", 0D, Code, "No. Serie");
 
         DimMgt.UpdateDefaultDim(
           DATABASE::"NPR Mixed Discount", Code,
@@ -339,7 +335,6 @@ table 6014411 "NPR Mixed Discount"
         Text001: Label 'The following Lines are already active on other Mixed Discounts:\ %1\\Continue?';
         Text002: Label '\  - %1 %2 (%3)';
         Text1060000: Label 'This field cannot be changed. Modification is done via NPK Retail configuration!';
-        RetailSetup: Record "NPR Retail Setup";
         StatusErr: Label 'Mix discount configuration not activated.';
 
     procedure Assistedit(MixedDiscount: Record "NPR Mixed Discount"): Boolean
@@ -347,18 +342,19 @@ table 6014411 "NPR Mixed Discount"
         MixedDiscount2: Record "NPR Mixed Discount";
         NoSeriesMgt: Codeunit NoSeriesManagement;
     begin
-        with MixedDiscount2 do begin
-            MixedDiscount2 := Rec;
-            RetailSetup.Get;
-            RetailSetup.TestField("Mixed Discount No. Management");
-            if NoSeriesMgt.SelectSeries(RetailSetup."Mixed Discount No. Management", MixedDiscount."No. Serie", "No. Serie") then begin
-                RetailSetup.Get;
-                RetailSetup.TestField("Mixed Discount No. Management");
-                NoSeriesMgt.SetSeries(Code);
-                Rec := MixedDiscount2;
-                exit(true);
-            end;
+        MixedDiscount2 := Rec;
+        if NoSeriesMgt.SelectSeries(GetNoSeries(), MixedDiscount."No. Serie", MixedDiscount2."No. Serie") then begin
+            NoSeriesMgt.SetSeries(MixedDiscount2.Code);
+            Rec := MixedDiscount2;
+            exit(true);
         end;
+    end;
+
+    local procedure GetNoSeries(): Code[10]
+    var
+        MixedDiscountMgt: Codeunit "NPR Mixed Discount Management";
+    begin
+        exit(MixedDiscountMgt.GetNoSeries());
     end;
 
     procedure CalcMinQty() MinQty: Decimal

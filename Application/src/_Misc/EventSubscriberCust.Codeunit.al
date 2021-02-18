@@ -3,7 +3,6 @@ codeunit 6014442 "NPR Event Subscriber (Cust)"
     Permissions = TableData "NPR Audit Roll" = rimd;
 
     var
-        RetailSetup: Record "NPR Retail Setup";
         SalesSetup: Record "Sales & Receivables Setup";
         RetailSetupFetched: Boolean;
         SalesSetupFetched: Boolean;
@@ -130,17 +129,6 @@ codeunit 6014442 "NPR Event Subscriber (Cust)"
         if not SalesSetup.Get then
             exit(false);
         SalesSetupFetched := true;
-        exit(true);
-    end;
-
-    local procedure GetRetailSetup(): Boolean
-    begin
-        if RetailSetupFetched then
-            exit(true);
-
-        if not RetailSetup.Get then
-            exit(false);
-        RetailSetupFetched := true;
         exit(true);
     end;
 

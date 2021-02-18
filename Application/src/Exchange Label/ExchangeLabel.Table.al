@@ -1,20 +1,5 @@
 table 6014498 "NPR Exchange Label"
 {
-    // NPR4.04/JDH/20150427  CASE 212229  Removed references to old Variant solution "Color Size"
-    // NPR4.10/MMV/20150527  CASE 213523 Added missing danish captions
-    //                                   Added blank option value to field "Sales Header Type" IN FRONT!
-    // NPR5.26/MMV /20160810 CASE 248262 Removed fields 25 & 26.
-    // NPR5.26/MMV /20160802 CASE 246998 Added field 30 - Quantity.
-    //                                   Added field 32 - Unit of Measure.
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
-    // NPR5.30/MMV /20170307 CASE 248985 Renamed field 8 from "Print In Label Group Batch" to "Packaged Batch".
-    //                                   Renamed field 4 from "Label Group Batch" to "Batch No."
-    //                                   Renamed field 3 from "Label Barcode" to "Barcode".
-    //                                   Renamed field 2 from "Label No." to "No."
-    // NPR5.48/JDH /20181109 CASE 334163 Added caption to missing fields
-    // NPR5.49/MHA /20190211 CASE 345209 Added field 35 "Unit Price"
-    // NPR5.51/ALST/20190624 CASE 337539 Added field "Retail Cross Reference No."
-
     Caption = 'Exchange Label';
     DataClassification = CustomerContent;
 
@@ -187,13 +172,14 @@ table 6014498 "NPR Exchange Label"
     end;
 
     var
-        RetailConfiguration: Record "NPR Retail Setup";
         NoSeriesMgt: Codeunit NoSeriesManagement;
 
     procedure GetNoSeriesCode(): Code[10]
+    var
+        ExchangeLabelSetup: Record "NPR Exchange Label Setup";
     begin
-        RetailConfiguration.Get;
-        exit(RetailConfiguration."Exchange Label  No. Series");
+        ExchangeLabelSetup.Get();
+        exit(ExchangeLabelSetup."Exchange Label  No. Series");
     end;
 }
 

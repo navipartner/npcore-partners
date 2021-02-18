@@ -1137,12 +1137,10 @@ table 6014407 "NPR Audit Roll"
         end;
         if "Offline receipt no." = '' then
             "Offline receipt no." := "Sales Ticket No.";
-        RetailSetup.Get;
     end;
 
     var
         AuditRoll: Record "NPR Audit Roll";
-        RetailSetup: Record "NPR Retail Setup";
         GLAccount: Record "G/L Account";
         DimMgt: Codeunit DimensionManagement;
         NPRDimMgt: Codeunit "NPR Dimension Mgt.";

@@ -58,7 +58,7 @@ codeunit 6014431 "NPR Assisted Setup Subs"
     local procedure UpdateRetailWizardStatus()
     var
         AssistedSetup: Codeunit "Assisted Setup";
-        RetailSetup: Record "NPR Retail Setup";
+        RetailSetup: Record "NPR NP Retail Setup";
     begin
         if not RetailSetup.IsEmpty then
             AssistedSetup.Complete(Page::"NPR Retail Wizard");

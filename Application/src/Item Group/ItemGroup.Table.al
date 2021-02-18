@@ -643,7 +643,7 @@ table 6014410 "NPR Item Group"
         Text1060002: Label 'Deletion cancelled!';
         Text1060004: Label 'The item group cannot be subgroup to itself!';
         Text1060008: Label 'The main groups to item group %1 must be activated to used goods groups!';
-        RetailSetup: Record "NPR Retail Setup";
+        RetailItemSetup: Record "NPR Retail Item Setup";
         DimMgt: Codeunit DimensionManagement;
         Text1060010: Label 'Items have been found belonging to %1 %2, but not having %3 in %4.\Edit these to %4 %5';
         Text1060011: Label 'You are about to move the relation to another item group, do you with to inherit the attributes?';
@@ -699,13 +699,13 @@ table 6014410 "NPR Item Group"
         NoSeriesLine: Record "No. Series Line";
         Text0001: Label 'NoSeries for itemgroup';
     begin
-        RetailSetup.Get;
-        if RetailSetup."Itemgroup Pre No. Serie" = '' then
+        RetailItemSetup.Get;
+        if RetailItemSetup."Itemgroup Pre No. Serie" = '' then
             exit;
 
-        "No. Series" := RetailSetup."Itemgroup Pre No. Serie" + "No.";
+        "No. Series" := RetailItemSetup."Itemgroup Pre No. Serie" + "No.";
 
-        if StrLen(RetailSetup."Itemgroup Pre No. Serie" + "No.") > 10 then
+        if StrLen(RetailItemSetup."Itemgroup Pre No. Serie" + "No.") > 10 then
             Error(ErrLength);
 
         NoSeries.Init;
@@ -719,9 +719,9 @@ table 6014410 "NPR Item Group"
         NoSeriesLine."Series Code" := NoSeries.Code;
         NoSeriesLine."Line No." := 10000;
         NoSeriesLine."Starting Date" := CalcDate('<-1D>', Today);
-        NoSeriesLine."Starting No." := "No." + RetailSetup."Itemgroup No. Serie StartNo.";
-        NoSeriesLine."Ending No." := "No." + RetailSetup."Itemgroup No. Serie EndNo.";
-        NoSeriesLine."Warning No." := RetailSetup."Itemgroup No. Serie Warning";
+        NoSeriesLine."Starting No." := "No." + RetailItemSetup."Itemgroup No. Serie StartNo.";
+        NoSeriesLine."Ending No." := "No." + RetailItemSetup."Itemgroup No. Serie EndNo.";
+        NoSeriesLine."Warning No." := RetailItemSetup."Itemgroup No. Serie Warning";
         NoSeriesLine."Increment-by No." := 1;
         NoSeriesLine."Last No. Used" := NoSeriesLine."Starting No.";
         NoSeriesLine.Open := true;
@@ -733,7 +733,7 @@ table 6014410 "NPR Item Group"
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
     begin
-        if RetailSetup."Itemgroup Pre No. Serie" = '' then
+        if RetailItemSetup."Itemgroup Pre No. Serie" = '' then
             exit;
 
         if "No. Series" = xRec."No. Series" then
@@ -749,7 +749,7 @@ table 6014410 "NPR Item Group"
         NoSeriesLine."Warning No." := "No." + '99000';
         NoSeriesLine.Modify;
 
-        "No. Series" := RetailSetup."Itemgroup Pre No. Serie" + "No.";
+        "No. Series" := RetailItemSetup."Itemgroup Pre No. Serie" + "No.";
     end;
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
@@ -840,9 +840,9 @@ table 6014410 "NPR Item Group"
         ConfigTemplateHeader: Record "Config. Template Header";
         ConfigTemplateManagement: Codeunit "Config. Template Management";
         RecRef: RecordRef;
-        RetailSetup: Record "NPR Retail Setup";
+        RetailItemSetup: Record "NPR Retail Item Setup";
     begin
-        RetailSetup.Get();
+        RetailItemSetup.Get();
 
         ItemGroup.TestField("VAT Bus. Posting Group");
         ItemGroup.TestField("Gen. Prod. Posting Group");
@@ -867,7 +867,7 @@ table 6014410 "NPR Item Group"
         Item.Validate(Item."NPR Guarantee Index", ItemGroup."Warranty File");
         Item.Validate(Item."NPR Guarantee voucher", ItemGroup.Warranty);
         Item.Validate(Item."Tariff No.", ItemGroup."Tarif No.");
-        if (RetailSetup."Item Description at 1 star") and (Item.Description = '') then Item.Validate(Item.Description, ItemGroup.Description);
+        if (RetailItemSetup."Item Description at 1 star") and (Item.Description = '') then Item.Validate(Item.Description, ItemGroup.Description);
         Item."Costing Method" := ItemGroup."Costing Method";
         Item."NPR Insurrance category" := ItemGroup."Insurance Category";
 

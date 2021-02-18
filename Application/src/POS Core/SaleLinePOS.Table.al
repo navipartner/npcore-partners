@@ -65,7 +65,6 @@ table 6014406 "NPR Sale Line POS"
                 InitFromSalePOS();
 
                 RegisterGlobal.Get(Rec."Register No.");
-                RetailSetup.Get;
 
                 if (Type = Type::Item) and ("No." = '*') then begin
                     Type := Type::Comment;
@@ -257,6 +256,7 @@ table 6014406 "NPR Sale Line POS"
 
             trigger OnValidate()
             var
+                RetailSetup: Record "NPR NP Retail Setup";
                 ErrDisabled: Label 'Unit Cost is disabled';
                 ErrDisNo: Label 'Unit Cost is disabled for Quantity > 0';
                 ErrDisX: Label 'Unit Cost cannot be reduced';
@@ -289,7 +289,7 @@ table 6014406 "NPR Sale Line POS"
                                         end;
                                     RetailSetup."Unit Cost Control"::Disabled:
                                         begin
-                                            if not (RetailSetup."Reset unit price on neg. sale" and (Quantity < 0)) then
+                                            if Quantity < 0 then
                                                 Error(ErrDisabled);
                                         end;
                                     RetailSetup."Unit Cost Control"::"Disabled if Quantity > 0":
@@ -1646,7 +1646,6 @@ table 6014406 "NPR Sale Line POS"
     trigger OnDelete()
     var
         SaleLinePOS: Record "NPR Sale Line POS";
-        ErrNoDelete: Label 'Sales lines cannot be deleted when sale is part of a selection';
         ErrNoDeleteDep: Label 'Deposit line from a rental is not to be deleted.';
         ICommRec: Record "NPR I-Comm";
         Err001: Label '%1 is not legal tender';
@@ -1655,11 +1654,6 @@ table 6014406 "NPR Sale Line POS"
     begin
         if "EFT Approved" then
             Error(ERR_EFT_DELETE);
-
-        RetailSetup.Get;
-
-        if RetailSetup."Sales Lines from Selection" and "From Selection" then
-            Error(ErrNoDelete);
 
         if ((Type = Type::Customer) and ("Sale Type" = "Sale Type"::Deposit) and ("From Selection")) then
             Error(ErrNoDeleteDep);
@@ -1751,7 +1745,6 @@ table 6014406 "NPR Sale Line POS"
     var
         Item: Record Item;
         PaymentTypePOS: Record "NPR Payment Type POS";
-        RetailSetup: Record "NPR Retail Setup";
         RegisterGlobal: Record "NPR Register";
         CustomerGlobal: Record Customer;
         SalePOS: Record "NPR Sale POS";
@@ -2410,9 +2403,6 @@ table 6014406 "NPR Sale Line POS"
         Clear(PaymentTypePOS);
 
         RegisterNo := '';
-        RetailSetup.Get;
-        if RetailSetup."Payment Type By Register" then
-            RegisterNo := "Register No.";
 
         PaymentTypePOS.Get("No.", RegisterNo);
     end;
@@ -2600,8 +2590,9 @@ table 6014406 "NPR Sale Line POS"
     var
         TempItemLedgerEntry: Record "Item Ledger Entry" temporary;
         ItemLedgerEntry: Record "Item Ledger Entry";
+        RetailItemSetup: Record "NPR Retail Item Setup";
     begin
-        RetailSetup.Get;
+        RetailItemSetup.Get();
         TestField("Sale Type", "Sale Type"::Sale);
         TestField(Type, Type::Item);
 
@@ -2615,7 +2606,7 @@ table 6014406 "NPR Sale Line POS"
         ItemLedgerEntry.SetRange("Location Code", "Location Code");
         if "Variant Code" <> '' then
             ItemLedgerEntry.SetRange("Variant Code", "Variant Code");
-        if not RetailSetup."Not use Dim filter SerialNo" then
+        if not RetailItemSetup."Not use Dim filter SerialNo" then
             ItemLedgerEntry.SetRange("Global Dimension 1 Code", "Shortcut Dimension 1 Code");
         if ItemLedgerEntry.Find('-') then
             repeat

@@ -1394,12 +1394,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
         until TempMixedDiscountCopy.Next = 0;
     end;
 
-    local procedure "--- Discount Interface"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6014455, 'InitDiscountPriority', '', true, true)]
-    local procedure OnInitDiscountPriority(var DiscountPriority: Record "NPR Discount Priority")
+    procedure GetOrInit(var DiscountPriority: Record "NPR Discount Priority")
     begin
         if DiscountPriority.Get(DiscSourceTableId()) then
             exit;
@@ -1411,6 +1406,29 @@ codeunit 6014416 "NPR Mixed Discount Management"
         DiscountPriority."Discount Calc. Codeunit ID" := DiscCalcCodeunitId();
         DiscountPriority."Cross Line Calculation" := true;
         DiscountPriority.Insert(true);
+    end;
+
+    procedure GetNoSeries(): Code[10]
+    var
+        DiscountPriority: Record "NPR Discount Priority";
+        NoSeriesCodeTok: Label 'MIX-DISC', Locked = true;
+        NoSeriesDescriptionTok: Label 'Mixed Discount No. Series';
+    begin
+        GetOrInit(DiscountPriority);
+        if DiscountPriority."Discount No. Series" = '' then // if not initialized via upgrade codeunit
+            DiscountPriority.CreateNoSeries(NoSeriesCodeTok, NoSeriesDescriptionTok, false);
+
+        exit(DiscountPriority."Discount No. Series");
+    end;
+
+    local procedure "--- Discount Interface"()
+    begin
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6014455, 'InitDiscountPriority', '', true, true)]
+    local procedure OnInitDiscountPriority(var DiscountPriority: Record "NPR Discount Priority")
+    begin
+        GetOrInit(DiscountPriority);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014455, 'ApplyDiscount', '', true, true)]

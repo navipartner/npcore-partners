@@ -76,14 +76,14 @@ codeunit 6014404 "NPR Event Subscriber"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnBeforeInsertTransferEntry', '', true, false)]
     local procedure ItemJnlPostLineOnBeforeInsertTransferEntry(var NewItemLedgerEntry: Record "Item Ledger Entry"; var OldItemLedgerEntry: Record "Item Ledger Entry"; var ItemJournalLine: Record "Item Journal Line")
     var
-        RetailSetup: Record "NPR Retail Setup";
+        RetailItemSetup: Record "NPR Retail Item Setup";
     begin
-        RetailSetup.Get();
+        RetailItemSetup.Get();
         NewItemLedgerEntry."NPR Vendor No." := OldItemLedgerEntry."NPR Vendor No.";
         NewItemLedgerEntry."NPR Item Group No." := OldItemLedgerEntry."NPR Item Group No.";
         NewItemLedgerEntry."NPR Register Number" := OldItemLedgerEntry."NPR Register Number";
         NewItemLedgerEntry."NPR Salesperson Code" := OldItemLedgerEntry."NPR Salesperson Code";
-        if RetailSetup."Transfer SeO Item Entry" then
+        if RetailItemSetup."Transfer SeO Item Entry" then
             NewItemLedgerEntry."Item Reference No." := OldItemLedgerEntry."Item Reference No.";
     end;
 
@@ -140,7 +140,7 @@ codeunit 6014404 "NPR Event Subscriber"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostSalesDoc', '', true, false)]
     local procedure SalesPostOnBeforePostSalesDoc(var SalesHeader: Record "Sales Header")
     var
-        RetailSetup: Record "NPR Retail Setup";
+        RetailSetup: Record "NPR NP Retail Setup";
     begin
         if not RetailSetup.Get() then
             RetailSetup.Init();

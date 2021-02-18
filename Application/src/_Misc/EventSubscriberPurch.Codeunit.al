@@ -1,7 +1,7 @@
 codeunit 6014444 "NPR Event Subscriber (Purch)"
 {
     var
-        RetailSetup: Record "NPR Retail Setup";
+        RetailSetup: Record "NPR NP Retail Setup";
         RetailSetupFetched: Boolean;
 
     [EventSubscriber(ObjectType::Table, 39, 'OnBeforeValidateEvent', 'Vendor Item No.', true, false)]

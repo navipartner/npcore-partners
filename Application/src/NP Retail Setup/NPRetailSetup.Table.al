@@ -95,7 +95,58 @@ table 6150613 "NPR NP Retail Setup"
             ObsoleteReason = 'This field is not being used anymore';
             ObsoleteTag = 'Refactoring 3/2/2021';
         }
-
+        field(5058; "Open Register Password"; Code[20])
+        {
+            Caption = 'Open Cash Register Password';
+            DataClassification = CustomerContent;
+            Description = 'kode til at åbne kasseskuffen';
+        }
+        field(5061; "Unit Cost Control"; Option)
+        {
+            Caption = 'Unit Cost Control';
+            DataClassification = CustomerContent;
+            Description = 'Spærremuligheder til ændring af á pris';
+            OptionCaption = 'Enabled,Disabled,Disabled if Quantity > 0,Disabled if xUnit Cost > Unit Cost,Disabled if Quantity > 0 and xUnit Cost > Unit Cost';
+            OptionMembers = Enabled,Disabled,"Disabled if Quantity > 0","Disabled if xUnit Cost > Unit Cost","Disabled if Quantity > 0 and xUnit Cost > Unit Cost";
+        }
+        field(5152; "Check Purchase Lines if vendor"; Boolean)
+        {
+            Caption = 'Check Purchase Lines If Vendor';
+            DataClassification = CustomerContent;
+            Description = 'Afg¢re om man på k¢bslinie skal checke om vare man taster tilh¢rer leverand¢re som man laver ordre for.';
+        }
+        field(5154; "Salespersoncode on Salesdoc."; Option)
+        {
+            Caption = 'Salesperson Code On Sales Documents';
+            DataClassification = CustomerContent;
+            Description = 'Opsætning for sælgerkode på salgsbilag';
+            OptionCaption = 'Forced,Free';
+            OptionMembers = Forced,Free;
+        }
+        field(6211; "Password on unblock discount"; Text[4])
+        {
+            Caption = 'Administrator Password';
+            DataClassification = CustomerContent;
+        }
+        field(6215; "Retail Journal No. Series"; Code[10])
+        {
+            Caption = 'Retail Journal No. Series';
+            DataClassification = CustomerContent;
+            TableRelation = "No. Series";
+        }
+        field(6233; "Costing Method Standard"; Enum "Costing Method")
+        {
+            Caption = 'Costing Method Std.';
+            DataClassification = CustomerContent;
+            InitValue = Standard;
+        }
+        field(6270; "Margin and Turnover By Shop"; Option)
+        {
+            Caption = 'Margin And Turnover By Shop';
+            DataClassification = CustomerContent;
+            OptionCaption = ' ,Dimension1,Dimension2';
+            OptionMembers = " ",Dimension1,Dimension2;
+        }
         field(10000; "Data Model Build"; Integer)
         {
             Caption = 'Data Model Build';

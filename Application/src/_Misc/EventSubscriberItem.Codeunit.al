@@ -2,7 +2,6 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
 {
     var
         InventorySetup: Record "Inventory Setup";
-        RetailSetup: Record "NPR Retail Setup";
         SalesSetup: Record "Sales & Receivables Setup";
         InventorySetupFetched: Boolean;
         RetailSetupFetched: Boolean;
@@ -21,6 +20,8 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
     [EventSubscriber(ObjectType::Table, 27, 'OnBeforeInsertEvent', '', true, false)]
     local procedure OnBeforeInsertEventLicenseCheck(var Rec: Record Item; RunTrigger: Boolean)
     var
+        NPRetailSetup: Record "NPR NP Retail Setup";
+        RetailItemSetup: Record "NPR Retail Item Setup";
         InvtSetup: Record "Inventory Setup";
         ItemGroup: Record "NPR Item Group";
         NoSeriesMgt: Codeunit NoSeriesManagement;
@@ -29,10 +30,11 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
         if not RunTrigger then
             exit;
 
-        GetRetailSetup;
         GetSalesSetup;
+        NPRetailSetup.Get();
+        RetailItemSetup.Get();
 
-        if RetailSetup."Item Group on Creation" and (Rec."No." = '') and (Rec."NPR Item Group" = '') then begin
+        if RetailItemSetup."Item Group on Creation" and (Rec."No." = '') and (Rec."NPR Item Group" = '') then begin
             if PAGE.RunModal(PAGE::"NPR Item Group Tree", ItemGroup) = ACTION::LookupOK then begin
                 Rec."NPR Item Group" := ItemGroup."No.";
                 if ItemGroup."No. Series" <> '' then begin
@@ -49,7 +51,7 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
         end;
 
         if not Rec."NPR Group sale" then
-            Rec."Costing Method" := RetailSetup."Costing Method Standard";
+            Rec."Costing Method" := NPRetailSetup."Costing Method Standard";
 
         if Rec."Price Includes VAT" and (SalesSetup."VAT Bus. Posting Gr. (Price)" <> '') then
             Rec."VAT Bus. Posting Gr. (Price)" := SalesSetup."VAT Bus. Posting Gr. (Price)";
@@ -195,21 +197,6 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
         ItemCostMgt.UpdateUnitCost(Rec, '', '', 0, 0, false, false, true, Rec.FieldNo("NPR Group sale"));
     end;
 
-
-
-
-
-    local procedure GetRetailSetup(): Boolean
-    begin
-        if RetailSetupFetched then
-            exit(true);
-
-        if not RetailSetup.Get then
-            exit(false);
-        RetailSetupFetched := true;
-        exit(true);
-    end;
-
     local procedure GetInventorySetup(): Boolean
     begin
         if InventorySetupFetched then
@@ -240,10 +227,12 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
     end;
 
     local procedure UnitCostValidation(var Item: Record Item)
+    var
+        StaffSetup: Record "NPR Staff Setup";
     begin
-        GetRetailSetup();
-        if RetailSetup."Staff SalesPrice Calc Codeunit" > 0 then
-            CODEUNIT.Run(RetailSetup."Staff SalesPrice Calc Codeunit", Item);
+        StaffSetup.Get();
+        if StaffSetup."Staff SalesPrice Calc Codeunit" > 0 then
+            Codeunit.Run(StaffSetup."Staff SalesPrice Calc Codeunit", Item);
     end;
 
     local procedure UpdateVendorItemRef(var Item: Record Item; xItem: Record Item)

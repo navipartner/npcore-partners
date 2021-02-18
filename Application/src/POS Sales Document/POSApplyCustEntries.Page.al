@@ -603,7 +603,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
         Text019: Label 'Post application process has been canceled.';
         SaleLinePOS: Record "NPR Sale Line POS";
         BalancePOSLine: Boolean;
-        RetailSetup: Record "NPR Retail Setup";
+        RetailSetup: Record "NPR NP Retail Setup";
 
     procedure SetGenJnlLine(NewGenJnlLine: Record "Gen. Journal Line"; ApplnTypeSelect: Integer)
     begin

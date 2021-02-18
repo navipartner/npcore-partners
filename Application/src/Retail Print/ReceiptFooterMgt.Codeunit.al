@@ -3,7 +3,6 @@ codeunit 6014424 "NPR Receipt Footer Mgt."
     procedure GetPOSUnitTicketText(var RetailComment: Record "NPR Retail Comment" temporary; POSUnit: Record "NPR POS Unit")
     var
         RetailComment2: Record "NPR Retail Comment";
-        RetailSetup2: Record "NPR Retail Setup";
         POSUnitReceiptTextProfile: Record "NPR POS Unit Rcpt.Txt Profile";
     begin
         if not POSUnitReceiptTextProfile.Get(POSUnit."POS Unit Receipt Text Profile") then

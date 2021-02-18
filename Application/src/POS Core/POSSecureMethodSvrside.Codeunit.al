@@ -191,7 +191,7 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
 
     local procedure ValidateRetailSetupOpenRegisterPassword(var Sender: Codeunit "NPR POS Secure Method Svrside"; Password: Text): Boolean
     var
-        RetailSetup: Record "NPR Retail Setup";
+        RetailSetup: Record "NPR NP Retail Setup";
         Reason: Text;
     begin
 
@@ -213,7 +213,7 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
 
     local procedure ValidateRetailSetupAdminPassword(var Sender: Codeunit "NPR POS Secure Method Svrside"; Password: Text): Boolean
     var
-        RetailSetup: Record "NPR Retail Setup";
+        RetailSetup: Record "NPR NP Retail Setup";
         Reason: Text;
     begin
 
@@ -225,7 +225,6 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
         end;
 
         RetailSetup.Get();
-        // Caption is "Administrator Password"
         if (Password = RetailSetup."Password on unblock discount") then begin
             Sender.ConfirmPassword('SysAdmin');
             exit(true);

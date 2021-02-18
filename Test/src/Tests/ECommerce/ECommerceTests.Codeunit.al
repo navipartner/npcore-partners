@@ -1714,6 +1714,7 @@ codeunit 85008 "NPR E-Commerce Tests"
         LibraryECommerce: Codeunit "NPR Library - E-Commerce";
     begin
         if not Initialized then begin
+            InitializeSetupRecords();
             PrepareDataForXml();
             SetSalesDocumentAsXml();
             SetPurchDocumentAsXml();
@@ -1725,7 +1726,7 @@ codeunit 85008 "NPR E-Commerce Tests"
 
     local procedure PrepareDataForXml()
     var
-        RetailSetup: Record "NPR Retail Setup";
+        RetailItemSetup: Record "NPR Retail Item Setup";
         LibraryECommerce: Codeunit "NPR Library - E-Commerce";
     begin
         LibraryECommerce.GetSalesOrderNo(SalesOrderNo);
@@ -1739,9 +1740,9 @@ codeunit 85008 "NPR E-Commerce Tests"
         LibraryECommerce.GetMagentoPaymentCode(MagentoPaymentCode2);
         LibraryECommerce.GetMagentoPaymentTransactionId(TransactionId2);
         LibraryECommerce.GetMagentoShipmentMethodCode(ExternalShipmentMethodCode);
-        if RetailSetup.get() and RetailSetup."Item Group on Creation" then begin
-            RetailSetup."Item Group on Creation" := false;
-            RetailSetup.Modify();
+        if RetailItemSetup.get() and RetailItemSetup."Item Group on Creation" then begin
+            RetailItemSetup."Item Group on Creation" := false;
+            RetailItemSetup.Modify();
         end;
         LibraryECommerce.CreateItem(ItemNo);
         LibraryECommerce.CreateItem(ItemNo2);
@@ -1939,6 +1940,13 @@ codeunit 85008 "NPR E-Commerce Tests"
         LibraryECommerce.CreateMagentoPaymentMapping(MagentoPaymentCode, '');
         LibraryECommerce.CreateMagentoPaymentMapping(MagentoPaymentCode2, '');
         LibraryECommerce.CreateMagentoShipmentMapping(ExternalShipmentMethodCode);
+    end;
+
+    local procedure InitializeSetupRecords()
+    var
+        LibraryECommerce: Codeunit "NPR Library - E-Commerce";
+    begin
+        LibraryECommerce.CreateRetailSetup();
     end;
 
     local procedure LoadXmlAndRemoveElement(XPath: Text; ImportType: Record "NPR Nc Import Type"; var ImportEntry: Record "NPR NC Import Entry"; DocName: Text; Xml: TextBuilder)

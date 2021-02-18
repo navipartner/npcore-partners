@@ -1,10 +1,5 @@
 table 6014451 "NPR Retail Journal Header"
 {
-    // //-NPR3.0e oversættelser v.simon
-    // NPR5.41/NPKNAV/20180427  CASE 309131 Transport NPR5.41 - 27 April 2018
-    // NPR5.46/JDH /20181002 CASE 294354  Renamed Variables. Cleanup, and more functionality to support easier usage of Retail Journal
-    // NPR5.49/BHR /20190220 CASE 344000  Update Retail Journal Lines
-
     Caption = 'Label Printing Header';
     LookupPageID = "NPR Retail Journal List";
     DataClassification = CustomerContent;
@@ -58,23 +53,11 @@ table 6014451 "NPR Retail Journal Header"
             Caption = 'Location Code';
             TableRelation = Location;
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                RetailJournalLine: Record "NPR Retail Journal Line";
-            begin
-                //-NPR5.46 [294354]
-                //-NPR5.41 [309131]
-                // RetailJournalLine.SETRANGE("No.", Rec."No.");
-                // RetailJournalLine.MODIFYALL("Location Filter", Rec."Location Code", TRUE);
-                //+NPR5.41
-                //+NPR5.46 [294354]
-            end;
         }
         field(20; "Register No."; Code[20])
         {
             Caption = 'Cash Register No.';
-            TableRelation = "NPR Register";
+            TableRelation = "NPR POS Unit";
             DataClassification = CustomerContent;
         }
         field(30; "Customer Price Group"; Code[10])
@@ -113,8 +96,8 @@ table 6014451 "NPR Retail Journal Header"
     begin
         if "No." = '' then begin
             RetailSetup.Get;
-            RetailSetup.TestField("Retail Journal No. Management");
-            NoSeriesMgt.InitSeries(RetailSetup."Retail Journal No. Management", xRec."No. Series", 0D, "No.", "No. Series");
+            RetailSetup.TestField("Retail Journal No. Series");
+            NoSeriesMgt.InitSeries(RetailSetup."Retail Journal No. Series", xRec."No. Series", 0D, "No.", "No. Series");
         end;
 
         "Date of creation" := Today;
@@ -122,13 +105,11 @@ table 6014451 "NPR Retail Journal Header"
 
     trigger OnModify()
     begin
-        //-NPR5.49 [344000]
         UpdateJournalLines;
-        //+NPR5.49 [344000]
     end;
 
     var
-        RetailSetup: Record "NPR Retail Setup";
+        RetailSetup: Record "NPR NP Retail Setup";
         NoSeriesMgt: Codeunit NoSeriesManagement;
         RetailJournalLine: Record "NPR Retail Journal Line";
 
@@ -139,8 +120,8 @@ table 6014451 "NPR Retail Journal Header"
         with this do begin
             this := Rec;
             RetailSetup.Get;
-            RetailSetup.TestField("Retail Journal No. Management");
-            if NoSeriesMgt.SelectSeries(RetailSetup."Retail Journal No. Management", old."No. Series", "No. Series") then begin
+            RetailSetup.TestField("Retail Journal No. Series");
+            if NoSeriesMgt.SelectSeries(RetailSetup."Retail Journal No. Series", old."No. Series", "No. Series") then begin
                 NoSeriesMgt.SetSeries("No.");
                 Rec := this;
                 exit(true);
@@ -150,7 +131,6 @@ table 6014451 "NPR Retail Journal Header"
 
     procedure SetPrintQuantityByInventory()
     begin
-        //-NPR5.46 [294354]
         RetailJournalLine.Reset;
         RetailJournalLine.SetRange("No.", "No.");
         if RetailJournalLine.FindSet then
@@ -162,14 +142,12 @@ table 6014451 "NPR Retail Journal Header"
                     RetailJournalLine.Modify;
                 end;
             until RetailJournalLine.Next = 0;
-        //+NPR5.46 [294354]
     end;
 
     local procedure UpdateJournalLines()
     var
         RetailJournalLine1: Record "NPR Retail Journal Line";
     begin
-        //-NPR5.49 [344000]
         if ("Shortcut Dimension 1 Code" <> xRec."Shortcut Dimension 1 Code") or
           ("Shortcut Dimension 2 Code" <> xRec."Shortcut Dimension 2 Code") or
           ("Location Code" <> xRec."Location Code") then begin
@@ -183,7 +161,6 @@ table 6014451 "NPR Retail Journal Header"
                     RetailJournalLine1.Modify;
                 until RetailJournalLine1.Next = 0;
         end;
-        //+NPR5.49 [344000]
     end;
 }
 

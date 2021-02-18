@@ -204,37 +204,23 @@ codeunit 6150830 "NPR POS Action: ScanExchLabel"
     var
         ExchangeLabel: Record "NPR Exchange Label";
         IComm: Record "NPR I-Comm";
-        RetailConfiguration: Record "NPR Retail Setup";
-        SMSSetup: Record "NPR SMS Setup";
+        ExchangeLabelSetup: Record "NPR Exchange Label Setup";
         ExchangeLabelManagement: Codeunit "NPR Exchange Label Mgt.";
     begin
-        //-NPR5.45 [319706]
         if StrLen(Barcode) > MaxStrLen(ExchangeLabel.Barcode) then
             exit(false);
 
         Barcode := UpperCase(Barcode);
-        RetailConfiguration.Get;
-        //-NPR5.53 [372948]
-        //IF COPYSTR(Barcode,1,2) <> RetailConfiguration."EAN Prefix Exhange Label" THEN
-        if not ExchangeLabelManagement.CheckPrefix(Barcode, RetailConfiguration."EAN Prefix Exhange Label") then
-            //+NPR5.53 [372948]
+        ExchangeLabelSetup.Get();
+        if not ExchangeLabelManagement.CheckPrefix(Barcode, ExchangeLabelSetup."EAN Prefix Exhange Label") then
             exit(false);
 
         ExchangeLabel.SetCurrentKey(Barcode);
         ExchangeLabel.SetRange(Barcode, Barcode);
-        if ExchangeLabel.FindFirst then
+        if ExchangeLabel.FindFirst() then
             exit(true);
 
-        if not RetailConfiguration."Use I-Comm" then
-            exit(false);
-        if not (IComm.Get) and not (SMSSetup.Get()) then
-            exit(false);
-        if IComm."Exchange Label Center Company" = '' then
-            exit(false);
-
-        ExchangeLabel.SetRange(Barcode, Barcode);
-        exit(ExchangeLabel.FindFirst);
-        //+NPR5.45 [319706]
+        exit(false);
     end;
 }
 

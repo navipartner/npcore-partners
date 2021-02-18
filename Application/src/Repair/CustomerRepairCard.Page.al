@@ -1,24 +1,5 @@
 page 6014503 "NPR Customer Repair Card"
 {
-    // NPR70.00.00.02/BHR/20150130 CASE 204899 Pass variable to show additional fields on lines.
-    //                                         create Action Finalize
-    // NPR5.25/TS  /20160615  CASE 244140 Removed ReportValg Variable to ReportSelectionPhoto and moved from global to local. Replaced Register No. on SETRANGE as Register field is beinf filled instead
-    // NPR5.26/TS  /20160809  CASE 248351 Fix Insert Picture. Removed  CustomerType1 and Added Customer Type
-    // NPR5.27/TS  /20161009  CASE 254679 Corrected In house Repairer
-    // NPR5.27/TS  /20161017  CASE 254715 Added Field Item Description
-    // NPR5.27/TS  /20161018  CASE 254659 Added Report Sending by Mail
-    // NPR5.27/MHA /20161025  CASE 255580 Update Action: Send Status Sms
-    // NPR5.29/TS  /20161212  CASE 260764 Updated Tab Name Invoive to Invoice To
-    // NPR5.30/BHR /20170203  CASE 262923 Add field "Bag No.", Add action PrintLabel,Add FactBox Notes
-    // NPR5.35/TJ  /20170823  CASE 286283 Renamed variables/function into english and into proper naming terminology
-    //                                    Removed unused variables
-    // NPR5.36/KENU/20170710  CASE 278925 Changed REPORT.RUN to use function RunReport from Codeunit "Report Printer Interface"
-    // NPR5.40/TS  /20180105  CASE 300893 Group Invoice to renamed to Invoiced To
-    // NPR5.40/TS  /20180308  CASE 307591 Removed Find Repair Card
-    // NPR5.40/TS  /20180315  CASE 307592 Split General Tab
-    // NPR5.52/ANPA/20190920  CASE 369594 Removed page actions input and delete from section pictures from actiongroup <Action6150715>
-    // NPR5.52/ANPA/20190920  CASE 369595 Removed Fax No. field
-
     UsageCategory = None;
     Caption = 'Customer Repair Card';
     PromotedActionCategories = 'New,Process,Reports,Pictures,Tasks';
@@ -55,14 +36,11 @@ page 6014503 "NPR Customer Repair Card"
 
                     trigger OnDrillDown()
                     begin
-                        // LS 13-05-10
-                        // Added to get customer ledger entries for the customer
                         if "Customer No." <> '' then begin
                             CustLedgerEntry.Reset;
                             CustLedgerEntry.SetRange(CustLedgerEntry."Customer No.", "Customer No.");
                             PAGE.RunModal(PAGE::"Customer Ledger Entries", CustLedgerEntry)
                         end;
-                        // END of LS 13-05-10
                     end;
                 }
                 field(Name; Name)
@@ -207,18 +185,6 @@ page 6014503 "NPR Customer Repair Card"
                         ApplicationArea = All;
                         ShowMandatory = true;
                         ToolTip = 'Specifies the value of the Item No. field';
-
-                        trigger OnValidate()
-                        begin
-                            //-NPR5.27
-                            // LS 18/05/10 - CASE 88117
-                            //IF "Item No."<> '' THEN
-                            //  IF ItemRec.GET("Item No.") THEN
-                            //   ItemDesc:=ItemRec.Description;
-
-                            // END of LS 18/05/10 - CASE 88117
-                            //+NPR5.27
-                        end;
                     }
                     field("Item Description"; "Item Description")
                     {
@@ -243,9 +209,7 @@ page 6014503 "NPR Customer Repair Card"
 
                         trigger OnValidate()
                         begin
-                            //-NPR5.27
                             WarantyTextEnabled := Worranty;
-                            //+NPR5.27
                         end;
                     }
                     field("Warranty Text"; "Warranty Text")
@@ -515,7 +479,6 @@ page 6014503 "NPR Customer Repair Card"
                         RecRef: RecordRef;
                         RecID: RecordID;
                     begin
-                        //-NPR5.30 [262923]
                         ReportSelectionContract.SetRange("Report Type", ReportSelectionContract."Report Type"::"Repair Label");
                         if ReportSelectionContract.FindFirst then begin
                             RecRef.Open(DATABASE::"NPR Customer Repair");
@@ -525,7 +488,6 @@ page 6014503 "NPR Customer Repair Card"
                             if ReportSelectionContract."Codeunit ID" = CODEUNIT::"NPR RP Matrix Print Mgt." then
                                 MatrixPrintMgt.ProcessTemplate(ReportSelectionContract."Print Template", RecRef);
                         end;
-                        //+NPR5.30 [262923]
                     end;
                 }
                 action("&Repair Offer")
@@ -544,28 +506,16 @@ page 6014503 "NPR Customer Repair Card"
                     begin
                         CustomerRepairGlobal := Rec;
                         CustomerRepairGlobal.SetRecFilter;
-                        //-NPR5.25
-                        //REPORT.RUN(REPORT::"Repair Offer",TRUE,FALSE,rep);
-                        //+NPR5.25
 
                         ReportSelectionContract.SetRange("Report Type", ReportSelectionContract."Report Type"::"Repair offer");
                         ReportSelectionContract.SetFilter("Report ID", '<> 0');
-                        //-NPR5.25
-                        //ReportSelectionPhoto.SETRANGE("Register No.","Register No.");
                         ReportSelectionContract.SetRange("Register No.", Register);
-                        //+NPR5.25
                         if not ReportSelectionContract.Find('-') then
                             ReportSelectionContract.SetRange("Register No.", '');
 
-                        //-NPR5.25
-                        //IF ReportSelectionPhoto.FIND('-') THEN BEGIN
                         if ReportSelectionContract.FindSet then begin
-                            //+NPR5.25
                             repeat
-                                //-NPR5.36
-                                //REPORT.RUNMODAL(ReportSelectionPhoto."Report ID",TRUE,FALSE,rep);
                                 ReportPrinterInterface.RunReport(ReportSelectionContract."Report ID", true, false, CustomerRepairGlobal);
-                            //+NPR5.36
                             until ReportSelectionContract.Next = 0;
                         end else begin
                             Error(ErrNoReportFound,
@@ -590,27 +540,16 @@ page 6014503 "NPR Customer Repair Card"
                     begin
                         CustomerRepairGlobal := Rec;
                         CustomerRepairGlobal.SetRecFilter;
-                        //-NPR5.25
-                        //REPORT.RUN(REPORT::"Repair Done",TRUE,FALSE,rep);
-                        //+NPR5.25
                         ReportSelectionContract.SetRange("Report Type", ReportSelectionContract."Report Type"::"Repair finished");
                         ReportSelectionContract.SetFilter("Report ID", '<> 0');
-                        //-NPR5.25
-                        //ReportSelectionPhoto.SETRANGE("Register No.","Register No.");
                         ReportSelectionContract.SetRange("Register No.", Register);
-                        //+NPR5.25
 
                         if not ReportSelectionContract.Find('-') then
                             ReportSelectionContract.SetRange("Register No.", '');
-                        //-NPR5.25
-                        //IF ReportSelectionPhoto.FIND('-') THEN BEGIN
+
                         if ReportSelectionContract.FindSet then begin
-                            //+NPR5.25
                             repeat
-                                //-NPR5.36
-                                //REPORT.RUNMODAL(ReportSelectionPhoto."Report ID",TRUE,FALSE,rep);
                                 ReportPrinterInterface.RunReport(ReportSelectionContract."Report ID", true, false, CustomerRepairGlobal);
-                            //+NPR5.36
                             until ReportSelectionContract.Next = 0;
                         end else begin
                             Error(ErrNoReportFound,
@@ -635,27 +574,16 @@ page 6014503 "NPR Customer Repair Card"
                     begin
                         CustomerRepairGlobal := Rec;
                         CustomerRepairGlobal.SetRecFilter;
-                        //-NPR5.25
-                        //REPORT.RUN(REPORT::"Repair Warranty",TRUE,FALSE,rep);
-                        //+NPR5.25
                         ReportSelectionContract.SetRange("Report Type", ReportSelectionContract."Report Type"::"Repair warranty");
                         ReportSelectionContract.SetFilter("Report ID", '<> 0');
-                        //-NPR5.25
-                        //ReportSelectionPhoto.SETRANGE("Register No.","Register No.");
                         ReportSelectionContract.SetRange("Register No.", Register);
-                        //+NPR5.25
 
                         if not ReportSelectionContract.Find('-') then
                             ReportSelectionContract.SetRange("Register No.", '');
-                        //-NPR5.25
-                        //IF ReportSelectionPhoto.FIND('-') THEN BEGIN
+
                         if ReportSelectionContract.FindSet then begin
-                            //+NPR5.25
                             repeat
-                                //-NPR5.36
-                                //REPORT.RUNMODAL(ReportSelectionPhoto."Report ID",TRUE,FALSE,rep);
                                 ReportPrinterInterface.RunReport(ReportSelectionContract."Report ID", true, false, CustomerRepairGlobal);
-                            //+NPR5.36
                             until ReportSelectionContract.Next = 0;
                         end else begin
                             Error(ErrNoReportFound,
@@ -680,26 +608,15 @@ page 6014503 "NPR Customer Repair Card"
                     begin
                         CustomerRepairGlobal := Rec;
                         CustomerRepairGlobal.SetRecFilter;
-                        //-NPR5.25
-                        //REPORT.RUN(REPORT::"Repair Receipt",TRUE,FALSE,rep);
-                        //+NPR5.25
                         ReportSelectionContract.SetRange("Report Type", ReportSelectionContract."Report Type"::"Customer receipt");
                         ReportSelectionContract.SetFilter("Report ID", '<> 0');
-                        //-NPR5.25
-                        //ReportSelectionPhoto.SETRANGE("Register No.","Register No.");
                         ReportSelectionContract.SetRange("Register No.", Register);
-                        //+NPR5.25
                         if not ReportSelectionContract.Find('-') then
                             ReportSelectionContract.SetRange("Register No.", '');
-                        //-NPR5.25
-                        //IF ReportSelectionPhoto.FIND('-') THEN BEGIN
+
                         if ReportSelectionContract.FindSet then begin
-                            //+NPR5.25
                             repeat
-                                //-NPR5.36
-                                //REPORT.RUNMODAL(ReportSelectionPhoto."Report ID",TRUE,FALSE,rep);
                                 ReportPrinterInterface.RunReport(ReportSelectionContract."Report ID", false, false, CustomerRepairGlobal);
-                            //+NPR5.36
                             until ReportSelectionContract.Next = 0;
                         end else begin
                             Error(ErrNoReportFound,
@@ -724,25 +641,14 @@ page 6014503 "NPR Customer Repair Card"
                     begin
                         CustomerRepairGlobal := Rec;
                         CustomerRepairGlobal.SetRecFilter;
-                        //-NPR5.25
-                        //REPORT.RUN(REPORT::"Delivery Note for Repair",TRUE,FALSE,rep);
-                        //+NPR5.25
                         ReportSelectionContract.SetRange("Report Type", ReportSelectionContract."Report Type"::"Shipment note");
                         ReportSelectionContract.SetFilter("Report ID", '<> 0');
-                        //ReportSelectionPhoto.SETRANGE("Register No.","Register No.");
                         ReportSelectionContract.SetRange("Register No.", Register);
-                        //+NPR5.25
                         if not ReportSelectionContract.Find('-') then
                             ReportSelectionContract.SetRange("Register No.", '');
-                        //-NPR5.25
-                        //IF ReportSelectionPhoto.FIND('-') THEN BEGIN
                         if ReportSelectionContract.FindSet then begin
-                            //+NPR5.25
                             repeat
-                                //-NPR5.36
-                                //REPORT.RUNMODAL(ReportSelectionPhoto."Report ID",TRUE,FALSE,rep);
                                 ReportPrinterInterface.RunReport(ReportSelectionContract."Report ID", false, false, CustomerRepairGlobal);
-                            //+NPR5.36
                             until ReportSelectionContract.Next = 0;
                         end else begin
                             Error(ErrNoReportFound,
@@ -773,24 +679,14 @@ page 6014503 "NPR Customer Repair Card"
                         var
                             RecRef: RecordRef;
                         begin
-                            //-NPR5.25
-                            //TextName:="Picture Documentation1".IMPORT(Text10600000,TRUE);
-                            //+NPR5.25
                             ImageFound := "Picture Documentation1".HasValue;
                             Clear(TempBlob);
-                            //-NPR5.26
-                            //Name := FileManagement.BLOBImport(TempBlob,TextName);
                             "Picture Path 1" := FileManagement.BLOBImport(TempBlob, TextName);
-                            //+NPR5.26
                             RecRef.GetTable(Rec);
                             TempBlob.ToRecordRef(RecRef, FieldNo("Picture Documentation1"));
                             RecRef.SetTable(Rec);
-                            //-NPR5.26
-                            //IF Name= '' THEN
-                            //  EXIT;
                             if "Picture Path 1" = '' then
                                 exit;
-                            //+NPR5.26
                             if ImageFound then
                                 if not Confirm(Text10600001, false) then
                                     exit;
@@ -812,12 +708,6 @@ page 6014503 "NPR Customer Repair Card"
                             CustomerRepair: Record "NPR Customer Repair";
                         begin
                             Clear(TempBlob);
-                            //-NPR5.26
-                            //CALCFIELDS("Picture Documentation1");
-
-                            //TempBlob.Blob := "Picture Documentation1";
-                            //IF "Picture Documentation1".HASVALUE THEN
-                            //   Name := FileManagement.BLOBExport(TempBlob,TextName,TRUE);
                             CustomerRepair.SetRange("No.", "No.");
                             if CustomerRepair.FindFirst then begin
                                 CustomerRepair.CalcFields("Picture Documentation1");
@@ -825,7 +715,6 @@ page 6014503 "NPR Customer Repair Card"
                                 if CustomerRepair."Picture Documentation1".HasValue then
                                     FileManagement.BLOBExport(TempBlob, CustomerRepair."Picture Path 1", true);
                             end;
-                            //+NPR5.26
                         end;
                     }
                     action("&Delete")
@@ -867,12 +756,6 @@ page 6014503 "NPR Customer Repair Card"
                             CustomerRepair: Record "NPR Customer Repair";
                         begin
                             Clear(TempBlob);
-                            //-NPR5.26
-                            //CALCFIELDS("Picture Documentation1");
-
-                            //TempBlob.Blob := "Picture Documentation2";
-                            //IF "Picture Documentation2".HASVALUE THEN
-                            //   Name := FileManagement.BLOBExport(TempBlob,TextName,TRUE);
                             CustomerRepair.SetRange("No.", "No.");
                             if CustomerRepair.FindFirst then begin
                                 CustomerRepair.CalcFields("Picture Documentation2");
@@ -880,7 +763,6 @@ page 6014503 "NPR Customer Repair Card"
                                 if CustomerRepair."Picture Documentation2".HasValue then
                                     FileManagement.BLOBExport(TempBlob, CustomerRepair."Picture Path 2", true);
                             end;
-                            //+NPR5.26
                         end;
                     }
                 }
@@ -923,10 +805,8 @@ page 6014503 "NPR Customer Repair Card"
 
                     trigger OnAction()
                     begin
-                        //-NPR70.00.00.02
                         if Confirm(Text10600004, true) then
                             PostItemPart(Rec);
-                        //+NPR70.00.00.02
                     end;
                 }
                 action("Post Items")
@@ -940,9 +820,7 @@ page 6014503 "NPR Customer Repair Card"
 
                     trigger OnAction()
                     begin
-                        //-NPR5.26
                         PostItemPartWithoutFinalize(Rec);
-                        //+NPR5.26
                     end;
                 }
                 action("Finalize Repair and Print")
@@ -957,14 +835,12 @@ page 6014503 "NPR Customer Repair Card"
 
                     trigger OnAction()
                     begin
-                        //-NPR70.00.00.02
                         if Confirm(Text10600005, true) then begin
                             PostItemPart(Rec);
                             SetRecFilter;
                             if xRec.Finalized = false then
                                 REPORT.RunModal(6014502, false, true, Rec);
                         end;
-                        //+NPR70.00.00.02
                     end;
                 }
                 action("Send Status Sms")
@@ -981,10 +857,7 @@ page 6014503 "NPR Customer Repair Card"
                     var
                         RetailContractMgt: Codeunit "NPR Retail Contract Mgt.";
                     begin
-                        //-NPR5.27
-                        //SendStatusSMS;
                         RetailContractMgt.SendStatusSms(Rec);
-                        //+NPR5.27
                     end;
                 }
                 action("Send Custom Sms")
@@ -1041,7 +914,6 @@ page 6014503 "NPR Customer Repair Card"
                         CustomerRepair: Record "NPR Customer Repair";
                         ReportSelectionContract: Record "NPR Report Selection: Contract";
                     begin
-                        //-NPR5.27
                         CustomerRepair := Rec;
                         CustomerRepair.SetRecFilter;
 
@@ -1058,7 +930,6 @@ page 6014503 "NPR Customer Repair Card"
                                   ReportSelectionContract.TableCaption);
                         end;
                         Message(EmailSent);
-                        //+NPR5.27
                     end;
                 }
                 action("Email Repair Done")
@@ -1073,7 +944,6 @@ page 6014503 "NPR Customer Repair Card"
                         CustomerRepair: Record "NPR Customer Repair";
                         ReportSelectionContract: Record "NPR Report Selection: Contract";
                     begin
-                        //-NPR5.27
                         CustomerRepair := Rec;
                         CustomerRepair.SetRecFilter;
 
@@ -1090,7 +960,6 @@ page 6014503 "NPR Customer Repair Card"
                                   ReportSelectionContract.TableCaption);
                         end;
                         Message(EmailSent);
-                        //+NPR5.27
                     end;
                 }
                 action("Email Repair Guarantee")
@@ -1105,7 +974,6 @@ page 6014503 "NPR Customer Repair Card"
                         CustomerRepair: Record "NPR Customer Repair";
                         ReportSelectionContract: Record "NPR Report Selection: Contract";
                     begin
-                        //-NPR5.27
                         CustomerRepair := Rec;
                         CustomerRepair.SetRecFilter;
 
@@ -1122,7 +990,6 @@ page 6014503 "NPR Customer Repair Card"
                                   ReportSelectionContract.TableCaption);
                         end;
                         Message(EmailSent);
-                        //+NPR5.27
                     end;
                 }
                 action("Email Customer Note")
@@ -1179,51 +1046,29 @@ page 6014503 "NPR Customer Repair Card"
     trigger OnAfterGetRecord()
     begin
         SetOwnRepair;
-        //-NPR5.40
-        //IF xRec."No." <> "No." THEN
-        //  SearchNoEnabled := TRUE;
-        //+NPR5.40
         if Worranty = true then
             WarantyTextEnabled := true
         else begin
             WarantyTextEnabled := false;
             "Warranty Text" := '';
         end;
-
-        //-NPR5.27
-        // LS 18/05/10 - CASE 88117
-
-        //IF "Item No."<> '' THEN BEGIN
-        //  ItemRec.RESET;
-        //  IF ItemRec.GET("Item No.") THEN
-        //    ItemDesc := ItemRec.Description;
-        //END;
-        // END of LS 18/05/10 - CASE 88117
-        //+NPR5.27
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        //-NPR5.27
         SetOwnRepair;
-        //+NPR5.27
-        RetailSetup.Get;
-        Validate("Customer Type", RetailSetup."Rep. Cust. Default");
+        CustomerRepairSetup.Get;
+        Validate("Customer Type", CustomerRepairSetup."Rep. Cust. Default");
     end;
 
     trigger OnOpenPage()
     begin
-        //-NPR5.40
-        //SearchNoEnabled := TRUE;
-        //+NPR5.40
-        //-NPR70.00.00.02
         Show := true;
         CurrPage.CustomerRepairJournal.PAGE.ShowField(Show);
-        //+NPR70.00.00.02
     end;
 
     var
-        RetailSetup: Record "NPR Retail Setup";
+        CustomerRepairSetup: Record "NPR Customer Repair Setup";
         CustomerRepairGlobal: Record "NPR Customer Repair";
         ImageFound: Boolean;
         CustLedgerEntry: Record "Cust. Ledger Entry";
@@ -1255,16 +1100,6 @@ page 6014503 "NPR Customer Repair Card"
 
     procedure SetOwnRepair()
     begin
-        //-NPR5.25
-        /*
-        CurrForm."Repairer No.".ENABLED( NOT "In-house Repairer" );
-        CurrForm."Repairer Name".ENABLED( NOT "In-house Repairer" );
-        CurrForm."Repairer Address".ENABLED( NOT "In-house Repairer" );
-        CurrForm."Repairer Address2".ENABLED( NOT "In-house Repairer" );
-        CurrForm."Repairer Post Code".ENABLED( NOT "In-house Repairer" );
-        CurrForm."Repairer City".ENABLED( NOT "In-house Repairer" );
-         */
-        //+NPR5.25
         RepairedNoEnabled := not "In-house Repairer";
         RepairNameEnabled := not "In-house Repairer";
         RepairAddressEnabled := not "In-house Repairer";
@@ -1279,10 +1114,8 @@ page 6014503 "NPR Customer Repair Card"
         Recref: RecordRef;
         EmailMgt: Codeunit "NPR E-mail Management";
     begin
-        //-NPR5.27
         Recref.GetTable(CustomerRep);
         EmailMgt.SendReport(ReportNo, Recref, CustomerRep."E-mail", true);
-        //+NPR5.27
     end;
 }
 

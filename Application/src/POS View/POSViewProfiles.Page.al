@@ -58,6 +58,11 @@ page 6150635 "NPR POS View Profiles"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the After End-of-Sale View field';
                 }
+                field("POS - Show discount fields"; "POS - Show discount fields")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Show Discount field';
+                }
             }
         }
     }

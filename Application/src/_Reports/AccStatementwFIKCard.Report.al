@@ -743,6 +743,12 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Log Interaction field';
                     }
+                    field(FIKNo; FIKNo)
+                    {
+                        Caption = 'FIK No.';
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the FIK No. field';
+                    }
                 }
                 group("Output Options")
                 {
@@ -831,7 +837,6 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
         Cust2: Record Customer;
         DtldCustLedgEntries2: Record "Detailed Cust. Ledg. Entry";
         GLSetup: Record "General Ledger Setup";
-        RetailSetup: Record "NPR Retail Setup";
         FormatAddr: Codeunit "Format Address";
         Language: Codeunit Language;
         SegManagement: Codeunit SegManagement;
@@ -853,6 +858,7 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
         ShowPrintRemaining: Boolean;
         AgingBandCurrencyCode: Code[10];
         CurrencyCode3: Code[10];
+        FIKNo: Code[10];
         AgingBandEndingDate: Date;
         AgingDate: array[5] of Date;
         "Due Date": Date;
@@ -1035,11 +1041,11 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
         if DelChr(Format(Cust."No."), '=', NumbersLbl) <> '' then
             exit;
 
-        if not RetailSetup.Get then
+        if FIKNo = '' then
             exit;
 
         IK_Card_Type := '71';
-        Giro_No := RetailSetup."FIK No.";
+        Giro_No := FIKNo;
 
         Payment_ID := PadStr('', StringLen - 2 - StrLen(Cust."No."), '0') + Cust."No." + '1';
         Payment_ID := Payment_ID + Modulus10(Payment_ID);

@@ -81,7 +81,6 @@ table 6014405 "NPR Sale POS"
                 xSaleLinePOS: Record "NPR Sale Line POS";
                 POSSaleLine: Codeunit "NPR POS Sale Line";
             begin
-                RetailSetup.Get();
                 Register.Get("Register No.");
                 GetPOSUnit;
                 "POS Store Code" := POSUnit."POS Store Code";
@@ -148,10 +147,7 @@ table 6014405 "NPR Sale POS"
                     Validate("Country Code", '');
                 end;
 
-                if Cust."No." <> '' then
-                    "Prices Including VAT" := Cust."Prices Including VAT"
-                else
-                    "Prices Including VAT" := RetailSetup."Prices incl. VAT";
+                "Prices Including VAT" := true;
 
                 if not Modify then;
 
@@ -705,8 +701,6 @@ table 6014405 "NPR Sale POS"
     var
         SaleLinePOS: Record "NPR Sale Line POS";
     begin
-        RetailSetup.Get;
-
         SaleLinePOS.SetRange("Register No.", "Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
         SaleLinePOS.DeleteAll(true);
@@ -716,7 +710,6 @@ table 6014405 "NPR Sale POS"
     var
         POSPricingProfile: Record "NPR POS Pricing Profile";
     begin
-        RetailSetup.Get();
         GetPOSStore();
         GetPOSUnit();
 
@@ -734,9 +727,6 @@ table 6014405 "NPR Sale POS"
     end;
 
     var
-        Text1060002: Label 'You are not permitted to enter customers! Contact the system administrator.';
-        RetailSetup: Record "NPR Retail Setup";
-        SalesPerson: Record "Salesperson/Purchaser";
         DimMgt: Codeunit DimensionManagement;
         NPRDimMgt: Codeunit "NPR Dimension Mgt.";
         Register: Record "NPR Register";

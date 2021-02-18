@@ -79,6 +79,11 @@ table 6150651 "NPR POS View Profile"
             OptionCaption = 'Initial Sales View,Login View';
             OptionMembers = INITIAL_SALE_VIEW,LOGIN_VIEW;
         }
+        field(6232; "POS - Show discount fields"; Boolean)
+        {
+            Caption = 'Show Discount';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

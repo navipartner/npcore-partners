@@ -387,19 +387,17 @@ codeunit 6059972 "NPR Variety Clone Data"
 
     procedure GetNextVariantCode(ItemNo: Code[20]; Variant1Code: Code[20]; Variant2Code: Code[20]; Variant3Code: Code[20]; Variant4Code: Code[20]) NewVariantCode: Code[20]
     var
-        RetailSetup: Record "NPR Retail Setup";
+        VarietySetup: Record "NPR Variety Setup";
         NoSeriesMgt: Codeunit NoSeriesManagement;
     begin
-        //-NPR5.43 [317108]
         GetNewVariantCode(ItemNo, Variant1Code, Variant2Code, Variant3Code, Variant4Code, NewVariantCode);
         if NewVariantCode <> '' then
             exit(NewVariantCode);
-        //+NPR5.43 [317108]
-        RetailSetup.Get;
-        //-VRT1.10
-        RetailSetup.TestField("Variant No. Series");
-        //+VRT1.10
-        exit(NoSeriesMgt.GetNextNo(RetailSetup."Variant No. Series", Today, true));
+
+        VarietySetup.Get();
+        VarietySetup.TestField("Variant No. Series");
+
+        exit(NoSeriesMgt.GetNextNo(VarietySetup."Variant No. Series", Today, true));
     end;
 
     procedure FillDescription(var ItemVariant: Record "Item Variant"; Item: Record Item)
@@ -745,64 +743,61 @@ codeunit 6059972 "NPR Variety Clone Data"
 
     procedure ShowEAN13BarcodeNoSetup()
     var
-        RetailSetup: Record "NPR Retail Setup";
+        RetailItemSetup: Record "NPR Retail Item Setup";
+        VarietySetup: Record "NPR Variety Setup";
         NoSeriesMgt: Codeunit NoSeriesManagement;
         ItemRef1: Record "Item Reference";
         ItemRef2: Record "Item Reference";
         Filler: array[3] of Text;
         NextNo: array[3] of Text;
     begin
-        //-VRT1.11
-        RetailSetup.Get;
-        if RetailSetup."EAN-Internal" <> 0 then begin
+        RetailItemSetup.Get;
+        VarietySetup.Get;
+        if VarietySetup."EAN-Internal" <> 0 then begin
             ItemRef1.SetCurrentKey("Reference Type", "Reference No.");
             ItemRef1.SetRange("Reference Type", ItemRef1."Reference Type"::"Bar Code");
-            ItemRef1.SetFilter("Reference No.", '%1', Format(RetailSetup."EAN-Internal") + '*');
+            ItemRef1.SetFilter("Reference No.", '%1', Format(VarietySetup."EAN-Internal") + '*');
             if ItemRef1.FindLast then;
-            NextNo[1] := NoSeriesMgt.TryGetNextNo(RetailSetup."Internal EAN No. Management", Today);
-            Filler[1] := PadStr('', 12 - StrLen(Format(RetailSetup."EAN-Internal")) - StrLen(NextNo[1]), '0')
+            NextNo[1] := NoSeriesMgt.TryGetNextNo(VarietySetup."Internal EAN No. Series", Today);
+            Filler[1] := PadStr('', 12 - StrLen(Format(VarietySetup."EAN-Internal")) - StrLen(NextNo[1]), '0')
         end;
-        if RetailSetup."EAN-External" <> 0 then begin
+        if VarietySetup."EAN-External" <> 0 then begin
             ItemRef2.SetCurrentKey("Reference Type", "Reference No.");
             ItemRef2.SetRange("Reference Type", ItemRef2."Reference Type"::"Bar Code");
-            ItemRef2.SetFilter("Reference No.", '%1', Format(RetailSetup."EAN-External") + '*');
+            ItemRef2.SetFilter("Reference No.", '%1', Format(VarietySetup."EAN-External") + '*');
             if ItemRef2.FindLast then;
-            NextNo[2] := NoSeriesMgt.TryGetNextNo(RetailSetup."External EAN-No. Management", Today);
-            Filler[2] := PadStr('', 12 - StrLen(Format(RetailSetup."EAN-External")) - StrLen(NextNo[2]), '0')
+            NextNo[2] := NoSeriesMgt.TryGetNextNo(VarietySetup."External EAN No. Series", Today);
+            Filler[2] := PadStr('', 12 - StrLen(Format(VarietySetup."EAN-External")) - StrLen(NextNo[2]), '0')
         end;
 
-        Message(RetailSetup.FieldCaption("EAN-Internal") + '\' +
-                '   ' + RetailSetup.FieldCaption("Internal EAN No. Management") + ' : ' + RetailSetup."Internal EAN No. Management" + '\' +
-                '   ' + RetailSetup.FieldCaption("EAN-Internal") + ' : ' + Format(RetailSetup."EAN-Internal") + '\' +
-                '   ' + Format(RetailSetup."EAN-Internal") + '-' + Filler[1] + '-' + NextNo[1] + '-x\' +
+        Message(VarietySetup.FieldCaption("EAN-Internal") + '\' +
+                '   ' + VarietySetup.FieldCaption("Internal EAN No. Series") + ' : ' + VarietySetup."Internal EAN No. Series" + '\' +
+                '   ' + VarietySetup.FieldCaption("EAN-Internal") + ' : ' + Format(VarietySetup."EAN-Internal") + '\' +
+                '   ' + Format(VarietySetup."EAN-Internal") + '-' + Filler[1] + '-' + NextNo[1] + '-x\' +
                 '    Last Item reference found: ' + ItemRef1."Reference No." + '\' +
-                RetailSetup.FieldCaption("EAN-External") + '\' +
-                '   ' + RetailSetup.FieldCaption("External EAN-No. Management") + ' : ' + RetailSetup."External EAN-No. Management" + '\' +
-                '   ' + RetailSetup.FieldCaption("EAN-External") + ' : ' + Format(RetailSetup."EAN-External") + '\' +
-                '   ' + Format(RetailSetup."EAN-External") + '-' + Filler[2] + '-' + NextNo[2] + '-x\' +
+                VarietySetup.FieldCaption("EAN-External") + '\' +
+                '   ' + VarietySetup.FieldCaption("External EAN No. Series") + ' : ' + VarietySetup."External EAN No. Series" + '\' +
+                '   ' + VarietySetup.FieldCaption("EAN-External") + ' : ' + Format(VarietySetup."EAN-External") + '\' +
+                '   ' + Format(VarietySetup."EAN-External") + '-' + Filler[2] + '-' + NextNo[2] + '-x\' +
                 '    Last Item reference found: ' + ItemRef2."Reference No." + '\' +
                 'Retail Setup Enabled Fields:\' +
-                '   ' + RetailSetup.FieldCaption("ISBN Bookland EAN") + ' : ' + Format(RetailSetup."ISBN Bookland EAN") + '\' +
-                '   ' + RetailSetup.FieldCaption("Autocreate EAN-Number") + ' : ' + Format(RetailSetup."Autocreate EAN-Number") + '\' +
-                '   ' + RetailSetup.FieldCaption("EAN No. at 1 star") + ' : ' + Format(RetailSetup."EAN No. at 1 star") + '\' +
-                '   ' + RetailSetup.FieldCaption("EAN-No. at Item Create") + ' : ' + Format(RetailSetup."EAN-No. at Item Create") + '\'
+                '   ' + RetailItemSetup.FieldCaption("Autocreate EAN-Number") + ' : ' + Format(RetailItemSetup."Autocreate EAN-Number") + '\' +
+                '   ' + RetailItemSetup.FieldCaption("EAN No. at 1 star") + ' : ' + Format(RetailItemSetup."EAN No. at 1 star") + '\' +
+                '   ' + RetailItemSetup.FieldCaption("EAN-No. at Item Create") + ' : ' + Format(RetailItemSetup."EAN-No. at Item Create") + '\'
         );
         //+VRT1.11
     end;
 
     procedure DisableOldBarcodeSetup()
     var
-        RetailSetup: Record "NPR Retail Setup";
+        RetailItemSetup: Record "NPR Retail Item Setup";
     begin
-        //-VRT1.11
-        RetailSetup.Get;
-        RetailSetup."ISBN Bookland EAN" := false;
-        RetailSetup."Autocreate EAN-Number" := false;
-        RetailSetup."EAN No. at 1 star" := false;
-        RetailSetup."EAN-No. at Item Create" := false;
+        RetailItemSetup.Get;
+        RetailItemSetup."Autocreate EAN-Number" := false;
+        RetailItemSetup."EAN No. at 1 star" := false;
+        RetailItemSetup."EAN-No. at Item Create" := false;
 
-        RetailSetup.Modify;
-        //+VRT1.11
+        RetailItemSetup.Modify;
     end;
 
     procedure AssignBarcodes(Item: Record Item)
@@ -1056,19 +1051,15 @@ codeunit 6059972 "NPR Variety Clone Data"
     [EventSubscriber(ObjectType::Codeunit, 6059972, 'GetNewVariantCode', '', true, true)]
     local procedure CreateVariantCodeFromNoSeries(ItemNo: Code[20]; Variant1Code: Code[20]; Variant2Code: Code[20]; Variant3Code: Code[20]; Variant4Code: Code[20]; var NewVariantCode: Code[10])
     var
-        RetailSetup: Record "NPR Retail Setup";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
         VarietySetup: Record "NPR Variety Setup";
+        NoSeriesMgt: Codeunit NoSeriesManagement;
     begin
-        //-NPR5.43 [317108]
-        VarietySetup.Get;
+        VarietySetup.Get();
         if not (VarietySetup."Create Variant Code From" in ['', 'CreateVariantCodeFromNoSeries']) then
             exit;
 
-        RetailSetup.Get;
-        RetailSetup.TestField("Variant No. Series");
-        NewVariantCode := NoSeriesMgt.GetNextNo(RetailSetup."Variant No. Series", Today, true);
-        //+NPR5.43 [317108]
+        VarietySetup.TestField("Variant No. Series");
+        NewVariantCode := NoSeriesMgt.GetNextNo(VarietySetup."Variant No. Series", Today, true);
     end;
 
     local procedure GetUnitOfMeasure(ItemNo: Code[20]; ReturnType: Integer): Code[10]

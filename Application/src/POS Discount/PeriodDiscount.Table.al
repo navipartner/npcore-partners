@@ -333,7 +333,6 @@ table 6014413 "NPR Period Discount"
         CommentLine: Record "Comment Line";
         RetailComment: Record "NPR Retail Comment";
     begin
-        RetailSetup.Get;
         PeriodDiscountLine.SetRange(Code, Code);
         PeriodDiscountLine.DeleteAll(true);
 
@@ -354,18 +353,13 @@ table 6014413 "NPR Period Discount"
     begin
         "Created Date" := Today;
 
-        if Code = '' then begin
-            RetailSetup.Get;
-            RetailSetup.TestField("Period Discount Management");
-            NoSeriesMgt.InitSeries(RetailSetup."Period Discount Management", xRec."No. Series", 0D, Code, "No. Series");
-        end;
+        if Code = '' then
+            NoSeriesMgt.InitSeries(GetNoSeries(), xRec."No. Series", 0D, Code, "No. Series");
 
         Date.SetRange("Period Type", Date."Period Type"::Date);
         "Starting Date" := Today;
         if Date.Find('+') then
             "Ending Date" := Date."Period Start";
-
-        RetailSetup.Get;
 
         DimMgt.UpdateDefaultDim(
           DATABASE::"NPR Period Discount", Code,
@@ -412,25 +406,25 @@ table 6014413 "NPR Period Discount"
         PeriodDiscountLine: Record "NPR Period Discount Line";
         PeriodDiscountLine2: Record "NPR Period Discount Line";
         MixedDiscount: Record "NPR Mixed Discount";
-        RetailSetup: Record "NPR Retail Setup";
         NoSeriesMgt: Codeunit NoSeriesManagement;
         PeriodDiscount: Record "NPR Period Discount";
         DimMgt: Codeunit DimensionManagement;
 
     procedure AssistEdit(PeriodDisc: Record "NPR Period Discount"): Boolean
     begin
-        with PeriodDiscount do begin
-            PeriodDiscount := Rec;
-            RetailSetup.Get;
-            RetailSetup.TestField("Period Discount Management");
-            if NoSeriesMgt.SelectSeries(RetailSetup."Period Discount Management", PeriodDisc."No. Series", "No. Series") then begin
-                RetailSetup.Get;
-                RetailSetup.TestField("Period Discount Management");
-                NoSeriesMgt.SetSeries(Code);
-                Rec := PeriodDiscount;
-                exit(true);
-            end;
+        PeriodDiscount := Rec;
+        if NoSeriesMgt.SelectSeries(GetNoSeries(), PeriodDisc."No. Series", PeriodDiscount."No. Series") then begin
+            NoSeriesMgt.SetSeries(PeriodDiscount.Code);
+            Rec := PeriodDiscount;
+            exit(true);
         end;
+    end;
+
+    local procedure GetNoSeries(): Code[10]
+    var
+        PeriodDiscountMgt: Codeunit "NPR Period Discount Management";
+    begin
+        exit(PeriodDiscountMgt.GetNoSeries());
     end;
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
