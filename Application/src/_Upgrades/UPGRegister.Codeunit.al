@@ -62,6 +62,7 @@ codeunit 6150925 "NPR UPG Register"
                 end;
                 POSPostingProfile."POS Posting Diff. Account" := Register."Difference Account";
                 POSPostingProfile."Posting Diff. Account (Neg.)" := Register."Difference Account - Neg.";
+                POSPostingProfile."POS Payment Bin" := POSUnit."Default POS Payment Bin";
                 POSPostingProfile.Modify();
             end;
         until Register.Next() = 0;

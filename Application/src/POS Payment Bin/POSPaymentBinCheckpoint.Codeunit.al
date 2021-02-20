@@ -186,6 +186,7 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
         FromPOSUnit: Record "NPR POS Unit";
         ToPOSPostingSetup: Record "NPR POS Posting Setup";
         FromPOSPostingSetup: Record "NPR POS Posting Setup";
+        POSPostingProfile: Record "NPR POS Posting Profile";
         POSPostEntries: Codeunit "NPR POS Post Entries";
         TargetPaymentbin: Code[10];
     begin
@@ -211,8 +212,10 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
                         POSPostEntries.GetPostingSetup(FromPOSUnit."POS Store Code", POSBinEntry."Payment Method Code", POSBinEntry."Payment Bin No.", FromPOSPostingSetup);
 
                         TargetPaymentbin := FromPOSPostingSetup."Close to POS Bin No.";
-                        if (TargetPaymentbin = '') then
-                            TargetPaymentbin := ToPOSUnit."Default POS Payment Bin";
+                        if (TargetPaymentbin = '') then begin
+                            ToPOSUnit.GetProfile(POSPostingProfile);
+                            TargetPaymentbin := POSPostingProfile."POS Payment Bin";
+                        end;
 
                         POSPostEntries.GetPostingSetup(ToPOSUnit."POS Store Code", POSBinEntry."Payment Method Code", TargetPaymentbin, ToPOSPostingSetup);
 
