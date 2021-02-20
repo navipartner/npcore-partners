@@ -32,7 +32,23 @@ page 6150648 "NPR POS Pricing Profiles"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer Price Group field';
                 }
-
+                field("Item Price Codeunit ID"; Rec."Item Price Codeunit ID")
+                {
+                    ApplicationArea = All;
+                    Visible = false;
+                    ToolTip = 'Specifies the value of the Item Price Codeunit ID field';
+                }
+                field("Item Price Codeunit Name"; Rec."Item Price Codeunit Name")
+                {
+                    ApplicationArea = All;
+                    Visible = false;
+                    ToolTip = 'Specifies the value of the Item Price Codeunit Name field';
+                }
+                field("Item Price Function"; Rec."Item Price Function")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Price Function field';
+                }
             }
         }
     }
