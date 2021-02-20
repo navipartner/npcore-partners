@@ -575,10 +575,13 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
     local procedure OpenDrawer(CashDrawerNo: Code[10]; POSUnit: Record "NPR POS Unit"; SalePOS: Record "NPR Sale POS")
     var
         POSPaymentBin: Record "NPR POS Payment Bin";
+        POSPostingProfile: Record "NPR POS Posting Profile";
         POSPaymentBinInvokeMgt: Codeunit "NPR POS Payment Bin Eject Mgt.";
     begin
-        if (CashDrawerNo = '') then
-            CashDrawerNo := POSUnit."Default POS Payment Bin";
+        if (CashDrawerNo = '') then begin
+            POSUnit.GetProfile(POSPostingProfile);
+            CashDrawerNo := POSPostingProfile."POS Payment Bin";
+        end;
 
         if not POSPaymentBin.Get(CashDrawerNo) then
             exit;

@@ -213,7 +213,6 @@ codeunit 6150629 "NPR POS Entry Management"
         if not POSPaymentBin.Get(POSUnitCode) then
             CreateBinCodeFromUnit(POSUnit, POSStore);
         POSUnit.Validate("POS Store Code", POSStore.Code);
-        POSUnit.Validate("Default POS Payment Bin", POSPaymentBin."No.");
         POSUnit.Insert(true);
     end;
 

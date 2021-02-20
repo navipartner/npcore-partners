@@ -105,6 +105,13 @@ table 6150653 "NPR POS Posting Profile"
             DataClassification = CustomerContent;
             TableRelation = "Source Code";
         }
+
+        field(140; "POS Payment Bin"; Code[10])
+        {
+            Caption = 'POS Payment Bin';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Payment Bin";
+        }
     }
 
     keys

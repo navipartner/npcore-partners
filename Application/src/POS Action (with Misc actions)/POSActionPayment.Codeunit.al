@@ -11,7 +11,6 @@ codeunit 6150725 "NPR POS Action: Payment"
         PaymentTypeNotFound: Label '%1 %2 for register %3 was not found.';
         TextAmountLabel: Label 'Enter Amount:';
         TextVoucherLabel: Label 'Enter Voucher Number:';
-        VoucherNotValid: Label 'Voucher %1 is not valid.';
         MissingImpl: Label 'Payment failed!\%1 = %2, %3 = %4 on %5 = %6 did not respond with being handled.\\Check the setup for %1 and %5.';
         NO_SALES_LINES: Label 'There are no sales lines in the POS. You must add at least one sales line before handling payment.';
 
@@ -22,7 +21,7 @@ codeunit 6150725 "NPR POS Action: Payment"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.4');
+        exit('1.5');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
@@ -77,6 +76,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         POSAuditProfile: Record "NPR POS Audit Profile";
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR Sale POS";
+        POSPostingProfile: Record "NPR POS Posting Profile";
     begin
 
         if not Action.IsThisAction(ActionCode()) then
@@ -85,11 +85,9 @@ codeunit 6150725 "NPR POS Action: Payment"
         POSSession.GetSetup(Setup);
         Setup.GetPOSUnit(POSUnit);
         Register.Get(Setup.Register());
-        //+NPR5.51 [359714]
 
-        //-NPR5.51 [359714]
-        POSUnit.TestField("Default POS Payment Bin");
-        //+NPR5.51 [359714]
+        POSUnit.GetProfile(POSPostingProfile);
+        POSPostingProfile.TestField("POS Payment Bin");
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);

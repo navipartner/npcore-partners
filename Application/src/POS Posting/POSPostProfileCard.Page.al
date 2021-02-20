@@ -13,45 +13,51 @@ page 6150639 "NPR POS Post. Profile Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Automatic Item Posting"; "Automatic Item Posting")
+                field("Automatic Item Posting"; Rec."Automatic Item Posting")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Automatic Item Posting field';
                 }
-                field("Automatic POS Posting"; "Automatic POS Posting")
+                field("Automatic POS Posting"; Rec."Automatic POS Posting")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Automatic POS Posting field';
                 }
-                field("Automatic Posting Method"; "Automatic Posting Method")
+                field("Automatic Posting Method"; Rec."Automatic Posting Method")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Automatic Posting Method field';
                 }
-                field("Source Code"; "Source Code")
+                field("Source Code"; Rec."Source Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Source Code field';
                 }
+                field("POS Payment Bin"; Rec."POS Payment Bin")
+                {
+                    ApplicationArea = All;
+                    ShowMandatory = true;
+                    ToolTip = 'Specifies the value of the POS Payment Bin field';
+                }
                 group("Posting Difference")
                 {
                     Caption = 'Posting Difference';
-                    field("Max. POS Posting Diff. (LCY)"; "Max. POS Posting Diff. (LCY)")
+                    field("Max. POS Posting Diff. (LCY)"; Rec."Max. POS Posting Diff. (LCY)")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Max. POS Posting Diff. (LCY) field';
                     }
-                    field("POS Posting Diff. Account"; "POS Posting Diff. Account")
+                    field("POS Posting Diff. Account"; Rec."POS Posting Diff. Account")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Differences Account field';
@@ -60,17 +66,17 @@ page 6150639 "NPR POS Post. Profile Card"
                 group(Rounding)
                 {
                     Caption = 'Rounding';
-                    field("POS Sales Rounding Account"; "POS Sales Rounding Account")
+                    field("POS Sales Rounding Account"; Rec."POS Sales Rounding Account")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the POS Sales Rounding Account field';
                     }
-                    field("POS Sales Amt. Rndng Precision"; "POS Sales Amt. Rndng Precision")
+                    field("POS Sales Amt. Rndng Precision"; Rec."POS Sales Amt. Rndng Precision")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the POS Sales Amt. Rndng Precision field';
                     }
-                    field("Rounding Type"; "Rounding Type")
+                    field("Rounding Type"; Rec."Rounding Type")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Rounding Type field';
@@ -80,7 +86,7 @@ page 6150639 "NPR POS Post. Profile Card"
             group(Numbering)
             {
                 Caption = 'Numbering';
-                field("Default POS Entry No. Series"; "Default POS Entry No. Series")
+                field("Default POS Entry No. Series"; Rec."Default POS Entry No. Series")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Default POS Entry No. Series field';
@@ -98,10 +104,6 @@ page 6150639 "NPR POS Post. Profile Card"
                 ApplicationArea = All;
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

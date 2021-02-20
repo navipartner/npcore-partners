@@ -1138,12 +1138,12 @@ codeunit 6150614 "NPR POS Create Entry"
     var
         POSUnit: Record "NPR POS Unit";
         POSUnittoBinRelation: Record "NPR POS Unit to Bin Relation";
+        POSPostingProfile: Record "NPR Pos Posting Profile";
     begin
-
         POSUnit.Get(UnitNo);
+        POSUnit.GetProfile(POSPostingProfile);
 
-        // TODO: Consider the UnitToBinRelation
-        exit(POSUnit."Default POS Payment Bin");
+        exit(POSPostingProfile."POS Payment Bin");
     end;
 
     local procedure IsCancelledSale(SalePOS: Record "NPR Sale POS"): Boolean

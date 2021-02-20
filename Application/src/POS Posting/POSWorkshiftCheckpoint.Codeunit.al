@@ -61,15 +61,17 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         UnittoBinRelation: Record "NPR POS Unit to Bin Relation";
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         POSUnit: Record "NPR POS Unit";
+        POSPostingProfile: Record "NPR POS Posting Profile";
         EntrySourceMethod: Option;
     begin
 
         POSWorkshiftCheckpoint.Get(CheckPointEntryNo);
 
         POSUnit.Get(POSWorkshiftCheckpoint."POS Unit No.");
+        POSUnit.GetProfile(POSPostingProfile);
 
-        if (POSUnit."Default POS Payment Bin" <> '') then
-            PaymentBinCheckpoint.CreatePosEntryBinCheckpoint(POSUnit."No.", POSUnit."Default POS Payment Bin", CheckPointEntryNo);
+        if (POSPostingProfile."POS Payment Bin" <> '') then
+            PaymentBinCheckpoint.CreatePosEntryBinCheckpoint(POSUnit."No.", POSPostingProfile."POS Payment Bin", CheckPointEntryNo);
 
         UnittoBinRelation.SetFilter("POS Unit No.", '=%1', POSWorkshiftCheckpoint."POS Unit No.");
         if (UnittoBinRelation.FindSet()) then begin
@@ -78,7 +80,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
 
             until (UnittoBinRelation.Next() = 0);
         end else begin
-            if (POSUnit."Default POS Payment Bin" = '') then
+            if (POSPostingProfile."POS Payment Bin" = '') then
                 Error(MissingBin, POSWorkshiftCheckpoint."POS Unit No.");
 
         end;
