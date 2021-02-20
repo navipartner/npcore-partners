@@ -2,7 +2,7 @@ page 6014541 "NPR Report Selection: Contract"
 {
     Caption = 'Report Type - Contract';
     DelayedInsert = true;
-    PageType = Card;
+    PageType = Worksheet;
     SourceTable = "NPR Report Selection: Contract";
     UsageCategory = Administration;
     ApplicationArea = All;
@@ -26,47 +26,47 @@ page 6014541 "NPR Report Selection: Contract"
             repeater(Control6150615)
             {
                 ShowCaption = false;
-                field(Sequence; Sequence)
+                field(Sequence; Rec.Sequence)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sequence field';
                 }
-                field("Report ID"; "Report ID")
+                field("Report ID"; Rec."Report ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Report ID field';
                 }
-                field("Register No."; "Register No.")
+                field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Cash Register No. field';
                 }
-                field("XML Port ID"; "XML Port ID")
+                field("XML Port ID"; Rec."XML Port ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the XML Port ID field';
                 }
-                field("XML Port Name"; "XML Port Name")
+                field("XML Port Name"; Rec."XML Port Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the XML Port Name field';
                 }
-                field("Report Name"; "Report Name")
+                field("Report Name"; Rec."Report Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Report Name field';
                 }
-                field("Codeunit ID"; "Codeunit ID")
+                field("Codeunit ID"; Rec."Codeunit ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Codeunit ID field';
                 }
-                field("Codeunit Name"; "Codeunit Name")
+                field("Codeunit Name"; Rec."Codeunit Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Codeunit Name field';
                 }
-                field("Print Template"; "Print Template")
+                field("Print Template"; Rec."Print Template")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Print Template field';
@@ -92,7 +92,7 @@ page 6014541 "NPR Report Selection: Contract"
 
     trigger OnOpenPage()
     begin
-        ReportType := "Report Type"::"Insurance Offer";
+        ReportType := Rec."Report Type"::"Insurance Offer";
         SetReportTypeFilter();
     end;
 
@@ -101,9 +101,9 @@ page 6014541 "NPR Report Selection: Contract"
 
     local procedure SetReportTypeFilter()
     begin
-        FilterGroup(2);
-        SetRange("Report Type", ReportType);
-        FilterGroup(0);
+        Rec.FilterGroup(2);
+        Rec.SetRange("Report Type", ReportType);
+        Rec.FilterGroup(0);
         CurrPage.Update(false);
     end;
 }

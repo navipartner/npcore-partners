@@ -1,10 +1,10 @@
 page 6150625 "NPR POS NPRE Restaur. Profiles"
 {
-    PageType = ListPlus;
+    PageType = List;
     UsageCategory = Administration;
     ApplicationArea = All;
     SourceTable = "NPR POS NPRE Rest. Profile";
-
+    Caption = 'POS Restaur. Profiles';
     layout
     {
         area(content)

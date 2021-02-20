@@ -1,6 +1,7 @@
 page 6150720 "NPR POS Stargate Pkg Creator"
 {
     UsageCategory = None;
+    PageType = Card;
     Caption = 'POS Stargate Package Creator';
     DataCaptionExpression = AssemblyName;
     DeleteAllowed = true;
@@ -53,17 +54,17 @@ page 6150720 "NPR POS Stargate Pkg Creator"
                     }
                 }
             }
-            repeater(Dependencies)
+            group(Dependencies)
             {
                 Caption = 'Dependencies';
                 Editable = false;
-                field("Assembly Name"; "Assembly Name")
+                field("Assembly Name"; Rec."Assembly Name")
                 {
                     ApplicationArea = All;
                     StyleExpr = Style;
                     ToolTip = 'Specifies the value of the Assembly Name field';
                 }
-                field(Path; Path)
+                field(Path; Rec.Path)
                 {
                     ApplicationArea = All;
                     AssistEdit = true;
@@ -76,7 +77,7 @@ page 6150720 "NPR POS Stargate Pkg Creator"
                         MapAssembly();
                     end;
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     StyleExpr = Style;
@@ -96,7 +97,7 @@ page 6150720 "NPR POS Stargate Pkg Creator"
                 Ellipsis = true;
                 Image = ViewDocumentLine;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -113,7 +114,7 @@ page 6150720 "NPR POS Stargate Pkg Creator"
                 Ellipsis = true;
                 Image = Add;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -130,7 +131,7 @@ page 6150720 "NPR POS Stargate Pkg Creator"
                 Ellipsis = true;
                 Image = NewItem;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -270,12 +271,12 @@ page 6150720 "NPR POS Stargate Pkg Creator"
             exit;
 
         Assembly := Assembly.ReflectionOnlyLoadFrom(FilePath);
-        if Assembly.FullName <> "Assembly Name" then
-            Error(Text002, "Assembly Name", Assembly.FullName);
+        if Assembly.FullName <> Rec."Assembly Name" then
+            Error(Text002, Rec."Assembly Name", Assembly.FullName);
 
         Detector := Detector.AssemblyDetector();
-        if not Detector.IsSameAssembly("Assembly Name", FilePath) then
-            Error(Text003, "Assembly Name");
+        if not Detector.IsSameAssembly(Rec."Assembly Name", FilePath) then
+            Error(Text003, Rec."Assembly Name");
 
         Rec.Path := FilePath;
         Rec.Status := Rec.Status::Mapped;

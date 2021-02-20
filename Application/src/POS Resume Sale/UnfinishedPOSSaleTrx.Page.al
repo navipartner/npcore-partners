@@ -1,8 +1,5 @@
 page 6150747 "NPR Unfinished POS Sale Trx"
 {
-    // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
-    // NPR5.55/ALPO/20200812 CASE 391678 Log sale canceling to POS Entry
-
     Caption = 'Unfinished POS Sale Transactions';
     DataCaptionExpression = '';
     Editable = false;
@@ -16,91 +13,91 @@ page 6150747 "NPR Unfinished POS Sale Trx"
     {
         area(content)
         {
-            repeater(Group)
+            group(General)
             {
-                field("Register No."; "Register No.")
+                field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Cash Register No. field';
                 }
-                field("Sales Ticket No."; "Sales Ticket No.")
+                field("Sales Ticket No."; Rec."Sales Ticket No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Ticket No. field';
                 }
-                field("Salesperson Code"; "Salesperson Code")
+                field("Salesperson Code"; Rec."Salesperson Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
-                field("Date"; Date)
+                field("Date"; Rec.Date)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Date field';
                 }
-                field("Start Time"; "Start Time")
+                field("Start Time"; Rec."Start Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Start Time field';
                 }
-                field("Customer No."; "Customer No.")
+                field("Customer No."; Rec."Customer No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer No. field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Customer Name"; "Customer Name")
+                field("Customer Name"; Rec."Customer Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer Name field';
                 }
-                field("Location Code"; "Location Code")
+                field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Location Code field';
                 }
-                field(Amount; Amount)
+                field(Amount; Rec.Amount)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount field';
                 }
-                field("Amount Including VAT"; "Amount Including VAT")
+                field("Amount Including VAT"; Rec."Amount Including VAT")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount Including VAT field';
                 }
-                field("Payment Amount"; "Payment Amount")
+                field("Payment Amount"; Rec."Payment Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Payment Amount field';
                 }
-                field("POS Sale ID"; "POS Sale ID")
+                field("POS Sale ID"; Rec."POS Sale ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Sale ID field';
                 }
-                field("Retail ID"; "Retail ID")
+                field("Retail ID"; Rec."Retail ID")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Retail ID field';
                 }
-                field("User ID"; "User ID")
+                field("User ID"; Rec."User ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the User ID field';
                 }
-                field("Host Name"; "Host Name")
+                field("Host Name"; Rec."Host Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Host Name field';
                 }
-                field("Device ID"; "Device ID")
+                field("Device ID"; Rec."Device ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Device ID field';
@@ -136,7 +133,7 @@ page 6150747 "NPR Unfinished POS Sale Trx"
                     Caption = 'Park Sale';
                     Image = TransferToGeneralJournal;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = false;
@@ -146,8 +143,7 @@ page 6150747 "NPR Unfinished POS Sale Trx"
                     trigger OnAction()
                     begin
                         Error('Not Supported');
-                        //POSResumeSale.DoSaveAsPOSQuote(Rec,FALSE);  //NPR5.55 [391678]-revoked
-                        POSResumeSale.DoSaveAsPOSQuote(POSSession, Rec, false, false);  //NPR5.55 [391678]
+                        POSResumeSale.DoSaveAsPOSQuote(POSSession, Rec, false, false);
                         CurrPage.Update(false);
                     end;
                 }
@@ -156,7 +152,7 @@ page 6150747 "NPR Unfinished POS Sale Trx"
                     Caption = 'Cancel Sale';
                     Image = CancelAllLines;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = false;
@@ -179,7 +175,7 @@ page 6150747 "NPR Unfinished POS Sale Trx"
                     Caption = 'All For Register';
                     Image = GetLines;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ToolTip = 'Show all unfinished sale transactions for current cash register';
@@ -190,10 +186,10 @@ page 6150747 "NPR Unfinished POS Sale Trx"
                         SalePOS: Record "NPR Sale POS";
                     begin
                         SalePOS.Copy(Rec);
-                        Reset;
+                        Rec.Reset;
                         SalePOS.CopyFilter("Register No.", "Register No.");
-                        Ascending(false);
-                        if FindFirst then;
+                        Rec.Ascending(false);
+                        if Rec.FindFirst then;
                     end;
                 }
             }
@@ -201,12 +197,8 @@ page 6150747 "NPR Unfinished POS Sale Trx"
     }
 
     var
-        LeaveAsIsAndNewText: Label 'The following unfinished sale transactions exist in the database. Selecting ''Cancel'' will start a new sale leaving unfinished sale transactions untouched.';
-        CancelAndNewText: Label 'The following unfinished sale transactions exist in the database. Note: Your settings do not allow you to postpone unfinished sale transaction resume process. You will have to walk though the list before starting a new sale.';
-        HitCancelToStartNewText: Label 'Hit ''Cancel'' to start a new sale';
         POSSession: Codeunit "NPR POS Session";
         POSResumeSale: Codeunit "NPR POS Resume Sale Mgt.";
-        AllowToPostpone: Boolean;
 
     procedure SetParameters(POSSessionIn: Codeunit "NPR POS Session")
     begin

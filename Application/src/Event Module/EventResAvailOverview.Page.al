@@ -1,14 +1,12 @@
 page 6059833 "NPR Event Res. Avail. Overview"
 {
-    // NPR5.55/TJ  /20200408 CASE 399255 New object
-
     Caption = 'Event Resource Avail. Overview';
     DataCaptionExpression = '';
     DeleteAllowed = false;
     InsertAllowed = false;
     LinksAllowed = false;
     ModifyAllowed = false;
-    PageType = ListPlus;
+    PageType = Worksheet;
     ShowFilter = false;
     SourceTable = "NPR Event Plan. Line Buffer";
     SourceTableTemporary = true;
@@ -63,7 +61,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
             {
                 Editable = false;
                 FreezeColumn = "Ending Time";
-                IndentationColumn = "Line No.";
+                IndentationColumn = Rec."Line No.";
                 IndentationControls = ResNoAndDesc;
                 ShowAsTree = true;
                 ShowCaption = false;
@@ -73,12 +71,12 @@ page 6059833 "NPR Event Res. Avail. Overview"
                     Caption = 'No.';
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field("Starting Time"; "Starting Time")
+                field("Starting Time"; Rec."Starting Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Starting Time field';
                 }
-                field("Ending Time"; "Ending Time")
+                field("Ending Time"; Rec."Ending Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ending Time field';
@@ -192,7 +190,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
                 Caption = 'Show';
                 Image = ShowMatrix;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -209,7 +207,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
                 Enabled = PreviousSetEnabled;
                 Image = PreviousSet;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -226,7 +224,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
                 Enabled = NextSetEnabled;
                 Image = NextSet;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -242,14 +240,13 @@ page 6059833 "NPR Event Res. Avail. Overview"
 
     trigger OnAfterGetRecord()
     begin
-        Resource.Get("No.");
-        ResNoAndDesc := "No." + ' ' + Resource.Name;
+        Resource.Get(Rec."No.");
+        ResNoAndDesc := Rec."No." + ' ' + Resource.Name;
         SetMatrixData();
         SetStyle();
     end;
 
     var
-        Job: Record Job;
         Resource: Record Resource;
         ResourceNoFilter: Text;
         StartingDate: Date;
@@ -291,7 +288,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
     begin
         CheckDate();
         CheckTime();
-        DeleteAll;
+        Rec.DeleteAll;
         if ResourceNoFilter <> '' then
             Resource.SetFilter("No.", ResourceNoFilter);
         if Resource.FindSet then
@@ -340,13 +337,13 @@ page 6059833 "NPR Event Res. Avail. Overview"
     begin
         Clear(MatrixDataHolder);
         for i := 1 to ArrayLen(DateColumnCaption) do begin
-            if ("Line No." = 0) or (DateArray[i] = 0D) then
+            if (Rec."Line No." = 0) or (DateArray[i] = 0D) then
                 MatrixDataHolder[i] := ''
             else begin
-                "Planning Date" := DateArray[i];
-                "Status Text" := '';
+                Rec."Planning Date" := DateArray[i];
+                Rec."Status Text" := '';
                 EventPlanLineGroupingMgt.CheckCapAndTimeAvailabilityOnDemand(Rec, false);
-                if "Status Text" = '' then
+                if Rec."Status Text" = '' then
                     MatrixDataHolder[i] := FreeText
                 else
                     MatrixDataHolder[i] := NotFreeText;
@@ -394,13 +391,13 @@ page 6059833 "NPR Event Res. Avail. Overview"
 
     local procedure InsertRec(Resource: Record Resource; LineNo: Integer; MainLineNo: Integer; FromTime: Time; ToTime: Time)
     begin
-        Init;
-        "No." := Resource."No.";
-        "Job Planning Line No." := LineNo;
-        "Line No." := MainLineNo;
-        "Starting Time" := FromTime;
-        "Ending Time" := ToTime;
-        Insert;
+        Rec.Init;
+        Rec."No." := Resource."No.";
+        Rec."Job Planning Line No." := LineNo;
+        Rec."Line No." := MainLineNo;
+        Rec."Starting Time" := FromTime;
+        Rec."Ending Time" := ToTime;
+        Rec.Insert;
     end;
 
     local procedure SetStyle()

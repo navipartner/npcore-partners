@@ -3,7 +3,7 @@ page 6151413 "NPR Magento Item Pict. List"
     Caption = 'Item Pictures';
     DeleteAllowed = false;
     InsertAllowed = false;
-    PageType = ListPlus;
+    PageType = List;
     UsageCategory = Administration;
     ApplicationArea = All;
     SourceTable = "Item Variant";
@@ -61,9 +61,6 @@ page 6151413 "NPR Magento Item Pict. List"
         }
     }
 
-    actions
-    {
-    }
 
     trigger OnAfterGetCurrRecord()
     begin
