@@ -186,51 +186,6 @@ page 6014653 "NPR POS Store List Step"
                         end;
                     end;
                 }
-                field("Gen. Bus. Posting Group"; "Gen. Bus. Posting Group")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Gen. Bus. Posting Group field';
-
-                    trigger OnLookup(var Text: Text): Boolean
-                    var
-                        GenBusPostGr: Record "Gen. Business Posting Group";
-                        GenBusPostingGroups: Page "Gen. Business Posting Groups";
-                    begin
-                        GenBusPostingGroups.LookupMode := true;
-
-                        if "Gen. Bus. Posting Group" <> '' then
-                            if GenBusPostGr.Get("Gen. Bus. Posting Group") then
-                                GenBusPostingGroups.SetRecord(GenBusPostGr);
-
-                        if GenBusPostingGroups.RunModal() = Action::LookupOK Then begin
-                            GenBusPostingGroups.GetRecord(GenBusPostGr);
-                            "Gen. Bus. Posting Group" := GenBusPostGr.Code;
-                        end;
-                    end;
-                }
-                field("VAT Bus. Posting Group"; "VAT Bus. Posting Group")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the VAT Bus. Posting Group field';
-
-                    trigger OnLookup(var Text: Text): Boolean
-                    var
-                        VATBusPostGr: Record "VAT Business Posting Group";
-                        VATBusPostingGroups: Page "VAT Business Posting Groups";
-                    begin
-                        VATBusPostingGroups.LookupMode := true;
-
-                        if "VAT Bus. Posting Group" <> '' then
-                            if VATBusPostGr.Get("VAT Bus. Posting Group") then
-                                VATBusPostingGroups.SetRecord(VATBusPostGr);
-
-                        if VATBusPostingGroups.RunModal() = Action::LookupOK then begin
-                            VATBusPostingGroups.GetRecord(VATBusPostGr);
-                            "VAT Bus. Posting Group" := VATBusPostGr.Code;
-                        end;
-                    end;
-
-                }
                 field("Default POS Posting Setup"; "Default POS Posting Setup")
                 {
                     ApplicationArea = All;

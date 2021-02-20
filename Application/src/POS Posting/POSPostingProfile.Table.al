@@ -105,12 +105,38 @@ table 6150653 "NPR POS Posting Profile"
             DataClassification = CustomerContent;
             TableRelation = "Source Code";
         }
-
         field(140; "POS Payment Bin"; Code[10])
         {
             Caption = 'POS Payment Bin';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Payment Bin";
+        }
+        field(150; "Gen. Bus. Posting Group"; Code[10])
+        {
+            Caption = 'Gen. Bus. Posting Group';
+            DataClassification = CustomerContent;
+            TableRelation = "Gen. Business Posting Group";
+
+            trigger OnValidate()
+            var
+                GenBusPostingGrp: Record "Gen. Business Posting Group";
+            begin
+                if xRec."Gen. Bus. Posting Group" <> "Gen. Bus. Posting Group" then
+                    if GenBusPostingGrp.ValidateVatBusPostingGroup(GenBusPostingGrp, "Gen. Bus. Posting Group") then
+                        Validate("VAT Bus. Posting Group", GenBusPostingGrp."Def. VAT Bus. Posting Group");
+            end;
+        }
+        field(151; "VAT Bus. Posting Group"; Code[10])
+        {
+            Caption = 'VAT Bus. Posting Group';
+            DataClassification = CustomerContent;
+            TableRelation = "VAT Business Posting Group";
+        }
+        field(160; "POS Period Register No. Series"; Code[10])
+        {
+            Caption = 'POS Period Register No. Series';
+            DataClassification = CustomerContent;
+            TableRelation = "No. Series";
         }
     }
 

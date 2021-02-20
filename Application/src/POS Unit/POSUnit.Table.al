@@ -270,7 +270,7 @@ table 6150615 "NPR POS Unit"
         Clear(POSPricingProfile);
         if "POS Pricing Profile" = '' then
             exit;
-        exit(POSPricingProfile.Get("POS Posting Profile"));
+        exit(POSPricingProfile.Get("POS Pricing Profile"));
     end;
 
     procedure GetProfile(var MPOSProfile: Record "NPR MPOS Profile"): Boolean
@@ -286,7 +286,7 @@ table 6150615 "NPR POS Unit"
         Clear(POSPostingProfile);
         if "POS Posting Profile" = '' then
             exit;
-        exit(POSPostingProfile.Get("MPOS Profile"));
+        exit(POSPostingProfile.Get("POS Posting Profile"));
     end;
 
     procedure GetProfile(var POSViewProfile: Record "NPR POS View Profile"): Boolean
@@ -300,9 +300,9 @@ table 6150615 "NPR POS Unit"
     procedure GetProfile(var SSProfile: Record "NPR SS Profile"): Boolean
     begin
         Clear(SSProfile);
-        if "POS View Profile" = '' then
+        if "POS Self Service Profile" = '' then
             exit;
-        exit(SSProfile.Get("POS View Profile"));
+        exit(SSProfile.Get("POS Self Service Profile"));
     end;
 
     procedure GetCurrentPOSUnit(): Code[10]
