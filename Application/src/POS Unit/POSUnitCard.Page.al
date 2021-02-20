@@ -38,38 +38,11 @@ page 6150617 "NPR POS Unit Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
-                field("Lock Timeout"; "Lock Timeout")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Lock Timeout field';
-                }
                 field("Default POS Payment Bin"; "Default POS Payment Bin")
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Default POS Payment Bin field';
-                }
-                field("Item Price Codeunit ID"; "Item Price Codeunit ID")
-                {
-                    ApplicationArea = All;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Item Price Codeunit ID field';
-                }
-                field("Item Price Codeunit Name"; "Item Price Codeunit Name")
-                {
-                    ApplicationArea = All;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Item Price Codeunit Name field';
-                }
-                field("Item Price Function"; "Item Price Function")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Item Price Function field';
-                }
-                field("Kiosk Mode Unlock PIN"; "Kiosk Mode Unlock PIN")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Kiosk Mode Unlock PIN field';
                 }
                 field("POS Type"; "POS Type")
                 {

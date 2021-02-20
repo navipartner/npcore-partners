@@ -46,6 +46,10 @@ codeunit 6150927 "NPR UPG POS Pricing Profile"
                     POSPricingProfile.Description := CopyStr('Created by running upgrade procedure', 1, MaxStrLen(POSPricingProfile.Description));
                     POSPricingProfile.Insert();
                 end;
+                POSPricingProfile."Item Price Codeunit ID" := POSUnit."Item Price Codeunit ID";
+                POSPricingProfile."Item Price Function" := POSUnit."Item Price Function";
+                POSPricingProfile.Modify();
+
                 POSUnit."POS Pricing Profile" := POSPricingProfile.Code;
                 POSUnit.Modify();
             end;

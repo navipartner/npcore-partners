@@ -79,6 +79,11 @@ table 6150651 "NPR POS View Profile"
             OptionCaption = 'Initial Sales View,Login View';
             OptionMembers = INITIAL_SALE_VIEW,LOGIN_VIEW;
         }
+        field(60; "Lock Timeout"; Enum "NPR POS View LockTimeout")
+        {
+            Caption = 'Lock Timeout';
+            DataClassification = CustomerContent;
+        }
         field(6232; "POS - Show discount fields"; Boolean)
         {
             Caption = 'Show Discount';

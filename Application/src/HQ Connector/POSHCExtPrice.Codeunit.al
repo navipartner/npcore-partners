@@ -3,21 +3,21 @@ codeunit 6150910 "NPR POS HC Ext. Price"
     var
         InvalidXml: Label 'The response is not in valid XML format.\\%1';
 
-    [EventSubscriber(ObjectType::Codeunit, 6014453, 'OnFindItemPrice', '', true, true)]
-    local procedure FindHQConnectorPrice(POSUnit: Record "NPR POS Unit"; SalePOS: Record "NPR Sale POS"; var SaleLinePOS: Record "NPR Sale Line POS"; var Handled: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Price Calc. Mgt.", 'OnFindItemPrice', '', true, true)]
+    local procedure FindHQConnectorPrice(POSPricingProfile: Record "NPR POS Pricing Profile"; SalePOS: Record "NPR Sale POS"; var SaleLinePOS: Record "NPR Sale Line POS"; var Handled: Boolean)
     var
         EndpointSetup: Record "NPR POS HC Endpoint Setup";
         GeneralLedgerSetup: Record "General Ledger Setup";
         TmpSalesLine: Record "Sales Line" temporary;
     begin
-        if POSUnit."Item Price Codeunit ID" <> CODEUNIT::"NPR POS HC Ext. Price" then
+        if POSPricingProfile."Item Price Codeunit ID" <> GetPublisherCodeunitId() then
             exit;
-        if POSUnit."Item Price Function" <> 'FindHQConnectorPrice' then
+        if POSPricingProfile."Item Price Function" <> GetPublisherFunction() then
             exit;
         Handled := true;
 
         EndpointSetup.SetRange(Active, true);
-        EndpointSetup.FindFirst;
+        EndpointSetup.FindFirst();
 
         if SalePOS.Get(SalePOS."Register No.", SalePOS."Sales Ticket No.") then;
 
@@ -29,7 +29,7 @@ codeunit 6150910 "NPR POS HC Ext. Price"
         TmpSalesLine."Variant Code" := SaleLinePOS."Variant Code";
         TmpSalesLine.Quantity := SaleLinePOS.Quantity;
         TmpSalesLine."Unit of Measure Code" := SaleLinePOS."Unit of Measure Code";
-        TmpSalesLine.Insert;
+        TmpSalesLine.Insert();
 
         GetCustomerPrice(EndpointSetup.Code, SalePOS."Customer No.", SalePOS."Sales Ticket No.", GeneralLedgerSetup."LCY Code", TmpSalesLine);
 
@@ -63,7 +63,6 @@ codeunit 6150910 "NPR POS HC Ext. Price"
         ResponseText: Text;
         ResponseXmlText: Text;
     begin
-
         HCEndpointSetup.Get(EndpointCode);
 
         BuildPriceRequest(CustomerNumber, ExternalDocumentNumber, CurrencyCode, TmpSalesLine, SoapAction, RequestXmlDocText);
@@ -78,7 +77,6 @@ codeunit 6150910 "NPR POS HC Ext. Price"
     var
         LineType: Option;
     begin
-
         SoapAction := 'urn:microsoft-dynamics-schemas/codeunit/hqconnector:GetCustomerPrice';
         XmlRequest :=
          '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:hqc="urn:microsoft-dynamics-schemas/codeunit/hqconnector" xmlns:x61="urn:microsoft-dynamics-nav/xmlports/x6150903">' +
@@ -244,6 +242,16 @@ codeunit 6150910 "NPR POS HC Ext. Price"
 
         Evaluate(IntegerValueOut, NumberText, 9);
         exit(IntegerValueOut);
+    end;
+
+    local procedure GetPublisherCodeunitId(): Integer
+    begin
+        exit(CODEUNIT::"NPR POS HC Ext. Price");
+    end;
+
+    local procedure GetPublisherFunction(): Text
+    begin
+        exit('FindHQConnectorPrice');
     end;
 }
 

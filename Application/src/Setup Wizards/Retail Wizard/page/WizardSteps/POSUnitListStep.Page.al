@@ -184,25 +184,6 @@ page 6014683 "NPR POS Unit List Step"
                     Visible = false;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field("Item Price Codeunit ID"; "Item Price Codeunit ID")
-                {
-                    ApplicationArea = All;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Item Price Codeunit ID field';
-                }
-                field("Item Price Codeunit Name"; "Item Price Codeunit Name")
-                {
-                    ApplicationArea = All;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Item Price Codeunit Name field';
-                }
-                field("Item Price Function"; "Item Price Function")
-                {
-                    ApplicationArea = All;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Item Price Function field';
-                }
-
                 field("POS Audit Profile"; "POS Audit Profile")
                 {
                     ApplicationArea = All;

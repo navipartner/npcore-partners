@@ -69,21 +69,18 @@ table 6150615 "NPR POS Unit"
             DataClassification = CustomerContent;
             OptionCaption = 'Never,30 Seconds,60 Seconds,90 Seconds,120 Seconds,600 Seconds';
             OptionMembers = NEVER,"30S","60S","90S","120S","600S";
-
-            trigger OnValidate()
-            var
-                POSSetup: Record "NPR POS Setup";
-            begin
-                POSSetup.Get("POS Named Actions Profile");
-                if ("Lock Timeout" <> "Lock Timeout"::NEVER) then
-                    POSSetup.TestField("Lock POS Action Code");
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Move to dedicated POS Unit Profile';
+            ObsoleteTag = 'NPR POS Unit -> NPR POS View Profile';
         }
         field(50; "Kiosk Mode Unlock PIN"; Text[30])
         {
             Caption = 'Kiosk Mode Unlock PIN';
             DataClassification = CustomerContent;
             Description = 'NPR5.45';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Move to dedicated POS Unit Profile';
+            ObsoleteTag = 'NPR POS Unit -> NPR POS SS Profile';
         }
         field(60; "POS Type"; Option)
         {
@@ -113,85 +110,30 @@ table 6150615 "NPR POS Unit"
             Caption = 'Item Price Codeunit ID';
             DataClassification = CustomerContent;
             Description = 'NPR5.45';
-
-            trigger OnLookup()
-            var
-                EventSubscription: Record "Event Subscription";
-            begin
-                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID", GetPublisherCodeunitId());
-                EventSubscription.SetRange("Published Function", GetPublisherFunction());
-                if PAGE.RunModal(PAGE::"Event Subscriptions", EventSubscription) <> ACTION::LookupOK then
-                    exit;
-
-                "Item Price Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
-                "Item Price Function" := EventSubscription."Subscriber Function";
-            end;
-
-            trigger OnValidate()
-            var
-                EventSubscription: Record "Event Subscription";
-            begin
-                if "Item Price Codeunit ID" = 0 then begin
-                    "Item Price Function" := '';
-                    exit;
-                end;
-
-                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID", GetPublisherCodeunitId());
-                EventSubscription.SetRange("Published Function", GetPublisherFunction());
-                EventSubscription.SetRange("Subscriber Codeunit ID", "Item Price Codeunit ID");
-                if "Item Price Function" <> '' then
-                    EventSubscription.SetRange("Subscriber Function", "Item Price Function");
-                EventSubscription.FindFirst;
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Move to dedicated POS Unit Profile';
+            ObsoleteTag = 'NPR POS Unit -> NPR POS Pricing Profile';
         }
         field(305; "Item Price Codeunit Name"; Text[30])
         {
             CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
-                                                             "Object ID" = FIELD("Item Price Codeunit ID")));
+                                                             "Object ID" = CONST(6014453)));
             Caption = 'Item Price Codeunit Name';
             Description = 'NPR5.45';
             Editable = false;
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Move to dedicated POS Unit Profile';
+            ObsoleteTag = 'NPR POS Unit -> NPR POS Pricing Profile';
         }
         field(310; "Item Price Function"; Text[250])
         {
             Caption = 'Item Price Function';
             DataClassification = CustomerContent;
             Description = 'NPR5.45';
-
-            trigger OnLookup()
-            var
-                EventSubscription: Record "Event Subscription";
-            begin
-                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID", GetPublisherCodeunitId());
-                EventSubscription.SetRange("Published Function", GetPublisherFunction());
-                if PAGE.RunModal(PAGE::"Event Subscriptions", EventSubscription) <> ACTION::LookupOK then
-                    exit;
-
-                "Item Price Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
-                "Item Price Function" := EventSubscription."Subscriber Function";
-            end;
-
-            trigger OnValidate()
-            var
-                EventSubscription: Record "Event Subscription";
-            begin
-                if "Item Price Function" = '' then begin
-                    "Item Price Codeunit ID" := 0;
-                    exit;
-                end;
-
-                EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID", GetPublisherCodeunitId());
-                EventSubscription.SetRange("Published Function", GetPublisherFunction());
-                EventSubscription.SetRange("Subscriber Codeunit ID", "Item Price Codeunit ID");
-                if "Item Price Function" <> '' then
-                    EventSubscription.SetRange("Subscriber Function", "Item Price Function");
-                EventSubscription.FindFirst;
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Move to dedicated POS Unit Profile';
+            ObsoleteTag = 'NPR POS Unit -> NPR POS Pricing Profile';
         }
         field(400; "Global POS Sales Setup"; Code[10])
         {
@@ -267,6 +209,12 @@ table 6150615 "NPR POS Unit"
             DataClassification = CustomerContent;
             TableRelation = "NPR MPOS Profile";
         }
+        field(600; "POS Self Service Profile"; Code[20])
+        {
+            Caption = 'POS Self Service Profile';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR SS Profile";
+        }
     }
 
     keys
@@ -303,16 +251,6 @@ table 6150615 "NPR POS Unit"
         Modify;
     end;
 
-    local procedure GetPublisherCodeunitId(): Integer
-    begin
-        exit(CODEUNIT::"NPR POS Sales Price Calc. Mgt.");
-    end;
-
-    local procedure GetPublisherFunction(): Text
-    begin
-        exit('OnFindItemPrice');
-    end;
-
     procedure GetPostingProfile(POSUnitNo: Code[10]; var POSPostingProfile: Record "NPR POS Posting Profile")
     var
         POSUnit: Record "NPR POS Unit";
@@ -336,6 +274,22 @@ table 6150615 "NPR POS Unit"
         if "MPOS Profile" = '' then
             exit;
         exit(MPOSProfile.Get("MPOS Profile"));
+    end;
+
+    procedure GetProfile(var POSViewProfile: Record "NPR POS View Profile"): Boolean
+    begin
+        Clear(POSViewProfile);
+        if "POS View Profile" = '' then
+            exit;
+        exit(POSViewProfile.Get("POS View Profile"));
+    end;
+
+    procedure GetProfile(var SSProfile: Record "NPR SS Profile"): Boolean
+    begin
+        Clear(SSProfile);
+        if "POS View Profile" = '' then
+            exit;
+        exit(SSProfile.Get("POS View Profile"));
     end;
 
     procedure GetCurrentPOSUnit(): Code[10]
