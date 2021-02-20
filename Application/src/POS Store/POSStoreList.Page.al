@@ -65,16 +65,6 @@ page 6150614 "NPR POS Store List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Location Code field';
                 }
-                field("Gen. Bus. Posting Group"; "Gen. Bus. Posting Group")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Gen. Bus. Posting Group field';
-                }
-                field("VAT Bus. Posting Group"; "VAT Bus. Posting Group")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the VAT Bus. Posting Group field';
-                }
             }
         }
     }
@@ -143,7 +133,7 @@ page 6150614 "NPR POS Store List"
                     Caption = 'POS Posting Setup';
                     Image = GeneralPostingSetup;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Posting Setup";
@@ -156,7 +146,7 @@ page 6150614 "NPR POS Store List"
                     Caption = 'POS Period Registers';
                     Image = Register;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Period Register List";
@@ -169,7 +159,7 @@ page 6150614 "NPR POS Store List"
                     Caption = 'POS Entries';
                     Image = LedgerEntries;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Entry List";

@@ -138,15 +138,17 @@ table 6150620 "NPR POS Period Register"
 
     local procedure GenerateDocumentNo()
     var
-        POSStore: Record "NPR POS Store";
+        POSUnit: Record "NPR POS Unit";
+        POSPostingProfile: Record "NPR POS Posting Profile";
         NoSeriesMgt: Codeunit NoSeriesManagement;
     begin
         if ("Document No." <> '') then
             exit;
-        TestField("POS Store Code");
-        POSStore.Get("POS Store Code");
-        if POSStore."POS Period Register No. Series" <> '' then
-            NoSeriesMgt.InitSeries(POSStore."POS Period Register No. Series", xRec."No. Series", WorkDate, "Document No.", "No. Series");
+        TestField("POS Unit No.");
+        POSUnit.Get("POS Unit No.");
+        POSUnit.GetProfile(POSPostingProfile);
+        if POSPostingProfile."POS Period Register No. Series" <> '' then
+            NoSeriesMgt.InitSeries(POSPostingProfile."POS Period Register No. Series", xRec."No. Series", WorkDate, "Document No.", "No. Series");
     end;
 
     local procedure UpdateTimeStamps()

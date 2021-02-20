@@ -15,57 +15,47 @@ page 6059781 "NPR POS Stores Select"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Post Code"; "Post Code")
+                field("Post Code"; Rec."Post Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Post Code field';
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the City field';
                 }
-                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                 }
-                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
-                field("Gen. Bus. Posting Group"; "Gen. Bus. Posting Group")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Gen. Bus. Posting Group field';
-                }
-                field("VAT Bus. Posting Group"; "VAT Bus. Posting Group")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the VAT Bus. Posting Group field';
-                }
-                field("Default POS Posting Setup"; "Default POS Posting Setup")
+                field("Default POS Posting Setup"; Rec."Default POS Posting Setup")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Default POS Posting Setup field';
                 }
-                field("Tax Area Code"; "Tax Area Code")
+                field("Tax Area Code"; Rec."Tax Area Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Tax Area Code field';
                 }
-                field("Tax Liable"; "Tax Liable")
+                field("Tax Liable"; Rec."Tax Liable")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Tax Liable field';
