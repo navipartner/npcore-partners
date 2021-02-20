@@ -1,13 +1,11 @@
 page 6059976 "NPR Variant per Location"
 {
-    // NPR5.28/JDH /20161128 CASE 255961 Updated Layout
-
     Caption = 'Variant per Location';
     DeleteAllowed = false;
     Editable = false;
     InsertAllowed = false;
     ModifyAllowed = false;
-    PageType = Document;
+    PageType = List;
     UsageCategory = Administration;
     ApplicationArea = All;
     SourceTable = "Inventory Buffer";
@@ -18,24 +16,24 @@ page 6059976 "NPR Variant per Location"
         {
             repeater(Group)
             {
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item No. field';
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     AssistEdit = false;
                     Lookup = false;
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field("Location Code"; "Location Code")
+                field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = All;
                     AssistEdit = false;
@@ -46,8 +44,5 @@ page 6059976 "NPR Variant per Location"
         }
     }
 
-    actions
-    {
-    }
 }
 

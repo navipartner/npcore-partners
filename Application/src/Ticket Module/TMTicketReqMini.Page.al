@@ -1,15 +1,13 @@
 page 6060101 "NPR TM Ticket Req. Mini"
 {
-    // TM1.19/NPKNAV/20170309  CASE 266372 Transport TM1.19 - 8 March 2017
-    // TM90.1.46/TSA /20200304 CASE 399138 Added a currpage update as changes did not "stick"
-
     Caption = 'Ticket Request Mini';
     InsertAllowed = false;
     InstructionalText = 'Set quantity to the number of guest for each line';
-    PageType = ListPlus;
+    PageType = List;
     SourceTable = "NPR TM Ticket Reservation Req.";
     SourceTableTemporary = true;
-    UsageCategory = None;
+    UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {
@@ -17,43 +15,40 @@ page 6060101 "NPR TM Ticket Req. Mini"
         {
             repeater(General)
             {
-                field("External Item Code"; "External Item Code")
+                field("External Item Code"; Rec."External Item Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                     ToolTip = 'Specifies the value of the External Item Code field';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Quantity field';
 
                     trigger OnValidate()
                     begin
-
-                        //-#337112 [337112]
                         CurrPage.Update(true);
-                        //+#337112 [337112]
                     end;
                 }
-                field("Admission Code"; "Admission Code")
+                field("Admission Code"; Rec."Admission Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Admission Code field';
                 }
-                field("Admission Description"; "Admission Description")
+                field("Admission Description"; Rec."Admission Description")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Admission Description field';
                 }
-                field("Notification Method"; "Notification Method")
+                field("Notification Method"; Rec."Notification Method")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Notification Method field';
                 }
-                field("Notification Address"; "Notification Address")
+                field("Notification Address"; Rec."Notification Address")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Notification Address field';
@@ -62,31 +57,23 @@ page 6060101 "NPR TM Ticket Req. Mini"
         }
     }
 
-    actions
-    {
-    }
-
     procedure FillRequestTable(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary)
     begin
-
-        if (TmpTicketReservationRequest.FindSet()) then begin
+        if TmpTicketReservationRequest.FindSet() then
             repeat
-                TransferFields(TmpTicketReservationRequest, true);
-                Insert();
+                Rec.TransferFields(TmpTicketReservationRequest, true);
+                Rec.Insert();
             until (TmpTicketReservationRequest.Next() = 0);
-        end;
     end;
 
     procedure GetTicketRequest(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary)
     begin
-
-        Reset;
-        if (FindSet()) then begin
+        Rec.Reset;
+        if Rec.FindSet() then
             repeat
                 TmpTicketReservationRequest.TransferFields(Rec, true);
                 TmpTicketReservationRequest.Insert();
-            until (Next() = 0);
-        end;
+            until Rec.Next() = 0;
     end;
 }
 

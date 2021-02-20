@@ -3,7 +3,7 @@ page 6151490 "NPR Salesperson List"
     Caption = 'Salesperson List';
     DeleteAllowed = false;
     InsertAllowed = false;
-    PageType = ListPlus;
+    PageType = List;
     UsageCategory = Administration;
     ApplicationArea = All;
     SourceTable = "Salesperson/Purchaser";
@@ -25,7 +25,7 @@ page 6151490 "NPR Salesperson List"
 
                     trigger OnValidate()
                     begin
-                        Mark(Selected);
+                        Rec.Mark(Selected);
                     end;
                 }
                 field("Code"; Rec.Code)
