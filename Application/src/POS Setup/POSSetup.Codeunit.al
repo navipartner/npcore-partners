@@ -8,10 +8,6 @@ codeunit 6150708 "NPR POS Setup"
     // sure that in the future, when different levels are introduced, and when setup is perhaps made hierarchical, no consumer code
     // has to be changed.
 
-    trigger OnRun()
-    begin
-    end;
-
     var
         Setup: Record "NPR POS Setup";
         UserSetup: Record "User Setup";
@@ -265,19 +261,22 @@ codeunit 6150708 "NPR POS Setup"
     end;
 
     procedure GetLockTimeout() LockTimeoutInSeconds: Integer
+    var
+        POSViewProfile: Record "NPR POS View Profile";
     begin
         POSUnitRec.TestField("No.");
+        POSUnitRec.GetProfile(POSViewProfile);
 
-        case POSUnitRec."Lock Timeout" of
-            POSUnitRec."Lock Timeout"::"30S":
+        case POSViewProfile."Lock Timeout" of
+            POSViewProfile."Lock Timeout"::"30S":
                 LockTimeoutInSeconds := 30;
-            POSUnitRec."Lock Timeout"::"60S":
+            POSViewProfile."Lock Timeout"::"60S":
                 LockTimeoutInSeconds := 60;
-            POSUnitRec."Lock Timeout"::"90S":
+            POSViewProfile."Lock Timeout"::"90S":
                 LockTimeoutInSeconds := 90;
-            POSUnitRec."Lock Timeout"::"120S":
+            POSViewProfile."Lock Timeout"::"120S":
                 LockTimeoutInSeconds := 120;
-            POSUnitRec."Lock Timeout"::"600S":
+            POSViewProfile."Lock Timeout"::"600S":
                 LockTimeoutInSeconds := 600;
             else
                 LockTimeoutInSeconds := 0;
@@ -285,8 +284,10 @@ codeunit 6150708 "NPR POS Setup"
     end;
 
     procedure GetKioskUnlockEnabled(): Boolean
+    var
+        SSProfile: Record "NPR SS Profile";
     begin
-        exit(POSUnitRec."Kiosk Mode Unlock PIN" <> '');
+        exit(POSUnitRec.GetProfile(SSProfile) and (SSProfile."Kiosk Mode Unlock PIN" <> ''));
     end;
 
     procedure GetNamedActionSetup(var POSSetupOut: Record "NPR POS Setup")
