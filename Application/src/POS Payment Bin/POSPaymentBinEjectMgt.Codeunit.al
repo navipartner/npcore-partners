@@ -1,17 +1,5 @@
 codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
 {
-    // NPR5.40/MMV /20180228 CASE 300660 Created object
-    // NPR5.40.02/MMV /20180418 CASE 311900 Fallback if missing setup
-    // NPR5.41/MMV /20180425 CASE 312990 Proper fallback.
-    // NPR5.43/MMV /20180627 CASE 320714 Filter on payment amount
-    // NPR5.51/TJ  /20190628 CASE 357069 Drawer opening requirement is now checked based on Open Drawer field
-    // NPR5.53/ALPO/20191216 CASE 378985 Finish credit sale workflow: eject payment bin step
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         WORKFLOW_STEP: Label 'Eject Payment Bin';
 
@@ -108,10 +96,6 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
         exit(Date);
     end;
 
-    local procedure "-- Aux"()
-    begin
-    end;
-
     local procedure IsDrawerOpenRequiredAuditRoll(SalePOS: Record "NPR Sale POS"): Boolean
     var
         AuditRoll: Record "NPR Audit Roll";
@@ -119,10 +103,7 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
         FilterString: Text;
     begin
         PaymentTypePOS.SetCurrentKey("Processing Type");
-        //-NPR5.51 [357069]
-        //PaymentTypePOS.SETFILTER("Processing Type", '%1|%2', PaymentTypePOS."Processing Type"::Cash, PaymentTypePOS."Processing Type"::"Foreign Currency");
         PaymentTypePOS.SetRange("Open Drawer", true);
-        //+NPR5.51 [357069]
         if not PaymentTypePOS.FindSet then
             exit;
 
@@ -137,9 +118,7 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
         AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Payment);
         AuditRoll.SetRange(Type, AuditRoll.Type::Payment);
         AuditRoll.SetFilter("No.", FilterString);
-        //-NPR5.43 [320714]
         AuditRoll.SetFilter("Amount Including VAT", '<>%1', 0);
-        //+NPR5.43 [320714]
         exit(not AuditRoll.IsEmpty);
     end;
 
@@ -152,10 +131,7 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
         FilterString: Text;
     begin
         PaymentTypePOS.SetCurrentKey("Processing Type");
-        //-NPR5.51 [357069]
-        //PaymentTypePOS.SETFILTER("Processing Type", '%1|%2', PaymentTypePOS."Processing Type"::Cash, PaymentTypePOS."Processing Type"::"Foreign Currency");
         PaymentTypePOS.SetRange("Open Drawer", true);
-        //+NPR5.51 [357069]
         if not PaymentTypePOS.FindSet then
             exit;
 
@@ -170,9 +146,7 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
 
         POSPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSPaymentLine.SetFilter("POS Payment Method Code", FilterString);
-        //-NPR5.43 [320714]
         POSPaymentLine.SetFilter("Amount (Sales Currency)", '<>%1', 0);
-        //+NPR5.43 [320714]
         exit(not POSPaymentLine.IsEmpty);
     end;
 
@@ -181,12 +155,11 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
         NPRetailSetup: Record "NPR NP Retail Setup";
         POSPaymentBin: Record "NPR POS Payment Bin";
         POSUnit: Record "NPR POS Unit";
+        POSPostingProfile: Record "NPR POS Posting Profile";
         OpenDrawer: Boolean;
     begin
-        //-NPR5.53 [378985]
         OpenDrawer := Force;
         if not OpenDrawer then begin
-            //+NPR5.53 [378985]
             if not NPRetailSetup.Get then
                 exit;
 
@@ -196,19 +169,16 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
 
             if not OpenDrawer then
                 exit;
-        end;  //NPR5.53 [378985]
+        end;
 
-        if ((not POSUnit.Get(SalePOS."Register No.")) or (not POSPaymentBin.Get(POSUnit."Default POS Payment Bin"))) then
+        POSUnit.GetProfile(POSPostingProfile);
+        if ((not POSUnit.Get(SalePOS."Register No.")) or (not POSPaymentBin.Get(POSPostingProfile."POS Payment Bin"))) then
             POSPaymentBin."Eject Method" := 'PRINTER';
 
         EjectDrawer(POSPaymentBin, SalePOS);
     end;
 
-    local procedure "-- Finish Sales Workflow"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
         if Rec."Subscriber Codeunit ID" <> CODEUNIT::"NPR POS Payment Bin Eject Mgt." then
@@ -220,7 +190,7 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
         Rec."Sequence No." := 15;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
     local procedure EjectPaymentBin(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
     begin
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CODEUNIT::"NPR POS Payment Bin Eject Mgt." then
@@ -228,41 +198,12 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
         if POSSalesWorkflowStep."Subscriber Function" <> 'EjectPaymentBin' then
             exit;
 
-        CarryOutPaymentBinEject(SalePOS, false);  //NPR5.53 [378985]
-
-        //-NPR5.53 [378985]-revoked (Moved to a separate function to avoid code duplication)
-        /*
-        IF NOT NPRetailSetup.GET THEN
-          EXIT;
-        
-        //Change below to just loop and fire open on all unique payment bin from pos payment lines when the payment bins are properly implemented on payments
-        
-        IF NPRetailSetup."Advanced Posting Activated" THEN
-          OpenDrawer := IsDrawerOpenRequiredPOSEntry(SalePOS)
-        ELSE
-          OpenDrawer := IsDrawerOpenRequiredAuditRoll(SalePOS);
-        
-        IF NOT OpenDrawer THEN
-          EXIT;
-        
-        IF ((NOT POSUnit.GET(SalePOS."Register No.")) OR (NOT POSPaymentBin.GET(POSUnit."Default POS Payment Bin"))) THEN
-          POSPaymentBin."Eject Method" := 'PRINTER';
-        
-        EjectDrawer(POSPaymentBin, SalePOS);
-        */
-        //+NPR5.53 [378985]-revoked
-
+        CarryOutPaymentBinEject(SalePOS, false);
     end;
 
-    local procedure "-- Finish Credit Sale Workflow"()
-    begin
-        //NPR5.53 [378985]
-    end;
-
-    [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertCreditSaleWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
-        //-NPR5.53 [378985]
         if Rec."Subscriber Codeunit ID" <> CODEUNIT::"NPR POS Payment Bin Eject Mgt." then
             exit;
         if Rec."Subscriber Function" <> 'EjectPaymentBinOnCreditSale' then
@@ -271,10 +212,9 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
         Rec.Description := WORKFLOW_STEP;
         Rec."Sequence No." := 10;
         Rec.Enabled := false;
-        //+NPR5.53 [378985]
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014407, 'OnFinishCreditSale', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Sales Doc. Exp. Mgt.", 'OnFinishCreditSale', '', true, true)]
     local procedure EjectPaymentBinOnCreditSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
     var
         NPRetailSetup: Record "NPR NP Retail Setup";
@@ -282,18 +222,12 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
         POSPaymentBin: Record "NPR POS Payment Bin";
         POSUnit: Record "NPR POS Unit";
     begin
-        //-NPR5.53 [378985]
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CODEUNIT::"NPR POS Payment Bin Eject Mgt." then
             exit;
         if POSSalesWorkflowStep."Subscriber Function" <> 'EjectPaymentBinOnCreditSale' then
             exit;
 
         CarryOutPaymentBinEject(SalePOS, true);
-        //+NPR5.53 [378985]
-    end;
-
-    local procedure "-- Event Publishers"()
-    begin
     end;
 
     [IntegrationEvent(false, false)]

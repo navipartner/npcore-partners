@@ -30,6 +30,9 @@ table 6150615 "NPR POS Unit"
             Caption = 'Default POS Payment Bin';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Payment Bin";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Moved to POS Unit Posting Profile';
+            ObsoleteTag = 'POS Unit -> POS Posting Profile';
         }
         field(20; Status; Option)
         {
@@ -92,7 +95,7 @@ table 6150615 "NPR POS Unit"
         }
         field(200; "Ean Box Sales Setup"; Code[20])
         {
-            Caption = 'Ean Box Sales Setup';
+            Caption = 'POS Input Profile';
             DataClassification = CustomerContent;
             Description = 'NPR5.45';
             TableRelation = "NPR Ean Box Setup" WHERE("POS View" = CONST(Sale));
@@ -137,7 +140,7 @@ table 6150615 "NPR POS Unit"
         }
         field(400; "Global POS Sales Setup"; Code[10])
         {
-            Caption = 'Global POS Sales Setup';
+            Caption = 'POS Global Sales Profile';
             DataClassification = CustomerContent;
             Description = 'NPR5.52';
             TableRelation = "NPR NpGp POS Sales Setup";
@@ -189,6 +192,8 @@ table 6150615 "NPR POS Unit"
             Caption = 'POS Unit Serial No';
             DataClassification = CustomerContent;
             Description = 'NPR5.55';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Doesn''t have any reference';
         }
         field(570; "POS Restaurant Profile"; Code[20])
         {
@@ -274,6 +279,14 @@ table 6150615 "NPR POS Unit"
         if "MPOS Profile" = '' then
             exit;
         exit(MPOSProfile.Get("MPOS Profile"));
+    end;
+
+    procedure GetProfile(var POSPostingProfile: Record "NPR POS Posting Profile"): Boolean
+    begin
+        Clear(POSPostingProfile);
+        if "POS Posting Profile" = '' then
+            exit;
+        exit(POSPostingProfile.Get("MPOS Profile"));
     end;
 
     procedure GetProfile(var POSViewProfile: Record "NPR POS View Profile"): Boolean

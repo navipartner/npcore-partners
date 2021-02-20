@@ -38,12 +38,6 @@ page 6150617 "NPR POS Unit Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
-                field("Default POS Payment Bin"; "Default POS Payment Bin")
-                {
-                    ApplicationArea = All;
-                    ShowMandatory = true;
-                    ToolTip = 'Specifies the value of the Default POS Payment Bin field';
-                }
                 field("POS Type"; "POS Type")
                 {
                     ApplicationArea = All;
@@ -53,11 +47,6 @@ page 6150617 "NPR POS Unit Card"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
-                }
-                field("POS Unit Serial No"; "POS Unit Serial No")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the POS Unit Serial No field';
                 }
                 field(ActiveEventNo; ActiveEventNo)
                 {
@@ -90,6 +79,7 @@ page 6150617 "NPR POS Unit Card"
                 field("POS End of Day Profile"; "POS End of Day Profile")
                 {
                     ApplicationArea = All;
+                    ShowMandatory = true;
                     ToolTip = 'Specifies the value of the POS End of Day Profile field';
                 }
                 field("POS Posting Profile"; "POS Posting Profile")
@@ -138,6 +128,11 @@ page 6150617 "NPR POS Unit Card"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the MPOS Profile field where ticket admission should be set.';
+                }
+                field("POS Self Service Profile"; Rec."POS Self Service Profile")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Self Service Profile field.';
                 }
             }
         }
