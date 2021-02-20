@@ -75,6 +75,7 @@ table 6014405 "NPR Sale POS"
                 Item: Record Item;
                 Contact: Record Contact;
                 POSPricingProfile: Record "NPR POS Pricing Profile";
+                POSPostingProfile: Record "NPR POS Posting Profile";
                 DoCreate: Boolean;
                 Cust: Record Customer;
                 POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
@@ -89,10 +90,12 @@ table 6014405 "NPR Sale POS"
                 POSUnit.GetProfile(POSPricingProfile);
                 "Customer Price Group" := POSPricingProfile."Customer Price Group";
                 "Customer Disc. Group" := POSPricingProfile."Customer Disc. Group";
-                "Gen. Bus. Posting Group" := POSStore."Gen. Bus. Posting Group";
+
+                POSUnit.GetProfile(POSPostingProfile);
+                "Gen. Bus. Posting Group" := POSPostingProfile."Gen. Bus. Posting Group";
                 "Tax Area Code" := POSStore."Tax Area Code";
                 "Tax Liable" := POSStore."Tax Liable";
-                "VAT Bus. Posting Group" := POSStore."VAT Bus. Posting Group";
+                "VAT Bus. Posting Group" := POSPostingProfile."VAT Bus. Posting Group";
 
                 if ("Customer Type" = "Customer Type"::Cash) and ("Customer No." <> '') then begin
                     Contact.Get("Customer No.");
@@ -129,10 +132,10 @@ table 6014405 "NPR Sale POS"
                             "Tax Liable" := Cust."Tax Liable";
                             "VAT Bus. Posting Group" := Cust."VAT Bus. Posting Group";
                         end else begin
-                            "Gen. Bus. Posting Group" := POSStore."Gen. Bus. Posting Group";
+                            "Gen. Bus. Posting Group" := POSPostingProfile."Gen. Bus. Posting Group";
                             "Tax Area Code" := POSStore."Tax Area Code";
                             "Tax Liable" := POSStore."Tax Liable";
-                            "VAT Bus. Posting Group" := POSStore."VAT Bus. Posting Group";
+                            "VAT Bus. Posting Group" := POSPostingProfile."VAT Bus. Posting Group";
                         end;
                     end;
                 end;

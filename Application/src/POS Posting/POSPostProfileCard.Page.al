@@ -43,6 +43,21 @@ page 6150639 "NPR POS Post. Profile Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Source Code field';
                 }
+                field("Gen. Bus. Posting Group"; Rec."Gen. Bus. Posting Group")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Gen. Bus. Posting Group field';
+                }
+                field("VAT Bus. Posting Group"; Rec."VAT Bus. Posting Group")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the VAT Bus. Posting Group field';
+                }
+                field("POS Period Register No. Series"; Rec."POS Period Register No. Series")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Period Register No. Series field';
+                }
                 field("POS Payment Bin"; Rec."POS Payment Bin")
                 {
                     ApplicationArea = All;

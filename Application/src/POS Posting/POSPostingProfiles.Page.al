@@ -65,6 +65,16 @@ page 6150638 "NPR POS Posting Profiles"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Source Code field';
                 }
+                field("Gen. Bus. Posting Group"; Rec."Gen. Bus. Posting Group")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Gen. Bus. Posting Group field';
+                }
+                field("VAT Bus. Posting Group"; Rec."VAT Bus. Posting Group")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the VAT Bus. Posting Group field';
+                }
             }
         }
     }

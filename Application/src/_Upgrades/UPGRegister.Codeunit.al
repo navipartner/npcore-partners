@@ -29,6 +29,7 @@ codeunit 6150925 "NPR UPG Register"
         Register: Record "NPR Register";
         POSUnit: Record "NPR POS Unit";
         POSPostingProfile: Record "NPR POS POsting Profile";
+        POSStore: Record "NPR POS Store";
     begin
         if not Register.FindSet() then
             exit;
@@ -63,6 +64,11 @@ codeunit 6150925 "NPR UPG Register"
                 POSPostingProfile."POS Posting Diff. Account" := Register."Difference Account";
                 POSPostingProfile."Posting Diff. Account (Neg.)" := Register."Difference Account - Neg.";
                 POSPostingProfile."POS Payment Bin" := POSUnit."Default POS Payment Bin";
+                if POSStore.Get(POSUnit."POS Store Code") then begin
+                    POSPostingProfile."Gen. Bus. Posting Group" := POSStore."Gen. Bus. Posting Group";
+                    POSPostingProfile."VAT Bus. Posting Group" := POSStore."VAT Bus. Posting Group";
+                    POSPostingProfile."POS Period Register No. Series" := POSStore."POS Period Register No. Series";
+                end;
                 POSPostingProfile.Modify();
             end;
         until Register.Next() = 0;

@@ -1,18 +1,5 @@
 table 6150614 "NPR POS Store"
 {
-    // NPR5.29/AP/20170126 CASE 261728 Recreated ENU-captions
-    // NPR5.30/AP/20170207 CASE 265509 Added new fields for Geolocation
-    // NPR5.31/AP/20170413 CASE 272321 Added fields primarily for BI measures and groupings (Fields 810..814)
-    //                                 Changed Decimal Places for Geolocation fields (800+801) to '0:7' (Google-precision coordinates)
-    // NPR5.32.10/BR/20170612 CASE 279551 Added fields and functions for Item Posting
-    // NPR5.36/BR/20170627 CASE 279551 Removed fields Item Journal Template and Item Journal Batch, changed Optionstring of field Item Posting
-    // NPR5.36/BR/20170914 CASE 289641 Added field VAT Customer No., Delete related POSPostingSetup records
-    // NPR5.38/BR/20180125 CASE 302803 Added field Posting Compression, renamed field POS Ledger No. Series to POS Period Register No. Series
-    // NPR5.48/MMV /20180615 CASE 318028 Added field 28 for countries with location specific registration no.
-    // NPR5.51/TSA /20190722 CASE 361917 Removed unreferenced functions SendToJournal(), PostToEntries(), PostOnFinaliseSale(), PostOnClosePOS()
-    // NPR5.53/ALPO/20191021 CASE 371956 Dimensions: POS Store & POS Unit integration
-    // NPR5.55/ALPO/20200730 CASE 414938 POS Store/POS Unit - Restaurant link (added "POS Restaurant Profile")
-
     Caption = 'POS Store';
     DataClassification = CustomerContent;
     DataCaptionFields = "Code", Name;
@@ -105,6 +92,8 @@ table 6150614 "NPR POS Store"
         {
             Caption = 'Fax No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Won''t be used anymore';
         }
         field(17; "E-Mail"; Text[80])
         {
@@ -132,14 +121,6 @@ table 6150614 "NPR POS Store"
             InitValue = "Per POS Entry";
             OptionCaption = 'Uncompressed,Per POS Entry,Per POS Period';
             OptionMembers = Uncompressed,"Per POS Entry","Per POS Period";
-
-            trigger OnValidate()
-            begin
-                //-NPR5.38 [302803]
-                if "Posting Compression" = "Posting Compression"::"Per POS Period" then
-                    TestField("POS Period Register No. Series");
-                //+NPR5.38 [302803]
-            end;
         }
         field(25; "Location Code"; Code[10])
         {
@@ -199,15 +180,9 @@ table 6150614 "NPR POS Store"
             Caption = 'Gen. Bus. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "Gen. Business Posting Group";
-
-            trigger OnValidate()
-            var
-                GenBusPostingGrp: Record "Gen. Business Posting Group";
-            begin
-                if xRec."Gen. Bus. Posting Group" <> "Gen. Bus. Posting Group" then
-                    if GenBusPostingGrp.ValidateVatBusPostingGroup(GenBusPostingGrp, "Gen. Bus. Posting Group") then
-                        Validate("VAT Bus. Posting Group", GenBusPostingGrp."Def. VAT Bus. Posting Group");
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Moved to dedicated POS Unit Profile';
+            ObsoleteTag = 'NPR POS Store -> NPR POS Unit -> NPR POS Posting Profile';
         }
         field(51; "Tax Area Code"; Code[20])
         {
@@ -225,6 +200,9 @@ table 6150614 "NPR POS Store"
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "VAT Business Posting Group";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Moved to dedicated POS Unit Profile';
+            ObsoleteTag = 'NPR POS Store -> NPR POS Unit -> NPR POS Posting Profile';
         }
         field(54; "Default POS Posting Setup"; Option)
         {
@@ -246,6 +224,9 @@ table 6150614 "NPR POS Store"
             Caption = 'POS Period Register No. Series';
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Moved to dedicated POS Unit Profile';
+            ObsoleteTag = 'NPR POS Store -> NPR POS Unit -> NPR POS Posting Profile';
         }
         field(70; "POS Entry Doc. No. Series"; Code[10])
         {
@@ -336,20 +317,16 @@ table 6150614 "NPR POS Store"
     var
         POSPostingSetup: Record "NPR POS Posting Setup";
     begin
-        //-NPR5.36 [289641]
         POSPostingSetup.SetRange("POS Store Code", Code);
         POSPostingSetup.DeleteAll(true);
-        //+NPR5.36 [289641]
-        DimMgt.DeleteDefaultDim(DATABASE::"NPR POS Store", Code);  //NPR5.53 [371956]
+        DimMgt.DeleteDefaultDim(DATABASE::"NPR POS Store", Code);
     end;
 
     trigger OnInsert()
     begin
-        //-NPR5.53 [371956]
         DimMgt.UpdateDefaultDim(
           DATABASE::"NPR POS Store", Code,
           "Global Dimension 1 Code", "Global Dimension 2 Code");
-        //+NPR5.53 [371956]
     end;
 
     var
@@ -357,10 +334,31 @@ table 6150614 "NPR POS Store"
         DimMgt: Codeunit DimensionManagement;
 
     local procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeValidateShortcutDimCode(Rec, xRec, FieldNumber, ShortcutDimCode, IsHandled);
+        if IsHandled then
+            exit;
+
         DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
-        DimMgt.SaveDefaultDim(DATABASE::"NPR POS Store", Code, FieldNumber, ShortcutDimCode);
-        Modify;
+        if not IsTemporary() then begin
+            DimMgt.SaveDefaultDim(DATABASE::"NPR POS Store", Code, FieldNumber, ShortcutDimCode);
+            Modify();
+        end;
+
+        OnAfterValidateShortcutDimCode(Rec, xRec, FieldNumber, ShortcutDimCode);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateShortcutDimCode(var POSStore: Record "NPR POS Store"; var xPOSStore: Record "NPR POS Store"; FieldNumber: Integer; var ShortcutDimCode: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterValidateShortcutDimCode(var POSStore: Record "NPR POS Store"; xPOSStore: Record "NPR POS Store"; FieldNumber: Integer; var ShortcutDimCode: Code[20])
+    begin
     end;
 }
 
