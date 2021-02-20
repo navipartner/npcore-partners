@@ -6,12 +6,12 @@ page 6151436 "NPR Magento Item Attr."
     DeleteAllowed = false;
     InsertAllowed = false;
     SourceTable = "NPR Magento Item Attr.";
-
+    PageType = Card;
     layout
     {
         area(content)
         {
-            repeater(Control6150613)
+            group(General)
             {
                 ShowCaption = false;
                 field("Attribute Description"; Rec."Attribute Description")

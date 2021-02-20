@@ -1,14 +1,10 @@
 page 6014586 "NPR Salesperson Stats Retail"
 {
-    // NPR4.21/TS/20160225  CASE 226010 Changed from ListPart to CardPart
-    // NPR5.31/BR/20172021  CASE 272890 Changed from CardPart to Card (for export to Excel) and made non-editable
-    // NPR5.55/BHR /20200724 CASE 361515 Comment Key not used in AL
-
     Caption = 'Salesperson Statistics';
     DeleteAllowed = false;
     Editable = false;
     InsertAllowed = false;
-    PageType = Card;
+    PageType = List;
     UsageCategory = Administration;
     ApplicationArea = All;
     SourceTable = "Salesperson/Purchaser";
@@ -20,7 +16,7 @@ page 6014586 "NPR Salesperson Stats Retail"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
@@ -36,7 +32,6 @@ page 6014586 "NPR Salesperson Stats Retail"
                         ItemLedgerEntry: Record "Item Ledger Entry";
                         ItemLedgerEntryForm: Page "Item Ledger Entries";
                     begin
-
                         SetItemLedgerEntryFilter(ItemLedgerEntry);
                         ItemLedgerEntryForm.SetTableView(ItemLedgerEntry);
                         ItemLedgerEntryForm.Editable(false);
@@ -61,7 +56,6 @@ page 6014586 "NPR Salesperson Stats Retail"
                         ValueEntry: Record "Value Entry";
                         ValueEntryForm: Page "Value Entries";
                     begin
-
                         SetValueEntryFilter(ValueEntry);
                         ValueEntryForm.SetTableView(ValueEntry);
                         ValueEntryForm.Editable(false);
@@ -105,10 +99,6 @@ page 6014586 "NPR Salesperson Stats Retail"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnAfterGetRecord()
     begin
         Calc;
@@ -116,9 +106,10 @@ page 6014586 "NPR Salesperson Stats Retail"
 
     trigger OnOpenPage()
     begin
-
-        if (Periodestart = 0D) then Periodestart := Today;
-        if (Periodeslut = 0D) then Periodeslut := Today;
+        if (Periodestart = 0D) then
+            Periodestart := Today;
+        if (Periodeslut = 0D) then
+            Periodeslut := Today;
     end;
 
     var
@@ -152,8 +143,7 @@ page 6014586 "NPR Salesperson Stats Retail"
 
     procedure SetFilter(GlobalDim1: Code[20]; GlobalDim2: Code[20]; DatoStart: Date; DatoEnd: Date; ItemGroup: Code[20]; LastYearCalc: Text[50]; ItemFilter: Code[20])
     begin
-        //SetFilter()
-        "NPR Global Dimension 1 Filter" := GlobalDim1;
+        Rec."NPR Global Dimension 1 Filter" := GlobalDim1;
         "Global Dimension 2 Filter" := GlobalDim2;
         Periodestart := DatoStart;
         Periodeslut := DatoEnd;
@@ -161,7 +151,6 @@ page 6014586 "NPR Salesperson Stats Retail"
         CalcLastYear := LastYearCalc;
         ItemNoFilter := ItemFilter;
 
-        //CurrForm.UPDATE;
         CurrPage.Update;
     end;
 
@@ -170,7 +159,6 @@ page 6014586 "NPR Salesperson Stats Retail"
         ValueEntry: Record "Value Entry";
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
-        //Calc()
         SetValueEntryFilter(ValueEntry);
         ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
 
@@ -193,9 +181,6 @@ page 6014586 "NPR Salesperson Stats Retail"
 
         SetItemLedgerEntryFilter(ItemLedgerEntry);
         ItemLedgerEntry.CalcSums(Quantity);
-        // ItemLedgerEntry."Item No."
-        // ValueEntry."Item No."
-        //
 
         "LastYear Sale Quantity" := ItemLedgerEntry.Quantity;
         "LastYear Sale Amount" := ValueEntry."Sales Amount (Actual)";
@@ -210,11 +195,9 @@ page 6014586 "NPR Salesperson Stats Retail"
 
     procedure SetItemLedgerEntryFilter(var ItemLedgerEntry: Record "Item Ledger Entry")
     begin
-        //SetItemLedgerEntryFilter
         ItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code");
         ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
-        ItemLedgerEntry.SetRange("NPR Salesperson Code", Code);
-        //ItemLedgerEntry.SETFILTER( "Posting Date", DateFilter );
+        ItemLedgerEntry.SetRange("NPR Salesperson Code", Rec.Code);
         if not LastYear then
             ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
         else
@@ -230,7 +213,7 @@ page 6014586 "NPR Salesperson Stats Retail"
         else
             ItemLedgerEntry.SetRange("Item No.");
 
-        if "NPR Global Dimension 1 Filter" <> '' then
+        if Rec."NPR Global Dimension 1 Filter" <> '' then
             ItemLedgerEntry.SetRange("Global Dimension 1 Code", "NPR Global Dimension 1 Filter")
         else
             ItemLedgerEntry.SetRange("Global Dimension 1 Code");
@@ -243,13 +226,8 @@ page 6014586 "NPR Salesperson Stats Retail"
 
     procedure SetValueEntryFilter(var ValueEntry: Record "Value Entry")
     begin
-        //SetValueEntryFilter
-        //-NPR5.55 [361515]
-        //ValueEntry.SETCURRENTKEY( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
-        //+NPR5.55 [361515]
         ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
         ValueEntry.SetRange("Salespers./Purch. Code", Code);
-        //ValueEntry.SETFILTER( "Posting Date", DateFilter );
         if not LastYear then
             ValueEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
         else
@@ -278,9 +256,8 @@ page 6014586 "NPR Salesperson Stats Retail"
 
     procedure InitForm()
     begin
-        //InitForm()
-        Reset;
-        "NPR Global Dimension 1 Filter" := '';
+        Rec.Reset();
+        Rec."NPR Global Dimension 1 Filter" := '';
         "Global Dimension 2 Filter" := '';
         Periodestart := Today;
         Periodeslut := Today;
@@ -289,11 +266,6 @@ page 6014586 "NPR Salesperson Stats Retail"
 
     procedure ShowLastYear(Show: Boolean)
     begin
-        //CurrForm."LastYear Sale Quantity".VISIBLE( Show );
-        //CurrForm."LastYear Sale Amount".VISIBLE( Show );
-        //CurrForm."LastYear Profit Amount".VISIBLE( Show );
-        //CurrForm."LastYear Profit %".VISIBLE( Show );
-
         LSQty := Show;
         LSAmount := Show;
         LPA := Show;
@@ -309,14 +281,13 @@ page 6014586 "NPR Salesperson Stats Retail"
         ItemLedgerEntry: Record "Item Ledger Entry";
         txtDlg: Label 'Processing SalesPerson #1######## @2@@@@@@@@';
     begin
-        //ChangeEmptyFilter()
         HideEmpty := not HideEmpty;
 
-        ClearMarks;
+        Rec.ClearMarks;
         if HideEmpty then begin
             Current := Rec;
             Dlg.Open(txtDlg);
-            if SalesPerson.FindSet then
+            if SalesPerson.FindSet() then
                 repeat
                     Count += 1;
 
@@ -326,20 +297,19 @@ page 6014586 "NPR Salesperson Stats Retail"
                     ItemLedgerEntry.SetRange("NPR Salesperson Code", SalesPerson.Code);
                     ItemLedgerEntry.CalcSums(Quantity);
                     if ItemLedgerEntry.Quantity <> 0 then begin
-                        Get(SalesPerson.Code);
-                        Mark(true);
+                        Rec.Get(SalesPerson.Code);
+                        Rec.Mark(true);
                     end;
-                until SalesPerson.Next = 0;
-            Dlg.Close;
+                until SalesPerson.Next() = 0;
+            Dlg.Close();
 
-            MarkedOnly(true);
+            Rec.MarkedOnly(true);
             Rec := Current;
         end else begin
-            MarkedOnly(false);
+            Rec.MarkedOnly(false);
         end;
 
-        //CurrForm.UPDATE;
-        CurrPage.Update;
+        CurrPage.Update();
 
         exit(HideEmpty);
     end;

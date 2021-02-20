@@ -1,70 +1,67 @@
 page 6150715 "NPR POS Unit Identity List"
 {
-    // #Transcendence/TSA/20170221 CASE Trancendence Login
-
     Caption = 'POS Unit Identity List';
     CardPageID = "NPR POS Unit Identity Card";
-    PageType = ListPlus;
+    PageType = List;
     SourceTable = "NPR POS Unit Identity";
     UsageCategory = Administration;
     ApplicationArea = All;
-
     layout
     {
         area(content)
         {
             repeater(Group)
             {
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
-                field("Device ID"; "Device ID")
+                field("Device ID"; Rec."Device ID")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Device ID field';
                 }
-                field("User ID"; "User ID")
+                field("User ID"; Rec."User ID")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the User ID field';
                 }
-                field("Default POS Unit No."; "Default POS Unit No.")
+                field("Default POS Unit No."; Rec."Default POS Unit No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Default POS Unit No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Host Name"; "Host Name")
+                field("Host Name"; Rec."Host Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Host Name field';
                 }
-                field("Session Type"; "Session Type")
+                field("Session Type"; Rec."Session Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Session Type field';
                 }
-                field("Select POS Using"; "Select POS Using")
+                field("Select POS Using"; Rec."Select POS Using")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Select POS Using field';
                 }
-                field("Created At"; "Created At")
+                field("Created At"; Rec."Created At")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Created At field';
                 }
-                field("Last Session At"; "Last Session At")
+                field("Last Session At"; Rec."Last Session At")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -72,10 +69,6 @@ page 6150715 "NPR POS Unit Identity List"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

@@ -1,8 +1,5 @@
 page 6150744 "NPR Archive POS Sale"
 {
-    // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
-    // NPR5.55/ALPO/20200423 CASE 401611 5.54 upgrade performace optimization: removed field "POS Sales Data" and related functions
-
     Caption = 'Archive POS Sale';
     Editable = false;
     PageType = Document;
@@ -14,75 +11,75 @@ page 6150744 "NPR Archive POS Sale"
     {
         area(content)
         {
-            repeater(Group)
+            group(General)
             {
-                field("Register No."; "Register No.")
+                field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Cash Register No. field';
                 }
-                field("Sales Ticket No."; "Sales Ticket No.")
+                field("Sales Ticket No."; Rec."Sales Ticket No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Ticket No. field';
                 }
-                field("Salesperson Code"; "Salesperson Code")
+                field("Salesperson Code"; Rec."Salesperson Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
-                field("Date"; Date)
+                field("Date"; Rec.Date)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Date field';
                 }
-                field("Start Time"; "Start Time")
+                field("Start Time"; Rec."Start Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Start Time field';
                 }
-                field("Customer No."; "Customer No.")
+                field("Customer No."; Rec."Customer No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer No. field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Customer Name"; "Customer Name")
+                field("Customer Name"; Rec."Customer Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer Name field';
                 }
-                field("Location Code"; "Location Code")
+                field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Location Code field';
                 }
-                field(Amount; Amount)
+                field(Amount; Rec.Amount)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount field';
                 }
-                field("Amount Including VAT"; "Amount Including VAT")
+                field("Amount Including VAT"; Rec."Amount Including VAT")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount Including VAT field';
                 }
-                field("Payment Amount"; "Payment Amount")
+                field("Payment Amount"; Rec."Payment Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Payment Amount field';
                 }
-                field("POS Sale ID"; "POS Sale ID")
+                field("POS Sale ID"; Rec."POS Sale ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Sale ID field';
                 }
-                field("Retail ID"; "Retail ID")
+                field("Retail ID"; Rec."Retail ID")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -105,10 +102,6 @@ page 6150744 "NPR Archive POS Sale"
                 ApplicationArea = All;
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

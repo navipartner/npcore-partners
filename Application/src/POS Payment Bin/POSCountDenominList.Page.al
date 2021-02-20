@@ -1,9 +1,10 @@
 page 6014488 "NPR POS Count. Denomin. List"
 {
-    UsageCategory = None;
+    UsageCategory = Lists;
+    ApplicationArea = All;
     Caption = 'Credit Card Prefix';
     SourceTable = "NPR POS Counting Denomination";
-
+    PageType = List;
     layout
     {
         area(content)
@@ -18,10 +19,6 @@ page 6014488 "NPR POS Count. Denomin. List"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 
 }

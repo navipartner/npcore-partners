@@ -4,7 +4,7 @@ page 6150633 "NPR NPRE Select Flow Status"
     DataCaptionExpression = GetDataCaptionExpr();
     DeleteAllowed = false;
     InsertAllowed = false;
-    PageType = ListPlus;
+    PageType = List;
     SourceTable = "NPR NPRE Flow Status";
     SourceTableView = SORTING("Status Object", "Flow Order");
     UsageCategory = Administration;
