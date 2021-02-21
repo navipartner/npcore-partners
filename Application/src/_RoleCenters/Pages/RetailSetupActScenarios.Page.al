@@ -21,12 +21,12 @@ page 6151247 "NPR Setup Act - Scenarios"
                     ToolTip = 'Specifies the value of the POS Sales Scenarios field';
                 }
 
-                field("EAN SETUPr"; Rec."EAN SETUP")
+                field("POS Input BOX Setup"; Rec."EAN SETUP")
                 {
                     ApplicationArea = All;
-                    Caption = 'EAN BOX SETUP';
+                    Caption = 'POS Input BOX SETUP';
                     ShowCaption = true;
-                    ToolTip = 'Specifies the value of the EAN BOX SETUP field';
+                    ToolTip = 'Specifies the value of the POS Input BOX SETUP field';
                 }
 
             }
