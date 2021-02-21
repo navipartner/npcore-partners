@@ -1,12 +1,10 @@
 table 6060105 "NPR Ean Box Setup"
 {
-    // NPR5.32/NPKNAV/20170526  CASE 272577 Transport NPR5.32 - 26 May 2017
-    // NPR5.45/MHA /20180814  CASE 319706 Reworked Identifier Dissociation to Ean Box Event Handler
 
     Caption = 'Ean Box Setup';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR Ean Box Setups";
-    LookupPageID = "NPR Ean Box Setups";
+    DrillDownPageID = "NPR POS Input Box Setups";
+    LookupPageID = "NPR POS Input Box Setups";
 
     fields
     {
