@@ -1,9 +1,5 @@
-codeunit 6060105 "NPR Ean Box Setup Mgt."
+codeunit 6060105 "NPR POS Input Box Setup Mgt."
 {
-    // NPR5.32/NPKNAV/20170526  CASE 272577 Transport NPR5.32 - 26 May 2017
-    // NPR5.34/TSA /20170724 CASE 284798 Corrected Spelling of publisher: IdentifyThisCodePublisher
-    // NPR5.36/ANEN  /20170901 CASE 288703 Adding fcn. SetDispenserExitCode and GetDispenserExitCode
-    // NPR5.45/MHA /20180814  CASE 319706 Reworked Identifier Dissociation to Ean Box Event Handler
 
 
     trigger OnRun()
@@ -11,7 +7,7 @@ codeunit 6060105 "NPR Ean Box Setup Mgt."
     end;
 
     var
-        Text000: Label 'Default Ean Box Sales Setup';
+        Text000: Label 'Default POS Input Box Sales Setup';
 
     [IntegrationEvent(false, false)]
     procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")

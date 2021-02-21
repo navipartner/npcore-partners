@@ -8,9 +8,9 @@ page 6151260 "NPR POS Entry Cue"
     {
         area(content)
         {
-            cuegroup("POS ENTRY POSTING")
+            cuegroup("POS Entry Unposted Posting")
             {
-                ShowCaption = false;
+                Caption = 'Unposted postings';
                 field("Unposted Item Trans."; Rec."Unposted Item Trans.")
                 {
                     ApplicationArea = All;
@@ -21,6 +21,10 @@ page 6151260 "NPR POS Entry Cue"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unposted G/L Trans. field';
                 }
+            }
+            cuegroup("POS Entry Failed Posting")
+            {
+                Caption = 'Failed postings';
                 field("Failed Item Transaction."; Rec."Failed Item Transaction.")
                 {
                     ApplicationArea = All;

@@ -1,16 +1,10 @@
 table 6060108 "NPR Ean Box Parameter"
 {
-    // NPR5.32/NPKNAV/20170526  CASE 272577 Transport NPR5.32 - 26 May 2017
-    // NPR5.32.11/ANEN/20170615 Fix, code bug
-    // NPR5.36/ANEN  /20170901 CASE 288703 Allowing all datatypes on 'Use Code As Value'
-    // NPR5.40/TJ  /20180312 CASE 307454 OptionValueInteger now gets updated even if Value is entered manually
-    // NPR5.45/MHA /20180814  CASE 319706 Reworked Identifier Dissociation to Ean Box Event Handler
-    // NPR5.49/MHA /20190220  CASE 344084 Updated LookupValue() and ValidateValue() to use POS Parameter Value framework
 
     Caption = 'Ean Box Parameter';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR Ean Box Parameters";
-    LookupPageID = "NPR Ean Box Parameters";
+    DrillDownPageID = "NPR POS Input Box Parameters";
+    LookupPageID = "NPR POS Input Box Parameters";
 
     fields
     {
@@ -100,7 +94,6 @@ table 6060108 "NPR Ean Box Parameter"
     var
         TempPOSParameterValue: Record "NPR POS Parameter Value" temporary;
     begin
-        //-NPR5.49 [344084]
         // CASE "Data Type" OF
         //  "Data Type"::Option :
         //    BEGIN
@@ -125,7 +118,6 @@ table 6060108 "NPR Ean Box Parameter"
         InitPOSParameterValue(TempPOSParameterValue);
         TempPOSParameterValue.LookupValue();
         Value := TempPOSParameterValue.Value;
-        //+NPR5.49 [344084]
     end;
 
     local procedure ValidateValue()
@@ -133,7 +125,6 @@ table 6060108 "NPR Ean Box Parameter"
         TempPOSParameterValue: Record "NPR POS Parameter Value" temporary;
         TypeHelper: Codeunit "Type Helper";
     begin
-        //-NPR5.49 [344084]
         // TempPOSActionParameter."Data Type" := "Data Type";
         // TempPOSActionParameter.Options := Options;
         // TempPOSActionParameter.VALIDATE("Default Value",Value);
@@ -141,20 +132,17 @@ table 6060108 "NPR Ean Box Parameter"
         InitPOSParameterValue(TempPOSParameterValue);
         TempPOSParameterValue.Validate(Value);
         Value := TempPOSParameterValue.Value;
-        //+NPR5.49 [344084]
         if "Data Type" = "Data Type"::Option then
             Validate(OptionValueInteger, TypeHelper.GetOptionNo(Value, Options));
     end;
 
     local procedure InitPOSParameterValue(var TempPOSParameterValue: Record "NPR POS Parameter Value" temporary)
     begin
-        //-NPR5.49 [344084]
         TempPOSParameterValue.Init;
         TempPOSParameterValue."Action Code" := "Action Code";
         TempPOSParameterValue.Name := Name;
         TempPOSParameterValue."Data Type" := "Data Type";
         TempPOSParameterValue.Value := Value;
-        //+NPR5.49 [344084]
     end;
 }
 

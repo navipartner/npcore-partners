@@ -1,11 +1,7 @@
-page 6060098 "NPR Ean Box Setup Events"
+page 6060098 "NPR POS Input Box Setup Events"
 {
-    // NPR5.32/NPKNAV/20170526  CASE 272577 Transport NPR5.32 - 26 May 2017
-    // NPR5.40/VB  /20180307 CASE 306347 Force-invoking physical action discovery.
-    // NPR5.45/MHA /20180814  CASE 319706 Reworked Identifier Dissociation to Ean Box Event Handler
-    // NPR5.47/MHA /20181024  CASE 333512 Added field 10 Priority
 
-    Caption = 'Ean Box Setup Events';
+    Caption = 'POS Input Box Setup Events';
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
@@ -74,7 +70,7 @@ page 6060098 "NPR Ean Box Setup Events"
                 var
                     EanBoxEvent: Record "NPR Ean Box Event";
                     EanBoxParameter: Record "NPR Ean Box Parameter";
-                    EanBoxSetupMgt: Codeunit "NPR Ean Box Setup Mgt.";
+                    EanBoxSetupMgt: Codeunit "NPR POS Input Box Setup Mgt.";
                 begin
                     EanBoxSetupMgt.InitEanBoxSetupEventParameters(Rec);
                     EanBoxParameter.SetRange("Setup Code", "Setup Code");

@@ -1,9 +1,7 @@
-page 6060099 "NPR Ean Box Parameters"
+page 6060099 "NPR POS Input Box Parameters"
 {
-    // NPR5.32/NPKNAV/20170526  CASE 272577 Transport NPR5.32 - 26 May 2017
-    // NPR5.45/MHA /20180814  CASE 319706 Reworked Identifier Dissociation to Ean Box Event Handler
 
-    Caption = 'Ean Box Parameters';
+    Caption = 'POS Input Box Parameters';
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = List;

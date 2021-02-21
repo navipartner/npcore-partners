@@ -1,4 +1,4 @@
-codeunit 6060107 "NPR Ean Box Event Handler"
+codeunit 6060107 "NPR POS Input Box Evt Handler"
 {
     var
         Text000: Label 'Ambigous input, please specify.';
@@ -32,7 +32,7 @@ codeunit 6060107 "NPR Ean Box Event Handler"
     var
         SalePOS: Record "NPR Sale POS";
         POSUnit: Record "NPR POS Unit";
-        EanBoxSetupMgt: Codeunit "NPR Ean Box Setup Mgt.";
+        EanBoxSetupMgt: Codeunit "NPR POS Input Box Setup Mgt.";
         POSSale: Codeunit "NPR POS Sale";
         CurrView: Codeunit "NPR POS View";
     begin
