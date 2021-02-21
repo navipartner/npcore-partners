@@ -1,11 +1,8 @@
-page 6060100 "NPR Ean Box Setup"
+page 6060100 "NPR POS Input Box Setup"
 {
-    // NPR4.02/JC  /20150319  CASE 207094 Data collect for Customer, Vendor and Item
-    // NPR4.10/JC  /20150422  CASE 207094 Added Description Field
-    // NPR5.45/MHA /20180814  CASE 319706 Reworked this unused page "Data Cleanup GCVI" to be included in Ean Box Event Handler
 
     UsageCategory = None;
-    Caption = 'Ean Box Setup';
+    Caption = 'POS Input Box Setup';
     SourceTable = "NPR Ean Box Setup";
 
     layout
@@ -31,7 +28,7 @@ page 6060100 "NPR Ean Box Setup"
                     ToolTip = 'Specifies the value of the POS View field';
                 }
             }
-            part(Control6014402; "NPR Ean Box Setup Events")
+            part(Control6014402; "NPR POS Input Box Setup Events")
             {
                 SubPageLink = "Setup Code" = FIELD(Code);
                 ApplicationArea = All;

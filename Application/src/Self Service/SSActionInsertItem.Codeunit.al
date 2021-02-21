@@ -677,7 +677,7 @@ codeunit 6151289 "NPR SS Action: Insert Item"
     end;
     #endregion
     #region Ean Box Event Handling
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Ean Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
     local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
     var
         Item: Record Item;
@@ -727,8 +727,8 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Ean Box Setup Mgt.", 'OnInitEanBoxParameters', '', true, true)]
-    local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR Ean Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'OnInitEanBoxParameters', '', true, true)]
+    local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR POS Input Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
     begin
         case EanBoxEvent.Code of
             EventCodeItemNo():
@@ -754,7 +754,7 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Ean Box Event Handler", 'SetEanBoxEventInScope', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Evt Handler", 'SetEanBoxEventInScope', '', true, true)]
     local procedure SetEanBoxEventInScopeItemNo(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
     var
         Item: Record Item;
@@ -768,7 +768,7 @@ codeunit 6151289 "NPR SS Action: Insert Item"
             InScope := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Ean Box Event Handler", 'SetEanBoxEventInScope', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Evt Handler", 'SetEanBoxEventInScope', '', true, true)]
     local procedure SetEanBoxEventInScopeItemCrossRef(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
     var
         ItemReference: Record "Item Reference";
@@ -785,7 +785,7 @@ codeunit 6151289 "NPR SS Action: Insert Item"
             InScope := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Ean Box Event Handler", 'SetEanBoxEventInScope', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Evt Handler", 'SetEanBoxEventInScope', '', true, true)]
     local procedure SetEanBoxEventInScopeItemSearch(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
     var
         Item: Record Item;

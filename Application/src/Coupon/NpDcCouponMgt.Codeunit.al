@@ -892,7 +892,7 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
     #endregion Sale Document Functionality
     #region Ean Box Event Handling
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Ean Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
     local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
     var
         NpDcCoupon: Record "NPR NpDc Coupon";
@@ -908,8 +908,8 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Ean Box Setup Mgt.", 'OnInitEanBoxParameters', '', true, true)]
-    local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR Ean Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'OnInitEanBoxParameters', '', true, true)]
+    local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR POS Input Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
     begin
         case EanBoxEvent.Code of
             EventCodeRefNo():
@@ -919,7 +919,7 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Ean Box Event Handler", 'SetEanBoxEventInScope', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Evt Handler", 'SetEanBoxEventInScope', '', true, true)]
     local procedure SetEanBoxEventInScopeRefNo(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
     var
         NpDcCoupon: Record "NPR NpDc Coupon";

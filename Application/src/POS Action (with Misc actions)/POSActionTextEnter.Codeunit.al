@@ -40,7 +40,7 @@ codeunit 6150722 "NPR POS Action: Text Enter"
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
-        EanBoxEventHandler: Codeunit "NPR Ean Box Event Handler";
+        EanBoxEventHandler: Codeunit "NPR POS Input Box Evt Handler";
         ControlId: Text;
         Value: Text;
         POSSaleLine: Codeunit "NPR POS Sale Line";

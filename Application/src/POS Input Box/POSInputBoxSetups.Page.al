@@ -1,7 +1,7 @@
-page 6060096 "NPR Ean Box Setups"
+page 6060096 "NPR POS Input Box Setups"
 {
-    Caption = 'Ean Box Setups';
-    CardPageID = "NPR Ean Box Setup";
+    Caption = 'POS Input Box Setups';
+    CardPageID = "NPR POS Input Box Setup";
     Editable = false;
     PageType = List;
     SourceTable = "NPR Ean Box Setup";
@@ -40,7 +40,7 @@ page 6060096 "NPR Ean Box Setups"
     var
         EanBoxEvent: Record "NPR Ean Box Event";
         POSAction: Record "NPR POS Action";
-        EanBoxSetupMgt: Codeunit "NPR Ean Box Setup Mgt.";
+        EanBoxSetupMgt: Codeunit "NPR POS Input Box Setup Mgt.";
     begin
         POSAction.DiscoverActions();
         EanBoxSetupMgt.DiscoverEanBoxEvents(EanBoxEvent);

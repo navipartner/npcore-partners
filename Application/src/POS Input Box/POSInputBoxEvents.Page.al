@@ -1,10 +1,7 @@
-page 6060097 "NPR Ean Box Events"
+page 6060097 "NPR POS Input Box Events"
 {
-    // NPR5.32/NPKNAV/20170526  CASE 272577 Transport NPR5.32 - 26 May 2017
-    // NPR5.40/THRO/20180306  CASE 306684 Added Discovery to OnOpenPage()
-    // NPR5.45/MHA /20180814  CASE 319706 Reworked Identifier Dissociation to Ean Box Event Handler
 
-    Caption = 'Ean Box Events';
+    Caption = 'POS Input Box Events';
     InsertAllowed = false;
     PageType = List;
     SourceTable = "NPR Ean Box Event";
@@ -73,7 +70,7 @@ page 6060097 "NPR Ean Box Events"
                 trigger OnAction()
                 var
                     EanBoxParameter: Record "NPR Ean Box Parameter";
-                    EanBoxSetupMgt: Codeunit "NPR Ean Box Setup Mgt.";
+                    EanBoxSetupMgt: Codeunit "NPR POS Input Box Setup Mgt.";
                 begin
                     EanBoxSetupMgt.InitEanBoxEventParameters(Rec);
 
@@ -88,7 +85,7 @@ page 6060097 "NPR Ean Box Events"
     trigger OnOpenPage()
     var
         POSAction: Record "NPR POS Action";
-        EanBoxSetupMgt: Codeunit "NPR Ean Box Setup Mgt.";
+        EanBoxSetupMgt: Codeunit "NPR POS Input Box Setup Mgt.";
     begin
         POSAction.DiscoverActions();
         EanBoxSetupMgt.DiscoverEanBoxEvents(Rec);

@@ -73,14 +73,6 @@ page 6151245 "NPR Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Menus action';
                 }
-                action("POS Default View")
-                {
-                    Caption = 'POS Default View';
-                    Image = View;
-                    RunObject = Page "NPR POS Default Views";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the POS Default View action';
-                }
                 action("POS Actions")
                 {
                     Caption = 'POS Actions';
@@ -88,6 +80,14 @@ page 6151245 "NPR Setup RC"
                     RunObject = Page "NPR POS Actions";
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Actions action';
+                }
+                action("POS Default View")
+                {
+                    Caption = 'POS Default View';
+                    Image = View;
+                    RunObject = Page "NPR POS Default Views";
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the POS Default View action';
                 }
                 action("POS View List")
                 {
@@ -135,13 +135,6 @@ page 6151245 "NPR Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Themes action';
                 }
-                action("POS Info List")
-                {
-                    Caption = 'POS Info List';
-                    RunObject = Page "NPR POS Info List";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the POS Info List action';
-                }
                 action("POS Display Setup")
                 {
                     Caption = 'POS Display Setup';
@@ -156,21 +149,21 @@ page 6151245 "NPR Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Scenarios Sets action';
                 }
-                action("Ean Box Events")
+                action("POS Input Box Events")
                 {
-                    Caption = 'Ean Box Events';
+                    Caption = 'POS Input Box Events';
                     Image = List;
-                    RunObject = Page "NPR Ean Box Events";
+                    RunObject = Page "NPR POS Input Box Events";
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Ean Box Events action';
+                    ToolTip = 'Executes the POS Input Box Events action';
                 }
-                action("Ean Box Setups")
+                action("POS Input Box Setups")
                 {
-                    Caption = 'Ean Box Setups';
+                    Caption = 'POS Input Box Setups';
                     Image = List;
-                    RunObject = Page "NPR Ean Box Setups";
+                    RunObject = Page "NPR POS Input Box Setups";
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Ean Box Setups action';
+                    ToolTip = 'Executes the POS Input Box Setups action';
                 }
             }
             group(PaymentCard)
@@ -193,11 +186,11 @@ page 6151245 "NPR Setup RC"
                 }
                 action("POS Payment view Event Setup")
                 {
-                    Caption = 'POS Payment view Event Setup';
+                    Caption = 'POS Payment View Event Setup';
                     Image = List;
                     RunObject = page "NPR POS Paym. View Event Setup";
                     ApplicationArea = All;
-                    ToolTip = 'Executes the POS Payment view Event Setup action';
+                    ToolTip = 'Executes the POS Payment View Event Setup action';
                 }
                 action("<Page Payment Type - List>")
                 {
@@ -428,6 +421,13 @@ page 6151245 "NPR Setup RC"
                     RunObject = Page "NPR Scanner - List";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Scanners action';
+                }
+                action("POS Info List")
+                {
+                    Caption = 'POS Info List';
+                    RunObject = Page "NPR POS Info List";
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the POS Info List action';
                 }
                 action("POS Keyboard Binding Setup")
                 {
