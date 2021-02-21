@@ -1,8 +1,5 @@
 codeunit 6150837 "NPR POS Action: Boarding Pass"
 {
-    // NPR5.380/ANEN  /20171117 CASE 296330 Created to scan IATA boarding pass in POS text enter
-    // NPR5.45/MHA /20180814  CASE 319706 Deleted function BoardingPassPatternSubscriber()
-    // NPR5.49/MHA /20190220  CASE 344084 Added  workflowstep for input of BoardingPassString and Ean Box Event Subscriber
 
 
     trigger OnRun()
@@ -30,9 +27,7 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
 
     local procedure ActionVersion(): Text
     begin
-        //-NPR5.49 [344084]
         exit('1.1');
-        //+NPR5.49 [344084]
         exit('1.0');
     end;
 
@@ -47,7 +42,6 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
               Sender.Type::Generic,
               Sender."Subscriber Instances Allowed"::Multiple)
             then begin
-                //-NPR5.49 [344084]
                 Sender.RegisterWorkflowStep(
                   'boardingpass_input',
                     'if(!param.BoardingPassString) {' +
@@ -55,13 +49,10 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
                     '} else {' +
                     '  context.$boardingpass_input = {"input": param.BoardingPassString};' +
                     '};');
-                //+NPR5.49 [344084]
                 RegisterWorkflowStep('process', 'respond()');
 
                 RegisterWorkflow(false);
-                //-NPR5.49 [344084]
                 //RegisterDataBinding();
-                //+NPR5.49 [344084]
                 RegisterTextParameter('BoardingPassString', '');
                 RegisterBooleanParameter('RequiredTravelToday', true);
                 RegisterTextParameter('RequiredLegAirPortCode', '');
@@ -73,9 +64,7 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
-        //-NPR5.49 [344084]
         Captions.AddActionCaption(ActionCode(), 'BoardingPass', Text001);
-        //+NPR5.49 [344084]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', true, true)]
@@ -83,7 +72,6 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
     var
         POSInfo: Record "NPR POS Info";
     begin
-        //-NPR5.49 [344084]
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
         if POSParameterValue.Name <> 'InfoCode' then
@@ -95,7 +83,6 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         POSInfo.SetRange(Type, POSInfo.Type::"Request Data");
         if PAGE.RunModal(0, POSInfo) = ACTION::LookupOK then
             POSParameterValue.Value := POSInfo.Code;
-        //+NPR5.49 [344084]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnValidateValue', '', true, true)]
@@ -103,7 +90,6 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
     var
         POSInfo: Record "NPR POS Info";
     begin
-        //-NPR5.49 [344084]
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
         if POSParameterValue.Name <> 'InfoCode' then
@@ -124,7 +110,6 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         POSInfo.Get(POSParameterValue.Value);
         POSInfo.TestField("Input Type", POSInfo."Input Type"::Text);
         POSInfo.TestField(Type, POSInfo.Type::"Request Data");
-        //+NPR5.49 [344084]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -152,16 +137,12 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         if not Action.IsThisAction(ActionCode) then
             exit;
 
-        //-NPR5.49 [344084]
         Handled := true;
-        //+NPR5.49 [344084]
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        //-NPR5.49 [344084]
         //BoardingPassString := JSON.GetStringParameter('BoardingPassString',TRUE);
         JSON.SetScope('$boardingpass_input', true);
         BoardingPassString := JSON.GetString('input', true);
         JSON.SetScope('/', true);
-        //+NPR5.49 [344084]
         RequiredTravelToday := JSON.GetBooleanParameter('RequiredTravelToday', true);
         RequiredLegAirPortCode := JSON.GetStringParameter('RequiredLegAirPortCode', true);
         ShowTripMessage := JSON.GetBooleanParameter('ShowTripMessage', true);
@@ -170,38 +151,30 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         DecodeBoardingPassString(BoardingPassString, RequiredLegAirPortCode, RequiredLegAirPortCodeInTrip, RequiredLegAirPortFlightDate, TravelStartDate, TravelEndDate, TravelDescription, TravelSaveString);
 
         if (RequiredLegAirPortCode <> '') and (not RequiredLegAirPortCodeInTrip) then begin
-            //-NPR5.49 [344084]
             //POSEventMarshaller.DisplayError(ERR, STRSUBSTNO(ERRAPCODE, RequiredLegAirPortCode, TravelDescription), FALSE);
             //Handled := TRUE;
             //EXIT;
             Error(ERRAPCODE, RequiredLegAirPortCode, TravelDescription);
-            //+NPR5.49 [344084]
         end;
 
         if (RequiredLegAirPortCode <> '') and (RequiredLegAirPortCodeInTrip) and (RequiredTravelToday) and (RequiredLegAirPortFlightDate <> WorkDate) then begin
-            //+NPR5.49 [344084]
             //POSEventMarshaller.DisplayError(ERR,STRSUBSTNO(ERRTRAVELDATE, WORKDATE, TravelDescription), FALSE);
             //Handled := TRUE;
             //EXIT;
             Error(ERRTRAVELDATE, WorkDate, TravelDescription);
-            //+NPR5.49 [344084]
         end;
 
         if RequiredTravelToday and ((WorkDate < TravelStartDate) or (WorkDate > TravelEndDate)) then begin
-            //-NPR5.49 [344084]
             //POSEventMarshaller.DisplayError(ERR,STRSUBSTNO(ERRTRAVELDATE, WORKDATE, TravelDescription), FALSE);
             //Handled := TRUE;
             //EXIT;
             Error(ERRTRAVELDATE, WorkDate, TravelDescription);
-            //+NPR5.49 [344084]
         end;
 
 
         if ShowTripMessage then begin
-            //-NPR5.49 [344084]
             //POSEventMarshaller.DisplayError(TXTBPASS, TravelDescription, FALSE);
             Message(TravelDescription);
-            //+NPR5.49 [344084]
         end;
 
 
@@ -332,7 +305,6 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
     [EventSubscriber(ObjectType::Codeunit, 6060105, 'DiscoverEanBoxEvents', '', true, true)]
     local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
     begin
-        //-NPR5.49 [344084]
         if not EanBoxEvent.Get(EventCodeBoardingPass()) then begin
             EanBoxEvent.Init;
             EanBoxEvent.Code := EventCodeBoardingPass();
@@ -343,53 +315,43 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
             EanBoxEvent."Event Codeunit" := CurrCodeunitId();
             EanBoxEvent.Insert(true);
         end;
-        //+NPR5.49 [344084]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060105, 'OnInitEanBoxParameters', '', true, true)]
-    local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR Ean Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
+    local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR POS Input Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
     begin
-        //-NPR5.49 [344084]
         case EanBoxEvent.Code of
             EventCodeBoardingPass():
                 begin
                     Sender.SetNonEditableParameterValues(EanBoxEvent, 'BoardingPassString', true, '');
                 end;
         end;
-        //+NPR5.49 [344084]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060107, 'SetEanBoxEventInScope', '', true, true)]
     local procedure SetEanBoxEventInScopeBoardingPass(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
     begin
-        //-NPR5.49 [344084]
         if EanBoxSetupEvent."Event Code" <> EventCodeBoardingPass() then
             exit;
 
         if BarCodeIsBoardingPass(EanBoxValue) then
             InScope := true;
-        //+NPR5.49 [344084]
     end;
 
     local procedure EventCodeBoardingPass(): Code[20]
     begin
-        //-NPR5.49 [344084]
         exit('BOARDING_PASS');
-        //+NPR5.49 [344084]
     end;
 
     local procedure CurrCodeunitId(): Integer
     begin
-        //-NPR5.49 [344084]
         exit(CODEUNIT::"NPR POS Action: Boarding Pass");
-        //+NPR5.49 [344084]
     end;
 
     procedure BarCodeIsBoardingPass(Barcode: Text): Boolean
     var
         IntBuffer: Integer;
     begin
-        //-NPR5.49 [344084]
         if StrLen(Barcode) < 60 then
             exit(false);
 
@@ -400,7 +362,6 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
             exit(false);
 
         exit(true);
-        //+NPR5.49 [344084]
     end;
 }
 

@@ -1,10 +1,5 @@
 codeunit 6150830 "NPR POS Action: ScanExchLabel"
 {
-    // NPR5.36/ANEN /20170910 CASE 289887 Created pos action to handle scan of exchange labels
-    // NPR5.41/MMV /20180424 CASE 311653 Select line after scan.
-    // NPR5.45/MHA /20180817  CASE 319706 Added Ean Box Event Handler functions
-    // NPR5.49/MHA /20190328  CASE 350374 Added MaxStrLen to EanBox.Description in DiscoverEanBoxEvents()
-    // NPR5.53/ALST/20191028  CASE 372948 check EAN prefix in range instead of single value
 
 
     trigger OnRun()
@@ -110,24 +105,20 @@ codeunit 6150830 "NPR POS Action: ScanExchLabel"
 
         CodeBarcode := CopyStr(iBarcode, 1, MaxStrLen(CodeBarcode));
 
-        //-NPR5.45 [319706]
         // IF NOT ExchangeLabelManagement.BarCodeIsExchangeLabel(CodeBarcode) THEN BEGIN
         //  ERROR(STRSUBSTNO(ErrNotExchLabel,iBarcode));
         // END;
         if not BarCodeIsExchangeLabel(CodeBarcode) then
             Error(StrSubstNo(ErrNotExchLabel, iBarcode));
-        //+NPR5.45 [319706]
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
-        //-NPR5.41 [311653]
         //ExchangeLabelManagement.ScanExchangeLabel(SalePOS, CodeBarcode, CodeBarcode);
         if ExchangeLabelManagement.ScanExchangeLabel(SalePOS, CodeBarcode, CodeBarcode) then begin
             POSSession.GetSaleLine(POSSaleLine);
             POSSaleLine.SetFirst();
         end;
-        //+NPR5.41 [311653]
     end;
 
     local procedure "--- Ean Box Event Handling"()
@@ -139,27 +130,22 @@ codeunit 6150830 "NPR POS Action: ScanExchLabel"
     var
         ExchangeLabel: Record "NPR Exchange Label";
     begin
-        //-NPR5.45 [319706]
         if not EanBoxEvent.Get(EventCodeExchLabel()) then begin
             EanBoxEvent.Init;
             EanBoxEvent.Code := EventCodeExchLabel;
             EanBoxEvent."Module Name" := InpTitle;
-            //-NPR5.49 [350374]
             //EanBoxEvent.Description := ExchangeLabel.FIELDCAPTION(Barcode);
             EanBoxEvent.Description := CopyStr(ExchangeLabel.FieldCaption(Barcode), 1, MaxStrLen(EanBoxEvent.Description));
-            //+NPR5.49 [350374]
             EanBoxEvent."Action Code" := ActionCode();
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
             EanBoxEvent."Event Codeunit" := CurrCodeunitId();
             EanBoxEvent.Insert(true);
         end;
-        //+NPR5.45 [319706]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060105, 'OnInitEanBoxParameters', '', true, true)]
-    local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR Ean Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
+    local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR POS Input Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
     begin
-        //-NPR5.45 [319706]
         case EanBoxEvent.Code of
             EventCodeExchLabel():
                 begin
@@ -167,7 +153,6 @@ codeunit 6150830 "NPR POS Action: ScanExchLabel"
                     Sender.SetNonEditableParameterValues(EanBoxEvent, 'PromptForBarcode', false, 'false');
                 end;
         end;
-        //+NPR5.45 [319706]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060107, 'SetEanBoxEventInScope', '', true, true)]
@@ -175,7 +160,6 @@ codeunit 6150830 "NPR POS Action: ScanExchLabel"
     var
         ExchangeLabel: Record "NPR Exchange Label";
     begin
-        //-NPR5.45 [319706]
         if EanBoxSetupEvent."Event Code" <> EventCodeExchLabel() then
             exit;
         if StrLen(EanBoxValue) > MaxStrLen(ExchangeLabel.Barcode) then
@@ -183,21 +167,16 @@ codeunit 6150830 "NPR POS Action: ScanExchLabel"
 
         if BarCodeIsExchangeLabel(EanBoxValue) then
             InScope := true;
-        //+NPR5.45 [319706]
     end;
 
     local procedure EventCodeExchLabel(): Code[20]
     begin
-        //-NPR5.45 [319706]
         exit('EXCHLABEL');
-        //+NPR5.45 [319706]
     end;
 
     local procedure CurrCodeunitId(): Integer
     begin
-        //-NPR5.45 [319706]
         exit(CODEUNIT::"NPR POS Action: ScanExchLabel");
-        //+NPR5.45 [319706]
     end;
 
     procedure BarCodeIsExchangeLabel(Barcode: Text): Boolean
