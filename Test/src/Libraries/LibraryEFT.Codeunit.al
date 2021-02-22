@@ -15,10 +15,10 @@ codeunit 85000 "NPR Library - EFT"
         EFTSetup.Insert;
     end;
 
-    procedure CreateEFTPaymentTypePOS(var PaymentTypePOS: Record "NPR Payment Type POS"; POSUnit: Record "NPR POS Unit"; POSStore: Record "NPR POS Store")
+
+    procedure CreateEFTPaymentTypePOS(var POSPaymentMethod: Record "NPR POS Payment Method"; POSUnit: Record "NPR POS Unit"; POSStore: Record "NPR POS Store")
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        POSPaymentMethod: Record "NPR POS Payment Method";
         LibraryERM: Codeunit "Library - ERM";
         SurchargeItem: Record Item;
         TipItem: Record Item;
@@ -33,10 +33,9 @@ codeunit 85000 "NPR Library - EFT"
         SurchargeItem.Validate(Type, SurchargeItem.Type::Service);
         SurchargeItem.Modify(true);
 
-        PaymentTypePOS.Get(POSPaymentMethod.Code);
-        PaymentTypePOS."EFT Surcharge Service Item No." := SurchargeItem."No.";
-        PaymentTypePOS."EFT Tip Service Item No." := TipItem."No.";
-        PaymentTypePOS.Modify;
+        POSPaymentMethod."EFT Surcharge Service Item No." := SurchargeItem."No.";
+        POSPaymentMethod."EFT Tip Service Item No." := TipItem."No.";
+        POSPaymentMethod.Modify;
     end;
 }
 

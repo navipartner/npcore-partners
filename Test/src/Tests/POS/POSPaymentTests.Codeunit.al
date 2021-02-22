@@ -7,7 +7,6 @@ codeunit 85006 "NPR POS Payment Tests"
     var
         _Initialized: Boolean;
         _POSUnit: Record "NPR POS Unit";
-        _PaymentTypePOS: Record "NPR Payment Type POS";
         _POSPaymentMethod: Record "NPR POS Payment Method";
         _POSSession: Codeunit "NPR POS Session";
         _POSStore: Record "NPR POS Store";
@@ -121,7 +120,7 @@ codeunit 85006 "NPR POS Payment Tests"
         POSPaymentLine: Record "NPR POS Payment Line";
         Register: Record "NPR Register";
         POSSetup: Codeunit "NPR POS Setup";
-        ReturnPaymentTypePOS: Record "NPR Payment Type POS";
+        ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
     begin
         // [Scenario] Check that a successful cash payment is handled correctly via a created payment line, with sale ending as payment was above the total.
 
@@ -160,9 +159,10 @@ codeunit 85006 "NPR POS Payment Tests"
         // [Then] POS Entry includes the change due to overtender.
         _POSSession.GetSetup(POSSetup);
         POSSetup.GetRegisterRecord(Register);
-        ReturnPaymentTypePOS.GetByRegister(Register."Return Payment Type", Register."Register No.");
+        ReturnPOSPaymentMethod.Get(_POSPaymentMethod."Return Payment Method Code");
 
-        POSPaymentLine.SetRange("POS Payment Method Code", ReturnPaymentTypePOS."No.");
+        POSPaymentLine.SetRange("POS Payment Method Code", ReturnPOSPaymentMethod.Code);
+        POSPaymentLine.SetFilter("Amount (LCY)", '<0');
         Assert.Istrue(POSPaymentLine.FindFirst, 'Payment line exists with matching info for return payment (change)');
         POSPaymentLine.TestField("Amount (LCY)", -5);
     end;

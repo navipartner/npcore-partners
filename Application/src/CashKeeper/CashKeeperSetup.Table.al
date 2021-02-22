@@ -29,7 +29,7 @@ table 6059945 "NPR CashKeeper Setup"
         {
             Caption = 'Payment Type';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Payment Type POS"."No.";
+            TableRelation = "NPR POS Payment Method".Code;
         }
     }
 

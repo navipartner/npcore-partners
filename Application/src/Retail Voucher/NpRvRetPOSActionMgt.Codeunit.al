@@ -129,7 +129,7 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         Context: Codeunit "NPR POS JSON Management";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         PaidAmount: Decimal;
@@ -150,16 +150,16 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         Context.InitializeJObjectParser(Parameters, FrontEnd);
         VoucherTypeCode := Context.GetString('VoucherTypeCode', false);
         NpRvVoucherType.Get(VoucherTypeCode);
-        PaymentTypePOS.Get(NpRvVoucherType."Payment Type");
-        if PaymentTypePOS."Rounding Precision" > 0 then
-            ReturnAmount := Round(SaleAmount - PaidAmount, PaymentTypePOS."Rounding Precision");
+        POSPaymentMethod.Get(NpRvVoucherType."Payment Type");
+        if POSPaymentMethod."Rounding Precision" > 0 then
+            ReturnAmount := Round(SaleAmount - PaidAmount, POSPaymentMethod."Rounding Precision");
         if ReturnAmount >= 0 then
             Error(Text005);
 
-        if PaymentTypePOS."Minimum Amount" < 0 then
-            PaymentTypePOS."Minimum Amount" := 0;
-        if (PaymentTypePOS."Minimum Amount" > 0) and (-ReturnAmount < PaymentTypePOS."Minimum Amount") then
-            Error(Text007, PaymentTypePOS.TableCaption, PaymentTypePOS."No.", PaymentTypePOS."Minimum Amount");
+        if POSPaymentMethod."Minimum Amount" < 0 then
+            POSPaymentMethod."Minimum Amount" := 0;
+        if (POSPaymentMethod."Minimum Amount" > 0) and (-ReturnAmount < POSPaymentMethod."Minimum Amount") then
+            Error(Text007, POSPaymentMethod.TableCaption, POSPaymentMethod.Code, POSPaymentMethod."Minimum Amount");
 
         if NpRvVoucherType."Minimum Amount Issue" < 0 then
             NpRvVoucherType."Minimum Amount Issue" := 0;
@@ -250,8 +250,8 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
     local procedure EndSale(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
-        PaymentTypePOS: Record "NPR Payment Type POS";
-        ReturnPaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
         Register: Record "NPR Register";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         POSSetup: Codeunit "NPR POS Setup";
@@ -273,15 +273,15 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         JSON.SetScope('parameters', true);
         VoucherTypeCode := UpperCase(JSON.GetString('VoucherTypeCode', true));
         NpRvVoucherType.Get(VoucherTypeCode);
-        if not POSPaymentLine.GetPaymentType(PaymentTypePOS, NpRvVoucherType."Payment Type", Register."Register No.") then
+        if not POSPaymentMethod.Get(NpRvVoucherType."Payment Type") then
             exit;
-        if not POSPaymentLine.GetPaymentType(ReturnPaymentTypePOS, Register."Return Payment Type", Register."Register No.") then
+        if not ReturnPOSPaymentMethod.Get(POSPaymentMethod."Return Payment Method Code") then
             exit;
-        if POSPaymentLine.CalculateRemainingPaymentSuggestion(SaleAmount, PaidAmount, PaymentTypePOS, ReturnPaymentTypePOS, false) <> 0 then
+        if POSPaymentLine.CalculateRemainingPaymentSuggestion(SaleAmount, PaidAmount, POSPaymentMethod, ReturnPOSPaymentMethod, false) <> 0 then
             exit;
 
         POSSession.GetSale(POSSale);
-        if not POSSale.TryEndSaleWithBalancing(POSSession, PaymentTypePOS, ReturnPaymentTypePOS) then
+        if not POSSale.TryEndSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod) then
             exit;
     end;
 
@@ -292,7 +292,7 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         SalePOS: Record "NPR Sale POS";
         SaleLinePOS: Record "NPR Sale Line POS";
         NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         TempVoucher: Record "NPR NpRv Voucher" temporary;
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
@@ -319,9 +319,9 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         VoucherType.Get(VoucherTypeCode);
 
         ReturnAmount := PaidAmount - SaleAmount;
-        PaymentTypePOS.Get(VoucherType."Payment Type");
-        if PaymentTypePOS."Rounding Precision" > 0 then
-            ReturnAmount := Round(ReturnAmount, PaymentTypePOS."Rounding Precision");
+        POSPaymentMethod.Get(VoucherType."Payment Type");
+        if POSPaymentMethod."Rounding Precision" > 0 then
+            ReturnAmount := Round(ReturnAmount, POSPaymentMethod."Rounding Precision");
 
         if Amount > ReturnAmount then
             Error(Text004, ReturnAmount);
@@ -414,7 +414,7 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
 
     local procedure ValidateAmt(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         VoucherType: Record "NPR NpRv Voucher Type";
         VoucherTypeCode: Text;
         Amount: Decimal;
@@ -422,13 +422,13 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         JSON.SetScope('/', true);
         VoucherTypeCode := UpperCase(JSON.GetString('VoucherTypeCode', true));
         VoucherType.Get(VoucherTypeCode);
-        PaymentTypePOS.Get(VoucherType."Payment Type");
+        POSPaymentMethod.Get(VoucherType."Payment Type");
 
         JSON.SetScope('/', true);
         JSON.SetScope('$amt_input', true);
         Amount := JSON.GetDecimal('numpad', true);
-        if PaymentTypePOS."Rounding Precision" > 0 then
-            Amount := Round(Amount, PaymentTypePOS."Rounding Precision");
+        if POSPaymentMethod."Rounding Precision" > 0 then
+            Amount := Round(Amount, POSPaymentMethod."Rounding Precision");
 
         if VoucherType."Minimum Amount Issue" < 0 then
             VoucherType."Minimum Amount Issue" := 0;

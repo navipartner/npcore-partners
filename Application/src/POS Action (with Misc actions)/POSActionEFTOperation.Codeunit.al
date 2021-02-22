@@ -271,7 +271,7 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
         POSParameterValue2: Record "NPR POS Parameter Value";
         EFTSetup: Record "NPR EFT Setup";
         PaymentTypeFilter: Text;
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
@@ -303,9 +303,9 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
                             PaymentTypeFilter += '|';
                         PaymentTypeFilter += StrSubstNo('%1', EFTSetup."Payment Type POS");
                     until EFTSetup.Next = 0;
-                    PaymentTypePOS.SetFilter("No.", PaymentTypeFilter);
-                    if PAGE.RunModal(0, PaymentTypePOS) = ACTION::LookupOK then
-                        POSParameterValue.Value := PaymentTypePOS."No.";
+                    POSPaymentMethod.SetFilter(Code, PaymentTypeFilter);
+                    if PAGE.RunModal(0, POSPaymentMethod) = ACTION::LookupOK then
+                        POSParameterValue.Value := POSPaymentMethod.Code;
                 end;
             'AuxId':
                 begin

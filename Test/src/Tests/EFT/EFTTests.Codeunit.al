@@ -7,7 +7,7 @@ codeunit 85004 "NPR EFT Tests"
     var
         _Initialized: Boolean;
         _POSUnit: Record "NPR POS Unit";
-        _PaymentTypePOS: Record "NPR Payment Type POS";
+        _POSPaymentMethod: Record "NPR POS Payment Method";
         _EFTSetup: Record "NPR EFT Setup";
         _LastTrxEntryNo: Integer;
         _POSSession: Codeunit "NPR POS Session";
@@ -52,7 +52,7 @@ codeunit 85004 "NPR EFT Tests"
 
         // [When] Requesting to pay 5 LCY
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, 5, '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, 5, '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [Then] 5 LCY is the trx result and a payment line for the result was created.
@@ -101,7 +101,7 @@ codeunit 85004 "NPR EFT Tests"
 
         // [When] Requesting to pay 5 LCY
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, 5, '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, 5, '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [Then] 0 LCY is the trx result and a payment line for the result was created.
@@ -152,7 +152,7 @@ codeunit 85004 "NPR EFT Tests"
 
         // [When] Requesting to pay 5 LCY
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, 5, '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, 5, '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [Then] 5 LCY is the trx result and a payment line for the result was created.
@@ -205,7 +205,7 @@ codeunit 85004 "NPR EFT Tests"
 
         // [When] Requesting to pay 5 LCY
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, 5, '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, 5, '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [Then] 5 LCY is the trx result and a payment line for the result was created. It should be voided and linked to a newer void trx.
@@ -266,7 +266,7 @@ codeunit 85004 "NPR EFT Tests"
 
         // [When] Requesting to pay 5 LCY
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, 5, '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, 5, '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [Then] (5+2) LCY is the trx result and a payment line for the result was created along with a g/l deposit line for the tip.
@@ -320,7 +320,7 @@ codeunit 85004 "NPR EFT Tests"
 
         // [When] Requesting to pay 5 LCY
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, 5, '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, 5, '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [Then] (5+2) LCY is the trx result and a payment line for the result was created along with a g/l deposit line for the surcharge.
@@ -373,7 +373,7 @@ codeunit 85004 "NPR EFT Tests"
 
         // [When] Requesting to pay 7 LCY (-> 2 LCY as cashback)
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, 7, '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, 7, '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [Then] 7 LCY is the trx result and a payment line for the result was created. 2 was calculated as the cashback.
@@ -427,7 +427,7 @@ codeunit 85004 "NPR EFT Tests"
         // [When] Requesting to pay 5 LCY
         // [Then] Get error back immediately
         SetSessionActionStateBeforePayment();
-        asserterror EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, 5, '', SalePOS);
+        asserterror EFTTransactionMgt.StartPayment(_EFTSetup, 5, '', SalePOS);
     end;
 
     [Test]
@@ -469,7 +469,7 @@ codeunit 85004 "NPR EFT Tests"
 
         // [When] Requesting to refund 5 LCY
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, -5, '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, -5, '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [Then] 5 LCY is the trx result and a payment line for the result was created.
@@ -520,7 +520,7 @@ codeunit 85004 "NPR EFT Tests"
 
         // [When] Requesting to refund 5 LCY
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, -5, '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, -5, '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [Then] 5 LCY is the trx result and a payment line for the result was created.
@@ -1794,7 +1794,7 @@ codeunit 85004 "NPR EFT Tests"
         _POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, 5, '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, 5, '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [Then] The transaction ends up being a lookup of the last purchase trx instead of a new payment. Lookup is successful
@@ -1847,7 +1847,7 @@ codeunit 85004 "NPR EFT Tests"
         _POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, 5, '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, 5, '', SalePOS);
 
         // [Then] The new purchase trx was started and ended correctly. Initial transaction still needs lookup.
         EFTTransactionRequest.Get(_LastTrxEntryNo);
@@ -2397,7 +2397,7 @@ codeunit 85004 "NPR EFT Tests"
 
         // [Given] EFT payment on full amount (5 LCY)
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, 5, '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, 5, '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
         EFTTransactionRequest.TestField(Successful, true);
         EFTTransactionRequest.TestField("Result Processed", true);
@@ -2453,7 +2453,6 @@ codeunit 85004 "NPR EFT Tests"
         POSSalesLine: Record "NPR POS Sales Line";
         SaleEnded: Boolean;
         POSActionEFTGiftCard: Codeunit "NPR POS Action: EFT Gift Card";
-        GiftCardPaymentTypePOS: Record "NPR Payment Type POS";
         GiftCardPOSPaymentMethod: Record "NPR POS Payment Method";
         POSFrontEndManagement: Codeunit "NPR POS Front End Management";
         DiscountLineID: Guid;
@@ -2476,14 +2475,14 @@ codeunit 85004 "NPR EFT Tests"
 
         // [Given] A gift card payment type
         NPRLibraryPOSMasterData.CreatePOSPaymentMethod(GiftCardPOSPaymentMethod, GiftCardPOSPaymentMethod."Processing Type"::VOUCHER, '', false);
-        GiftCardPaymentTypePOS.Get(GiftCardPOSPaymentMethod.Code);
-        GiftCardPaymentTypePOS."Processing Type" := GiftCardPaymentTypePOS."Processing Type"::"Gift Voucher";
-        GiftCardPaymentTypePOS.Modify;
-        NPRLibraryEFT.CreateMockEFTSetup(GiftCardEFTSetup, _POSUnit."No.", GiftCardPaymentTypePOS."No.");
+        GiftCardPOSPaymentMethod.Get(GiftCardPOSPaymentMethod.Code);
+        GiftCardPOSPaymentMethod."Processing Type" := GiftCardPOSPaymentMethod."Processing Type"::Voucher;
+        GiftCardPOSPaymentMethod.Modify;
+        NPRLibraryEFT.CreateMockEFTSetup(GiftCardEFTSetup, _POSUnit."No.", GiftCardPOSPaymentMethod.Code);
 
         // [When] Loading a gift card with 10% discount
         _POSSession.GetFrontEnd(POSFrontEndManagement, true);
-        POSActionEFTGiftCard.PrepareGiftCardLoopBusinessLogic(_POSSession, GiftCardPaymentTypePOS."No.", 5, 10, 1);
+        POSActionEFTGiftCard.PrepareGiftCardLoopBusinessLogic(_POSSession, GiftCardPOSPaymentMethod.Code, 5, 10, 1);
         _LastTrxEntryNo := POSActionEFTGiftCard.LoadGiftCard(_POSSession, POSFrontEndManagement);
         DiscountLineID := POSActionEFTGiftCard.InsertVoucherDiscountLine(_POSSession);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
@@ -2521,7 +2520,6 @@ codeunit 85004 "NPR EFT Tests"
         POSSalesLine: Record "NPR POS Sales Line";
         SaleEnded: Boolean;
         POSActionEFTGiftCard: Codeunit "NPR POS Action: EFT Gift Card";
-        GiftCardPaymentTypePOS: Record "NPR Payment Type POS";
         GiftCardPOSPaymentMethod: Record "NPR POS Payment Method";
         POSFrontEndManagement: Codeunit "NPR POS Front End Management";
         DiscountLineID: Guid;
@@ -2544,14 +2542,14 @@ codeunit 85004 "NPR EFT Tests"
 
         // [Given] A gift card payment type
         NPRLibraryPOSMasterData.CreatePOSPaymentMethod(GiftCardPOSPaymentMethod, GiftCardPOSPaymentMethod."Processing Type"::VOUCHER, '', false);
-        GiftCardPaymentTypePOS.Get(GiftCardPOSPaymentMethod.Code);
-        GiftCardPaymentTypePOS."Processing Type" := GiftCardPaymentTypePOS."Processing Type"::"Gift Voucher";
-        GiftCardPaymentTypePOS.Modify;
-        NPRLibraryEFT.CreateMockEFTSetup(GiftCardEFTSetup, _POSUnit."No.", GiftCardPaymentTypePOS."No.");
+        GiftCardPOSPaymentMethod.Get(GiftCardPOSPaymentMethod.Code);
+        GiftCardPOSPaymentMethod."Processing Type" := GiftCardPOSPaymentMethod."Processing Type"::Voucher;
+        GiftCardPOSPaymentMethod.Modify;
+        NPRLibraryEFT.CreateMockEFTSetup(GiftCardEFTSetup, _POSUnit."No.", GiftCardPOSPaymentMethod.Code);
 
         // [When] Loading a gift card with 10% discount
         _POSSession.GetFrontEnd(POSFrontEndManagement, true);
-        POSActionEFTGiftCard.PrepareGiftCardLoopBusinessLogic(_POSSession, GiftCardPaymentTypePOS."No.", 5, 10, 1);
+        POSActionEFTGiftCard.PrepareGiftCardLoopBusinessLogic(_POSSession, GiftCardPOSPaymentMethod.Code, 5, 10, 1);
         _LastTrxEntryNo := POSActionEFTGiftCard.LoadGiftCard(_POSSession, POSFrontEndManagement);
         Commit;
         asserterror POSActionEFTGiftCard.InsertVoucherDiscountLine(_POSSession);
@@ -2590,7 +2588,6 @@ codeunit 85004 "NPR EFT Tests"
         POSSalesLine: Record "NPR POS Sales Line";
         SaleEnded: Boolean;
         POSActionEFTGiftCard: Codeunit "NPR POS Action: EFT Gift Card";
-        GiftCardPaymentTypePOS: Record "NPR Payment Type POS";
         GiftCardPOSPaymentMethod: Record "NPR POS Payment Method";
         POSFrontEndManagement: Codeunit "NPR POS Front End Management";
         DiscountLineID: Guid;
@@ -2613,14 +2610,14 @@ codeunit 85004 "NPR EFT Tests"
 
         // [Given] A gift card payment type
         NPRLibraryPOSMasterData.CreatePOSPaymentMethod(GiftCardPOSPaymentMethod, GiftCardPOSPaymentMethod."Processing Type"::VOUCHER, '', false);
-        GiftCardPaymentTypePOS.Get(GiftCardPOSPaymentMethod.Code);
-        GiftCardPaymentTypePOS."Processing Type" := GiftCardPaymentTypePOS."Processing Type"::"Gift Voucher";
-        GiftCardPaymentTypePOS.Modify;
-        NPRLibraryEFT.CreateMockEFTSetup(GiftCardEFTSetup, _POSUnit."No.", GiftCardPaymentTypePOS."No.");
+        GiftCardPOSPaymentMethod.Get(GiftCardPOSPaymentMethod.Code);
+        GiftCardPOSPaymentMethod."Processing Type" := GiftCardPOSPaymentMethod."Processing Type"::Voucher;
+        GiftCardPOSPaymentMethod.Modify;
+        NPRLibraryEFT.CreateMockEFTSetup(GiftCardEFTSetup, _POSUnit."No.", GiftCardPOSPaymentMethod.Code);
 
         // [When] Loading a gift card with 10% discount
         _POSSession.GetFrontEnd(POSFrontEndManagement, true);
-        POSActionEFTGiftCard.PrepareGiftCardLoopBusinessLogic(_POSSession, GiftCardPaymentTypePOS."No.", 5, 10, 1);
+        POSActionEFTGiftCard.PrepareGiftCardLoopBusinessLogic(_POSSession, GiftCardPOSPaymentMethod.Code, 5, 10, 1);
         _LastTrxEntryNo := POSActionEFTGiftCard.LoadGiftCard(_POSSession, POSFrontEndManagement);
         Commit;
         asserterror POSActionEFTGiftCard.InsertVoucherDiscountLine(_POSSession);
@@ -2659,7 +2656,6 @@ codeunit 85004 "NPR EFT Tests"
         POSSalesLine: Record "NPR POS Sales Line";
         SaleEnded: Boolean;
         POSActionEFTGiftCard: Codeunit "NPR POS Action: EFT Gift Card";
-        GiftCardPaymentTypePOS: Record "NPR Payment Type POS";
         GiftCardPOSPaymentMethod: Record "NPR POS Payment Method";
         POSFrontEndManagement: Codeunit "NPR POS Front End Management";
         DiscountLineID: Guid;
@@ -2719,7 +2715,6 @@ codeunit 85004 "NPR EFT Tests"
         POSSalesLine: Record "NPR POS Sales Line";
         SaleEnded: Boolean;
         POSActionEFTGiftCard: Codeunit "NPR POS Action: EFT Gift Card";
-        GiftCardPaymentTypePOS: Record "NPR Payment Type POS";
         GiftCardPOSPaymentMethod: Record "NPR POS Payment Method";
         POSFrontEndManagement: Codeunit "NPR POS Front End Management";
         DiscountLineID: Guid;
@@ -2823,8 +2818,8 @@ codeunit 85004 "NPR EFT Tests"
             NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
             NPRLibraryPOSMasterData.CreatePOSStore(_POSStore);
             NPRLibraryPOSMasterData.CreatePOSUnit(_POSUnit, _POSStore.Code, POSPostingProfile.Code);
-            NPRLibraryEFT.CreateEFTPaymentTypePOS(_PaymentTypePOS, _POSUnit, _POSStore);
-            NPRLibraryEFT.CreateMockEFTSetup(_EFTSetup, _POSUnit."No.", _PaymentTypePOS."No.");
+            NPRLibraryEFT.CreateEFTPaymentTypePOS(_POSPaymentMethod, _POSUnit, _POSStore);
+            NPRLibraryEFT.CreateMockEFTSetup(_EFTSetup, _POSUnit."No.", _POSPaymentMethod.Code);
             _Initialized := true;
         end;
 

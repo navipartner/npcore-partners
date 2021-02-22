@@ -74,8 +74,8 @@ codeunit 85002 "NPR Library - POS Master Data"
 
     procedure CreatePOSPaymentMethod(var POSPaymentMethod: Record "NPR POS Payment Method"; ProcessingType: Option; CurrencyCode: Code[10]; PostCondensed: Boolean)
     var
+        ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
         LibraryUtility: Codeunit "Library - Utility";
-        PaymentTypePOS: Record "NPR Payment Type POS";
         LibraryRandom: Codeunit "Library - Random";
         LibraryERM: Codeunit "Library - ERM";
     begin
@@ -89,21 +89,22 @@ codeunit 85002 "NPR Library - POS Master Data"
         POSPaymentMethod.Validate("Currency Code", CurrencyCode);
         POSPaymentMethod.Validate("Post Condensed", PostCondensed);
         POSPaymentMethod.Validate("Rounding Type", LibraryRandom.RandIntInRange(0, 2));
+        POSPaymentMethod.Validate("Account Type", POSPaymentMethod."Account Type"::"G/L Account");
+        POSPaymentMethod.Validate("Account No.", LibraryERM.CreateGLAccountNo);
         POSPaymentMethod.Validate("Rounding Gains Account", LibraryERM.CreateGLAccountNo);
         POSPaymentMethod.Validate("Rounding Losses Account", LibraryERM.CreateGLAccountNo);
-        POSPaymentMethod.Validate("Rounding Precision", LibraryRandom.RandDec(1, 2));
+        POSPaymentMethod.Validate("Rounding Precision", GetRandomPrecision());
         POSPaymentMethod.Insert(true);
 
-        CreatePOSPostingSetupSet('', POSPaymentMethod.Code, '');
-
-        case POSPaymentMethod."Processing Type" of
-            POSPaymentMethod."Processing Type"::CASH:
-                CreatePaymentTypePOS(PaymentTypePOS, POSPaymentMethod.Code, PaymentTypePOS."Processing Type"::Cash);
-            POSPaymentMethod."Processing Type"::EFT:
-                CreatePaymentTypePOS(PaymentTypePOS, POSPaymentMethod.Code, PaymentTypePOS."Processing Type"::EFT);
-            else
-                CreatePaymentTypePOS(PaymentTypePOS, POSPaymentMethod.Code, PaymentTypePOS."Processing Type"::Cash);
+        if POSPaymentMethod."Processing Type" = POSPaymentMethod."Processing Type"::CASH then
+            POSPaymentMethod."Return Payment Method Code" := POSPaymentMethod.Code
+        else begin
+            CreatePOSPaymentMethod(ReturnPOSPaymentMethod, POSPaymentMethod."Processing Type"::CASH, '', false);
+            POSPaymentMethod."Return Payment Method Code" := ReturnPOSPaymentMethod.Code;
         end;
+        POSPaymentMethod.Modify();
+
+        CreatePOSPostingSetup(POSPaymentMethod);
     end;
 
     procedure CreatePOSPostingSetupSet(POSStoreCode: Code[10]; POSPaymentMethodCode: Code[10]; POSPaymentBinCode: Code[10])
@@ -199,35 +200,31 @@ codeunit 85002 "NPR Library - POS Master Data"
             Register.Insert;
         end;
         Register."Primary Payment Type" := PrimaryPaymentType;
-        Register."Return Payment Type" := ReturnPaymentType;
         Register.Modify;
     end;
 
-    procedure CreatePaymentTypePOS(var PaymentTypePOS: Record "NPR Payment Type POS"; No: Text; ProcessingType: Integer)
+    procedure CreatePOSPaymentMethod(var POSPaymentMethod: Record "NPR POS Payment Method"; No: Text; ProcessingType: Integer)
     var
         LibraryERM: Codeunit "Library - ERM";
         LibraryUtility: Codeunit "Library - Utility";
     begin
-        PaymentTypePOS.Init;
+        POSPaymentMethod.Init;
         if No <> '' then begin
-            PaymentTypePOS.Validate("No.", No);
+            POSPaymentMethod.Validate(Code, No);
         end else begin
-            PaymentTypePOS.Validate(
-              "No.",
+            POSPaymentMethod.Validate(
+              Code,
               CopyStr(
-                LibraryUtility.GenerateRandomCode(PaymentTypePOS.FieldNo("No."), DATABASE::"NPR Payment Type POS"), 1,
-                LibraryUtility.GetFieldLength(DATABASE::"NPR Payment Type POS", PaymentTypePOS.FieldNo("No."))));
+                LibraryUtility.GenerateRandomCode(POSPaymentMethod.FieldNo(Code), DATABASE::"NPR POS Payment Method"), 1,
+                LibraryUtility.GetFieldLength(DATABASE::"NPR POS Payment Method", POSPaymentMethod.FieldNo(Code))));
         end;
-        if not PaymentTypePOS.Find then
-            PaymentTypePOS.Insert;
+        if not POSPaymentMethod.Find then
+            POSPaymentMethod.Insert;
 
-        PaymentTypePOS."Processing Type" := ProcessingType;
-        PaymentTypePOS.Status := PaymentTypePOS.Status::Active;
-        PaymentTypePOS."G/L Account No." := LibraryERM.CreateGLAccountNo();
-        PaymentTypePOS."Auto End Sale" := true;
-        PaymentTypePOS."To be Balanced" := true;
-        PaymentTypePOS."Balancing Type" := PaymentTypePOS."Balancing Type"::Normal;
-        PaymentTypePOS.Modify;
+        POSPaymentMethod."Processing Type" := ProcessingType;
+        POSPaymentMethod."Block POS Payment" := false;
+        POSPaymentMethod."Auto End Sale" := true;
+        POSPaymentMethod.Modify;
     end;
 
     procedure CreatePeriodRegister(var POSUnit: Record "NPR POS Unit")
@@ -383,6 +380,71 @@ codeunit 85002 "NPR Library - POS Master Data"
         if not RetailItemSetup.Get() then
             RetailItemSetup.Insert();
     end;
+
+    local procedure CreatePOSPostingSetup(var POSPaymentMethod: Record "NPR POS Payment Method")
+    var
+        POSPostingSetup: Record "NPR POS Posting Setup";
+        POSUnit: Record "NPR POS Unit";
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        POSStore: Record "NPR POS Store";
+    begin
+
+        if not POSPaymentMethod.Get(POSPaymentMethod.Code) then
+            exit;
+        POSPostingSetup.Init;
+        POSPostingSetup."POS Store Code" := '';
+        POSPostingSetup."POS Payment Method Code" := POSPaymentMethod.Code;
+        POSPostingSetup."POS Payment Bin Code" := '';
+        case POSPaymentMethod."Account Type" of
+            POSPaymentMethod."Account Type"::Bank:
+                begin
+                    POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::"Bank Account";
+                    POSPostingSetup."Account No." := POSPaymentMethod."Account No.";
+                end;
+            POSPaymentMethod."Account Type"::Customer:
+                begin
+                    POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::Customer;
+                    POSPostingSetup."Account No." := POSPaymentMethod."Account No.";
+                end;
+            POSPaymentMethod."Account Type"::"G/L Account":
+                begin
+                    POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::"G/L Account";
+                    POSPostingSetup."Account No." := POSPaymentMethod."Account No.";
+                end;
+        end;
+        if not POSPostingSetup.Find then
+            POSPostingSetup.Insert(true);
+
+        if POSUnit.FindSet then
+            repeat
+                if POSStore.Get(POSUnit."POS Store Code") then begin
+                    if POSPostingProfile.Get(POSUnit."POS Posting Profile") then begin
+                        POSPostingSetup."POS Store Code" := POSStore.Code;
+                        POSPostingSetup."Difference Account Type" := POSPostingSetup."Difference Account Type"::"G/L Account";
+                        POSPostingSetup."Difference Acc. No." := POSPostingProfile."POS Posting Diff. Account";
+                        POSPostingSetup."Difference Acc. No. (Neg)" := POSPostingProfile."Posting Diff. Account (Neg.)";
+                        if not POSPostingSetup.Find then
+                            POSPostingSetup.Insert(true);
+                    end;
+                end;
+            until POSUnit.Next() = 0;
+    end;
+
+    local procedure GetRandomPrecision() Precision: Decimal
+    var
+        LibraryRandom: Codeunit "Library - Random";
+        Denominations: List of [Decimal];
+    begin
+        Denominations.Add(0.01);
+        Denominations.Add(0.02);
+        Denominations.Add(0.05);
+        Denominations.Add(0.1);
+        Denominations.Add(0.2);
+        Denominations.Add(0.5);
+        Denominations.Add(1);
+        exit(Denominations.Get(LibraryRandom.RandIntInRange(1, Denominations.Count())));
+    end;
+
 
     procedure CreateItemForPOSSaleUsage(var Item: Record Item; POSUnit: Record "NPR POS Unit"; POSStore: Record "NPR POS Store")
     var

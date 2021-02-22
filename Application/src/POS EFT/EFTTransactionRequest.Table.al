@@ -124,13 +124,13 @@ table 6184495 "NPR EFT Transaction Request"
         {
             Caption = 'POS Payment Type Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Payment Type POS";
+            TableRelation = "NPR POS Payment Method";
         }
         field(96; "Original POS Payment Type Code"; Code[10])
         {
             Caption = 'Original POS Payment Type Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Payment Type POS";
+            TableRelation = "NPR POS Payment Method";
         }
         field(100; "Result Code"; Integer)
         {

@@ -5,7 +5,6 @@ codeunit 85007 "NPR POS Quote Tests"
     var
         _Initialized: Boolean;
         _POSUnit: Record "NPR POS Unit";
-        _PaymentTypePOS: Record "NPR Payment Type POS";
         _POSPaymentMethod: Record "NPR POS Payment Method";
         _POSSession: Codeunit "NPR POS Session";
         _POSStore: Record "NPR POS Store";

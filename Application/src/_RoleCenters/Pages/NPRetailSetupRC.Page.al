@@ -192,14 +192,7 @@ page 6151245 "NPR Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Payment View Event Setup action';
                 }
-                action("<Page Payment Type - List>")
-                {
-                    Caption = 'Types';
-                    Image = Payment;
-                    RunObject = Page "NPR Payment Type - List";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Types action';
-                }
+
                 action("EFT Setup")
                 {
                     Caption = 'EFT Setup';

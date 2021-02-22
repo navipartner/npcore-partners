@@ -48,7 +48,7 @@ table 6014407 "NPR Audit Roll"
             DataClassification = CustomerContent;
             TableRelation = IF (Type = CONST("G/L")) "G/L Account"."No."
             ELSE
-            IF (Type = CONST(Payment)) "NPR Payment Type POS"."No."
+            IF (Type = CONST(Payment)) "NPR POS Payment Method".Code
             ELSE
             IF (Type = CONST(Customer)) Customer."No."
             ELSE

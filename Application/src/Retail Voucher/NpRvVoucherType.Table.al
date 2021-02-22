@@ -84,7 +84,7 @@ table 6151012 "NPR NpRv Voucher Type"
         {
             Caption = 'Payment Type';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Payment Type POS";
+            TableRelation = "NPR POS Payment Method";
         }
         field(72; "Minimum Amount Issue"; Decimal)
         {

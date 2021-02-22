@@ -1,8 +1,5 @@
 codeunit 6150715 "NPR POS Data Driver: ExchRate"
 {
-    // NPR5.39/TSA /20180131 CASE 303052 Completely refactored to use data driver extensions
-
-
     trigger OnRun()
     begin
     end;
@@ -34,20 +31,17 @@ codeunit 6150715 "NPR POS Data Driver: ExchRate"
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', false, false)]
     local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
+        POSPaymentMethod: Record "NPR POS Payment Method";
         DataType: Enum "NPR Data Type";
-        PaymentType: Record "NPR Payment Type POS";
     begin
-
         if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
             exit;
-
-        PaymentType.SetFilter("Processing Type", '=%1', PaymentType."Processing Type"::"Foreign Currency");
-        PaymentType.SetFilter(Status, '=%1', PaymentType.Status::Active);
-        PaymentType.SetFilter("Register No.", '=%1', '');
-        if (PaymentType.FindSet()) then begin
+        POSPaymentMethod.SetFilter("Currency Code", '<>%1', '');
+        POSPaymentMethod.SetRange("Block POS Payment", false);
+        if (POSPaymentMethod.FindSet()) then begin
             repeat
-                DataSource.AddColumn(PaymentType."No.", PaymentType.Description, DataType::String, false);
-            until (PaymentType.Next() = 0);
+                DataSource.AddColumn(POSPaymentMethod.Code, POSPaymentMethod.Description, DataType::String, false);
+            until (POSPaymentMethod.Next() = 0);
         end;
 
         Handled := true;
@@ -60,8 +54,8 @@ codeunit 6150715 "NPR POS Data Driver: ExchRate"
         POSSale: Codeunit "NPR POS Sale";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         Setup: Codeunit "NPR POS Setup";
-        PaymentType: Record "NPR Payment Type POS";
-        PaymentType2: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        POSPaymentMethod2: Record "NPR POS Payment Method";
         SalesAmount: Decimal;
         ReturnAmount: Decimal;
         PaidAmount: Decimal;
@@ -77,15 +71,12 @@ codeunit 6150715 "NPR POS Data Driver: ExchRate"
 
         POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
 
-        PaymentType.SetFilter("Processing Type", '=%1', PaymentType."Processing Type"::"Foreign Currency");
-        PaymentType.SetFilter(Status, '=%1', PaymentType.Status::Active);
-        PaymentType.SetFilter("Register No.", '=%1', '');
-        if (PaymentType.FindSet()) then begin
+        POSPaymentMethod.SetFilter("Currency Code", '<>%1', '');
+        POSPaymentMethod.SetRange("Block POS Payment", false);
+        if POSPaymentMethod.FindSet() then
             repeat
-                POSPaymentLine.GetPaymentType(PaymentType2, PaymentType."No.", Setup.Register);
-                DataRow.Add(PaymentType2."No.", Format(POSPaymentLine.RoundAmount(PaymentType2, POSPaymentLine.CalculateForeignAmount(PaymentType2, SubTotal))));
-            until (PaymentType.Next() = 0);
-        end;
+                DataRow.Add(POSPaymentMethod.Code, Format(POSPaymentLine.RoundAmount(POSPaymentMethod, POSPaymentLine.CalculateForeignAmount(POSPaymentMethod, SubTotal))));
+            until POSPaymentMethod.Next() = 0;
     end;
 }
 

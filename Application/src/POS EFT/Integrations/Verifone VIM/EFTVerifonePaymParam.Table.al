@@ -11,7 +11,7 @@ table 6184514 "NPR EFT Verifone Paym. Param."
         {
             Caption = 'Payment Type POS';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Payment Type POS"."No.";
+            TableRelation = "NPR POS Payment Method".Code;
         }
         field(10; "Initialize Timeout Seconds"; Integer)
         {

@@ -319,13 +319,14 @@ table 6014401 "NPR Register"
         {
             Caption = 'Primary Payment Type';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Payment Type POS"."No." WHERE(Status = CONST(Active));
         }
         field(160; "Return Payment Type"; Code[10])
         {
             Caption = 'Return Payment Type';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Payment Type POS"."No." WHERE(Status = CONST(Active));
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register -> POS Payment Method';
         }
         field(250; "Display 1"; Text[20])
         {
@@ -990,7 +991,6 @@ table 6014401 "NPR Register"
         {
             Caption = 'Credit card button';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Payment Type POS";
             ObsoleteState = Removed;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
@@ -1015,7 +1015,6 @@ table 6014401 "NPR Register"
         {
             Caption = 'Credit card offline';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Payment Type POS";
             ObsoleteState = Removed;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
@@ -1043,7 +1042,6 @@ table 6014401 "NPR Register"
             Caption = 'MobilePay Payment Type';
             DataClassification = CustomerContent;
             Description = 'MbP1.80';
-            TableRelation = "NPR Payment Type POS";
             ObsoleteState = Removed;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
@@ -1098,7 +1096,6 @@ table 6014401 "NPR Register"
             Caption = 'mPos Payment Type';
             DataClassification = CustomerContent;
             Description = 'NPR5.29';
-            TableRelation = "NPR Payment Type POS";
             ObsoleteState = Removed;
             ObsoleteReason = 'This table won''t be used anymore';
             ObsoleteTag = 'NPR Register';

@@ -191,8 +191,8 @@ codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
     local procedure EndSale(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
-        PaymentTypePOS: Record "NPR Payment Type POS";
-        ReturnPaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
         Register: Record "NPR Register";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         POSSale: Codeunit "NPR POS Sale";
@@ -213,15 +213,15 @@ codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
 
         VoucherTypeCode := UpperCase(JSON.GetString('VoucherType', true));
         NpRvVoucherType.Get(VoucherTypeCode);
-        if not POSPaymentLine.GetPaymentType(PaymentTypePOS, NpRvVoucherType."Payment Type", Register."Register No.") then
+        if not POSPaymentMethod.Get(NpRvVoucherType."Payment Type") then
             exit;
-        if not POSPaymentLine.GetPaymentType(ReturnPaymentTypePOS, Register."Return Payment Type", Register."Register No.") then
+        if not ReturnPOSPaymentMethod.Get(POSPaymentMethod."Return Payment Method Code") then
             exit;
-        if POSPaymentLine.CalculateRemainingPaymentSuggestion(SaleAmount, PaidAmount, PaymentTypePOS, ReturnPaymentTypePOS, false) <> 0 then
+        if POSPaymentLine.CalculateRemainingPaymentSuggestion(SaleAmount, PaidAmount, POSPaymentMethod, ReturnPOSPaymentMethod, false) <> 0 then
             exit;
 
         POSSession.GetSale(POSSale);
-        if not POSSale.TryEndSaleWithBalancing(POSSession, PaymentTypePOS, ReturnPaymentTypePOS) then
+        if not POSSale.TryEndSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod) then
             exit;
     end;
 

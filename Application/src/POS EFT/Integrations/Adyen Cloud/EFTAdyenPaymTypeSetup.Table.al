@@ -16,7 +16,7 @@ table 6184508 "NPR EFT Adyen Paym. Type Setup"
         {
             Caption = 'Payment Type POS';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Payment Type POS"."No.";
+            TableRelation = "NPR POS Payment Method".Code;
         }
         field(2; "API Key"; Text[250])
         {

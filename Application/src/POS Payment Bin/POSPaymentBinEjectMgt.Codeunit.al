@@ -96,50 +96,25 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
         exit(Date);
     end;
 
-    local procedure IsDrawerOpenRequiredAuditRoll(SalePOS: Record "NPR Sale POS"): Boolean
-    var
-        AuditRoll: Record "NPR Audit Roll";
-        PaymentTypePOS: Record "NPR Payment Type POS";
-        FilterString: Text;
-    begin
-        PaymentTypePOS.SetCurrentKey("Processing Type");
-        PaymentTypePOS.SetRange("Open Drawer", true);
-        if not PaymentTypePOS.FindSet then
-            exit;
-
-        repeat
-            if FilterString <> '' then
-                FilterString += '|';
-            FilterString += '''' + PaymentTypePOS."No." + '''';
-        until PaymentTypePOS.Next = 0;
-
-        AuditRoll.SetRange("Register No.", SalePOS."Register No.");
-        AuditRoll.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Payment);
-        AuditRoll.SetRange(Type, AuditRoll.Type::Payment);
-        AuditRoll.SetFilter("No.", FilterString);
-        AuditRoll.SetFilter("Amount Including VAT", '<>%1', 0);
-        exit(not AuditRoll.IsEmpty);
-    end;
 
     local procedure IsDrawerOpenRequiredPOSEntry(SalePOS: Record "NPR Sale POS"): Boolean
     var
         POSEntry: Record "NPR POS Entry";
         POSPaymentLine: Record "NPR POS Payment Line";
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         POSEntryManagement: Codeunit "NPR POS Entry Management";
         FilterString: Text;
     begin
-        PaymentTypePOS.SetCurrentKey("Processing Type");
-        PaymentTypePOS.SetRange("Open Drawer", true);
-        if not PaymentTypePOS.FindSet then
+        POSPaymentMethod.SetCurrentKey("Processing Type");
+        POSPaymentMethod.SetRange("Open Drawer", true);
+        if not POSPaymentMethod.FindSet then
             exit;
 
         repeat
             if FilterString <> '' then
                 FilterString += '|';
-            FilterString += '''' + PaymentTypePOS."No." + '''';
-        until PaymentTypePOS.Next = 0;
+            FilterString += '''' + POSPaymentMethod.Code + '''';
+        until POSPaymentMethod.Next = 0;
 
         if not POSEntryManagement.FindPOSEntryViaDocumentNo(SalePOS."Sales Ticket No.", POSEntry) then
             exit(false);
@@ -162,11 +137,8 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
         if not OpenDrawer then begin
             if not NPRetailSetup.Get then
                 exit;
-
             //Change below to just loop and fire open on all unique payment bin from pos payment lines when the payment bins are properly implemented on payments
-
             OpenDrawer := IsDrawerOpenRequiredPOSEntry(SalePOS);
-
             if not OpenDrawer then
                 exit;
         end;
@@ -185,7 +157,6 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
             exit;
         if Rec."Subscriber Function" <> 'EjectPaymentBin' then
             exit;
-
         Rec.Description := WORKFLOW_STEP;
         Rec."Sequence No." := 15;
     end;
@@ -226,7 +197,6 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
             exit;
         if POSSalesWorkflowStep."Subscriber Function" <> 'EjectPaymentBinOnCreditSale' then
             exit;
-
         CarryOutPaymentBinEject(SalePOS, true);
     end;
 

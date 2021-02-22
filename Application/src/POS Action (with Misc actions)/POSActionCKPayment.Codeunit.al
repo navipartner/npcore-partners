@@ -4,7 +4,7 @@ codeunit 6150850 "NPR POS Action: CK Payment"
         ActionDescription: Label 'This is a built-in action for CashKeeper Payments';
         Setup: Codeunit "NPR POS Setup";
         TextAmountLabel: Label 'Enter Amount:';
-        PaymentTypeNotFound: Label '%1 %2 for register %3 was not found.';
+        PaymentTypeNotFound: Label '%1 %2 for register was not found.';
         CashkeeperNotFound: Label 'CashKeeper Setup for register %3 was not found.';
         NoCashBackErr: Label 'It is not allowed to enter an amount that is bigger than what is stated on the receipt for this payment type';
         RequestNotFound: Label 'Action Code %1 tried retrieving "TransactionRequest_EntryNo" from POS Session and got %2. There is however no record in %3 to match that entry number.';
@@ -51,14 +51,14 @@ codeunit 6150850 "NPR POS Action: CK Payment"
         Context: Codeunit "NPR POS JSON Management";
         JSON: Codeunit "NPR POS JSON Management";
         PaymentNo: Code[20];
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
         Register: Record "NPR Register";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         SalesAmount: Decimal;
         ReturnAmount: Decimal;
         PaidAmount: Decimal;
         SubTotal: Decimal;
-        ReturnPaymentTypePOS: Record "NPR Payment Type POS";
         CurrentView: Codeunit "NPR POS View";
         CashKeeperSetup: Record "NPR CashKeeper Setup";
     begin
@@ -80,13 +80,13 @@ codeunit 6150850 "NPR POS Action: CK Payment"
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
 
-        if (not POSPaymentLine.GetPaymentType(PaymentTypePOS, PaymentNo, Setup.Register())) then
-            Error(PaymentTypeNotFound, PaymentTypePOS.TableCaption, PaymentNo, Setup.Register());
+        if (not POSPaymentLine.GetPOSPaymentMethod(POSPaymentMethod, PaymentNo)) then
+            Error(PaymentTypeNotFound, POSPaymentMethod.TableCaption, PaymentNo);
 
-        if (not POSPaymentLine.GetPaymentType(ReturnPaymentTypePOS, Register."Return Payment Type", Setup.Register())) then
-            Error(PaymentTypeNotFound, PaymentTypePOS.TableCaption, Register."Return Payment Type", Setup.Register());
+        if (not POSPaymentLine.GetPOSPaymentMethod(ReturnPOSPaymentMethod, POSPaymentMethod."Return Payment Method Code")) then
+            Error(PaymentTypeNotFound, POSPaymentMethod.TableCaption, POSPaymentMethod."Return Payment Method Code");
 
-        Handled := ConfigureCashWorkflow(Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
+        Handled := ConfigureCashWorkflow(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount);
 
         FrontEnd.SetActionContext(ActionCode, Context);
     end;
@@ -96,7 +96,6 @@ codeunit 6150850 "NPR POS Action: CK Payment"
     var
         EFTHandled: Boolean;
         PaymentTypeNo: Code[20];
-        PaymentTypePOS: Record "NPR Payment Type POS";
         Register: Record "NPR Register";
         ConfirmId: Text;
         Confirmed: Boolean;
@@ -156,7 +155,6 @@ codeunit 6150850 "NPR POS Action: CK Payment"
         Register: Record "NPR Register";
         POSLine: Record "NPR Sale Line POS";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
-        PaymentTypePOS: Record "NPR Payment Type POS";
         Handled: Boolean;
         tmpVariant: Variant;
         SalesAmount: Decimal;
@@ -170,7 +168,6 @@ codeunit 6150850 "NPR POS Action: CK Payment"
         Setup.GetRegisterRecord(Register);
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.GetCurrentPaymentLine(POSLine);
-        POSPaymentLine.GetPaymentType(PaymentTypePOS, PaymentTypeNo, POSLine."Register No.");
         POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
 
         POSSession.GetSaleLine(POSSaleLine);
@@ -225,7 +222,7 @@ codeunit 6150850 "NPR POS Action: CK Payment"
     local procedure CheckTransactionResult(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var CashKeeperTransaction: Record "NPR CashKeeper Transaction"): Boolean
     var
         PaymentTypeNo: Code[10];
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         Context: JsonObject;
         JSON: Codeunit "NPR POS JSON Management";
         Txt001: Label 'CashKeeper error: %1 - %2';
@@ -242,34 +239,31 @@ codeunit 6150850 "NPR POS Action: CK Payment"
         end;
 
         PaymentTypeNo := CashKeeperTransaction."Payment Type";
-        PaymentTypePOS.Get(PaymentTypeNo, '');
-        UpdatePaymentLine(CashKeeperTransaction, PaymentTypePOS, Context, POSSession, FrontEnd);
+        POSPaymentMethod.Get(PaymentTypeNo);
+        UpdatePaymentLine(CashKeeperTransaction, POSPaymentMethod, Context, POSSession, FrontEnd);
         POSSession.RequestRefreshData();
         POSSession.ClearActionState();
         exit(true);
     end;
 
-    local procedure "--WorkflowHandlers"()
-    begin
-    end;
-
-    local procedure ConfigureCashWorkflow(var Context: Codeunit "NPR POS JSON Management"; PaymentType: Record "NPR Payment Type POS"; ReturnPaymentType: Record "NPR Payment Type POS"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
+    #region WorkflowHandlers
+    local procedure ConfigureCashWorkflow(var Context: Codeunit "NPR POS JSON Management"; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
     begin
         Context.SetContext('capture_amount', true);
-        Context.SetContext('amounttocapture', SuggestAmount(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType));
-        Context.SetContext('amount_description', PaymentType.Description);
-        Context.SetContext('paymenttypeno', PaymentType."No.");
+        Context.SetContext('amounttocapture', SuggestAmount(SalesAmount, PaidAmount, POSPaymentMethod, ReturnPOSPaymentMethod));
+        Context.SetContext('amount_description', POSPaymentMethod.Description);
+        Context.SetContext('paymenttypeno', POSPaymentMethod.Code);
         exit(true);
     end;
 
-    local procedure SuggestAmount(SalesAmount: Decimal; PaidAmount: Decimal; PaymentType: Record "NPR Payment Type POS"; ReturnPaymentType: Record "NPR Payment Type POS"): Decimal
+    local procedure SuggestAmount(SalesAmount: Decimal; PaidAmount: Decimal; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"): Decimal
     var
         POSPaymentLine: Codeunit "NPR POS Payment Line";
     begin
-        exit(CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType));
+        exit(CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, POSPaymentMethod, ReturnPOSPaymentMethod));
     end;
 
-    procedure CalculateRemainingPaymentSuggestion(SalesAmount: Decimal; PaidAmount: Decimal; PaymentType: Record "NPR Payment Type POS"; ReturnPaymentType: Record "NPR Payment Type POS"): Decimal
+    procedure CalculateRemainingPaymentSuggestion(SalesAmount: Decimal; PaidAmount: Decimal; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"): Decimal
     var
         Balance: Decimal;
         ReturnRoundedBalance: Decimal;
@@ -281,42 +275,42 @@ codeunit 6150850 "NPR POS Action: CK Payment"
             exit(0);
 
         if (SalesAmount >= 0) and (Balance < 0) then //Not paid enough.
-            exit(RoundAmount(PaymentType, CalculateForeignAmount(PaymentType, Balance)) * -1);
+            exit(RoundAmount(POSPaymentMethod, CalculateForeignAmount(POSPaymentMethod, Balance)) * -1);
 
         if (SalesAmount < 0) and (Balance >= 0) then //Not returned enough.
-            exit(RoundAmount(PaymentType, CalculateForeignAmount(PaymentType, Balance)) * -1);
+            exit(RoundAmount(POSPaymentMethod, CalculateForeignAmount(POSPaymentMethod, Balance)) * -1);
 
         if (SalesAmount < 0) and (Balance < 0) then begin //Returned too much.
-            if ReturnPaymentType."Rounding Precision" = 0 then
+            if ReturnPOSPaymentMethod."Rounding Precision" = 0 then
                 Result := Balance
             else begin
-                ReturnRoundedBalance := Round(Balance, ReturnPaymentType."Rounding Precision", '=');
-                Result := ReturnRoundedBalance + Round(Balance - ReturnRoundedBalance, ReturnPaymentType."Rounding Precision", '=');
+                ReturnRoundedBalance := Round(Balance, ReturnPOSPaymentMethod."Rounding Precision", ReturnPOSPaymentMethod.GetRoundingType());
+                Result := ReturnRoundedBalance + Round(Balance - ReturnRoundedBalance, ReturnPOSPaymentMethod."Rounding Precision", ReturnPOSPaymentMethod.GetRoundingType());
             end;
-            exit(RoundAmount(ReturnPaymentType, CalculateForeignAmount(ReturnPaymentType, Result)) * -1);
+            exit(RoundAmount(ReturnPOSPaymentMethod, CalculateForeignAmount(ReturnPOSPaymentMethod, Result)) * -1);
         end;
     end;
 
-    procedure CalculateForeignAmount(PaymentTypePOS: Record "NPR Payment Type POS"; AmountLCY: Decimal) Amount: Decimal
+    procedure CalculateForeignAmount(POSPaymentMethod: Record "NPR POS Payment Method"; AmountLCY: Decimal) Amount: Decimal
     begin
-        if (PaymentTypePOS."Fixed Rate" <> 0) then
-            Amount := AmountLCY / PaymentTypePOS."Fixed Rate" * 100
+        if (POSPaymentMethod."Fixed Rate" <> 0) then
+            Amount := AmountLCY / POSPaymentMethod."Fixed Rate" * 100
         else
             Amount := AmountLCY;
     end;
 
-    procedure RoundAmount(PaymentTypePOS: Record "NPR Payment Type POS"; Amount: Decimal): Decimal
+    procedure RoundAmount(POSPaymentMethod: Record "NPR POS Payment Method"; Amount: Decimal): Decimal
     begin
-        if (PaymentTypePOS."Rounding Precision" = 0) then
+        if (POSPaymentMethod."Rounding Precision" = 0) then
             exit(Amount);
 
-        if PaymentTypePOS."Processing Type" = PaymentTypePOS."Processing Type"::"Foreign Currency" then
-            exit(Round(Amount, PaymentTypePOS."Rounding Precision", '>')); //Amount is not in LCY - Round up to avoid hitting a value causing LCY loss.
+        if POSPaymentMethod."Currency Code" <> '' then
+            exit(Round(Amount, POSPaymentMethod."Rounding Precision", '>')); //Amount is not in LCY - Round up to avoid hitting a value causing LCY loss.
 
-        exit(Round(Amount, PaymentTypePOS."Rounding Precision", '='));
+        exit(Round(Amount, POSPaymentMethod."Rounding Precision", POSPaymentMethod.GetRoundingType()));
     end;
 
-    local procedure UpdatePaymentLine(CashKeeperTransaction: Record "NPR CashKeeper Transaction"; PaymentTypePOS: Record "NPR Payment Type POS"; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management") Handled: Boolean
+    local procedure UpdatePaymentLine(CashKeeperTransaction: Record "NPR CashKeeper Transaction"; POSPaymentMethod: Record "NPR POS Payment Method"; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management") Handled: Boolean
     var
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         AlternativTransactionRequest: Record "NPR EFT Transaction Request";
@@ -334,7 +328,7 @@ codeunit 6150850 "NPR POS Action: CK Payment"
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(POSLine);
 
-        POSLine."No." := PaymentTypePOS."No.";
+        POSLine."No." := POSPaymentMethod.Code;
         POSLine."EFT Approved" := (CashKeeperTransaction.Status = CashKeeperTransaction.Status::Ok);
 
         if (CashKeeperTransaction.Action = CashKeeperTransaction.Action::Capture) then
@@ -343,14 +337,14 @@ codeunit 6150850 "NPR POS Action: CK Payment"
         if (CashKeeperTransaction.Action = CashKeeperTransaction.Action::Pay) then
             POSLine."Amount Including VAT" := Abs(CashKeeperTransaction.Amount) * -1;
 
-        POSLine."No." := PaymentTypePOS."No.";
+        POSLine."No." := POSPaymentMethod.Code;
         POSLine."Currency Amount" := POSLine."Amount Including VAT";
 
         POSPaymentLine.InsertPaymentLine(POSLine, 0);
         POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
         Commit;
 
-        POSSale.TryEndSaleWithBalancing(POSSession, PaymentTypePOS, PaymentTypePOS);
+        POSSale.TryEndSaleWithBalancing(POSSession, POSPaymentMethod, POSPaymentMethod);
 
         exit(true);
     end;
@@ -374,10 +368,9 @@ codeunit 6150850 "NPR POS Action: CK Payment"
         if (not CashKeeperTransaction.Get(EntryNo)) then
             Error(RequestNotFound, ActionCode, TmpVariant, CashKeeperTransaction.TableCaption);
     end;
+    #endregion
 
-    local procedure "--Stargate"()
-    begin
-    end;
+    #region Stargate
 
     procedure OnInvokeDevice(var CashKeeperTransaction: Record "NPR CashKeeper Transaction")
     var
@@ -456,10 +449,9 @@ codeunit 6150850 "NPR POS Action: CK Payment"
                 CloseForm(Data);
         end;
     end;
+    #endregion
 
-    local procedure "--- Protocol Events"()
-    begin
-    end;
+    #region Protocol Events
 
     local procedure CloseForm(Data: Text)
     var
@@ -469,7 +461,6 @@ codeunit 6150850 "NPR POS Action: CK Payment"
         POSSession: Codeunit "NPR POS Session";
         TransactionNo: Integer;
         PaymentTypeNo: Code[20];
-        PaymentTypePOS: Record "NPR Payment Type POS";
     begin
         State := State.Deserialize(Data);
 
@@ -495,11 +486,9 @@ codeunit 6150850 "NPR POS Action: CK Payment"
 
         Commit;
     end;
+    #endregion
 
-    local procedure "---Subscriber"()
-    begin
-    end;
-
+    #region Subscriber
     [EventSubscriber(ObjectType::Table, 6059946, 'OnAfterModifyEvent', '', true, true)]
     local procedure OnCashKeeperTransModify(var Rec: Record "NPR CashKeeper Transaction"; var xRec: Record "NPR CashKeeper Transaction"; RunTrigger: Boolean)
     var
@@ -512,4 +501,5 @@ codeunit 6150850 "NPR POS Action: CK Payment"
         if POSSession.IsActiveSession(FrontEnd) then
             FrontEnd.ResumeWorkflow();
     end;
+    #endregion
 }

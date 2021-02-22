@@ -1,13 +1,5 @@
 codeunit 6150634 "NPR POS Give Change"
 {
-    // NPR5.37/BR  /20171017  CASE 293711 Object Created
-    // NPR5.37.03/MMV /20171122  CASE 296642 Added function InsertChange.
-    //                                    Removed subscriber (replaced with direct call from transcendence).
-    // NPR5.38/BR  /20171219  CASE 300558 Take Dimensions from Sale
-    // NPR5.38/MMV /20180108  CASE 300957 Rounding fix.
-    // NPR5.53/ALPO/20191024  CASE 371955 Rounding related fields moved to POS Posting Profiles
-
-
     trigger OnRun()
     begin
     end;
@@ -17,29 +9,19 @@ codeunit 6150634 "NPR POS Give Change"
         TextChange: Label 'Change';
         POSSetup: Codeunit "NPR POS Setup";
 
-    procedure InsertChange(SalePOS: Record "NPR Sale POS"; ReturnPaymentType: Record "NPR Payment Type POS"; Balance: Decimal) ChangeToGive: Decimal
+    procedure InsertChange(SalePOS: Record "NPR Sale POS"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; Balance: Decimal) ChangeToGive: Decimal
     var
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         RoundedBalance: Decimal;
     begin
-        //Called from transcendence POS
-        //-NPR5.38 [300957]
-        RoundedBalance := POSPaymentLine.RoundAmount(ReturnPaymentType, Balance);
-        ChangeToGive := RoundedBalance + POSPaymentLine.RoundAmount(ReturnPaymentType, Balance - RoundedBalance);
+        RoundedBalance := POSPaymentLine.RoundAmount(ReturnPOSPaymentMethod, Balance);
+        ChangeToGive := RoundedBalance + POSPaymentLine.RoundAmount(ReturnPOSPaymentMethod, Balance - RoundedBalance);
 
         if ChangeToGive = 0 then
             exit(0);
 
-        InsertOutPaymentLine(SalePOS, -ChangeToGive, ReturnPaymentType."No.", TextChange);
+        InsertOutPaymentLine(SalePOS, -ChangeToGive, ReturnPOSPaymentMethod.Code, TextChange);
         exit(ChangeToGive);
-
-        // RoundingAmount *= -1; //Is outpayment
-        // IF (ABS(SaleAmount) + ABS(RoundingAmount)) >= ABS(PaymentAmount) THEN
-        //  EXIT;
-        //
-        // InsertOutPaymentLine(SalePOS, - (PaymentAmount - SaleAmount - RoundingAmount), ReturnPaymentType."No.", TextChange);
-        // EXIT( PaymentAmount - SaleAmount - RoundingAmount );
-        //+NPR5.38 [300957]
     end;
 
     procedure CalcAndInsertChange(var SalePOS: Record "NPR Sale POS") ChangeToGive: Decimal
@@ -57,11 +39,8 @@ codeunit 6150634 "NPR POS Give Change"
             exit;
 
         RoundingAmount := GetRoundingAmount(SalePOS, PaymentAmount - SaleAmount);
-
-        //-NPR5.37.03 [296642]
         if (Abs(SaleAmount) + Abs(RoundingAmount)) = Abs(PaymentAmount) then
             exit;
-        //+NPR5.37.03 [296642]
 
         InsertOutPaymentLine(SalePOS, -(PaymentAmount - SaleAmount - RoundingAmount), GetReturnPaymentType(SalePOS), TextChange);
         exit((PaymentAmount - SaleAmount - RoundingAmount));
@@ -82,14 +61,6 @@ codeunit 6150634 "NPR POS Give Change"
             Date := SalePOS.Date;
             "Sale Type" := "Sale Type"::Payment;
             "Line No." := GetLastLineNo(SalePOS) + 10000;
-            //-NPR5.37.03 [296642]
-            //  SETRECFILTER;
-            //  IF NOT ISEMPTY THEN REPEAT
-            //    "Line No." := "Line No." + 10000; //Ensure the line no. is not already taken
-            //    SETRECFILTER;
-            //  UNTIL ISEMPTY;
-            //  RESET;
-            //+NPR5.37.03 [296642]
             Insert(true);
             "Location Code" := SalePOS."Location Code";
             Reference := SalePOS.Reference;
@@ -97,67 +68,42 @@ codeunit 6150634 "NPR POS Give Change"
             "No." := NoIn;
             Description := DescriptionIn;
             "Amount Including VAT" := AmountIn;
-            //-NPR5.38 [300558]
             "Shortcut Dimension 1 Code" := SalePOS."Shortcut Dimension 1 Code";
             "Shortcut Dimension 2 Code" := SalePOS."Shortcut Dimension 2 Code";
             "Dimension Set ID" := SalePOS."Dimension Set ID";
-            //+NPR5.38 [300558]
             Modify(true);
         end;
     end;
 
     local procedure GetReturnPaymentType(SalePOS: Record "NPR Sale POS"): Code[10]
     var
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         Register: Record "NPR Register";
     begin
         Register.Get(SalePOS."Register No.");
-        with PaymentTypePOS do begin
-            Reset;
-            SetRange("Processing Type", "Processing Type"::Cash);
-            SetRange(Status, Status::Active);
-            SetRange("No.", Register."Return Payment Type");
-            if FindFirst then
-                exit("No.");
-        end;
-        Error(TextNoReturnPaymentType, PaymentTypePOS.TableCaption);
-    end;
 
-    local procedure GetRoundingAccount(SalePOS: Record "NPR Sale POS"; var GLAccount: Record "G/L Account")
-    begin
-        //-NPR5.53 [371955]-revoked
-        //Register.GET(SalePOS."Register No.");
-        //Register.TESTFIELD(Rounding);
-        //GLAccount.GET(Register.Rounding);
-        //+NPR5.53 [371955]-revoked
-        //-NPR5.53 [371955]
-        SetPOSSetupPOSUnitContext(SalePOS."Register No.");
-        GLAccount.Get(POSSetup.RoundingAccount(true));
-        //+NPR5.53 [371955]
+        POSPaymentMethod.Reset();
+        POSPaymentMethod.SetRange("Processing Type", POSPaymentMethod."Processing Type"::CASH);
+        POSPaymentMethod.SetRange("Block POS Payment", false);
+        POSPaymentMethod.SetRange(Code, POSPaymentMethod."Return Payment Method Code");
+        if POSPaymentMethod.FindFirst then
+            exit(POSPaymentMethod.Code);
+
+        Error(TextNoReturnPaymentType, POSPaymentMethod.TableCaption);
     end;
 
     local procedure GetRoundingAmount(SalePOS: Record "NPR Sale POS"; ChangeAmount: Decimal): Decimal
     begin
-        //-NPR5.53 [371955]-revoked
-        //RetailSetup.GET;
-        //Register.GET(SalePOS."Register No.");
-        //IF (RetailSetup."Amount Rounding Precision" = 0) OR (Register.Rounding = '') THEN
-        //  EXIT(0);
-        //EXIT(ChangeAmount - ROUND(ChangeAmount,RetailSetup."Amount Rounding Precision",'='));
-        //+NPR5.53 [371955]-revoked
-        //-NPR5.53 [371955]
         SetPOSSetupPOSUnitContext(SalePOS."Register No.");
         if (POSSetup.AmountRoundingPrecision = 0) or (POSSetup.RoundingAccount(false) = '') then
             exit(0);
         exit(ChangeAmount - Round(ChangeAmount, POSSetup.AmountRoundingPrecision, POSSetup.AmountRoundingDirection));
-        //+NPR5.53 [371955]
     end;
 
     local procedure GetLastLineNo(SalePOS: Record "NPR Sale POS"): Integer
     var
         SaleLinePOS: Record "NPR Sale Line POS";
     begin
-        //-NPR5.37.03 [296642]
         with SaleLinePOS do begin
             SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
             SetRange("Register No.", SalePOS."Register No.");
@@ -165,17 +111,6 @@ codeunit 6150634 "NPR POS Give Change"
             if SaleLinePOS.FindLast then;
             exit(SaleLinePOS."Line No.");
         end;
-
-        // WITH SaleLinePOS DO BEGIN
-        //  SETRANGE("Register No.",SalePOS."Register No.");
-        //  SETRANGE("Sales Ticket No.",SalePOS."Sales Ticket No.");
-        //  SETRANGE(Date,SalePOS.Date);
-        //  SETRANGE("Sale Type","Sale Type"::"Out payment");
-        //  IF FINDLAST THEN
-        //    EXIT("Line No.");
-        // END;
-        // EXIT(0);
-        //+NPR5.37.03 [296642]
     end;
 
     local procedure GetSaleAmountInclTax(SalePOS: Record "NPR Sale POS"): Decimal
@@ -230,10 +165,8 @@ codeunit 6150634 "NPR POS Give Change"
     var
         POSUnit: Record "NPR POS Unit";
     begin
-        //-NPR5.53 [371955]
         POSUnit.Get(POSUnitNo);
         POSSetup.SetPOSUnit(POSUnit);
-        //+NPR5.53 [371955]
     end;
 }
 

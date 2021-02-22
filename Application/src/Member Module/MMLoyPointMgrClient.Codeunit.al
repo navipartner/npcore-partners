@@ -448,7 +448,6 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         OStream: OutStream;
         LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup";
         POSPaymentMethod: Record "NPR POS Payment Method";
-        PaymentTypePOS: Record "NPR Payment Type POS";
     begin
 
         if (not EFTTransactionRequest.Successful) then begin
@@ -464,17 +463,16 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         if (EFTTransactionRequest.Successful) then begin
 
             GetStoreSetup(EFTTransactionRequest."Register No.", ResponseMessage, LoyaltyStoreSetup);
-            if (not PaymentTypePOS.Get(LoyaltyStoreSetup."POS Payment Method Code", EFTTransactionRequest."Register No.")) then
-                PaymentTypePOS.Get(LoyaltyStoreSetup."POS Payment Method Code");
+            POSPaymentMethod.Get(LoyaltyStoreSetup."POS Payment Method Code");
 
-            if (PaymentTypePOS."Fixed Rate" = 0) then
-                PaymentTypePOS."Fixed Rate" := 100;
+            if (POSPaymentMethod."Fixed Rate" = 0) then
+                POSPaymentMethod."Fixed Rate" := 100;
 
             EFTTransactionRequest."Result Code" := 10;
             EFTTransactionRequest."Result Description" := TEXT_APPROVED;
             EFTTransactionRequest."Result Display Text" := TEXT_APPROVED;
 
-            EFTTransactionRequest."Result Amount" := EFTTransactionRequest."Amount Input" * PaymentTypePOS."Fixed Rate" / 100;
+            EFTTransactionRequest."Result Amount" := EFTTransactionRequest."Amount Input" * POSPaymentMethod."Fixed Rate" / 100;
             EFTTransactionRequest."Amount Output" := EFTTransactionRequest."Amount Input";
             EFTTransactionRequest."Authorisation Number" := AuthorizationCode;
             EFTTransactionRequest."Reference Number Output" := ReferenceNumber;
@@ -747,12 +745,11 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
     local procedure BurnPointsToAmount(LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup"; CurrencyCode: Code[10]; Points: Decimal) Amount: Decimal
     var
         PaymentMethod: Record "NPR POS Payment Method";
-        PaymentTypePOS: Record "NPR Payment Type POS";
     begin
 
-        PaymentTypePOS.Get(LoyaltyStoreSetup."POS Payment Method Code");
+        PaymentMethod.Get(LoyaltyStoreSetup."POS Payment Method Code");
 
-        Amount := Points * (PaymentTypePOS."Fixed Rate" / 100);
+        Amount := Points * (PaymentMethod."Fixed Rate" / 100);
     end;
 
     procedure AssignLoyaltyInformation(var EFTTransactionRequest: Record "NPR EFT Transaction Request") CardInfo: Boolean

@@ -4,9 +4,9 @@ codeunit 6014527 "NPR Credit Card Prot. Helper"
     begin
     end;
 
-    procedure FindPaymentType(CardPan: Code[20]; var PaymentTypePOS: Record "NPR Payment Type POS"; LocationCode: Code[10]): Boolean
+    procedure FindPaymentType(CardPan: Code[20]; var POSPaymentMethod: Record "NPR POS Payment Method"; LocationCode: Code[10]): Boolean
     begin
-        if MatchEFTBINRange(CardPan, PaymentTypePOS, LocationCode) then
+        if MatchEFTBINRange(CardPan, POSPaymentMethod, LocationCode) then
             exit(true);
     end;
 
@@ -24,7 +24,7 @@ codeunit 6014527 "NPR Credit Card Prot. Helper"
         exit(CardPan)
     end;
 
-    local procedure MatchEFTBINRange(CardPan: Code[20]; var PaymentTypePOS: Record "NPR Payment Type POS"; LocationCode: Code[10]): Boolean
+    local procedure MatchEFTBINRange(CardPan: Code[20]; var POSPaymentMethod: Record "NPR POS Payment Method"; LocationCode: Code[10]): Boolean
     var
         EFTBINRange: Record "NPR EFT BIN Range";
         EFTBINGroup: Record "NPR EFT BIN Group";
@@ -43,7 +43,7 @@ codeunit 6014527 "NPR Credit Card Prot. Helper"
                 if not EFTBINGroupPaymentLink.Get(EFTBINRange."BIN Group Code", '') then
                     exit(false);
 
-        exit(PaymentTypePOS.Get(EFTBINGroupPaymentLink."Payment Type POS"));
+        exit(POSPaymentMethod.Get(EFTBINGroupPaymentLink."Payment Type POS"));
     end;
 }
 

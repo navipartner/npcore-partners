@@ -53,7 +53,7 @@ table 6184483 "NPR EFT Type Pay. Gen. Param."
         {
             Caption = 'Payment Type POS';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Payment Type POS"."No.";
+            TableRelation = "NPR POS Payment Method".Code;
         }
     }
 

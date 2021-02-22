@@ -98,7 +98,6 @@ codeunit 6150707 "NPR POS Payment Line"
     procedure CalculateBalance(var SaleAmount: Decimal; var PaidAmount: Decimal; var ReturnAmount: Decimal; var Subtotal: Decimal)
     var
         PaymentLine: Record "NPR Sale Line POS";
-        PaymentType: Record "NPR Payment Type POS";
         Register: Record "NPR Register";
         RoundingAmount: Decimal;
         Decimal: Decimal;
@@ -112,9 +111,6 @@ codeunit 6150707 "NPR POS Payment Line"
             exit;
 
         Setup.GetRegisterRecord(Register);
-        if (not GetPaymentType(PaymentType, Register."Return Payment Type", Register."Register No.")) then
-            Error(t001);
-
         SaleAmount := 0;
         PaidAmount := 0;
         ReturnAmount := 0;
@@ -227,55 +223,55 @@ codeunit 6150707 "NPR POS Payment Line"
 
     local procedure ValidatePaymentLine(Line: Record "NPR Sale Line POS")
     var
-        PaymentType: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
     begin
 
-        if (not GetPaymentType(PaymentType, Line."No.", Line."Register No.")) then
-            Error(PaymentType.TableCaption, StrSubstNo('%1, %2', Line."No.", Line."Register No."));
+        if not POSPaymentMethod.Get(Line."No.") then
+            Error(POSPaymentMethod.TableCaption, StrSubstNo('%1, %2', Line."No.", Line."Register No."));
 
-        if (PaymentType."Account Type" = PaymentType."Account Type"::"G/L Account") then
-            PaymentType.TestField(PaymentType."G/L Account No.");
+        if (POSPaymentMethod."Account Type" = POSPaymentMethod."Account Type"::"G/L Account") then
+            POSPaymentMethod.TestField("Account No.");
 
-        PaymentType.TestField(Status, PaymentType.Status::Active);
+        POSPaymentMethod.TestField("Block POS Payment", false);
     end;
 
     local procedure ApplyForeignAmountConversion(var SaleLinePOS: Record "NPR Sale Line POS"; PrecalculatedAmount: Boolean; ForeignAmount: Decimal)
     var
-        PaymentType: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         Register: Record "NPR Register";
     begin
 
         with SaleLinePOS do begin
             "Currency Amount" := "Amount Including VAT";
 
-            if (not GetPaymentType(PaymentType, SaleLinePOS."No.", SaleLinePOS."Register No.")) then
+            if not POSPaymentMethod.Get(SaleLinePOS."No.") then
                 exit;
 
-            if (PaymentType."Fixed Rate" <> 0) then
-                "Currency Amount" := "Amount Including VAT" / (PaymentType."Fixed Rate" / 100);
+            if (POSPaymentMethod."Fixed Rate" <> 0) then
+                "Currency Amount" := "Amount Including VAT" / (POSPaymentMethod."Fixed Rate" / 100);
 
             if (PrecalculatedAmount) then
                 "Currency Amount" := ForeignAmount;
 
-            if (PaymentType."Fixed Rate" <> 0) then
-                Validate("Amount Including VAT", Round("Currency Amount" * PaymentType."Fixed Rate" / 100, 0.01, '='));
+            if (POSPaymentMethod."Fixed Rate" <> 0) then
+                Validate("Amount Including VAT", Round("Currency Amount" * POSPaymentMethod."Fixed Rate" / 100, 0.01, POSPaymentMethod.GetRoundingType()));
         end
     end;
 
     local procedure ReverseUnrealizedSalesVAT(var SaleLinePOS: Record "NPR Sale Line POS")
     var
-        PaymentType: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         Currency: Record Currency;
         SalesTaxCalculate: Codeunit "Sales Tax Calculate";
     begin
 
         with SaleLinePOS do begin
-            if (not GetPaymentType(PaymentType, "No.", "Register No.")) then
+            if not POSPaymentMethod.Get("No.") then
                 exit;
 
             Currency.InitRoundingPrecision();
 
-            if (PaymentType."Reverse Unrealized VAT") then begin
+            if (POSPaymentMethod."Reverse Unrealized VAT") then begin
                 "Line Amount" := "Amount Including VAT";
 
                 case "VAT Calculation Type" of
@@ -308,34 +304,22 @@ codeunit 6150707 "NPR POS Payment Line"
         end;
     end;
 
-    procedure GetPaymentType(var PaymentTypePosOut: Record "NPR Payment Type POS"; PaymentTypeCode: Code[10]; RegisterNo: Code[10]): Boolean
+    procedure GetPOSPaymentMethod(var POSPaymentMethod: Record "NPR POS Payment Method"; PaymentTypeCode: Code[10]): Boolean
     begin
-
-        if (PaymentTypePosOut.Get(PaymentTypeCode, RegisterNo)) then
-            exit(true);
-
-        exit(PaymentTypePosOut.Get(PaymentTypeCode, ''));
+        exit(POSPaymentMethod.Get(PaymentTypeCode));
     end;
 
-    procedure CalculateMinimumReturnAmount(PaymentTypePOS: Record "NPR Payment Type POS") ret: Decimal
-    var
-        Kasse: Record "NPR Register";
-        Betalingsvalg: Record "NPR Payment Type POS";
+
+    procedure CalculateForeignAmount(POSPaymentMethod: Record "NPR POS Payment Method"; AmountLCY: Decimal) Amount: Decimal
     begin
 
-        ret := Round(PaymentTypePOS."Rounding Precision" / 2, 0.001, '=');
-    end;
-
-    procedure CalculateForeignAmount(PaymentTypePOS: Record "NPR Payment Type POS"; AmountLCY: Decimal) Amount: Decimal
-    begin
-
-        if (PaymentTypePOS."Fixed Rate" <> 0) then
-            Amount := AmountLCY / PaymentTypePOS."Fixed Rate" * 100
+        if (POSPaymentMethod."Fixed Rate" <> 0) then
+            Amount := AmountLCY / POSPaymentMethod."Fixed Rate" * 100
         else
             Amount := AmountLCY;
     end;
 
-    procedure CalculateRemainingPaymentSuggestion(SalesAmount: Decimal; PaidAmount: Decimal; PaymentType: Record "NPR Payment Type POS"; ReturnPaymentType: Record "NPR Payment Type POS"; AllowNegativePaymentBalance: Boolean): Decimal
+    procedure CalculateRemainingPaymentSuggestion(SalesAmount: Decimal; PaidAmount: Decimal; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; AllowNegativePaymentBalance: Boolean): Decimal
     var
         Balance: Decimal;
         ReturnRoundedBalance: Decimal;
@@ -344,79 +328,74 @@ codeunit 6150707 "NPR POS Payment Line"
         Balance := PaidAmount - SalesAmount;
 
         if (SalesAmount >= 0) and (Balance >= 0) then begin //Paid exact or more.
-            if AllowNegativePaymentBalance and (PaymentType."No." = ReturnPaymentType."No.") then
-                exit(RoundAmount(PaymentType, CalculateForeignAmount(PaymentType, Balance)) * -1);
+            if AllowNegativePaymentBalance and (POSPaymentMethod.Code = ReturnPOSPaymentMethod.Code) then
+                exit(RoundAmount(POSPaymentMethod, CalculateForeignAmount(POSPaymentMethod, Balance)) * -1);
             exit(0);
         end;
 
         if (SalesAmount >= 0) and (Balance < 0) then //Not paid enough.
-            exit(RoundAmount(PaymentType, CalculateForeignAmount(PaymentType, Balance)) * -1);
+            exit(RoundAmount(POSPaymentMethod, CalculateForeignAmount(POSPaymentMethod, Balance)) * -1);
 
         if (SalesAmount < 0) and (Balance >= 0) then //Not returned enough.
-            exit(RoundAmount(PaymentType, CalculateForeignAmount(PaymentType, Balance)) * -1);
+            exit(RoundAmount(POSPaymentMethod, CalculateForeignAmount(POSPaymentMethod, Balance)) * -1);
 
         if (SalesAmount < 0) and (Balance < 0) then begin //Returned too much.
-            if ReturnPaymentType."Rounding Precision" = 0 then
+            if ReturnPOSPaymentMethod."Rounding Precision" = 0 then
                 Result := Balance
             else begin
-                ReturnRoundedBalance := Round(Balance, ReturnPaymentType."Rounding Precision", '=');
-                Result := ReturnRoundedBalance + Round(Balance - ReturnRoundedBalance, ReturnPaymentType."Rounding Precision", '=');
+                ReturnRoundedBalance := Round(Balance, ReturnPOSPaymentMethod."Rounding Precision", ReturnPOSPaymentMethod.GetRoundingType());
+                Result := ReturnRoundedBalance + Round(Balance - ReturnRoundedBalance, ReturnPOSPaymentMethod."Rounding Precision", ReturnPOSPaymentMethod.GetRoundingType());
             end;
-            exit(RoundAmount(ReturnPaymentType, CalculateForeignAmount(ReturnPaymentType, Result)) * -1);
+            exit(RoundAmount(ReturnPOSPaymentMethod, CalculateForeignAmount(ReturnPOSPaymentMethod, Result)) * -1);
         end;
     end;
 
-    procedure CalculateRemainingPaymentSuggestionInCurrentSale(PaymentTypePOS: Record "NPR Payment Type POS"): Decimal
+    procedure CalculateRemainingPaymentSuggestionInCurrentSale(POSPaymentMethod: Record "NPR POS Payment Method"): Decimal
     var
         SaleAmount: Decimal;
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
         SubTotal: Decimal;
-        Register: Record "NPR Register";
-        ReturnPaymentTypePOS: Record "NPR Payment Type POS";
+        ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
     begin
         if not Initialized then
             exit;
 
         CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, SubTotal);
-        Register.Get(RegisterNo);
-        GetPaymentType(ReturnPaymentTypePOS, Register."Return Payment Type", RegisterNo);
-        exit(CalculateRemainingPaymentSuggestion(SaleAmount, PaidAmount, PaymentTypePOS, ReturnPaymentTypePOS, false));
+        ReturnPOSPaymentMethod.Get(POSPaymentMethod."Return Payment Method Code");
+        exit(CalculateRemainingPaymentSuggestion(SaleAmount, PaidAmount, POSPaymentMethod, ReturnPOSPaymentMethod, false));
     end;
 
-    procedure RoundAmount(PaymentTypePOS: Record "NPR Payment Type POS"; Amount: Decimal): Decimal
+    procedure RoundAmount(POSPaymentMethod: Record "NPR POS Payment Method"; Amount: Decimal): Decimal
     begin
 
-        if (PaymentTypePOS."Rounding Precision" = 0) then
+        if (POSPaymentMethod."Rounding Precision" = 0) then
             exit(Amount);
 
-        if PaymentTypePOS."Processing Type" = PaymentTypePOS."Processing Type"::"Foreign Currency" then
-            exit(Round(Amount, PaymentTypePOS."Rounding Precision", '>')); //Amount is not in LCY - Round up to avoid hitting a value causing LCY loss.
+        if POSPaymentMethod."Currency Code" <> '' then
+            exit(Round(Amount, POSPaymentMethod."Rounding Precision", '>')); //Amount is not in LCY - Round up to avoid hitting a value causing LCY loss.
 
-        exit(Round(Amount, PaymentTypePOS."Rounding Precision", '='));
+        exit(Round(Amount, POSPaymentMethod."Rounding Precision", POSPaymentMethod.GetRoundingType()));
     end;
 
-    procedure ValidateAmountBeforePayment(PaymentTypePOS: Record "NPR Payment Type POS"; AmountToCapture: Decimal)
+    procedure ValidateAmountBeforePayment(POSPaymentMethod: Record "NPR POS Payment Method"; AmountToCapture: Decimal)
     begin
-        if (PaymentTypePOS."Maximum Amount" <> 0) then
-            if (AmountToCapture > PaymentTypePOS."Maximum Amount") then
-                Error(MaxAmountLimit, PaymentTypePOS.Description, PaymentTypePOS."Maximum Amount");
+        if (POSPaymentMethod."Maximum Amount" <> 0) then
+            if (AmountToCapture > POSPaymentMethod."Maximum Amount") then
+                Error(MaxAmountLimit, POSPaymentMethod.Description, POSPaymentMethod."Maximum Amount");
 
-        if (PaymentTypePOS."Minimum Amount" <> 0) then
-            if (AmountToCapture < PaymentTypePOS."Minimum Amount") then
-                Error(MinAmountLimit, PaymentTypePOS.Description, PaymentTypePOS."Minimum Amount");
+        if (POSPaymentMethod."Minimum Amount" <> 0) then
+            if (AmountToCapture < POSPaymentMethod."Minimum Amount") then
+                Error(MinAmountLimit, POSPaymentMethod.Description, POSPaymentMethod."Minimum Amount");
 
-        if (PaymentTypePOS."Rounding Precision" <> 0) then
-            if (AmountToCapture mod PaymentTypePOS."Rounding Precision") <> 0 then
-                Error(InvalidAmount, AmountToCapture, PaymentTypePOS.Description);
-
-        if (PaymentTypePOS."Account Type" = PaymentTypePOS."Account Type"::"G/L Account") then
-            PaymentTypePOS.TestField("G/L Account No.");
+        if (POSPaymentMethod."Rounding Precision" <> 0) then
+            if (AmountToCapture mod POSPaymentMethod."Rounding Precision") <> 0 then
+                Error(InvalidAmount, AmountToCapture, POSPaymentMethod.Description);
 
         if AmountToCapture < 0 then
-            PaymentTypePOS.TestField("Allow Refund");
+            POSPaymentMethod.TestField("Allow Refund");
 
-        PaymentTypePOS.TestField(Status, PaymentTypePOS.Status::Active);
+        POSPaymentMethod.TestField("Block POS Payment", false);
     end;
 
     [IntegrationEvent(false, false)]

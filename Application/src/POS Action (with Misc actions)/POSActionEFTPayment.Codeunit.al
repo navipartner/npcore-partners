@@ -1,8 +1,5 @@
 codeunit 6184474 "NPR POS Action: EFT Payment"
 {
-    // NPR5.55/JAKUBV/20200807  CASE 386254 Transport NPR5.55 - 31 July 2020
-
-
     trigger OnRun()
     begin
     end;
@@ -59,17 +56,17 @@ codeunit 6184474 "NPR POS Action: EFT Payment"
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR Sale POS";
         EFTSetup: Record "NPR EFT Setup";
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         IntegrationWorkflow: Text;
         EftEntryNo: Integer;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        PaymentTypePOS.GetByRegister(Context.GetString('paymentType', true), SalePOS."Register No.");
-        EFTSetup.FindSetup(SalePOS."Register No.", PaymentTypePOS."No.");
+        POSPaymentMethod.Get(Context.GetString('paymentType', true));
+        EFTSetup.FindSetup(SalePOS."Register No.", POSPaymentMethod.Code);
 
-        EftEntryNo := EFTTransactionMgt.PreparePayment(EFTSetup, PaymentTypePOS, Context.GetDecimal('amount', true), '', SalePOS, IntegrationWorkflow);
+        EftEntryNo := EFTTransactionMgt.PreparePayment(EFTSetup, Context.GetDecimal('amount', true), '', SalePOS, IntegrationWorkflow);
         Context.SetContext('integrationWorkflow', IntegrationWorkflow);
         Context.SetContext('entryNo', EftEntryNo);
 
@@ -83,9 +80,9 @@ codeunit 6184474 "NPR POS Action: EFT Payment"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151291, 'OnGetPaymentHandler', '', false, false)]
-    local procedure OnGetPaymentHandlerSelfService(PaymentTypePOS: Record "NPR Payment Type POS"; var PaymentHandler: Text; var ForceAmount: Decimal)
+    local procedure OnGetPaymentHandlerSelfService(POSPaymentMethod: Record "NPR POS Payment Method"; var PaymentHandler: Text; var ForceAmount: Decimal)
     begin
-        if PaymentTypePOS."Processing Type" <> PaymentTypePOS."Processing Type"::EFT then
+        if POSPaymentMethod."Processing Type" <> POSPaymentMethod."Processing Type"::EFT then
             exit;
         PaymentHandler := ActionCode();
     end;

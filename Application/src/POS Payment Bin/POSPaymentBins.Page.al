@@ -273,7 +273,7 @@ page 6150620 "NPR POS Payment Bins"
         Currency: Record Currency;
         CurrencyFactor: Decimal;
         CurrExchRate: Record "Currency Exchange Rate";
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
     begin
 
         POSBinEntry."Transaction Amount (LCY)" := POSBinEntry."Transaction Amount";
@@ -285,16 +285,16 @@ page 6150620 "NPR POS Payment Bins"
             exit;
 
         // ** Legacy Way
-        if (not PaymentTypePOS.Get(POSBinEntry."Payment Type Code")) then
+        if not POSPaymentMethod.Get(POSBinEntry."Payment Type Code") then
             exit;
 
-        if (PaymentTypePOS."Fixed Rate" <> 0) then
-            POSBinEntry."Transaction Amount (LCY)" := POSBinEntry."Transaction Amount" * PaymentTypePOS."Fixed Rate" / 100;
+        if (POSPaymentMethod."Fixed Rate" <> 0) then
+            POSBinEntry."Transaction Amount (LCY)" := POSBinEntry."Transaction Amount" * POSPaymentMethod."Fixed Rate" / 100;
 
-        if (PaymentTypePOS."Rounding Precision" = 0) then
+        if (POSPaymentMethod."Rounding Precision" = 0) then
             exit;
 
-        POSBinEntry."Transaction Amount (LCY)" := Round(POSBinEntry."Transaction Amount (LCY)", PaymentTypePOS."Rounding Precision", '=');
+        POSBinEntry."Transaction Amount (LCY)" := Round(POSBinEntry."Transaction Amount (LCY)", POSPaymentMethod."Rounding Precision", POSPaymentMethod.GetRoundingType());
         exit;
 
         // ** End Legacy

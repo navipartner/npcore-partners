@@ -34,13 +34,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         Text000007: Label 'Error. You can not post customer payments from the register using the sales module!';
         Text000008: Label '%1 %2 was created';
         ShowCreationMessage: Boolean;
-        ReturnAmount: Boolean;
-        FinishSale: Boolean;
-        OutputDocument: Boolean;
-        ShowDepositDialog: Boolean;
         OrderTypeSet: Boolean;
-        ReturnAmountPercentage: Decimal;
-        OutputCodeunit: Integer;
         Text000010: Label 'You cannot post when a payment has been made';
         Text000012: Label 'Only one sales document can be created per sales ticket';
         OrderType: Integer;
@@ -588,7 +582,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 
     local procedure TransferInfoFromSalePOS(var SalePOS: Record "NPR Sale POS"; var SalesHeader: Record "Sales Header")
     var
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         SaleLinePOS: Record "NPR Sale Line POS";
     begin
         if TransferSalesPerson then begin
@@ -615,9 +609,9 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             SaleLinePOS.SetRange(Date, SalePOS.Date);
             SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Payment);
             if SaleLinePOS.FindFirst then
-                if PaymentTypePOS.Get(SaleLinePOS."No.") then
-                    if PaymentTypePOS."Payment Method Code" <> '' then
-                        SalesHeader.Validate("Payment Method Code", PaymentTypePOS."Payment Method Code");
+                if POSPaymentMethod.Get(SaleLinePOS."No.") then
+                    if POSPaymentMethod."Payment Method Code" <> '' then
+                        SalesHeader.Validate("Payment Method Code", POSPaymentMethod."Payment Method Code");
         end;
 
         if TransferTaxSetup then begin
