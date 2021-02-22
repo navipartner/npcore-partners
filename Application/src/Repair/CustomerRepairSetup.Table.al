@@ -2,6 +2,8 @@ table 6014467 "NPR Customer Repair Setup"
 {
     Caption = 'Customer Repair Setup';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Repairs are not supported in core anymore.';
 
     fields
     {

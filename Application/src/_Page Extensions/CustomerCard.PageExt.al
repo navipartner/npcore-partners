@@ -234,16 +234,6 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Alternative No. action';
                 }
-                action("NPR Reparation")
-                {
-                    Caption = 'Reparation';
-                    Image = ServiceZone;
-                    RunObject = Page "NPR Customer Repair List";
-                    RunPageLink = "Customer No." = FIELD("No."),
-                                  "Customer Type" = CONST(Ordinary);
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Reparation action';
-                }
                 action("NPR PrintShippingLabel")
                 {
                     Caption = 'Shipping Label';

@@ -188,11 +188,7 @@ codeunit 6014401 "NPR Dimension Mgt."
             Type::"Item Group":
                 exit(DATABASE::"NPR Item Group");
             Type::Repair:
-                exit(DATABASE::"NPR Customer Repair");
-            //-NPR5.30 [264918]
-            //Type::Fotoarbejde :
-            //  EXIT(DATABASE::"Photo Work Main");
-            //+NPR5.30 [264918]
+                Error('AL Error: Repair are not used in Core.');
             Type::Payment:
                 exit(DATABASE::"NPR Payment Type POS");
             Type::"Open/Close":
