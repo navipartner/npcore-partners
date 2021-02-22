@@ -13,6 +13,11 @@ table 6150616 "NPR POS Payment Method"
             DataClassification = CustomerContent;
             NotBlank = true;
         }
+        field(2; Description; Text[50])
+        {
+            Caption = 'Description';
+            DataClassification = CustomerContent;
+        }
         field(10; "Processing Type"; Option)
         {
             Caption = 'Processing Type';
@@ -38,12 +43,34 @@ table 6150616 "NPR POS Payment Method"
             Caption = 'Is Finance Agreement';
             DataClassification = CustomerContent;
         }
+        field(28; "Account Type"; Enum "NPR POS Payment Method Account Type")
+        {
+            Caption = 'Account Type';
+            DataClassification = CustomerContent;
+
+        }
+        field(29; "Account No."; Code[20])
+        {
+            Caption = 'Account No.';
+            DataClassification = CustomerContent;
+            TableRelation = if ("Account Type" = const("G/L Account")) "G/L Account" where("Direct Posting" = const(true), "Account Type" = const(Posting), Blocked = const(false))
+            else
+            if ("Account Type" = const(Customer)) Customer
+            else
+            if ("Account Type" = const(Bank)) "Bank Account";
+        }
         field(30; "Include In Counting"; Option)
         {
             Caption = 'Include In Counting';
             DataClassification = CustomerContent;
             OptionCaption = 'No,Yes,Yes - Blind,Virtual';
             OptionMembers = NO,YES,BLIND,VIRTUAL;
+        }
+        field(31; "Fixed Rate"; Decimal)
+        {
+            Caption = 'Fixed Rate';
+            DataClassification = CustomerContent;
+
         }
         field(35; "Bin for Virtual-Count"; Code[10])
         {
@@ -94,6 +121,112 @@ table 6150616 "NPR POS Payment Method"
             Description = 'NPR5.36';
             TableRelation = "G/L Account";
         }
+        field(54; "Maximum Amount"; Decimal)
+        {
+            Caption = 'Max amount';
+            DataClassification = CustomerContent;
+        }
+        field(55; "Minimum Amount"; Decimal)
+        {
+            Caption = 'Min amount';
+            DataClassification = CustomerContent;
+        }
+        field(60; "Return Payment Method Code"; Code[10])
+        {
+            Caption = 'Return Payment Method Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Payment Method".Code;
+        }
+        field(68; "Forced Amount"; Boolean)
+        {
+            Caption = 'Forced amount';
+            DataClassification = CustomerContent;
+        }
+        field(75; "Match Sales Amount"; Boolean)
+        {
+            Caption = 'Match Sales Amount';
+            DataClassification = CustomerContent;
+        }
+        field(100; "Reverse Unrealized VAT"; Boolean)
+        {
+            Caption = 'Reverse Unrealized VAT';
+            DataClassification = CustomerContent;
+        }
+        field(110; "Open Drawer"; Boolean)
+        {
+            Caption = 'Open Drawer';
+            DataClassification = CustomerContent;
+            Description = 'NPR5.51';
+        }
+        field(120; "Allow Refund"; Boolean)
+        {
+            Caption = 'Allow Refund';
+            DataClassification = CustomerContent;
+            InitValue = true;
+        }
+        field(130; "Zero as Default on Popup"; Boolean)
+        {
+            Caption = 'Zero as Default on Popup';
+            DataClassification = CustomerContent;
+        }
+        field(140; "No Min Amount on Web Orders"; Boolean)
+        {
+            Caption = 'No Min Amount on Web Orders';
+            DataClassification = CustomerContent;
+        }
+        field(318; "Global Dimension 1 Code"; Code[20])
+        {
+            CaptionClass = '1,1,1';
+            Caption = 'Only used by Global Dimension 1';
+            DataClassification = CustomerContent;
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+
+            trigger OnValidate()
+            begin
+                ValidateShortcutDimCode(1, "Global Dimension 1 Code");
+            end;
+        }
+        field(319; "Global Dimension 2 Code"; Code[20])
+        {
+            CaptionClass = '1,1,2';
+            Caption = 'Only used by Global Dimension 2';
+            DataClassification = CustomerContent;
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+
+            trigger OnValidate()
+            begin
+                ValidateShortcutDimCode(2, "Global Dimension 2 Code");
+            end;
+        }
+        field(320; "Auto End Sale"; Boolean)
+        {
+            Caption = 'Auto end sale';
+            DataClassification = CustomerContent;
+            InitValue = true;
+        }
+        field(321; "Payment Method Code"; Code[10])
+        {
+            Caption = 'Payment Method Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Payment Method";
+        }
+        field(520; "EFT Surcharge Service Item No."; Code[20])
+        {
+            Caption = 'Surcharge Service Item No.';
+            DataClassification = CustomerContent;
+            TableRelation = Item WHERE(Type = CONST(Service));
+        }
+        field(530; "EFT Tip Service Item No."; Code[20])
+        {
+            Caption = 'Tip Service Item No.';
+            DataClassification = CustomerContent;
+            TableRelation = Item WHERE(Type = CONST(Service));
+        }
+        field(540; "Block POS Payment"; Boolean)
+        {
+            Caption = 'Block POS Payment';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -110,9 +243,42 @@ table 6150616 "NPR POS Payment Method"
     trigger OnDelete()
     var
         POSPostingSetup: Record "NPR POS Posting Setup";
+        DimMgt: Codeunit DimensionManagement;
     begin
-        POSPostingSetup.SetRange("POS Payment Method Code", Code);
+        POSPostingSetup.SetRange("POS Payment Method Code", Rec.Code);
         POSPostingSetup.DeleteAll(true);
+
+        DimMgt.DeleteDefaultDim(DATABASE::"NPR POS Payment Method", Rec.Code);
     end;
+
+    trigger OnInsert()
+    var
+        DimMgt: Codeunit DimensionManagement;
+    begin
+        DimMgt.UpdateDefaultDim(DATABASE::"NPR POS Payment Method", Rec.Code,
+                        Rec."Global Dimension 1 Code", Rec."Global Dimension 2 Code");
+    end;
+
+    local procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
+    var
+        DimMgt: Codeunit DimensionManagement;
+    begin
+        DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
+        DimMgt.SaveDefaultDim(DATABASE::"NPR POS Payment Method", Code, FieldNumber, ShortcutDimCode);
+        Modify();
+    end;
+
+    internal procedure GetRoundingType(): Text[1]
+    begin
+        case Rec."Rounding Type" of
+            Rec."Rounding Type"::Down:
+                exit('<');
+            Rec."Rounding Type"::Up:
+                exit('>');
+            Rec."Rounding Type"::Nearest:
+                exit('=');
+        end;
+    end;
+
 }
 

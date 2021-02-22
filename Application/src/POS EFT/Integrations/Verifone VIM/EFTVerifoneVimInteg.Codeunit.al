@@ -534,16 +534,12 @@ codeunit 6184526 "NPR EFT Verifone Vim Integ."
         exit(EFTVerifonePaymentParameter."Post Reconcile Delay Seconds");
     end;
 
-    local procedure "// Protocol Response"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6184527, 'OnAfterProtocolResponse', '', false, false)]
     local procedure OnAfterProtocolResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request")
     var
+        POSPaymentMethod: Record "NPR POS Payment Method";
         EFTInterface: Codeunit "NPR EFT Interface";
         EFTPaymentMapping: Codeunit "NPR EFT Payment Mapping";
-        PaymentTypePOS: Record "NPR Payment Type POS";
     begin
         if not EftTransactionRequest.Successful then begin
             if EftTransactionRequest."Processing Type" <> EftTransactionRequest."Processing Type"::AUXILIARY then begin
@@ -563,15 +559,13 @@ codeunit 6184526 "NPR EFT Verifone Vim Integ."
         if (EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::SETUP) and (EftTransactionRequest.Successful) then
             Message(EftTransactionRequest."Result Display Text");
 
-        //-NPR5.54 [364340]
         if EftTransactionRequest."Processing Type" in [EftTransactionRequest."Processing Type"::PAYMENT,
                                                        EftTransactionRequest."Processing Type"::REFUND,
                                                        EftTransactionRequest."Processing Type"::LOOK_UP,
                                                        EftTransactionRequest."Processing Type"::VOID] then begin
-            //+NPR5.54 [364340]
-            if EFTPaymentMapping.FindPaymentType(EftTransactionRequest, PaymentTypePOS) then begin
-                EftTransactionRequest."POS Payment Type Code" := PaymentTypePOS."No.";
-                EftTransactionRequest."Card Name" := CopyStr(PaymentTypePOS.Description, 1, MaxStrLen(EftTransactionRequest."Card Name"));
+            if EFTPaymentMapping.FindPaymentType(EftTransactionRequest, POSPaymentMethod) then begin
+                EftTransactionRequest."POS Payment Type Code" := POSPaymentMethod.Code;
+                EftTransactionRequest."Card Name" := CopyStr(POSPaymentMethod.Description, 1, MaxStrLen(EftTransactionRequest."Card Name"));
             end;
             EftTransactionRequest."POS Description" := CopyStr(GetPOSDescription(EftTransactionRequest), 1, MaxStrLen(EftTransactionRequest."POS Description"));
             EftTransactionRequest.Modify;

@@ -37,11 +37,6 @@ codeunit 6150705 "NPR POS Sale"
         Initialized: Boolean;
         Ended: Boolean;
         LastSaleRetrieved: Boolean;
-        LastSaleTotal: Decimal;
-        LastSalePayment: Decimal;
-        LastSaleDateText: Text;
-        LastSaleReturnAmount: Decimal;
-        LastReceiptNo: Text;
         SetDimension01: Label 'Dimension %1 does not exist';
         SetDimension02: Label 'Dimension Value %1 does not exist for dimension %2';
         EndedSalesAmount: Decimal;
@@ -83,12 +78,6 @@ codeunit 6150705 "NPR POS Sale"
         FrontEnd.StartTransaction(Rec);
     end;
 
-    local procedure CheckInit(WithError: Boolean): Boolean
-    begin
-        if WithError and (not Initialized) then
-            Error('Codeunit POS Sale was invoked in uninitialized state. This is a programming bug, not a user error');
-        exit(Initialized);
-    end;
 
     local procedure InitSale()
     var
@@ -96,7 +85,6 @@ codeunit 6150705 "NPR POS Sale"
         with Rec do begin
             "Salesperson Code" := Setup.Salesperson();
             "Register No." := Register."Register No.";
-            Register.TestField("Return Payment Type");
             "Sales Ticket No." := GetNextReceiptNo("Register No.");
             Date := Today;
             "Start Time" := Time;
@@ -347,8 +335,9 @@ codeunit 6150705 "NPR POS Sale"
         exit(true);
     end;
 
-    procedure TryEndSaleWithBalancing(POSSession: Codeunit "NPR POS Session"; PaymentType: Record "NPR Payment Type POS"; ReturnPaymentType: Record "NPR Payment Type POS"): Boolean
+    procedure TryEndSaleWithBalancing(POSSession: Codeunit "NPR POS Session"; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"): Boolean
     var
+
         SalesAmount: Decimal;
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
@@ -369,11 +358,11 @@ codeunit 6150705 "NPR POS Sale"
 
         PaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
 
-        if not IsPaymentValidForEndingSale(PaymentType, ReturnPaymentType, SalesAmount, PaidAmount) then
+        if not IsPaymentValidForEndingSale(POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount) then
             exit(false);
 
-        ChangeAmount := POSGiveChange.InsertChange(Rec, ReturnPaymentType, PaidAmount - SalesAmount);
-        RoundAmount := POSRounding.InsertRounding(Rec, ReturnPaymentType, PaidAmount - SalesAmount - ChangeAmount);
+        ChangeAmount := POSGiveChange.InsertChange(Rec, ReturnPOSPaymentMethod, PaidAmount - SalesAmount);
+        RoundAmount := POSRounding.InsertRounding(Rec, PaidAmount - SalesAmount - ChangeAmount);
 
         EndSale(POSSession, true);
         EndedSalesAmount := SalesAmount;
@@ -427,15 +416,15 @@ codeunit 6150705 "NPR POS Sale"
         end;
     end;
 
-    local procedure IsPaymentValidForEndingSale(PaymentType: Record "NPR Payment Type POS"; ReturnPaymentType: Record "NPR Payment Type POS"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
+    local procedure IsPaymentValidForEndingSale(POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
     var
         POSPaymentLine: Codeunit "NPR POS Payment Line";
     begin
 
-        if not PaymentType."Auto End Sale" then
+        if not POSPaymentMethod."Auto End Sale" then
             exit(false);
 
-        exit(POSPaymentLine.CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType, false) = 0);
+        exit(POSPaymentLine.CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, POSPaymentMethod, ReturnPOSPaymentMethod, false) = 0);
     end;
 
     procedure SelectViewForEndOfSale(POSSession: Codeunit "NPR POS Session")
@@ -463,7 +452,7 @@ codeunit 6150705 "NPR POS Sale"
 
     procedure ValidateSaleBeforeEnd(var Sale: Record "NPR Sale POS")
     var
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         SaleLinePOS: Record "NPR Sale Line POS";
         Item: Record Item;
         SalespersonPurchaser: Record "Salesperson/Purchaser";
@@ -509,8 +498,8 @@ codeunit 6150705 "NPR POS Sale"
                     SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Payment);
                     if SaleLinePOS.FindSet then
                         repeat
-                            if PaymentTypePOS.Get(SaleLinePOS."No.") then
-                                if (PaymentTypePOS."Processing Type" = PaymentTypePOS."Processing Type"::Cash) and
+                            if POSPaymentMethod.Get(SaleLinePOS."No.") then
+                                if (POSPaymentMethod."Processing Type" = POSPaymentMethod."Processing Type"::Cash) and
                                     (SaleLinePOS."Amount Including VAT" < 0) then begin
                                     saleNegCashSum := saleNegCashSum + SaleLinePOS."Amount Including VAT";
                                     if Abs(saleNegCashSum) > Abs(SalespersonPurchaser."NPR Maximum Cash Returnsale") then
@@ -519,8 +508,6 @@ codeunit 6150705 "NPR POS Sale"
                         until SaleLinePOS.Next = 0;
                 end;
         end;
-
-
 
         SaleLinePOS.Reset;
         SaleLinePOS.SetRange("Register No.", Sale."Register No.");
@@ -637,7 +624,6 @@ codeunit 6150705 "NPR POS Sale"
     begin
         Rec := SalePOS_ToResume;
         with Rec do begin
-            Register.TestField("Return Payment Type");
             UpdateSaleDeviceID(Rec);
 
             "Salesperson Code" := Setup.Salesperson();
@@ -741,9 +727,7 @@ codeunit 6150705 "NPR POS Sale"
         POSSession.AddServerStopwatch(Keyword, Duration);
     end;
 
-    local procedure "---Events---"()
-    begin
-    end;
+    #region Events
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitializeAtLogin(Register: Record "NPR Register")
@@ -799,10 +783,9 @@ codeunit 6150705 "NPR POS Sale"
     procedure OnRefresh(var SalePOS: Record "NPR Sale POS")
     begin
     end;
+    #endregion
 
-    local procedure "--- OnFinishSale Workflow"()
-    begin
-    end;
+        #region OnFinishSale Workflow
 
     [EventSubscriber(ObjectType::Table, Database::"NPR NP Retail Setup", 'OnAfterInsertEvent', '', true, true)]
     local procedure OnAfterInsertRetailSetup(var Rec: Record "NPR NP Retail Setup"; RunTrigger: Boolean)
@@ -869,4 +852,6 @@ codeunit 6150705 "NPR POS Sale"
     local procedure OnFinishSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
     begin
     end;
+
+    #endregion
 }

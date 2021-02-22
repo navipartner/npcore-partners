@@ -1,26 +1,5 @@
 codeunit 6151002 "NPR POS Proxy - Display"
 {
-    // NPR5.36/CLVA/20170701 CASE 282851 Changed change calculation
-    // NPR5.38/CLVA/20180104 CASE 300172 Closing receipt on endsale
-    // NPR5.42/CLVA/20180522 CASE 315824 Updated Bixolon functionality, Added function CalculateTotals, Added CU6150704OnBeforeChangeToPaymentView
-    // NPR5.42/CLVA/20180522 CASE 305714 Changed functionality from event subscriber CU6150706OnBeforeSetQuantity to CU6150706OnAfterSetQuantity
-    //                                   Changed functionality from event subscriber CU6150706OnBeforeDeletePOSSaleLine to CU6150706OnAfterDeletePOSSaleLine
-    // NPR5.43/CLVA/20180606  CASE 300254 Splitting Matrix and 2nd Display activation
-    // NPR5.43/MHA /20180619  CASE 319425 Added OnAfterInsertSaleLine POS Sales Workflow
-    // NPR5.44/CLVA/20180417  CASE 311568 Changed text constant NEWLINE to hardcoded value.
-    // NPR5.44/MMV /20180423  CASE 311309 Made function Update2ndDisplayFromSalePOS global
-    // NPR5.44/MHA /20180724  CASE 300254 Deleted Subscriber function CU6150792OnAfterInsertPOSSaleLine()
-    // NPR5.44/CLVA/20180606  CASE 318695 Added VAT functionality
-    // NPR5.45/CLVA/20180727  CASE 323345 Added error if Bixolon setup is missing
-    // NPR5.45/CLVA/20180727  CASE 318695 Added CU6150725OnBeforeActionWorkflow
-    // NPR5.50/CLVA/20190513  CASE 352390 Added support for custom display content. Changed CloseReceipt, Closed, EndSale and Payments to local = No
-    // NPR5.51/TILA/20190716  CASE 361939 Commented out non existing option
-    // NPR5.51/ANPA/20190722  CASE 352390 Added the possibility of hidding the receipt, when the display is activated
-    // NPR5.51/ANPA/20190723  CASE 350674 Now updating when customer is changed. Added event subscriber CU6150706OnUpdateLine.
-    // NPR5.51/ALPO/20190808  CASE 363658 Video on 2nd screen was not played in a loop, if there was only one video in the setups
-    // NPR5.51/ALPO/20190815  CASE 321307 Show registered payment amounts in both FCY and LCY on 2nd screen
-
-
     trigger OnRun()
     begin
     end;
@@ -65,30 +44,17 @@ codeunit 6151002 "NPR POS Proxy - Display"
         SaleHeader: Record "NPR Sale POS";
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
     begin
-        //-NPR5.43 [300254]
-        //IF NOT Register."Customer Display" THEN
-        //  EXIT;
         CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
             exit;
-        //+NPR5.43 [300254]
 
         if not POSSession.IsActiveSession(FrontEnd) then
             exit;
-
-        //-NPR5.43 [300254]
-        //IF DisplaySetup.GET(Register."Register No.") THEN
         if DisplayIsActivated then
-            //+NPR5.43 [300254]
             Login(FrontEnd, Register."Register No.")
-        //-NPR5.42 [315824]
-        //-NPR5.43 [300254]
-        //ELSE
         else
             if MatrixIsActivated then
-                //+NPR5.43 [300254]
                 UpdateDisplayFromSalePOS(SaleHeader, Register, Action::Login, '', '');
-        //+NPR5.42 [315824]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnAfterInitSale', '', true, true)]
@@ -100,29 +66,15 @@ codeunit 6151002 "NPR POS Proxy - Display"
     begin
         if not Register.Get(SaleHeader."Register No.") then
             exit;
-
-        //-NPR5.43 [300254]
-        //IF NOT Register."Customer Display" THEN
-        //  EXIT;
         CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
             exit;
-        //+NPR5.43 [300254]
 
-
-        //-NPR5.43 [300254]
-        //IF DisplaySetup.GET(Register."Register No.") THEN
         if DisplayIsActivated then
-            //+NPR5.43 [300254]
             Update2ndDisplayFromSalePOS(FrontEnd, SaleHeader, Register, Action::Clear, TextValue, 0)
-        //-NPR5.42 [315824]
-        //-NPR5.43 [300254]
-        //ELSE
         else
             if MatrixIsActivated then
-                //+NPR5.43 [300254]
                 UpdateDisplayFromSalePOS(SaleHeader, Register, Action::Login, TextValue, '');
-        //+NPR5.42 [315824]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterInsertSaleLine', '', true, true)]
@@ -134,40 +86,26 @@ codeunit 6151002 "NPR POS Proxy - Display"
         POSSession: Codeunit "NPR POS Session";
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
     begin
-        //-NPR5.43 [319425]
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
 
         if POSSalesWorkflowStep."Subscriber Function" <> 'UpdateDisplayOnSaleLineInsert' then
             exit;
-        //+NPR5.43 [319425]
         if not Register.Get(SaleLinePOS."Register No.") then
             exit;
 
-        //-NPR5.43 [300254]
-        //IF NOT Register."Customer Display" THEN
-        //  EXIT;
         CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
             exit;
-        //+NPR5.43 [300254]
 
         if not POSSession.IsActiveSession(FrontEnd) then
             exit;
 
-        //-NPR5.43 [300254]
-        //IF DisplaySetup.GET(Register."Register No.") THEN
         if DisplayIsActivated then
-            //+NPR5.43 [300254]
             Update2ndDisplayFromSaleLinePOS(FrontEnd, SaleLinePOS, Action::Payment, 0)
-        //-NPR5.42 [315824]
-        //-NPR5.43 [300254]
-        //ELSE
         else
             if MatrixIsActivated then
-                //+NPR5.43 [300254]
                 UpdateDisplayFromSaleLinePOS(SaleLinePOS);
-        //+NPR5.42 [315824]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterDeletePOSSaleLine', '', true, true)]
@@ -183,39 +121,26 @@ codeunit 6151002 "NPR POS Proxy - Display"
         Payment: Decimal;
         Change: Decimal;
     begin
-        //-NPR5.42 [305714]
         if not Register.Get(SaleLinePOS."Register No.") then
             exit;
 
-        //-NPR5.43 [300254]
-        //IF NOT Register."Customer Display" THEN
-        //  EXIT;
         CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
             exit;
-        //+NPR5.43 [300254]
 
         if not POSSession.IsActiveSession(FrontEnd) then
             exit;
 
-        //-NPR5.43 [300254]
-        //IF DisplaySetup.GET(Register."Register No.") THEN BEGIN
         if DisplayIsActivated then
-            //+NPR5.43 [300254]
             Update2ndDisplayFromSaleLinePOS(FrontEnd, SaleLinePOS, Action::DeleteLine, 0)
-        //-NPR5.42 [315824]
-        //-NPR5.43 [300254]
-        //END ELSE BEGIN
         else
             if MatrixIsActivated then begin
-                //+NPR5.43 [300254]
                 CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
                 if SaleLinePOS.Type = SaleLinePOS.Type::Payment then
                     UpdateDisplayFromSalePOS(SaleHeader, Register, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'))
                 else
                     UpdateDisplayFromSalePOS(SaleHeader, Register, Action::DeleteLine, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), '');
             end;
-        //+NPR5.42 [305714]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnUpdateLine', '', true, true)]
@@ -227,7 +152,6 @@ codeunit 6151002 "NPR POS Proxy - Display"
         POSSession: Codeunit "NPR POS Session";
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
     begin
-        //-NPR5.51 [350674]
         if not Register.Get(SaleLinePOS."Register No.") then
             exit;
 
@@ -243,7 +167,6 @@ codeunit 6151002 "NPR POS Proxy - Display"
         else
             if MatrixIsActivated then
                 UpdateDisplayFromSaleLinePOS(SaleLinePOS);
-        //+NPR5.51 [350674]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterSetQuantity', '', true, true)]
@@ -258,30 +181,18 @@ codeunit 6151002 "NPR POS Proxy - Display"
         if not Register.Get(SaleLinePOS."Register No.") then
             exit;
 
-        //-NPR5.43 [300254]
-        //IF NOT Register."Customer Display" THEN
-        //  EXIT;
         CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
             exit;
-        //+NPR5.43 [300254]
 
         if not POSSession.IsActiveSession(FrontEnd) then
             exit;
 
-        //-NPR5.43 [300254]
-        //IF DisplaySetup.GET(Register."Register No.") THEN
         if DisplayIsActivated then
-            //+NPR5.43 [300254]
             Update2ndDisplayFromSaleLinePOS(FrontEnd, SaleLinePOS, Action::NewQuantity, SaleLinePOS.Quantity)
-        //-NPR5.42 [315824]
-        //-NPR5.43 [300254]
-        //ELSE
         else
             if MatrixIsActivated then
-                //+NPR5.43 [300254]
                 UpdateDisplayFromSaleLinePOS(SaleLinePOS);
-        //+NPR5.42 [315824]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150707, 'OnAfterDeleteLine', '', true, true)]
@@ -300,35 +211,23 @@ codeunit 6151002 "NPR POS Proxy - Display"
         if not Register.Get(SaleLinePOS."Register No.") then
             exit;
 
-        //-NPR5.43 [300254]
-        //IF NOT Register."Customer Display" THEN
-        //  EXIT;
         CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
             exit;
-        //+NPR5.43 [300254]
 
         if not POSSession.IsActiveSession(FrontEnd) then
             exit;
 
-        //-NPR5.43 [300254]
-        //IF DisplaySetup.GET(Register."Register No.") THEN BEGIN
         if DisplayIsActivated then
-            //+NPR5.43 [300254]
             Update2ndDisplayFromSaleLinePOS(FrontEnd, SaleLinePOS, Action::Payment, 0)
-        //-NPR5.42 [315824]
-        //-NPR5.43 [300254]
-        //END ELSE BEGIN
         else
             if MatrixIsActivated then begin
-                //+NPR5.43 [300254]
                 CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
                 if SaleLinePOS.Type = SaleLinePOS.Type::Payment then
                     UpdateDisplayFromSalePOS(SaleHeader, Register, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'))
                 else
                     UpdateDisplayFromSalePOS(SaleHeader, Register, Action::DeleteLine, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), '');
             end;
-        //+NPR5.42 [305714]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150707, 'OnAfterInsertPaymentLine', '', true, true)]
@@ -350,32 +249,20 @@ codeunit 6151002 "NPR POS Proxy - Display"
         if not Register.Get(SaleLinePOS."Register No.") then
             exit;
 
-        //-NPR5.43 [300254]
-        //IF NOT Register."Customer Display" THEN
-        //  EXIT;
         CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
             exit;
-        //+NPR5.43 [300254]
 
         if not POSSession.IsActiveSession(FrontEnd) then
             exit;
 
-        //-NPR5.43 [300254]
-        //IF DisplaySetup.GET(Register."Register No.") THEN BEGIN
         if DisplayIsActivated then
-            //+NPR5.43 [300254]
             Update2ndDisplayFromSaleLinePOS(FrontEnd, SaleLinePOS, Action::Payment, 0)
-        //-NPR5.42 [315824]
-        //-NPR5.43 [300254]
-        //END ELSE BEGIN
         else
             if MatrixIsActivated then begin
-                //+NPR5.43 [300254]
                 CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
                 UpdateDisplayFromSalePOS(SaleHeader, Register, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'));
             end;
-        //+NPR5.42 [305714]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150704, 'OnBeforeChangeToPaymentView', '', true, true)]
@@ -391,7 +278,6 @@ codeunit 6151002 "NPR POS Proxy - Display"
         Change: Decimal;
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
     begin
-        //-NPR5.42 [315824]
         if not POSSession.IsActiveSession(FrontEnd) then
             exit;
 
@@ -401,27 +287,19 @@ codeunit 6151002 "NPR POS Proxy - Display"
         if not Register.Get(SaleLinePOS."Register No.") then
             exit;
 
-        //-NPR5.43 [300254]
-        //IF NOT Register."Customer Display" THEN
-        //  EXIT;
         CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
             exit;
-        //+NPR5.43 [300254]
 
-        //-NPR5.43 [300254]
-        //IF DisplaySetup.GET(Register."Register No.") THEN
         if DisplayIsActivated then
             exit;
-        //+NPR5.43 [300254]
 
         CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
         UpdateDisplayFromSalePOS(SaleHeader, Register, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'));
-        //+NPR5.42 [315824]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150725, 'OnBeforeActionWorkflow', '', true, true)]
-    local procedure CU6150725OnBeforeActionWorkflow(PaymentTypePOS: Record "NPR Payment Type POS"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: Codeunit "NPR POS JSON Management"; SubTotal: Decimal; var Handled: Boolean)
+    local procedure CU6150725OnBeforeActionWorkflow(POSPaymentMethod: Record "NPR POS Payment Method"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: Codeunit "NPR POS JSON Management"; SubTotal: Decimal; var Handled: Boolean)
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR Sale Line POS";
@@ -436,7 +314,6 @@ codeunit 6151002 "NPR POS Proxy - Display"
         Change: Decimal;
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
     begin
-        //-NPR5.45 [318695]
         if not POSSession.IsActiveSession(FrontEnd) then
             exit;
 
@@ -450,16 +327,15 @@ codeunit 6151002 "NPR POS Proxy - Display"
         if (not MatrixIsActivated) then
             exit;
 
-        if PaymentTypePOS."Processing Type" = PaymentTypePOS."Processing Type"::"Foreign Currency" then begin
-            CurrencyAmount := POSPaymentLine.RoundAmount(PaymentTypePOS, POSPaymentLine.CalculateForeignAmount(PaymentTypePOS, SubTotal));
-            Line1 := PadStr(PaymentTypePOS.Description, 20);
+        if POSPaymentMethod."Currency Code" <> '' then begin
+            CurrencyAmount := POSPaymentLine.RoundAmount(POSPaymentMethod, POSPaymentLine.CalculateForeignAmount(POSPaymentMethod, SubTotal));
+            Line1 := PadStr(POSPaymentMethod.Description, 20);
             Line2 := PadStr(' ', 20 - StrLen(Format(CurrencyAmount, 0, '<Precision,2:2><Standard Format,0>'))) + Format(CurrencyAmount, 0, '<Precision,2:2><Standard Format,0>');
             UpdateDisplay(Line1, Line2);
         end else begin
             CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
             UpdateDisplayFromSalePOS(SaleHeader, Register, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'));
         end;
-        //+NPR5.45 [318695]
     end;
 
     local procedure "-- Locals --"()
@@ -480,10 +356,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
             if "No." = '' then
                 exit;
 
-            //-NPR5.51 [361939]
-            //IF (Type = Type::Item) AND ("Discount Type" IN ["Discount Type"::"BOM List", "Discount Type"::"6"]) THEN
             if (Type = Type::Item) and ("Discount Type" = "Discount Type"::"BOM List") then
-                //+NPR5.51 [361939]
                 exit;
 
             Line1 := PadStr(Description, 20);
@@ -505,8 +378,6 @@ codeunit 6151002 "NPR POS Proxy - Display"
                 Line2 := PadStr('x' + Format(Abs(Quantity)), 20 - StrLen(Total)) + Total;
         end;
 
-        //MESSAGE('UpdateDisplayFromSaleLinePOS:\' + Line1 + '\' + Line2);
-
         UpdateDisplay(Line1, Line2);
     end;
 
@@ -523,7 +394,6 @@ codeunit 6151002 "NPR POS Proxy - Display"
         case Action of
             Action::Login:
                 begin
-                    //-NPR5.45 [323345]
                     Clear(ObjectOutputSelection);
                     ObjectOutputSelection.SetRange("Output Path", 'DisplayBixolon');
                     if ObjectOutputSelection.FindSet then begin
@@ -570,8 +440,6 @@ codeunit 6151002 "NPR POS Proxy - Display"
 
         end;
 
-        //MESSAGE('UpdateDisplayFromSalePOS:\' + Line1 + '\' + Line2);
-
         UpdateDisplay(Line1, Line2);
     end;
 
@@ -590,11 +458,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
         Line2: Text;
         SaleLinePOS: Record "NPR Sale Line POS";
     begin
-
-        //-NPR5.51 [352390]
         if not HideReceiptIsActivated then begin
-            //+NPR5.51 [352390]
-
             Clear(Line1);
             Clear(Line2);
 
@@ -637,9 +501,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
                         Closed(FrontEnd);
                     end;
             end;
-            //-NPR5.51 [352390]
         end;
-        //+NPR5.51 [352390]
     end;
 
     local procedure Update2ndDisplayFromSaleLinePOS(var FrontEnd: Codeunit "NPR POS Front End Management"; var Rec: Record "NPR Sale Line POS"; "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity; NewQuantity: Decimal)
@@ -673,21 +535,14 @@ codeunit 6151002 "NPR POS Proxy - Display"
     begin
         LineCounter := 0;
 
-        //-NPR5.44 [318695]
         DisplaySetup.Get(Rec."Register No.");
-        //+NPR5.44 [318695]
-        //-NPR5.51 [352390]
         if not DisplaySetup."Hide receipt" then begin
-            //+NPR5.51 [352390]
-
-            //-NPR5.50 [352390]
             if DisplaySetup."Custom Display Codeunit" <> 0 then begin
                 DisplayCustomContent.RecId := Rec.RecordId;
                 DisplayCustomContent.Action := Action;
                 DisplayCustomContent.NewQuantity := NewQuantity;
                 CODEUNIT.Run(DisplaySetup."Custom Display Codeunit", DisplayCustomContent);
             end else begin
-                //+NPR5.50 [352390]
                 SaleLinePOS.Reset;
                 SaleLinePOS.SetRange("Register No.", Rec."Register No.");
                 SaleLinePOS.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
@@ -705,16 +560,9 @@ codeunit 6151002 "NPR POS Proxy - Display"
                         if (Action = Action::DeleteLine) then
                             ShowLine := (SaleLinePOS."Line No." <> Rec."Line No.");
 
-                        //-NPR5.42 [305714]
-                        //IF (Action = Action::NewQuantity) THEN
-                        //  IF (SaleLinePOS."Line No." = Rec."Line No.") THEN
-                        //    SaleLinePOS.VALIDATE(Quantity,NewQuantity);
-                        //+NPR5.42 [305714]
-
                         if ShowLine then begin
                             LineCounter += 1;
                             if SaleLinePOS.Type = SaleLinePOS.Type::Payment then begin
-                                //-NPR5.51 [321307]
                                 if SaleLinePOS."Amount Including VAT" <> SaleLinePOS."Currency Amount" then
                                     PaymentAmountTxt := ' ' + SaleLinePOS."No." + ' ' + Format(SaleLinePOS."Currency Amount", 0, '<Precision,2:2><Standard Format,0>')
                                 else
@@ -733,19 +581,14 @@ codeunit 6151002 "NPR POS Proxy - Display"
                                 PaymentDetailsTxt := PaymentDetailsTxt +
                                   '#NEWLINE#' +
                                   PadStr(SaleLinePOS.Description, DisplaySetup."Receipt GrandTotal Padding" - StrLen(PaymentAmountTxt)) + PaymentAmountTxt;
-                                //+NPR5.51 [321307]
                                 Payment := Payment + SaleLinePOS."Amount Including VAT"
                             end else begin
                                 Line1 := PadStr(SaleLinePOS.Description, DisplaySetup."Receipt Description Padding");
-
-                                //-NPR5.44 [318695]
-                                //Total := FORMAT(SaleLinePOS."Amount Including VAT",0,'<Precision,2:2><Standard Format,0>');
                                 if DisplaySetup."Prices ex. VAT" then begin
                                     Total := Format(SaleLinePOS.Amount, 0, '<Precision,2:2><Standard Format,0>');
                                 end else begin
                                     Total := Format(SaleLinePOS."Amount Including VAT", 0, '<Precision,2:2><Standard Format,0>');
                                 end;
-                                //+NPR5.44 [318695]
 
                                 if (SaleLinePOS."Discount Type" <> SaleLinePOS."Discount Type"::" ") and (SaleLinePOS."Discount %" <> 0) then begin
                                     if SaleLinePOS.Amount <> 0 then
@@ -762,16 +605,12 @@ codeunit 6151002 "NPR POS Proxy - Display"
                                 end else
                                     Line2 := Line1 + ' ' + PadStr('x' + Format(Abs(SaleLinePOS.Quantity)), DisplaySetup."Receipt Total Padding" - StrLen(Total)) + Total;
 
-                                //-NPR5.51 [321307]
                                 if ReceiptText = '' then begin
                                     GLSetup.Get;
                                     ReceiptText := PadStr('', DisplaySetup."Receipt GrandTotal Padding" - StrLen(GLSetup.GetCurrencyCode('')) - 2) + GLSetup.GetCurrencyCode('') + '#NEWLINE#';
                                 end;
-                                //+NPR5.51 [321307]
                                 ReceiptText := ReceiptText + Line2 + '#NEWLINE#';
 
-                                //-NPR5.44 [318695]
-                                //GrandTotal := GrandTotal + SaleLinePOS."Amount Including VAT";
                                 if DisplaySetup."Prices ex. VAT" then begin
                                     GrandTotal := GrandTotal + SaleLinePOS.Amount;
                                     TotalTAX := TotalTAX + (SaleLinePOS."Amount Including VAT" - SaleLinePOS.Amount);
@@ -779,44 +618,29 @@ codeunit 6151002 "NPR POS Proxy - Display"
                                 end else begin
                                     GrandTotal := GrandTotal + SaleLinePOS."Amount Including VAT";
                                 end;
-                                //+NPR5.44 [318695]
-
                             end;
                         end;
                     until SaleLinePOS.Next = 0;
                 end;
 
                 GrandTotalTxt := Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>');
-                //-NPR5.44 [318695]
                 GrandTotalIncTaxTxt := Format(GrandTotalIncTax, 0, '<Precision,2:2><Standard Format,0>');
-                //+NPR5.44 [318695]
                 PaymentTxt := Format(Payment, 0, '<Precision,2:2><Standard Format,0>');
 
-                //-NPR5.36
                 Change := 0;
                 ChangeTxt := Format(Change, 0, '<Precision,2:2><Standard Format,0>');
-                //-NPR5.44 [318695]
                 if DisplaySetup."Prices ex. VAT" then begin
                     if (Payment > GrandTotalIncTax) then
                         ChangeTxt := Format(Round((Payment - GrandTotalIncTax) * -1, 0.01, '='), 0, '<Precision,2:2><Standard Format,0>')
-                    //-NPR5.51 [321307]
                     else
                         RemainingAmtTxt := Format(GrandTotalIncTax - Payment, 0, '<Precision,2:2><Standard Format,0>');
-                    //+NPR5.51 [321307]
                 end else begin
-                    //+NPR5.44 [318695]
                     if (Payment > GrandTotal) then
                         ChangeTxt := Format(Round((Payment - GrandTotal) * -1, 0.01, '='), 0, '<Precision,2:2><Standard Format,0>')
-                    //-NPR5.51 [321307]
                     else
                         RemainingAmtTxt := Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>');
-                    //+NPR5.51 [321307]
-                    //-NPR5.44 [318695]
                 end;
-                //+NPR5.44 [318695]
-                //+NPR5.36
 
-                //-NPR5.44 [318695]
                 if DisplaySetup."Prices ex. VAT" then begin
                     TotalTAXTxt := Format(TotalTAX, 0, '<Precision,2:2><Standard Format,0>');
 
@@ -830,15 +654,12 @@ codeunit 6151002 "NPR POS Proxy - Display"
                                  '#NEWLINE#' +
                                  '#NEWLINE#' +
                                  PadStr(CaptionPaymentTotal, DisplaySetup."Receipt GrandTotal Padding" - StrLen(PaymentTxt)) + PaymentTxt +
-                               //-NPR5.51 [321307]
                                '#NEWLINE#' +
                                PadStr(CaptionRemaningAmt, DisplaySetup."Receipt GrandTotal Padding" - StrLen(RemainingAmtTxt)) + RemainingAmtTxt +
-                                 //+NPR5.51 [321307]
                                  '#NEWLINE#' +
                                  PadStr(CaptionChangeTotal, DisplaySetup."Receipt GrandTotal Padding" - StrLen(ChangeTxt)) + ChangeTxt;
 
                 end else begin
-                    //+NPR5.44 [318695]
                     ReceiptText := ReceiptText +
                                  '#NEWLINE#' +
                                  '#NEWLINE#' +
@@ -851,11 +672,8 @@ codeunit 6151002 "NPR POS Proxy - Display"
                                  //+NPR5.51 [321307]
                                  '#NEWLINE#' +
                                  PadStr(CaptionChangeTotal, DisplaySetup."Receipt GrandTotal Padding" - StrLen(ChangeTxt)) + ChangeTxt;
-                    //-NPR5.44 [318695]
                 end;
-                //+NPR5.44 [318695]
-                ReceiptText := ReceiptText + PaymentDetailsTxt;  //-+NPR5.51 [321307]
-
+                ReceiptText := ReceiptText + PaymentDetailsTxt;
                 if LineCounter = 0 then begin
                     Closed(FrontEnd);
                 end else begin
@@ -876,12 +694,8 @@ codeunit 6151002 "NPR POS Proxy - Display"
                             Payments(FrontEnd, ReceiptText);
                     end
                 end;
-                //-NPR5.50 [352390]
             end;
-            //+NPR5.50 [352390]
-            //-NPR5.51 [352390]
         end;
-        //+NPR5.51 [352390]
     end;
 
     local procedure CalculateTotals(var Rec: Record "NPR Sale Line POS"; var GrandTotal: Decimal; var Payment: Decimal; var Change: Decimal)
@@ -923,12 +737,10 @@ codeunit 6151002 "NPR POS Proxy - Display"
             FrontEnd.InvokeDevice(SecondaryMonitorRequest, ProtocolName, 'LOGIN');
 
         case DisplayHandlerAction of
-            //NPR5.38-
             DisplayHandlerAction::OpenDisplay:
                 begin
                     Closed(FrontEnd);
                 end;
-            //NPR5.38+
             DisplayHandlerAction::DownloadFiles:
                 begin
                     DisplaySetup."Media Downloaded" := true;
@@ -1022,7 +834,6 @@ codeunit 6151002 "NPR POS Proxy - Display"
         SecondaryMonitorRequest.MediaDictionary := MediaDictionary;
         SecondaryMonitorRequest.Base64Dictionary := Base64Dictionary;
 
-        //MESSAGE(JsonConvert.SerializeObject(SecondaryMonitorRequest));
     end;
 
     local procedure SetMediaDictionary(MediaDictionaryIn: DotNet NPRNetDictionary_Of_T_U)
@@ -1109,7 +920,6 @@ codeunit 6151002 "NPR POS Proxy - Display"
             ContentHtml += '      myIndex++;';
             ContentHtml += '      if (myIndex > x.length) {myIndex = 1}';
             ContentHtml += '        x[myIndex-1].style.display = "block";';
-            //ContentHtml += '        setTimeout(carousel, 3000);'; //Move to setup
             ContentHtml += '        setTimeout(carousel, ' + Format(DisplaySetup."Image Rotation Interval") + ');';
             ContentHtml += '    }';
             ContentHtml += '  </script>';
@@ -1151,11 +961,8 @@ codeunit 6151002 "NPR POS Proxy - Display"
             ContentHtml += '    var videoPlayer = document.getElementById("fullscreenVideo");';
             ContentHtml += '    function run() {';
             ContentHtml += '      video_count++;';
-            //-=NPR5.51 [363658]
-            //ContentHtml += '      if (video_count == 3) video_count = 1;';
             ContentHtml += StrSubstNo(
                            '      if (video_count == %1) video_count = 1;', VideoCounter);
-            //+=NPR5.51 [363658]
             ContentHtml += '      var nextVideo = "video" + video_count + ".mp4";';
             ContentHtml += '      videoPlayer.src = nextVideo;';
             ContentHtml += '      videoPlayer.play();';
@@ -1246,22 +1053,14 @@ codeunit 6151002 "NPR POS Proxy - Display"
         if not MatrixIsActivated then
             if DisplaySetup.Get(Register."Register No.") then begin
                 DisplayIsActivated := DisplaySetup.Activate;
-                //-352390 [352390]
                 HideReceiptIsActivated := DisplaySetup."Hide receipt";
-                //+352390 [352390]
             end;
     end;
 
-    local procedure "--- OnAfterInsertSaleLine Workflow"()
-    begin
-        //-NPR5.43 [319425]
-        //+NPR5.43 [319425]
-    end;
 
     [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
-        //-NPR5.43 [319425]
         if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
 
@@ -1272,14 +1071,11 @@ codeunit 6151002 "NPR POS Proxy - Display"
                     Rec."Sequence No." := 10;
                 end;
         end;
-        //+NPR5.43 [319425]
     end;
 
     local procedure CurrCodeunitId(): Integer
     begin
-        //-NPR5.43 [319425]
         exit(CODEUNIT::"NPR POS Proxy - Display");
-        //+NPR5.43 [319425]
     end;
 }
 

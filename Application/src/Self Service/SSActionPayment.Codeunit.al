@@ -51,17 +51,17 @@ codeunit 6151291 "NPR SS Action: Payment"
 
     local procedure SetContext(POSSession: Codeunit "NPR POS Session"; Context: Codeunit "NPR POS JSON Management")
     var
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         POSSetup: Codeunit "NPR POS Setup";
         PaymentHandlerWorkflow: Text;
         ForceAmount: Decimal;
     begin
         POSSession.GetSetup(POSSetup);
-        PaymentTypePOS.GetByRegister(Context.GetStringParameter('PaymentType', true), POSSetup.Register());
+        POSPaymentMethod.Get(Context.GetStringParameter('PaymentType', true));
 
-        OnGetPaymentHandler(PaymentTypePOS, PaymentHandlerWorkflow, ForceAmount);
+        OnGetPaymentHandler(POSPaymentMethod, PaymentHandlerWorkflow, ForceAmount);
         if PaymentHandlerWorkflow = '' then begin
-            Error('No payment handler registered for %1', PaymentTypePOS."No.");
+            Error('No payment handler registered for %1', POSPaymentMethod.Code);
         end;
 
         Context.SetContext('handlerWorkflow', PaymentHandlerWorkflow);
@@ -69,15 +69,15 @@ codeunit 6151291 "NPR SS Action: Payment"
         if ForceAmount <> 0 then begin
             Context.SetContext('amount', ForceAmount);
         end else begin
-            Context.SetContext('amount', GetAmountSuggestion(POSSession, PaymentTypePOS));
+            Context.SetContext('amount', GetAmountSuggestion(POSSession, POSPaymentMethod));
         end;
     end;
 
     local procedure TryEndSale(POSSession: Codeunit "NPR POS Session"; Context: Codeunit "NPR POS JSON Management")
     var
         POSSetup: Codeunit "NPR POS Setup";
-        PaymentTypePOS: Record "NPR Payment Type POS";
-        ReturnPaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
         Register: Record "NPR Register";
         POSSale: Codeunit "NPR POS Sale";
     begin
@@ -86,22 +86,22 @@ codeunit 6151291 "NPR SS Action: Payment"
         POSSession.GetSale(POSSale);
         POSSetup.GetRegisterRecord(Register);
 
-        PaymentTypePOS.GetByRegister(Context.GetStringParameter('PaymentType', true), Register."Register No.");
-        ReturnPaymentTypePOS.GetByRegister(Register."Return Payment Type", Register."Register No.");
+        POSPaymentMethod.Get(Context.GetStringParameter('PaymentType', true));
+        ReturnPOSPaymentMethod.Get(POSPaymentMethod."Return Payment Method Code");
 
-        POSSale.TryEndSaleWithBalancing(POSSession, PaymentTypePOS, ReturnPaymentTypePOS);
+        POSSale.TryEndSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod);
     end;
 
-    local procedure GetAmountSuggestion(POSSession: Codeunit "NPR POS Session"; PaymentTypePOS: Record "NPR Payment Type POS"): Decimal
+    local procedure GetAmountSuggestion(POSSession: Codeunit "NPR POS Session"; POSPaymentMethod: Record "NPR POS Payment Method"): Decimal
     var
         POSPaymentLine: Codeunit "NPR POS Payment Line";
     begin
         POSSession.GetPaymentLine(POSPaymentLine);
-        exit(POSPaymentLine.CalculateRemainingPaymentSuggestionInCurrentSale(PaymentTypePOS));
+        exit(POSPaymentLine.CalculateRemainingPaymentSuggestionInCurrentSale(POSPaymentMethod));
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnGetPaymentHandler(PaymentTypePOS: Record "NPR Payment Type POS"; var PaymentHandler: Text; var ForceAmount: Decimal)
+    local procedure OnGetPaymentHandler(POSPaymentMethod: Record "NPR POS Payment Method"; var PaymentHandler: Text; var ForceAmount: Decimal)
     begin
     end;
 }

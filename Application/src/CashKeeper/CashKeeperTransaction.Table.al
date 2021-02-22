@@ -88,7 +88,7 @@ table 6059946 "NPR CashKeeper Transaction"
         {
             Caption = 'Payment Type';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Payment Type POS"."No.";
+            TableRelation = "NPR POS Payment Method".Code;
         }
     }
 

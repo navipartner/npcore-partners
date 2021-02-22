@@ -10,7 +10,7 @@ table 6014437 "NPR Payment Type - Detailed"
         field(1; "Payment No."; Code[10])
         {
             Caption = 'Payment Type';
-            TableRelation = "NPR Payment Type POS"."No.";
+            TableRelation = "NPR POS Payment Method".Code;
             DataClassification = CustomerContent;
         }
         field(2; "Register No."; Code[10])

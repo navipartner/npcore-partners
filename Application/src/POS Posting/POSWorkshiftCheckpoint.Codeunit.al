@@ -634,36 +634,6 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         exit(POSWorkshiftCheckpoint."Entry No.");
     end;
 
-    local procedure ConvertFCYToLCY(Amount: Decimal; PaymentTypeCode: Code[10]) "Amount (LCY)": Decimal
-    var
-        Currency: Record Currency;
-        CurrencyFactor: Decimal;
-        CurrExchRate: Record "Currency Exchange Rate";
-        PaymentTypePOS: Record "NPR Payment Type POS";
-    begin
-
-        "Amount (LCY)" := Amount;
-
-        if (Amount = 0) then
-            exit;
-
-        if (PaymentTypeCode = '') then
-            exit;
-
-        // ** Legacy Way
-        if (not PaymentTypePOS.Get(PaymentTypeCode)) then
-            exit;
-
-        if (PaymentTypePOS."Fixed Rate" <> 0) then
-            "Amount (LCY)" := Amount * PaymentTypePOS."Fixed Rate" / 100;
-
-        if (PaymentTypePOS."Rounding Precision" = 0) then
-            exit;
-
-        "Amount (LCY)" := Round("Amount (LCY)", PaymentTypePOS."Rounding Precision", '=');
-        exit;
-    end;
-
     local procedure AddWorkshifts(WorkshiftEntryNo: Integer; TargetWorkshiftEntryNo: Integer)
     var
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";

@@ -65,7 +65,7 @@ table 6150625 "NPR POS Bin Entry"
             Caption = 'Payment Type Code';
             DataClassification = CustomerContent;
             Description = 'This field should be dropped when new audit roll creates these entries';
-            TableRelation = "NPR Payment Type POS";
+            TableRelation = "NPR POS Payment Method";
         }
         field(40; "Transaction Date"; Date)
         {

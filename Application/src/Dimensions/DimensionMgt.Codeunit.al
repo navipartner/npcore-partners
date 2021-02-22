@@ -190,7 +190,7 @@ codeunit 6014401 "NPR Dimension Mgt."
             Type::Repair:
                 Error('AL Error: Repair are not used in Core.');
             Type::Payment:
-                exit(DATABASE::"NPR Payment Type POS");
+                exit(DATABASE::"NPR POS Payment Method");
             Type::"Open/Close":
                 exit(DATABASE::"NPR Retail Comment");
             Type::BOM:

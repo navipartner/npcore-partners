@@ -80,7 +80,7 @@ codeunit 6150816 "NPR POSAction: VAT Refusion"
         Context: Codeunit "NPR POS JSON Management";
         JSON: Codeunit "NPR POS JSON Management";
         TotalVATOnSale: Decimal;
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        NPRPOSPaymentMethod: Record "NPR POS Payment Method";
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR Sale POS";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
@@ -96,10 +96,9 @@ codeunit 6150816 "NPR POSAction: VAT Refusion"
         //Check pos payment type
         JSON.InitializeJObjectParser(Parameters, FrontEnd);
         POSSession.GetPaymentLine(POSPaymentLine);
-        POSPaymentLine.GetPaymentType(PaymentTypePOS, JSON.GetString('PaymentTypePOSCode', true), SalePOS."Register No.");
-        PaymentTypePOS.Get(PaymentTypePOS."No.", PaymentTypePOS."Register No.");
+        NPRPOSPaymentMethod.Get(JSON.GetString('PaymentTypePOSCode', true));
 
-        ValidateMinMaxAmount(PaymentTypePOS, TotalVATOnSale);
+        ValidateMinMaxAmount(NPRPOSPaymentMethod, TotalVATOnSale);
 
         Context.SetContext('VATAmount', TotalVATOnSale);
 
@@ -126,7 +125,7 @@ codeunit 6150816 "NPR POSAction: VAT Refusion"
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         PaymentLinePOS: Record "NPR Sale Line POS";
         TotalVATOnSale: Decimal;
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
     begin
 
         POSSession.GetSetup(Setup);
@@ -135,27 +134,22 @@ codeunit 6150816 "NPR POSAction: VAT Refusion"
         JSON.InitializeJObjectParser(Context, FrontEnd);
         JSON.SetScope('parameters', true);
         POSSession.GetPaymentLine(POSPaymentLine);
-        POSPaymentLine.GetPaymentType(PaymentTypePOS, JSON.GetString('PaymentTypePOSCode', true), SalePOS."Register No.");
-        PaymentTypePOS.Get(PaymentTypePOS."No.", PaymentTypePOS."Register No.");
+        POSPaymentLine.GetPOSPaymentMethod(POSPaymentMethod, JSON.GetString('PaymentTypePOSCode', true));
+        POSPaymentMethod.Get(POSPaymentMethod.Code);
 
         //Get amount and add to payment line
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        PaymentLinePOS."No." := PaymentTypePOS."No.";
+        PaymentLinePOS."No." := POSPaymentMethod.Code;
         PaymentLinePOS."Amount Including VAT" := JSON.GetDecimal('VATAmount', true);
         POSPaymentLine.InsertPaymentLine(PaymentLinePOS, 0);
 
         POSSession.RequestRefreshData();
     end;
 
-    local procedure "---"()
-    begin
-    end;
-
     local procedure CalcVATFromSale(SalePOS: Record "NPR Sale POS") VATAmount: Decimal
     var
         SaleLinePOS: Record "NPR Sale Line POS";
         TotalVAT: Decimal;
-        PaymentTypePOS: Record "NPR Payment Type POS";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         PaymentLinePOS: Record "NPR Sale Line POS";
     begin
@@ -179,16 +173,16 @@ codeunit 6150816 "NPR POSAction: VAT Refusion"
         exit(TotalVAT);
     end;
 
-    local procedure ValidateMinMaxAmount(PaymentTypePOS: Record "NPR Payment Type POS"; AmountToCapture: Decimal)
+    local procedure ValidateMinMaxAmount(NPRPOSPaymentMethod: Record "NPR POS Payment Method"; AmountToCapture: Decimal)
     begin
 
-        if (PaymentTypePOS."Maximum Amount" <> 0) then
-            if (AmountToCapture > PaymentTypePOS."Maximum Amount") then
-                Error(MaxAmountLimit, PaymentTypePOS.Description, PaymentTypePOS."Maximum Amount");
+        if (NPRPOSPaymentMethod."Maximum Amount" <> 0) then
+            if (AmountToCapture > NPRPOSPaymentMethod."Maximum Amount") then
+                Error(MaxAmountLimit, NPRPOSPaymentMethod.Description, NPRPOSPaymentMethod."Maximum Amount");
 
-        if (PaymentTypePOS."Minimum Amount" <> 0) then
-            if (AmountToCapture < PaymentTypePOS."Minimum Amount") then
-                Error(MaxAmountLimit, PaymentTypePOS.Description, PaymentTypePOS."Minimum Amount");
+        if (NPRPOSPaymentMethod."Minimum Amount" <> 0) then
+            if (AmountToCapture < NPRPOSPaymentMethod."Minimum Amount") then
+                Error(MaxAmountLimit, NPRPOSPaymentMethod.Description, NPRPOSPaymentMethod."Minimum Amount");
     end;
 }
 

@@ -416,7 +416,7 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
         CardType: Text;
         MaskedCardNo: Text;
         PaymentsXML: Text;
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
     begin
         //See page 51 of doc. for payment methods
 
@@ -427,19 +427,15 @@ codeunit 6014611 "NPR Tax Free PTF PI" implements "NPR Tax Free Handler Interfac
                     POSPaymentLine.SetRange("POS Entry No.", POSSalesLine."POS Entry No.");
                     if POSPaymentLine.FindSet then
                         repeat
-                            if PaymentTypePOS.Get(POSPaymentLine."POS Payment Method Code") then begin
-                                case PaymentTypePOS."Processing Type" of
-                                    PaymentTypePOS."Processing Type"::Cash:
-                                        PaymentMethod := '1';
-                                    PaymentTypePOS."Processing Type"::"Foreign Currency":
-                                        PaymentMethod := '2';
-
-                                    PaymentTypePOS."Processing Type"::"Other Credit Cards",
-                                  PaymentTypePOS."Processing Type"::"Terminal Card":
+                            if POSPaymentMethod.Get(POSPaymentLine."POS Payment Method Code") then begin
+                                case POSPaymentMethod."Processing Type" of
+                                    POSPaymentMethod."Processing Type"::Cash:
+                                        if POSPaymentMethod."Currency Code" = '' then
+                                            PaymentMethod := '1'
+                                        else
+                                            PaymentMethod := '2';
+                                    POSPaymentMethod."Processing Type"::EFT:
                                         PaymentMethod := '4';
-
-                                    PaymentTypePOS."Processing Type"::"Manual Card":
-                                        PaymentMethod := '11';
                                     else
                                         PaymentMethod := '13';
                                 end;

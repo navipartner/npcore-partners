@@ -23,7 +23,7 @@ table 6184512 "NPR EFT BIN Group Paym. Link"
         {
             Caption = 'Payment Type POS';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Payment Type POS";
+            TableRelation = "NPR POS Payment Method";
         }
     }
 

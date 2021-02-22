@@ -278,7 +278,6 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
     var
         EFTInterface: Codeunit "NPR EFT Interface";
         EFTPaymentMapping: Codeunit "NPR EFT Payment Mapping";
-        PaymentTypePOS: Record "NPR Payment Type POS";
     begin
         case EftTransactionRequest."Processing Type" of
             EftTransactionRequest."Processing Type"::PAYMENT,
@@ -311,15 +310,15 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
 
     local procedure HandleTrxResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request")
     var
+        POSPaymentMethod: Record "NPR POS Payment Method";
         EFTPaymentMapping: Codeunit "NPR EFT Payment Mapping";
-        PaymentTypePOS: Record "NPR Payment Type POS";
     begin
         if not EftTransactionRequest.Successful then
             Message(TRX_ERROR, EftTransactionRequest."Integration Type", Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
 
-        if EFTPaymentMapping.FindPaymentType(EftTransactionRequest, PaymentTypePOS) then begin
-            EftTransactionRequest."POS Payment Type Code" := PaymentTypePOS."No.";
-            EftTransactionRequest."Card Name" := CopyStr(PaymentTypePOS.Description, 1, MaxStrLen(EftTransactionRequest."Card Name"));
+        if EFTPaymentMapping.FindPaymentType(EftTransactionRequest, POSPaymentMethod) then begin
+            EftTransactionRequest."POS Payment Type Code" := POSPaymentMethod.Code;
+            EftTransactionRequest."Card Name" := CopyStr(POSPaymentMethod.Description, 1, MaxStrLen(EftTransactionRequest."Card Name"));
         end;
         EftTransactionRequest."POS Description" := CopyStr(GetPOSDescription(EftTransactionRequest), 1, MaxStrLen(EftTransactionRequest."POS Description"));
         EftTransactionRequest.Modify;
@@ -327,14 +326,14 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
 
     local procedure HandleVoidResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request")
     var
+        POSPaymentMethod: Record "NPR POS Payment Method";
         EFTPaymentMapping: Codeunit "NPR EFT Payment Mapping";
-        PaymentTypePOS: Record "NPR Payment Type POS";
-    begin
+    begin 
         if EftTransactionRequest.Successful then begin
             Message(VOID_SUCCESS, EftTransactionRequest."Entry No.");
-            if EFTPaymentMapping.FindPaymentType(EftTransactionRequest, PaymentTypePOS) then begin
-                EftTransactionRequest."POS Payment Type Code" := PaymentTypePOS."No.";
-                EftTransactionRequest."Card Name" := CopyStr(PaymentTypePOS.Description, 1, MaxStrLen(EftTransactionRequest."Card Name"));
+            if EFTPaymentMapping.FindPaymentType(EftTransactionRequest, POSPaymentMethod) then begin
+                EftTransactionRequest."POS Payment Type Code" := POSPaymentMethod.Code;
+                EftTransactionRequest."Card Name" := CopyStr(POSPaymentMethod.Description, 1, MaxStrLen(EftTransactionRequest."Card Name"));
             end;
             EftTransactionRequest."POS Description" := CopyStr(GetPOSDescription(EftTransactionRequest), 1, MaxStrLen(EftTransactionRequest."POS Description"));
             EftTransactionRequest.Modify;
@@ -415,7 +414,6 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
     local procedure CreateGenericRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         EFTSetup: Record "NPR EFT Setup";
-        PaymentTypePOS: Record "NPR Payment Type POS";
         EFTNETSBAXIPaymentSetup: Record "NPR EFT NETS BAXI Paym. Setup";
     begin
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."POS Payment Type Code");

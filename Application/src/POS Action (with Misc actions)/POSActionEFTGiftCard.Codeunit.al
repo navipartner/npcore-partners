@@ -146,7 +146,6 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
 
     procedure PrepareGiftCardLoopBusinessLogic(POSSession: Codeunit "NPR POS Session"; PaymentType: Text; Amount: Decimal; DiscountPercent: Decimal; NoOfVouchers: Integer)
     var
-        PaymentTypePOS: Record "NPR Payment Type POS";
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR Sale POS";
     begin
@@ -163,8 +162,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        PaymentTypePOS.GetByRegister(PaymentType, SalePOS."Register No.");
-
+        
         POSSession.ClearActionState();
         POSSession.BeginAction(ActionCode());
         POSSession.StoreActionState('eft_gift_card_payment_type', PaymentType);
@@ -184,7 +182,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
         POSSale: Codeunit "NPR POS Sale";
         EFTSetup: Record "NPR EFT Setup";
         SalePOS: Record "NPR Sale POS";
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         EFTPaymentMgt: Codeunit "NPR EFT Transaction Mgt.";
     begin
         //-NPR5.53 [375525]
@@ -195,11 +193,11 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        PaymentTypePOS.GetByRegister(PaymentType, SalePOS."Register No.");
-        EFTSetup.FindSetup(SalePOS."Register No.", PaymentTypePOS."No.");
+        POSPaymentMethod.Get(PaymentType);
+        EFTSetup.FindSetup(SalePOS."Register No.", POSPaymentMethod.Code);
 
         //-NPR5.54 [364340]
-        EftEntryNo := EFTPaymentMgt.StartGiftCardLoad(EFTSetup, PaymentTypePOS, Amount, '', SalePOS);
+        EftEntryNo := EFTPaymentMgt.StartGiftCardLoad(EFTSetup, Amount, '', SalePOS);
         //+NPR5.54 [364340]
         POSSession.StoreActionState('eft_gift_card_entry_no', EftEntryNo);
         //+NPR5.53 [375525]
@@ -213,7 +211,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
     var
         SaleLinePOS: Record "NPR Sale Line POS";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         LineAmount: Decimal;
         EftEntryNo: Integer;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -244,7 +242,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
-        PaymentTypePOS.GetByRegister(EFTTransactionRequest."Original POS Payment Type Code", EFTTransactionRequest."Register No.");
+        POSPaymentMethod.Get(EFTTransactionRequest."Original POS Payment Type Code");
 
         if SaleLinePOS."Currency Code" = '' then begin
             Currency.InitRoundingPrecision();
@@ -256,7 +254,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
 
         SaleLinePOS.Validate("Sale Type", SaleLinePOS."Sale Type"::Deposit);
         SaleLinePOS.Validate(Type, SaleLinePOS.Type::"G/L Entry");
-        SaleLinePOS.Validate("No.", PaymentTypePOS."G/L Account No.");
+        SaleLinePOS.Validate("No.", POSPaymentMethod."Account No.");
         SaleLinePOS.Validate(Quantity, 1);
         SaleLinePOS.Description := CopyStr(SaleLinePOS.Description + ' - ' + DISCOUNT, 1, MaxStrLen(SaleLinePOS.Description));
         SaleLinePOS.Validate("Unit Price", LineAmount);
@@ -331,7 +329,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', false, false)]
     local procedure OnLookupParameter(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean)
     var
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
     begin
         if POSParameterValue."Action Code" <> ActionCode then
             exit;
@@ -339,10 +337,9 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
         case POSParameterValue.Name of
             'PaymentType':
                 begin
-                    PaymentTypePOS.SetRange("Processing Type", PaymentTypePOS."Processing Type"::"Gift Voucher");
-                    PaymentTypePOS.SetRange("Via Terminal", true);
-                    if PAGE.RunModal(0, PaymentTypePOS) = ACTION::LookupOK then
-                        POSParameterValue.Validate(Value, PaymentTypePOS."No.");
+                    POSPaymentMethod.SetRange("Processing Type", POSPaymentMethod."Processing Type"::Voucher);
+                    if PAGE.RunModal(0, POSPaymentMethod) = ACTION::LookupOK then
+                        POSParameterValue.Validate(Value, POSPaymentMethod.Code);
                 end;
         end;
     end;
@@ -350,7 +347,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
     [EventSubscriber(ObjectType::Table, 6150705, 'OnValidateValue', '', false, false)]
     local procedure OnValidateParameter(var POSParameterValue: Record "NPR POS Parameter Value")
     var
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
     begin
         if POSParameterValue."Action Code" <> ActionCode then
             exit;
@@ -359,9 +356,8 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
             'PaymentType':
                 begin
                     if POSParameterValue.Value <> '' then begin
-                        PaymentTypePOS.Get(POSParameterValue.Value, '');
-                        PaymentTypePOS.TestField("Via Terminal", true);
-                        PaymentTypePOS.TestField("Processing Type", PaymentTypePOS."Processing Type"::"Gift Voucher");
+                        POSPaymentMethod.Get(POSParameterValue.Value);
+                        POSPaymentMethod.TestField("Processing Type", POSPaymentMethod."Processing Type"::Voucher);
                     end;
                 end;
         end;

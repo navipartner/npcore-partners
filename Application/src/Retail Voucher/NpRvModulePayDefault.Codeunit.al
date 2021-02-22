@@ -5,7 +5,7 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
 
     procedure ApplyPayment(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line")
     var
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         POSAction: Record "NPR POS Action";
         ReturnVoucherType: Record "NPR NpRv Ret. Vouch. Type";
         VoucherType2: Record "NPR NpRv Voucher Type";
@@ -23,12 +23,12 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
             exit;
 
         if ReturnVoucherType.Get(VoucherType.Code) then;
-        if VoucherType2.Get(ReturnVoucherType."Return Voucher Type") and PaymentTypePOS.Get(VoucherType2."Payment Type") then begin
+        if VoucherType2.Get(ReturnVoucherType."Return Voucher Type") and POSPaymentMethod.Get(VoucherType2."Payment Type") then begin
             ReturnAmount := SaleAmount - PaidAmount;
-            if PaymentTypePOS."Rounding Precision" > 0 then
-                ReturnAmount := Round(SaleAmount - PaidAmount, PaymentTypePOS."Rounding Precision");
+            if POSPaymentMethod."Rounding Precision" > 0 then
+                ReturnAmount := Round(SaleAmount - PaidAmount, POSPaymentMethod."Rounding Precision");
 
-            if (PaymentTypePOS."Minimum Amount" > 0) and (Abs(ReturnAmount) < (PaymentTypePOS."Minimum Amount")) then
+            if (POSPaymentMethod."Minimum Amount" > 0) and (Abs(ReturnAmount) < (POSPaymentMethod."Minimum Amount")) then
                 exit;
             if (VoucherType2."Minimum Amount Issue" > 0) and (Abs(ReturnAmount) < VoucherType2."Minimum Amount Issue") then
                 exit;
@@ -49,7 +49,7 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
         NpRvSalesLineNew: Record "NPR NpRv Sales Line";
         NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
         NpRvReturnVoucherType: Record "NPR NpRv Ret. Vouch. Type";
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         TempNpRvVoucher: Record "NPR NpRv Voucher" temporary;
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         ReturnAmount: Decimal;
@@ -89,12 +89,12 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
             exit;
         end;
 
-        if PaymentTypePOS.Get(NpRvVoucherTypeNew."Payment Type") then begin
-            if PaymentTypePOS."Rounding Precision" > 0 then
-                ReturnAmount := Round(ReturnAmount, PaymentTypePOS."Rounding Precision");
+        if POSPaymentMethod.Get(NpRvVoucherTypeNew."Payment Type") then begin
+            if POSPaymentMethod."Rounding Precision" > 0 then
+                ReturnAmount := Round(ReturnAmount, POSPaymentMethod."Rounding Precision");
 
-            if not PaymentTypePOS."No Min Amount on Web Orders" then
-                if (PaymentTypePOS."Minimum Amount" > 0) and (Abs(ReturnAmount) < Abs(PaymentTypePOS."Minimum Amount")) then begin
+            if not POSPaymentMethod."No Min Amount on Web Orders" then
+                if (POSPaymentMethod."Minimum Amount" > 0) and (Abs(ReturnAmount) < Abs(POSPaymentMethod."Minimum Amount")) then begin
                     if ReturnLineExists then
                         RemoveReturnVoucher(NpRvSalesLine);
                     exit;

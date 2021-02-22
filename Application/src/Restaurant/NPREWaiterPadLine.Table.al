@@ -104,8 +104,7 @@ table 6150661 "NPR NPRE Waiter Pad Line"
             ELSE
             IF (Type = CONST(Repair)) "NPR Customer Repair"."No."
             ELSE
-            IF (Type = CONST(Payment)) "NPR Payment Type POS"."No." WHERE(Status = CONST(Active),
-                                                                                          "Via Terminal" = CONST(false))
+            IF (Type = CONST(Payment)) "NPR POS Payment Method".Code WHERE("Block POS Payment" = const(false))
             ELSE
             IF (Type = CONST(Customer)) Customer."No."
             ELSE

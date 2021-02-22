@@ -49,7 +49,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         Text100: Label 'Payment is confirmed';
         PoSUnitAssigned: Boolean;
         PoSRegistered: Boolean;
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         POSUnit: Record "NPR POS Unit";
         Register: Record "NPR Register";
 
@@ -238,7 +238,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         EFTSetupIn.TestField("EFT Integration Type", IntegrationType());
 
         EFTSetup := EFTSetupIn;
-        PaymentTypePOS.Get(EFTSetup."Payment Type POS");
+        POSPaymentMethod.Get(EFTSetup."Payment Type POS");
         Register.Get(EFTSetup."POS Unit No.");
         POSUnit.Get(EFTSetup."POS Unit No.");
 
@@ -258,9 +258,9 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         if LocationID = '' then
             Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, RegisterNo, 'Location ID');
         if APIKey = '' then
-            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'API Key');
+            Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'API Key');
         if MerchantID = '' then
-            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
+            Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'Merchant ID');
 
         if Demo then begin
             //-NPR5.54 [388507]
@@ -444,7 +444,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         EftTransactionRequest.Modify;
 
         if MerchantID = '' then
-            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
+            Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'Merchant ID');
         if LocationID = '' then
             Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
         if PoSID = '' then
@@ -512,7 +512,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         ResponseText: Text[1024];
     begin
         if MerchantID = '' then
-            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
+            Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'Merchant ID');
         if LocationID = '' then
             Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
         POSUNit.TestField(Name);
@@ -533,7 +533,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         ResponseText: Text[1024];
     begin
         if MerchantID = '' then
-            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
+            Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'Merchant ID');
         if LocationID = '' then
             Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
         if PoSID = '' then
@@ -555,7 +555,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         ResponseText: Text[1024];
     begin
         if MerchantID = '' then
-            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
+            Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'Merchant ID');
         if LocationID = '' then
             Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
         if PoSID = '' then
@@ -575,7 +575,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         ResponseText: Text[1024];
     begin
         if MerchantID = '' then
-            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
+            Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'Merchant ID');
 
         //-NPR5.54 [388507]
         //RequestBody := STRSUBSTNO('{"MerchantId":"%1"}',PaymentTypePOS."MobilePay Merchant ID");
@@ -593,7 +593,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         ResponseText: Text[1024];
     begin
         if MerchantID = '' then
-            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
+            Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'Merchant ID');
         if LocationID = '' then
             Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
         if PoSID = '' then
@@ -614,7 +614,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         ResponseText: Text[1024];
     begin
         if MerchantID = '' then
-            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
+            Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'Merchant ID');
         if LocationID = '' then
             Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
         if PoSID = '' then
@@ -637,7 +637,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         ResponseText: Text[1024];
     begin
         if MerchantID = '' then
-            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
+            Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'Merchant ID');
         if LocationID = '' then
             Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
         if PoSID = '' then
@@ -658,7 +658,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         ResponseText: Text[1024];
     begin
         if MerchantID = '' then
-            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
+            Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'Merchant ID');
         if LocationID = '' then
             Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, EFTSetup."POS Unit No.", 'Location ID');
 
@@ -775,7 +775,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         UnixTimeStamp: Integer;
     begin
         if APIKey = '' then
-            Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'API Key');
+            Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'API Key');
 
         UnixTimeStamp := GetUnixTime(CurrentDateTime);
 

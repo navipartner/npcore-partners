@@ -58,7 +58,7 @@ codeunit 85003 "NPR Library - POS Mock"
     procedure PayAndTryEndSaleAndStartNew(POSSession: Codeunit "NPR POS Session"; PaymentMethod: Code[10]; Amount: Decimal; VoucherNo: Text): Boolean
     var
         POSActionPayment: Codeunit "NPR POS Action: Payment";
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR Sale POS";
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -69,13 +69,13 @@ codeunit 85003 "NPR Library - POS Mock"
         POSSession.GetFrontEnd(FrontEnd, true);
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        PaymentTypePOS.GetByRegister(PaymentMethod, SalePOS."Register No.");
+        POSPaymentMethod.Get(PaymentMethod);
 
         //Invoke the business logic of the PAYMENT action
         POSSession.ClearActionState();
         POSSession.StoreActionState('ContextId', POSSession.BeginAction(POSActionPayment.ActionCode())); //Is done at start of payment action
-        POSActionPayment.CapturePayment(PaymentTypePOS, POSSession, FrontEnd, Amount, VoucherNo, Handled); //Capture step of payment action
-        POSActionPayment.TryEndSale(PaymentTypePOS, POSSession); //TryEndSale step of payment action
+        POSActionPayment.CapturePayment(POSPaymentMethod, POSSession, FrontEnd, Amount, VoucherNo, Handled); //Capture step of payment action
+        POSActionPayment.TryEndSale(POSPaymentMethod, POSSession); //TryEndSale step of payment action
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(NewSalePOS);
