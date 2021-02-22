@@ -351,12 +351,12 @@ xmlport 6184850 "NPR FR Audit Archive"
 
                             trigger OnAfterGetRecord()
                             var
-                                PaymentTypePOS: Record "NPR Payment Type POS";
+                                POSPaymentMethod: Record "NPR POS Payment Method";
                             begin
-                                if not PaymentTypePOS.Get("POS Payment Line"."POS Payment Method Code", "POS Payment Line"."POS Unit No.") then
-                                    PaymentTypePOS.Get("POS Payment Line"."POS Payment Method Code", '');
 
-                                PaymentLineType := Format(PaymentTypePOS."Processing Type");
+                                POSPaymentMethod.Get("POS Payment Line"."POS Payment Method Code");
+
+                                PaymentLineType := Format(POSPaymentMethod."Processing Type");
                                 PaymentLineExchRate := Format(Round("POS Payment Line"."Amount (LCY)" / "POS Payment Line"."Amount (Sales Currency)", 0.00001, '='));
                             end;
                         }

@@ -82,7 +82,7 @@ table 6150701 "NPR POS Menu Button"
             ELSE
             IF ("Action Type" = CONST(Customer)) Customer
             ELSE
-            IF ("Action Type" = CONST(PaymentType)) "NPR Payment Type POS";
+            IF ("Action Type" = CONST(PaymentType)) "NPR POS Payment Method";
 
             trigger OnLookup()
             begin
@@ -315,12 +315,10 @@ table 6150701 "NPR POS Menu Button"
 
     local procedure AssignCaptionForPaymentType()
     var
-        PaymentType: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
     begin
-        PaymentType.SetRange("No.", "Action Code");
-        if PaymentType.FindFirst then begin
-            Caption := PaymentType.Description;
-        end;
+        if POSPaymentMethod.Get("Action Code") then
+            Caption := POSPaymentMethod.Description;
     end;
 
     local procedure AssignCaptionForCustomer()
@@ -391,11 +389,11 @@ table 6150701 "NPR POS Menu Button"
     var
         Customer: Record Customer;
         Item: Record Item;
-        PaymentType: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         POSMenu: Record "NPR POS Menu";
         CustomerList: Page "Customer List";
         ItemList: Page "Item List";
-        PaymentTypes: Page "NPR Payment Type - Register";
+        POSPaymentMethodList: Page "NPR POS Payment Method List";
         POSMenus: Page "NPR POS Menus";
     begin
         case "Action Type" of
@@ -424,13 +422,13 @@ table 6150701 "NPR POS Menu Button"
                 end;
             "Action Type"::PaymentType:
                 begin
-                    PaymentType.SetRange("No.", "Action Code");
-                    if PaymentType.Find() then
-                        PaymentTypes.SetRecord(PaymentType);
-                    PaymentTypes.LookupMode := true;
-                    if PaymentTypes.RunModal() = ACTION::LookupOK then begin
-                        PaymentTypes.GetRecord(PaymentType);
-                        Validate("Action Code", PaymentType."No.");
+                    POSPaymentMethod.SetRange(Code, "Action Code");
+                    if POSPaymentMethod.Find() then
+                        POSPaymentMethodList.SetRecord(POSPaymentMethod);
+                    POSPaymentMethodList.LookupMode := true;
+                    if POSPaymentMethodList.RunModal() = ACTION::LookupOK then begin
+                        POSPaymentMethodList.GetRecord(POSPaymentMethod);
+                        Validate("Action Code", POSPaymentMethod.Code);
                     end;
                 end;
             "Action Type"::PopupMenu:

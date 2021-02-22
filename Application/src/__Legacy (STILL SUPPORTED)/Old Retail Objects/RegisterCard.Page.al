@@ -22,11 +22,6 @@ page 6014406 "NPR Register Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Primary Payment Type field';
                 }
-                field("Return Payment Type"; Rec."Return Payment Type")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Return Payment Type field';
-                }
             }
             group(Posting)
             {

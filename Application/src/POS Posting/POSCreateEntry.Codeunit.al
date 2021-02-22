@@ -378,9 +378,7 @@ codeunit 6150614 "NPR POS Create Entry"
         POSPaymentLine."POS Unit No." := SaleLinePOS."Register No.";
         POSPaymentLine."Document No." := SaleLinePOS."Sales Ticket No.";
 
-        if not POSPaymentMethod.Get(SaleLinePOS."No.") then
-            CreatePOSPaymentMethod(SaleLinePOS, POSPaymentMethod);
-        POSPaymentLine."POS Payment Method Code" := POSPaymentMethod.Code;
+        POSPaymentLine."POS Payment Method Code" := SaleLinePOS."No.";
 
         POSPaymentLine."POS Payment Bin Code" := SelectUnitBin(POSPaymentLine."POS Unit No.");
         POSPaymentLine."Retail ID" := SaleLinePOS."Retail ID";
@@ -833,10 +831,10 @@ codeunit 6150614 "NPR POS Create Entry"
 
     local procedure CalculateTransactionAmountLCY(var POSBinEntry: Record "NPR POS Bin Entry")
     var
+        POSPaymentMethod: Record "NPR POS Payment Method";
         Currency: Record Currency;
         CurrencyFactor: Decimal;
         CurrExchRate: Record "Currency Exchange Rate";
-        PaymentTypePOS: Record "NPR Payment Type POS";
     begin
 
         POSBinEntry."Transaction Amount (LCY)" := POSBinEntry."Transaction Amount";
@@ -848,16 +846,16 @@ codeunit 6150614 "NPR POS Create Entry"
             exit;
 
         // ** Legacy Way
-        if (not PaymentTypePOS.Get(POSBinEntry."Payment Type Code")) then
+        if not POSPaymentMethod.Get(POSBinEntry."Payment Type Code") then
             exit;
 
-        if (PaymentTypePOS."Fixed Rate" <> 0) then
-            POSBinEntry."Transaction Amount (LCY)" := POSBinEntry."Transaction Amount" * PaymentTypePOS."Fixed Rate" / 100;
+        if (POSPaymentMethod."Fixed Rate" <> 0) then
+            POSBinEntry."Transaction Amount (LCY)" := POSBinEntry."Transaction Amount" * POSPaymentMethod."Fixed Rate" / 100;
 
-        if (PaymentTypePOS."Rounding Precision" = 0) then
+        if (POSPaymentMethod."Rounding Precision" = 0) then
             exit;
 
-        POSBinEntry."Transaction Amount (LCY)" := Round(POSBinEntry."Transaction Amount (LCY)", PaymentTypePOS."Rounding Precision", '=');
+        POSBinEntry."Transaction Amount (LCY)" := Round(POSBinEntry."Transaction Amount (LCY)", POSPaymentMethod."Rounding Precision", POSPaymentMethod.GetRoundingType());
         exit;
 
         // ** End Legacy
@@ -978,109 +976,6 @@ codeunit 6150614 "NPR POS Create Entry"
         until (PaymentBinCheckpoint.Next() = 0);
 
         exit(POSEntry."Entry No.");
-    end;
-
-    local procedure CreatePOSPaymentMethod(var SaleLinePOS: Record "NPR Sale Line POS"; var POSPaymentMethod: Record "NPR POS Payment Method"): Integer
-    var
-        PaymentTypePOS: Record "NPR Payment Type POS";
-        Currency: Record Currency;
-    begin
-        POSPaymentMethod.Init;
-        POSPaymentMethod.Validate(Code, SaleLinePOS."No.");
-        if not PaymentTypePOS.Get(SaleLinePOS."No.") then
-            exit;
-        case PaymentTypePOS."Processing Type" of
-            PaymentTypePOS."Processing Type"::" ":
-                ;
-            PaymentTypePOS."Processing Type"::Cash:
-                POSPaymentMethod.Validate("Processing Type", POSPaymentMethod."Processing Type"::CASH);
-            PaymentTypePOS."Processing Type"::"Terminal Card":
-                POSPaymentMethod.Validate("Processing Type", POSPaymentMethod."Processing Type"::EFT);
-            PaymentTypePOS."Processing Type"::"Manual Card":
-                POSPaymentMethod.Validate("Processing Type", POSPaymentMethod."Processing Type"::EFT);
-            PaymentTypePOS."Processing Type"::"Other Credit Cards":
-                POSPaymentMethod.Validate("Processing Type", POSPaymentMethod."Processing Type"::EFT);
-            PaymentTypePOS."Processing Type"::EFT:
-                POSPaymentMethod.Validate("Processing Type", POSPaymentMethod."Processing Type"::EFT);
-            PaymentTypePOS."Processing Type"::"Foreign Currency":
-                POSPaymentMethod.Validate("Processing Type", POSPaymentMethod."Processing Type"::CASH);
-            PaymentTypePOS."Processing Type"::"Debit sale":
-                POSPaymentMethod.Validate("Processing Type", POSPaymentMethod."Processing Type"::CUSTOMER);
-            PaymentTypePOS."Processing Type"::Invoice:
-                POSPaymentMethod.Validate("Processing Type", POSPaymentMethod."Processing Type"::CUSTOMER);
-            PaymentTypePOS."Processing Type"::Payout:
-                POSPaymentMethod.Validate("Processing Type", POSPaymentMethod."Processing Type"::PAYOUT);
-        end;
-        if (PaymentTypePOS."Fixed Rate" <> 0) and (PaymentTypePOS."Fixed Rate" <> 1) then begin
-            Clear(Currency);
-            Currency.Init;
-            if not Currency.Get(PaymentTypePOS."No.") then begin
-                if not Currency.Get(CopyStr(PaymentTypePOS."No.", 1, 3)) then begin
-                    if not Currency.Get(CopyStr(PaymentTypePOS."No.", 1, 2)) then begin
-                        Currency.Init;
-                        Currency.Validate(Code, PaymentTypePOS."No.");
-                        Currency.Validate(Description, CopyStr(PaymentTypePOS.Description, 1, MaxStrLen(Currency.Description)));
-                        Currency.Insert(true);
-                    end;
-                end;
-            end;
-            POSPaymentMethod.Validate("Currency Code", Currency.Code);
-        end;
-        POSPaymentMethod."Rounding Precision" := POSPaymentMethod."Rounding Precision";
-        POSPaymentMethod.Insert(true);
-
-        CreatePOSPostingSetup(POSPaymentMethod);
-
-    end;
-
-    local procedure CreatePOSPostingSetup(var POSPaymentMethod: Record "NPR POS Payment Method")
-    var
-        PaymentTypePOS: Record "NPR Payment Type POS";
-        POSPostingSetup: Record "NPR POS Posting Setup";
-        POSUnit: Record "NPR POS Unit";
-        POSPostingProfile: Record "NPR POS Posting Profile";
-        POSStore: Record "NPR POS Store";
-    begin
-
-        if not PaymentTypePOS.Get(POSPaymentMethod.Code) then
-            exit;
-        POSPostingSetup.Init;
-        POSPostingSetup."POS Store Code" := '';
-        POSPostingSetup."POS Payment Method Code" := POSPaymentMethod.Code;
-        POSPostingSetup."POS Payment Bin Code" := '';
-        case PaymentTypePOS."Account Type" of
-            PaymentTypePOS."Account Type"::Bank:
-                begin
-                    POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::"Bank Account";
-                    POSPostingSetup."Account No." := PaymentTypePOS."Bank Acc. No.";
-                end;
-            PaymentTypePOS."Account Type"::Customer:
-                begin
-                    POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::Customer;
-                    POSPostingSetup."Account No." := PaymentTypePOS."Customer No.";
-                end;
-            PaymentTypePOS."Account Type"::"G/L Account":
-                begin
-                    POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::"G/L Account";
-                    POSPostingSetup."Account No." := PaymentTypePOS."G/L Account No.";
-                end;
-        end;
-        if not POSPostingSetup.Find then
-            POSPostingSetup.Insert(true);
-
-        if POSUnit.FindSet then
-            repeat
-                if POSStore.Get(POSUnit."POS Store Code") then begin
-                    if POSPostingProfile.Get(POSUnit."POS Posting Profile") then begin
-                        POSPostingSetup."POS Store Code" := POSStore.Code;
-                        POSPostingSetup."Difference Account Type" := POSPostingSetup."Difference Account Type"::"G/L Account";
-                        POSPostingSetup."Difference Acc. No." := POSPostingProfile."POS Posting Diff. Account";
-                        POSPostingSetup."Difference Acc. No. (Neg)" := POSPostingProfile."Posting Diff. Account (Neg.)";
-                        if not POSPostingSetup.Find then
-                            POSPostingSetup.Insert(true);
-                    end;
-                end;
-            until POSUnit.Next() = 0;
     end;
 
     local procedure CreateRMAEntry(POSEntry: Record "NPR POS Entry"; SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS")

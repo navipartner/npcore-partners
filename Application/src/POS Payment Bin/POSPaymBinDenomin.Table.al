@@ -38,7 +38,7 @@ table 6150638 "NPR POS Paym. Bin Denomin."
         {
             Caption = 'Payment Type No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Payment Type POS"."No.";
+            TableRelation = "NPR POS Payment Method".Code;
         }
         field(220; "Payment Method No."; Code[10])
         {

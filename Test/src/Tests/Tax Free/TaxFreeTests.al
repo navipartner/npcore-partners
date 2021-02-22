@@ -58,7 +58,7 @@ codeunit 85019 "NPR Tax Free Tests"
 
         // [When] Requesting to pay Item."Unit Price"
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, Item."Unit Price", '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, Item."Unit Price", '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [When] Sale ends
@@ -130,7 +130,7 @@ codeunit 85019 "NPR Tax Free Tests"
 
         // [When] Requesting to pay Item."Unit Price" LCY
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, Item."Unit Price", '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, Item."Unit Price", '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [When] Sale ends
@@ -203,7 +203,7 @@ codeunit 85019 "NPR Tax Free Tests"
 
         // [When] Requesting to pay Item."Unit Price" LCY
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, Item."Unit Price", '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, Item."Unit Price", '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [When] Sale ends
@@ -271,7 +271,7 @@ codeunit 85019 "NPR Tax Free Tests"
 
         // [When] Requesting to pay Item."Unit Price" LCY
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, Item."Unit Price", '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, Item."Unit Price", '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [When] Sale ends
@@ -340,7 +340,7 @@ codeunit 85019 "NPR Tax Free Tests"
 
         // [When] Requesting to pay Item."Unit Price" LCY
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, Item."Unit Price", '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, Item."Unit Price", '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [When] Sale ends
@@ -413,7 +413,7 @@ codeunit 85019 "NPR Tax Free Tests"
 
         // [When] Requesting to pay Item."Unit Price" LCY
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, Item."Unit Price", '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, Item."Unit Price", '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [When] Sale ends and voucher is issued
@@ -490,7 +490,7 @@ codeunit 85019 "NPR Tax Free Tests"
 
         // [When] Requesting to pay Item."Unit Price" LCY
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, Item."Unit Price", '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, Item."Unit Price", '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [When] Sale ends and voucher is issued
@@ -572,7 +572,7 @@ codeunit 85019 "NPR Tax Free Tests"
 
         // [When] Requesting to pay Item."Unit Price" LCY
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, Item."Unit Price", '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, Item."Unit Price", '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [When] Sale ends and voucher is issued
@@ -720,7 +720,7 @@ codeunit 85019 "NPR Tax Free Tests"
 
         // [When] Requesting to pay Item."Unit Price" LCY
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, Item."Unit Price", '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, Item."Unit Price", '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [When] Sale ends
@@ -795,7 +795,7 @@ codeunit 85019 "NPR Tax Free Tests"
         BindSubscription(MockTaxFreeHadnlerIface);
         // [When] Requesting to pay Item."Unit Price" LCY
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, Item."Unit Price", '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, Item."Unit Price", '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [When] Sale ends
@@ -872,7 +872,7 @@ codeunit 85019 "NPR Tax Free Tests"
 
         // [When] Requesting to pay Item."Unit Price" LCY
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, Item."Unit Price", '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, Item."Unit Price", '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [When] Sale ends
@@ -944,7 +944,7 @@ codeunit 85019 "NPR Tax Free Tests"
 
         // [When] Requesting to pay Item."Unit Price" LCY
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, Item."Unit Price", '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, Item."Unit Price", '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [When] Sale ends
@@ -1017,7 +1017,7 @@ codeunit 85019 "NPR Tax Free Tests"
 
         // [When] Requesting to pay Item."Unit Price" LCY
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, Item."Unit Price", '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, Item."Unit Price", '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [When] Sale ends
@@ -1094,7 +1094,7 @@ codeunit 85019 "NPR Tax Free Tests"
 
         // [When] Requesting to pay Item."Unit Price" LCY
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, Item."Unit Price", '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, Item."Unit Price", '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [When] Sale ends and voucher is issued
@@ -1172,7 +1172,7 @@ codeunit 85019 "NPR Tax Free Tests"
 
         // [When] Requesting to pay Item."Unit Price" LCY
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, Item."Unit Price", '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, Item."Unit Price", '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [When] Sale ends and voucher is issued
@@ -1255,7 +1255,7 @@ codeunit 85019 "NPR Tax Free Tests"
 
         // [When] Requesting to pay Item."Unit Price" LCY
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, _PaymentTypePOS, Item."Unit Price", '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, Item."Unit Price", '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [When] Sale ends and voucher is issued
@@ -1338,8 +1338,8 @@ codeunit 85019 "NPR Tax Free Tests"
             NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
             NPRLibraryPOSMasterData.CreatePOSStore(_POSStore);
             NPRLibraryPOSMasterData.CreatePOSUnit(_POSUnit, _POSStore.Code, POSPostingProfile.Code);
-            NPRLibraryEFT.CreateEFTPaymentTypePOS(_PaymentTypePOS, _POSUnit, _POSStore);
-            NPRLibraryEFT.CreateMockEFTSetup(_EFTSetup, _POSUnit."No.", _PaymentTypePOS."No.");
+            NPRLibraryEFT.CreateEFTPaymentTypePOS(_POSPaymentMethod, _POSUnit, _POSStore);
+            NPRLibraryEFT.CreateMockEFTSetup(_EFTSetup, _POSUnit."No.", _POSPaymentMethod.Code);
             NPRLibraryTaxFree.CreateTaxFreePosUnit(_POSUnit."No.", _TaxFreePOSUnit);
             NPRLibraryPOSMasterData.CreatePOSPaymentMethod(_POSPaymentMethod, _POSPaymentMethod."Processing Type"::CASH, '', false);
             _Initialized := true;
@@ -1360,7 +1360,6 @@ codeunit 85019 "NPR Tax Free Tests"
         _POSPaymentMethod: Record "NPR POS Payment Method";
         _Initialized: Boolean;
         _POSUnit: Record "NPR POS Unit";
-        _PaymentTypePOS: Record "NPR Payment Type POS";
         _EFTSetup: Record "NPR EFT Setup";
         _POSSession: Codeunit "NPR POS Session";
         _POSStore: Record "NPR POS Store";

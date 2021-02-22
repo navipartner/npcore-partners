@@ -11,7 +11,7 @@ table 6184518 "NPR EFT NETS BAXI Paym. Setup"
         {
             Caption = 'Payment Type POS';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Payment Type POS"."No.";
+            TableRelation = "NPR POS Payment Method".Code;
         }
         field(20; "Log File Path"; Text[250])
         {

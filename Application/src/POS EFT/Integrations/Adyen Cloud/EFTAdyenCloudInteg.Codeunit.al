@@ -1,22 +1,5 @@
 codeunit 6184517 "NPR EFT Adyen Cloud Integ."
 {
-    // NPR5.48/MMV /20190124 CASE 341237 Created object
-    // NPR5.49/MMV /20190219 CASE 345188 Added AcquireCard support
-    //                                   Moved payment type parameters to adyen specific table to mask API key.
-    // NPR5.49/MMV /20190410 CASE 347476 Get log level
-    // NPR5.50/MMV /20190430 CASE 352465 Added support for silent price reduction after customer recognition.
-    // NPR5.51/MMV /20190520 CASE 355433 Validate 1 recurring contract limitation before creating new.
-    //                                   Force AcquireCard before creating recurring contract.
-    //                                   Added support for custom capture delay parameter.
-    //                                   Added support for new cashback boolean.
-    // NPR5.53/MHA /20191118 CASE 377930 Changed Scope of function IntegrationType() from Local to Global
-    // NPR5.53/MMV /20191211 CASE 377533 Changed protocol response handler.
-    //                                   Added aux operations for detecting shopper & clearing shopper contracts.
-    // NPR5.53/MMV /20200131 CASE 377533 Copy payment information onto void record for correct posting & log.
-    // NPR5.54/MMV /20200218 CASE 387990 Set recoverable false at the same time as external response received for acquire card.
-    // NPR5.54/MMV /20200414 CASE 364340 Handle card data correctly for voids
-    // NPR5.55/MMV /20200421 CASE 386254 Parameter controlled model GUI & unattended support
-
 
     trigger OnRun()
     begin
@@ -86,7 +69,6 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
         tmpEFTAuxOperation.Description := ABORT_ACQUIRED;
         tmpEFTAuxOperation.Insert;
 
-        //-NPR5.53 [377533]
         tmpEFTAuxOperation.Init;
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 4;
@@ -104,7 +86,6 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
         tmpEFTAuxOperation."Auxiliary ID" := 6;
         tmpEFTAuxOperation.Description := DISABLE_CONTRACT;
         tmpEFTAuxOperation.Insert;
-        //+NPR5.53 [377533]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnConfigureIntegrationUnitSetup', '', false, false)]
@@ -163,7 +144,6 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
             exit;
         Handled := true;
 
-        //-NPR5.54 [364340]
         OriginalEftTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
         if OriginalEftTransactionRequest."Processing Type" = OriginalEftTransactionRequest."Processing Type"::VOID then begin
             //Integration does not provide these values in void response so we copy manually
@@ -172,7 +152,6 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
             EftTransactionRequest."Card Application ID" := OriginalEftTransactionRequest."Card Application ID";
             EftTransactionRequest."Card Issuer ID" := OriginalEftTransactionRequest."Card Issuer ID";
         end;
-        //+NPR5.54 [364340]
 
         CreateGenericRequest(EftTransactionRequest);
         EftTransactionRequest.Insert(true);
@@ -218,7 +197,6 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
             exit;
         Handled := true;
 
-        //-NPR5.54 [364340]
         OriginalEftTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
         if OriginalEftTransactionRequest.Recovered then
             OriginalEftTransactionRequest.Get(OriginalEftTransactionRequest."Recovered by Entry No.");
@@ -228,7 +206,6 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
         EftTransactionRequest."Card Name" := OriginalEftTransactionRequest."Card Name";
         EftTransactionRequest."Card Application ID" := OriginalEftTransactionRequest."Card Application ID";
         EftTransactionRequest."Card Issuer ID" := OriginalEftTransactionRequest."Card Issuer ID";
-        //+NPR5.54 [364340]
 
         CreateGenericRequest(EftTransactionRequest);
         EftTransactionRequest.Recoverable := true;
@@ -275,9 +252,7 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
         if AcquireCardBeforeTransaction(EftTransactionRequest) then
             exit;
 
-        //-NPR5.55 [386254]
         EFTAdyenCloudProtocol.SendEftDeviceRequest(EftTransactionRequest, true);
-        //+NPR5.55 [386254]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnAfterFinancialCommit', '', false, false)]
@@ -341,9 +316,7 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
             exit;
 
         with EFTTransactionRequest do
-            //-NPR5.53 [377533]
             Skip := (("Processing Type" = EFTTransactionRequest."Processing Type"::AUXILIARY) and ("Auxiliary Operation ID" in [1, 2, 3, 6]))
-                    //+NPR5.53 [377533]
                     or (("Processing Type" in ["Processing Type"::SETUP, "Processing Type"::VOID, "Processing Type"::LOOK_UP]) and (not POSFrontEnd.IsPaused));
 
         //POS is not robust against Pause & Resume without client ping-pong so we skip both for SETUP,VOID,LOOKUP operations as they are all server-side synchronous API requests in Adyen
@@ -353,9 +326,7 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
     var
         EFTInterface: Codeunit "NPR EFT Interface";
         EFTPaymentMapping: Codeunit "NPR EFT Payment Mapping";
-        PaymentTypePOS: Record "NPR Payment Type POS";
     begin
-        //-NPR5.53 [377533]
         case EftTransactionRequest."Processing Type" of
             EftTransactionRequest."Processing Type"::PAYMENT,
           EftTransactionRequest."Processing Type"::REFUND,
@@ -380,24 +351,21 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
         end;
 
         EFTInterface.EftIntegrationResponse(EftTransactionRequest);
-        //+NPR5.53 [377533]
     end;
 
     local procedure HandleTrxResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request")
     var
+        POSPaymentMethod: Record "NPR POS Payment Method";
         EFTPaymentMapping: Codeunit "NPR EFT Payment Mapping";
-        PaymentTypePOS: Record "NPR Payment Type POS";
     begin
-        //-NPR5.55 [386254]
         if (not EftTransactionRequest.Successful) and
           ((not EftTransactionRequest."Self Service") or (not EftTransactionRequest."External Result Known")) then begin
             Message(TRX_ERROR, Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
         end;
-        //+NPR5.55 [386254]
 
-        if EFTPaymentMapping.FindPaymentType(EftTransactionRequest, PaymentTypePOS) then begin
-            EftTransactionRequest."POS Payment Type Code" := PaymentTypePOS."No.";
-            EftTransactionRequest."Card Name" := CopyStr(PaymentTypePOS.Description, 1, MaxStrLen(EftTransactionRequest."Card Name"));
+        if EFTPaymentMapping.FindPaymentType(EftTransactionRequest, POSPaymentMethod) then begin
+            EftTransactionRequest."POS Payment Type Code" := POSPaymentMethod.Code;
+            EftTransactionRequest."Card Name" := CopyStr(POSPaymentMethod.Description, 1, MaxStrLen(EftTransactionRequest."Card Name"));
         end;
         EftTransactionRequest."POS Description" := CopyStr(GetPOSDescription(EftTransactionRequest), 1, MaxStrLen(EftTransactionRequest."POS Description"));
         EftTransactionRequest.Modify;
@@ -406,27 +374,23 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
     local procedure HandleVoidResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request")
     var
         VoidedTrx: Record "NPR EFT Transaction Request";
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         EFTPaymentMapping: Codeunit "NPR EFT Payment Mapping";
     begin
         if EftTransactionRequest.Successful then begin
-            //-NPR5.55 [386254]
             if (not EftTransactionRequest."Self Service") then
-                //+NPR5.55 [386254]
                 Message(VOID_SUCCESS, EftTransactionRequest."Entry No.");
 
-            if EFTPaymentMapping.FindPaymentType(EftTransactionRequest, PaymentTypePOS) then begin
-                EftTransactionRequest."POS Payment Type Code" := PaymentTypePOS."No.";
-                EftTransactionRequest."Card Name" := CopyStr(PaymentTypePOS.Description, 1, MaxStrLen(EftTransactionRequest."Card Name"));
+            if EFTPaymentMapping.FindPaymentType(EftTransactionRequest, POSPaymentMethod) then begin
+                EftTransactionRequest."POS Payment Type Code" := POSPaymentMethod.Code;
+                EftTransactionRequest."Card Name" := CopyStr(POSPaymentMethod.Description, 1, MaxStrLen(EftTransactionRequest."Card Name"));
             end;
             EftTransactionRequest."POS Description" := CopyStr(GetPOSDescription(EftTransactionRequest), 1, MaxStrLen(EftTransactionRequest."POS Description"));
             EftTransactionRequest.Modify;
 
         end else begin
-            //-NPR5.55 [386254]
             if (not EftTransactionRequest."Self Service") or (not EftTransactionRequest."External Result Known") then
-                //+NPR5.55 [386254]
                 Message(TRX_ERROR, Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
         end;
     end;
@@ -447,17 +411,13 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
 
     local procedure HandleClearShopperContractResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request")
     begin
-        //-NPR5.53 [377533]
         if EftTransactionRequest.Successful then
             Message(DISABLE_SHOPPER_SUCCESS, EftTransactionRequest."External Customer ID")
         else
             Message(TRX_ERROR, Format(EftTransactionRequest."Auxiliary Operation Desc."), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
-        //+NPR5.53 [377533]
     end;
 
-    local procedure "// EFT Parameter Handling"()
-    begin
-    end;
+    #region EFT Parameter Handling
 
     procedure GetAPIKey(EFTSetupIn: Record "NPR EFT Setup"): Text
     var
@@ -553,36 +513,30 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
     var
         EFTAdyenPaymentTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
     begin
-        //-NPR5.53 [377533]
         GetPaymentTypeParameters(EFTSetupIn, EFTAdyenPaymentTypeSetup);
         exit(EFTAdyenPaymentTypeSetup."Merchant Account");
-        //+NPR5.53 [377533]
     end;
 
     procedure GetRecurringURLPrefix(EFTSetupIn: Record "NPR EFT Setup"): Text
     var
         EFTAdyenPaymentTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
     begin
-        //-NPR5.53 [377533]
         GetPaymentTypeParameters(EFTSetupIn, EFTAdyenPaymentTypeSetup);
         EFTAdyenPaymentTypeSetup.TestField("Recurring API URL Prefix");
         exit(EFTAdyenPaymentTypeSetup."Recurring API URL Prefix");
-        //+NPR5.53 [377533]
     end;
 
     procedure GetUnattended(EFTSetupIn: Record "NPR EFT Setup"): Boolean
     var
         EFTAdyenPaymentTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
     begin
-        //-NPR5.55 [386254]
         GetPaymentTypeParameters(EFTSetupIn, EFTAdyenPaymentTypeSetup);
         exit(EFTAdyenPaymentTypeSetup.Unattended);
-        //+NPR5.55 [386254]
     end;
 
-    local procedure "// Aux"()
-    begin
-    end;
+    #endregion
+
+    #region Aux
 
     local procedure CreateGenericRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
@@ -598,9 +552,7 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
         if not GetCashbackAllowed(EFTSetup) then
             EFTTransactionRequest.TestField("Cashback Amount", 0);
 
-        //-NPR5.55 [386254]
         EFTTransactionRequest."Self Service" := GetUnattended(EFTSetup);
-        //+NPR5.55 [386254]
     end;
 
     procedure VoidTransactionAfterSignatureDecline(EFTTransactionRequest: Record "NPR EFT Transaction Request")
@@ -642,10 +594,8 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
         EFTFrameworkMgt.CreateAuxRequest(AcquireCardEFTTransactionRequest, EFTSetup, 2, EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.");
         AcquireCardEFTTransactionRequest."Initiated from Entry No." := EFTTransactionRequest."Entry No.";
         AcquireCardEFTTransactionRequest.Modify;
-        //-NPR5.53 [377533]
         EFTTransactionRequest.Recoverable := false; //Not recoverable if we fail on card acquisition, since it never started externally.
         EFTTransactionRequest.Modify;
-        //+NPR5.53 [377533]
         Commit;
         EFTFrameworkMgt.SendRequest(AcquireCardEFTTransactionRequest);
         exit(true);
@@ -725,7 +675,6 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
         if EFTTransactionRequest."Processing Type" <> EFTTransactionRequest."Processing Type"::AUXILIARY then
             exit(false);
 
-        //-NPR5.53 [377533]
         case EFTTransactionRequest."Auxiliary Operation ID" of
             2:
                 begin
@@ -744,7 +693,6 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
             else
                 EFTTransactionRequest.FieldError("Auxiliary Operation ID");
         end;
-        //+NPR5.53 [377533]
     end;
 
     local procedure ShouldProceedToPurchaseTransaction(POSSession: Codeunit "NPR POS Session"; EFTTransactionRequest: Record "NPR EFT Transaction Request"; var ContinueOnTransactionEntryNo: Integer): Boolean
@@ -752,7 +700,6 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
         EFTAdyenCloudProtocol: Codeunit "NPR EFT Adyen Cloud Prot.";
         EFTPaymentTransactionRequest: Record "NPR EFT Transaction Request";
     begin
-        //-NPR5.53 [377533]
         if not EFTTransactionRequest.Successful then
             exit(false);
 
@@ -766,12 +713,9 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
         EFTPaymentTransactionRequest.Recoverable := true;
         EFTPaymentTransactionRequest.Modify;
         Commit;
-        //-NPR5.55 [386254]
         EFTAdyenCloudProtocol.SendEftDeviceRequest(EFTPaymentTransactionRequest, true);
-        //+NPR5.55 [386254]
         ContinueOnTransactionEntryNo := EFTPaymentTransactionRequest."Entry No.";
         exit(true);
-        //+NPR5.53 [377533]
     end;
 
     local procedure ClearShopperContract(POSSession: Codeunit "NPR POS Session"; EFTTransactionRequest: Record "NPR EFT Transaction Request")
@@ -782,7 +726,6 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
         DisableEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTSetup: Record "NPR EFT Setup";
     begin
-        //-NPR5.53 [377533]
         if not (EFTTransactionRequest.Successful) then
             exit;
 
@@ -808,7 +751,6 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
         DisableEFTTransactionRequest.Modify;
         Commit;
         EFTFrameworkMgt.SendRequest(DisableEFTTransactionRequest);
-        //+NPR5.53 [377533]
     end;
 
     local procedure ContinueAfterShopperRecognition(EFTTransactionRequest: Record "NPR EFT Transaction Request"; POSSession: Codeunit "NPR POS Session"): Boolean
@@ -834,7 +776,6 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
     var
         EFTShopperRecognition: Record "NPR EFT Shopper Recognition";
     begin
-        //-NPR5.53 [377533]
         if not (EFTTransactionRequest.Successful) then
             exit;
 
@@ -853,7 +794,6 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
         Commit;
         if not CODEUNIT.Run(CODEUNIT::"NPR EFT Try Add Shopper", EFTShopperRecognition) then
             Message(GetLastErrorText);
-        //+NPR5.53 [377533]
     end;
 
     local procedure DetectShopperSilent(EftTransactionRequest: Record "NPR EFT Transaction Request"; POSSale: Codeunit "NPR POS Sale"): Boolean
@@ -877,15 +817,15 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
 
     local procedure GetRemainingPaymentSuggestion(EFTTransactionRequest: Record "NPR EFT Transaction Request"; POSSession: Codeunit "NPR POS Session"): Decimal
     var
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
     begin
         POSSession.GetPaymentLine(POSPaymentLine);
 
-        if not POSPaymentLine.GetPaymentType(PaymentTypePOS, EFTTransactionRequest."Original POS Payment Type Code", EFTTransactionRequest."Register No.") then
-            Error('%1 %2 could not be retrieved. This is a programming bug, not a user error.', PaymentTypePOS.TableCaption, EFTTransactionRequest."Original POS Payment Type Code");
+        if not POSPaymentMethod.Get(EFTTransactionRequest."Original POS Payment Type Code") then
+            Error('%1 %2 could not be retrieved. This is a programming bug, not a user error.', POSPaymentMethod.TableCaption, EFTTransactionRequest."Original POS Payment Type Code");
 
-        exit(POSPaymentLine.CalculateRemainingPaymentSuggestionInCurrentSale(PaymentTypePOS));
+        exit(POSPaymentLine.CalculateRemainingPaymentSuggestionInCurrentSale(POSPaymentMethod));
     end;
 
     local procedure HandleAcquireCardPriceChange(EFTTransactionRequest: Record "NPR EFT Transaction Request"; BeforeAmount: Decimal; AfterAmount: Decimal): Boolean
@@ -906,9 +846,7 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
             exit(true); //Positive amount before and after, original payment was on full remaining amount, and silent allowed is set.
         end;
 
-        //-NPR5.53 [377533]
         AbortAcquireCard(EFTTransactionRequest, StrSubstNo(PRICE_CHANGED, BeforeAmount, AfterAmount));
-        //+NPR5.53 [377533]
         exit(false);
     end;
 
@@ -924,14 +862,10 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
             Sleep(500);
         end;
 
-        //-NPR5.53 [377533]
         if Reason <> '' then
-            //+NPR5.53 [377533]
             Message(Reason);
 
-        //-NPR5.53 [377533]
         ProcessOriginalTrxAfterAcquireCardFailure(EFTTransactionRequest);
-        //+NPR5.53 [377533]
 
         if not Aborted then
             Message(ABORT_ACQUIRED_FAIL);
@@ -943,11 +877,9 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
         AbortEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTSetup: Record "NPR EFT Setup";
     begin
-        //-NPR5.54 [364340]
         EFTSetup.FindSetup(RegisterNo, EFTTransactionRequest."Original POS Payment Type Code");
 
         EFTFrameworkMgt.CreateAuxRequest(AbortEFTTransactionRequest, EFTSetup, 1, RegisterNo, SalesTicketNo);
-        //+NPR5.54 [364340]
         AbortEFTTransactionRequest."Processed Entry No." := EFTTransactionRequest."Entry No.";
         AbortEFTTransactionRequest.Modify;
         Commit;
@@ -998,27 +930,22 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
     var
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
-        //-NPR5.53 [377533]
         if (EFTTransactionRequest."Initiated from Entry No." = 0) then
             exit;
-        //-NPR5.54 [387990]
         if (EFTTransactionRequest."Processing Type" <> EFTTransactionRequest."Processing Type"::AUXILIARY) then
             exit;
         if (EFTTransactionRequest."Auxiliary Operation ID" <> 2) then
             exit;
-        //+NPR5.54 [387990]
 
         OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.");
         OriginalEFTTransactionRequest."External Result Known" := true; //We know the primary transaction "failed correctly" since we never started it in the first place.
-        //-NPR5.54 [387990]
         OriginalEFTTransactionRequest.Recoverable := false; //Not recoverable since we never started it in the first place.
         OriginalEFTTransactionRequest."NST Error" := EFTTransactionRequest."NST Error";
-        //+NPR5.54 [387990]
         OriginalEFTTransactionRequest."Result Description" := EFTTransactionRequest."Result Description";
         OriginalEFTTransactionRequest."Result Display Text" := EFTTransactionRequest."Result Display Text";
         OriginalEFTTransactionRequest.Modify;
         HandleProtocolResponse(OriginalEFTTransactionRequest);
-        //+NPR5.53 [377533]
     end;
+    #endregion
 }
 

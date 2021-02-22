@@ -23,7 +23,7 @@ table 6184497 "NPR Pepper Card Type"
         {
             Caption = 'Payment Type POS';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Payment Type POS";
+            TableRelation = "NPR POS Payment Method";
         }
         field(40; "Card Type Group Code"; Code[10])
         {

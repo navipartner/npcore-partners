@@ -61,7 +61,8 @@ codeunit 6150725 "NPR POS Action: Payment"
         Context: Codeunit "NPR POS JSON Management";
         JSON: Codeunit "NPR POS JSON Management";
         PaymentNo: Code[20];
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
         Register: Record "NPR Register";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -70,7 +71,6 @@ codeunit 6150725 "NPR POS Action: Payment"
         ReturnAmount: Decimal;
         PaidAmount: Decimal;
         SubTotal: Decimal;
-        ReturnPaymentTypePOS: Record "NPR Payment Type POS";
         CurrentView: Codeunit "NPR POS View";
         POSUnit: Record "NPR POS Unit";
         POSAuditProfile: Record "NPR POS Audit Profile";
@@ -111,27 +111,30 @@ codeunit 6150725 "NPR POS Action: Payment"
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
 
-        if (not POSPaymentLine.GetPaymentType(PaymentTypePOS, PaymentNo, Setup.Register())) then
-            Error(PaymentTypeNotFound, PaymentTypePOS.TableCaption, PaymentNo, Setup.Register());
+        if not POSPaymentMethod.Get(PaymentNo) then
+            Error(PaymentTypeNotFound, POSPaymentMethod.TableCaption, PaymentNo, Setup.Register());
 
-        if (not POSPaymentLine.GetPaymentType(ReturnPaymentTypePOS, Register."Return Payment Type", Setup.Register())) then
-            Error(PaymentTypeNotFound, PaymentTypePOS.TableCaption, Register."Return Payment Type", Setup.Register());
+        if not ReturnPOSPaymentMethod.Get(POSPaymentMethod."Return Payment Method Code") then
+            Error(PaymentTypeNotFound, ReturnPOSPaymentMethod.TableCaption, POSPaymentMethod."Return Payment Method Code", Setup.Register());
 
-        OnBeforeActionWorkflow(PaymentTypePOS, Parameters, POSSession, FrontEnd, Context, SubTotal, Handled);
-
+        OnBeforeActionWorkflow(POSPaymentMethod, Parameters, POSSession, FrontEnd, Context, SubTotal, Handled);
+        
         if (not Handled) then begin
-            case PaymentTypePOS."Processing Type" of
-                PaymentTypePOS."Processing Type"::Cash:
-                    Handled := ConfigureCashWorkflow(Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
-                PaymentTypePOS."Processing Type"::"Foreign Currency":
-                    Handled := ConfigureForeignCashWorkflow(Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
-                PaymentTypePOS."Processing Type"::EFT:
-                    Handled := ConfigureCashTerminalWorkflow(Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
-                PaymentTypePOS."Processing Type"::"Manual Card":
-                    Handled := ConfigureManualCardWorkflow(Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
-                else
-                    // provide a resonable default
-                    Handled := ConfigureCashWorkflow(Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
+            case POSPaymentMethod."Processing Type" of
+                POSPaymentMethod."Processing Type"::Cash:
+                    Handled := ConfigureCashWorkflow(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount);
+                POSPaymentMethod."Processing Type"::VOUCHER:
+                    Handled := ConfigureVoucherWorkflow(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount);
+                POSPaymentMethod."Processing Type"::CHECK:
+                    Handled := ConfigureCheckWorkflow(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount);
+                POSPaymentMethod."Processing Type"::EFT:
+                    Handled := ConfigureCashTerminalWorkflow(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount);
+                POSPaymentMethod."Processing Type"::CUSTOMER:
+                    Handled := ConfigureCustomerWorkflow(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount);
+                POSPaymentMethod."Processing Type"::PAYOUT:
+                    Handled := ConfigurePayoutWorkflow(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount);
+                else                    // provide a resonable default
+                    Handled := ConfigureCashWorkflow(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount);
             end;
         end;
 
@@ -195,9 +198,9 @@ codeunit 6150725 "NPR POS Action: Payment"
         JSON: Codeunit "NPR POS JSON Management";
         POSSale: Codeunit "NPR POS Sale";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         SalePOS: Record "NPR Sale POS";
-        PaymentNo: Code[20];
+        PaymentMethodCode: Code[20];
         Register: Record "NPR Register";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         TaxFreeUnit: Record "NPR Tax Free POS Unit";
@@ -209,7 +212,6 @@ codeunit 6150725 "NPR POS Action: Payment"
         ReturnAmount: Decimal;
         PaidAmount: Decimal;
         SubTotal: Decimal;
-        ReturnPaymentTypePOS: Record "NPR Payment Type POS";
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -219,11 +221,11 @@ codeunit 6150725 "NPR POS Action: Payment"
         POSSession.GetSetup(Setup);
         JSON.InitializeJObjectParser(Context, FrontEnd);
         JSON.SetScope('parameters', true);
-        PaymentNo := JSON.GetString('paymentNo', true);
+        PaymentMethodCode := JSON.GetString('paymentNo', true);
 
         POSSession.GetPaymentLine(POSPaymentLine);
-        if (not POSPaymentLine.GetPaymentType(PaymentTypePOS, PaymentNo, Setup.Register)) then
-            Error(PaymentTypeNotFound, PaymentTypePOS.TableCaption, PaymentNo, Setup.Register);
+        if not POSPaymentMethod.Get(PaymentMethodCode) then
+            Error(PaymentTypeNotFound, POSPaymentMethod.TableCaption, PaymentMethodCode, Setup.Register);
 
         POSSession.GetSale(POSSale);
 
@@ -233,103 +235,110 @@ codeunit 6150725 "NPR POS Action: Payment"
                     POSSession.ClearActionState();
                     POSSession.StoreActionState('ContextId', POSSession.BeginAction(ActionCode));
 
-                    OnBeforeAction(WorkflowStep, PaymentTypePOS, Context, POSSession, FrontEnd, PaymentHandled);
-                    CapturePayment(PaymentTypePOS, POSSession, FrontEnd, GetAmount(Context, FrontEnd), GetVoucherNo(Context, FrontEnd), PaymentHandled);
-                    OnAfterAction(WorkflowStep, PaymentTypePOS, Context, POSSession, FrontEnd, PaymentHandled);
+                    OnBeforeAction(WorkflowStep, POSPaymentMethod, Context, POSSession, FrontEnd, PaymentHandled);
+                    CapturePayment(POSPaymentMethod, POSSession, FrontEnd, GetAmount(Context, FrontEnd), GetVoucherNo(Context, FrontEnd), PaymentHandled);
+                    OnAfterAction(WorkflowStep, POSPaymentMethod, Context, POSSession, FrontEnd, PaymentHandled);
                 end;
             'tryEndSale':
                 begin
                     PaymentHandled := true;
-                    TryEndSale(PaymentTypePOS, POSSession);
+                    TryEndSale(POSPaymentMethod, POSSession);
                 end;
         end;
 
         if (not PaymentHandled) then
-            Message(MissingImpl, PaymentTypePOS.TableCaption(), PaymentTypePOS."No.", PaymentTypePOS.FieldCaption("Processing Type"), PaymentTypePOS."Processing Type", Register.TableCaption(), Setup.Register());
+            Message(MissingImpl, POSPaymentMethod.TableCaption(), POSPaymentMethod.Code, POSPaymentMethod.FieldCaption("Processing Type"), POSPaymentMethod."Processing Type", Register.TableCaption(), Setup.Register());
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeActionWorkflow(PaymentTypePOS: Record "NPR Payment Type POS"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: Codeunit "NPR POS JSON Management"; SubTotal: Decimal; var Handled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeAction(WorkflowStep: Text; PaymentType: Record "NPR Payment Type POS"; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    local procedure OnBeforeActionWorkflow(POSPaymentMethod: Record "NPR POS Payment Method"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: Codeunit "NPR POS JSON Management"; SubTotal: Decimal; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterAction(WorkflowStep: Text; PaymentType: Record "NPR Payment Type POS"; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    local procedure OnBeforeAction(WorkflowStep: Text; POSPaymentMethod: Record "NPR POS Payment Method"; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
     end;
 
-    local procedure ConfigureCashWorkflow(var Context: Codeunit "NPR POS JSON Management"; PaymentType: Record "NPR Payment Type POS"; ReturnPaymentType: Record "NPR Payment Type POS"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterAction(WorkflowStep: Text; POSPaymentMethod: Record "NPR POS Payment Method"; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    begin
+    end;
+
+    local procedure ConfigureCashWorkflow(var Context: Codeunit "NPR POS JSON Management"; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
     begin
         Context.SetContext('capture_amount', true);
-        SetContextAmounts(Context, PaymentType, ReturnPaymentType, SalesAmount, PaidAmount, true, false);
-        Context.SetContext('amount_description', PaymentType.Description);
+        SetContextAmounts(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount, true, false);
+        Context.SetContext('amount_description', POSPaymentMethod.Description);
         exit(true);
     end;
 
-    local procedure ConfigureManualCardWorkflow(var Context: Codeunit "NPR POS JSON Management"; PaymentType: Record "NPR Payment Type POS"; ReturnPaymentType: Record "NPR Payment Type POS"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
+    local procedure ConfigureManualCardWorkflow(var Context: Codeunit "NPR POS JSON Management"; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
     begin
         Context.SetContext('capture_amount', true);
-        SetContextAmounts(Context, PaymentType, ReturnPaymentType, SalesAmount, PaidAmount, false, false);
-        Context.SetContext('amount_description', PaymentType.Description);
+        SetContextAmounts(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount, false, false);
+        Context.SetContext('amount_description', POSPaymentMethod.Description);
         exit(true);
     end;
 
-    local procedure ConfigureForeignCashWorkflow(var Context: Codeunit "NPR POS JSON Management"; PaymentType: Record "NPR Payment Type POS"; ReturnPaymentType: Record "NPR Payment Type POS"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
-    begin
-        Context.SetContext('capture_amount', true);
-        SetContextAmounts(Context, PaymentType, ReturnPaymentType, SalesAmount, PaidAmount, false, false);
-        Context.SetContext('amount_description', PaymentType.Description);
-        exit(true);
-    end;
 
-    local procedure ConfigureVoucherWorkflow(var Context: Codeunit "NPR POS JSON Management"; PaymentType: Record "NPR Payment Type POS"; ReturnPaymentType: Record "NPR Payment Type POS"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
+    local procedure ConfigureVoucherWorkflow(var Context: Codeunit "NPR POS JSON Management"; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
     begin
         Context.SetContext('capture_amount', false);
         Context.SetContext('capture_voucher', true);
-        SetContextAmounts(Context, PaymentType, ReturnPaymentType, SalesAmount, PaidAmount, false, false);
+        SetContextAmounts(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount, false, false);
         exit(true);
     end;
 
-    local procedure ConfigureForeignVoucherWorkflow(var Context: Codeunit "NPR POS JSON Management"; PaymentType: Record "NPR Payment Type POS"; ReturnPaymentType: Record "NPR Payment Type POS"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
-    var
-        Amount: Decimal;
+    local procedure ConfigureCheckWorkflow(var Context: Codeunit "NPR POS JSON Management"; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
     begin
-        Context.SetContext('capture_amount', (PaymentType."Forced Amount" = false));
-        Context.SetContext('capture_voucher', (PaymentType."Reference Incoming"));
-        SetContextAmounts(Context, PaymentType, ReturnPaymentType, SalesAmount, PaidAmount, false, true);
+        Context.SetContext('capture_amount', true);
+        Context.SetContext('capture_voucher', false);
+        SetContextAmounts(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount, false, false);
         exit(true);
-
     end;
 
-    local procedure ConfigureCashTerminalWorkflow(var Context: Codeunit "NPR POS JSON Management"; PaymentType: Record "NPR Payment Type POS"; ReturnPaymentType: Record "NPR Payment Type POS"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
+    local procedure ConfigureCashTerminalWorkflow(var Context: Codeunit "NPR POS JSON Management"; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
     begin
-        Context.SetContext('capture_amount', (PaymentType."Forced Amount" = false));
-        SetContextAmounts(Context, PaymentType, ReturnPaymentType, SalesAmount, PaidAmount, false, false);  //NPR5.55 [410991]
-        Context.SetContext('amount_description', PaymentType.Description);
+        Context.SetContext('capture_amount', (POSPaymentMethod."Forced Amount" = false));
+        SetContextAmounts(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount, false, false);  //NPR5.55 [410991]
+        Context.SetContext('amount_description', POSPaymentMethod.Description);
         exit(true);
     end;
 
-    local procedure SetContextAmounts(var Context: Codeunit "NPR POS JSON Management"; PaymentType: Record "NPR Payment Type POS"; ReturnPaymentType: Record "NPR Payment Type POS"; SalesAmount: Decimal; PaidAmount: Decimal; AllowNegativePaymentBalance: Boolean; PositiveOnly: Boolean)
+    local procedure ConfigureCustomerWorkflow(var Context: Codeunit "NPR POS JSON Management"; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
+    begin
+        Context.SetContext('capture_amount', true);
+        Context.SetContext('capture_voucher', false);
+        SetContextAmounts(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount, false, false);
+        exit(true);
+    end;
+
+    local procedure ConfigurePayoutWorkflow(var Context: Codeunit "NPR POS JSON Management"; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
+    begin
+        Context.SetContext('capture_amount', true);
+        Context.SetContext('capture_voucher', false);
+        SetContextAmounts(Context, POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount, false, false);
+        exit(true);
+    end;
+
+
+    local procedure SetContextAmounts(var Context: Codeunit "NPR POS JSON Management"; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; SalesAmount: Decimal; PaidAmount: Decimal; AllowNegativePaymentBalance: Boolean; PositiveOnly: Boolean)
     var
         AmtToCapture: Decimal;
     begin
-        AmtToCapture := SuggestAmount(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType, AllowNegativePaymentBalance);
+        AmtToCapture := SuggestAmount(SalesAmount, PaidAmount, POSPaymentMethod, ReturnPOSPaymentMethod, AllowNegativePaymentBalance);
         if PositiveOnly and (AmtToCapture < 0) then
             AmtToCapture := 0;
 
         Context.SetContext('amounttocapture', AmtToCapture);
-        if PaymentType."Zero as Default on Popup" then
+        if POSPaymentMethod."Zero as Default on Popup" then
             Context.SetContext('defaultamount', 0)
         else
             Context.SetContext('defaultamount', AmtToCapture);
     end;
 
-    procedure CapturePayment(PaymentTypePOS: Record "NPR Payment Type POS"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; AmountToCapture: Decimal; VoucherNo: Text; var Handled: Boolean)
+    procedure CapturePayment(POSPaymentMethod: Record "NPR POS Payment Method"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; AmountToCapture: Decimal; VoucherNo: Text; var Handled: Boolean)
     var
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         POSLine: Record "NPR Sale Line POS";
@@ -352,34 +361,28 @@ codeunit 6150725 "NPR POS Action: Payment"
             POSSession.GetSetup(POSSetup);
             POSLine."Register No." := POSSetup.Register();
 
-            POSLine."No." := PaymentTypePOS."No.";
+            POSLine."No." := POSPaymentMethod.Code;
             POSLine."Register No." := SalePOS."Register No.";
             POSLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
 
-            case PaymentTypePOS."Processing Type" of
-                PaymentTypePOS."Processing Type"::Cash:
-                    Handled := CaptureCashPayment(AmountToCapture, POSPaymentLine, POSLine, PaymentTypePOS);
-                PaymentTypePOS."Processing Type"::"Foreign Currency":
-                    Handled := CaptureForeignCashPayment(AmountToCapture, POSPaymentLine, POSLine, PaymentTypePOS);
-                PaymentTypePOS."Processing Type"::"Gift Voucher":
-                    Error('Gift Voucher is no longer supported. Please mgirate to retail voucher.');
-                PaymentTypePOS."Processing Type"::"Credit Voucher":
-                    Error('Credit Voucher is no longer supported. Please mgirate to retail voucher.');
-                PaymentTypePOS."Processing Type"::EFT:
-                    Handled := CaptureEftPayment(AmountToCapture, POSSession, POSPaymentLine, POSLine, PaymentTypePOS, FrontEnd);
-                PaymentTypePOS."Processing Type"::"Foreign Gift Voucher":
-                    Error('Foreign Gift Voucher is no longer supported. Please mgirate to retail voucher.');
-                PaymentTypePOS."Processing Type"::"Foreign Credit Voucher":
-                    Error('Foreign Credit Voucher is no longer supported. Please migrate to retail voucher.');
-                PaymentTypePOS."Processing Type"::"Manual Card":
-                    Handled := CaptureManualCardPayment(AmountToCapture, POSPaymentLine, POSLine, PaymentTypePOS);
+            case POSPaymentMethod."Processing Type" of
+                POSPaymentMethod."Processing Type"::Cash:
+                    Handled := CaptureCashPayment(AmountToCapture, POSPaymentLine, POSLine, POSPaymentMethod);
+                POSPaymentMethod."Processing Type"::"Voucher":
+                    Handled := CaptureVoucherPayment(AmountToCapture, POSPaymentLine, POSLine, POSPaymentMethod);
+                POSPaymentMethod."Processing Type"::EFT:
+                    Handled := CaptureEftPayment(AmountToCapture, POSSession, POSPaymentLine, POSLine, POSPaymentMethod, FrontEnd);
+                POSPaymentMethod."Processing Type"::CUSTOMER:
+                    Handled := CaptureCustomerPayment(AmountToCapture, POSPaymentLine, POSLine, POSPaymentMethod);
+                POSPaymentMethod."Processing Type"::PAYOUT:
+                    Handled := CapturePayoutPayment(AmountToCapture, POSPaymentLine, POSLine, POSPaymentMethod);
                 else
                     Handled := false;
             end;
         end;
     end;
 
-    local procedure CaptureCashPayment(AmountToCaptureLCY: Decimal; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR Sale Line POS"; PaymentType: Record "NPR Payment Type POS"): Boolean
+    local procedure CaptureCashPayment(AmountToCaptureLCY: Decimal; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR Sale Line POS"; POSPaymentMethod: Record "NPR POS Payment Method"): Boolean
     var
         AmountToCapture: Decimal;
     begin
@@ -388,7 +391,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         if AmountToCaptureLCY = 0 then
             exit(true);
 
-        POSPaymentLine.ValidateAmountBeforePayment(PaymentType, AmountToCaptureLCY);
+        POSPaymentLine.ValidateAmountBeforePayment(POSPaymentMethod, AmountToCaptureLCY);
 
         POSLine."Amount Including VAT" := AmountToCaptureLCY;
         POSPaymentLine.InsertPaymentLine(POSLine, AmountToCapture);
@@ -396,7 +399,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         exit(true);
     end;
 
-    local procedure CaptureManualCardPayment(AmountToCaptureLCY: Decimal; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR Sale Line POS"; PaymentType: Record "NPR Payment Type POS"): Boolean
+    local procedure CapturePayoutPayment(AmountToCaptureLCY: Decimal; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR Sale Line POS"; POSPaymentMethod: Record "NPR POS Payment Method"): Boolean
     var
         AmountToCapture: Decimal;
     begin
@@ -405,7 +408,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         if AmountToCaptureLCY = 0 then
             exit(true);
 
-        POSPaymentLine.ValidateAmountBeforePayment(PaymentType, AmountToCaptureLCY);
+        POSPaymentLine.ValidateAmountBeforePayment(POSPaymentMethod, AmountToCaptureLCY);
 
         POSLine."Amount Including VAT" := AmountToCaptureLCY;
         POSPaymentLine.InsertPaymentLine(POSLine, AmountToCapture);
@@ -413,16 +416,16 @@ codeunit 6150725 "NPR POS Action: Payment"
         exit(true);
     end;
 
-    local procedure CaptureForeignCashPayment(AmountToCapture: Decimal; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR Sale Line POS"; PaymentType: Record "NPR Payment Type POS"): Boolean
+    local procedure CaptureCustomerPayment(AmountToCaptureLCY: Decimal; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR Sale Line POS"; POSPaymentMethod: Record "NPR POS Payment Method"): Boolean
     var
-        AmountToCaptureLCY: Decimal;
+        AmountToCapture: Decimal;
     begin
-        AmountToCaptureLCY := 0;
+        AmountToCapture := 0;
 
-        if AmountToCapture = 0 then
+        if AmountToCaptureLCY = 0 then
             exit(true);
 
-        POSPaymentLine.ValidateAmountBeforePayment(PaymentType, AmountToCapture);
+        POSPaymentLine.ValidateAmountBeforePayment(POSPaymentMethod, AmountToCaptureLCY);
 
         POSLine."Amount Including VAT" := AmountToCaptureLCY;
         POSPaymentLine.InsertPaymentLine(POSLine, AmountToCapture);
@@ -430,7 +433,25 @@ codeunit 6150725 "NPR POS Action: Payment"
         exit(true);
     end;
 
-    local procedure CaptureEftPayment(AmountToCapture: Decimal; POSSession: Codeunit "NPR POS Session"; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR Sale Line POS"; PaymentType: Record "NPR Payment Type POS"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    local procedure CaptureVoucherPayment(AmountToCaptureLCY: Decimal; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR Sale Line POS"; POSPaymentMethod: Record "NPR POS Payment Method"): Boolean
+    var
+        AmountToCapture: Decimal;
+    begin
+        AmountToCapture := 0;
+
+        if AmountToCaptureLCY = 0 then
+            exit(true);
+
+        POSPaymentLine.ValidateAmountBeforePayment(POSPaymentMethod, AmountToCaptureLCY);
+
+        POSLine."Amount Including VAT" := AmountToCaptureLCY;
+        POSPaymentLine.InsertPaymentLine(POSLine, AmountToCapture);
+
+        exit(true);
+    end;
+
+
+    local procedure CaptureEftPayment(AmountToCapture: Decimal; POSSession: Codeunit "NPR POS Session"; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR Sale Line POS"; POSPaymentMethod: Record "NPR POS Payment Method"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
     var
         Register: Record "NPR Register";
         Handled: Boolean;
@@ -440,7 +461,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         EFTSetup: Record "NPR EFT Setup";
         SalePOS: Record "NPR Sale POS";
     begin
-        POSPaymentLine.ValidateAmountBeforePayment(PaymentType, AmountToCapture);
+        POSPaymentLine.ValidateAmountBeforePayment(POSPaymentMethod, AmountToCapture);
 
         if AmountToCapture = 0 then
             exit(true);
@@ -448,9 +469,9 @@ codeunit 6150725 "NPR POS Action: Payment"
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
-        EFTSetup.FindSetup(SalePOS."Register No.", PaymentType."No.");
+        EFTSetup.FindSetup(SalePOS."Register No.", POSPaymentMethod.Code);
         FrontEnd.PauseWorkflow(); //THIS IS ONLY REQUIRED BECAUSE A CONFIRM DIALOG IN THE EFT MODULE TO LOOKUP LAST TRX WOULD, IN NAV2016, CAUSE A CONTINUE IN THE FRONT END...
-        EFTTransactionMgt.StartPayment(EFTSetup, PaymentType, AmountToCapture, POSLine."Currency Code", SalePOS);
+        EFTTransactionMgt.StartPayment(EFTSetup, AmountToCapture, POSLine."Currency Code", SalePOS);
         exit(true);
     end;
 
@@ -493,11 +514,11 @@ codeunit 6150725 "NPR POS Action: Payment"
         exit(false);
     end;
 
-    local procedure SuggestAmount(SalesAmount: Decimal; PaidAmount: Decimal; PaymentType: Record "NPR Payment Type POS"; ReturnPaymentType: Record "NPR Payment Type POS"; AllowNegativePaymentBalance: Boolean): Decimal
+    local procedure SuggestAmount(SalesAmount: Decimal; PaidAmount: Decimal; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; AllowNegativePaymentBalance: Boolean): Decimal
     var
         POSPaymentLine: Codeunit "NPR POS Payment Line";
     begin
-        exit(POSPaymentLine.CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType, AllowNegativePaymentBalance));
+        exit(POSPaymentLine.CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, POSPaymentMethod, ReturnPOSPaymentMethod, AllowNegativePaymentBalance));
     end;
 
     local procedure GetAmount(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management"): Decimal
@@ -524,12 +545,12 @@ codeunit 6150725 "NPR POS Action: Payment"
         exit('');
     end;
 
-    procedure TryEndSale(PaymentTypePOS: Record "NPR Payment Type POS"; POSSession: Codeunit "NPR POS Session")
+    procedure TryEndSale(POSPaymentMethod: Record "NPR POS Payment Method"; POSSession: Codeunit "NPR POS Session")
     var
         POSSale: Codeunit "NPR POS Sale";
         Register: Record "NPR Register";
         Setup: Codeunit "NPR POS Setup";
-        ReturnPaymentTypePOS: Record "NPR Payment Type POS";
+        ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
     begin
         POSSession.GetSale(POSSale);
         POSSession.GetSetup(Setup);
@@ -539,10 +560,10 @@ codeunit 6150725 "NPR POS Action: Payment"
         if SkipAfterEFTTransaction(POSSession) then
             exit;
 
-        if PaymentTypePOS."Auto End Sale" then begin
+        if POSPaymentMethod."Auto End Sale" then begin
             Register.Get(Setup.Register);
-            ReturnPaymentTypePOS.GetByRegister(Register."Return Payment Type", Register."Register No.");
-            POSSale.TryEndSaleWithBalancing(POSSession, PaymentTypePOS, ReturnPaymentTypePOS);
+            ReturnPOSPaymentMethod.Get(POSPaymentMethod."Return Payment Method Code");
+            POSSale.TryEndSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod);
         end;
     end;
 }

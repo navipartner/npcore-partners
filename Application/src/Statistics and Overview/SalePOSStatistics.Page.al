@@ -27,12 +27,7 @@ page 6014410 "NPR Sale POS - Statistics"
         DiscountAmt: Decimal;
         InvoiceDiscountAmt: Decimal;
         InvoiceFee: Decimal;
-        InsuranceCost: Decimal;
-        InsuranceProfit: Decimal;
-        AverageAuditRollSaleAmt: Decimal;
-        NoOfAuditRollRecords: Integer;
-        Utility: Codeunit "NPR Receipt Footer Mgt.";
-
+        
     procedure EnableMenu()
     begin
         CalculatePotentialInvoiceDiscount(Rec);
@@ -64,8 +59,6 @@ page 6014410 "NPR Sale POS - Statistics"
             DG := DB * 100 / Netto
         else
             DG := 0;
-
-        CalculateSaleLineNoAmount("Register No.", Date);
     end;
 
     procedure CalculatePotentialInvoiceDiscount(var SalePOS: Record "NPR Sale POS")
@@ -146,30 +139,6 @@ page 6014410 "NPR Sale POS - Statistics"
                     until SaleLinePOS2.Next = 0;
             end;
         end;
-    end;
-
-    procedure CalculateSaleLineNoAmount(RegisterFilter: Text[250]; CalculationDate: Date)
-    var
-        PaymentTypePOS: Record "NPR Payment Type POS";
-    begin
-        if RegisterFilter <> '' then
-            PaymentTypePOS.SetFilter("Register Filter", RegisterFilter)
-        else
-            PaymentTypePOS.SetRange("Register Filter");
-
-        if CalculationDate <> 0D then
-            PaymentTypePOS.SetRange("Date Filter", CalculationDate)
-        else
-            PaymentTypePOS.SetRange("Date Filter");
-
-        PaymentTypePOS.CalcFields("No. of Sales in Audit Roll", "Normal Sale in Audit Roll", "No. of Deb. Sales in Aud. Roll",
-          "Debit Sale in Audit Roll");
-        NoOfAuditRollRecords := PaymentTypePOS."No. of Sales in Audit Roll";
-        NoOfAuditRollRecords += PaymentTypePOS."No. of Deb. Sales in Aud. Roll";
-        if NoOfAuditRollRecords <> 0 then
-            AverageAuditRollSaleAmt := (PaymentTypePOS."Normal Sale in Audit Roll" + PaymentTypePOS."Debit Sale in Audit Roll") / NoOfAuditRollRecords
-        else
-            AverageAuditRollSaleAmt := 0;
     end;
 
     procedure Initialize(StatMenu: Integer)

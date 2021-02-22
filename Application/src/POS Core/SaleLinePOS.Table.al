@@ -52,8 +52,7 @@ table 6014406 "NPR Sale Line POS"
             ELSE
             IF (Type = CONST(Repair)) "NPR Customer Repair"."No."
             ELSE
-            IF (Type = CONST(Payment)) "NPR Payment Type POS"."No." WHERE(Status = CONST(Active),
-                                                                                          "Via Terminal" = CONST(false))
+            IF (Type = CONST(Payment)) "NPR POS Payment Method".Code WHERE("Block POS Payment" = const(false))
             ELSE
             IF (Type = CONST(Customer)) Customer."No."
             ELSE
@@ -521,18 +520,6 @@ table 6014406 "NPR Sale Line POS"
                     end;
                 end;
 
-                if Type = Type::Payment then begin
-                    if PaymentTypePOS."Maximum Amount" <> 0 then begin
-                        if Abs("Amount Including VAT") > Abs(PaymentTypePOS."Maximum Amount") then
-                            Error(ErrMaxExceeded, "No.", PaymentTypePOS."Maximum Amount");
-                    end;
-                    if PaymentTypePOS."Minimum Amount" <> 0 then begin
-                        if Abs("Amount Including VAT") < PaymentTypePOS."Minimum Amount" then
-                            Error(ErrMinExceeded, "No.", PaymentTypePOS."Minimum Amount");
-                    end;
-                    if EuroExchRate <> 0 then
-                        Euro := "Amount Including VAT" / EuroExchRate;
-                end;
             end;
         }
         field(32; "Allow Invoice Discount"; Boolean)
@@ -675,15 +662,6 @@ table 6014406 "NPR Sale Line POS"
             Caption = 'Euro';
             DataClassification = CustomerContent;
 
-            trigger OnValidate()
-            var
-                OriginalEUROamount: Decimal;
-            begin
-                OriginalEUROamount := Euro;
-                Validate("Amount Including VAT", Euro * EuroExchRate);
-                Euro := OriginalEUROamount;
-                Validate("Currency Amount", Euro);
-            end;
         }
         field(57; "Quantity (Base)"; Decimal)
         {
@@ -1646,6 +1624,7 @@ table 6014406 "NPR Sale Line POS"
     trigger OnDelete()
     var
         SaleLinePOS: Record "NPR Sale Line POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         ErrNoDeleteDep: Label 'Deposit line from a rental is not to be deleted.';
         ICommRec: Record "NPR I-Comm";
         Err001: Label '%1 is not legal tender';
@@ -1677,34 +1656,7 @@ table 6014406 "NPR Sale Line POS"
                             until SaleLinePOS.Next = 0;
                     end;
             end;
-        end else
-            if Type <> Type::"G/L Entry" then
-                if (Type = Type::Payment) then begin
-                    GetPaymentTypePOS(PaymentTypePOS);
-                    if PaymentTypePOS."G/L Account No." <> '' then begin
-                        case PaymentTypePOS."Processing Type" of
-                            PaymentTypePOS."Processing Type"::Cash:
-                                begin
-                                    if "Discount Type" = "Discount Type"::Rounding then begin
-                                        SaleLinePOS.Reset;
-                                        SaleLinePOS.SetRange("Register No.", "Register No.");
-                                        SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-                                        SaleLinePOS.SetRange("Sale Type", "Sale Type"::"Out payment");
-                                        SaleLinePOS.SetRange(Type, Type::"G/L Entry");
-                                        SaleLinePOS.SetFilter("Line No.", "Discount Code");
-                                        SaleLinePOS.SetRange(Date, Date);
-                                        SaleLinePOS.DeleteAll;
-                                    end;
-                                end;
-                        end;
-                    end else begin
-                        if PaymentTypePOS."Account Type" = PaymentTypePOS."Account Type"::"G/L Account" then
-                            Error(Err002, "No.");
-                    end;
-                end else begin
-                    if PaymentTypePOS."Account Type" = PaymentTypePOS."Account Type"::"G/L Account" then
-                        Error(Err002, "No.");
-                end;
+        end;
 
         if GiftCrtLine <> 0 then begin
             SaleLinePOS.Reset;
@@ -1744,7 +1696,6 @@ table 6014406 "NPR Sale Line POS"
 
     var
         Item: Record Item;
-        PaymentTypePOS: Record "NPR Payment Type POS";
         RegisterGlobal: Record "NPR Register";
         CustomerGlobal: Record Customer;
         SalePOS: Record "NPR Sale POS";
@@ -1794,17 +1745,6 @@ table 6014406 "NPR Sale Line POS"
             Validate("Unit Cost (LCY)", ((1 - Item."Profit %" / 100) * "Unit Price" / (1 + VATPercent / 100)) * "Qty. per Unit of Measure")
         else
             Validate("Unit Cost (LCY)", Item."Unit Cost" * "Qty. per Unit of Measure");
-    end;
-
-    procedure EuroExchRate(): Decimal
-    var
-        PaymentTypePOS2: Record "NPR Payment Type POS";
-    begin
-        PaymentTypePOS2.SetRange(Euro, true);
-        if PaymentTypePOS2.FindFirst then
-            exit(PaymentTypePOS2."Fixed Rate" / 100)
-        else
-            exit(0.01);
     end;
 
     procedure RemoveBOMDiscount()
@@ -2370,41 +2310,16 @@ table 6014406 "NPR Sale Line POS"
 
     local procedure InitFromPaymentTypePOS()
     var
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         GLAccount: Record "G/L Account";
     begin
         if "No." = '' then
             exit;
 
-        TestPaymentTypePOS();
+        POSPaymentMethod.Get("No.");
+        TestPaymentMethod(POSPaymentMethod);
+        Description := POSPaymentMethod.Description;
 
-        GetPaymentTypePOS(PaymentTypePOS);
-        Description := PaymentTypePOS."Sales Line Text";
-
-        if (PaymentTypePOS."Reverse Unrealized VAT") then begin
-            if (PaymentTypePOS."Account Type" = PaymentTypePOS."Account Type"::"G/L Account") then begin
-
-                GLAccount.Get(PaymentTypePOS."G/L Account No.");
-                GLAccount.CheckGLAcc();
-
-                "Gen. Posting Type" := GLAccount."Gen. Posting Type";
-                "Gen. Prod. Posting Group" := GLAccount."Gen. Prod. Posting Group";
-                "VAT Prod. Posting Group" := GLAccount."VAT Prod. Posting Group";
-                "Tax Group Code" := GLAccount."Tax Group Code";
-                UpdateVATSetup();
-            end;
-        end;
-    end;
-
-    procedure GetPaymentTypePOS(var PaymentTypePOS: Record "NPR Payment Type POS"): Boolean
-    var
-        RegisterNo: Code[10];
-    begin
-        Clear(PaymentTypePOS);
-
-        RegisterNo := '';
-
-        PaymentTypePOS.Get("No.", RegisterNo);
     end;
 
     local procedure TestItem()
@@ -2428,23 +2343,22 @@ table 6014406 "NPR Sale Line POS"
         end;
     end;
 
-    local procedure TestPaymentTypePOS()
+    local procedure TestPaymentMethod(POSPaymentMethod: Record "NPR POS Payment Method")
     var
         POSUnit: Record "NPR POS Unit";
         SaleLinePOS: Record "NPR Sale Line POS";
     begin
-        GetPaymentTypePOS(PaymentTypePOS);
         POSUnit.Get("Register No.");
 
-        if (PaymentTypePOS."G/L Account No." = '') and (PaymentTypePOS."Customer No." = '') and (PaymentTypePOS."Bank Acc. No." = '') then
+        if POSPaymentMethod."Account No." = '' then
             Error(Text001, "No.");
-        PaymentTypePOS.TestField(Status, PaymentTypePOS.Status::Active);
-        if PaymentTypePOS."Global Dimension 1 Code" <> '' then
-            PaymentTypePOS.TestField("Global Dimension 1 Code", POSUnit."Global Dimension 1 Code");
 
-        if PaymentTypePOS."Processing Type" <> PaymentTypePOS."Processing Type"::Invoice then
+        POSPaymentMethod.TestField("Block POS Payment", false);
+        if POSPaymentMethod."Global Dimension 1 Code" <> '' then
+            POSPaymentMethod.TestField("Global Dimension 1 Code", POSUnit."Global Dimension 1 Code");
+
+        if POSPaymentMethod."Processing Type" <> POSPaymentMethod."Processing Type"::CUSTOMER then
             exit;
-
         GetPOSHeader;
         SalePOS.TestField("Customer No.");
 
@@ -2455,10 +2369,11 @@ table 6014406 "NPR Sale Line POS"
         SaleLinePOS.SetFilter("No.", '<>%1', '');
         if SaleLinePOS.FindSet then
             repeat
-                SaleLinePOS.GetPaymentTypePOS(PaymentTypePOS);
-                if PaymentTypePOS."Processing Type" = PaymentTypePOS."Processing Type"::Invoice then
+                POSPaymentMethod.Get(SaleLinePOS."No.");
+                if POSPaymentMethod."Processing Type" = POSPaymentMethod."Processing Type"::CUSTOMER then
                     Error(Text000);
             until SaleLinePOS.Next = 0;
+
     end;
 
     local procedure CalcBaseQty(Qty: Decimal): Decimal

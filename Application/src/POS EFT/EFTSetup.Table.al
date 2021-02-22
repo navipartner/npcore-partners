@@ -12,7 +12,7 @@ table 6184485 "NPR EFT Setup"
         {
             Caption = 'Payment Type POS';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Payment Type POS"."No.";
+            TableRelation = "NPR POS Payment Method".Code;
         }
         field(2; "EFT Integration Type"; Code[20])
         {

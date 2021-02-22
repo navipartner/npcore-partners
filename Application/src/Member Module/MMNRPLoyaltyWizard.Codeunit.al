@@ -49,7 +49,7 @@ codeunit 6151159 "NPR MM NRP Loyalty Wizard"
         CreateEndpoints(CommunityCode, StrSubstNo('%1-M', CommunityCode), BaseUrl, 0, UserName, Password, TenantName);
         CreateEndpoints(CommunityCode, StrSubstNo('%1-L', CommunityCode), BaseUrl, 1, UserName, Password, TenantName);
 
-        CreatePaymentType(PaymentTypeCode, GL_Account, BurnFactor);
+        CreatePOSPaymentMethod(PaymentTypeCode, GL_Account, BurnFactor);
         CreateEFTSetup(PaymentTypeCode);
 
         CreateStoreSetup(CommunityCode, AuthCode, LoyaltyCompanyName, LoyaltyCode, PaymentTypeCode);
@@ -153,41 +153,29 @@ codeunit 6151159 "NPR MM NRP Loyalty Wizard"
         exit(LoyaltyCode);
     end;
 
-    local procedure CreatePaymentType(PaymentTypeCode: Code[10]; GLAccountNo: Code[10]; FixedRate: Decimal): Code[10]
+    local procedure CreatePOSPaymentMethod(PaymentTypeCode: Code[10]; GLAccountNo: Code[10]; FixedRate: Decimal): Code[10]
     var
-        PaymentTypePOS: Record "NPR Payment Type POS";
         POSPaymentMethod: Record "NPR POS Payment Method";
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
 
         GeneralLedgerSetup.Get();
 
-        if (not PaymentTypePOS.Get(PaymentTypeCode)) then begin
-            PaymentTypePOS."No." := PaymentTypeCode;
-            PaymentTypePOS.Insert();
-        end;
-
-        PaymentTypePOS.Init();
-        PaymentTypePOS.Description := 'NPR Loyalty Points';
-        PaymentTypePOS."Sales Line Text" := 'NPR Loyalty Points';
-        PaymentTypePOS."Search Description" := 'NPR Loyalty';
-        PaymentTypePOS.Status := PaymentTypePOS.Status::Active;
-        PaymentTypePOS."Processing Type" := PaymentTypePOS."Processing Type"::EFT;
-        PaymentTypePOS."Fixed Rate" := FixedRate * 100;
-        PaymentTypePOS."Rounding Precision" := 1.0;
-        PaymentTypePOS."G/L Account No." := GLAccountNo;
-
-        PaymentTypePOS.Modify(true);
-
         if (not POSPaymentMethod.Get(PaymentTypeCode)) then begin
             POSPaymentMethod.Code := PaymentTypeCode;
             POSPaymentMethod.Insert();
         end;
 
+        POSPaymentMethod.Init();
+        POSPaymentMethod.Description := 'NPR Loyalty Points';
+        POSPaymentMethod."Block POS Payment" := false;
         POSPaymentMethod."Processing Type" := POSPaymentMethod."Processing Type"::EFT;
+        POSPaymentMethod."Fixed Rate" := FixedRate * 100;
+        POSPaymentMethod."Rounding Precision" := 1.0;
+        POSPaymentMethod."Account Type" := POSPaymentMethod."Account Type"::"G/L Account";
+        POSPaymentMethod."Account No." := GLAccountNo;
         POSPaymentMethod."Currency Code" := CreateCurrencyCode('NPLP', FixedRate);
-        POSPaymentMethod.Modify();
-
+        POSPaymentMethod.Modify(true);
         exit(PaymentTypeCode);
     end;
 

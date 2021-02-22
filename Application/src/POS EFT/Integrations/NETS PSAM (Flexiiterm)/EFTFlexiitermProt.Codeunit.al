@@ -1,13 +1,5 @@
 codeunit 6184516 "NPR EFT Flexiiterm Prot."
 {
-    // NPR5.51/MMV /20190626 CASE 359385 Removed gift card balance handling (Is now only supported via explicit action).
-    //                                   Added gift card load support.
-    // NPR5.51/MMV /20190718 CASE 331463 Match card prefix again after result if it switched during trx. (This final match is too late for any surcharge).
-    // NPR5.53/MMV /20191219 CASE 383259 Corrections to #331463
-    // NPR5.53/MMV /20200113 CASE 385078 Send cashback value to flexiiterm
-    // NPR5.54/MMV /20200131 CASE 387965 Reintroduced gift card balance check integration.
-    // NPR5.54/MMV /20200225 CASE 364340 Discontinued support for surcharge.
-
     SingleInstance = true;
 
     trigger OnRun()
@@ -15,16 +7,11 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
     end;
 
     var
-        Err001: Label 'Terminal amount is 0';
-        AuxNotSupported: Label 'Aux functions are not supported for this credit card solution.';
-        GlobalGiftCardCustomerID: Text;
 
     procedure SendRequest(EFTTransactionRequest: Record "NPR EFT Transaction Request")
     begin
         case EFTTransactionRequest."Processing Type" of
-            //-NPR5.51 [359385]
             EFTTransactionRequest."Processing Type"::GIFTCARD_LOAD,
-          //+NPR5.51 [359385]
           EFTTransactionRequest."Processing Type"::PAYMENT,
           EFTTransactionRequest."Processing Type"::REFUND:
                 PaymentTransaction(EFTTransactionRequest);
@@ -54,15 +41,9 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
         State.ReceiptNo := EFTTransactionRequest."Sales Ticket No.";
         State.VerificationMethod := EFTFlexiitermIntegration.GetCVM(EFTSetup);
         State.TransactionType := EFTFlexiitermIntegration.GetTransactionType(EFTSetup);
-        //-NPR5.54 [364340]
-        //State.UseFee := EFTFlexiitermIntegration.GetSurchargeStatus(EFTSetup);
-        //+NPR5.54 [364340]
         State.IsBarcode := false;
         State.CardSwipeActivatesTerminal := true;
-        //-NPR5.53 [385078]
         State.Cashback := EFTTransactionRequest."Cashback Amount";
-        //+NPR5.53 [385078]
-
         GatewayRequest := GatewayRequest.PaymentGatewayProcessRequest();
         GatewayRequest.Path := EFTFlexiitermIntegration.GetFolderPath(EFTSetup);
         GatewayRequest.State := State;
@@ -70,9 +51,7 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
         POSFrontEnd.InvokeDevice(GatewayRequest, 'Flexiiterm_EftTrx', 'EftTrx');
     end;
 
-    local procedure "--- Protocol Events"()
-    begin
-    end;
+    #region Protocol Events
 
     local procedure CloseForm(Data: Text)
     var
@@ -80,7 +59,7 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTFlexiitermIntegration: Codeunit "NPR EFT Flexiiterm Integ.";
         CreditCardHelper: Codeunit "NPR Credit Card Prot. Helper";
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         SalePOS: Record "NPR Sale POS";
         NewCardNumber: Text;
     begin
@@ -88,25 +67,17 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
         State := State.Deserialize(Data);
 
         EFTTransactionRequest.Get(State.RequestEntryNo);
-        //-NPR5.51 [331463]
-        //-NPR5.53 [383259]
-        // IF EFTTransactionRequest."Card Number" <> State.CardPan THEN BEGIN //Card was switched around during transaction
         NewCardNumber := CreditCardHelper.CutCardPan(State.CardPan);
 
         if (NewCardNumber <> '') and (EFTTransactionRequest."Card Number" <> NewCardNumber) then begin //Card was switched around during transaction
             EFTTransactionRequest."Card Number" := NewCardNumber;
-            //+NPR5.53 [383259]
 
             SalePOS.Get(EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.");
-            if CreditCardHelper.FindPaymentType(EFTTransactionRequest."Card Number", PaymentTypePOS, SalePOS."Location Code") then begin
-                EFTTransactionRequest."POS Payment Type Code" := PaymentTypePOS."No.";
-                EFTTransactionRequest."Card Name" := CopyStr(PaymentTypePOS.Description, 1, MaxStrLen(EFTTransactionRequest."Card Name"));
+            if CreditCardHelper.FindPaymentType(EFTTransactionRequest."Card Number", POSPaymentMethod, SalePOS."Location Code") then begin
+                EFTTransactionRequest."POS Payment Type Code" := POSPaymentMethod.Code;
+                EFTTransactionRequest."Card Name" := CopyStr(POSPaymentMethod.Description, 1, MaxStrLen(EFTTransactionRequest."Card Name"));
             end;
-            //-NPR5.53 [383259]
-            //  EFTTransactionRequest."Card Number" := State.CardPan;
-            //+NPR5.53 [383259]
         end;
-        //+NPR5.51 [331463]
 
         EFTTransactionRequest."Amount Output" := State.CapturedAmount;
         EFTTransactionRequest."Result Amount" := State.CapturedAmount;
@@ -118,7 +89,7 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
 
     local procedure FindPaymentType(Data: Text; var ReturnData: Text)
     var
-        PaymentTypePOS: Record "NPR Payment Type POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
         CreditCardHelper: Codeunit "NPR Credit Card Prot. Helper";
         PaymentNo: Code[10];
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -139,15 +110,15 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
 
         SalePOS.Get(State.RegisterNo, State.ReceiptNo);
 
-        if (CreditCardHelper.FindPaymentType(State.CardPan, PaymentTypePOS, SalePOS."Location Code")) then begin
+        if (CreditCardHelper.FindPaymentType(State.CardPan, POSPaymentMethod, SalePOS."Location Code")) then begin
             State.SalesAmountInclVat := EFTTransactionRequest."Amount Input";
-            State.PaymentNo := PaymentTypePOS."No.";
+            State.PaymentNo := POSPaymentMethod.Code;
 
-            State.MatchSalesAmount := PaymentTypePOS."Match Sales Amount";
+            State.MatchSalesAmount := POSPaymentMethod."Match Sales Amount";
 
             EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."POS Payment Type Code");
-            EFTTransactionRequest."POS Payment Type Code" := PaymentTypePOS."No.";
-            EFTTransactionRequest."Card Name" := CopyStr(PaymentTypePOS.Description, 1, MaxStrLen(EFTTransactionRequest."Card Name"));
+            EFTTransactionRequest."POS Payment Type Code" := POSPaymentMethod.Code;
+            EFTTransactionRequest."Card Name" := CopyStr(POSPaymentMethod.Description, 1, MaxStrLen(EFTTransactionRequest."Card Name"));
 
             EFTTransactionRequest.Modify();
         end;
@@ -299,10 +270,8 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
                 CloseForm(Data);
             'FindPaymentType':
                 FindPaymentType(Data, ReturnData);
-            //-NPR5.54 [364340]
             'InsertSaleLineFee':
                 ; //Delete when event is completely gone from stargate assembly.
-                  //+NPR5.54 [364340]
             'CheckTransactionFromCheckResult':
                 CheckTransactionFromCheckResult(Data, ReturnData);
             'ModifyTransactionFromCheckResult':
@@ -318,7 +287,6 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
                   //-NPR5.54 [387965]
             'GetGiftVoucherBalance':
                 GetGiftVoucherBalance(Data, ReturnData);
-            //+NPR5.54 [387965]
             else
                 Error('Unhandled event sent from PaymentGateway %1', EventName);
         end;
@@ -328,5 +296,7 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
     local procedure OnAfterProtocolResponse(var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     begin
     end;
+
+    #endregion
 }
 
