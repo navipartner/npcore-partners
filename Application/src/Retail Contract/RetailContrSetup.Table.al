@@ -7,6 +7,8 @@ table 6014515 "NPR Retail Contr. Setup"
 
     Caption = 'Foto Setup';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Repairs are not supported in core anymore.';
 
     fields
     {

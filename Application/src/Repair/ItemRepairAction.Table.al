@@ -5,8 +5,8 @@ table 6059981 "NPR Item Repair Action"
 
     Caption = 'Item Repair Action';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR Item Repair Action";
-    LookupPageID = "NPR Item Repair Action";
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Repairs are not supported in core anymore.';
 
     fields
     {

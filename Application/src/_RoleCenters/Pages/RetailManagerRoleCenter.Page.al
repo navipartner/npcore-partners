@@ -797,17 +797,6 @@ page 6151241 "NPR Manager"
                     ToolTip = 'View Sales Credit Memos that have been done.';
                     ApplicationArea = All;
                 }
-                action("Repair Document List")
-                {
-                    Caption = 'Repair Document List';
-                    Image = RegisteredDocs;
-                    Promoted = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Process;
-                    RunObject = Page "NPR Customer Repair List";
-                    ToolTip = 'View the list of Repair List.';
-                    ApplicationArea = All;
-                }
             }
             group("Discount, Coupons & Vouchers")
             {

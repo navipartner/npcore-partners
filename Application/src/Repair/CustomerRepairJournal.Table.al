@@ -9,6 +9,8 @@ table 6014505 "NPR Customer Repair Journal"
 
     Caption = 'Customer Repair Journal';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Repairs are not supported in core anymore.';
 
     fields
     {
@@ -16,7 +18,6 @@ table 6014505 "NPR Customer Repair Journal"
         {
             Caption = 'Customer Repair No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Customer Repair";
         }
         field(2; Type; Option)
         {
@@ -46,26 +47,6 @@ table 6014505 "NPR Customer Repair Journal"
             DataClassification = CustomerContent;
             Description = 'NPR70.00.01.01';
             TableRelation = Item;
-
-            trigger OnValidate()
-            var
-                Item: Record Item;
-            begin
-                //-NPR70.00.01.01
-                Item.Get("Item Part No.");
-                Description := Item.Description;
-                Quantity := 1;
-                if Date = 0D then
-                    Date := Today;
-                //+NPR70.00.01.01
-                //-NPR5.30 [262923]
-                "Unit Price Excl. VAT" := Item."Unit Price";
-                CustomerRepair.Get("Customer Repair No.");
-                Customer.Get(CustomerRepair."Customer No.");
-                "VAT Bus. Posting Group" := Customer."VAT Bus. Posting Group";
-                Validate("VAT Prod. Posting Group", Item."VAT Prod. Posting Group");
-                //+NPR5.30 [262923]
-            end;
         }
         field(7; Quantity; Decimal)
         {
@@ -105,12 +86,6 @@ table 6014505 "NPR Customer Repair Journal"
             Caption = 'Unit Price Excl. VAT';
             DataClassification = CustomerContent;
 
-            trigger OnValidate()
-            begin
-                //-NPR5.30 [262923]
-                CalcAmounts;
-                //+NPR5.30 [262923]
-            end;
         }
         field(25; "VAT %"; Decimal)
         {
@@ -132,48 +107,6 @@ table 6014505 "NPR Customer Repair Journal"
             Caption = 'Amount Including VAT';
             DataClassification = CustomerContent;
             Editable = false;
-
-            trigger OnValidate()
-            begin
-                /*"Amount Including VAT" := ROUND("Amount Including VAT",Currency."Amount Rounding Precision");
-                CASE "VAT Calculation Type" OF
-                  "VAT Calculation Type"::"Normal VAT",
-                  "VAT Calculation Type"::"Reverse Charge VAT":
-                    BEGIN
-                      Amount :=
-                        ROUND(
-                          "Amount Including VAT" /
-                          (1 + (1 - SalesHeader."VAT Base Discount %" / 100) * "VAT %" / 100),
-                          Currency."Amount Rounding Precision");
-                      "VAT Base Amount" :=
-                        ROUND(Amount * (1 - SalesHeader."VAT Base Discount %" / 100),Currency."Amount Rounding Precision");
-                    END;
-                  "VAT Calculation Type"::"Full VAT":
-                    BEGIN
-                      Amount := 0;
-                      "VAT Base Amount" := 0;
-                    END;
-                  "VAT Calculation Type"::"Sales Tax":
-                    BEGIN
-                      SalesHeader.TESTFIELD("VAT Base Discount %",0);
-                      Amount :=
-                        SalesTaxCalculate.ReverseCalculateTax(
-                          "Tax Area Code","Tax Group Code","Tax Liable",SalesHeader."Posting Date",
-                          "Amount Including VAT","Quantity (Base)",SalesHeader."Currency Factor");
-                      IF Amount <> 0 THEN
-                        "VAT %" :=
-                          ROUND(100 * ("Amount Including VAT" - Amount) / Amount,0.00001)
-                      ELSE
-                        "VAT %" := 0;
-                      Amount := ROUND(Amount,Currency."Amount Rounding Precision");
-                      "VAT Base Amount" := Amount;
-                    END;
-                END;
-                
-                InitOutstandingAmount;
-                */
-
-            end;
         }
         field(40; "VAT Calculation Type"; Enum "Tax Calculation Type")
         {
@@ -186,37 +119,12 @@ table 6014505 "NPR Customer Repair Journal"
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "VAT Business Posting Group";
-
-            trigger OnValidate()
-            begin
-                //-NPR5.30 [262923]
-                Validate("VAT Prod. Posting Group");
-                //+NPR5.30 [262923]
-            end;
         }
         field(42; "VAT Prod. Posting Group"; Code[10])
         {
             Caption = 'VAT Prod. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "VAT Product Posting Group";
-
-            trigger OnValidate()
-            var
-                POSTaxCalculation: Codeunit "NPR POS Tax Calculation";
-                Handled: Boolean;
-            begin
-                //-NPR5.30 [262923]
-                VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group");
-                //-NPR5.51 [358985]
-                POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup, Handled);
-                //+NPR5.51 [358985]
-                "VAT %" := VATPostingSetup."VAT %";
-                "VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
-                "VAT Identifier" := VATPostingSetup."VAT Identifier";
-
-                CalcAmounts;
-                //+NPR5.30 [262923]
-            end;
         }
         field(43; "VAT Identifier"; Code[10])
         {
@@ -236,40 +144,5 @@ table 6014505 "NPR Customer Repair Journal"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
-
-    trigger OnDelete()
-    begin
-        //-NPR5.26
-        //-NPR5.30 [262923]
-        //IF CALCFIELDS("Qty Posted") THEN
-        //    ERROR(NPRText001);
-
-        if CalcFields("Qty Posted") then begin
-            if "Qty Posted" > 0 then
-                Error(NPRText001);
-        end;
-        //+NPR5.30 [262923]
-        //+NPR5.26
-    end;
-
-    var
-        NPRText001: Label 'Posted Entries Exist.';
-        VATPostingSetup: Record "VAT Posting Setup";
-        CustomerRepair: Record "NPR Customer Repair";
-        Customer: Record Customer;
-
-    local procedure CalcAmounts()
-    begin
-
-        //-NPR5.30 [262923]
-        "VAT Amount" := "Unit Price Excl. VAT" * Quantity * ("VAT %" / 100);
-        Amount := "Unit Price Excl. VAT" * Quantity;
-        "Amount Including VAT" := Amount + "VAT Amount";
-        //+NPR5.30 [262923]
-    end;
 }
 
