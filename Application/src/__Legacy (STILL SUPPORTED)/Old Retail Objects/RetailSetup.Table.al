@@ -2,7 +2,7 @@ table 6014400 "NPR Retail Setup"
 {
     Caption = 'Retail Setup';
     DataClassification = CustomerContent;
-    ObsoleteState = Pending;
+    ObsoleteState = Removed;
     ObsoleteReason = 'Fields will be spread out to more module specific areas';
 
     fields
@@ -1840,18 +1840,11 @@ table 6014400 "NPR Retail Setup"
     trigger OnInsert()
     var
         IComm: Record "NPR I-Comm";
-        FotoOps: Record "NPR Retail Contr. Setup";
     begin
         if IComm.ReadPermission then
             if not IComm.Get then begin
                 IComm.Init;
                 IComm.Insert(true);
-            end;
-
-        if FotoOps.ReadPermission then
-            if not FotoOps.Get then begin
-                FotoOps.Init;
-                FotoOps.Insert(true);
             end;
 
         recRef.GetTable(Rec);

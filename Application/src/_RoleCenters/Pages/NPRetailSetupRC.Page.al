@@ -396,14 +396,6 @@ page 6151245 "NPR Setup RC"
                     ToolTip = 'Executes the SMS Template List action';
 
                 }
-                action("Report Selection - Contract")
-                {
-                    Caption = 'Report Selection - Contract';
-                    RunObject = page "NPR Report Selection: Contract";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Report Selection - Contract action';
-
-                }
             }
             group(Miscellaneous)
             {

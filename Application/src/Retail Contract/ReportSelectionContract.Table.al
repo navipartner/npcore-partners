@@ -2,6 +2,8 @@ table 6014520 "NPR Report Selection: Contract"
 {
     Caption = 'Report Selection - Contract';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Repairs are not supported in core anymore.';
 
     fields
     {
@@ -24,11 +26,6 @@ table 6014520 "NPR Report Selection: Contract"
             Caption = 'Report ID';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Report));
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                CalcFields("Report Name");
-            end;
         }
         field(4; "Report Name"; Text[30])
         {
@@ -43,11 +40,6 @@ table 6014520 "NPR Report Selection: Contract"
             Caption = 'XML Port ID';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(XMLport));
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                CalcFields("XML Port Name");
-            end;
         }
         field(6; "XML Port Name"; Text[30])
         {
@@ -95,20 +87,5 @@ table 6014520 "NPR Report Selection: Contract"
     fieldgroups
     {
     }
-
-    var
-        RapportValg2: Record "NPR Report Selection: Contract";
-
-    procedure NyRecord()
-    begin
-        RapportValg2.SetRange("Report Type", "Report Type");
-        //-NPR5.26
-        //IF RapportValg2.FIND('+') AND (RapportValg2.Sequence <> '') THEN
-        if RapportValg2.FindLast and (RapportValg2.Sequence <> '') then
-            //+NPR5.26
-            Sequence := IncStr(RapportValg2.Sequence)
-        else
-            Sequence := '1';
-    end;
 }
 

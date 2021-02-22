@@ -100,7 +100,6 @@ codeunit 6014422 "NPR NP Retail Setup Upgrade"
         UpgradePOSViewProfile();
         UpgradeExchangeLabelSetup();
         UpgradeRetailItemSetup();
-        UpgradeCustomerRepairSetup();
         UpgradeStaffSetup();
 
         UpgradeTag.SetUpgradeTag(UpgradeTagLbl);
@@ -246,44 +245,23 @@ codeunit 6014422 "NPR NP Retail Setup Upgrade"
         RetailItemSetup.Modify();
     end;
 
-    local procedure UpgradeCustomerRepairSetup()
-    var
-        RetailSetup: Record "NPR Retail Setup";
-        CustomerRepairSetup: Record "NPR Customer Repair Setup";
-    begin
-        if not RetailSetup.Get() then
-            exit;
-
-        if not CustomerRepairSetup.Get() then begin
-            CustomerRepairSetup.Init();
-            CustomerRepairSetup.Insert();
-        end;
-
-        CustomerRepairSetup."Customer Repair No. Series" := RetailSetup."Customer Repair Management";
-        CustomerRepairSetup."Repair Msg." := RetailSetup."Repair Msg.";
-        CustomerRepairSetup."Rep. Cust. Default" := RetailSetup."Rep. Cust. Default";
-        CustomerRepairSetup."Fixed Price of Mending" := RetailSetup."Fixed Price of Mending";
-        CustomerRepairSetup."Fixed Price of Denied Mending" := RetailSetup."Fixed Price of Denied Mending";
-        CustomerRepairSetup.Modify();
-    end;
-
     local procedure UpgradeStaffSetup()
     var
         RetailSetup: Record "NPR Retail Setup";
-        CustomerRepairSetup: Record "NPR Staff Setup";
+        StaffSetup: Record "NPR Staff Setup";
     begin
         if not RetailSetup.Get() then
             exit;
 
-        if not CustomerRepairSetup.Get() then begin
-            CustomerRepairSetup.Init();
-            CustomerRepairSetup.Insert();
+        if not StaffSetup.Get() then begin
+            StaffSetup.Init();
+            StaffSetup.Insert();
         end;
 
-        CustomerRepairSetup."Internal Unit Price" := RetailSetup."Internal Unit Price";
-        CustomerRepairSetup."Staff Disc. Group" := RetailSetup."Staff Disc. Group";
-        CustomerRepairSetup."Staff Price Group" := RetailSetup."Staff Price Group";
-        CustomerRepairSetup."Staff SalesPrice Calc Codeunit" := RetailSetup."Staff SalesPrice Calc Codeunit";
-        CustomerRepairSetup.Modify();
+        StaffSetup."Internal Unit Price" := RetailSetup."Internal Unit Price";
+        StaffSetup."Staff Disc. Group" := RetailSetup."Staff Disc. Group";
+        StaffSetup."Staff Price Group" := RetailSetup."Staff Price Group";
+        StaffSetup."Staff SalesPrice Calc Codeunit" := RetailSetup."Staff SalesPrice Calc Codeunit";
+        StaffSetup.Modify();
     end;
 }

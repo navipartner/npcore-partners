@@ -1,8 +1,9 @@
 table 6014504 "NPR Customer Repair"
 {
     Caption = 'Customer Repair';
-    LookupPageID = "NPR Customer Repair List";
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Repairs are not supported in core anymore.';
 
     fields
     {
@@ -19,246 +20,33 @@ table 6014504 "NPR Customer Repair"
             IF ("Customer Type" = CONST(Ordinary)) Customer;
             ValidateTableRelation = false;
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                Contact: Record Contact;
-                ContactBusinessRelation: Record "Contact Business Relation";
-                Customer: Record Customer;
-            begin
-                if Rec."Customer No." <> '' then begin
-                    if "Customer Type" = "Customer Type"::Ordinary then begin
-                        Customer.Get("Customer No.");
-                        Name := Customer.Name;
-                        Address := Customer.Address;
-                        "Address 2" := Customer."Address 2";
-                        City := Customer.City;
-                        "Phone No." := Customer."Phone No.";
-                        "Post Code" := Customer."Post Code";
-                        "Fax No." := Customer."Fax No.";
-                        Validate("Invoice To", Customer."No.");
-                        "E-mail" := Customer."E-Mail";
-                    end else begin
-                        Contact.Get("Customer No.");
-                        Name := Contact.Name;
-                        Address := Contact.Address;
-                        "Address 2" := Contact."Address 2";
-                        City := Contact.City;
-                        "Phone No." := Contact."Phone No.";
-                        "Post Code" := Contact."Post Code";
-                        "Fax No." := Contact."Fax No.";
-                        "Mobile Phone No." := Contact."Mobile Phone No.";
-                        ContactBusinessRelation.Reset;
-                        ContactBusinessRelation.SetRange("Link to Table", ContactBusinessRelation."Link to Table"::Customer);
-                        ContactBusinessRelation.SetRange("Contact No.", "Customer No.");
-                        if not ContactBusinessRelation.FindFirst then
-                            exit;
-                        if not Customer.Get(ContactBusinessRelation."No.") then
-                            exit;
-                        Validate("Invoice To", Customer."No.");
-                    end;
-                end else begin
-                    "Customer No." := '';
-                    Name := '';
-                    Address := '';
-                    "Address 2" := '';
-                    City := '';
-                    "Phone No." := '';
-                    "Post Code" := '';
-                    "Fax No." := '';
-                    "Mobile Phone No." := '';
-                end;
-            end;
         }
         field(3; Name; Text[100])
         {
             Caption = 'Name';
             DataClassification = CustomerContent;
 
-            trigger OnValidate()
-            var
-                Contact: Record Contact;
-                Customer: Record Customer;
-            begin
-                if "Customer No." = '' then
-                    exit;
-                TestField("Customer No.");
-                if (Name <> xRec.Name) then begin
-                    if "Customer Type" = "Customer Type"::Ordinary then begin
-                        Customer.Get("Customer No.");
-                        if (Customer.Name <> Name) and
-                          (Confirm(StrSubstNo(Text1060001,
-                            Customer.Name, Name), false)) then begin
-                            Customer.Name := Name;
-                            Customer.Modify;
-                        end else
-                            Name := Customer.Name;
-                    end else begin
-                        Contact.Get("Customer No.");
-                        if (Contact.Name <> Name) and
-                          (Confirm(StrSubstNo(Text1060001,
-                            Contact.Name, Name), false)) then begin
-                            Contact.Name := Name;
-                            Contact.Modify;
-                        end else
-                            Name := Contact.Name;
-                    end;
-                end;
-            end;
         }
         field(4; Address; Text[100])
         {
             Caption = 'Address';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                Contact: Record Contact;
-                Customer: Record Customer;
-            begin
-                if "Customer No." = '' then
-                    exit;
-                TestField("Customer No.");
-                if (Address <> xRec.Address) then begin
-                    if "Customer Type" = "Customer Type"::Ordinary then begin
-                        Customer.Get("Customer No.");
-                        if (Customer.Address <> Address) and
-                          (Confirm(StrSubstNo(Text1060002,
-                            Customer.Address, Address), false)) then begin
-                            Customer.Address := Address;
-                            Customer.Modify;
-                        end else
-                            Address := Customer.Address;
-                    end else begin
-                        Contact.Get("Customer No.");
-                        if (Contact.Address <> Address) and
-                          (Confirm(StrSubstNo(Text1060002,
-                            Contact.Address, Address), false)) then begin
-                            Contact.Address := Address;
-                            Contact.Modify;
-                        end else
-                            Address := Contact.Address;
-                    end;
-                end;
-            end;
         }
         field(5; "Address 2"; Text[50])
         {
             Caption = 'Address 2';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                Contact: Record Contact;
-                Customer: Record Customer;
-            begin
-                if "Customer No." = '' then
-                    exit;
-
-                TestField("Customer No.");
-                if ("Address 2" <> xRec."Address 2") then begin
-                    if "Customer Type" = "Customer Type"::Ordinary then begin
-                        Customer.Get("Customer No.");
-                        if (Customer."Address 2" <> "Address 2") and
-                          (Confirm(StrSubstNo(Text1060003,
-                            Customer."Address 2", "Address 2"), false)) then begin
-                            Customer."Address 2" := "Address 2";
-                            Customer.Modify;
-                        end else
-                            "Address 2" := Customer."Address 2";
-                    end else begin
-                        Contact.Get("Customer No.");
-                        if (Contact."Address 2" <> "Address 2") and
-                          (Confirm(StrSubstNo(Text1060003,
-                            Contact."Address 2", "Address 2"), false)) then begin
-                            Contact."Address 2" := "Address 2";
-                            Contact.Modify;
-                        end else
-                            "Address 2" := Contact."Address 2";
-                    end;
-                end;
-            end;
         }
         field(6; "Post Code"; Code[20])
         {
             Caption = 'Post Code';
             TableRelation = "Post Code";
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                Contact: Record Contact;
-                Customer: Record Customer;
-                PostCode: Record "Post Code";
-            begin
-                if "Customer No." = '' then
-                    exit;
-
-                TestField("Invoice To");
-                if ("Post Code" <> xRec."Post Code") then begin
-                    if "Customer Type" = "Customer Type"::Ordinary then begin
-                        Customer.Get("Customer No.");
-                        if (Customer."Post Code" <> "Post Code") and
-                          (Confirm(StrSubstNo(Text1060004,
-                            Customer."Post Code", "Post Code"), false)) then begin
-                            Customer."Post Code" := "Post Code";
-                            Customer.Modify;
-                        end else
-                            "Post Code" := Customer."Post Code";
-                    end else begin
-                        Contact.Get("Customer No.");
-                        if (Contact."Post Code" <> "Post Code") and
-                          (Confirm(StrSubstNo(Text1060004,
-                            Contact."Post Code", "Post Code"), false)) then begin
-                            Contact."Post Code" := "Post Code";
-                            Contact.Modify;
-                        end else
-                            "Post Code" := Contact."Post Code";
-                    end;
-                end;
-
-                PostCode.Reset;
-                PostCode.SetRange(Code, "Post Code");
-                if PostCode.FindFirst then
-                    City := PostCode.City;
-            end;
         }
         field(7; City; Text[30])
         {
             Caption = 'City';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                Contact: Record Contact;
-                Customer: Record Customer;
-            begin
-                if "Customer No." = '' then
-                    exit;
-
-                TestField("Customer No.");
-                if (City <> xRec.City) then begin
-                    if "Customer Type" = "Customer Type"::Ordinary then begin
-                        Customer.Get("Customer No.");
-                        if (Customer.City <> City) and
-                          (Confirm(StrSubstNo(Text1060005,
-                            Customer.City, City), false)) then begin
-                            Customer.City := City;
-                            Customer.Modify;
-                        end else
-                            City := Customer.City;
-                    end else begin
-                        Contact.Get("Customer No.");
-                        if (Contact.City <> City) and
-                          (Confirm(StrSubstNo(Text1060005,
-                            Contact.City, City), false)) then begin
-                            Contact.City := City;
-                            Contact.Modify;
-                        end else
-                            City := Contact.City;
-                    end;
-                end;
-            end;
         }
         field(8; "Invoice To"; Code[20])
         {
@@ -266,358 +54,64 @@ table 6014504 "NPR Customer Repair"
             TableRelation = IF ("Customer Type" = CONST(Ordinary)) Customer;
             ValidateTableRelation = false;
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                ContactBusinessRelation: Record "Contact Business Relation";
-                Customer: Record Customer;
-            begin
-                if "Invoice To" <> '' then begin
-                    if "Customer Type" = "Customer Type"::Ordinary then begin
-                        Customer.Get("Invoice To");
-                        "Customer Name" := Customer.Name;
-                        "Customer Address" := Customer.Address;
-                        "Customer Address 2" := Customer."Address 2";
-                        "Customer Post Code" := Customer."Post Code";
-                        "Customer City" := Customer.City;
-                    end else begin
-                        ContactBusinessRelation.Reset;
-                        ContactBusinessRelation.SetRange("Link to Table", ContactBusinessRelation."Link to Table"::Customer);
-                        ContactBusinessRelation.SetRange("Contact No.", "Customer No.");
-                        if not ContactBusinessRelation.FindFirst then
-                            exit;
-                        if not Customer.Get(ContactBusinessRelation."No.") then
-                            exit;
-                        "Customer Name" := Customer.Name;
-                        "Customer Address" := Customer.Address;
-                        "Customer Address 2" := Customer."Address 2";
-                        "Customer Post Code" := Customer."Post Code";
-                        "Customer City" := Customer.City;
-                    end;
-                end else begin
-                    "Customer Name" := '';
-                    "Customer Address" := '';
-                    "Customer Address 2" := '';
-                    "Customer Post Code" := '';
-                    "Customer City" := '';
-                end;
-            end;
         }
         field(9; "Customer Name"; Text[100])
         {
             Caption = 'Customer Name';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                Contact: Record Contact;
-                Customer: Record Customer;
-            begin
-                TestField("Invoice To");
-                if ("Customer Name" <> xRec."Customer Name") then begin
-                    if "Customer Type" = "Customer Type"::Ordinary then begin
-                        Customer.Get("Invoice To");
-                        if (Customer.Name <> "Customer Name") and
-                          (Confirm(StrSubstNo(Text1060006,
-                            Customer.Name, "Customer Name"), false)) then begin
-                            Customer.Name := "Customer Name";
-                            Customer.Modify;
-                        end else
-                            "Customer Name" := Customer.Name;
-                    end else begin
-                        Contact.Get("Invoice To");
-                        if (Contact.Name <> "Customer Name") and
-                          (Confirm(StrSubstNo(Text1060006,
-                            Contact.Name, "Customer Name"), false)) then begin
-                            Contact.Name := "Customer Name";
-                            Contact.Modify;
-                        end else
-                            "Customer Name" := Contact.Name;
-                    end;
-                end;
-            end;
         }
         field(10; "Customer Address"; Text[100])
         {
             Caption = 'Customer Address';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                Contact: Record Contact;
-                Customer: Record Customer;
-            begin
-                TestField("Invoice To");
-                if ("Customer Address" <> xRec."Customer Address") then begin
-                    if "Customer Type" = "Customer Type"::Ordinary then begin
-                        Customer.Get("Invoice To");
-                        if (Customer.Address <> "Customer Address") and
-                          (Confirm(StrSubstNo(Text1060007,
-                            Customer.Address, "Customer Address"), false)) then begin
-                            Customer.Address := "Customer Address";
-                            Customer.Modify;
-                        end else
-                            "Customer Address" := Customer.Address;
-                    end else begin
-                        Contact.Get("Invoice To");
-                        if (Contact.Address <> "Customer Address") and
-                          (Confirm(StrSubstNo(Text1060007,
-                            Contact.Address, "Customer Address"), false)) then begin
-                            Contact.Address := "Customer Address";
-                            Contact.Modify;
-                        end else
-                            "Customer Address" := Contact.Address;
-                    end;
-                end;
-            end;
         }
         field(11; "Customer Address 2"; Text[50])
         {
             Caption = 'Customer Address 2';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                Contact: Record Contact;
-                Customer: Record Customer;
-            begin
-                TestField("Invoice To");
-                if ("Customer Address 2" <> xRec."Customer Address 2") then begin
-                    if "Customer Type" = "Customer Type"::Ordinary then begin
-                        Customer.Get("Invoice To");
-                        if (Customer."Address 2" <> "Customer Address 2") and
-                          (Confirm(StrSubstNo(Text1060008,
-                            Customer."Address 2", "Customer Address 2"), false)) then begin
-                            Customer."Address 2" := "Customer Address 2";
-                            Customer.Modify;
-                        end else
-                            "Customer Address 2" := Customer."Address 2";
-                    end else begin
-                        Contact.Get("Invoice To");
-                        if (Contact."Address 2" <> "Customer Address 2") and
-                          (Confirm(StrSubstNo(Text1060008,
-                            Contact."Address 2", "Customer Address 2"), false)) then begin
-                            Contact."Address 2" := "Customer Address 2";
-                            Contact.Modify;
-                        end else
-                            "Customer Address 2" := Contact."Address 2";
-                    end;
-                end;
-            end;
         }
         field(12; "Customer Post Code"; Code[20])
         {
             Caption = 'Customer Post Code';
             TableRelation = "Post Code";
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                Contact: Record Contact;
-                Customer: Record Customer;
-                PostCode: Record "Post Code";
-            begin
-                TestField("Invoice To");
-                if ("Customer Post Code" <> xRec."Customer Post Code") then begin
-                    if "Customer Type" = "Customer Type"::Ordinary then begin
-                        Customer.Get("Invoice To");
-                        if (Customer."Post Code" <> "Customer Post Code") and
-                          (Confirm(StrSubstNo(Text1060009,
-                            Customer."Post Code", "Customer Post Code"), false)) then begin
-                            Customer."Post Code" := "Customer Post Code";
-                            Customer.Modify;
-                        end else
-                            "Customer Post Code" := Customer."Post Code";
-                    end else begin
-                        Contact.Get("Invoice To");
-                        if (Contact."Post Code" <> "Customer Post Code") and
-                          (Confirm(StrSubstNo(Text1060009,
-                            Contact."Post Code", "Customer Post Code"), false)) then begin
-                            Contact."Post Code" := "Customer Post Code";
-                            Contact.Modify;
-                        end else
-                            "Customer Post Code" := Contact."Post Code";
-                    end;
-                end;
-
-                if PostCode.Get("Customer Post Code") then
-                    "Customer City" := PostCode.City;
-            end;
         }
         field(13; "Customer City"; Text[30])
         {
             Caption = 'Customer City';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                Contact: Record Contact;
-                Customer: Record Customer;
-            begin
-                TestField("Invoice To");
-                if ("Customer City" <> xRec."Customer City") then begin
-                    if "Customer Type" = "Customer Type"::Ordinary then begin
-                        Customer.Get("Invoice To");
-                        if (Customer.City <> "Customer City") and
-                          (Confirm(StrSubstNo(Text1060010,
-                            Customer.City, "Customer City"), false)) then begin
-                            Customer.City := "Customer City";
-                            Customer.Modify;
-                        end else
-                            "Customer City" := Customer.City;
-                    end else begin
-                        Contact.Get("Invoice To");
-                        if (Contact.City <> "Customer City") and
-                          (Confirm(StrSubstNo(Text1060010,
-                            Contact.City, "Customer City"), false)) then begin
-                            Contact.City := "Customer City";
-                            Contact.Modify;
-                        end else
-                            "Customer City" := Contact.City;
-                    end;
-                end;
-            end;
         }
         field(14; "Repairer No."; Code[20])
         {
             Caption = 'Repairer No.';
             TableRelation = Vendor;
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                Vendor: Record Vendor;
-            begin
-                if "Repairer No." <> '' then begin
-                    Vendor.Get("Repairer No.");
-                    "Repairer Name" := Vendor.Name;
-                    "Repairer Address" := Vendor.Address;
-                    "Repairer Address2" := Vendor."Address 2";
-                    "Repairer Post Code" := Vendor."Post Code";
-                    "Repairer City" := Vendor.City;
-                end else begin
-                    "Repairer Name" := '';
-                    "Repairer Address" := '';
-                    "Repairer Address2" := '';
-                    "Repairer Post Code" := '';
-                    "Repairer City" := '';
-                end;
-            end;
         }
         field(15; "Repairer Name"; Text[100])
         {
             Caption = 'Repairer Name';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                Vendor: Record Vendor;
-            begin
-                TestField("Repairer No.");
-                if ("Repairer Name" <> xRec."Repairer Name") then begin
-                    Vendor.Get("Repairer No.");
-                    if (Vendor.Name <> "Repairer Name") and
-                      (Confirm(StrSubstNo(Text1060011,
-                        Vendor.Name, "Repairer Name"), false)) then begin
-                        Vendor.Name := "Repairer Name";
-                        Vendor.Modify;
-                    end else
-                        "Repairer Name" := Vendor.Name;
-                end;
-            end;
         }
         field(16; "Repairer Address"; Text[100])
         {
             Caption = 'Repairer Address';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                Vendor: Record Vendor;
-            begin
-                TestField("Repairer No.");
-                if ("Repairer Address" <> xRec."Repairer Address") then begin
-                    Vendor.Get("Repairer No.");
-                    if (Vendor.Address <> "Repairer Address") and
-                      (Confirm(StrSubstNo(Text1060012,
-                        Vendor.Address, "Repairer Address"), false)) then begin
-                        Vendor.Address := "Repairer Address";
-                        Vendor.Modify;
-                    end else
-                        "Repairer Address" := Vendor.Address;
-                end;
-            end;
         }
         field(17; "Repairer Address2"; Text[50])
         {
             Caption = 'Repairer Address2';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                Vendor: Record Vendor;
-            begin
-                TestField("Repairer No.");
-                if ("Repairer Address2" <> xRec."Repairer Address2") then begin
-                    Vendor.Get("Repairer No.");
-                    if (Vendor."Address 2" <> "Repairer Address2") and
-                      (Confirm(StrSubstNo(Text1060013,
-                        Vendor."Address 2", "Repairer Address2"), false)) then begin
-                        Vendor."Address 2" := "Repairer Address2";
-                        Vendor.Modify;
-                    end else
-                        "Repairer Address2" := Vendor."Address 2";
-                end;
-            end;
         }
         field(18; "Repairer Post Code"; Code[20])
         {
             Caption = 'Repairer Post Code';
             TableRelation = "Post Code";
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                PostCode: Record "Post Code";
-                Vendor: Record Vendor;
-            begin
-                TestField("Repairer No.");
-                if ("Repairer Post Code" <> xRec."Repairer Post Code") then begin
-                    Vendor.Get("Repairer No.");
-                    if (Vendor."Post Code" <> "Repairer Address2") and
-                      (Confirm(StrSubstNo(Text1060014,
-                        Vendor."Post Code", "Repairer Post Code"), false)) then begin
-                        Vendor."Post Code" := "Repairer Post Code";
-                        Vendor.Modify;
-                    end else
-                        "Repairer Post Code" := Vendor."Post Code";
-                end;
-                PostCode.SetRange(Code, "Repairer Post Code");
-                if PostCode.FindFirst then
-                    "Repairer City" := PostCode.City;
-            end;
         }
         field(19; "Repairer City"; Text[30])
         {
             Caption = 'Repairer City';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                Vendor: Record Vendor;
-            begin
-                TestField("Repairer No.");
-                if ("Repairer City" <> xRec."Repairer City") then begin
-                    Vendor.Get("Repairer No.");
-                    if (Vendor.City <> "Repairer City") and
-                      (Confirm(StrSubstNo(Text1060015,
-                        Vendor.City, "Repairer Post Code"), false)) then begin
-                        Vendor.City := "Repairer City";
-                        Vendor.Modify;
-                    end else
-                        "Repairer City" := Vendor.City;
-                end;
-            end;
         }
         field(20; "In-house Repairer"; Boolean)
         {
@@ -687,15 +181,6 @@ table 6014504 "NPR Customer Repair"
             OptionCaption = 'At Vendor,Awaits Approval,Approved,Awaits Claiming,Return No Repair,Ready No Repair,Claimed,To be sent';
             OptionMembers = "At Vendor","Awaits Approval",Approved,"Awaits Claiming","Return No Repair","Ready No Repair",Claimed,"To be sent";
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                RetailContractMgt: Codeunit "NPR Retail Contract Mgt.";
-            begin
-                CustomerRepairSetup.Get;
-                if (Status = Status::"Awaits Claiming") and CustomerRepairSetup."Repair Msg." then
-                    RetailContractMgt.SendStatusSms(Rec);
-            end;
         }
         field(33; Brand; Text[50])
         {
@@ -905,11 +390,6 @@ table 6014504 "NPR Customer Repair"
             Caption = 'Global Dimension 1 Code';
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
             DataClassification = CustomerContent;
-
-            trigger OnLookup()
-            begin
-                LookUpShortcutDimCode(1, "Global Dimension 1 Code");
-            end;
         }
         field(113; "Register No."; Code[10])
         {
@@ -931,11 +411,6 @@ table 6014504 "NPR Customer Repair"
             Caption = 'Global Dimension 2 Code';
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
             DataClassification = CustomerContent;
-
-            trigger OnLookup()
-            begin
-                LookUpShortcutDimCode(2, "Global Dimension 2 Code");
-            end;
         }
         field(117; "Warranty Text"; Text[100])
         {
@@ -1037,288 +512,5 @@ table 6014504 "NPR Customer Repair"
     fieldgroups
     {
     }
-
-    trigger OnInsert()
-    var
-        NoSeriesMgt: Codeunit NoSeriesManagement;
-        POSUnit: Record "NPR POS Unit";
-        RecRegister: Record "NPR Register";
-        UserSetup: Record "User Setup";
-    begin
-        CustomerRepairSetup.Get;
-
-        "Handed In Date" := Today;
-        "Prices Including VAT" := CustomerRepairSetup."Fixed Price of Mending";
-        "Price when Not Accepted" := CustomerRepairSetup."Fixed Price of Denied Mending";
-
-        if "No." = '' then begin
-            CustomerRepairSetup.TestField("Customer Repair No. Series");
-            NoSeriesMgt.InitSeries(CustomerRepairSetup."Customer Repair No. Series", xRec."No. Series", 0D, "No.", "No. Series");
-        end else begin
-            NoSeriesMgt.TestManual(CustomerRepairSetup."Customer Repair No. Series");
-        end;
-
-        if UserSetup.Get(UserId) then begin
-            if RecRegister.Get(UserSetup."NPR Backoffice Register No.") then begin
-                Location := GetStoreLocationCode();
-                POSUnit.Get(UserSetup."NPR Backoffice Register No.");
-                "Global Dimension 1 Code" := POSUnit."Global Dimension 1 Code";
-                "Global Dimension 2 Code" := POSUnit."Global Dimension 2 Code";
-            end;
-        end;
-    end;
-
-    trigger OnModify()
-    begin
-        "Last Date Modified" := Today;
-    end;
-
-    var
-        Text1060001: Label 'Do you want to change customer name from %1 to %2?';
-        Text1060002: Label 'Do you want to change customer address from %1 to %2?';
-        Text1060003: Label 'Do you want to change customer address 2 from %1 to %2?';
-        Text1060004: Label 'Do you want to change customer post code from %1 to %2?';
-        Text1060005: Label 'Do you want to change customer city  from %1 to %2?';
-        Text1060006: Label 'Do you want to change debtor name from %1 to %2?';
-        Text1060007: Label 'Do you want to change debtor address from %1 to %2?';
-        Text1060008: Label 'Do you want to change debtor address 2 from %1 to %2?';
-        Text1060009: Label 'Do you want to change debtor post code from %1 to %2?';
-        Text1060010: Label 'Do you want to change debtor city from %1 to %2?';
-        Text1060011: Label 'Do you want to change creditor name from %1 to %2?';
-        Text1060012: Label 'Do you want to change creditor address from %1 to %2?';
-        Text1060013: Label 'Do you want to change creditor address 2 from %1 to %2?';
-        Text1060014: Label 'Do you want to change creditor post code from %1 to %2?';
-        Text1060015: Label 'Do you want to change creditor city from %1 to %2?';
-        Text1060020: Label 'For Repair : ';
-        CustomerRepairSetup: Record "NPR Customer Repair Setup";
-
-    procedure AssistEdit(xCustomerRepair: Record "NPR Customer Repair"): Boolean
-    var
-        CustomerRepair: Record "NPR Customer Repair";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
-    begin
-        CustomerRepair := Rec;
-        CustomerRepairSetup.Get;
-        CustomerRepairSetup.TestField("Customer Repair No. Series");
-        if NoSeriesMgt.SelectSeries(CustomerRepairSetup."Customer Repair No. Series", xCustomerRepair."No. Series", CustomerRepair."No. Series") then begin
-            NoSeriesMgt.SetSeries(CustomerRepair."No.");
-            Rec := CustomerRepair;
-            exit(true);
-        end;
-    end;
-
-    procedure Navigate()
-    var
-        AuditRoll: Record "NPR Audit Roll";
-        NavigatePage: Page Navigate;
-    begin
-        AuditRoll.SetRange("Register No.", "Delivered Register No.");
-        AuditRoll.SetRange("Sales Ticket No.", "Delivering Sales Ticket No.");
-        AuditRoll.SetRange("Sale Type", "Audit Roll Trans. Type");
-        AuditRoll.SetRange("Line No.", "Audit Roll Line No.");
-        AuditRoll.Find('-');
-        NavigatePage.SetDoc("Date Delivered", AuditRoll."Posted Doc. No.");
-        NavigatePage.Run;
-    end;
-
-    procedure LookUpShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
-    var
-        NprDimMgt: Codeunit "NPR Dimension Mgt.";
-    begin
-        NprDimMgt.LookupDimValueCode(FieldNumber, ShortcutDimCode);
-    end;
-
-    procedure CreateSalesDocument("Document Type": Enum "Sales Document Type")
-    var
-        TxtInvCreated: Label 'The invoice has been created on number %1';
-        TxtOrderCreated: Label 'Salesorder is created with number %1';
-        RetailContractSetup: Record "NPR Retail Contr. Setup";
-        SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        SalesLine2: Record "Sales Line";
-    begin
-        if "Related to Invoice No." = '' then begin
-            if "Customer Type" = "Customer Type"::Cash then
-                Validate("Customer Type", "Customer Type"::Ordinary);
-
-            SalesHeader.Init;
-            SalesHeader."Document Type" := "Document Type";
-            SalesHeader.Insert(true);
-            SalesHeader.Validate("Sell-to Customer No.", "Customer No.");
-            SalesHeader."Salesperson Code" := "Salesperson Code";
-            if Format("Expected Completion Date") <> '' then
-                SalesHeader."Promised Delivery Date" := "Expected Completion Date";
-            SalesHeader."External Document No." := "No.";
-            SalesHeader.Modify;
-
-            SalesLine2.Init;
-            SalesLine2."Document Type" := SalesHeader."Document Type";
-            SalesLine2."Document No." := SalesHeader."No.";
-            SalesLine2."Line No." := 10000;
-            SalesLine2.Description := Text1060020;
-            SalesLine2.Insert(true);
-            SalesLine.Init;
-            SalesLine."Document Type" := SalesHeader."Document Type";
-            SalesLine."Document No." := SalesHeader."No.";
-            SalesLine."Line No." := 20000;
-            SalesLine.Insert(true);
-            RetailContractSetup.Get;
-            SalesLine.Type := SalesLine.Type::Item;
-
-            SalesLine.Validate(SalesLine."No.", RetailContractSetup."Repair Item No.");
-
-            SalesLine.Validate("Sell-to Customer No.", "Customer No.");
-
-            SalesLine.Validate(SalesLine.Description, "Item Description");
-            SalesLine.Validate(SalesLine.Quantity, 1);
-            if not SalesHeader."Prices Including VAT" then begin
-                SalesLine.Validate(SalesLine."Unit Price", ("Prices Including VAT" * 100) / (100 + SalesLine."VAT %"));
-            end else
-                SalesLine.Validate(SalesLine."Unit Price", "Prices Including VAT");
-            SalesLine.Modify;
-
-            CreateSalesLine(SalesHeader, Rec);
-
-            Status := Status::Claimed;
-            "Date Delivered" := Today;
-            "Related to Invoice No." := SalesHeader."No.";
-            case "Document Type" of
-                "Document Type"::Invoice:
-                    Message(TxtInvCreated, SalesHeader."No.");
-                "Document Type"::Order:
-                    Message(TxtOrderCreated, SalesHeader."No.");
-            end;
-        end;
-    end;
-
-    procedure PostItemPart(var CustRepair: Record "NPR Customer Repair")
-    var
-        ItemJnlLine: Record "Item Journal Line" temporary;
-        CustRepairItemParts: Record "NPR Customer Repair Journal";
-        ItemJnlPostLine: Codeunit "Item Jnl.-Post Line";
-        Window: Dialog;
-        LineNo: Integer;
-    begin
-        if CustRepair.Finalized = false then begin
-            CustRepairItemParts.SetRange("Customer Repair No.", CustRepair."No.");
-            CustRepairItemParts.SetFilter("Item Part No.", '<>%1', '');
-            CustRepairItemParts.SetFilter(Quantity, '<>%1', 0);
-            CustRepairItemParts.SetRange("Expenses to be charged", false);
-            if CustRepairItemParts.FindSet then begin
-                Window.Open('Processing Item #1#################################');
-                repeat
-                    LineNo += 10000;
-                    Window.Update(1, StrSubstNo('%1', CustRepairItemParts."Item Part No."));
-                    ItemJnlLine.Init;
-                    ItemJnlLine.Validate("Posting Date", Today);
-                    if CustRepairItemParts.Quantity < 0 then
-                        ItemJnlLine.Validate("Entry Type", ItemJnlLine."Entry Type"::"Positive Adjmt.")
-                    else
-                        ItemJnlLine.Validate("Entry Type", ItemJnlLine."Entry Type"::"Negative Adjmt.");
-                    ItemJnlLine.Validate("Document No.", CustRepairItemParts."Customer Repair No.");
-
-                    ItemJnlLine.Validate("Item No.", CustRepairItemParts."Item Part No.");
-                    ItemJnlLine.Validate(Quantity, CustRepairItemParts.Quantity);
-                    ItemJnlLine.Validate("Location Code", Location);
-                    ItemJnlLine.Validate("Line No.", CustRepairItemParts."Line No.");
-                    ItemJnlPostLine.RunWithCheck(ItemJnlLine);
-                    CustRepairItemParts.Quantity := 0;
-                    CustRepairItemParts.Modify();
-                until CustRepairItemParts.Next = 0;
-                Window.Close;
-            end;
-            CustRepair.Finalized := true;
-            CustRepair.Modify;
-        end;
-    end;
-
-    procedure PostItemPartWithoutFinalize(var CustRepair: Record "NPR Customer Repair")
-    var
-        ItemJnlLine: Record "Item Journal Line" temporary;
-        CustRepairItemParts: Record "NPR Customer Repair Journal";
-        ItemJnlPostLine: Codeunit "Item Jnl.-Post Line";
-        Window: Dialog;
-        LineNo: Integer;
-    begin
-        CustRepairItemParts.SetRange("Customer Repair No.", CustRepair."No.");
-        CustRepairItemParts.SetFilter("Item Part No.", '<>%1', '');
-        CustRepairItemParts.SetFilter(Quantity, '<>%1', 0);
-        CustRepairItemParts.SetRange("Expenses to be charged", false);
-        if CustRepairItemParts.FindSet then begin
-            Window.Open('Processing Item #1#################################');
-            repeat
-                LineNo += 10000;
-                Window.Update(1, StrSubstNo('%1', CustRepairItemParts."Item Part No."));
-                ItemJnlLine.Init;
-                ItemJnlLine.Validate("Posting Date", Today);
-                if CustRepairItemParts.Quantity < 0 then
-                    ItemJnlLine.Validate("Entry Type", ItemJnlLine."Entry Type"::"Positive Adjmt.")
-                else
-                    ItemJnlLine.Validate("Entry Type", ItemJnlLine."Entry Type"::"Negative Adjmt.");
-                ItemJnlLine.Validate("Document No.", CustRepairItemParts."Customer Repair No.");
-                ItemJnlLine.Validate("Item No.", CustRepairItemParts."Item Part No.");
-                ItemJnlLine.Validate(Quantity, CustRepairItemParts.Quantity);
-                ItemJnlLine.Validate("Location Code", Location);
-                ItemJnlPostLine.RunWithCheck(ItemJnlLine);
-                CustRepairItemParts.Quantity := 0;
-                CustRepairItemParts.Modify();
-            until CustRepairItemParts.Next = 0;
-            Window.Close;
-        end;
-    end;
-
-    procedure CreateSalesLine(SalesHeader: Record "Sales Header"; CustomerRepair: Record "NPR Customer Repair")
-    var
-        SalesLine: Record "Sales Line";
-        CustomerRepairJournal: Record "NPR Customer Repair Journal";
-        PhotoSetup: Record "NPR Retail Contr. Setup";
-        LineNo: Integer;
-    begin
-        LineNo := 20000;
-        PhotoSetup.Get;
-        CustomerRepairJournal.SetRange("Customer Repair No.", CustomerRepair."No.");
-        CustomerRepairJournal.SetRange("Expenses to be charged", true);
-        if CustomerRepairJournal.FindSet then
-            repeat
-                SalesLine.Init;
-                LineNo += 10000;
-                SalesLine.Validate("Document Type", SalesHeader."Document Type");
-                SalesLine.Validate("Document No.", SalesHeader."No.");
-                SalesLine.Validate("Line No.", LineNo);
-
-                Clear(SalesLine.Type);
-                if CustomerRepairJournal."Item Part No." <> '' then begin
-                    SalesLine.Validate(Type, SalesLine.Type::Item);
-                    SalesLine.Validate("No.", CustomerRepairJournal."Item Part No.");
-                end;
-
-                SalesLine.Insert(true);
-                SalesLine.Validate("Variant Code", CustomerRepairJournal."Variant Code");
-                SalesLine.Validate(Description, CustomerRepairJournal.Description);
-                if CustomerRepairJournal.Quantity <> 0 then begin
-                    SalesLine.Validate(Quantity, CustomerRepairJournal.Quantity);
-                    if SalesHeader."Prices Including VAT" then
-                        SalesLine.Validate("Unit Price", CustomerRepairJournal."Unit Price Excl. VAT" + CustomerRepairJournal."VAT Amount")
-                    else
-                        SalesLine.Validate(SalesLine."Unit Price", CustomerRepairJournal."Unit Price Excl. VAT");
-                end;
-                SalesLine.Modify;
-            until CustomerRepairJournal.Next = 0;
-    end;
-
-    local procedure GetStoreLocationCode(): Code[10]
-    var
-        POSSession: Codeunit "NPR POS Session";
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
-        POSSetup: Codeunit "NPR POS Setup";
-        POSStore: Record "NPR POS Store";
-    begin
-        if not POSSession.IsActiveSession(POSFrontEnd) then
-            exit('');
-        POSFrontEnd.GetSession(POSSession);
-        POSSession.GetSetup(POSSetup);
-        POSSetup.GetPOSStore(POSStore);
-        exit(POSStore."Location Code");
-    end;
 }
 

@@ -224,8 +224,6 @@ page 6014587 "NPR Item Group Stats Subpage"
     end;
 
     trigger OnOpenPage()
-    var
-        "retail config": Record "NPR Retail Setup";
     begin
 
         if (Periodestart = 0D) then Periodestart := Today;

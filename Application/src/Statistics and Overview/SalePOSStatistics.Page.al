@@ -17,8 +17,6 @@ page 6014410 "NPR Sale POS - Statistics"
 
     var
         SaleLinePOS: Record "NPR Sale Line POS";
-        RetailContractSetup: Record "NPR Retail Contr. Setup";
-        RetailContractMgt: Codeunit "NPR Retail Contract Mgt.";
         InsuranceCompanyCode: Code[50];
         RegisterNo: Code[20];
         DG: Decimal;
@@ -181,8 +179,6 @@ page 6014410 "NPR Sale POS - Statistics"
         SetRange("Sales Ticket No.", "Sales Ticket No.");
         SetRange(Date, Date);
         FilterGroup(0);
-        if RetailContractSetup.Get then
-            InsuranceCompanyCode := RetailContractSetup."Default Insurance Company";
 
         EnableMenu;
         SaleLineStatistics;
