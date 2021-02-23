@@ -108,10 +108,8 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
     var
         LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
         Utility: Codeunit "NPR Receipt Footer Mgt.";
-        tmpRetailComment: Record "NPR Retail Comment" temporary;
-        Register: Record "NPR Register";
+        TicketRcptText: Record "NPR POS Ticket Rcpt. Text";
         RecRef: RecordRef;
-        AuditRoll: Record "NPR Audit Roll";
         POSEntry: Record "NPR POS Entry";
         POSUnit: Record "NPR POS Unit";
     begin
@@ -122,14 +120,13 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
                     RecRef.SetTable(POSEntry);
                     POSEntry.Find;
                     POSUnit.Get(POSEntry."POS Unit No.");
-                    Utility.GetPOSUnitTicketText(tmpRetailComment, POSUnit);
+                    Utility.GetSalesTicketReceiptText(TicketRcptText, POSUnit);
                 end;
         end;
         LinePrintMgt.SetFont(TemplateLine."Type Option");
-        if tmpRetailComment.FindSet then
-            repeat
-                LinePrintMgt.AddTextField(1, TemplateLine.Align, tmpRetailComment.Comment);
-            until tmpRetailComment.Next = 0;
+        repeat
+            LinePrintMgt.AddTextField(1, TemplateLine.Align, TicketRcptText."Receipt Text");
+        until TicketRcptText.Next() = 0;
     end;
 
     procedure FormatMonthFromDate(ProcessingDate: Date) FormattedMonth: Text
