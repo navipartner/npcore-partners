@@ -12,38 +12,38 @@ page 6150617 "NPR POS Unit Card"
             group(General)
             {
                 Caption = 'General';
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("POS Store Code"; "POS Store Code")
+                field("POS Store Code"; Rec."POS Store Code")
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the POS Store Code field';
                 }
-                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                 }
-                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
-                field("POS Type"; "POS Type")
+                field("POS Type"; Rec."POS Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Type field';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
@@ -64,57 +64,57 @@ page 6150617 "NPR POS Unit Card"
             group(Profiles)
             {
                 Caption = 'Profiles';
-                field("POS Audit Profile"; "POS Audit Profile")
+                field("POS Audit Profile"; Rec."POS Audit Profile")
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the POS Audit Profile field';
                 }
-                field("POS View Profile"; "POS View Profile")
+                field("POS View Profile"; Rec."POS View Profile")
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the POS View Profile field';
                 }
-                field("POS End of Day Profile"; "POS End of Day Profile")
+                field("POS End of Day Profile"; Rec."POS End of Day Profile")
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the POS End of Day Profile field';
                 }
-                field("POS Posting Profile"; "POS Posting Profile")
+                field("POS Posting Profile"; Rec."POS Posting Profile")
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the POS Posting Profile field';
                 }
-                field("POS Unit Receipt Text Profile"; "POS Unit Receipt Text Profile")
+                field("POS Unit Receipt Text Profile"; Rec."POS Unit Receipt Text Profile")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit Receipt Text Profile field';
                 }
-                field("Ean Box Sales Setup"; "Ean Box Sales Setup")
+                field("Ean Box Sales Setup"; Rec."Ean Box Sales Setup")
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Ean Box Sales Setup field';
                 }
-                field("POS Sales Workflow Set"; "POS Sales Workflow Set")
+                field("POS Sales Workflow Set"; Rec."POS Sales Workflow Set")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Sales Workflow Set field';
                 }
-                field("Global POS Sales Setup"; "Global POS Sales Setup")
+                field("Global POS Sales Setup"; Rec."Global POS Sales Setup")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global POS Sales Setup field';
                 }
-                field("POS Named Actions Profile"; "POS Named Actions Profile")
+                field("POS Named Actions Profile"; Rec."POS Named Actions Profile")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Named Actions Profile field';
                 }
-                field("POS Restaurant Profile"; "POS Restaurant Profile")
+                field("POS Restaurant Profile"; Rec."POS Restaurant Profile")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Restaurant Profile field';
@@ -133,6 +133,11 @@ page 6150617 "NPR POS Unit Card"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Self Service Profile field.';
+                }
+                field("POS Display Profile"; Rec."POS Display Profile")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Display Profile field';
                 }
             }
         }

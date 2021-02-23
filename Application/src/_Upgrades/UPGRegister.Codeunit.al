@@ -30,6 +30,7 @@ codeunit 6150925 "NPR UPG Register"
         POSUnit: Record "NPR POS Unit";
         POSPostingProfile: Record "NPR POS POsting Profile";
         POSStore: Record "NPR POS Store";
+        DisplaySetup: Record "NPR Display Setup";
     begin
         if not Register.FindSet() then
             exit;
@@ -51,6 +52,12 @@ codeunit 6150925 "NPR UPG Register"
                         begin
                             POSUnit.Status := POSUnit.Status::EOD;
                         end;
+                end;
+                if POSUnit."POS Display Profile" = '' then begin
+                    DisplaySetup."Register No." := POSUnit."No.";
+                    if DisplaySetup.Find() then begin
+                        POSUnit."POS Display Profile" := DisplaySetup."Register No.";
+                    end;
                 end;
                 POSUnit.Modify();
                 UpsertPOSUnitActiveEvent(Register, POSUnit);
