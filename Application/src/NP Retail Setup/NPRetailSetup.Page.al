@@ -14,13 +14,7 @@ page 6150613 "NPR NP Retail Setup"
             group("System")
             {
                 Caption = 'System';
-                field("Data Model Build"; Rec."Data Model Build")
-                {
-                    ApplicationArea = All;
-                    DrillDownPageID = "NPR Retail Data Model Upg.Log";
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Data Model Build field';
-                }
+
                 field("Last Data Model Build Upgrade"; Rec."Last Data Model Build Upgrade")
                 {
                     ApplicationArea = All;

@@ -10,12 +10,14 @@ codeunit 85010 "NPR Library - E-Commerce"
     procedure CreateRetailSetup()
     var
         RetailItemSetup: Record "NPR Retail Item Setup";
+        RetailSetup: Record "NPR NP Retail Setup";
     begin
         if not RetailItemSetup.Get() then begin
             RetailItemSetup.Init();
             RetailItemSetup.Insert();
         end;
-
+        if not RetailSetup.Get then
+            RetailSetup.Insert;
     end;
 
     procedure CreateEcStore(StoreCode: Code[20])

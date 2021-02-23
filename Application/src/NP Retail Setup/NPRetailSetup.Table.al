@@ -151,6 +151,9 @@ table 6150613 "NPR NP Retail Setup"
         {
             Caption = 'Data Model Build';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(10001; "Last Data Model Build Upgrade"; DateTime)
         {

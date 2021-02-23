@@ -2,7 +2,6 @@ table 6150699 "NPR Data Model Upg. Log Entry"
 {
     Caption = 'Data Model Upgrade Log Entry';
     DataClassification = CustomerContent;
-
     fields
     {
         field(1; "Entry No."; Integer)
