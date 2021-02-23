@@ -14,48 +14,53 @@ page 6150616 "NPR POS Unit List"
         {
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("POS Store Code"; "POS Store Code")
+                field("POS Store Code"; Rec."POS Store Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Store Code field';
                 }
-                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
+                field("POS Display Profile"; Rec."POS Display Profile")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Display Profile field';
+                }
+                field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                 }
-                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
+                field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field("Ean Box Sales Setup"; "Ean Box Sales Setup")
+                field("Ean Box Sales Setup"; Rec."Ean Box Sales Setup")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ean Box Sales Setup field';
                 }
-                field("POS Sales Workflow Set"; "POS Sales Workflow Set")
+                field("POS Sales Workflow Set"; Rec."POS Sales Workflow Set")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Sales Workflow Set field';
                 }
-                field("POS Type"; "POS Type")
+                field("POS Type"; Rec."POS Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Type field';
