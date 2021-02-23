@@ -1,15 +1,6 @@
 page 6059950 "NPR Display Setup"
 {
-    // NPR5.29/CLVA/20170118 CASE 256153 Added functionality OnOpenPage
-    //                                   Added field "Image Rotation Interval"
-    // NPR5.43/CLVA/20180606 CASE 300254 Added field Activate
-    // NPR5.44/CLVA/20180629 CASE 318695 Added field Prices ex. VAT
-    // NPR5.46/CLVA/20180920 CASE 328581 Added function InitDisplayContent
-    //                                   Removed relation to Codeunit 6059950 Display API
-    // NPR5.50/CLVA/20190513 CASE 352390 Added field "Custom Display Codeunit"
-    // NPR5.51/ANPA/20190722 CASE 352390 Added field "Hide receipt"
-
-    Caption = 'Display Setup';
+    Caption = 'POS Display Profiles';
     PageType = List;
     SourceTable = "NPR Display Setup";
     UsageCategory = Administration;
@@ -21,82 +12,82 @@ page 6059950 "NPR Display Setup"
         {
             repeater(Group)
             {
-                field("Register No."; "Register No.")
+                field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Cash Register No. field';
+                    ToolTip = 'Specifies the value of the Code field';
                 }
-                field("Display Content Code"; "Display Content Code")
+                field("Display Content Code"; Rec."Display Content Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Display Content Code field';
                 }
-                field("Screen No."; "Screen No.")
+                field("Screen No."; Rec."Screen No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Screen No. field';
                 }
-                field("Receipt Duration"; "Receipt Duration")
+                field("Receipt Duration"; Rec."Receipt Duration")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Receipt Duration field';
                 }
-                field("Receipt Width Pct."; "Receipt Width Pct.")
+                field("Receipt Width Pct."; Rec."Receipt Width Pct.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Receipt Width Pct. field';
                 }
-                field("Receipt Placement"; "Receipt Placement")
+                field("Receipt Placement"; Rec."Receipt Placement")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Receipt Placement field';
                 }
-                field("Receipt Description Padding"; "Receipt Description Padding")
+                field("Receipt Description Padding"; Rec."Receipt Description Padding")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Receipt Description Padding field';
                 }
-                field("Receipt Discount Padding"; "Receipt Discount Padding")
+                field("Receipt Discount Padding"; Rec."Receipt Discount Padding")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Receipt Discount Padding field';
                 }
-                field("Receipt Total Padding"; "Receipt Total Padding")
+                field("Receipt Total Padding"; Rec."Receipt Total Padding")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Receipt Total Padding field';
                 }
-                field("Receipt GrandTotal Padding"; "Receipt GrandTotal Padding")
+                field("Receipt GrandTotal Padding"; Rec."Receipt GrandTotal Padding")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Receipt GrandTotal Padding field';
                 }
-                field("Image Rotation Interval"; "Image Rotation Interval")
+                field("Image Rotation Interval"; Rec."Image Rotation Interval")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Image Rotation Interval field';
                 }
-                field("Media Downloaded"; "Media Downloaded")
+                field("Media Downloaded"; Rec."Media Downloaded")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Media Downloaded field';
                 }
-                field("Prices ex. VAT"; "Prices ex. VAT")
+                field("Prices ex. VAT"; Rec."Prices ex. VAT")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Prices ex. VAT field';
                 }
-                field("Custom Display Codeunit"; "Custom Display Codeunit")
+                field("Custom Display Codeunit"; Rec."Custom Display Codeunit")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Custom Display Codeunit field';
                 }
-                field(Activate; Activate)
+                field(Activate; Rec.Activate)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Activate field';
                 }
-                field("Hide receipt"; "Hide receipt")
+                field("Hide receipt"; Rec."Hide receipt")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Hide receipt field';
@@ -105,43 +96,9 @@ page 6059950 "NPR Display Setup"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnOpenPage()
     begin
-        //NPR5.29-
-        //-NPR5.46 [328581]
-        //DisplayAPI.InitDisplayContent;
-        InitDisplayContent;
-        //+NPR5.46 [328581]
-        //NPR5.29+
-    end;
-
-    procedure InitDisplayContent()
-    var
-        DisplayContent: Record "NPR Display Content";
-    begin
-        //-NPR5.46 [328581]
-        if DisplayContent.FindSet then
-            exit;
-
-        DisplayContent.Init;
-        DisplayContent.Code := 'HTML';
-        DisplayContent.Type := DisplayContent.Type::Html;
-        DisplayContent.Insert;
-
-        DisplayContent.Init;
-        DisplayContent.Code := 'IMAGE';
-        DisplayContent.Type := DisplayContent.Type::Image;
-        DisplayContent.Insert;
-
-        DisplayContent.Init;
-        DisplayContent.Code := 'VIDEO';
-        DisplayContent.Type := DisplayContent.Type::Video;
-        DisplayContent.Insert;
-        //+NPR5.46 [328581]
+        Rec.InitDisplayContent();
     end;
 }
 

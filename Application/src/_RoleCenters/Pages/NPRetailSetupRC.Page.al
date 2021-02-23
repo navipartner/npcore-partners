@@ -135,13 +135,6 @@ page 6151245 "NPR Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Themes action';
                 }
-                action("POS Display Setup")
-                {
-                    Caption = 'POS Display Setup';
-                    RunObject = Page "NPR Display Setup";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the POS Display Setup action';
-                }
                 action("POS Scenarios Sets")
                 {
                     Caption = 'POS Scenarios Sets';

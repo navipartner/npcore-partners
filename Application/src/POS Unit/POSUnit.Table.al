@@ -220,6 +220,12 @@ table 6150615 "NPR POS Unit"
             DataClassification = CustomerContent;
             TableRelation = "NPR SS Profile";
         }
+        field(610; "POS Display Profile"; Code[10])
+        {
+            Caption = 'POS Display Profile';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Display Setup";
+        }
     }
 
     keys
@@ -303,6 +309,14 @@ table 6150615 "NPR POS Unit"
         if "POS Self Service Profile" = '' then
             exit;
         exit(SSProfile.Get("POS Self Service Profile"));
+    end;
+
+    procedure GetProfile(var DisplayProfile: Record "NPR Display Setup"): Boolean
+    begin
+        Clear(DisplayProfile);
+        if "POS Display Profile" = '' then
+            exit;
+        exit(DisplayProfile.Get("POS Display Profile"));
     end;
 
     procedure GetCurrentPOSUnit(): Code[10]
