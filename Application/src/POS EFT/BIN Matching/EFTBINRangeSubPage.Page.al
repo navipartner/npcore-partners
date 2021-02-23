@@ -1,8 +1,5 @@
 page 6184510 "NPR EFT BIN Range SubPage"
 {
-    // NPR5.40/NPKNAV/20180330  CASE 290734 Transport NPR5.40 - 30 March 2018
-    // NPR5.53/MMV /20191204 CASE 349520 Switched type to ListPart
-
     Caption = 'EFT BIN Ranges';
     PageType = ListPart;
     UsageCategory = Administration;
@@ -15,22 +12,22 @@ page 6184510 "NPR EFT BIN Range SubPage"
         {
             repeater(Group)
             {
-                field("BIN from"; "BIN from")
+                field("BIN from"; Rec."BIN from")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the BIN from field';
                 }
-                field("BIN to"; "BIN to")
+                field("BIN to"; Rec."BIN to")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the BIN to field';
                 }
-                field("BIN Group Code"; "BIN Group Code")
+                field("BIN Group Code"; Rec."BIN Group Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the BIN Group Code field';
                 }
-                field("BIN Group Priority"; "BIN Group Priority")
+                field("BIN Group Priority"; Rec."BIN Group Priority")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -38,10 +35,6 @@ page 6184510 "NPR EFT BIN Range SubPage"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

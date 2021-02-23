@@ -1,8 +1,5 @@
 table 6184510 "NPR EFT BIN Range"
 {
-    // NPR5.40/NPKNAV/20180330  CASE 290734 Transport NPR5.40 - 30 March 2018
-    // NPR5.53/MMV /20191204 CASE 349520 Added conditional validation
-
     Caption = 'EFT BIN Range';
     DataClassification = CustomerContent;
 
@@ -28,9 +25,7 @@ table 6184510 "NPR EFT BIN Range"
             var
                 EFTBINGroup: Record "NPR EFT BIN Group";
             begin
-                //-NPR5.53 [349520]
                 if EFTBINGroup.Get("BIN Group Code") then
-                    //+NPR5.53 [349520]
                     "BIN Group Priority" := EFTBINGroup.Priority;
             end;
         }
@@ -51,10 +46,6 @@ table 6184510 "NPR EFT BIN Range"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     procedure FindMatch(BIN: Text): Boolean
     var
         BigInt: BigInteger;
@@ -71,14 +62,14 @@ table 6184510 "NPR EFT BIN Range"
     [TryFunction]
     local procedure TryParseBIN(BINText: Text; var BINOut: BigInteger)
     var
-        Regex: DotNet NPRNetRegex;
-        Match: DotNet NPRNetMatch;
+        DotNet_Regex: Codeunit DotNet_Regex;
+        DotNet_Match: Codeunit DotNet_Match;
     begin
-        Regex := Regex.Regex('^\d*');
-        Match := Regex.Match(BINText);
-        if not Match.Success then
+        DotNet_Regex.Regex('^\d*');
+        DotNet_Regex.Match(BINText, DotNet_Match);
+        if not DotNet_Match.Success() then
             Error('');
-        Evaluate(BINOut, Match.Value);
+        Evaluate(BINOut, DotNet_Match.Value());
     end;
 }
 
