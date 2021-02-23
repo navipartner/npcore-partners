@@ -265,7 +265,7 @@ page 6060079 "NPR TM Ticket Setup"
                 Ellipsis = true;
                 Image = Action;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 trigger OnAction()
                 var
@@ -290,6 +290,15 @@ page 6060079 "NPR TM Ticket Setup"
                 begin
                     TicketDemoSetup.CreateTicketDemoData(false);
                 end;
+            }
+
+            action(DeployRapidPackageFromAzureBlob)
+            {
+                Caption = 'Deploy Rapid Package From Azure';
+                Image = ImportDatabase;
+                ApplicationArea = All;
+                RunObject = page "NPR TM Ticket Rapid Packages";
+                ToolTip = 'Executes the Deploy Rapidstart Package for Ticket module From Azure Blob Storage';
             }
         }
     }
