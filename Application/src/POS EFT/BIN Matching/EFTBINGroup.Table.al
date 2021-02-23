@@ -1,10 +1,6 @@
 table 6184511 "NPR EFT BIN Group"
 {
-    // NPR5.40/NPKNAV/20180330  CASE 290734 Transport NPR5.40 - 30 March 2018
-    // NPR5.42/MMV /20180507 CASE 306689 Moved "Payment Type POS" to a link table for location code support.
-    // NPR5.53/MMV /20191204 CASE 349520 Added insert validation
-
-    Caption = 'EFT BIN Group';
+    Caption = 'EFT Mapping Group';
     DataClassification = CustomerContent;
     LookupPageID = "NPR EFT BIN Group List";
 
@@ -33,6 +29,11 @@ table 6184511 "NPR EFT BIN Group"
                 EFTBINRange.ModifyAll("BIN Group Priority", Priority);
             end;
         }
+        field(5; "Card Issuer ID"; Text[30])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Card Issuer ID';
+        }
     }
 
     keys
@@ -40,10 +41,6 @@ table 6184511 "NPR EFT BIN Group"
         key(Key1; "Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnDelete()
@@ -56,9 +53,7 @@ table 6184511 "NPR EFT BIN Group"
 
     trigger OnInsert()
     begin
-        //-NPR5.53 [349520]
         TestField(Code);
-        //+NPR5.53 [349520]
     end;
 }
 

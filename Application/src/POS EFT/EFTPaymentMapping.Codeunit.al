@@ -1,12 +1,5 @@
 codeunit 6184510 "NPR EFT Payment Mapping"
 {
-    // NPR5.48/MMV /20190124 CASE 341237 Created object
-    // NPR5.49/MMV /20190312 CASE 345188 Renamed object
-
-
-    trigger OnRun()
-    begin
-    end;
 
     procedure FindPaymentType(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var POSPaymentMethod: Record "NPR POS Payment Method"): Boolean
     var
@@ -17,6 +10,9 @@ codeunit 6184510 "NPR EFT Payment Mapping"
             LocationCode := SalePOS."Location Code";
 
         if MatchBIN(EFTTransactionRequest, LocationCode, POSPaymentMethod) then
+            exit(true);
+
+        if MatchIssuerID(EFTTransactionRequest, LocationCode, POSPaymentMethod) then
             exit(true);
     end;
 
@@ -37,6 +33,28 @@ codeunit 6184510 "NPR EFT Payment Mapping"
                 exit(false)
             else
                 if not EFTBINGroupPaymentLink.Get(EFTBINRange."BIN Group Code", '') then
+                    exit(false);
+
+        exit(POSPaymentMethod.Get(EFTBINGroupPaymentLink."Payment Type POS"));
+    end;
+
+    local procedure MatchIssuerID(EFTTransactionRequest: Record "NPR EFT Transaction Request"; LocationCode: Text; var POSPaymentMethod: Record "NPR POS Payment Method"): Boolean
+    var
+        EFTBINGroup: Record "NPR EFT BIN Group";
+        EFTBINGroupPaymentLink: Record "NPR EFT BIN Group Paym. Link";
+    begin
+        if EFTTransactionRequest."Card Issuer ID" = '' then
+            exit(false);
+
+        EFTBINGroup.SetRange("Card Issuer ID", EFTTransactionRequest."Card Issuer ID");
+        if not EFTBINGroup.FindFirst() then
+            exit(false);
+
+        if not EFTBINGroupPaymentLink.Get(EFTBINGroup.Code, LocationCode) then
+            if LocationCode = '' then
+                exit(false)
+            else
+                if not EFTBINGroupPaymentLink.Get(EFTBINGroup.Code, '') then
                     exit(false);
 
         exit(POSPaymentMethod.Get(EFTBINGroupPaymentLink."Payment Type POS"));
