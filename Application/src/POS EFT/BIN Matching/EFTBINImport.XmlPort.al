@@ -1,7 +1,5 @@
 xmlport 6184500 "NPR EFT BIN Import"
 {
-    // NPR5.40/NPKNAV/20180330  CASE 290734 Transport NPR5.40 - 30 March 2018
-
     Caption = 'Teller BIN Import';
     Direction = Import;
     FieldSeparator = ';';
@@ -61,10 +59,6 @@ xmlport 6184500 "NPR EFT BIN Import"
                     ToolTip = 'Specifies the value of the Delete existing BIN groups field';
                 }
             }
-        }
-
-        actions
-        {
         }
     }
 
