@@ -30,23 +30,6 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
         exit(4);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterInitialization', '', true, true)]
-    local procedure TestUpgradeOnOnAfterInitialization()
-    var
-    begin
-        if NavApp.IsInstalling() then
-            exit;
-
-        if not (CurrentClientType() in [CLIENTTYPE::Windows, CLIENTTYPE::Web, CLIENTTYPE::Tablet, CLIENTTYPE::Phone, CLIENTTYPE::Desktop, CLIENTTYPE::NAS]) then
-            exit;
-
-        if not NPRetailSetup.WritePermission() then
-            exit;
-
-        RunSilent := true;
-        TestUpgradeDataModel();
-        Commit();
-    end;
 
     procedure TestUpgradeFromDataUpgradePerCompany()
     begin
@@ -76,7 +59,6 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
         CreateLogEntry(StrSubstNo(DataModelUpgStartedTxt, NPRetailSetup."Data Model Build", GetCurrentDataModelBuild()), 0, 0, NPRetailSetup."Data Model Build");
 
         NPRetailSetup."Prev. Data Model Build" := NPRetailSetup."Data Model Build";
-        NPRetailSetup."Data Model Build" := UpgradeDataModel(NPRetailSetup."Prev. Data Model Build" + 1, GetCurrentDataModelBuild());
         NPRetailSetup."Last Data Model Build Upgrade" := CurrentDateTime();
         if not RunSilent then begin
             NPRetailSetup.Modify();
@@ -181,8 +163,6 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
         UpgradeDataModel(FromBuildStep, ToBuildStep);
 
         NPRetailSetup."Last Data Model Build Upgrade" := CurrentDateTime;
-        if ToBuildStep > NPRetailSetup."Data Model Build" then
-            NPRetailSetup."Data Model Build" := ToBuildStep;
         NPRetailSetup.Modify;
     end;
 
