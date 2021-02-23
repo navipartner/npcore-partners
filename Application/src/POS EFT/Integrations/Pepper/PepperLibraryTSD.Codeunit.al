@@ -1,11 +1,6 @@
 codeunit 6184487 "NPR Pepper Library TSD"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
-        PepperState: Option BeginWorkshift,Transaction,EndWorkshift,AuxFunction,Install,CompletedWithSuccess,CompletedWithError;
         POSSession: Codeunit "NPR POS Session";
         FrontEnd: Codeunit "NPR POS Front End Management";
         Text001: Label 'DLL version: %1';
@@ -97,10 +92,6 @@ codeunit 6184487 "NPR Pepper Library TSD"
         exit(true);
     end;
 
-    local procedure "--"()
-    begin
-    end;
-
     local procedure AutomaticallyBeginWorkshift(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
     var
         EftBeginWorkshiftRequest: Record "NPR EFT Transaction Request";
@@ -126,7 +117,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
     var
         PepperConfigManagement: Codeunit "NPR Pepper Config. Mgt.";
         PepperBeginWorkshift: Codeunit "NPR Pepper Begin Workshift TSD";
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         LicenseString: Text;
         CustomerID: Text;
         LicenseID: Text;
@@ -192,11 +183,11 @@ codeunit 6184487 "NPR Pepper Library TSD"
                 end;
             PepperConfiguration."Header and Footer Handling"::"Send Headers and Footers to Terminal":
                 begin
-                    Register.Get(PepperTerminal."Register No.");
+                    POSUnit.Get(PepperTerminal."Register No.");
                     PepperBeginWorkshift.SetHeaderFooters(true, PepperConfiguration."Ticket Directory",
-                                                            PepperConfigManagement.GetHeaderFooterText(Register, 0, 0), PepperConfigManagement.GetHeaderFooterText(Register, 0, 1),
-                                                            PepperConfigManagement.GetHeaderFooterText(Register, 1, 0), PepperConfigManagement.GetHeaderFooterText(Register, 1, 1),
-                                                            PepperConfigManagement.GetHeaderFooterText(Register, 2, 0), PepperConfigManagement.GetHeaderFooterText(Register, 2, 1));
+                                                            PepperConfigManagement.GetHeaderFooterText(POSUnit, 0, 0), PepperConfigManagement.GetHeaderFooterText(POSUnit, 0, 1),
+                                                            PepperConfigManagement.GetHeaderFooterText(POSUnit, 1, 0), PepperConfigManagement.GetHeaderFooterText(POSUnit, 1, 1),
+                                                            PepperConfigManagement.GetHeaderFooterText(POSUnit, 2, 0), PepperConfigManagement.GetHeaderFooterText(POSUnit, 2, 1));
                 end;
             PepperConfiguration."Header and Footer Handling"::"Add Headers and Footers at Printing", PepperConfiguration."Header and Footer Handling"::"No Headers and Footers":
                 begin
@@ -1637,19 +1628,16 @@ codeunit 6184487 "NPR Pepper Library TSD"
     local procedure MakeReceipt(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var StreamIn: InStream; var EntryNo: Integer; ReceiptType: Option CUSTOMER,MERCHANT)
     var
         CreditCardTransaction: Record "NPR EFT Receipt";
-        RetailComment: Record "NPR Retail Comment";
-        Register: Record "NPR Register";
         POSUnit: Record "NPR POS Unit";
         Utility: Codeunit "NPR Receipt Footer Mgt.";
+        TicketRcptText: Record "NPR POS Ticket Rcpt. Text";
         ReceiptLineText: Text;
         Encoding: TextEncoding;
         I: Integer;
         TextDot: Label '______________________________';
         TextSig: Label 'Customer Signature';
     begin
-
-        Register.Get(EFTTransactionRequest."Register No.");
-        POSUnit.Get(Register."Register No.");
+        POSUnit.Get(EFTTransactionRequest."Register No.");
 
         CreditCardTransaction."Register No." := EFTTransactionRequest."Register No.";
         CreditCardTransaction."Sales Ticket No." := EFTTransactionRequest."Sales Ticket No.";
@@ -1662,12 +1650,11 @@ codeunit 6184487 "NPR Pepper Library TSD"
         CreditCardTransaction."Receipt No." := ReceiptType;
 
         if (PepperConfiguration."Header and Footer Handling" = PepperConfiguration."Header and Footer Handling"::"Add Headers and Footers at Printing") then begin
-            Utility.GetPOSUnitTicketText(RetailComment, POSUnit);
-            if RetailComment.FindSet then
-                repeat
-                    EntryNo := EntryNo + 1;
-                    WriteRequestLine(CreditCardTransaction, EntryNo, CopyStr(RetailComment.Comment, 1, MaxStrLen(CreditCardTransaction.Text)));
-                until RetailComment.Next = 0;
+            Utility.GetSalesTicketReceiptText(TicketRcptText, POSUnit);
+            repeat
+                EntryNo := EntryNo + 1;
+                WriteRequestLine(CreditCardTransaction, EntryNo, CopyStr(TicketRcptText."Receipt Text", 1, MaxStrLen(CreditCardTransaction.Text)));
+            until TicketRcptText.next() = 0;
         end;
 
         repeat
@@ -1706,10 +1693,6 @@ codeunit 6184487 "NPR Pepper Library TSD"
             Validate(Text, ParText);
             Insert(true);
         end;
-    end;
-
-    local procedure "--***Other"()
-    begin
     end;
 
     procedure SetTerminalToOfflineMode(Register: Record "NPR Register"; CommandType: Option Activate,Deactivate) Success: Boolean

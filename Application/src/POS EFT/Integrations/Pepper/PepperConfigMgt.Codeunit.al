@@ -156,16 +156,13 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
             exit(I);
     end;
 
-    procedure GetHeaderFooterText(Register: Record "NPR Register"; PrintType: Option Transaction,"Transaction CC",Administration; TextType: Option Header,Footer): Text
+    procedure GetHeaderFooterText(POSUnit: Record "NPR POS Unit"; PrintType: Option Transaction,"Transaction CC",Administration; TextType: Option Header,Footer): Text
     var
         Utility: Codeunit "NPR Receipt Footer Mgt.";
-        RetailComment: Record "NPR Retail Comment" temporary;
-        POSUnit: Record "NPR POS Unit";
+        PreviewReceiptTextTokens: List of [Text];
         TextToPrint: Text;
-        Separator: Char;
     begin
         TextToPrint := '';
-        Separator := 10;
         case PrintType of
             PrintType::Transaction,
             PrintType::"Transaction CC",
@@ -173,14 +170,7 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
                 case TextType of
                     TextType::Header:
                         begin
-                            POSUnit.get(Register."Register No.");
-                            Utility.GetPOSUnitTicketText(RetailComment, POSUnit);
-                            if RetailComment.FindSet() then
-                                repeat
-                                    if TextToPrint <> '' then
-                                        TextToPrint := TextToPrint + Format(Separator);
-                                    TextToPrint := TextToPrint + RetailComment.Comment;
-                                until RetailComment.Next() = 0;
+                            Utility.GetSalesTicketReceiptText(TextToPrint, POSUnit);
                         end;
                     TextType::Footer:
                         begin
@@ -188,7 +178,7 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
                 end;
         end;
         exit(TextToPrint);
-        end;
+    end;
 
     procedure GetReceiptText(PepperTransactionRequest: Record "NPR EFT Transaction Request"; ReceiptNo: Integer; AddBackSlash: Boolean): Text
     var
