@@ -37,13 +37,31 @@ page 6151247 "NPR Setup Act - Scenarios"
 
                 actions
                 {
-                    action(Action43)
+                    action(ProductVideos)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Product Videos';
                         Image = TileVideo;
                         RunObject = Page "Product Videos";
                         ToolTip = 'Open a list of videos that showcase some of the product capabilities.';
+                    }
+                }
+            }
+            cuegroup("Get Started")
+            {
+                actions
+                {
+                    action(GetStartedVideo)
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Replay Getting Started';
+                        Image = TileVideo;
+                        Tooltip = 'Show the Getting Started guide again';
+
+                        trigger OnAction()
+                        begin  
+                            PAGE.RunModal(PAGE::"NPR Getting Started");
+                        end;
                     }
                 }
             }

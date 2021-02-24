@@ -1,0 +1,109 @@
+div{
+    display: block; 
+}
+
+.mainCanvas {
+    width:100%;
+    max-width: 550px;
+}
+.sectionborder {
+    border-bottom: solid 1px #d0d3d7;
+    width: 100%; 
+    margin-bottom: 10px;
+}
+
+.welcomediv{
+    display: inline-block;
+    vertical-align: top;
+    max-width: 70%;
+    margin-bottom: 10px;
+}
+
+
+.titlefont {
+    font-family: "Segoe UI Light", "Segoe WP Light", device-segoe-light, "Segoe WP Semilight", "Segoe UI", "Segoe WP", Segoe, Tahoma, Helvetica, Arial, sans-serif;
+    font-size: 12pt;
+}
+.title {
+    color: #212121;
+    vertical-align: text-top;
+    line-height: 15pt; 
+    display: inline-block;
+}
+
+.brandPrimary {
+    color: #008489;
+}
+
+.subtitle {
+    vertical-align: text-top;
+    display: inline-block;
+    margin-bottom: 12px;
+}
+
+.brandSecondary {
+    color: #505C6D;
+}
+.explanation {
+    font-family: "Segoe UI Light", "Segoe WP Light", device-segoe-light, "Segoe WP Semilight", "Segoe UI", "Segoe WP", Segoe, Tahoma, Helvetica, Arial, sans-serif;
+    font-size: 10.5pt;
+    vertical-align: text-top;
+}
+
+.welcomeimagediv {
+    display: inline-block;
+    vertical-align: top;
+    max-width: 30%;
+}
+
+.welcomeimage {
+    max-height: 123px;
+    max-width: 123px;
+    width: 100%; 
+    margin-top: 5px; 
+}
+
+.links {
+    vertical-align: top;
+    max-height: 400px;
+}
+
+.tilemarginright {
+    margin-right: 3.3%;
+}
+.field {
+    border: 0; 
+    padding: 0; 
+    background-color: transparent;
+    text-align: left;
+}
+
+.tile {
+    max-width: 29.7%;
+    vertical-align: top;
+    display: inline-block;
+    width: 33%;
+}
+
+.tileDescription {
+    font-family: "Segoe UI Semibold",device-segoe-semibold;
+    font-size: 9pt;
+    color: #212121;
+    line-height: 9pt;
+}
+
+.segoeRegularfont {
+    font-family: "Segoe UI",device-segoe;
+    font-size: 9pt;
+    line-height: 9pt;
+    min-height: 26px; 
+}
+
+#videoImage,#outlookVideo,#assistanceVideo{
+    cursor: pointer;
+    max-width: 205px; 
+    max-height: 120px;
+    width: 100%; 
+    display: block; 
+    margin-top:10px;
+}
