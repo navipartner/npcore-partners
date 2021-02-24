@@ -1,8 +1,6 @@
-codeunit 6150798 "NPR POS Action: Reverse Sale"
+codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
 {
-    trigger OnRun()
-    begin
-    end;
+    Description = 'POS Action: Reverse Direct Sale';
 
     var
         ActionDescription: Label 'Refund / Reverse Sale. This action will prompt for a receipt no and recreate the sales with reversed quantity.';
@@ -19,10 +17,11 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
         QTY_ADJUSTED: Label 'Quantity was adjusted due to previous return sales.';
         POSEntryMgt: Codeunit "NPR POS Entry Management";
         DimsNotCopied: Label 'Dimension copy is only supported, when Advanced Posting is activated.\Dimensions were not copied from the original sale.';
+        Text00001: Label 'There already exists lines in the sales. Please delete the lines to fetch and customize the return sale.';
 
     local procedure ActionCode(): Text
     begin
-        exit('REVERSE_SALE');
+        exit('REVERSE_DIRECT_SALE');
     end;
 
     local procedure ActionVersion(): Text
@@ -56,7 +55,6 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         Setup: Codeunit "NPR POS Setup";
-        RetailItemSetup: Record "NPR Retail Item Setup";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         Context: Codeunit "NPR POS JSON Management";
     begin
@@ -66,9 +64,6 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
         // TODO: Remove this verification and start the permission & security workflow instead
         POSSession.GetSetup(Setup);
         SalespersonPurchaser.Get(Setup.Salesperson);
-
-        RetailItemSetup.Get();
-        Context.SetContext('PromptForReason', RetailItemSetup."Reason for Return Mandatory");
 
         case SalespersonPurchaser."NPR Reverse Sales Ticket" of
             SalespersonPurchaser."NPR Reverse Sales Ticket"::No:
@@ -124,7 +119,7 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
     local procedure VerifyReceiptForReversal(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         JSON: Codeunit "NPR POS JSON Management";
-        AuditRoll: Record "NPR Audit Roll";
+        POSEntry: Record "NPR POS Entry";
         SalesTicketNo: Code[20];
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -136,14 +131,15 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
             Error('That receipt is not valid for sales reversal.');
 
         POSEntryMgt.DeObfuscateTicketNo(JSON.GetIntegerParameter('ObfucationMethod', false), SalesTicketNo);
-        AuditRoll.SetRange("Sales Ticket No.", SalesTicketNo);
-        if (not AuditRoll.FindFirst()) then
+        POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
+        POSEntry.SetRange("Document No.", SalesTicketNo);
+        if (not POSEntry.FindFirst()) then
             Error(NotFound, JSON.GetString('input', true));
 
         if (IsCompleteReversal(SalesTicketNo)) then
             Error(NOTHING_TO_RETURN, SalesTicketNo);
 
-        OnBeforeReverseSalesTicket(AuditRoll."Sales Ticket No.");
+        OnBeforeReverseSalesTicket(POSEntry."Document No.");
     end;
 
     local procedure CopySalesReceiptForReversal(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -153,7 +149,6 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SalePOS: Record "NPR Sale POS";
         SaleLinePOS: Record "NPR Sale Line POS";
-        RetailItemSetup: Record "NPR Retail Item Setup";
         SalesTicketNo: Code[20];
         ReturnReasonCode: Code[20];
     begin
@@ -171,12 +166,13 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
 
         SetCustomerOnReverseSale(SalePOS, SalesTicketNo);
 
-        RetailItemSetup.Get();
         JSON.SetScope('/', true);
-        ReturnReasonCode := JSON.GetString('ReturnReasonCode', RetailItemSetup."Reason for Return Mandatory");
 
-        //This function heavily used audit roll and tried to do too much. It should just reverse the simple types like Item, GL. Any aux module needs to subscribe and handle itself like retail voucher etc.
-        //RetailSalesCode.ReverseSalesTicket2(SalePOS, SalesTicketNo, ReturnReasonCode);     
+        //This function heavily used audit roll and tried to do too much. It should just reverse the simple types like Item, GL. 
+        //Any aux module needs to subscribe and handle itself like retail voucher etc.
+        //RetailSalesCode.ReverseSalesTicket2(SalePOS, SalesTicketNo, ReturnReasonCode);
+        ReturnReasonCode := JSON.GetString('ReturnReasonCode', true);
+        ReverseSalesTicket(SalePOS, SalesTicketNo, ReturnReasonCode);
 
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
@@ -199,11 +195,85 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
         POSSale.RefreshCurrent();
     end;
 
+    procedure ReverseSalesTicket(var SalePOS: Record "NPR Sale POS"; SalesTicketNo: Code[20]; ReturnReasonCode: Code[20])
+    var
+        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS2: Record "NPR Sale Line POS";
+        VoucherNo: Text[100];
+        POSEntry: Record "NPR POS Entry";
+        POSSalesLine: Record "NPR POS Sales Line";
+        POSPaymnetLine: Record "NPR POS Payment Line";
+    begin
+        POSSalesLine.SetRange("Document No.", SalesTicketNo);
+        POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
+
+        SaleLinePOS2.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS2.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        if SaleLinePOS2.FindFirst then
+            Error(Text00001);
+
+        if POSSalesLine.FindSet(false, false) then
+            repeat
+                SaleLinePOS.Init;
+                SaleLinePOS."Register No." := SalePOS."Register No.";
+                SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
+                SaleLinePOS.Date := SalePOS.Date;
+                SaleLinePOS.Type := SaleLinePOS.Type::Item;
+                SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Sale;
+                SaleLinePOS."Line No." := POSSalesLine."Line No.";
+                SaleLinePOS.Insert(true);
+                ReverseAuditInfoToSalesLine(SaleLinePOS, POSSalesLine);
+                if ReturnReasonCode <> '' then
+                    SaleLinePOS.Validate("Return Reason Code", ReturnReasonCode);
+                SaleLinePOS.UpdateAmounts(SaleLinePOS);
+                SaleLinePOS.Modify(true);
+            until POSSalesLine.Next = 0;
+    end;
+
+    procedure ReverseAuditInfoToSalesLine(var SaleLinePOS: Record "NPR Sale Line POS"; POSSalesLine: Record "NPR POS Sales Line")
+    var
+        NPRDimMgt: Codeunit "NPR Dimension Mgt.";
+        FromNPRLineDim: Record "NPR Line Dimension";
+        ToNPRLineDim: Record "NPR Line Dimension";
+        POSEntry: Record "NPR POS Entry";
+    begin
+        POSEntry.Get(POSSalesLine."POS Entry No.");
+
+        SaleLinePOS.Silent := true;
+        SaleLinePOS.Validate("No.", POSSalesLine."No.");
+        SaleLinePOS.Description := POSSalesLine.Description;
+
+        if SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Sale then
+            SaleLinePOS.Validate(Quantity, -POSSalesLine.Quantity);
+
+        SaleLinePOS."VAT %" := POSSalesLine."VAT %";
+        SaleLinePOS."Discount %" := Abs(POSSalesLine."Line Discount %");
+        SaleLinePOS."Discount Amount" := -POSSalesLine."Line Discount Amount Excl. VAT";
+        SaleLinePOS.Amount := -POSSalesLine."Amount Excl. VAT";
+        SaleLinePOS."Currency Amount" := -POSSalesLine."Amount Excl. VAT";
+        SaleLinePOS."Amount Including VAT" := -POSSalesLine."Amount Incl. VAT";
+        SaleLinePOS."Serial No." := POSSalesLine."Serial No.";
+        SaleLinePOS."Discount Type" := POSSalesLine."Discount Type";
+        SaleLinePOS."Discount Code" := POSSalesLine."Discount Code";
+        SaleLinePOS."Gen. Bus. Posting Group" := POSSalesLine."Gen. Bus. Posting Group";
+        SaleLinePOS."Gen. Prod. Posting Group" := POSSalesLine."Gen. Prod. Posting Group";
+        SaleLinePOS."VAT Bus. Posting Group" := POSSalesLine."VAT Bus. Posting Group";
+        SaleLinePOS."VAT Prod. Posting Group" := POSSalesLine."VAT Prod. Posting Group";
+        SaleLinePOS."Unit Cost (LCY)" := POSSalesLine."Unit Cost (LCY)";
+        SaleLinePOS.Cost := -(POSSalesLine."Unit Cost" * POSSalesLine.Quantity);
+        SaleLinePOS."Unit Cost" := POSSalesLine."Unit Cost";
+        SaleLinePOS."Unit Price" := POSSalesLine."Unit Price";
+        SaleLinePOS."VAT Base Amount" := -POSSalesLine."VAT Base Amount";
+        SaleLinePOS."Variant Code" := POSSalesLine."Variant Code";
+        SaleLinePOS."Shortcut Dimension 1 Code" := POSSalesLine."Shortcut Dimension 1 Code";
+        SaleLinePOS."Shortcut Dimension 2 Code" := POSSalesLine."Shortcut Dimension 2 Code";
+        SaleLinePOS."Dimension Set ID" := POSSalesLine."Dimension Set ID";
+    end;
+
     local procedure SelectReturnReason(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Code[20]
     var
         ReturnReason: Record "Return Reason";
     begin
-
         if (PAGE.RunModal(PAGE::"NPR TouchScreen: Ret. Reasons", ReturnReason) = ACTION::LookupOK) then
             exit(ReturnReason.Code);
 
@@ -212,21 +282,21 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
 
     local procedure SetCustomerOnReverseSale(var SalePOS: Record "NPR Sale POS"; SalesTicketNo: Code[20])
     var
-        AuditRoll: Record "NPR Audit Roll";
         CustomerNo: Code[20];
         POSSale: Codeunit "NPR POS Sale";
         Customer: Record Customer;
         Contact: Record Contact;
+        POSEntry: Record "NPR POS Entry";
     begin
-        AuditRoll.SetRange("Sales Ticket No.", SalesTicketNo);
-        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
-        AuditRoll.SetRange(Type, AuditRoll.Type::Item);
+        POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
+        POSEntry.SetRange("Document No.", SalesTicketNo);
+        if POSEntry.IsEmpty then exit;
 
-        if AuditRoll.IsEmpty then exit;
-        AuditRoll.FindSet;
-        repeat
-            CustomerNo := AuditRoll."Customer No.";
-        until ((0 = AuditRoll.Next) or (CustomerNo <> ''));
+        POSEntry.SetFilter("Customer No.", '<>%1', '');
+        if POSEntry.FindFirst() then
+            CustomerNo := POSEntry."Customer No."
+        else
+            exit;
 
         if Customer.Get(CustomerNo) then begin
             SalePOS.Validate("Customer No.", Customer."No.");
