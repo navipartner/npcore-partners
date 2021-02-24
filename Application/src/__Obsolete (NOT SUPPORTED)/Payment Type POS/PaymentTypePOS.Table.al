@@ -13,7 +13,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'No.';
             DataClassification = CustomerContent;
             NotBlank = true;
-            
+
         }
         field(2; Description; Text[50])
         {
@@ -64,7 +64,6 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Cash Register No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Register";
         }
         field(21; "Cost Account No."; Code[20])
         {

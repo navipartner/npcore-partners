@@ -28,37 +28,37 @@ page 6059780 "NPR POS Units Select"
                 }
                 field(Status; Status)
                 {
-                    Visible = CashRegisterMode;
+                    Visible = POSUnitMode;
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
-                    Visible = CashRegisterMode;
+                    Visible = POSUnitMode;
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                 }
                 field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
-                    Visible = CashRegisterMode;
+                    Visible = POSUnitMode;
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
                 field(LocationCode; LocationCode)
                 {
-                    Visible = CashRegisterMode;
+                    Visible = POSUnitMode;
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the LocationCode field';
                 }
                 field(OpeningCash; OpeningCash)
                 {
-                    Visible = CashRegisterMode;
+                    Visible = POSUnitMode;
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the OpeningCash field';
                 }
                 field(ClosingCash; ClosingCash)
                 {
-                    Visible = CashRegisterMode;
+                    Visible = POSUnitMode;
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the ClosingCash field';
                 }
@@ -67,19 +67,17 @@ page 6059780 "NPR POS Units Select"
     }
 
     var
-        CashRegisterMode: Boolean;
+        POSUnitMode: Boolean;
         OpeningCash: Decimal;
         ClosingCash: Decimal;
         LocationCode: Code[10];
-        OpeningCashCaption: Text;
-        ClosingCashcaption: Text;
         LocationCaption: Text;
 
     trigger OnAfterGetRecord()
     var
         POSStore: Record "NPR POS Store";
     begin
-        if not CashRegisterMode then exit;
+        if not POSUnitMode then exit;
 
         if POSStore.Get(Rec."POS Store Code") then begin
             // ivas todo - don't know where are these fields now
@@ -94,9 +92,9 @@ page 6059780 "NPR POS Units Select"
         end;
     end;
 
-    procedure SetCashRegisterMode(Set: Boolean)
+    procedure SetPOSUnitMode(Set: Boolean)
     begin
-        CashRegisterMode := Set;
+        POSUnitMode := Set;
     end;
 
     procedure SetRec(var TempPOSUnit: Record "NPR POS Unit")

@@ -55,7 +55,7 @@ codeunit 6150793 "NPR POS Action: Open Drawer"
         POSSale.GetCurrentSale(SalePOS);
 
         if (CashDrawerNo = '') then begin
-            if (POSUnit.Get(POSSetup.Register)) then begin
+            if (POSUnit.Get(POSSetup.GetPOSUnitNo())) then begin
                 POSUnit.GetProfile(POSPostingProfile);
                 CashDrawerNo := POSPostingProfile."POS Payment Bin";
             end;

@@ -52,7 +52,7 @@ tableextension 6014431 "NPR Item Ledger Entry" extends "Item Ledger Entry"
         }
         field(6014413; "NPR Register Number"; Code[20])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }

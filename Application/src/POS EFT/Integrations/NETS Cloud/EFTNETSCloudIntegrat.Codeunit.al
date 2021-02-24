@@ -198,7 +198,7 @@ codeunit 6184532 "NPR EFT NETSCloud Integrat."
     begin
         POSSession.GetSetup(POSSetup);
 
-        EFTSetup.SetFilter("POS Unit No.", POSSetup.Register());
+        EFTSetup.SetFilter("POS Unit No.", POSSetup.GetPOSUnitNo());
         EFTSetup.SetRange("EFT Integration Type", IntegrationType());
         if not EFTSetup.FindFirst then begin
             EFTSetup.SetRange("POS Unit No.", '');

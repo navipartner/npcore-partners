@@ -327,7 +327,7 @@ table 6150615 "NPR POS Unit"
     begin
         if POSSession.GetSession(POSSession, false) then begin
             POSSession.GetSetup(POSSetup);
-            exit(POSSetup.Register());
+            exit(POSSetup.GetPOSUnitNo());
         end;
 
         if not UserSetup.Get(UserId) then
@@ -354,6 +354,21 @@ table 6150615 "NPR POS Unit"
         POSUnitEvent: Record "NPR POS Unit Event";
     begin
         POSUnitEvent.DeleteActiveEvent(Rec."No.");
+    end;
+
+    procedure SetThisUnitNo(UnitNo: Code[10])
+    var
+        UserSetup: Record "User Setup";
+    begin
+        if UserSetup.Get(UserId) then begin
+            UserSetup."NPR Backoffice Register No." := UnitNo;
+            UserSetup.Modify;
+        end else begin
+            UserSetup.Init();
+            UserSetup."User ID" := UserId;
+            UserSetup."NPR Backoffice Register No." := UnitNo;
+            UserSetup.Insert();
+        end;
     end;
 }
 

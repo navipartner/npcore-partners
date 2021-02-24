@@ -2,9 +2,8 @@ table 6014401 "NPR Register"
 {
     Caption = 'Cash Register';
     DataClassification = CustomerContent;
-    LookupPageID = "NPR Register List";
     Permissions =;
-    ObsoleteState = Pending;
+    ObsoleteState = Removed;
     ObsoleteReason = 'Replaced with POS Unit, POS store, POS unit profiles';
 
     fields
@@ -319,6 +318,9 @@ table 6014401 "NPR Register"
         {
             Caption = 'Primary Payment Type';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';            
         }
         field(160; "Return Payment Type"; Code[10])
         {
@@ -1106,7 +1108,7 @@ table 6014401 "NPR Register"
     {
         key(Key1; "Register No.")
         {
-            SumIndexFields = "Opening Cash";
+
         }
         key(Key2; "Logon-User Name")
         {
@@ -1139,7 +1141,6 @@ table 6014401 "NPR Register"
             if not Confirm(StrSubstNo(Text1060009, "Register No."), false) then
                 Error('');
         end;
-        DimMgt.DeleteDefaultDim(DATABASE::"NPR Register", "Register No.");
     end;
 
     trigger OnInsert()
@@ -1166,29 +1167,6 @@ table 6014401 "NPR Register"
         Text1060008: Label 'Warning:\You are about to delete register %1\Last entry is registered on %2\Do you wish to delete it anyway?';
         Text1060009: Label 'Warning:\You are about to delete register %1\Do you wish to delete it anyway?';
         TXT001: Label '2nd Display is already activated on register %1\. Deactivate 2nd Display before activating Customer Display';
-
-    procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
-    begin
-        DimsAreDiscontinuedOnRegister;  //NPR5.53 [371956]
-        DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
-        DimMgt.SaveDefaultDim(DATABASE::"NPR Register", "Register No.", FieldNumber, ShortcutDimCode);
-        Modify;
-    end;
-
-    procedure setThisRegisterNo(RegNo: Code[10])
-    var
-        UserSetup: Record "User Setup";
-    begin
-        if UserSetup.Get(UserId) then begin
-            UserSetup."NPR Backoffice Register No." := RegNo;
-            UserSetup.Modify;
-        end else begin
-            UserSetup.Init;
-            UserSetup."User ID" := UserId;
-            UserSetup."NPR Backoffice Register No." := RegNo;
-            UserSetup.Insert;
-        end;
-    end;
 
     procedure DimsAreDiscontinuedOnRegister()
     var

@@ -58,9 +58,9 @@ table 6014404 "NPR Report Selection Retail"
         }
         field(7; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Register";
+            TableRelation = "NPR POS Unit";
         }
         field(9; "Codeunit ID"; Integer)
         {

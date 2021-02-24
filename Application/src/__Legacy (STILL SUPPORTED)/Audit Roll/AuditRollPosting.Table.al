@@ -9,7 +9,6 @@ table 6014424 "NPR Audit Roll Posting"
         {
             Caption = 'Cash Register No.';
             NotBlank = true;
-            TableRelation = "NPR Register";
             DataClassification = CustomerContent;
 
             trigger OnValidate()

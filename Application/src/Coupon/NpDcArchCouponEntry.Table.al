@@ -76,7 +76,7 @@ table 6151598 "NPR NpDc Arch.Coupon Entry"
         {
             Caption = 'Register No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Register"."Register No.";
+            TableRelation = "NPR POS Unit"."No.";
         }
         field(55; "Document No."; Code[20])
         {

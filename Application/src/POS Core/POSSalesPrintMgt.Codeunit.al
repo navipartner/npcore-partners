@@ -28,7 +28,6 @@ codeunit 6150729 "NPR POS Sales Print Mgt."
     local procedure PrintReceiptOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
     var
         AuditRoll: Record "NPR Audit Roll";
-        Register: Record "NPR Register";
         NPRetailSetup: Record "NPR NP Retail Setup";
     begin
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then

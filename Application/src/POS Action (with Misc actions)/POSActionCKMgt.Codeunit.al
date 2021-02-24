@@ -1,23 +1,9 @@
 codeunit 6150854 "NPR POS Action - CK Mgt."
 {
-    // NPR5.43/CLVA/20180613 CASE 319114 Object created
-    // NPR5.43/CLVA/20180620 CASE 319764 Collecting CashKeeper overview info
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is a built-in action for CashKeeper Payments';
         Setup: Codeunit "NPR POS Setup";
-        TextAmountLabel: Label 'Enter Amount:';
-        PaymentTypeNotFound: Label '%1 %2 for register %3 was not found.';
         CashkeeperNotFound: Label 'CashKeeper Setup for register %3 was not found.';
-        NoCashBackErr: Label 'It is not allowed to enter an amount that is bigger than what is stated on the receipt for this payment type';
-        RequestNotFound: Label 'Action Code %1 tried retrieving "TransactionRequest_EntryNo" from POS Session and got %2. There is however no record in %3 to match that entry number.';
-        NoNegativeCashBackErr: Label 'It is not allowed to enter an amount that is different from what is stated on the receipt for this payment type';
-        NegativeCashBackErr: Label 'It is not allowed to enter an negative amount';
 
     local procedure ActionCode(): Text
     begin
@@ -26,10 +12,10 @@ codeunit 6150854 "NPR POS Action - CK Mgt."
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.0');
+        exit('1.1');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
@@ -46,7 +32,7 @@ codeunit 6150854 "NPR POS Action - CK Mgt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnBeforeWorkflow', '', false, false)]
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         Context: Codeunit "NPR POS JSON Management";
@@ -57,12 +43,12 @@ codeunit 6150854 "NPR POS Action - CK Mgt."
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
@@ -78,10 +64,6 @@ codeunit 6150854 "NPR POS Action - CK Mgt."
         Handled := true;
     end;
 
-    local procedure "--Stargate"()
-    begin
-    end;
-
     procedure OnInvokeDevice(POSSession: Codeunit "NPR POS Session")
     var
         CashKeeperRequest: DotNet NPRNetCashKeeperRequest0;
@@ -90,13 +72,13 @@ codeunit 6150854 "NPR POS Action - CK Mgt."
         CashKeeperSetup: Record "NPR CashKeeper Setup";
         FrontEnd: Codeunit "NPR POS Front End Management";
         StepTxt: Text;
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
     begin
         POSSession.GetSetup(Setup);
-        Setup.GetRegisterRecord(Register);
+        Setup.GetPOSUnit(POSUnit);
 
-        if not CashKeeperSetup.Get(Register."Register No.") then
-            Error(CashkeeperNotFound, Register."Register No.");
+        if not CashKeeperSetup.Get(POSUnit."No.") then
+            Error(CashkeeperNotFound, POSUnit."No.");
 
         State := State.State();
         State.ActionType := StateEnum.Setup;
@@ -114,14 +96,14 @@ codeunit 6150854 "NPR POS Action - CK Mgt."
         FrontEnd.InvokeDevice(CashKeeperRequest, 'CK_MANAGEMENT', StepTxt);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnDeviceResponse', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Stargate Management", 'OnDeviceResponse', '', true, true)]
     local procedure OnDeviceResponse(ActionName: Text; Step: Text; Envelope: DotNet NPRNetResponseEnvelope0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
         if (ActionName <> 'CK_MANAGEMENT') then
             exit;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnAppGatewayProtocol', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Stargate Management", 'OnAppGatewayProtocol', '', true, true)]
     local procedure OnDeviceEvent(ActionName: Text; EventName: Text; Data: Text; ResponseRequired: Boolean; var ReturnData: Text; var Handled: Boolean)
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -130,16 +112,10 @@ codeunit 6150854 "NPR POS Action - CK Mgt."
             exit;
 
         Handled := true;
-        //-NPR5.43 [319764]
         case EventName of
             'CloseForm':
                 CloseForm(Data);
         end;
-        //+NPR5.43 [319764]
-    end;
-
-    local procedure "--- Protocol Events"()
-    begin
     end;
 
     local procedure CloseForm(Data: Text)
@@ -147,7 +123,7 @@ codeunit 6150854 "NPR POS Action - CK Mgt."
         State: DotNet NPRNetState4;
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         CashKeeperOverview: Record "NPR CashKeeper Overview";
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR Sale POS";
@@ -156,7 +132,7 @@ codeunit 6150854 "NPR POS Action - CK Mgt."
         State := State.Deserialize(Data);
 
         POSSession.GetSetup(Setup);
-        Setup.GetRegisterRecord(Register);
+        Setup.GetPOSUnit(POSUnit);
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
@@ -165,7 +141,7 @@ codeunit 6150854 "NPR POS Action - CK Mgt."
                 CashKeeperOverview.Init;
                 CashKeeperOverview."CashKeeper IP" := State.IP;
                 CashKeeperOverview."Lookup Timestamp" := CurrentDateTime;
-                CashKeeperOverview."Register No." := Register."Register No.";
+                CashKeeperOverview."Register No." := POSUnit."No.";
                 CashKeeperOverview.Salesperson := SalePOS."Salesperson Code";
                 CashKeeperOverview."Value In Cents" := OverviewAmout;
                 if CashKeeperOverview."Value In Cents" > 0 then

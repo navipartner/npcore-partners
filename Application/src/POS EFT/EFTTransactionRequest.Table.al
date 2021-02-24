@@ -117,7 +117,7 @@ table 6184495 "NPR EFT Transaction Request"
         }
         field(90; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
         }
         field(95; "POS Payment Type Code"; Code[10])

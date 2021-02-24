@@ -91,37 +91,37 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
 
     local procedure InsertSalePOS(TempSalePOS: Record "NPR Sale POS" temporary; var SalePOS: Record "NPR Sale POS")
     var
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         UserSetup: Record "User Setup";
         POSSale: Codeunit "NPR POS Sale";
         SalesTicketNo: Code[20];
     begin
-        if not Register.Get('-_-') then begin
-            Register.Init;
-            Register."Register No." := '-_-';
-            Register.Insert;
+        if not POSUnit.Get('-_-') then begin
+            POSUnit.Init();
+            POSUnit."No." := '-_-';
+            POSUnit.Insert();
         end;
 
         if not UserSetup.Get(UserId) then begin
             UserSetup.Init;
             UserSetup."User ID" := UserId;
-            UserSetup."NPR Backoffice Register No." := Register."Register No.";
+            UserSetup."NPR Backoffice Register No." := POSUnit."No.";
             UserSetup.Insert;
         end else
             if UserSetup."NPR Backoffice Register No." = '' then begin
-                UserSetup."NPR Backoffice Register No." := Register."Register No.";
+                UserSetup."NPR Backoffice Register No." := POSUnit."No.";
                 UserSetup.Modify;
             end;
 
         SalesTicketNo := DelChr(Format(CurrentDateTime, 0, 9), '=', ' -:.ZT');
-        while SalePOS.Get(Register."Register No.", '-' + SalesTicketNo) do
+        while SalePOS.Get(POSUnit."No.", '-' + SalesTicketNo) do
             SalesTicketNo := IncStr(SalesTicketNo);
 
-        SalePOS.Init;
-        SalePOS."Register No." := Register."Register No.";
+        SalePOS.Init();
+        SalePOS."Register No." := POSUnit."No.";
         SalePOS."Sales Ticket No." := '-' + SalesTicketNo;
-        SalePOS.Date := Today;
-        SalePOS.Insert;
+        SalePOS.Date := Today();
+        SalePOS.Insert();
     end;
 
     local procedure InsertSaleLinePOS(SalePOS: Record "NPR Sale POS"; TempSaleLinePOS: Record "NPR Sale Line POS" temporary)

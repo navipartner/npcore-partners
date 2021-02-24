@@ -3,9 +3,6 @@ table 6014493 "NPR Arch. NpRv SL POS Ref."
     // The purpose of this table:
     //   All existing unfinished sale transactions have been moved to archive tables
     //   The table may be deleted later, when it is no longer relevant.
-    // 
-    // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
-    // NPR5.55/ALPO/20200423 CASE 401611 5.54 upgrade performace optimization
 
     Caption = 'Sale Line POS Retail Voucher Reference';
     DrillDownPageID = "NPR NpRv Sales Line Ref.";
@@ -16,9 +13,9 @@ table 6014493 "NPR Arch. NpRv SL POS Ref."
     {
         field(1; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             NotBlank = true;
-            TableRelation = "NPR Register";
+            TableRelation = "NPR POS Unit";
             DataClassification = CustomerContent;
         }
         field(5; "Sales Ticket No."; Code[20])

@@ -63,7 +63,6 @@ codeunit 6150725 "NPR POS Action: Payment"
         PaymentNo: Code[20];
         POSPaymentMethod: Record "NPR POS Payment Method";
         ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
-        Register: Record "NPR Register";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR Sale Line POS";
@@ -84,7 +83,6 @@ codeunit 6150725 "NPR POS Action: Payment"
 
         POSSession.GetSetup(Setup);
         Setup.GetPOSUnit(POSUnit);
-        Register.Get(Setup.Register());
 
         POSUnit.GetProfile(POSPostingProfile);
         POSPostingProfile.TestField("POS Payment Bin");
@@ -112,13 +110,13 @@ codeunit 6150725 "NPR POS Action: Payment"
         POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
 
         if not POSPaymentMethod.Get(PaymentNo) then
-            Error(PaymentTypeNotFound, POSPaymentMethod.TableCaption, PaymentNo, Setup.Register());
+            Error(PaymentTypeNotFound, POSPaymentMethod.TableCaption, PaymentNo, Setup.GetPOSUnitNo());
 
         if not ReturnPOSPaymentMethod.Get(POSPaymentMethod."Return Payment Method Code") then
-            Error(PaymentTypeNotFound, ReturnPOSPaymentMethod.TableCaption, POSPaymentMethod."Return Payment Method Code", Setup.Register());
+            Error(PaymentTypeNotFound, ReturnPOSPaymentMethod.TableCaption, POSPaymentMethod."Return Payment Method Code", Setup.GetPOSUnitNo());
 
         OnBeforeActionWorkflow(POSPaymentMethod, Parameters, POSSession, FrontEnd, Context, SubTotal, Handled);
-        
+
         if (not Handled) then begin
             case POSPaymentMethod."Processing Type" of
                 POSPaymentMethod."Processing Type"::Cash:
@@ -201,7 +199,6 @@ codeunit 6150725 "NPR POS Action: Payment"
         POSPaymentMethod: Record "NPR POS Payment Method";
         SalePOS: Record "NPR Sale POS";
         PaymentMethodCode: Code[20];
-        Register: Record "NPR Register";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         TaxFreeUnit: Record "NPR Tax Free POS Unit";
         TaxFree: Codeunit "NPR Tax Free Handler Mgt.";
@@ -212,6 +209,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         ReturnAmount: Decimal;
         PaidAmount: Decimal;
         SubTotal: Decimal;
+        POSUnit: Record "NPR POS Unit";
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -225,7 +223,7 @@ codeunit 6150725 "NPR POS Action: Payment"
 
         POSSession.GetPaymentLine(POSPaymentLine);
         if not POSPaymentMethod.Get(PaymentMethodCode) then
-            Error(PaymentTypeNotFound, POSPaymentMethod.TableCaption, PaymentMethodCode, Setup.Register);
+            Error(PaymentTypeNotFound, POSPaymentMethod.TableCaption, PaymentMethodCode, Setup.GetPOSUnitNo());
 
         POSSession.GetSale(POSSale);
 
@@ -247,7 +245,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         end;
 
         if (not PaymentHandled) then
-            Message(MissingImpl, POSPaymentMethod.TableCaption(), POSPaymentMethod.Code, POSPaymentMethod.FieldCaption("Processing Type"), POSPaymentMethod."Processing Type", Register.TableCaption(), Setup.Register());
+            Message(MissingImpl, POSPaymentMethod.TableCaption(), POSPaymentMethod.Code, POSPaymentMethod.FieldCaption("Processing Type"), POSPaymentMethod."Processing Type", POSUnit.TableCaption(), Setup.GetPOSUnitNo());
     end;
 
     [IntegrationEvent(false, false)]
@@ -359,7 +357,7 @@ codeunit 6150725 "NPR POS Action: Payment"
 
             Clear(POSLine);
             POSSession.GetSetup(POSSetup);
-            POSLine."Register No." := POSSetup.Register();
+            POSLine."Register No." := POSSetup.GetPOSUnitNo();
 
             POSLine."No." := POSPaymentMethod.Code;
             POSLine."Register No." := SalePOS."Register No.";
@@ -453,7 +451,6 @@ codeunit 6150725 "NPR POS Action: Payment"
 
     local procedure CaptureEftPayment(AmountToCapture: Decimal; POSSession: Codeunit "NPR POS Session"; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR Sale Line POS"; POSPaymentMethod: Record "NPR POS Payment Method"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
     var
-        Register: Record "NPR Register";
         Handled: Boolean;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         POSSale: Codeunit "NPR POS Sale";
@@ -548,7 +545,7 @@ codeunit 6150725 "NPR POS Action: Payment"
     procedure TryEndSale(POSPaymentMethod: Record "NPR POS Payment Method"; POSSession: Codeunit "NPR POS Session")
     var
         POSSale: Codeunit "NPR POS Sale";
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         Setup: Codeunit "NPR POS Setup";
         ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
     begin
@@ -561,7 +558,7 @@ codeunit 6150725 "NPR POS Action: Payment"
             exit;
 
         if POSPaymentMethod."Auto End Sale" then begin
-            Register.Get(Setup.Register);
+            POSUnit.Get(Setup.GetPOSUnitNo());
             ReturnPOSPaymentMethod.Get(POSPaymentMethod."Return Payment Method Code");
             POSSale.TryEndSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod);
         end;

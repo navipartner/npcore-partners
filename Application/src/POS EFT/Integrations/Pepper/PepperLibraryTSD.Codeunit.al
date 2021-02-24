@@ -1685,21 +1685,18 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
     local procedure WriteRequestLine(var ParCreditCardTransaction: Record "NPR EFT Receipt"; ParEntryNo: Integer; ParText: Text)
     begin
-
-        with ParCreditCardTransaction do begin
-            Validate("Entry No.", ParEntryNo);
-            Validate("Line No.", 0);
-            Validate(Type, 0);
-            Validate(Text, ParText);
-            Insert(true);
-        end;
+        ParCreditCardTransaction.Validate("Entry No.", ParEntryNo);
+        ParCreditCardTransaction.Validate("Line No.", 0);
+        ParCreditCardTransaction.Validate(Type, 0);
+        ParCreditCardTransaction.Validate(Text, ParText);
+        ParCreditCardTransaction.Insert(true);
     end;
 
-    procedure SetTerminalToOfflineMode(Register: Record "NPR Register"; CommandType: Option Activate,Deactivate) Success: Boolean
+    procedure SetTerminalToOfflineMode(POSUnit: Record "NPR POS Unit"; CommandType: Option Activate,Deactivate) Success: Boolean
     var
         PepperTerminal: Record "NPR Pepper Terminal";
     begin
-        InitializePepperSetup(Register."Register No.");
+        InitializePepperSetup(POSUnit."No.");
         Success := false;
         case CommandType of
             CommandType::Activate:
@@ -1730,11 +1727,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         exit(true);
     end;
 
-    local procedure "--*** Integration Subscribers"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnSendEftDeviceRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnSendEftDeviceRequest', '', false, false)]
     local procedure OnEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
 
@@ -1744,7 +1737,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         Handled := MakeDeviceRequest(EftTransactionRequest);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateBeginWorkshiftRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateBeginWorkshiftRequest', '', false, false)]
     local procedure OnCreateBeginWorkshiftRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
 
@@ -1754,7 +1747,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateEndWorkshiftRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateEndWorkshiftRequest', '', false, false)]
     local procedure OnCreateEndWorkshiftRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
 
@@ -1764,7 +1757,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreatePaymentOfGoodsRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreatePaymentOfGoodsRequest', '', false, false)]
     local procedure OnCreatePaymentOfGoodsRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
 
@@ -1776,7 +1769,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateRefundRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateRefundRequest', '', false, false)]
     local procedure OnCreateRefundOfGoodsRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     var
         OriginalTransactionRequest: Record "NPR EFT Transaction Request";
@@ -1799,7 +1792,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateVoidRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateVoidRequest', '', false, false)]
     local procedure OnCreateVoidPaymentOfGoodsRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     var
         OriginalTransactionRequest: Record "NPR EFT Transaction Request";
@@ -1824,7 +1817,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateAuxRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateAuxRequest', '', false, false)]
     local procedure OnCreateAuxRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
 
@@ -1835,7 +1828,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateVerifySetupRequest', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateVerifySetupRequest', '', false, false)]
     local procedure OnCreateInstallRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
 
@@ -1846,7 +1839,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnAfterFinancialCommit', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnAfterFinancialCommit', '', false, false)]
     local procedure OnAfterFinancialCommit(EftTransactionRequest: Record "NPR EFT Transaction Request")
     var
         AlternativeTransactionRequest: Record "NPR EFT Transaction Request";
@@ -1862,7 +1855,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnAfterPaymentConfirm', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnAfterPaymentConfirm', '', false, false)]
     local procedure OnAfterPaymentConfirm(EftTransactionRequest: Record "NPR EFT Transaction Request"; var DoNotResume: Boolean)
     var
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
@@ -1892,7 +1885,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnQueueCloseBeforeRegisterBalance', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnQueueCloseBeforeRegisterBalance', '', false, false)]
     local procedure OnQueueCloseBeforeRegisterBalance(POSSession: Codeunit "NPR POS Session"; var tmpEFTSetup: Record "NPR EFT Setup" temporary)
     var
         POSSetup: Codeunit "NPR POS Setup";
@@ -1901,7 +1894,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
         POSSession.GetSetup(POSSetup);
 
-        EFTSetup.SetFilter("POS Unit No.", POSSetup.Register());
+        EFTSetup.SetFilter("POS Unit No.", POSSetup.GetPOSUnitNo());
         EFTSetup.SetRange("EFT Integration Type", GetIntegrationType());
         if not EFTSetup.FindFirst then begin
             EFTSetup.SetRange("POS Unit No.", '');
@@ -1914,7 +1907,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDisplayReceipt', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnDisplayReceipt', '', false, false)]
     local procedure OnDisplayReceipt(EFTTransactionRequest: Record "NPR EFT Transaction Request"; ReceiptNo: Integer; var Handled: Boolean)
     var
         PepperConfigManagement: Codeunit "NPR Pepper Config. Mgt.";
@@ -1928,7 +1921,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnPrintReceipt', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnPrintReceipt', '', false, false)]
     local procedure OnPrintReceipt(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     var
         CreditCardTransaction: Record "NPR EFT Receipt";
@@ -1950,7 +1943,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverIntegrations', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin
 
@@ -1961,7 +1954,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverAuxiliaryOperations', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnDiscoverAuxiliaryOperations', '', false, false)]
     local procedure OnDiscoverAuxiliaryOperations(var tmpEFTAuxOperation: Record "NPR EFT Aux Operation" temporary)
     begin
 
@@ -2021,7 +2014,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnConfigureIntegrationUnitSetup', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnConfigureIntegrationUnitSetup', '', false, false)]
     local procedure OnConfigureIntegrationUnitSetup(EFTSetup: Record "NPR EFT Setup")
     var
         PepperTerminal: Record "NPR Pepper Terminal";
@@ -2036,7 +2029,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184485, 'OnAfterInsertEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFT Setup", 'OnAfterInsertEvent', '', false, false)]
     local procedure OnAfterEFTSetupInsert(var Rec: Record "NPR EFT Setup"; RunTrigger: Boolean)
     var
         EFTSetup: Record "NPR EFT Setup";
@@ -2052,7 +2045,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
     end;
 
-    [EventSubscriber(ObjectType::Table, 6184485, 'OnAfterRenameEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR EFT Setup", 'OnAfterRenameEvent', '', false, false)]
     local procedure OnAfterEFTSetupRename(var Rec: Record "NPR EFT Setup"; var xRec: Record "NPR EFT Setup"; RunTrigger: Boolean)
     var
         EFTSetup: Record "NPR EFT Setup";
@@ -2068,11 +2061,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
 
     end;
 
-    local procedure "--*** Device Subscribers"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6184491, 'OnBeginWorkshiftReponse', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Pepper Begin Workshift TSD", 'OnBeginWorkshiftReponse', '', false, false)]
     local procedure OnBeginWorkshiftResponse(var Sender: Codeunit "NPR Pepper Begin Workshift TSD"; EFTPaymentRequestID: Integer)
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -2082,7 +2071,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         BeginWorkshiftResponse(Sender, EFTTransactionRequest);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184492, 'OnTransactionReponse', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Pepper Transaction TSD", 'OnTransactionReponse', '', false, false)]
     local procedure OnTransactionResponse(var Sender: Codeunit "NPR Pepper Transaction TSD"; EFTPaymentRequestID: Integer)
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -2092,7 +2081,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         TrxResponse(Sender, EFTTransactionRequest);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184493, 'OnEndWorkshiftResponse', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Pepper End Workshift TSD", 'OnEndWorkshiftResponse', '', false, false)]
     local procedure OnEndWorkshiftResponse(var Sender: Codeunit "NPR Pepper End Workshift TSD"; EFTPaymentRequestID: Integer)
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -2102,7 +2091,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         EndWorkshiftResponse(Sender, EFTTransactionRequest);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184494, 'OnAuxResponse', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Pepper Aux Func. TSD", 'OnAuxResponse', '', false, false)]
     local procedure OnAuxResponse(var Sender: Codeunit "NPR Pepper Aux Func. TSD"; EFTPaymentRequestID: Integer)
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -2112,7 +2101,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         AuxFunctionResponse(Sender, EFTTransactionRequest);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184495, 'OnFileMgtResponse', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Pepper FileMgmt. Func. TSD", 'OnFileMgtResponse', '', false, false)]
     local procedure OnFileMgtResponse(EFTPaymentRequestID: Integer)
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";

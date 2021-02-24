@@ -52,7 +52,7 @@ table 6150625 "NPR POS Bin Entry"
             Caption = 'Register No.';
             DataClassification = CustomerContent;
             Description = 'This field should be dropped when new audit roll creates these entries';
-            TableRelation = "NPR Register";
+            TableRelation = "NPR POS Unit";
         }
         field(30; "Payment Method Code"; Code[10])
         {

@@ -308,7 +308,7 @@ table 6014504 "NPR Customer Repair"
         }
         field(57; "Delivered Register No."; Code[10])
         {
-            Caption = 'Delivered Cash Register No.';
+            Caption = 'Delivered POS Unit No.';
             DataClassification = CustomerContent;
         }
         field(58; "Audit Roll Line No."; Integer)
@@ -323,7 +323,7 @@ table 6014504 "NPR Customer Repair"
         }
         field(60; Register; Code[10])
         {
-            Caption = 'Cash Register';
+            Caption = 'POS Unit';
             DataClassification = CustomerContent;
         }
         field(61; Location; Code[10])
@@ -393,7 +393,7 @@ table 6014504 "NPR Customer Repair"
         }
         field(113; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
         }
         field(114; "Costs Paid by Offer"; Boolean)

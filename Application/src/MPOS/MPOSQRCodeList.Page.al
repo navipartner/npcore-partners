@@ -1,9 +1,5 @@
 page 6059964 "NPR MPOS QR Code List"
 {
-    // NPR5.33/NPKNAV/20170630  CASE 277791 Transport NPR5.33 - 30 June 2017
-    // NPR5.36/CLVA/20170703 CASE 280444 Upgrading MPOS functionality to transcendence
-    // NPR5.42/CLVA/20180302 CASE 304559 Added Company and "Cash Register Id" to the primary key/link to factbox
-
     Caption = 'MPOS QR Code List';
     PageType = List;
     UsageCategory = Administration;
@@ -51,7 +47,7 @@ page 6059964 "NPR MPOS QR Code List"
                 field("Cash Register Id"; "Cash Register Id")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Cash Register Id field';
+                    ToolTip = 'Specifies the value of the POS Unit Id field';
                 }
                 field(Url; Url)
                 {

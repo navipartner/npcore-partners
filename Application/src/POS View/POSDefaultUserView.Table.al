@@ -21,9 +21,9 @@ table 6150712 "NPR POS Default User View"
         }
         field(3; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Register";
+            TableRelation = "NPR POS Unit";
         }
         field(4; "User Name"; Code[250])
         {

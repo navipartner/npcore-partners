@@ -91,8 +91,6 @@ table 6059950 "NPR Display Setup"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
-            var
-                Register: Record "NPR Register";
             begin
                 if (xRec.Activate) and (not Activate) then
                     "Media Downloaded" := false;

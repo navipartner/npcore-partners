@@ -20,7 +20,7 @@ table 6150661 "NPR NPRE Waiter Pad Line"
         }
         field(11; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
             NotBlank = true;
         }

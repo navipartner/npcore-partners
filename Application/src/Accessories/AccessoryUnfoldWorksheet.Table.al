@@ -134,7 +134,7 @@ table 6014507 "NPR Accessory Unfold Worksheet"
         field(65; "Cash Register No."; Code[20])
         {
             CalcFormula = Lookup("Item Ledger Entry"."NPR Register Number" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             Editable = false;
             FieldClass = FlowField;
         }

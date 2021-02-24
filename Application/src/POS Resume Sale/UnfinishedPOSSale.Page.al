@@ -25,7 +25,7 @@ page 6150746 "NPR Unfinished POS Sale"
                 field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Cash Register No. field';
+                    ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
                 field("Sales Ticket No."; Rec."Sales Ticket No.")
                 {

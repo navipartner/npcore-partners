@@ -236,7 +236,6 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
     local procedure EftPaymentResponseReceived(EftTransactionRequest: Record "NPR EFT Transaction Request"; POSFrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session")
     var
         POSSale: Codeunit "NPR POS Sale";
-        Register: Record "NPR Register";
         EFTInterface: Codeunit "NPR EFT Interface";
         OriginalEftTransactionRequest: Record "NPR EFT Transaction Request";
         Skip: Boolean;
@@ -486,7 +485,6 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
     local procedure GiftCardLoadResponseReceived(EftTransactionRequest: Record "NPR EFT Transaction Request"; POSFrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session")
     var
         POSSale: Codeunit "NPR POS Sale";
-        Register: Record "NPR Register";
         EFTInterface: Codeunit "NPR EFT Interface";
         OriginalEftTransactionRequest: Record "NPR EFT Transaction Request";
         Skip: Boolean;

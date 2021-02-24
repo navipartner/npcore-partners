@@ -33,7 +33,7 @@ table 6014508 "NPR Accessory Unfold Entry"
         }
         field(15; "Source Type"; Option)
         {
-            CalcFormula = Lookup ("Item Ledger Entry"."Source Type" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
+            CalcFormula = Lookup("Item Ledger Entry"."Source Type" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
             Caption = 'Source Type';
             Editable = false;
             FieldClass = FlowField;
@@ -42,7 +42,7 @@ table 6014508 "NPR Accessory Unfold Entry"
         }
         field(20; "Source No."; Code[20])
         {
-            CalcFormula = Lookup ("Item Ledger Entry"."Source No." WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
+            CalcFormula = Lookup("Item Ledger Entry"."Source No." WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
             Caption = 'Source No.';
             Editable = false;
             FieldClass = FlowField;
@@ -54,21 +54,21 @@ table 6014508 "NPR Accessory Unfold Entry"
         }
         field(25; "Document Type"; Enum "Item Ledger Document Type")
         {
-            CalcFormula = Lookup ("Item Ledger Entry"."Document Type" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
+            CalcFormula = Lookup("Item Ledger Entry"."Document Type" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
             Caption = 'Document Type';
             Editable = false;
             FieldClass = FlowField;
         }
         field(30; "Document No."; Code[20])
         {
-            CalcFormula = Lookup ("Item Ledger Entry"."Document No." WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
+            CalcFormula = Lookup("Item Ledger Entry"."Document No." WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
             Caption = 'Document No.';
             Editable = false;
             FieldClass = FlowField;
         }
         field(35; "Document Line No."; Integer)
         {
-            CalcFormula = Lookup ("Item Ledger Entry"."Document Line No." WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
+            CalcFormula = Lookup("Item Ledger Entry"."Document Line No." WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
             Caption = 'Document Line No.';
             Editable = false;
             FieldClass = FlowField;
@@ -80,7 +80,7 @@ table 6014508 "NPR Accessory Unfold Entry"
         }
         field(45; "Location Code"; Code[10])
         {
-            CalcFormula = Lookup ("Item Ledger Entry"."Location Code" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
+            CalcFormula = Lookup("Item Ledger Entry"."Location Code" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
             Caption = 'Location Code';
             Editable = false;
             FieldClass = FlowField;
@@ -94,7 +94,7 @@ table 6014508 "NPR Accessory Unfold Entry"
         }
         field(55; "Global Dimension 1 Code"; Code[20])
         {
-            CalcFormula = Lookup ("Item Ledger Entry"."Global Dimension 1 Code" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
+            CalcFormula = Lookup("Item Ledger Entry"."Global Dimension 1 Code" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
             Editable = false;
@@ -103,7 +103,7 @@ table 6014508 "NPR Accessory Unfold Entry"
         }
         field(60; "Global Dimension 2 Code"; Code[20])
         {
-            CalcFormula = Lookup ("Item Ledger Entry"."Global Dimension 2 Code" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
+            CalcFormula = Lookup("Item Ledger Entry"."Global Dimension 2 Code" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
             Editable = false;
@@ -112,21 +112,21 @@ table 6014508 "NPR Accessory Unfold Entry"
         }
         field(65; "Cash Register No."; Code[20])
         {
-            CalcFormula = Lookup ("Item Ledger Entry"."NPR Register Number" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
-            Caption = 'Cash Register No.';
+            CalcFormula = Lookup("Item Ledger Entry"."NPR Register Number" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
+            Caption = 'POS Unit No.';
             Editable = false;
             FieldClass = FlowField;
         }
         field(70; "Salesperson Code"; Code[20])
         {
-            CalcFormula = Lookup ("Item Ledger Entry"."NPR Salesperson Code" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
+            CalcFormula = Lookup("Item Ledger Entry"."NPR Salesperson Code" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
             Caption = 'Salesperson Code';
             Editable = false;
             FieldClass = FlowField;
         }
         field(75; "Document Time"; Time)
         {
-            CalcFormula = Lookup ("Item Ledger Entry"."NPR Document Time" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
+            CalcFormula = Lookup("Item Ledger Entry"."NPR Document Time" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
             Caption = 'Document Time';
             Editable = false;
             FieldClass = FlowField;
@@ -138,7 +138,7 @@ table 6014508 "NPR Accessory Unfold Entry"
         }
         field(85; "Posting Date"; Date)
         {
-            CalcFormula = Lookup ("Item Ledger Entry"."Posting Date" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
+            CalcFormula = Lookup("Item Ledger Entry"."Posting Date" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
             Caption = 'Posting Date';
             Editable = false;
             FieldClass = FlowField;

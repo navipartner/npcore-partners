@@ -10,7 +10,7 @@ table 6014641 "NPR Tax Free POS Unit"
         field(1; "POS Unit No."; Code[10])
         {
             Caption = 'POS Unit No.';
-            TableRelation = "NPR Register"."Register No.";
+            TableRelation = "NPR POS Unit"."No.";
             DataClassification = CustomerContent;
         }
         field(2; "Handler ID"; Text[30])

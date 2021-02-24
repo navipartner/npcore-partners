@@ -93,7 +93,7 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
         CreditCardHelper: Codeunit "NPR Credit Card Prot. Helper";
         PaymentNo: Code[10];
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         SalePOS: Record "NPR Sale POS";
         State: DotNet NPRNetState6;
         ConfirmFee: Boolean;
@@ -104,7 +104,7 @@ codeunit 6184516 "NPR EFT Flexiiterm Prot."
         State := State.Deserialize(Data);
 
         EFTTransactionRequest.Get(State.RequestEntryNo);
-        Register.Get(EFTTransactionRequest."Register No.");
+        POSUnit.Get(EFTTransactionRequest."Register No.");
 
         State.CardPan := CreditCardHelper.CutCardPan(State.CardPan);
 

@@ -78,13 +78,11 @@ codeunit 6151291 "NPR SS Action: Payment"
         POSSetup: Codeunit "NPR POS Setup";
         POSPaymentMethod: Record "NPR POS Payment Method";
         ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
-        Register: Record "NPR Register";
         POSSale: Codeunit "NPR POS Sale";
     begin
         POSSession.RequestRefreshData();
         POSSession.GetSetup(POSSetup);
         POSSession.GetSale(POSSale);
-        POSSetup.GetRegisterRecord(Register);
 
         POSPaymentMethod.Get(Context.GetStringParameter('PaymentType', true));
         ReturnPOSPaymentMethod.Get(POSPaymentMethod."Return Payment Method Code");

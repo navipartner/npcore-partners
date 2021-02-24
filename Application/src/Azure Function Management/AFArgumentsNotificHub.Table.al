@@ -59,7 +59,6 @@ table 6151573 "NPR AF Arguments - Notific.Hub"
             ObsoleteReason = 'Table ''NPR Register'' is marked for removal. Reason: Replaced with POS Unit, POS store, POS unit profiles.';
             Caption = 'To Register No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Register";
         }
         field(18; "Action Type"; Option)
         {
@@ -86,7 +85,6 @@ table 6151573 "NPR AF Arguments - Notific.Hub"
             ObsoleteReason = 'Table ''NPR Register'' is marked for removal. Reason: Replaced with POS Unit, POS store, POS unit profiles.';
             Caption = 'From Register No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Register";
         }
         field(22; "Created By"; Code[50])
         {

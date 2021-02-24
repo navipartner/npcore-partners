@@ -168,7 +168,7 @@ page 6151018 "NPR NpRv Sales Line Card"
                     field("Register No."; "Register No.")
                     {
                         ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Cash Register No. field';
+                        ToolTip = 'Specifies the value of the POS Unit No. field';
                     }
                     field("Sales Ticket No."; "Sales Ticket No.")
                     {

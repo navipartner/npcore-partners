@@ -61,7 +61,7 @@ page 6014423 "NPR Report Selection: Retail"
                 field("Register No."; "Register No.")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Cash Register No. field';
+                    ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
                 field("Report ID"; "Report ID")
                 {
@@ -157,7 +157,7 @@ page 6014423 "NPR Report Selection: Retail"
                     Caption = '&List';
                     Image = Report2;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR Retail Report Select. List";

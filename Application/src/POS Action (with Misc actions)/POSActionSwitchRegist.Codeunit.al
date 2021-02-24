@@ -1,15 +1,5 @@
 codeunit 6150804 "NPR POS Action: Switch Regist."
 {
-    // NPR5.38/TSA /20180104  CASE 301340 Added option to control input dialog
-    // NPR5.38/MHA /20180115  CASE 302240 Added functions TestAllowRegisterSwitch() and OnValidateRegisterSwitchFilter()
-    // NPR5.40/MHA /20180227  CASE 306510 Added Optionvalue "List" to Parameter "DialogType"
-    // NPR5.41/MMV /20180410 CASE 307453 Changed implementation of 304310 to prevent double POS menu parse on first initialization.
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'Switch to a different register';
         Prompt_EnterRegister: Label 'Enter Register';
@@ -19,30 +9,23 @@ codeunit 6150804 "NPR POS Action: Switch Regist."
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode,
-              ActionDescription,
-              ActionVersion,
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple)
-            then begin
-                //-NPR5.38 [301340]
-                // RegisterWorkflowStep('', 'input(labels.prompt).respond();');
-                RegisterWorkflowStep('textfield', 'if (param.DialogType == param.DialogType["TextField"]) {input(labels.prompt).respond();}');
-                RegisterWorkflowStep('numpad', 'if (param.DialogType == param.DialogType["Numpad"]) {numpad(labels.prompt).respond();}');
-                //-NPR5.40 [306510]
-                //RegisterOptionParameter ('DialogType','TextField,Numpad','TextField');
-                RegisterWorkflowStep('list', 'if (param.DialogType == param.DialogType["List"]) {respond();}');
-                RegisterOptionParameter('DialogType', 'TextField,Numpad,List', 'TextField');
-                //+NPR5.40 [306510]
-                //+NPR5.38 [301340]
+        if Sender.DiscoverAction(
+            ActionCode,
+            ActionDescription,
+            ActionVersion,
+            Sender.Type::Generic,
+            Sender."Subscriber Instances Allowed"::Multiple)
+        then begin
+            Sender.RegisterWorkflowStep('textfield', 'if (param.DialogType == param.DialogType["TextField"]) {input(labels.prompt).respond();}');
+            Sender.RegisterWorkflowStep('numpad', 'if (param.DialogType == param.DialogType["Numpad"]) {numpad(labels.prompt).respond();}');
+            Sender.RegisterWorkflowStep('list', 'if (param.DialogType == param.DialogType["List"]) {respond();}');
+            Sender.RegisterOptionParameter('DialogType', 'TextField,Numpad,List', 'TextField');
 
-                RegisterWorkflow(false);
-            end;
+            Sender.RegisterWorkflow(false);
+        end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
         Captions.AddActionCaption(ActionCode, 'prompt', Prompt_EnterRegister);
@@ -55,10 +38,10 @@ codeunit 6150804 "NPR POS Action: Switch Regist."
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.1');
+        exit('1.2');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
@@ -68,9 +51,6 @@ codeunit 6150804 "NPR POS Action: Switch Regist."
         if not Action.IsThisAction(ActionCode) then
             exit;
 
-        //-NPR5.40 [306510]
-        //SwitchRegister (Context, POSSession, FrontEnd);
-        //Handled := TRUE;
         case WorkflowStep of
             'list':
                 begin
@@ -86,7 +66,6 @@ codeunit 6150804 "NPR POS Action: Switch Regist."
                     SwitchRegister(Context, POSSession, FrontEnd, NewRegisterNo);
                 end;
         end;
-        //+NPR5.40 [306510]
     end;
 
     local procedure OnActionList(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -95,108 +74,80 @@ codeunit 6150804 "NPR POS Action: Switch Regist."
         POSSale: Codeunit "NPR POS Sale";
         NewRegisterNo: Code[10];
     begin
-        //-NPR5.40 [306510]
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         if not SelectRegister(SalePOS."Register No.", NewRegisterNo) then
             exit;
 
         SwitchRegister(Context, POSSession, FrontEnd, NewRegisterNo);
-        //+NPR5.40 [306510]
     end;
 
-    local procedure SelectRegister(CurrRegisterNo: Code[10]; var NewRegisterNo: Code[10]) LookupOK: Boolean
+    local procedure SelectRegister(CurrUnitNo: Code[10]; var NewUnitNo: Code[10]) LookupOK: Boolean
     var
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         UserSetup: Record "User Setup";
     begin
-        //-NPR5.40 [306510]
         UserSetup.Get(UserId);
         if not UserSetup."NPR Allow Register Switch" then
             Error(Text001, UserSetup."User ID");
 
-        Register.FilterGroup(41);
-        Register.SetFilter("Register No.", '<>%1', CurrRegisterNo);
-        Register.FilterGroup(42);
-        Register.SetFilter("Register No.", UserSetup."NPR Register Switch Filter");
-        Register.FilterGroup(0);
+        POSUnit.FilterGroup(41);
+        POSUnit.SetFilter("No.", '<>%1', CurrUnitNo);
+        POSUnit.FilterGroup(42);
+        POSUnit.SetFilter("No.", UserSetup."NPR Register Switch Filter");
+        POSUnit.FilterGroup(0);
 
-        LookupOK := PAGE.RunModal(0, Register) = ACTION::LookupOK;
-        NewRegisterNo := Register."Register No.";
+        LookupOK := PAGE.RunModal(0, POSUnit) = ACTION::LookupOK;
+        NewUnitNo := POSUnit."No.";
         exit(LookupOK);
-        //+NPR5.40 [306510]
     end;
 
-    local procedure SwitchRegister(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; NewRegisterNo: Code[10])
+    local procedure SwitchRegister(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; NewUnitNo: Code[10])
     var
         POSUnitIdentity: Codeunit "NPR POS Unit Identity";
         POSUnitIdentityRec: Record "NPR POS Unit Identity";
         Setup: Codeunit "NPR POS Setup";
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
     begin
-        //-NPR5.40 [306510]
-        //JSON.InitializeJObjectParser (Context, FrontEnd);
-        //+NPR5.40 [306510]
-        //-NPR5.38 [301340]
-        //JSON.SetScope ('$', TRUE);
-        //NewRegisterNo := JSON.GetString ('input', TRUE);
-        //-NPR5.40 [306510]
-        //NewRegisterNo := COPYSTR (JSON.GetString ('value', TRUE), 1, MAXSTRLEN (NewRegisterNo));
-        //+NPR5.40 [306510]
-        //+NPR5.38 [301340]
-
-        //-NPR5.38 [302240]
-        TestAllowRegisterSwitch(NewRegisterNo);
-        //+NPR5.38 [302240]
-        Register.setThisRegisterNo(NewRegisterNo);
+        TestAllowUnitSwitch(NewUnitNo);
+        POSUnit.SetThisUnitNo(NewUnitNo);
 
         POSSession.GetSetup(Setup);
 
-        POSUnitIdentity.SwitchToPosUnit(POSSession, NewRegisterNo, POSUnitIdentityRec);
+        POSUnitIdentity.SwitchToPosUnit(POSSession, NewUnitNo, POSUnitIdentityRec);
         Setup.InitializeUsingPosUnitIdentity(POSUnitIdentityRec);
 
-        //-NPR5.41 [307453]
-        //POSSession.InitializeSession ();
         POSSession.InitializeSession(true);
-        //+NPR5.41 [307453]
     end;
 
-    local procedure "--- Test"()
-    begin
-    end;
-
-    local procedure TestAllowRegisterSwitch(RegisterNo: Code[10])
+    local procedure TestAllowUnitSwitch(UnitNo: Code[10])
     var
-        Register: Record "NPR Register";
+        PSOUnit: Record "NPR POS Unit";
         UserSetup: Record "User Setup";
     begin
-        //-NPR5.38 [302240]
         UserSetup.Get(UserId);
         if not UserSetup."NPR Allow Register Switch" then
-            Error(Text000, UserSetup."User ID", RegisterNo);
+            Error(Text000, UserSetup."User ID", UnitNo);
         if UserSetup."NPR Register Switch Filter" = '' then
             exit;
 
-        Register.Get(RegisterNo);
-        Register.SetRecFilter;
-        Register.FilterGroup(40);
-        Register.SetFilter("Register No.", UserSetup."NPR Register Switch Filter");
-        if not Register.FindFirst then
-            Error(Text000, UserSetup."User ID", RegisterNo);
-        //+NPR5.38 [302240]
+        PSOUnit.Get(UnitNo);
+        PSOUnit.SetRecFilter;
+        PSOUnit.FilterGroup(40);
+        PSOUnit.SetFilter("No.", UserSetup."NPR Register Switch Filter");
+        if not PSOUnit.FindFirst() then
+            Error(Text000, UserSetup."User ID", UnitNo);
     end;
 
-    [EventSubscriber(ObjectType::Table, 91, 'OnAfterValidateEvent', 'NPR Register Switch Filter', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"User Setup", 'OnAfterValidateEvent', 'NPR Register Switch Filter', true, true)]
     local procedure OnValidateRegisterSwitchFilter(var Rec: Record "User Setup"; var xRec: Record "User Setup"; CurrFieldNo: Integer)
     var
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
     begin
-        //-NPR5.38 [302240]
         if Rec."NPR Register Switch Filter" = '' then
             exit;
 
-        Register.SetFilter("Register No.", Rec."NPR Register Switch Filter");
-        //+NPR5.38 [302240]
+        POSUnit.SetFilter("No.", Rec."NPR Register Switch Filter");
     end;
 }
 

@@ -3,9 +3,6 @@ table 6014491 "NPR Archive POS Info Trx"
     // The purpose of this table:
     //   All existing unfinished sale transactions have been moved to archive tables
     //   The table may be deleted later, when it is no longer relevant.
-    // 
-    // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
-    // NPR5.55/ALPO/20200423 CASE 401611 5.54 upgrade performace optimization
 
     Caption = 'POS Info Transaction';
     DataClassification = CustomerContent;
@@ -14,7 +11,7 @@ table 6014491 "NPR Archive POS Info Trx"
     {
         field(1; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
         }
         field(2; "Sales Ticket No."; Code[20])

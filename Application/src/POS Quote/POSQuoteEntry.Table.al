@@ -20,7 +20,7 @@ table 6151002 "NPR POS Quote Entry"
         }
         field(10; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
             NotBlank = true;
         }
