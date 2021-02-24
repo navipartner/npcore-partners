@@ -97,6 +97,20 @@ codeunit 6014594 "NPR RapidStart Base Data Mgt."
         ConfigPackage.Get(PackageCode);
         ConfigPackage.SetRecFilter();
         ConfigPackageTable.SETRANGE("Package Code", ConfigPackage.Code);
+
+        RemoveObsoleteTables(configPackageTable);
+
         ConfigPackageManagement.ApplyPackage(ConfigPackage, ConfigPackageTable, TRUE);
+    end;
+
+    local procedure RemoveObsoleteTables(var ConfigPackageTable: Record "Config. Package Table")
+    begin
+        if ConfigPackageTable.FindSet(true) then begin
+            repeat
+                if not TableObjectExists(ConfigPackageTable."Table ID") then begin
+                    ConfigPackageTable.Delete();
+                end;
+            until ConfigPackageTable.Next = 0;
+        end;
     end;
 }
