@@ -1,7 +1,7 @@
 codeunit 6014627 "NPR Managed Dependency Mgt."
 {
-    Permissions = TableData "NPR .NET Assembly" = rimd,
-                  TableData "NPR Web Client Dependency" = rimd;
+    Permissions = TableData "NPR Web Client Dependency" = rimd,
+                  TableData "NPR POS Stargate Package" = rimd;
 
     trigger OnRun()
     begin
@@ -103,7 +103,7 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
         UserSetup: Record "User Setup";
     begin
         GetDependencyMgtSetup(DepMgtSetup);
-        exit(DepMgtSetup.Configured and not DepMgtSetup."Disable Deployment");
+        exit(not DepMgtSetup."Disable Deployment");
     end;
 
     local procedure ReadDependenciesFromGroundControl() Result: Boolean
@@ -238,9 +238,10 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
         Url: Text;
         JObject: JsonObject;
         JSON: Text;
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
     begin
-        Client.UseWindowsAuthentication(DepMgtSetup.Username, DepMgtSetup.GetManagedDependencyPassword());
-        Url := DepMgtSetup."OData URL" + '/' + Entity + '?$format=json' + FilterText;
+        Client.UseWindowsAuthentication(AzureKeyVaultMgt.GetSecret('NpDeployOdataUsername'), AzureKeyVaultMgt.GetSecret('NpDeployOdataPassword'));
+        Url := 'https://npdeploy.dynamics-retail.com:7088/NPDeploy/OData/Company(''RetailDemo'')/' + Entity + '?$format=json' + FilterText;
 
         if not Client.Get(URL, ResponseMessage) then
             Error('Failed to call URL: %1', URL);
@@ -266,6 +267,7 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
         RequestContent: HttpContent;
         ContentHeader: HttpHeaders;
         Response: HttpResponseMessage;
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
     begin
         GetDependencyMgtSetup(DepMgtSetup);
 
@@ -286,8 +288,8 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
         ContentHeader.Add('Content-Type', 'application/json');
         ContentHeader := Client.DefaultRequestHeaders();
 
-        Client.UseWindowsAuthentication(DepMgtSetup.Username, DepMgtSetup.GetManagedDependencyPassword());
-        Client.Post(DepMgtSetup."OData URL" + '/ManagedDependenciesLog?$format=json', RequestContent, Response);
+        Client.UseWindowsAuthentication(AzureKeyVaultMgt.GetSecret('NpDeployOdataUsername'), AzureKeyVaultMgt.GetSecret('NpDeployOdataPassword'));
+        Client.Post('https://npdeploy.dynamics-retail.com:7088/NPDeploy/OData/Company(''RetailDemo'')/' + 'ManagedDependenciesLog?$format=json', RequestContent, Response);
 
         if not Response.IsSuccessStatusCode then
             Error(Response.ReasonPhrase);
@@ -337,18 +339,10 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
 
     local procedure GetTypeNameVersionFromRecordRef(RecRef: RecordRef; var FileType: Text; var Name: Text; var FileVersion: Text)
     var
-        DotNetLibrary: Record "NPR .NET Assembly";
         WebClientDependency: Record "NPR Web Client Dependency";
         StargatePackage: Record "NPR POS Stargate Package";
     begin
         case RecRef.Number() of
-            DATABASE::"NPR .NET Assembly":
-                begin
-                    RecRef.SetTable(DotNetLibrary);
-                    FileType := '.NET Assembly';
-                    Name := DotNetLibrary."Assembly Name";
-                    FileVersion := '1.0';
-                end;
             DATABASE::"NPR Web Client Dependency":
                 begin
                     RecRef.SetTable(WebClientDependency);

@@ -2,6 +2,7 @@ table 6014623 "NPR .NET Assembly"
 {
     Caption = '.NET Assembly';
     DataPerCompany = false;
+    ObsoleteState = Removed;
 
     fields
     {
@@ -13,8 +14,6 @@ table 6014623 "NPR .NET Assembly"
         field(2; "User ID"; Code[50])
         {
             Caption = 'User ID';
-            TableRelation = User."User Name";
-            ValidateTableRelation = false;
             DataClassification = EndUserIdentifiableInformation;
         }
         field(10; Assembly; BLOB)
