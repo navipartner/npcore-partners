@@ -22,7 +22,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
         CaptionDeletedSaleline: Label 'Deleted item';
         MatrixIsActivated: Boolean;
         DisplayIsActivated: Boolean;
-        Text000: Label 'Update Cash Register Display on Sale Line Insert';
+        Text000: Label 'Update POS Unit Display on Sale Line Insert';
         CaptionTAXTotal: Label 'Tax';
         CaptionSubTotal: Label 'Sub-Total';
         BixolonError: Label 'Display Setup is missing\\Object Output Selection is missing for DisplayBixolon\and will result in the following error\\The value "" can''t be evaluated into type Integer ';
@@ -36,51 +36,51 @@ codeunit 6151002 "NPR POS Proxy - Display"
         exit('CUSTOMER_DISPLAY');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnAfterInitializeAtLogin', '', true, true)]
-    local procedure CU6150705OnAfterInitializeAtLogin(Register: Record "NPR Register")
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterInitializeAtLogin', '', true, true)]
+    local procedure CU6150705OnAfterInitializeAtLogin(POSUnit: Record "NPR POS Unit")
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
         SaleHeader: Record "NPR Sale POS";
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
     begin
-        CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
+        CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
             exit;
 
         if not POSSession.IsActiveSession(FrontEnd) then
             exit;
         if DisplayIsActivated then
-            Login(FrontEnd, Register."Register No.")
+            Login(FrontEnd, POSUnit."No.")
         else
             if MatrixIsActivated then
-                UpdateDisplayFromSalePOS(SaleHeader, Register, Action::Login, '', '');
+                UpdateDisplayFromSalePOS(SaleHeader, POSUnit, Action::Login, '', '');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnAfterInitSale', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterInitSale', '', true, true)]
     local procedure CU6150705OnAfterInitSale(SaleHeader: Record "NPR Sale POS"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         TextValue: Text;
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
     begin
-        if not Register.Get(SaleHeader."Register No.") then
+        if not POSUnit.Get(SaleHeader."Register No.") then
             exit;
-        CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
+        CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
             exit;
 
         if DisplayIsActivated then
-            Update2ndDisplayFromSalePOS(FrontEnd, SaleHeader, Register, Action::Clear, TextValue, 0)
+            Update2ndDisplayFromSalePOS(FrontEnd, SaleHeader, POSUnit, Action::Clear, TextValue, 0)
         else
             if MatrixIsActivated then
-                UpdateDisplayFromSalePOS(SaleHeader, Register, Action::Login, TextValue, '');
+                UpdateDisplayFromSalePOS(SaleHeader, POSUnit, Action::Login, TextValue, '');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterInsertSaleLine', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterInsertSaleLine', '', true, true)]
     local procedure UpdateDisplayOnSaleLineInsert(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SaleLinePOS: Record "NPR Sale Line POS")
     var
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         TextValue: Text;
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
@@ -91,10 +91,10 @@ codeunit 6151002 "NPR POS Proxy - Display"
 
         if POSSalesWorkflowStep."Subscriber Function" <> 'UpdateDisplayOnSaleLineInsert' then
             exit;
-        if not Register.Get(SaleLinePOS."Register No.") then
+        if not POSUnit.Get(SaleLinePOS."Register No.") then
             exit;
 
-        CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
+        CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
             exit;
 
@@ -108,10 +108,10 @@ codeunit 6151002 "NPR POS Proxy - Display"
                 UpdateDisplayFromSaleLinePOS(SaleLinePOS);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterDeletePOSSaleLine', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterDeletePOSSaleLine', '', true, true)]
     local procedure CU6150706OnAfterDeletePOSSaleLine(var Sender: Codeunit "NPR POS Sale Line"; SaleLinePOS: Record "NPR Sale Line POS")
     var
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         TextValue: Text;
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
@@ -121,10 +121,10 @@ codeunit 6151002 "NPR POS Proxy - Display"
         Payment: Decimal;
         Change: Decimal;
     begin
-        if not Register.Get(SaleLinePOS."Register No.") then
+        if not POSUnit.Get(SaleLinePOS."Register No.") then
             exit;
 
-        CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
+        CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
             exit;
 
@@ -137,25 +137,25 @@ codeunit 6151002 "NPR POS Proxy - Display"
             if MatrixIsActivated then begin
                 CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
                 if SaleLinePOS.Type = SaleLinePOS.Type::Payment then
-                    UpdateDisplayFromSalePOS(SaleHeader, Register, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'))
+                    UpdateDisplayFromSalePOS(SaleHeader, POSUnit, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'))
                 else
-                    UpdateDisplayFromSalePOS(SaleHeader, Register, Action::DeleteLine, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), '');
+                    UpdateDisplayFromSalePOS(SaleHeader, POSUnit, Action::DeleteLine, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), '');
             end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnUpdateLine', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnUpdateLine', '', true, true)]
     local procedure CU6150706OnUpdateLine(var Sender: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR Sale Line POS")
     var
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         TextValue: Text;
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
     begin
-        if not Register.Get(SaleLinePOS."Register No.") then
+        if not POSUnit.Get(SaleLinePOS."Register No.") then
             exit;
 
-        CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
+        CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
             exit;
 
@@ -169,19 +169,19 @@ codeunit 6151002 "NPR POS Proxy - Display"
                 UpdateDisplayFromSaleLinePOS(SaleLinePOS);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterSetQuantity', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterSetQuantity', '', true, true)]
     local procedure CU6150706OnAfterSetQuantity(var Sender: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR Sale Line POS")
     var
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         TextValue: Text;
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
     begin
-        if not Register.Get(SaleLinePOS."Register No.") then
+        if not POSUnit.Get(SaleLinePOS."Register No.") then
             exit;
 
-        CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
+        CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
             exit;
 
@@ -195,10 +195,10 @@ codeunit 6151002 "NPR POS Proxy - Display"
                 UpdateDisplayFromSaleLinePOS(SaleLinePOS);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150707, 'OnAfterDeleteLine', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Payment Line", 'OnAfterDeleteLine', '', true, true)]
     local procedure CU6150707OnAfterDeleteLine(SaleLinePOS: Record "NPR Sale Line POS")
     var
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         TextValue: Text;
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
@@ -208,10 +208,10 @@ codeunit 6151002 "NPR POS Proxy - Display"
         Payment: Decimal;
         Change: Decimal;
     begin
-        if not Register.Get(SaleLinePOS."Register No.") then
+        if not POSUnit.Get(SaleLinePOS."Register No.") then
             exit;
 
-        CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
+        CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
             exit;
 
@@ -224,16 +224,16 @@ codeunit 6151002 "NPR POS Proxy - Display"
             if MatrixIsActivated then begin
                 CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
                 if SaleLinePOS.Type = SaleLinePOS.Type::Payment then
-                    UpdateDisplayFromSalePOS(SaleHeader, Register, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'))
+                    UpdateDisplayFromSalePOS(SaleHeader, POSUnit, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'))
                 else
-                    UpdateDisplayFromSalePOS(SaleHeader, Register, Action::DeleteLine, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), '');
+                    UpdateDisplayFromSalePOS(SaleHeader, POSUnit, Action::DeleteLine, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), '');
             end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150707, 'OnAfterInsertPaymentLine', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Payment Line", 'OnAfterInsertPaymentLine', '', true, true)]
     local procedure CU6150707OnAfterInsertPaymentLine(SaleLinePOS: Record "NPR Sale Line POS")
     var
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         TextValue: Text;
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
@@ -246,10 +246,10 @@ codeunit 6151002 "NPR POS Proxy - Display"
         Payment: Decimal;
         Change: Decimal;
     begin
-        if not Register.Get(SaleLinePOS."Register No.") then
+        if not POSUnit.Get(SaleLinePOS."Register No.") then
             exit;
 
-        CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
+        CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
             exit;
 
@@ -261,14 +261,14 @@ codeunit 6151002 "NPR POS Proxy - Display"
         else
             if MatrixIsActivated then begin
                 CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
-                UpdateDisplayFromSalePOS(SaleHeader, Register, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'));
+                UpdateDisplayFromSalePOS(SaleHeader, POSUnit, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'));
             end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150704, 'OnBeforeChangeToPaymentView', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Front End Management", 'OnBeforeChangeToPaymentView', '', true, true)]
     local procedure CU6150704OnBeforeChangeToPaymentView(var Sender: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session")
     var
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR Sale Line POS";
@@ -284,10 +284,10 @@ codeunit 6151002 "NPR POS Proxy - Display"
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not Register.Get(SaleLinePOS."Register No.") then
+        if not POSUnit.Get(SaleLinePOS."Register No.") then
             exit;
 
-        CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
+        CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
             exit;
 
@@ -295,15 +295,15 @@ codeunit 6151002 "NPR POS Proxy - Display"
             exit;
 
         CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
-        UpdateDisplayFromSalePOS(SaleHeader, Register, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'));
+        UpdateDisplayFromSalePOS(SaleHeader, POSUnit, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'));
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150725, 'OnBeforeActionWorkflow', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: Payment", 'OnBeforeActionWorkflow', '', true, true)]
     local procedure CU6150725OnBeforeActionWorkflow(POSPaymentMethod: Record "NPR POS Payment Method"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: Codeunit "NPR POS JSON Management"; SubTotal: Decimal; var Handled: Boolean)
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR Sale Line POS";
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         CurrencyAmount: Decimal;
         Line1: Text;
@@ -320,10 +320,10 @@ codeunit 6151002 "NPR POS Proxy - Display"
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not Register.Get(SaleLinePOS."Register No.") then
+        if not POSUnit.Get(SaleLinePOS."Register No.") then
             exit;
 
-        CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
+        CustomerDisplayIsActivated(POSUnit, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) then
             exit;
 
@@ -334,12 +334,8 @@ codeunit 6151002 "NPR POS Proxy - Display"
             UpdateDisplay(Line1, Line2);
         end else begin
             CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
-            UpdateDisplayFromSalePOS(SaleHeader, Register, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'));
+            UpdateDisplayFromSalePOS(SaleHeader, POSUnit, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'));
         end;
-    end;
-
-    local procedure "-- Locals --"()
-    begin
     end;
 
     local procedure UpdateDisplayFromSaleLinePOS(var Rec: Record "NPR Sale Line POS")
@@ -381,7 +377,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
         UpdateDisplay(Line1, Line2);
     end;
 
-    local procedure UpdateDisplayFromSalePOS(SalePOS: Record "NPR Sale POS"; Register: Record "NPR Register"; "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity; TextValue: Text[30]; TextValue2: Text[30]): Boolean
+    local procedure UpdateDisplayFromSalePOS(SalePOS: Record "NPR Sale POS"; POSUnit: Record "NPR POS Unit"; "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity; TextValue: Text[30]; TextValue2: Text[30]): Boolean
     var
         Line1: Text;
         Line2: Text;
@@ -452,7 +448,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
         PrintToDisplay.Run();
     end;
 
-    procedure Update2ndDisplayFromSalePOS(var FrontEnd: Codeunit "NPR POS Front End Management"; var SalePOS: Record "NPR Sale POS"; var Register: Record "NPR Register"; "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity; TextValue: Text[30]; NewQuantity: Decimal): Boolean
+    procedure Update2ndDisplayFromSalePOS(var FrontEnd: Codeunit "NPR POS Front End Management"; var SalePOS: Record "NPR Sale POS"; var POSUnit: Record "NPR POS Unit"; "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity; TextValue: Text[30]; NewQuantity: Decimal): Boolean
     var
         Line1: Text;
         Line2: Text;
@@ -465,7 +461,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
             case Action of
                 Action::Login:
                     begin
-                        Login(FrontEnd, Register."Register No.");
+                        Login(FrontEnd, POSUnit."No.");
                     end;
                 Action::Clear:
                     begin
@@ -1047,18 +1043,18 @@ codeunit 6151002 "NPR POS Proxy - Display"
         end;
     end;
 
-    local procedure CustomerDisplayIsActivated(Register: Record "NPR Register"; var MatrixIsActivated: Boolean; var DisplayIsActivated: Boolean)
+    local procedure CustomerDisplayIsActivated(POSUnit: Record "NPR POS Unit"; var MatrixIsActivated: Boolean; var DisplayIsActivated: Boolean)
     begin
         MatrixIsActivated := false;
         if not MatrixIsActivated then
-            if DisplaySetup.Get(Register."Register No.") then begin
+            if DisplaySetup.Get(POSUnit."No.") then begin
                 DisplayIsActivated := DisplaySetup.Activate;
                 HideReceiptIsActivated := DisplaySetup."Hide receipt";
             end;
     end;
 
 
-    [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
         if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then

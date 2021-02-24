@@ -506,7 +506,6 @@ codeunit 6150723 "NPR POS Action: Insert Item"
 
     local procedure SerialNumberCanBeUsedForItem(var ItemRef: Record "Item Reference"; SerialNumber: Code[20]; var UserInformationErrorWarning: Text) CanBeUsed: Boolean
     var
-        Register: Record "NPR Register";
         Item: Record Item;
         ItemTrackingCode: Record "Item Tracking Code";
         ItemLedgerEntry: Record "Item Ledger Entry";

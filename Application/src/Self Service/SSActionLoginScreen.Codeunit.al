@@ -81,7 +81,7 @@ codeunit 6151283 "NPR SS Action: Login Screen"
     begin
 
         POSSession.GetSetup(POSSetup);
-        POSCreateEntry.InsertUnitLogoutEntry(POSSetup.Register(), POSSetup.Salesperson());
+        POSCreateEntry.InsertUnitLogoutEntry(POSSetup.GetPOSUnitNo(), POSSetup.Salesperson());
 
         SalesIsCanceled := false;
         if (IsOkToCancel(POSSession)) then

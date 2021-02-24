@@ -7,16 +7,14 @@ tableextension 6014454 "NPR User Setup" extends "User Setup"
             Caption = 'Backoffice Register No.';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
-            TableRelation = "NPR Register";
+            TableRelation = "NPR POS Unit";
         }
         field(6014405; "NPR Allow Register Switch"; Boolean)
         {
             Caption = 'Allow Register Switch';
             DataClassification = CustomerContent;
             Description = 'NPR5.38';
-            TableRelation = "NPR Register";
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "NPR POS Unit";
             ValidateTableRelation = false;
         }
         field(6014410; "NPR Register Switch Filter"; Text[100])

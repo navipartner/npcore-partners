@@ -78,9 +78,9 @@ codeunit 6150634 "NPR POS Give Change"
     local procedure GetReturnPaymentType(SalePOS: Record "NPR Sale POS"): Code[10]
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
     begin
-        Register.Get(SalePOS."Register No.");
+        POSUnit.Get(SalePOS."Register No.");
 
         POSPaymentMethod.Reset();
         POSPaymentMethod.SetRange("Processing Type", POSPaymentMethod."Processing Type"::CASH);

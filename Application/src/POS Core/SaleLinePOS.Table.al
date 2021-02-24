@@ -9,10 +9,10 @@ table 6014406 "NPR Sale Line POS"
     {
         field(1; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = "NPR Register";
+            TableRelation = "NPR POS Unit";
         }
         field(2; "Sales Ticket No."; Code[20])
         {
@@ -63,7 +63,7 @@ table 6014406 "NPR Sale Line POS"
             begin
                 InitFromSalePOS();
 
-                RegisterGlobal.Get(Rec."Register No.");
+                POSUnitGlobal.Get(Rec."Register No.");
 
                 if (Type = Type::Item) and ("No." = '*') then begin
                     Type := Type::Comment;
@@ -266,7 +266,7 @@ table 6014406 "NPR Sale Line POS"
                 TotalAmount: Decimal;
             begin
                 RetailSetup.Get;
-                RegisterGlobal.Get("Register No.");
+                POSUnitGlobal.Get("Register No.");
                 case Type of
                     Type::"G/L Entry":
                         begin
@@ -1039,7 +1039,7 @@ table 6014406 "NPR Sale Line POS"
         }
         field(300; "Return Sale Register No."; Code[10])
         {
-            Caption = 'Return Sale Cash Register No.';
+            Caption = 'Return Sale POS Unit No.';
             DataClassification = CustomerContent;
         }
         field(301; "Return Sale Sales Ticket No."; Code[20])
@@ -1696,7 +1696,7 @@ table 6014406 "NPR Sale Line POS"
 
     var
         Item: Record Item;
-        RegisterGlobal: Record "NPR Register";
+        POSUnitGlobal: Record "NPR POS Unit";
         CustomerGlobal: Record Customer;
         SalePOS: Record "NPR Sale POS";
         Currency: Record Currency;
@@ -1704,8 +1704,6 @@ table 6014406 "NPR Sale Line POS"
         NPRDimMgt: Codeunit "NPR Dimension Mgt.";
         TotalItemLedgerEntryQuantity: Decimal;
         TotalAuditRollQuantity: Decimal;
-        ErrMaxExceeded: Label 'The amount on payment option %1 must not surpass %2';
-        ErrMinExceeded: Label 'The amount on payment option %1 must not be below %2';
         SkipCalcDiscount: Boolean;
         ErrVATCalcNotSupportInPOS: Label '%1 %2 not supported in POS';
         Text000: Label 'Only one means of payment type allowed as payment choice on Invoice';

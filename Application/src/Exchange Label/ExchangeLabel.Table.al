@@ -53,8 +53,8 @@ table 6014498 "NPR Exchange Label"
         }
         field(20; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
-            TableRelation = "NPR Register";
+            Caption = 'POS Unit No.';
+            TableRelation = "NPR POS Unit";
             DataClassification = CustomerContent;
         }
         field(21; "Sales Ticket No."; Code[20])

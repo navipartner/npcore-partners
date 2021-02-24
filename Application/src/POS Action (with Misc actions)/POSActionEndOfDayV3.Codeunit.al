@@ -17,7 +17,7 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.8');
+        exit('1.9');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -57,7 +57,7 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
@@ -65,7 +65,6 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         POSSale: Codeunit "NPR POS Sale";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         SalePOS: Record "NPR Sale POS";
-        Register: Record "NPR Register";
         POSUnit: Record "NPR POS Unit";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EftHandled: Boolean;
@@ -76,7 +75,7 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         ClosingEntryNo: Integer;
         CashDrawerNo: Code[10];
         RecID: RecordID;
-        OpenCashRegister: Boolean;
+        OpenUnit: Boolean;
         BalanceEntryToPrint: Integer;
         CurrentView: Codeunit "NPR POS View";
     begin
@@ -87,7 +86,7 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        OpenCashRegister := JSON.GetBooleanParameter('Auto-Open Cash Drawer', false);
+        OpenUnit := JSON.GetBooleanParameter('Auto-Open Cash Drawer', false);
         CashDrawerNo := JSON.GetStringParameter('Cash Drawer No.', false);
 
         EndOfDayType := JSON.GetIntegerParameter('Type', true);
@@ -97,19 +96,18 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         POSSession.GetSetup(POSSetup);
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        POSSetup.GetRegisterRecord(Register);
 
         POSSetup.GetPOSUnit(POSUnit);
         POSSetup.GetSalespersonRecord(SalespersonPurchaser);
-        SalePOS."Register No." := Register."Register No.";
+        SalePOS."Register No." := POSUnit."No.";
 
         NextWorkflowStep := NextWorkflowStep::NA;
         case WorkflowStep of
             'ValidateRequirements':
                 begin
-                    if (not (ValidateRequirements(Register."Register No.", SalePOS."Sales Ticket No."))) then
+                    if (not (ValidateRequirements(POSUnit."No.", SalePOS."Sales Ticket No."))) then
                         FrontEnd.ContinueAtStep('EndOfWorkflow');
-                    POSCreateEntry.InsertUnitCloseBeginEntry(Register."Register No.", SalespersonPurchaser.Code);
+                    POSCreateEntry.InsertUnitCloseBeginEntry(POSUnit."No.", SalespersonPurchaser.Code);
                 end;
 
             'NotifySubscribers':
@@ -129,7 +127,7 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
                     EftCloseDone(POSSession);
 
             'OpenCashDrawer':
-                if (OpenCashRegister) then
+                if (OpenUnit) then
                     OpenDrawer(CashDrawerNo, POSUnit, SalePOS);
 
             'BalanceRegister':
@@ -140,8 +138,8 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
                     case (EndOfDayType) of
                         EndOfDayTypeOption::"Z-Report":
                             begin
-                                if (FinalEndOfDay(Register."Register No.", SalePOS."Dimension Set ID", BalanceEntryToPrint)) then begin
-                                    ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry(Register."Register No.", SalespersonPurchaser.Code);
+                                if (FinalEndOfDay(POSUnit."No.", SalePOS."Dimension Set ID", BalanceEntryToPrint)) then begin
+                                    ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry(POSUnit."No.", SalespersonPurchaser.Code);
                                     POSManagePOSUnit.ClosePOSUnitNo(POSUnit."No.", ClosingEntryNo);
                                     CheckAndPostAfterBalancing(ClosingEntryNo);
 
@@ -155,8 +153,8 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
 
                         EndOfDayTypeOption::CloseWorkshift:
                             begin
-                                CloseWorkshift(Register."Register No.", SalePOS."Dimension Set ID", BalanceEntryToPrint);
-                                ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry(Register."Register No.", SalespersonPurchaser.Code);
+                                CloseWorkshift(POSUnit."No.", SalePOS."Dimension Set ID", BalanceEntryToPrint);
+                                ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry(POSUnit."No.", SalespersonPurchaser.Code);
                                 POSManagePOSUnit.ClosePOSUnitNo(POSUnit."No.", ClosingEntryNo);
 
                                 CheckAndPostAfterBalancing(ClosingEntryNo);
@@ -169,7 +167,7 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
 
                             end;
                         else begin
-                                PreliminaryEndOfDay(Register."Register No.", SalePOS."Dimension Set ID");
+                                PreliminaryEndOfDay(POSUnit."No.", SalePOS."Dimension Set ID");
                                 POSManagePOSUnit.ReOpenLastPeriodRegister(POSUnit."No.");
                             end;
                     end;
@@ -395,11 +393,6 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
 
         POSSession.StoreActionState('eft_close_list', EFTSetup);
         NextWorkflowStep := NextWorkflowStep::EFT_CLOSE;
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeBalancing(SalePOS: Record "NPR Sale POS"; Register: Record "NPR Register")
-    begin
     end;
 
     procedure CheckAndPostAfterBalancing(POSEntryno: Integer)

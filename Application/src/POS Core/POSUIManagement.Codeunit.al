@@ -36,25 +36,23 @@ codeunit 6150702 "NPR POS UI Management"
         FrontEnd.ConfigureCaptions(Captions);
     end;
 
-    procedure InitializeNumberAndDateFormat(Register: Record "NPR Register")
+    procedure InitializeNumberAndDateFormat(POSUnit: Record "NPR POS Unit")
     var
-        POSUnit: Record "NPR POS Unit";
         POSViewProfile: Record "NPR POS View Profile";
     begin
-        if (not POSUnit.Get(Register."Register No.")) or (not POSViewProfile.Get(POSUnit."POS View Profile")) then
+        if not POSViewProfile.Get(POSUnit."POS View Profile") then
             Clear(POSViewProfile);
 
         FrontEnd.ConfigureNumberAndDateFormats(POSViewProfile);
     end;
 
-    procedure InitializeLogo(Register: Record "NPR Register")
+    procedure InitializeLogo(POSUnit: Record "NPR POS Unit")
     var
         InStr: InStream;
         Base64: Codeunit "Base64 Convert";
-        POSUnit: Record "NPR POS Unit";
         POSViewProfile: Record "NPR POS View Profile";
     begin
-        if (not POSUnit.Get(Register."Register No.")) or (not POSViewProfile.Get(POSUnit."POS View Profile")) or (not POSViewProfile.Picture.HasValue()) then
+        if (not POSViewProfile.Get(POSUnit."POS View Profile")) or (not POSViewProfile.Picture.HasValue()) then
             exit;
 
         POSViewProfile.CalcFields(Picture);
@@ -62,23 +60,22 @@ codeunit 6150702 "NPR POS UI Management"
         FrontEnd.ConfigureLogo(Base64.ToBase64(InStr));
     end;
 
-    procedure InitializeMenus(Register: Record "NPR Register"; Salesperson: Record "Salesperson/Purchaser"; POSSession: Codeunit "NPR POS Session")
+    procedure InitializeMenus(POSUnit: Record "NPR POS Unit"; Salesperson: Record "Salesperson/Purchaser"; POSSession: Codeunit "NPR POS Session")
     var
         Menu: Record "NPR POS Menu";
         tmpPOSParameterValue: Record "NPR POS Parameter Value" temporary;
-        POSUnit: Record "NPR POS Unit";
         POSViewProfile: Record "NPR POS View Profile";
         MenuObj: Codeunit "NPR POS Menu";
         Menus: JsonArray;
     begin
-        if (not POSUnit.Get(Register."Register No.")) or (not POSViewProfile.Get(POSUnit."POS View Profile")) then
+        if not POSViewProfile.Get(POSUnit."POS View Profile") then
             Clear(POSViewProfile);
 
         PreloadParameters(tmpPOSParameterValue);
 
         Menu.SetRange(Blocked, false);
         Menu.SetFilter("Register Type", '%1|%2', POSViewProfile.Code, '');
-        Menu.SetFilter("Register No.", '%1|%2', Register."Register No.", '');
+        Menu.SetFilter("Register No.", '%1|%2', POSUnit."No.", '');
         Menu.SetFilter("Salesperson Code", '%1|%2', Salesperson.Code, '');
         Menu.SetRange("Available on Desktop", true);                // TODO: fix this after developing app stuff
 
@@ -174,18 +171,17 @@ codeunit 6150702 "NPR POS UI Management"
             MenuButtonObj.Content.Add('filterRegister', MenuButton."Register No.");
     end;
 
-    procedure InitializeTheme(Register: Record "NPR Register")
+    procedure InitializeTheme(POSUnit: Record "NPR POS Unit")
     var
         POSTheme: Record "NPR POS Theme";
         ThemeDep: Record "NPR POS Theme Dependency";
-        WebClientDep: Record "NPR Web Client Dependency";
-        POSUnit: Record "NPR POS Unit";
+        WebClientDep: Record "NPR Web Client Dependency";        
         POSViewProfile: Record "NPR POS View Profile";
         ThemeLine: JsonObject;
         Theme: JsonArray;
         DependencyContent: Text;
     begin
-        if (not POSUnit.Get(Register."Register No.")) or (not POSViewProfile.Get(POSUnit."POS View Profile")) or (not POSTheme.Get(POSViewProfile."POS Theme Code")) or POSTheme.Blocked then
+        if (not POSViewProfile.Get(POSUnit."POS View Profile")) or (not POSTheme.Get(POSViewProfile."POS Theme Code")) or POSTheme.Blocked then
             exit;
 
         ThemeDep.SetRange("POS Theme Code", POSViewProfile."POS Theme Code");
@@ -225,12 +221,11 @@ codeunit 6150702 "NPR POS UI Management"
         FrontEnd.ConfigureTheme(Theme);
     end;
 
-    procedure InitializeAdministrativeTemplates(Register: Record "NPR Register")
+    procedure InitializeAdministrativeTemplates(POSUnit: Record "NPR POS Unit")
     var
         AdminTemplate: Record "NPR POS Admin. Template";
         AdminTemplateScope: Record "NPR POS Admin. Template Scope";
         AdminTemplateScopeTmp: Record "NPR POS Admin. Template Scope" temporary;
-        POSUnit: Record "NPR POS Unit";
         Templates: JsonArray;
         Template: JsonObject;
     begin
@@ -241,15 +236,13 @@ codeunit 6150702 "NPR POS UI Management"
                 AdminTemplateScopeTmp.Insert();
             until AdminTemplateScope.Next = 0;
 
-        if POSUnit.Get(Register."Register No.") then begin
-            AdminTemplateScope.SetRange("Applies To", AdminTemplateScope."Applies To"::"POS Unit");
-            AdminTemplateScope.SetRange("Applies To Code", POSUnit."No.");
-            if AdminTemplateScope.FindSet then
-                repeat
-                    AdminTemplateScopeTmp := AdminTemplateScope;
-                    AdminTemplateScopeTmp.Insert();
-                until AdminTemplateScope.Next = 0;
-        end;
+        AdminTemplateScope.SetRange("Applies To", AdminTemplateScope."Applies To"::"POS Unit");
+        AdminTemplateScope.SetRange("Applies To Code", POSUnit."No.");
+        if AdminTemplateScope.FindSet then
+            repeat
+                AdminTemplateScopeTmp := AdminTemplateScope;
+                AdminTemplateScopeTmp.Insert();
+            until AdminTemplateScope.Next = 0;
 
         AdminTemplateScope.SetRange("Applies To", AdminTemplateScope."Applies To"::User);
         AdminTemplateScope.SetRange("Applies To Code", UserId);

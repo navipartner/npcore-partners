@@ -222,7 +222,7 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
     begin
         POSSession.GetSetup(POSSetup);
 
-        EFTSetup.SetFilter("POS Unit No.", POSSetup.Register());
+        EFTSetup.SetFilter("POS Unit No.", POSSetup.GetPOSUnitNo());
         EFTSetup.SetRange("EFT Integration Type", IntegrationType());
         if not EFTSetup.FindFirst then begin
             EFTSetup.SetRange("POS Unit No.", '');
@@ -328,7 +328,7 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
         EFTPaymentMapping: Codeunit "NPR EFT Payment Mapping";
-    begin 
+    begin
         if EftTransactionRequest.Successful then begin
             Message(VOID_SUCCESS, EftTransactionRequest."Entry No.");
             if EFTPaymentMapping.FindPaymentType(EftTransactionRequest, POSPaymentMethod) then begin

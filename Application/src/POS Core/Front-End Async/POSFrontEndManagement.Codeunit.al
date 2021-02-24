@@ -331,7 +331,7 @@ codeunit 6150704 "NPR POS Front End Management"
         if POSView.FindViewByType(
           DefaultView.Type,
           Setup.Salesperson(),
-          Setup.Register())
+          Setup.GetPOSUnitNo())
         then begin
             Markup := POSView.GetMarkup();
             if Markup <> '' then begin

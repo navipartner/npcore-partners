@@ -11,20 +11,19 @@ codeunit 6014498 "NPR Exchange Label Mgt."
     var
         ExchangeLabel: Record "NPR Exchange Label";
         ExchangeLabelSetup: Record "NPR Exchange Label Setup";
-        Register: Record "NPR Register";
         String: Codeunit "NPR String Library";
         POSUnit: Record "NPR POS Unit";
     begin
         ExchangeLabelSetup.Get();
         ExchangeLabel.Init;
 
-        if Register.Get(POSUnit.GetCurrentPOSUnit()) then;
+        if POSUnit.Get(POSUnit.GetCurrentPOSUnit()) then;
 
         if StrLen(POSUnit."POS Store Code") <> 3 then
             POSUnit."POS Store Code" := String.PadStrLeft(POSUnit."POS Store Code", 3, ' ', false);
 
         ExchangeLabel."Store ID" := POSUnit."POS Store Code";
-        ExchangeLabel."Register No." := Register."Register No.";
+        ExchangeLabel."Register No." := POSUnit."No.";
 
         ExchangeLabel."Company Name" := CompanyName;
         ExchangeLabel."Table No." := RecRef.Number;
@@ -53,17 +52,12 @@ codeunit 6014498 "NPR Exchange Label Mgt."
         AssignIntegerFieldValue(ExchangeLabel."Sales Line No.", RecRef, 'Line No.');
         AssignCodeFieldValue(ExchangeLabel."Item No.", RecRef, 'No.');
         AssignCodeFieldValue(ExchangeLabel."Variant Code", RecRef, 'Variant Code');
-        //-NPR5.37 [292701]
         if PackagedBatch then
             AssignDecimalFieldValue(ExchangeLabel.Quantity, RecRef, 'Quantity')
         else
             ExchangeLabel.Quantity := 1;
-        //AssignDecimalFieldValue(ExchangeLabel.Quantity,                 RecRef, 'Quantity');
-        //+NPR5.37 [292701]
 
-        //-NPR5.51
         ExchangeLabel."Retail Cross Reference No." := InitRetailReference(RecRef);
-        //+NPR5.51
 
         ExchangeLabel.Insert(true);
         exit(ExchangeLabel."No.");
@@ -469,13 +463,12 @@ codeunit 6014498 "NPR Exchange Label Mgt."
     var
         ErrEAN: Label 'Check No. is invalid for EAN-No.';
         ErrLength: Label 'EAN Creation number is too long.';
-        Register: Record "NPR Register";
         VarietySetup: Record "NPR Variety Setup";
         EAN1: Code[20];
         POSUnit: Record "NPR POS Unit";
         INVALID_EAN_VALUE: Label 'Only digits are allowed when creating EAN: %1';
     begin
-        if Register.Get(POSUnit.GetCurrentPOSUnit()) then;
+        if POSUnit.Get(POSUnit.GetCurrentPOSUnit()) then;
         if StrLen(Prefix) + StrLen(POSUnit."POS Store Code") + StrLen(Format(Unique)) > 12 then
             Error(ErrLength);
 

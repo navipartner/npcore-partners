@@ -44,19 +44,17 @@ table 6151574 "NPR AF Notification Hub"
         }
         field(14; "From Register No."; Code[10])
         {
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Table ''NPR Register'' is marked for removal. Reason: Replaced with POS Unit, POS store, POS unit profiles.';
             Caption = 'From Register No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Register";
         }
         field(15; "To Register No."; Code[10])
         {
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Table ''NPR Register'' is marked for removal. Reason: Replaced with POS Unit, POS store, POS unit profiles.';
             Caption = 'To Register No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Register";
         }
         field(18; "Action Type"; Option)
         {
@@ -120,11 +118,10 @@ table 6151574 "NPR AF Notification Hub"
         }
         field(106; "Handled Register"; Code[10])
         {
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Table ''NPR Register'' is marked for removal. Reason: Replaced with POS Unit, POS store, POS unit profiles.';
             Caption = 'Handled Register';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Register";
         }
         field(107; Cancelled; DateTime)
         {
@@ -139,11 +136,10 @@ table 6151574 "NPR AF Notification Hub"
         }
         field(109; "Cancelled Register"; Code[10])
         {
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Table ''NPR Register'' is marked for removal. Reason: Replaced with POS Unit, POS store, POS unit profiles.';
             Caption = 'Cancelled Register';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Register";
         }
         field(110; Completed; DateTime)
         {
@@ -158,11 +154,10 @@ table 6151574 "NPR AF Notification Hub"
         }
         field(112; "Completed Register"; Code[10])
         {
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Table ''NPR Register'' is marked for removal. Reason: Replaced with POS Unit, POS store, POS unit profiles.';
             Caption = 'Completed Register';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Register";
         }
         field(200; "Request Data"; BLOB)
         {
@@ -176,11 +171,10 @@ table 6151574 "NPR AF Notification Hub"
         }
         field(202; "Temp Current Register"; Code[10])
         {
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteReason = 'Table ''NPR Register'' is marked for removal. Reason: Replaced with POS Unit, POS store, POS unit profiles.';
             Caption = 'Temp Current Register';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Register";
         }
         field(220; "Handled Pos Unit No."; Code[10])
         {

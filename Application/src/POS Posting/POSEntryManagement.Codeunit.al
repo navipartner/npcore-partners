@@ -186,65 +186,6 @@ codeunit 6150629 "NPR POS Entry Management"
         if (BankAccount."Currency Code" <> POSPaymentMethod."Currency Code") then
             Error(TextInconsistent, BankAccount.FieldCaption("Currency Code"), BankAccount."Currency Code", BankAccount.TableCaption, POSPaymentMethod."Currency Code", POSPaymentMethod.TableCaption, POSPostingSetup.TableCaption);
     end;
-
-    procedure GetPOSUnit(RegisterNo: Code[10]): Code[10]
-    var
-        POSUnit: Record "NPR POS Unit";
-        Register: Record "NPR Register";
-    begin
-        if POSUnit.Get(RegisterNo) then
-            exit(RegisterNo);
-        CreatePOSUnit(RegisterNo);
-        exit(RegisterNo);
-    end;
-
-    local procedure CreatePOSUnit(POSUnitCode: Code[10])
-    var
-        POSUnit: Record "NPR POS Unit";
-        POSStore: Record "NPR POS Store";
-        POSPaymentBin: Record "NPR POS Payment Bin";
-        Register: Record "NPR Register";
-    begin
-        POSUnit.Init();
-        Register.Get(POSUnitCode);
-        POSUnit."No." := Register."Register No.";
-        if not POSStore.Get(POSUnitCode) then
-            CreatePOSStore(POSUnit, Register);
-        if not POSPaymentBin.Get(POSUnitCode) then
-            CreateBinCodeFromUnit(POSUnit, POSStore);
-        POSUnit.Validate("POS Store Code", POSStore.Code);
-        POSUnit.Insert(true);
-    end;
-
-    local procedure CreatePOSStore(var POSUnit: Record "NPR POS Unit"; Register: Record "NPR Register")
-    var
-        POSStore: Record "NPR POS Store";
-    begin
-        POSStore.Init();
-        POSStore.Code := POSUnit."No.";
-        POSStore.Validate("Global Dimension 1 Code", POSUnit."Global Dimension 1 Code");
-        POSStore.Validate("Global Dimension 2 Code", POSUnit."Global Dimension 2 Code");
-        POSStore.Validate("Default POS Posting Setup", POSStore."Default POS Posting Setup"::Customer);
-        POSStore.Insert(true);
-    end;
-
-    local procedure CreateBinCodeFromUnit(var POSUnit: Record "NPR POS Unit"; var POSStore: Record "NPR POS Store")
-    var
-        POSPaymentBin: Record "NPR POS Payment Bin";
-        POSUnittoBinRelation: Record "NPR POS Unit to Bin Relation";
-    begin
-        POSPaymentBin.Init();
-        POSPaymentBin."No." := POSUnit."No.";
-        POSPaymentBin."POS Store Code" := POSStore.Code;
-        POSPaymentBin."Attached to POS Unit No." := POSUnit."No.";
-        POSPaymentBin.Description := POSStore.Name;
-        POSPaymentBin.Insert(true);
-        POSUnittoBinRelation.Init;
-        POSUnittoBinRelation."POS Unit No." := POSUnit."No.";
-        POSUnittoBinRelation."POS Payment Bin No." := POSPaymentBin."No.";
-        POSUnittoBinRelation.Insert(true);
-    end;
-
     procedure ShowSalesDocument(POSEntry: Record "NPR POS Entry"): Boolean
     var
         SalesHeader: Record "Sales Header";

@@ -18,8 +18,8 @@ table 6014478 "NPR Retail Logo"
         }
         field(2; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
-            TableRelation = "NPR Register"."Register No.";
+            Caption = 'POS Unit No.';
+            TableRelation = "NPR POS Unit"."No.";
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;

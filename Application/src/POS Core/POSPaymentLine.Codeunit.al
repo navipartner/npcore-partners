@@ -98,7 +98,7 @@ codeunit 6150707 "NPR POS Payment Line"
     procedure CalculateBalance(var SaleAmount: Decimal; var PaidAmount: Decimal; var ReturnAmount: Decimal; var Subtotal: Decimal)
     var
         PaymentLine: Record "NPR Sale Line POS";
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         RoundingAmount: Decimal;
         Decimal: Decimal;
         DiscountRounding: Decimal;
@@ -110,7 +110,7 @@ codeunit 6150707 "NPR POS Payment Line"
         if (not Initialized) then
             exit;
 
-        Setup.GetRegisterRecord(Register);
+        Setup.GetPOSUnit(POSUnit);
         SaleAmount := 0;
         PaidAmount := 0;
         ReturnAmount := 0;
@@ -238,24 +238,20 @@ codeunit 6150707 "NPR POS Payment Line"
     local procedure ApplyForeignAmountConversion(var SaleLinePOS: Record "NPR Sale Line POS"; PrecalculatedAmount: Boolean; ForeignAmount: Decimal)
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
-        Register: Record "NPR Register";
     begin
+        SaleLinePOS."Currency Amount" := SaleLinePOS."Amount Including VAT";
 
-        with SaleLinePOS do begin
-            "Currency Amount" := "Amount Including VAT";
+        if not POSPaymentMethod.Get(SaleLinePOS."No.") then
+            exit;
 
-            if not POSPaymentMethod.Get(SaleLinePOS."No.") then
-                exit;
+        if (POSPaymentMethod."Fixed Rate" <> 0) then
+            SaleLinePOS."Currency Amount" := SaleLinePOS."Amount Including VAT" / (POSPaymentMethod."Fixed Rate" / 100);
 
-            if (POSPaymentMethod."Fixed Rate" <> 0) then
-                "Currency Amount" := "Amount Including VAT" / (POSPaymentMethod."Fixed Rate" / 100);
+        if (PrecalculatedAmount) then
+            SaleLinePOS."Currency Amount" := ForeignAmount;
 
-            if (PrecalculatedAmount) then
-                "Currency Amount" := ForeignAmount;
-
-            if (POSPaymentMethod."Fixed Rate" <> 0) then
-                Validate("Amount Including VAT", Round("Currency Amount" * POSPaymentMethod."Fixed Rate" / 100, 0.01, POSPaymentMethod.GetRoundingType()));
-        end
+        if (POSPaymentMethod."Fixed Rate" <> 0) then
+            SaleLinePOS.Validate("Amount Including VAT", Round(SaleLinePOS."Currency Amount" * POSPaymentMethod."Fixed Rate" / 100, 0.01, POSPaymentMethod.GetRoundingType()));
     end;
 
     local procedure ReverseUnrealizedSalesVAT(var SaleLinePOS: Record "NPR Sale Line POS")

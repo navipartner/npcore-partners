@@ -229,9 +229,9 @@ table 6150701 "NPR POS Menu Button"
         }
         field(42; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Register";
+            TableRelation = "NPR POS Unit";
         }
         field(43; "Salesperson Code"; Code[20])
         {

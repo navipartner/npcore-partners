@@ -51,8 +51,8 @@ table 6014520 "NPR Report Selection: Contract"
         }
         field(7; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
-            TableRelation = "NPR Register";
+            Caption = 'POS Unit No.';
+            TableRelation = "NPR POS Unit";
             DataClassification = CustomerContent;
         }
         field(8; "Codeunit ID"; Integer)

@@ -1288,7 +1288,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
         FRAuditNoSeries: Record "NPR FR Audit No. Series";
         POSEndofDayProfile: Record "NPR POS End of Day Profile";
         POSAuditProfile: Record "NPR POS Audit Profile";
-        Register: Record "NPR Register";
         FRAuditNoSeries2: Record "NPR FR Audit No. Series";
         POSStore: Record "NPR POS Store";
         CompanyInformation: Record "Company Information";
@@ -1300,7 +1299,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
         FrontEnd.GetSession(POSSession);
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
-        POSSetup.GetRegisterRecord(Register);
         if not IsEnabled(POSUnit."POS Audit Profile") then
             exit;
 

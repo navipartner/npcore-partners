@@ -46,7 +46,7 @@ codeunit 6151287 "NPR SS Action: Idle Timeout"
     begin
 
         POSSession.GetSetup(POSSetup);
-        POSCreateEntry.InsertUnitLockEntry(POSSetup.Register(), POSSetup.Salesperson());
+        POSCreateEntry.InsertUnitLockEntry(POSSetup.GetPOSUnitNo(), POSSetup.Salesperson());
 
         POSSession.ChangeViewLogin();
     end;

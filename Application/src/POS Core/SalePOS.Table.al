@@ -7,7 +7,7 @@ table 6014405 "NPR Sale POS"
     {
         field(1; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
             NotBlank = true;
         }
@@ -82,8 +82,7 @@ table 6014405 "NPR Sale POS"
                 xSaleLinePOS: Record "NPR Sale Line POS";
                 POSSaleLine: Codeunit "NPR POS Sale Line";
             begin
-                Register.Get("Register No.");
-                GetPOSUnit;
+                GetPOSUnit();
                 "POS Store Code" := POSUnit."POS Store Code";
                 GetPOSStore();
 
@@ -474,7 +473,7 @@ table 6014405 "NPR Sale POS"
         }
         field(126; "Alternative Register No."; Code[20])
         {
-            Caption = 'Alternative Cash Register No.';
+            Caption = 'Alternative POS Unit No.';
             DataClassification = CustomerContent;
         }
         field(127; "Country Code"; Code[10])
@@ -719,8 +718,6 @@ table 6014405 "NPR Sale POS"
         GetPOSStore();
         GetPOSUnit();
 
-        Register.Get("Register No.");
-        GetPOSUnit();
         POSUnit.GetProfile(POSPricingProfile);
         "Location Code" := POSStore."Location Code";
         "Customer Disc. Group" := POSPricingProfile."Customer Disc. Group";
@@ -735,7 +732,6 @@ table 6014405 "NPR Sale POS"
     var
         DimMgt: Codeunit DimensionManagement;
         NPRDimMgt: Codeunit "NPR Dimension Mgt.";
-        Register: Record "NPR Register";
         POSUnit: Record "NPR POS Unit";
         POSStore: Record "NPR POS Store";
 

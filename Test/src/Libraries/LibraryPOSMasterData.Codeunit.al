@@ -7,7 +7,6 @@ codeunit 85002 "NPR Library - POS Master Data"
     procedure CreatePOSUnit(var POSUnit: Record "NPR POS Unit"; POSStoreCode: Code[10]; POSProfileCode: Code[20])
     var
         POSStore: Record "NPR POS Store";
-        Register: Record "NPR Register";
         POSPaymentMethod: Record "NPR POS Payment Method";
         POSAuditProfile: Record "NPR POS Audit Profile";
         LibraryUtility: Codeunit "Library - Utility";
@@ -31,7 +30,6 @@ codeunit 85002 "NPR Library - POS Master Data"
 
         CreatePeriodRegister(POSUnit);
         CreatePOSPaymentMethod(POSPaymentMethod, POSPaymentMethod."Processing Type"::CASH, '', false);
-        CreateRegister(Register, POSUnit, POSPaymentMethod.Code, POSPaymentMethod.Code);
     end;
 
     procedure CreatePOSStore(var POSStore: Record "NPR POS Store")
@@ -190,17 +188,6 @@ codeunit 85002 "NPR Library - POS Master Data"
 
         POSSetup.Init;
         POSSetup.Insert();
-    end;
-
-    procedure CreateRegister(var Register: Record "NPR Register"; POSUnit: Record "NPR POS Unit"; PrimaryPaymentType: Code[10]; ReturnPaymentType: Code[10])
-    begin
-        if not Register.Get(POSUnit."No.") then begin
-            Register.Init;
-            Register."Register No." := POSUnit."No.";
-            Register.Insert;
-        end;
-        Register."Primary Payment Type" := PrimaryPaymentType;
-        Register.Modify;
     end;
 
     procedure CreatePOSPaymentMethod(var POSPaymentMethod: Record "NPR POS Payment Method"; No: Text; ProcessingType: Integer)

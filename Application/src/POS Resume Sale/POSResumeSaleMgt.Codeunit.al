@@ -40,7 +40,7 @@ codeunit 6150739 "NPR POS Resume Sale Mgt."
         Setup.GetPOSUnit(POSUnit);
 
         SalePOS.FilterGroup(2);
-        SalePOS.SetRange("Register No.", Setup.Register);
+        SalePOS.SetRange("Register No.", Setup.GetPOSUnitNo());
         SalePOS.FilterGroup(0);
         //SalePOS.SETRANGE("Salesperson Code",Setup.Salesperson());
         if POSUnitIdentity."Entry No." = 0 then

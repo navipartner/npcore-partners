@@ -1,9 +1,5 @@
 table 6059945 "NPR CashKeeper Setup"
 {
-    // NPR5.29\CLVA\20161108 CASE NPR5.29 Object Created
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
-    // NPR5.40/CLVA/20180307 CASE 291921 Added field "Payment Type"
-
     Caption = 'CashKeeper Setup';
     DataClassification = CustomerContent;
 
@@ -11,9 +7,9 @@ table 6059945 "NPR CashKeeper Setup"
     {
         field(1; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Register";
+            TableRelation = "NPR POS Unit";
         }
         field(10; "CashKeeper IP"; Text[20])
         {

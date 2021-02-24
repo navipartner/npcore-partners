@@ -57,7 +57,7 @@ codeunit 6150724 "NPR POS Action - Change View"
         Item: Record Item;
         POSAction: Record "NPR POS Action";
         POSDefaultUserView: Record "NPR POS Default User View";
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         POSSetup: Codeunit "NPR POS Setup";
         JSON: Codeunit "NPR POS JSON Management";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
@@ -70,15 +70,15 @@ codeunit 6150724 "NPR POS Action - Change View"
 
         ViewType := JSON.GetIntegerParameter('ViewType', true);
         POSSession.GetSetup(POSSetup);
-        POSSetup.GetRegisterRecord(Register);
-        POSDefaultUserView.SetDefault(ViewType, Register."Register No.", JSON.GetStringParameter('ViewCode', false));
+        POSSetup.GetPOSUnit(POSUnit);
+        POSDefaultUserView.SetDefault(ViewType, POSUnit."No.", JSON.GetStringParameter('ViewCode', false));
 
         POSSession.GetCurrentView(CurrentView);
 
         case ViewType of
             ViewType::Login:
                 begin
-                    POSCreateEntry.InsertUnitLogoutEntry(Register."Register No.", POSSetup.Salesperson());
+                    POSCreateEntry.InsertUnitLogoutEntry(POSUnit."No.", POSSetup.Salesperson());
 
                     if (CurrentView.Type = CurrentView.Type::Sale) or (CurrentView.Type = CurrentView.Type::Payment) then begin
                         POSSession.GetSaleLine(POSSaleLine);
@@ -98,7 +98,7 @@ codeunit 6150724 "NPR POS Action - Change View"
                 POSSession.ChangeViewBalancing();
             ViewType::Locked:
                 begin
-                    POSCreateEntry.InsertUnitLockEntry(Register."Register No.", POSSetup.Salesperson());
+                    POSCreateEntry.InsertUnitLockEntry(POSUnit."No.", POSSetup.Salesperson());
                     POSSession.ChangeViewLocked();
                 end;
         end;

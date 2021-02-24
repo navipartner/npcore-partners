@@ -31,7 +31,7 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
             Sender.RegisterWorkflow(false);
             Sender.RegisterOptionParameter('LookupType', CreateOptionString, '');
             Sender.RegisterTextParameter('View', '');
-            Sender.RegisterOptionParameter('LocationFilter', 'POS Store,Cash Register,Use View', 'POS Store');
+            Sender.RegisterOptionParameter('LocationFilter', 'POS Store,POS Unit,Use View', '');
         end;
     end;
 
@@ -124,7 +124,7 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
             -1, 0:
                 Item.SetFilter("Location Filter", '=%1', GetStoreLocation(POSSession));
             1:
-                Item.SetFilter("Location Filter", '=%1', GetStoreLocation(POSSession));
+                Item.SetFilter("Location Filter", '=%1', GetStoreLocationFromUnit(POSSession));
         end;
 
         Item.SetFilter(Blocked, '=%1', false);
@@ -185,7 +185,7 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
             -1, 0:
                 StockkeepingUnit.SetFilter("Location Code", '=%1', GetStoreLocation(POSSession));
             1:
-                StockkeepingUnit.SetFilter("Location Code", '=%1', GetStoreLocation(POSSession));
+                StockkeepingUnit.SetFilter("Location Code", '=%1', GetStoreLocationFromUnit(POSSession));
         end;
 
         StockkeepingUnitList.Editable(false);
@@ -207,7 +207,6 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         Setup: Codeunit "NPR POS Setup";
         NewSaleLinePOS: Record "NPR Sale Line POS";
-        Register: Record "NPR Register";
         POSSetup: Record "NPR POS Setup";
         POSAction: Record "NPR POS Action";
     begin
@@ -253,6 +252,19 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
     begin
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSStore(POSStore);
+
+        exit(POSStore."Location Code");
+    end;
+
+    local procedure GetStoreLocationFromUnit(POSSession: Codeunit "NPR POS Session"): Code[10]
+    var
+        POSSetup: Codeunit "NPR POS Setup";
+        POSStore: Record "NPR POS Store";
+        POSUnit: Record "NPR POS Unit";
+    begin
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetPOSUnit(POSUnit);
+        POSStore.Get(POSUnit."POS Store Code");
 
         exit(POSStore."Location Code");
     end;

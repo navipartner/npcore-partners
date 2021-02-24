@@ -9,10 +9,10 @@ table 6151015 "NPR NpRv Sales Line"
     {
         field(1; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = "NPR Register";
+            TableRelation = "NPR POS Unit";
         }
         field(5; "Sales Ticket No."; Code[20])
         {

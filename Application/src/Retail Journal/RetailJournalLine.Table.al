@@ -318,8 +318,8 @@ table 6014422 "NPR Retail Journal Line"
         }
         field(47; "Register No."; Code[20])
         {
-            Caption = 'Cash Register No.';
-            TableRelation = "NPR Register";
+            Caption = 'POS Unit No.';
+            TableRelation = "NPR POS Unit";
             DataClassification = CustomerContent;
         }
         field(50; "Location Filter"; Code[10])
@@ -553,7 +553,6 @@ table 6014422 "NPR Retail Journal Line"
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
         TMPDiscountPriority: Record "NPR Discount Priority" temporary;
         TempSaleLinePOS2: Record "NPR Sale Line POS" temporary;
-        Register: Record "NPR Register";
         POSUnit: Record "NPR POS Unit";
         POSPricingProfile: Record "NPR POS Pricing Profile";
     begin
@@ -567,8 +566,8 @@ table 6014422 "NPR Retail Journal Line"
         else
             TempSalePOS."Register No." := POSUnit.GetCurrentPOSUnit();
 
-        if not Register.Get(TempSalePOS."Register No.") then
-            Register.Init;
+        if not POSUnit.Get(TempSalePOS."Register No.") then
+            POSUnit.Init;
 
         if not POSUnit.Get(TempSalePOS."Register No.") then
             POSUnit.Init();

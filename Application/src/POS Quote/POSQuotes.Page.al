@@ -23,7 +23,7 @@ page 6151002 "NPR POS Quotes"
                 field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Cash Register No. field';
+                    ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
                 field("Created at"; Rec."Created at")
                 {

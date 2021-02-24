@@ -66,7 +66,7 @@ codeunit 6151177 "NPR POS Action: Prnt Post.Exch"
         POSSession.GetSetup(POSSetup);
 
         POSEntry.FilterGroup(2);
-        POSEntry.SetRange("POS Unit No.", POSSetup.Register);
+        POSEntry.SetRange("POS Unit No.", POSSetup.GetPOSUnitNo());
         POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
         POSEntry.FilterGroup(0);
 
