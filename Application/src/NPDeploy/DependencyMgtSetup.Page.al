@@ -15,46 +15,6 @@ page 6014670 "NPR Dependency Mgt. Setup"
                 group(Configuration)
                 {
                     Caption = 'Configuration';
-                    field("OData URL"; "OData URL")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Managed Dependency OData URL field';
-
-                        trigger OnValidate()
-                        begin
-                            InvalidateManagedDependencies();
-                        end;
-                    }
-                    field(Username; Username)
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Managed Dependency Username field';
-
-                        trigger OnValidate()
-                        begin
-                            InvalidateManagedDependencies();
-                        end;
-                    }
-                    field(ManagedDependencyPassword; ManagedDependencyPassword)
-                    {
-                        ApplicationArea = All;
-                        Editable = PasswordEditable;
-                        ExtendedDatatype = Masked;
-                        ToolTip = 'Specifies the value of the ManagedDependencyPassword field';
-
-                        trigger OnValidate()
-                        begin
-                            InvalidateManagedDependencies();
-                            StoreManagedDependencyPassword(ManagedDependencyPassword);
-                            CurrPage.SaveRecord();
-                        end;
-                    }
-                    field(Configured; Configured)
-                    {
-                        ApplicationArea = All;
-                        Editable = false;
-                        ToolTip = 'Specifies the value of the Managed Dependency Configured field';
-                    }
                     field("Disable Deployment"; "Disable Deployment")
                     {
                         ApplicationArea = All;
@@ -69,17 +29,6 @@ page 6014670 "NPR Dependency Mgt. Setup"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Accept Dependency Statuses field';
                     }
-                    field("Tag Filter"; "Tag Filter")
-                    {
-                        ApplicationArea = All;
-                        Caption = 'Tag Filter (Comma Separated)';
-                        ToolTip = 'Specifies the value of the Tag Filter (Comma Separated) field';
-                    }
-                    field("Tag Filter Comparison Operator"; "Tag Filter Comparison Operator")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Tag Filter Comparison Operator field';
-                    }
                 }
             }
         }
@@ -89,65 +38,25 @@ page 6014670 "NPR Dependency Mgt. Setup"
     {
         area(processing)
         {
-            action("Validate Managed Dependencies")
-            {
-                Caption = 'Validate Managed Dependencies';
-                Image = TestDatabase;
-                Promoted = true;
-				PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                ApplicationArea = All;
-                ToolTip = 'Executes the Validate Managed Dependencies action';
-
-                trigger OnAction()
-                begin
-                    ValidateManagedDependencySetup();
-                end;
-            }
-            action("Setup Managed Dependecy")
-            {
-                Caption = 'Setup Managed Dependecy';
-                Image = Setup;
-                Promoted = true;
-				PromotedOnly = true;
-                PromotedIsBig = true;
-                ApplicationArea = All;
-                ToolTip = 'Executes the Setup Managed Dependecy action';
-
-                trigger OnAction()
-                var
-                    InstallDependencies: Codeunit "NPR Install Mng. Dependencies";
-                begin
-                    InstallDependencies.InsertBaseData;
-                end;
-            }
             action("Download Managed Dependencies")
             {
                 Caption = 'Download Managed Dependencies';
                 Image = ImportCodes;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Download Managed Dependencies action';
 
                 trigger OnAction()
                 var
-                    InstallDependencies: Codeunit "NPR Install Mng. Dependencies";
+                    ManagedDependencyMgt: Codeunit "NPR Managed Dependency Mgt.";
                 begin
-                    InstallDependencies.DownloadManagedDependecies;
+                    ManagedDependencyMgt.Run();
                 end;
             }
         }
     }
-
-    trigger OnAfterGetRecord()
-    begin
-        if Password.HasValue then
-            ManagedDependencyPassword := GetManagedDependencyPassword();
-        PasswordEditable := CurrPage.Editable;
-    end;
 
     trigger OnOpenPage()
     begin
@@ -156,29 +65,6 @@ page 6014670 "NPR Dependency Mgt. Setup"
             Init;
             Insert;
         end;
-    end;
-
-    var
-        ManagedDependencyPassword: Text;
-        [InDataSet]
-        PasswordEditable: Boolean;
-
-    local procedure InvalidateManagedDependencies()
-    begin
-        Configured := false;
-    end;
-
-    local procedure ValidateManagedDependencySetup()
-    var
-        ManagedDepMgt: Codeunit "NPR Managed Dependency Mgt.";
-        ErrorMessage: Text;
-        TextOk: Label 'Managed Dependency OData web service has been configured successfully. Your external dependencies will now be managed centrally by Ground Control.';
-    begin
-        TestField("OData URL");
-        ManagedDepMgt.ValidateGroundControlConfiguration(Rec);
-        Configured := true;
-        CurrPage.SaveRecord();
-        Message(TextOk);
     end;
 }
 

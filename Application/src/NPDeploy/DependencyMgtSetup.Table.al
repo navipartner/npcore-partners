@@ -15,22 +15,26 @@ table 6014625 "NPR Dependency Mgt. Setup"
         {
             Caption = 'Managed Dependency OData URL';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(11; Username; Text[30])
         {
             Caption = 'Managed Dependency Username';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(12; Password; BLOB)
         {
             Caption = 'Managed Dependency Password';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(13; Configured; Boolean)
         {
             Caption = 'Managed Dependency Configured';
             Editable = false;
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(14; "Accept Statuses"; Option)
         {
@@ -43,6 +47,7 @@ table 6014625 "NPR Dependency Mgt. Setup"
         {
             Caption = 'Tag Filter';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(16; "Tag Filter Comparison Operator"; Option)
         {
@@ -50,6 +55,7 @@ table 6014625 "NPR Dependency Mgt. Setup"
             OptionCaption = 'Any,All';
             OptionMembers = Any,All;
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(17; "Disable Deployment"; Boolean)
         {
@@ -64,25 +70,5 @@ table 6014625 "NPR Dependency Mgt. Setup"
         {
         }
     }
-
-    procedure StoreManagedDependencyPassword(Pwd: Text)
-    var
-        OutStr: OutStream;
-    begin
-        Password.CreateOutStream(OutStr, TextEncoding::UTF8);
-        OutStr.Write(Pwd);
-    end;
-
-    [NonDebuggable]
-    procedure GetManagedDependencyPassword() Pwd: Text
-    var
-        InStr: InStream;
-    begin
-        if Password.HasValue then begin
-            CalcFields(Password);
-            Password.CreateInStream(InStr, TextEncoding::UTF8);
-            InStr.Read(Pwd);
-        end;
-    end;
 }
 
