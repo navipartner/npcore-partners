@@ -365,44 +365,6 @@ codeunit 6014401 "NPR Dimension Mgt."
 
     end;
 
-    procedure CopyAuditRollDimToSaleLinePOSDim(var AuditRoll: Record "NPR Audit Roll"; var SaleLinePOS: Record "NPR Sale Line POS")
-    var
-        FromNPRLineDim: Record "NPR Line Dimension";
-        ToNPRLineDim: Record "NPR Line Dimension";
-    begin
-        //CopyRevRulleDimToEkspLineDim
-        Clear(ToNPRLineDim);
-        if SaleLinePOS."Line No." <> 0 then begin
-            ToNPRLineDim.SetRange("Table ID", DATABASE::"NPR Sale Line POS");
-            ToNPRLineDim.SetRange("Register No.", SaleLinePOS."Register No.");
-            ToNPRLineDim.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-            ToNPRLineDim.SetRange(Date, SaleLinePOS.Date);
-            ToNPRLineDim.SetRange("Sale Type", SaleLinePOS."Sale Type");
-            ToNPRLineDim.SetRange("Line No.", SaleLinePOS."Line No.");
-            ToNPRLineDim.SetRange("No.", '');
-            ToNPRLineDim.DeleteAll(true);
-        end;
-
-        Clear(ToNPRLineDim);
-        with FromNPRLineDim do begin
-            SetNPRDimFilterAuditRoll(FromNPRLineDim, AuditRoll);
-            if Find('-') then
-                repeat
-                    ToNPRLineDim."Table ID" := DATABASE::"NPR Sale Line POS";
-                    ToNPRLineDim."Register No." := SaleLinePOS."Register No.";
-                    ToNPRLineDim."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-                    ToNPRLineDim.Date := SaleLinePOS.Date;
-                    ToNPRLineDim."Sale Type" := SaleLinePOS."Sale Type";
-                    ToNPRLineDim."Line No." := SaleLinePOS."Line No.";
-                    ToNPRLineDim."No." := '';
-                    ToNPRLineDim."Dimension Code" := FromNPRLineDim."Dimension Code";
-                    ToNPRLineDim."Dimension Value Code" := FromNPRLineDim."Dimension Value Code";
-                    if not ToNPRLineDim.Insert(true) then
-                        ToNPRLineDim.Modify(true);
-                until Next = 0;
-        end;
-    end;
-
     procedure SetNPRDimFilterSaleLinePOS(var NPRLineDimension: Record "NPR Line Dimension"; var SaleLinePOS: Record "NPR Sale Line POS")
     begin
         //SetNPRDimFilterEkspLine
@@ -415,56 +377,6 @@ codeunit 6014401 "NPR Dimension Mgt."
         NPRLineDimension.SetRange("Sale Type", SaleLinePOS."Sale Type");
         NPRLineDimension.SetRange("Line No.", SaleLinePOS."Line No.");
         //NPRDimension.SETRANGE("No.",'');
-    end;
-
-    procedure SetNPRDimFilterAuditRoll(var NPRLineDimension: Record "NPR Line Dimension"; var AuditRoll: Record "NPR Audit Roll")
-    begin
-        //SetNPRDimFilterRevRulle
-        NPRLineDimension.SetRange("Table ID", DATABASE::"NPR Audit Roll");
-        NPRLineDimension.SetRange("Register No.", AuditRoll."Register No.");
-        NPRLineDimension.SetRange("Sales Ticket No.", AuditRoll."Sales Ticket No.");
-        NPRLineDimension.SetRange(Date, AuditRoll."Sale Date");
-        NPRLineDimension.SetRange("Sale Type", AuditRoll."Sale Type");
-        NPRLineDimension.SetRange("Line No.", AuditRoll."Line No.");
-        NPRLineDimension.SetRange("No.", AuditRoll."No.");
-    end;
-
-    procedure CopySaleLineDimToAuditDim(var SaleLinePOS: Record "NPR Sale Line POS"; var AuditRoll: Record "NPR Audit Roll")
-    var
-        FromNPRLineDim: Record "NPR Line Dimension";
-        ToNPRLineDim: Record "NPR Line Dimension";
-    begin
-        //CopySaleLineDimToAuditDim()
-        Clear(ToNPRLineDim);
-        if AuditRoll."Sales Ticket No." <> '' then begin
-            ToNPRLineDim.SetRange("Table ID", DATABASE::"NPR Audit Roll");
-            ToNPRLineDim.SetRange("Register No.", AuditRoll."Register No.");
-            ToNPRLineDim.SetRange("Sales Ticket No.", AuditRoll."Sales Ticket No.");
-            ToNPRLineDim.SetRange(Date, AuditRoll."Sale Date");
-            ToNPRLineDim.SetRange("Sale Type", AuditRoll."Sale Type");
-            ToNPRLineDim.SetRange("Line No.", AuditRoll."Line No.");
-            ToNPRLineDim.SetRange("No.", AuditRoll."No.");
-            ToNPRLineDim.DeleteAll(true);
-        end;
-
-        Clear(ToNPRLineDim);
-        with FromNPRLineDim do begin
-            SetNPRDimFilterSaleLinePOS(FromNPRLineDim, SaleLinePOS);
-            if Find('-') then
-                repeat
-                    ToNPRLineDim."Table ID" := DATABASE::"NPR Audit Roll";
-                    ToNPRLineDim."Register No." := SaleLinePOS."Register No.";
-                    ToNPRLineDim."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-                    ToNPRLineDim.Date := SaleLinePOS.Date;
-                    ToNPRLineDim."Sale Type" := AuditRoll."Sale Type";
-                    ToNPRLineDim."Line No." := AuditRoll."Line No.";
-                    ToNPRLineDim."No." := AuditRoll."No.";
-                    ToNPRLineDim."Dimension Code" := FromNPRLineDim."Dimension Code";
-                    ToNPRLineDim."Dimension Value Code" := FromNPRLineDim."Dimension Value Code";
-                    if not ToNPRLineDim.Insert(true) then
-                        ToNPRLineDim.Modify(true);
-                until Next = 0;
-        end;
     end;
 }
 
