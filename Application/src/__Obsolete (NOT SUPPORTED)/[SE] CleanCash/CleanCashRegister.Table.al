@@ -12,7 +12,6 @@ table 6184503 "NPR CleanCash Register"
         {
             Caption = 'Cash Register No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Register"."Register No.";
         }
         field(2; "CleanCash No. Series"; Code[10])
         {

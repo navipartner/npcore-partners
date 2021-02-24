@@ -13,7 +13,7 @@ table 6014418 "NPR Archive Sale POS"
     {
         field(1; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             NotBlank = true;
             DataClassification = CustomerContent;
         }
@@ -271,7 +271,7 @@ table 6014418 "NPR Archive Sale POS"
         }
         field(126; "Alternative Register No."; Code[20])
         {
-            Caption = 'Alternative Cash Register No.';
+            Caption = 'Alternative POS Unit No.';
             DataClassification = CustomerContent;
         }
         field(127; "Country Code"; Code[10])

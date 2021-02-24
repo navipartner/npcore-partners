@@ -64,7 +64,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         ERR_ORDER_SALE_SYNC: Label '%1 %2 was created successfully but an error occurred when syncing changes with POS, preventing POS sale from ending:\%3';
         ERR_DOC_MISSING: Label '%1 %2 is missing after page closed. Cannot sync with POS and end sale.';
         SendICOrderConf: Boolean;
-        UseLocationFrom: Option Register,"POS Store","POS Sale","Specific Location";
+        UseLocationFrom: Option "POS Unit","POS Store","POS Sale","Specific Location";
         UseLocationCode: Code[10];
         CustomerCreditCheck: Boolean;
         CUSTOMER_CREDIT_CHECK_FAILED: Label 'Customer credit check failed';
@@ -184,7 +184,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         SendICOrderConf := Set;
     end;
 
-    procedure SetLocationSource(NewSource: Option Register,"POS Store","POS Sale","Specific Location"; NewLocationCode: Code[10])
+    procedure SetLocationSource(NewSource: Option "POS Unit","POS Store","POS Sale","Specific Location"; NewLocationCode: Code[10])
     begin
         UseLocationFrom := NewSource;
         UseLocationCode := NewLocationCode;
@@ -1147,9 +1147,15 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
     local procedure GetLocationCode(SalePOS: Record "NPR Sale POS"): Code[10]
     var
         POSStore: Record "NPR POS Store";
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
     begin
         case UseLocationFrom of
+            UseLocationFrom::"POS Unit":
+                begin
+                    POSUnit.Get(SalePOS."Register No.");
+                    POSStore.Get(POSUnit."POS Store Code");
+                    exit(POSStore."Location Code");
+                end;
             UseLocationFrom::"POS Store":
                 begin
                     POSStore.Get(SalePOS."POS Store Code");

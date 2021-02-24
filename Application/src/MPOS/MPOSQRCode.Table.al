@@ -83,7 +83,7 @@ table 6059964 "NPR MPOS QR Code"
         {
             Caption = 'Cash Register Id';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Register"."Register No.";
+            TableRelation = "NPR POS Unit"."No.";
             ValidateTableRelation = false;
         }
     }

@@ -122,7 +122,7 @@ page 6014690 "NPR User Setup Step"
                     begin
                         POSUnitsList.LookupMode := true;
 
-                        POSUnitsList.SetCashRegisterMode(true);
+                        POSUnitsList.SetPOSUnitMode(true);
                         POSUnitsList.SetRec(TempAllPOSUnit);
 
                         if "NPR Backoffice Register No." <> '' then
@@ -132,7 +132,7 @@ page 6014690 "NPR User Setup Step"
                         if POSUnitsList.RunModal() = Action::LookupOK then
                             "NPR Backoffice Register No." := TempAllPOSUnit."No.";
 
-                        POSUnitsList.SetCashRegisterMode(false);
+                        POSUnitsList.SetPOSUnitMode(false);
                     end;
                 }
                 field("Allow Register Switch"; "NPR Allow Register Switch")
@@ -143,7 +143,7 @@ page 6014690 "NPR User Setup Step"
                 field("Register Switch Filter"; "NPR Register Switch Filter")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the NPR Register Switch Filter field';
+                    ToolTip = 'Specifies the value of the NPR POS Unit Switch Filter field';
                 }
                 field(Email; "E-Mail")
                 {

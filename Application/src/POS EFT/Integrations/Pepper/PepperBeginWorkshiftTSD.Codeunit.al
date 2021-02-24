@@ -137,7 +137,7 @@ codeunit 6184491 "NPR Pepper Begin Workshift TSD"
         ConfigDriver.IPAddress := IpAddressAndPort;
     end;
 
-    procedure SetCDP_EftTerminalInformation(EftTerminalType: Integer; Language: Integer; CashRegisterNumber: Integer; ReceiptFormat: Code[2])
+    procedure SetCDP_EftTerminalInformation(EftTerminalType: Integer; Language: Integer; UnitNumber: Integer; ReceiptFormat: Code[2])
     begin
 
         if not InitializedRequest then
@@ -145,7 +145,7 @@ codeunit 6184491 "NPR Pepper Begin Workshift TSD"
 
         ConfigDriver.PayTermType := EftTerminalType;
         ConfigDriver.LanguageCode := Language;
-        ConfigDriver.CashRegisterNbr := CashRegisterNumber;
+        ConfigDriver.CashRegisterNbr := UnitNumber;
         ConfigDriver.ReceiptFormat := ReceiptFormat;
     end;
 

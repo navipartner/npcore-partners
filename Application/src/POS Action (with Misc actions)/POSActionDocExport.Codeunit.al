@@ -107,7 +107,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         DescDocPaymentMenu: Label 'Prompt with different payment methods for handling in new sale, after export is done.';
         CaptionUseLocationFrom: Label 'Use Location From';
         DescUseLocationFrom: Label 'Select source to get location code from for sales document';
-        OptionUseLocationFrom: Label 'Cash Register,POS Store,POS Sale Header,Specific Location';
+        OptionUseLocationFrom: Label 'POS Store,POS Sale Header,Specific Location';
         CaptionUseSpecLocationCode: Label 'Use Specific Location Code';
         DescUseSpecLocationCode: Label 'Select location code to be used for sales document, if parameter ''Use Location From'' is set to ''Specific Location''';
         SpecLocationCodeMustBeSpecified: Label 'POS Action''s parameter ''Use Location From'' is set to ''Specific Location''. You must specify location code to be used for sale document as a parameter of the POS action (the parameter name is ''Use Specific Location Code'')';

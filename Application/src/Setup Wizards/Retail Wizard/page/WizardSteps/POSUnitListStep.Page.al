@@ -550,18 +550,6 @@ page 6014683 "NPR POS Unit List Step"
                 POSUnit := POSUnitToCreate;
                 if not POSUnit.Insert() then
                     POSUnit.Modify();
-                CreateCashRegisterFromPOSUnit(POSUnitToCreate);
             until POSUnitToCreate.Next() = 0;
-    end;
-
-    local procedure CreateCashRegisterFromPOSUnit(var POSUnitToCreate: Record "NPR POS Unit")
-    var
-        CashRegister: Record "NPR Register";
-    begin
-        CashRegister.Init();
-        CashRegister."Register No." := POSUnitToCreate."No.";
-        CashRegister.Description := POSUnitToCreate.Name;
-        if not CashRegister.Insert() then
-            CashRegister.Modify();
     end;
 }

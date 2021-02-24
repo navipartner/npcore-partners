@@ -13,7 +13,6 @@ table 6014407 "NPR Audit Roll"
             Caption = 'Cash Register No.';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = "NPR Register";
         }
         field(2; "Sales Ticket No."; Code[20])
         {
@@ -1084,13 +1083,11 @@ table 6014407 "NPR Audit Roll"
 
     trigger OnInsert()
     var
-        Register2: Record "NPR Register";
         POSUnit: Record "NPR POS Unit";
         InsertAllowed: Boolean;
     begin
-        if Register2.Get("Register No.") then begin
+        if POSUnit.Get("Register No.") then begin
             InsertAllowed := false;
-            POSUnit.get(Register2."Register No.");
             case POSUnit.Status of
                 POSUnit.Status::OPEN:
                     begin
@@ -1102,10 +1099,7 @@ table 6014407 "NPR Audit Roll"
                             if not Balancing then
                                 InsertAllowed := true;
                         if Balancing then
-                            if Register2."Status Set By Sales Ticket" = "Sales Ticket No." then
-                                InsertAllowed := true
-                            else
-                                Error(Text1060002, "Sales Ticket No.", Register2."Status Set By Sales Ticket", POSUnit.Status);
+                            InsertAllowed := true;
 
                         if Type = Type::Cancelled then
                             InsertAllowed := true;
@@ -1114,10 +1108,7 @@ table 6014407 "NPR Audit Roll"
                     begin
                         if Type = Type::"Open/Close" then
                             if Balancing then
-                                if Register2."Status Set By Sales Ticket" = "Sales Ticket No." then
-                                    InsertAllowed := true
-                                else
-                                    Error(Text1060002, "Sales Ticket No.", Register2."Status Set By Sales Ticket", POSUnit.Status);
+                                InsertAllowed := true;
                         if Type = Type::Cancelled then
                             InsertAllowed := true;
                     end;
@@ -1127,8 +1118,8 @@ table 6014407 "NPR Audit Roll"
                 Error(
                   StrSubstNo(
                     Text1060001,
-                    Register2.FieldCaption("Register No."),
-                    Register2."Register No.",
+                    POSUnit.FieldCaption("No."),
+                    POSUnit."No.",
                     POSUnit.FieldCaption(Status),
                     POSUnit.Status,
                     TableCaption,
@@ -1146,7 +1137,7 @@ table 6014407 "NPR Audit Roll"
         NPRDimMgt: Codeunit "NPR Dimension Mgt.";
         HandleErrorUnderPrintReceipt: Boolean;
         Text1060001: Label '%1 %2 has %3 %4. It is not possible to insert %5 with %6 %7.';
-        Text1060002: Label 'Error at insert into the audit roll. \Sales ticket no. %1 <> Sales Ticket No. of set register status %2. \Status = %3.';
+        Text1060002: Label 'Error at insert into the audit roll. \Status = %2.';
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin

@@ -165,17 +165,17 @@ table 6150710 "NPR POS View"
         exit(true);
     end;
 
-    local procedure FilterApplicableView(var DefaultView: Record "NPR POS Default View"; SalespersonCode: Code[20]; RegisterCode: Code[10]): Boolean
+    local procedure FilterApplicableView(var DefaultView: Record "NPR POS Default View"; SalespersonCode: Code[20]; UnitCode: Code[10]): Boolean
     var
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         Salesperson: Record "Salesperson/Purchaser";
-        RegisterTemp: Record "NPR Register" temporary;
+        POSUnitTemp: Record "NPR POS Unit" temporary;
         SalespersonTemp: Record "Salesperson/Purchaser" temporary;
     begin
-        if RegisterCode <> '' then begin
-            if Register.Get(RegisterCode) then begin
-                RegisterTemp := Register;
-                RegisterTemp.Insert;
+        if UnitCode <> '' then begin
+            if POSUnit.Get(UnitCode) then begin
+                POSUnitTemp := POSUnit;
+                POSUnitTemp.Insert();
             end;
         end;
 
@@ -186,18 +186,18 @@ table 6150710 "NPR POS View"
             end;
         end;
 
-        if DefaultView.FindSet then
+        if DefaultView.FindSet() then
             repeat
                 if DefaultView."Register Filter" <> '' then
-                    RegisterTemp.SetFilter("Register No.", DefaultView."Register Filter");
+                    POSUnitTemp.SetFilter("No.", DefaultView."Register Filter");
                 if DefaultView."Salesperson Filter" <> '' then
                     SalespersonTemp.SetFilter(Code, DefaultView."Salesperson Filter");
 
-                if ((not RegisterTemp.IsEmpty) or (RegisterCode = '')) and ((not SalespersonTemp.IsEmpty) or (SalespersonCode = '')) then begin
+                if ((not POSUnitTemp.IsEmpty()) or (UnitCode = '')) and ((not SalespersonTemp.IsEmpty) or (SalespersonCode = '')) then begin
                     DefaultView.TestField("POS View Code");
                     Get(DefaultView."POS View Code");
                     exit(true);
                 end;
-            until DefaultView.Next = 0;
+            until DefaultView.Next() = 0;
     end;
 }

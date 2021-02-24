@@ -27,7 +27,7 @@ page 6059961 "NPR CashKeeper Overview"
                 field("Register No."; "Register No.")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Cash Register No. field';
+                    ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
                 field("Total Amount"; "Total Amount")
                 {

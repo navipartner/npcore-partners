@@ -75,7 +75,6 @@ codeunit 6150852 "NPR POS Action - Item Price"
         SaleLinePOS: Record "NPR Sale Line POS";
         SalePOS: Record "NPR Sale POS";
         LineNumber: Integer;
-        Register: Record "NPR Register";
         ItemIdentifyerType: Text;
         PriceExclVat: Boolean;
         POSUnit: Record "NPR POS Unit";
@@ -101,19 +100,14 @@ codeunit 6150852 "NPR POS Action - Item Price"
                         SaleLinePOS."Line No." := -1;
 
                     // Make sure add lines to the "end"
-                    Register.Get(SalePOS."Register No.");
-                    //-NPR5.49 [335739]
-                    //Register.TESTFIELD (Register."Line Order on Screen", Register."Line Order on Screen"::Normal);
                     if POSUnit.Get(SalePOS."Register No.") and POSViewProfile.Get(POSUnit."POS View Profile") then
                         POSViewProfile.TestField("Line Order on Screen", POSViewProfile."Line Order on Screen"::Normal);
-                    //+NPR5.49 [335739]
 
                     JSON.SetContext('LastSaleLineNoBeforeAddItem', SaleLinePOS."Line No.");
                     FrontEnd.SetActionContext(ActionCode(), JSON);
 
                     if not POSSession.RetrieveSessionAction('ITEM', POSAction) then
                         POSAction.Get('ITEM');
-                    //-NPR5.43 [319231]
                     JSON.SetScope('parameters', true);
                     ItemIdentifyerType := JSON.GetString('itemIdentifyerType', false);
                     JSON.SetScope('/', true);
@@ -141,7 +135,6 @@ codeunit 6150852 "NPR POS Action - Item Price"
                       SaleLinePOS.FieldCaption("No."), SaleLinePOS."No.",
                       SaleLinePOS.FieldCaption(Description), StrSubstNo('%1<br><h4>%2</h4>', SaleLinePOS.Description, SaleLinePOS."Description 2"),
                       SaleLinePOS.FieldCaption("Amount Including VAT"), SaleLinePOS."Amount Including VAT"));
-                    //-NPR5.43 [319231]
                     JSON.SetScope('parameters', true);
                     PriceExclVat := JSON.GetBoolean('priceExclVat', false);
                     JSON.SetScope('/', true);
@@ -150,7 +143,6 @@ codeunit 6150852 "NPR POS Action - Item Price"
                           SaleLinePOS.FieldCaption("No."), SaleLinePOS."No.",
                           SaleLinePOS.FieldCaption(Description), StrSubstNo('%1<br><h4>%2</h4>', SaleLinePOS.Description, SaleLinePOS."Description 2"),
                           SaleLinePOS.FieldCaption(Amount), SaleLinePOS.Amount));
-                    //+NPR5.43 [319231]
                     FrontEnd.SetActionContext(ActionCode(), JSON);
 
                     // Delete the lines from the end until we find the last line before inserting

@@ -1,12 +1,5 @@
 table 6150644 "NPR POS Info Transaction"
 {
-    // NPR5.26/OSFI/20160810 CASE 246167 Object Created
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
-    // NPR5.48/MHA /20181120 CASE 334922 Added key "Entry No."
-    // NPR5.53/ALPO/20200204 CASE 388697 Entries with Type = Write Default Message were not saved to "POS Info Transaction"/"POS Info POS Entry" tables
-    // NPR5.54/ALPO/20200423 CASE 401611 5.54 upgrade performace optimization
-    // NPR5.55/ALPO/20200424 CASE 401611 Remove dummy field needed for 5.54 upgrade performace optimization
-
     Caption = 'POS Info Transaction';
     DataClassification = CustomerContent;
 
@@ -14,7 +7,7 @@ table 6150644 "NPR POS Info Transaction"
     {
         field(1; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
         }
         field(2; "Sales Ticket No."; Code[20])

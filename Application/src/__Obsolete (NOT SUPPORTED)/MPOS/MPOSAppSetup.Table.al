@@ -12,7 +12,6 @@ table 6059966 "NPR MPOS App Setup"
         {
             Caption = 'Cash Register No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Register";
         }
         field(11; "Payment Gateway"; Code[10])
         {

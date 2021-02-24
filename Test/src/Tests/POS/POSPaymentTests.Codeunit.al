@@ -118,7 +118,6 @@ codeunit 85006 "NPR POS Payment Tests"
         POSEntry: Record "NPR POS Entry";
         POSSalesLine: Record "NPR POS Sales Line";
         POSPaymentLine: Record "NPR POS Payment Line";
-        Register: Record "NPR Register";
         POSSetup: Codeunit "NPR POS Setup";
         ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
     begin
@@ -158,7 +157,6 @@ codeunit 85006 "NPR POS Payment Tests"
 
         // [Then] POS Entry includes the change due to overtender.
         _POSSession.GetSetup(POSSetup);
-        POSSetup.GetRegisterRecord(Register);
         ReturnPOSPaymentMethod.Get(_POSPaymentMethod."Return Payment Method Code");
 
         POSPaymentLine.SetRange("POS Payment Method Code", ReturnPOSPaymentMethod.Code);

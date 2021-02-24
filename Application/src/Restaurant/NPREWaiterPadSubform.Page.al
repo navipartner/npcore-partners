@@ -42,7 +42,7 @@ page 6150661 "NPR NPRE Waiter Pad Subform"
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Cash Register No. field';
+                    ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
                 field("Start Date"; Rec."Start Date")
                 {

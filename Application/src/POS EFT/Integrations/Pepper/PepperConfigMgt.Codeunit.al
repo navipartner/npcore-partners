@@ -1,13 +1,5 @@
 codeunit 6184490 "NPR Pepper Config. Mgt."
 {
-    // NPR5.22\BR\20160422 CASE 231481 Added ZIP File Installation options
-    // NPR5.25/BR/20160608  CASE 231481 Extended Terminal Functions with License file, Client ID and License ID functions
-
-
-    trigger OnRun()
-    begin
-    end;
-
     procedure GetConfigurationText(PepperConfiguration: Record "NPR Pepper Config."; TextType: Option License,Configuration,AdditionalParameters): Text
     var
         PepperVersion: Record "NPR Pepper Version";
@@ -125,7 +117,6 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
         TextWhole: Text;
         TextLine: Text[1024];
     begin
-        //-NPR5.22
         TextWhole := '';
         PepperVersion.CalcFields("Install Zip File");
         if not PepperVersion."Install Zip File".HasValue then
@@ -136,22 +127,21 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
             TextWhole := TextWhole + TextLine;
         until StreamIn.EOS;
         exit(TextWhole);
-        //+NPR5.22
     end;
 
     procedure GetPepperRegisterNo(RegisterNo: Code[10]): Integer
     var
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         I: Integer;
     begin
         if not Evaluate(I, RegisterNo) then begin
             I := 0;
-            if Register.FindSet then
+            if POSUnit.FindSet() then
                 repeat
                     I := I + 1;
-                    if Register."Register No." = RegisterNo then
+                    if POSUnit."No." = RegisterNo then
                         exit(I);
-                until Register.Next = 0;
+                until POSUnit.Next() = 0;
         end else
             exit(I);
     end;
@@ -159,7 +149,6 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
     procedure GetHeaderFooterText(POSUnit: Record "NPR POS Unit"; PrintType: Option Transaction,"Transaction CC",Administration; TextType: Option Header,Footer): Text
     var
         Utility: Codeunit "NPR Receipt Footer Mgt.";
-        PreviewReceiptTextTokens: List of [Text];
         TextToPrint: Text;
     begin
         TextToPrint := '';

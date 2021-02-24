@@ -113,7 +113,7 @@ codeunit 6150836 "NPR POS Action: UnlockPOS"
             Error(IllegalPassword);
 
         POSSession.GetSetup(POSSetup);
-        POSCreateEntry.InsertUnitUnlockEntry(POSSetup.Register(), POSSetup.Salesperson());
+        POSCreateEntry.InsertUnitUnlockEntry(POSSetup.GetPOSUnitNo(), POSSetup.Salesperson());
 
         POSSession.ChangeViewSale();
     end;

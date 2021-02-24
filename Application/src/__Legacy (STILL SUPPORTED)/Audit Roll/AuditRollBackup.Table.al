@@ -10,7 +10,6 @@ table 6014538 "NPR Audit Roll Backup"
         {
             Caption = 'Cash Register No.';
             NotBlank = true;
-            TableRelation = "NPR Register";
             DataClassification = CustomerContent;
 
             trigger OnValidate()
@@ -879,12 +878,4 @@ table 6014538 "NPR Audit Roll Backup"
     fieldgroups
     {
     }
-
-    trigger OnInsert()
-    var
-        KasseLoc: Record "NPR Register";
-        InsertAllowed: Boolean;
-    begin
-    end;
 }
-

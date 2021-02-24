@@ -157,23 +157,6 @@ codeunit 6150617 "NPR POS-Audit Roll Integration"
             until AuditRolltoPOSEntryLink.Next = 0;
     end;
 
-    //Subscribers
-
-    [EventSubscriber(ObjectType::Table, 6150615, 'OnAfterInsertEvent', '', true, true)]
-    local procedure OnInsertPOSUnitInsertRegister(var Rec: Record "NPR POS Unit"; RunTrigger: Boolean)
-    var
-        Register: Record "NPR Register";
-        POSStore: Record "NPR POS Store";
-    begin
-        if Register.Get(Rec."No.") then
-            exit;
-        if Rec."POS Store Code" = '' then
-            exit;
-
-        Register.Init;
-        Register."Register No." := Rec."No.";
-        Register.Insert(true);
-    end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150615, 'OnAfterPostPOSEntry', '', true, true)]
     local procedure OnAfterPOSPostEntry(var POSEntry: Record "NPR POS Entry"; PreviewMode: Boolean)

@@ -26,7 +26,7 @@ table 6150711 "NPR POS Default View"
         }
         field(4; "Register Filter"; Text[250])
         {
-            Caption = 'Cash Register No. Filter';
+            Caption = 'POS Unit No. Filter';
             DataClassification = CustomerContent;
         }
         field(5; "Starting Date"; Date)

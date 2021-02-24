@@ -20,7 +20,6 @@ table 6014443 "NPR Touch Screen: MetaTriggers"
         field(3; "Register No."; Code[10])
         {
             Caption = 'Cash Register No.';
-            TableRelation = "NPR Register";
             DataClassification = CustomerContent;
         }
         field(4; ID; Integer)

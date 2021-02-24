@@ -475,7 +475,6 @@ codeunit 6184499 "NPR EFT Framework Mgt."
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         POSSetup: Codeunit "NPR POS Setup";
-        Register: Record "NPR Register";
         SaleAmount: Decimal;
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
@@ -489,7 +488,6 @@ codeunit 6184499 "NPR EFT Framework Mgt."
             Error(ERROR_SESSION);
         POSFrontEnd.GetSession(POSSession);
         POSSession.GetSetup(POSSetup);
-        POSSetup.GetRegisterRecord(Register);
         POSSession.GetPaymentLine(POSPaymentLine);
 
         POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, SubTotal);

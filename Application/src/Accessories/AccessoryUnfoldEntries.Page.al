@@ -88,7 +88,7 @@ page 6014505 "NPR Accessory Unfold Entries"
                 field("Cash Register No."; "Cash Register No.")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Cash Register No. field';
+                    ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
                 field("Salesperson Code"; "Salesperson Code")
                 {
@@ -123,7 +123,7 @@ page 6014505 "NPR Accessory Unfold Entries"
                 Caption = '&Navigate';
                 Image = Navigate;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the &Navigate action';

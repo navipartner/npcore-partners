@@ -34,7 +34,7 @@ table 6184492 "NPR Pepper Terminal"
         }
         field(40; "Configuration Code"; Code[10])
         {
-            CalcFormula = Lookup ("NPR Pepper Instance"."Configuration Code" WHERE(ID = FIELD("Instance ID")));
+            CalcFormula = Lookup("NPR Pepper Instance"."Configuration Code" WHERE(ID = FIELD("Instance ID")));
             Caption = 'Configuration Code';
             Editable = false;
             FieldClass = FlowField;
@@ -42,9 +42,9 @@ table 6184492 "NPR Pepper Terminal"
         }
         field(50; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Register";
+            TableRelation = "NPR POS Unit";
 
             trigger OnValidate()
             begin

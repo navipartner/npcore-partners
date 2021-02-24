@@ -160,22 +160,12 @@ page 6014468 "NPR Sales Ticket Statistics"
         PeriodFormMgt: Codeunit PeriodFormManagement;
         VendPeriodLength: Option Day,Week,Month,Quarter,Year,Period;
         AmountType: Option "Net Change","Balance at Date";
-        Kassedata: Record "NPR Register";
         Tidsvalg: Integer;
         Dim1Filter: Code[20];
         Dim2Filter: Code[20];
         PeriodType: Option Day,Week,Month,Year;
         AuditRoll: Record "NPR Audit Roll";
         totalCount: Decimal;
-
-    procedure Set(var NewVend: Record "NPR Register"; NewVendPeriodLength: Integer; NewAmountType: Option "Net Change","Balance at Date"; var NewKassedata: Record "NPR Register")
-    begin
-        Kassedata.Copy(NewKassedata);
-        VendPeriodLength := NewVendPeriodLength;
-        AmountType := NewAmountType;
-        //CurrForm.UPDATE(FALSE);
-        CurrPage.Update(false);
-    end;
 
     local procedure SetDateFilter()
     begin
@@ -191,18 +181,7 @@ page 6014468 "NPR Sales Ticket Statistics"
     var
         totalAmount: Decimal;
     begin
-
-        //-NPR4.10
-        //totalCount := Kassedata."All Count in Audit Roll";
-        //-NPR4.12
-        //-NPR5.31
-        // AuditRoll.SETFILTER("Sale Type",'%1|%2|%3|%4',
-        //                                  AuditRoll."Sale Type"::Salg,
-        //                                  AuditRoll."Sale Type"::Udbetaling,
-        //                                  AuditRoll."Sale Type"::Indbetaling,
-        //                                  AuditRoll."Sale Type"::Debetsalg);
         AuditRoll.SetFilter("Sale Type", '%1|%2', AuditRoll."Sale Type"::Sale, AuditRoll."Sale Type"::"Debit Sale");
-        //+NPR5.31
         totalCount := AuditRoll.GetNoOfSales();
         AuditRoll.SetRange("Sale Type");
 
@@ -214,7 +193,6 @@ page 6014468 "NPR Sales Ticket Statistics"
 
     procedure SetDimensionFilters()
     begin
-        //-NPR4.10
         if Dim1Filter <> '' then
             AuditRoll.SetRange("Shortcut Dimension 1 Code", Dim1Filter)
         else
@@ -224,7 +202,6 @@ page 6014468 "NPR Sales Ticket Statistics"
             AuditRoll.SetFilter("Shortcut Dimension 2 Code", Dim2Filter)
         else
             AuditRoll.SetRange("Shortcut Dimension 2 Code");
-        //+NPR4.10
     end;
 }
 

@@ -171,9 +171,10 @@ codeunit 6150721 "NPR POS Action - Login"
 
                         StartEODWorkflow(FrontEnd, POSSession, 'BALANCE_V3', IsManagedPOS);
                         exit;
-
-                        StartWorkflow(FrontEnd, POSSession, 'START_POS');
                     end;
+
+                    StartWorkflow(FrontEnd, POSSession, 'START_POS');
+
                 end;
 
             POSUnit.Status::EOD:
@@ -201,7 +202,7 @@ codeunit 6150721 "NPR POS Action - Login"
         ResumeExistingSale := POSResumeSale.SelectUnfinishedSaleToResume(SalePOS, POSSession, ResumeFromPOSQuoteNo);
 
         POSSession.GetSetup(POSSetup);
-        POSCreateEntry.InsertUnitLoginEntry(POSSetup.Register, POSSetup.Salesperson);
+        POSCreateEntry.InsertUnitLoginEntry(POSSetup.GetPOSUnitNo(), POSSetup.Salesperson);
 
         if ResumeExistingSale and (ResumeFromPOSQuoteNo = 0) then
             POSSession.ResumeTransaction(SalePOS)

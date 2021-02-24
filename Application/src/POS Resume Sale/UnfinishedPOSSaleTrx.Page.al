@@ -18,7 +18,7 @@ page 6150747 "NPR Unfinished POS Sale Trx"
                 field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Cash Register No. field';
+                    ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
                 field("Sales Ticket No."; Rec."Sales Ticket No.")
                 {
@@ -170,15 +170,15 @@ page 6150747 "NPR Unfinished POS Sale Trx"
             group(Show)
             {
                 Caption = 'Show';
-                action(ShowAllForCashRegister)
+                action(ShowAllForUnit)
                 {
-                    Caption = 'All For Register';
+                    Caption = 'All For POS Unit';
                     Image = GetLines;
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
-                    ToolTip = 'Show all unfinished sale transactions for current cash register';
+                    ToolTip = 'Show all unfinished sale transactions for current POS unit';
                     ApplicationArea = All;
 
                     trigger OnAction()
@@ -187,7 +187,7 @@ page 6150747 "NPR Unfinished POS Sale Trx"
                     begin
                         SalePOS.Copy(Rec);
                         Rec.Reset;
-                        SalePOS.CopyFilter("Register No.", "Register No.");
+                        SalePOS.CopyFilter("Register No.", Rec."Register No.");
                         Rec.Ascending(false);
                         if Rec.FindFirst then;
                     end;

@@ -46,7 +46,6 @@ codeunit 6014593 "NPR Change Log Auto Enabler"
         TestTable(DATABASE::"Purchases & Payables Setup");
         TestTable(DATABASE::"Inventory Setup");
         TestTable(DATABASE::"VAT Posting Setup");
-        TestTable(DATABASE::"NPR Register");
         TestTable(DATABASE::"NPR Object Output Selection");
         TestTable(DATABASE::"NPR Report Selection Retail");
         TestTable(DATABASE::"NPR Dependency Mgt. Setup");

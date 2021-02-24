@@ -84,7 +84,6 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         Customer: Record Customer;
         Contact: Record Contact;
-        Register: Record "NPR Register";
         POSUnit: Record "NPR POS Unit";
         ContactBusinessRelation: Record "Contact Business Relation";
     begin
@@ -107,10 +106,10 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
         DataRow.Add(GetSalespersonNameText(), SalespersonPurchaser.Name);
 
         Sale.GetCurrentSale(SalePOS);
-        Clear(Register);
-        if Register.Get(SalePOS."Register No.") then;
-        Clear(Customer);
+
+        clear(POSUnit);
         if POSUnit.Get(SalePOS."Register No.") then;
+        Clear(Customer);
         if Customer.Get(SalePOS."Customer No.") then;
         Clear(Contact);
         if Contact.Get(SalePOS."Contact No.") then begin

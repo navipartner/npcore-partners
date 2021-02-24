@@ -1,8 +1,5 @@
 table 6014430 "NPR Line Dimension"
 {
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
-    // NPR5.39/TJ  /20180206 CASE 302634 Changed OptionString property of field Sale Type to english version
-
     Caption = 'NPR Line Dimension';
     DataClassification = CustomerContent;
 
@@ -17,9 +14,9 @@ table 6014430 "NPR Line Dimension"
         }
         field(2; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             NotBlank = true;
-            TableRelation = "NPR Register";
+            TableRelation = "NPR POS Unit";
             DataClassification = CustomerContent;
         }
         field(3; "Sales Ticket No."; Code[20])

@@ -53,7 +53,6 @@ codeunit 6151286 "NPR SS Action: Start SelfServ."
     procedure StartSelfService(POSSession: Codeunit "NPR POS Session"; SalespersonCode: Code[20]; LanguageCode: Code[10])
     var
         POSUnit: Record "NPR POS Unit";
-        Register: Record "NPR Register";
         SalePOS: Record "NPR Sale POS";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         POSUnitIdentityRec: Record "NPR POS Unit Identity";
@@ -110,7 +109,7 @@ codeunit 6151286 "NPR SS Action: Start SelfServ."
                 Error('This unit is busy with another process right now. Please try again later. <br>Thank-you for your patience.');
         end;
 
-        POSCreateEntry.InsertUnitLoginEntry(POSSetup.Register, POSSetup.Salesperson);
+        POSCreateEntry.InsertUnitLoginEntry(POSSetup.GetPOSUnitNo(), POSSetup.Salesperson);
 
         if (Language.Get(LanguageCode)) then begin
             if (Language."Windows Language ID" > 0) then

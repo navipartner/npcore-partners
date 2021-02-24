@@ -39,17 +39,13 @@ codeunit 6150718 "NPR POS Unit Identity"
         ConfigureDeviceInternal(Format(CreateGuid()), '', '', false, DefaultRegister, POSUnitIdentityOut);
     end;
 
-    local procedure ConfigureDeviceInternal(HardwareId: Text; SessionName: Text; HostName: Text; Persistent: Boolean; DefaultRegister: Code[10]; var POSUnitIdentityOut: Record "NPR POS Unit Identity")
+    local procedure ConfigureDeviceInternal(HardwareId: Text; SessionName: Text; HostName: Text; Persistent: Boolean; DefaultUnitNo: Code[10]; var POSUnitIdentityOut: Record "NPR POS Unit Identity")
     var
         POSUnitIdentity: Record "NPR POS Unit Identity";
-        Register: Record "NPR Register";
     begin
 
         POSUnitIdentity.SetFilter("Device ID", '=%1', HardwareId);
-
-        //-NPR5.37 [284356]
         POSUnitIdentity.SetFilter("Host Name", '=%1', HostName);
-        //+NPR5.37 [284356]
 
         if (StrLen(SessionName) >= 3) then begin
             case UpperCase(CopyStr(SessionName, 1, 3)) of
@@ -61,47 +57,40 @@ codeunit 6150718 "NPR POS Unit Identity"
 
         if (not POSUnitIdentity.FindFirst()) then begin
             // Create a new entry
-            with POSUnitIdentity do begin
-                "Entry No." := 0;
-                "Device ID" := HardwareId;
-                "Host Name" := HostName;
+            POSUnitIdentity."Entry No." := 0;
+            POSUnitIdentity."Device ID" := HardwareId;
+            POSUnitIdentity."Host Name" := HostName;
 
-                if (StrLen(SessionName) >= 3) then begin
-                    "Select POS Using" := "Select POS Using"::UserID;
-                    case (UpperCase(CopyStr(SessionName, 1, 3))) of
-                        'RDP':
-                            "Session Type" := "Session Type"::RemoteDesktop;
-                        'ICA':
-                            "Session Type" := "Session Type"::Citrix;
-                        else begin
-                                "Session Type" := "Session Type"::"Local";
-                                "Select POS Using" := "Select POS Using"::DeviceID;
-                            end;
-                    end;
+            if (StrLen(SessionName) >= 3) then begin
+                POSUnitIdentity."Select POS Using" := POSUnitIdentity."Select POS Using"::UserID;
+                case (UpperCase(CopyStr(SessionName, 1, 3))) of
+                    'RDP':
+                        POSUnitIdentity."Session Type" := POSUnitIdentity."Session Type"::RemoteDesktop;
+                    'ICA':
+                        POSUnitIdentity."Session Type" := POSUnitIdentity."Session Type"::Citrix;
+                    else begin
+                            POSUnitIdentity."Session Type" := POSUnitIdentity."Session Type"::"Local";
+                            POSUnitIdentity."Select POS Using" := POSUnitIdentity."Select POS Using"::DeviceID;
+                        end;
                 end;
-
-                "User ID" := UpperCase(UserId);
-                "Created At" := CurrentDateTime;
-                "Last Session At" := CurrentDateTime;
-
-                // In case the POS is running in a web browser (without Major Tom), this setup will be invoked from the POS Login rather than the framework.
-                if (DefaultRegister <> '') then begin
-                    //      Register.RESET ();
-                    //      Register.SETFILTER ("Register No.", '=%1', DefaultRegister);
-                    //      Register.FINDFIRST ();
-                    "Default POS Unit No." := DefaultRegister;
-                end;
-
-                if (Persistent) then
-                    Insert();
-
             end;
+
+            POSUnitIdentity."User ID" := UpperCase(UserId);
+            POSUnitIdentity."Created At" := CurrentDateTime;
+            POSUnitIdentity."Last Session At" := CurrentDateTime();
+
+            // In case the POS is running in a web browser (without Major Tom), this setup will be invoked from the POS Login rather than the framework.
+            if (DefaultUnitNo <> '') then begin
+                POSUnitIdentity."Default POS Unit No." := DefaultUnitNo;
+            end;
+
+            if (Persistent) then
+                POSUnitIdentity.Insert();
+
         end;
 
         POSUnitIdentity."Last Session At" := CurrentDateTime;
-        //-NPR5.37 [284356]
         POSUnitIdentity."User ID" := UpperCase(UserId);
-        //+NPR5.37 [284356]
 
         if (Persistent) then begin
             POSUnitIdentity.Modify();
@@ -194,7 +183,6 @@ codeunit 6150718 "NPR POS Unit Identity"
         SessionName: Text;
         HostName: Text;
         POSUnitIdentity: Record "NPR POS Unit Identity";
-        Register: Record "NPR Register";
     begin
 
         POSession.GetSessionId(HardwareId, SessionName, HostName);

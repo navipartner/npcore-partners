@@ -8,9 +8,9 @@ table 6184500 "NPR CleanCash Setup"
     {
         field(1; Register; Code[20])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Register";
+            TableRelation = "NPR POS Unit";
         }
         field(2; "Connection String"; Text[100])
         {
@@ -56,7 +56,7 @@ table 6184500 "NPR CleanCash Setup"
         }
         field(9; "CleanCash Register No."; Text[16])
         {
-            Caption = 'CleanCash Cash Register No.';
+            Caption = 'CleanCash POS Unit No.';
             DataClassification = CustomerContent;
 
         }

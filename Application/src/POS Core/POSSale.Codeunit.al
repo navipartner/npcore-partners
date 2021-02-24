@@ -27,7 +27,7 @@ codeunit 6150705 "NPR POS Sale"
 
     var
         Rec: Record "NPR Sale POS";
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         This: Codeunit "NPR POS Sale";
         Setup: Codeunit "NPR POS Setup";
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -51,20 +51,20 @@ codeunit 6150705 "NPR POS Sale"
         OnRunPOSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
         OnRunXRec: Record "NPR Sale POS";
 
-    procedure InitializeAtLogin(RegisterIn: Record "NPR Register"; SetupIn: Codeunit "NPR POS Setup")
+    procedure InitializeAtLogin(POSUnitIn: Record "NPR POS Unit"; SetupIn: Codeunit "NPR POS Setup")
     begin
-        Register := RegisterIn;
+        POSUnit := POSUnitIn;
         Setup := SetupIn;
 
-        OnAfterInitializeAtLogin(Register);
+        OnAfterInitializeAtLogin(POSUnit);
     end;
 
-    procedure InitializeNewSale(RegisterIn: Record "NPR Register"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; ThisIn: Codeunit "NPR POS Sale")
+    procedure InitializeNewSale(POSUnitIn: Record "NPR POS Unit"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; ThisIn: Codeunit "NPR POS Sale")
     begin
         Initialized := true;
 
         FrontEnd := FrontEndIn;
-        Register := RegisterIn;
+        POSUnit := POSUnitIn;
         Setup := SetupIn;
         This := ThisIn;
 
@@ -82,35 +82,33 @@ codeunit 6150705 "NPR POS Sale"
     local procedure InitSale()
     var
     begin
-        with Rec do begin
-            "Salesperson Code" := Setup.Salesperson();
-            "Register No." := Register."Register No.";
-            "Sales Ticket No." := GetNextReceiptNo("Register No.");
-            Date := Today;
-            "Start Time" := Time;
-            "Sale type" := "Sale type"::Sale;
-            "Saved Sale" := false;
-            TouchScreen := true;
+        Rec."Salesperson Code" := Setup.Salesperson();
+        Rec."Register No." := POSUnit."No.";
+        Rec."Sales Ticket No." := GetNextReceiptNo(Rec."Register No.");
+        Rec.Date := Today();
+        Rec."Start Time" := Time;
+        Rec."Sale type" := Rec."Sale type"::Sale;
+        Rec."Saved Sale" := false;
+        Rec.TouchScreen := true;
 
-            if WorkDate <> Today then begin
-                WorkDate := Today;
-            end;
-
-            UpdateSaleDeviceID(Rec);
-            Insert(true);
-
-            Validate("Customer No.", '');
-
-            SaleLine.Init("Register No.", "Sales Ticket No.", This, Setup, FrontEnd);
-            PaymentLine.Init("Register No.", "Sales Ticket No.", This, Setup, FrontEnd);
-
-            FilterGroup := 2;
-            SetRange("Register No.", "Register No.");
-            SetRange("Sales Ticket No.", "Sales Ticket No.");
-            FilterGroup := 0;
-
-            IsModified := true;
+        if WorkDate <> Today() then begin
+            WorkDate := Today;
         end;
+
+        UpdateSaleDeviceID(Rec);
+        Rec.Insert(true);
+
+        Rec.Validate("Customer No.", '');
+
+        SaleLine.Init(Rec."Register No.", Rec."Sales Ticket No.", This, Setup, FrontEnd);
+        PaymentLine.Init(Rec."Register No.", Rec."Sales Ticket No.", This, Setup, FrontEnd);
+
+        Rec.FilterGroup := 2;
+        Rec.SetRange("Register No.", Rec."Register No.");
+        Rec.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
+        Rec.FilterGroup := 0;
+
+        IsModified := true;
 
     end;
 
@@ -153,7 +151,7 @@ codeunit 6150705 "NPR POS Sale"
         DataMgt: Codeunit "NPR POS Data Management";
     begin
         if not Initialized then begin
-            TempRec."Register No." := Register."Register No.";
+            TempRec."Register No." := POSUnit."No.";
             TempRec.Insert;
             DataMgt.RecordToDataSet(TempRec, CurrDataSet, DataSource, POSSession, FrontEnd);
             exit;
@@ -596,14 +594,14 @@ codeunit 6150705 "NPR POS Sale"
         POSInfoManagement.PostPOSInfo(Sale);
     end;
 
-    procedure ResumeExistingSale(SalePOS_ToResume: Record "NPR Sale POS"; RegisterIn: Record "NPR Register"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; ThisIn: Codeunit "NPR POS Sale")
+    procedure ResumeExistingSale(SalePOS_ToResume: Record "NPR Sale POS"; POSUnitIn: Record "NPR POS Unit"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; ThisIn: Codeunit "NPR POS Sale")
     var
         SalePOS: Record "NPR Sale POS";
     begin
         Initialized := true;
 
         FrontEnd := FrontEndIn;
-        Register := RegisterIn;
+        POSUnit := POSUnitIn;
         Setup := SetupIn;
         This := ThisIn;
 
@@ -730,7 +728,7 @@ codeunit 6150705 "NPR POS Sale"
     #region Events
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterInitializeAtLogin(Register: Record "NPR Register")
+    local procedure OnAfterInitializeAtLogin(POSUnit: Record "NPR POS Unit")
     begin
     end;
 
@@ -785,7 +783,7 @@ codeunit 6150705 "NPR POS Sale"
     end;
     #endregion
 
-        #region OnFinishSale Workflow
+    #region OnFinishSale Workflow
 
     [EventSubscriber(ObjectType::Table, Database::"NPR NP Retail Setup", 'OnAfterInsertEvent', '', true, true)]
     local procedure OnAfterInsertRetailSetup(var Rec: Record "NPR NP Retail Setup"; RunTrigger: Boolean)

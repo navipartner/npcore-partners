@@ -25,7 +25,7 @@ page 6150712 "NPR POS Default Views"
                 field("Register Filter"; Rec."Register Filter")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Cash Register No. Filter field';
+                    ToolTip = 'Specifies the value of the POS Unit No. Filter field';
                 }
                 field("Starting Date"; Rec."Starting Date")
                 {

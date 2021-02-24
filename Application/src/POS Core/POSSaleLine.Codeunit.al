@@ -63,7 +63,6 @@ codeunit 6150706 "NPR POS Sale Line"
 
     local procedure InitLine()
     var
-        Register: Record "NPR Register";
         POSStore: Record "NPR POS Store";
     begin
         if not (UsePresetLineNo and (Rec."Line No." <> 0)) then

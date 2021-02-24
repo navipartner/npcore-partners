@@ -1,13 +1,5 @@
 codeunit 6150835 "NPR POS Action: Lock POS"
 {
-    // NPR5.37/TSA /20171024 CASE 293905 POS Action - Lock POS, initial version
-    // NPR5.38/TSA /20171123 CASE 297087 Added Lock Entry System Event
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This built in function locks the POS';
 
@@ -20,26 +12,25 @@ codeunit 6150835 "NPR POS Action: Lock POS"
     local procedure ActionVersion(): Code[10]
     begin
 
-        exit('1.0');
+        exit('1.1');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion(),
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflow(false);
-                RegisterDataBinding();
-            end;
+        if Sender.DiscoverAction(
+            ActionCode(),
+            ActionDescription,
+            ActionVersion(),
+            Sender.Type::Generic,
+            Sender."Subscriber Instances Allowed"::Multiple)
+        then begin
+            Sender.RegisterWorkflow(false);
+            Sender.RegisterDataBinding();
+        end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
@@ -52,10 +43,8 @@ codeunit 6150835 "NPR POS Action: Lock POS"
 
         Handled := true;
 
-        //+NPR5.38 [297087]
         POSSession.GetSetup(POSSetup);
-        POSCreateEntry.InsertUnitLockEntry(POSSetup.Register(), POSSetup.Salesperson());
-        //-NPR5.38 [297087]
+        POSCreateEntry.InsertUnitLockEntry(POSSetup.GetPOSUnitNo(), POSSetup.Salesperson());
 
         POSSession.ChangeViewLocked();
     end;

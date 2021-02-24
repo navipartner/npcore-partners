@@ -77,7 +77,7 @@ codeunit 6150787 "NPR POS Action: Print Receipt"
         PresetTableView := JSON.GetStringParameter('ReceiptListView', false);
 
         POSSession.GetSetup(POSSetup);
-        CurrentRegisterNo := POSSetup.Register();
+        CurrentRegisterNo := POSSetup.GetPOSUnitNo();
 
         if (ReceiptListFilterOption < 0) or (ReceiptListFilterOption > ReceiptListFilterOption::Salesperson) then
             ReceiptListFilterOption := ReceiptListFilterOption::"POS Unit";

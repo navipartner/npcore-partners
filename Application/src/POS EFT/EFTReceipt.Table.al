@@ -35,7 +35,7 @@ table 6014403 "NPR EFT Receipt"
         }
         field(6; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
         }
         field(7; "Sales Ticket No."; Code[20])

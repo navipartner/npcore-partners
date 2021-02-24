@@ -20,7 +20,7 @@ table 6060104 "NPR Global Sale POS"
         }
         field(3; "Register No."; Code[20])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
         }
         field(4; "Sales Ticket No."; Code[20])

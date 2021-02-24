@@ -64,7 +64,7 @@ table 6151019 "NPR NpRv Arch. Voucher Entry"
         {
             Caption = 'Register No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Register"."Register No.";
+            TableRelation = "NPR POS Unit"."No.";
         }
         field(53; "Document Type"; Option)
         {

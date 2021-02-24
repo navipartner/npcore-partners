@@ -1,8 +1,5 @@
 table 6150643 "NPR POS Info Audit Roll"
 {
-    // NPR5.26/OSFI/20160810 CASE 246167 Object Created
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
-
     Caption = 'POS Info Audit Roll';
     DataClassification = CustomerContent;
 
@@ -10,7 +7,7 @@ table 6150643 "NPR POS Info Audit Roll"
     {
         field(1; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
         }
         field(2; "Sales Ticket No."; Code[20])

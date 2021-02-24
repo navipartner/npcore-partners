@@ -16,7 +16,6 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
 
     var
         Description: Label 'MobilePay by Danske Bank';
-        EnvironmentOption: Label 'DEMO,PROD';
         NoCashback: Label 'MobilePay integration does not support cashback';
         EFTSetup: Record "NPR EFT Setup";
         ServiceBaseURL: Text;
@@ -29,14 +28,14 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         PoSUnitID: Text;
         MissingPOSUnitSetup: Label '%1 %2 is missing %3 setup';
         InvalidParameter: Label '%1 setup for %2 %3 has invalid %4 configuration.';
-        Text6014517: Label 'Cash register %1 registered with POS-ID %2.';
-        Text6014518: Label 'Name for cash register %1 updated to %2.';
-        Text6014519: Label 'cash register %1 has been settled';
-        Text6014520: Label 'PoS Unit with ID %1 now updated with attachment to cash register %2.';
-        Text6014521: Label 'PoS Unit with ID %1 now attached to cash register %2.';
+        Text6014517: Label 'POS Unit %1 registered with POS-ID %2.';
+        Text6014518: Label 'Name for pos unit %1 updated to %2.';
+        Text6014519: Label 'pos unit %1 has been settled';
+        Text6014520: Label 'PoS Unit with ID %1 now updated with attachment to pos unit %2.';
+        Text6014521: Label 'PoS Unit with ID %1 now attached to pos unit %2.';
         Text6014522: Label 'attachment to PoS Unit has now been removed.';
         Text6014523: Label 'attachment to PoS Unit has been correctly registered.';
-        Text6014524: Label 'PoS Unit with ID %1 is attached to cash register %2 with PoS ID %3';
+        Text6014524: Label 'PoS Unit with ID %1 is attached to pos unit %2 with PoS ID %3';
         INCORRECT_POS_ID: Label 'Incorrect setup. PoS Unit %1 is currently attached to PoS ID %2';
         Text10: Label 'Idle, no payment requests in queue';
         Text20: Label 'Payment request is sent to customer';
@@ -51,15 +50,10 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
         PoSRegistered: Boolean;
         POSPaymentMethod: Record "NPR POS Payment Method";
         POSUnit: Record "NPR POS Unit";
-        Register: Record "NPR Register";
 
     procedure IntegrationType(): Text
     begin
         exit('MOBILEPAY');
-    end;
-
-    local procedure "// EFT Interface implementation"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnDiscoverIntegrations', '', false, false)]
@@ -239,7 +233,6 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
 
         EFTSetup := EFTSetupIn;
         POSPaymentMethod.Get(EFTSetup."Payment Type POS");
-        Register.Get(EFTSetup."POS Unit No.");
         POSUnit.Get(EFTSetup."POS Unit No.");
 
         LocationID := GetLocationID(EFTSetup);
@@ -250,10 +243,7 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
 
         APIKey := GetAPIKey(EFTSetup);
         MerchantID := GetMerchantID(EFTSetup);
-        //-NPR5.46.01 [333953]
-        //Demo := (GetEnvironment(EFTSetup) = 0);
         Demo := (GetEnvironment(EFTSetup) = 1);
-        //+NPR5.46.01 [333953]
 
         if LocationID = '' then
             Error(InvalidParameter, IntegrationType(), POSUnit.TableCaption, RegisterNo, 'Location ID');
@@ -263,12 +253,10 @@ codeunit 6184513 "NPR EFT MobilePay Integ."
             Error(InvalidParameter, IntegrationType(), POSPaymentMethod.TableCaption, POSPaymentMethod.Code, 'Merchant ID');
 
         if Demo then begin
-            //-NPR5.54 [388507]
             //  ServiceHost := 'mobilepaypos-extest.cloudapp.net';
             //  ServiceBaseURL := 'http://mobilepaypos-extest.cloudapp.net/API/V06/';
             ServiceHost := 'sandprod-pos2.mobilepay.dk';
             ServiceBaseURL := 'https://sandprod-pos2.mobilepay.dk/API/V06/';
-            //+NPR5.54 [388507]
         end else begin
             ServiceHost := 'mobilepaypos2.danskebank.dk';
             ServiceBaseURL := 'https://mobilepaypos2.danskebank.dk/API/V06/';

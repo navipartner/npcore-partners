@@ -193,7 +193,6 @@ codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         POSPaymentMethod: Record "NPR POS Payment Method";
         ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
-        Register: Record "NPR Register";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
@@ -207,7 +206,6 @@ codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
         POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal);
 
         POSSession.GetSetup(POSSetup);
-        POSSetup.GetRegisterRecord(Register);
         if Abs(Subtotal) > Abs(POSSetup.AmountRoundingPrecision) then
             exit;
 

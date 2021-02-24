@@ -12,7 +12,6 @@ codeunit 6150708 "NPR POS Setup"
         Setup: Record "NPR POS Setup";
         UserSetup: Record "User Setup";
         SalespersonRec: Record "Salesperson/Purchaser";
-        RegisterRec: Record "NPR Register";
         POSUnitRec: Record "NPR POS Unit";
         POSStoreRec: Record "NPR POS Store";
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -45,15 +44,12 @@ codeunit 6150708 "NPR POS Setup"
 
     procedure InitializeUsingPosUnitIdentity(POSUnitIdentity: Record "NPR POS Unit Identity")
     var
-        POSUnit: Record "NPR POS Unit";
         POSStore: Record "NPR POS Store";
     begin
+        POSUnitRec.Get(POSUnitIdentity."Default POS Unit No.");
 
-        POSUnit.Get(POSUnitIdentity."Default POS Unit No.");
-        RegisterRec.Get(POSUnitIdentity."Default POS Unit No.");
-
-        SetPOSUnit(POSUnit);
-        if POSStore.Get(POSUnit."POS Store Code") then
+        SetPOSUnit(POSUnitRec);
+        if POSStore.Get(POSUnitRec."POS Store Code") then
             SetPOSStore(POSStore);
 
         POSUnitIdentityGlobal := POSUnitIdentity;
@@ -97,10 +93,10 @@ codeunit 6150708 "NPR POS Setup"
 
     #region Setup
 
-    procedure Register(): Code[10]
+    procedure GetPOSUnitNo(): Code[10]
     begin
         MakeSureIsInitialized();
-        exit(RegisterRec."Register No.");
+        exit(POSUnitRec."No.");
     end;
 
     procedure Salesperson(): Code[10]
@@ -190,15 +186,6 @@ codeunit 6150708 "NPR POS Setup"
         SalespersonRec := SalespersonPurchaser;
     end;
 
-    procedure SetRegister(Register: Record "NPR Register")
-    var
-        POSUnit: Record "NPR POS Unit";
-    begin
-        RegisterRec := Register;
-        POSUnit.Get(RegisterRec."Register No.");
-        SetPOSUnit(POSUnit);
-    end;
-
     procedure SetPOSUnit(POSUnit: Record "NPR POS Unit")
     begin
         POSUnitRec := POSUnit;
@@ -215,11 +202,6 @@ codeunit 6150708 "NPR POS Setup"
     #endregion "Set Record => functions"
 
     #region "Get Record => functions"
-
-    procedure GetRegisterRecord(var RegisterOut: Record "NPR Register")
-    begin
-        RegisterOut := RegisterRec;
-    end;
 
     procedure GetUserSetupRecord(var UserSetupOut: Record "User Setup")
     begin

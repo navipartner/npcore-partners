@@ -56,7 +56,7 @@ table 6014451 "NPR Retail Journal Header"
         }
         field(20; "Register No."; Code[20])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             TableRelation = "NPR POS Unit";
             DataClassification = CustomerContent;
         }

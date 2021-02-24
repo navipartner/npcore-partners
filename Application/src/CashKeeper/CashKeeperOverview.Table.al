@@ -13,7 +13,7 @@ table 6059947 "NPR CashKeeper Overview"
         }
         field(11; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
         }
         field(12; "Total Amount"; Decimal)

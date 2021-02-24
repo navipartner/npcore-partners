@@ -503,7 +503,7 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
         if (POSSession.IsActiveSession(POSFrontEndManagement)) then begin
             POSFrontEndManagement.GetSession(POSSession);
             POSSession.GetSetup(POSSetup);
-            exit(POSSetup.Register());
+            exit(POSSetup.GetPOSUnitNo());
         end;
 
         exit('NOREGISTER');

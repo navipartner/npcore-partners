@@ -51,7 +51,6 @@ table 6014423 "NPR Period"
         {
             Caption = 'Cash Register No.';
             Editable = false;
-            TableRelation = "NPR Register"."Register No.";
             DataClassification = CustomerContent;
         }
         field(7; "Salesperson Code"; Code[20])
@@ -536,7 +535,7 @@ table 6014423 "NPR Period"
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
         NPRDimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
-        NPRDimMgt.SaveDefaultDim(DATABASE::"NPR Register", "Register No.", FieldNumber, ShortcutDimCode);
+        NPRDimMgt.SaveDefaultDim(DATABASE::"NPR POS Unit", "Register No.", FieldNumber, ShortcutDimCode);
         Modify;
     end;
 

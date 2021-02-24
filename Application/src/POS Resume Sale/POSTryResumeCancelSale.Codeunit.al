@@ -31,7 +31,7 @@ codeunit 6150738 "NPR POS Try Resume&CancelSale"
 
     local procedure ResumeAndCancelSale(SalePOS: Record "NPR Sale POS")
     var
-        CashRegister: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         POSActionCancelSale: Codeunit "NPR POSAction: Cancel Sale";
         POSFrontEndMgt: Codeunit "NPR POS Front End Management";
         POSSale: Codeunit "NPR POS Sale";
@@ -42,9 +42,9 @@ codeunit 6150738 "NPR POS Try Resume&CancelSale"
         POSSession.GetFrontEnd(POSFrontEndMgt, true);
 
         POSSession.GetSetup(Setup);
-        Setup.GetRegisterRecord(CashRegister);
+        Setup.GetPOSUnit(POSUnit);
         POSSession.GetSale(POSSale);
-        POSSale.ResumeExistingSale(SalePOS, CashRegister, POSFrontEndMgt, Setup, POSSale);
+        POSSale.ResumeExistingSale(SalePOS, POSUnit, POSFrontEndMgt, Setup, POSSale);
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.Init(SalePOS."Register No.", SalePOS."Sales Ticket No.", POSSale, Setup, POSFrontEndMgt);

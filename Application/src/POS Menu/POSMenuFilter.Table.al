@@ -290,7 +290,7 @@ table 6150717 "NPR POS Menu Filter"
                 begin
                     AuditRoll.SetView(FilterRecRef.GetView);
                     AuditRoll.CopyFilters(FilterRecVariant);
-                    AuditRoll.SetFilter("Register No.", '=%1', GetRegisterNo());
+                    AuditRoll.SetFilter("Register No.", '=%1', GetPosUnitNo());
                     FilterStringText := AuditRoll.GetView();
                 end;
             DATABASE::"NPR POS Entry":
@@ -301,22 +301,6 @@ table 6150717 "NPR POS Menu Filter"
                     FilterStringText := POSEntry.GetView();
                 end;
         end;
-    end;
-
-    local procedure GetRegisterNo() RegisterNo: Code[10]
-    var
-        POSFrontEndManagement: Codeunit "NPR POS Front End Management";
-        POSSession: Codeunit "NPR POS Session";
-        POSSetup: Codeunit "NPR POS Setup";
-    begin
-
-        if (POSSession.IsActiveSession(POSFrontEndManagement)) then begin
-            POSFrontEndManagement.GetSession(POSSession);
-            POSSession.GetSetup(POSSetup);
-            exit(POSSetup.Register());
-        end;
-
-        exit('');
     end;
 
     local procedure GetPosUnitNo(): Code[10]

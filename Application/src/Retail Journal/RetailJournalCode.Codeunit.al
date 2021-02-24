@@ -645,7 +645,7 @@ codeunit 6014467 "NPR Retail Journal Code"
     procedure CopySalesReturn2RetailJnlLines(var AuditRoll: Record "NPR Audit Roll"; RetailJnlCode: Code[40])
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         LocationCode: Code[10];
     begin
         if not SetRetailJnl(RetailJnlCode) then
@@ -662,8 +662,8 @@ codeunit 6014467 "NPR Retail Journal Code"
                     RetailJnlLine.Validate("Calculation Date", "Sale Date");
                     LocationCode := GetStoreLocationCode();
                     if LocationCode = '' then begin
-                        Register.Get("Register No.");
-                        LocationCode := GetPOSUnitLocationCode(Register);
+                        POSUnit.Get("Register No.");
+                        LocationCode := GetPOSUnitLocationCode(POSUnit);
                     end;
                     RetailJnlLine.Validate("Location Filter", LocationCode);
                     RetailJnlLine.Insert();
@@ -761,13 +761,10 @@ codeunit 6014467 "NPR Retail Journal Code"
         exit(POSStore."Location Code");
     end;
 
-    local procedure GetPOSUnitLocationCode(Register: Record "NPR Register"): Code[10]
+    local procedure GetPOSUnitLocationCode(POSUnit: Record "NPR POS Unit"): Code[10]
     var
-        POSUnit: Record "NPR POS Unit";
         POSStore: Record "NPR POS Store";
     begin
-        if not POSUnit.get(Register."Register No.") then
-            exit;
         if not POSStore.get(POSUnit."POS Store Code") then
             exit;
         exit(POSStore."Location Code");

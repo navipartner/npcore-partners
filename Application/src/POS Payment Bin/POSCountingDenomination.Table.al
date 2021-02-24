@@ -12,7 +12,7 @@ table 6014457 "NPR POS Counting Denomination"
         }
         field(2; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
         }
         field(3; Prefix; Code[20])

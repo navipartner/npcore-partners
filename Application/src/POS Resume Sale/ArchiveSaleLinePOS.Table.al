@@ -13,9 +13,9 @@ table 6014419 "NPR Archive Sale Line POS"
     {
         field(1; "Register No."; Code[10])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             NotBlank = true;
-            TableRelation = "NPR Register";
+            TableRelation = "NPR POS Unit";
             DataClassification = CustomerContent;
         }
         field(2; "Sales Ticket No."; Code[20])
@@ -54,7 +54,7 @@ table 6014419 "NPR Archive Sale Line POS"
             ELSE
             IF (Type = CONST(Repair)) "NPR Customer Repair"."No."
             ELSE
-IF (Type = CONST(Payment)) "NPR POS Payment Method".Code WHERE("Block POS Payment" = const(false))
+            IF (Type = CONST(Payment)) "NPR POS Payment Method".Code WHERE("Block POS Payment" = const(false))
             ELSE
             IF (Type = CONST(Customer)) Customer."No."
             ELSE
@@ -576,7 +576,7 @@ IF (Type = CONST(Payment)) "NPR POS Payment Method".Code WHERE("Block POS Paymen
         }
         field(300; "Return Sale Register No."; Code[10])
         {
-            Caption = 'Return Sale Cash Register No.';
+            Caption = 'Return Sale POS Unit No.';
             DataClassification = CustomerContent;
         }
         field(301; "Return Sale Sales Ticket No."; Code[20])

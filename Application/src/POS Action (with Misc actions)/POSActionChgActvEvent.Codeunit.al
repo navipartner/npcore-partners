@@ -10,27 +10,26 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode,
-              ActionDescription,
-              ActionVersion,
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('textfield',
-                  'if ((!param.ClearEvent) && (param.DialogType == param.DialogType["TextField"])) ' +
-                  '{input({title: labels.Title, caption: context.CaptionText, value: ""}).cancel(abort);}');
-                RegisterWorkflowStep('ProcessChange', ' {respond();}');
-                RegisterOptionParameter('DialogType', 'TextField,List', 'List');
-                RegisterBooleanParameter('ClearEvent', false);
-                RegisterBooleanParameter('OnlyCurrentSale', false);
-                RegisterWorkflow(false);
-                RegisterDataSourceBinding(ThisDataSource);
-            end;
+        if Sender.DiscoverAction(
+          ActionCode,
+          ActionDescription,
+          ActionVersion,
+          Sender.Type::Generic,
+          Sender."Subscriber Instances Allowed"::Multiple)
+        then begin
+            Sender.RegisterWorkflowStep('textfield',
+              'if ((!param.ClearEvent) && (param.DialogType == param.DialogType["TextField"])) ' +
+              '{input({title: labels.Title, caption: context.CaptionText, value: ""}).cancel(abort);}');
+            Sender.RegisterWorkflowStep('ProcessChange', ' {respond();}');
+            Sender.RegisterOptionParameter('DialogType', 'TextField,List', 'List');
+            Sender.RegisterBooleanParameter('ClearEvent', false);
+            Sender.RegisterBooleanParameter('OnlyCurrentSale', false);
+            Sender.RegisterWorkflow(false);
+            Sender.RegisterDataSourceBinding(ThisDataSource);
+        end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
         Captions.AddActionCaption(ActionCode, 'Title', EventNoLbl);
@@ -38,7 +37,7 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.2');
+        exit('1.3');
     end;
 
     local procedure ActionCode(): Text
@@ -46,7 +45,7 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
         exit('SET_ACTIVE_EVENT');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         POSUnit: Record "NPR POS Unit";
@@ -102,7 +101,7 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
         exit('ACTIVE_EVENT');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDiscoverDataSourceExtensions', '', true, false)]
     local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: List of [Text])
     begin
         if ThisDataSource <> DataSourceName then
@@ -111,7 +110,7 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
         Extensions.Add(ThisExtension);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSourceExtension', '', true, false)]
     local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
         DataType: Enum "NPR Data Type";
@@ -125,10 +124,9 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
         DataSource.AddColumn(DataSourceField_EventDescription(), DataSourceField_EventDescription(), DataType::String, false);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDataSourceExtensionReadData', '', true, false)]
     local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        CashRegister: Record "NPR Register";
         Job: Record Job;
         SalePOS: Record "NPR Sale POS";
         POSSale: Codeunit "NPR POS Sale";

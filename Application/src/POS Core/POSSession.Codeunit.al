@@ -19,9 +19,8 @@ codeunit 6150700 "NPR POS Session"
     EventSubscriberInstance = Manual;
 
     var
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         SessionActions: Record "NPR POS Action" temporary;
-        ActionSequence: Record "NPR POS Action Sequence";
         FrontEnd: Codeunit "NPR POS Front End Management";
         FrontEndKeeper: Codeunit "NPR POS Front End Keeper";
         Sale: Codeunit "NPR POS Sale";
@@ -105,8 +104,8 @@ codeunit 6150700 "NPR POS Session"
 
         DebugWithTimestamp('GetSalespersonRecord');
         Setup.GetSalespersonRecord(Salesperson);
-        DebugWithTimestamp('GetRegisterRecord');
-        Setup.GetRegisterRecord(Register);
+        DebugWithTimestamp('GetPOSUnit');
+        Setup.GetPOSUnit(POSUnit);
         DebugWithTimestamp('UI.Initialize');
         UI.Initialize(FrontEnd);
         DebugWithTimestamp('UI.SetOptions');
@@ -114,13 +113,13 @@ codeunit 6150700 "NPR POS Session"
         DebugWithTimestamp('UI.InitializeCaptions');
         UI.InitializeCaptions();
         DebugWithTimestamp('UI.InitializeNumberAndDateFormat');
-        UI.InitializeNumberAndDateFormat(Register);
+        UI.InitializeNumberAndDateFormat(POSUnit);
         DebugWithTimestamp('UI.InitializeLogo');
-        UI.InitializeLogo(Register);
+        UI.InitializeLogo(POSUnit);
         DebugWithTimestamp('UI.ConfigureFonts');
         UI.ConfigureFonts();
         DebugWithTimestamp('UI.InitializeMenus');
-        UI.InitializeMenus(Register, Salesperson, This);
+        UI.InitializeMenus(POSUnit, Salesperson, This);
         DebugWithTimestamp('UI.ConfigureReusableWorkflow');
         UI.ConfigureReusableWorkflows(This, Setup);
         DebugWithTimestamp('AdvertiseStargatePackages');
@@ -131,9 +130,9 @@ codeunit 6150700 "NPR POS Session"
         DebugWithTimestamp('ConfigureActionSequences');
         FrontEnd.ConfigureActionSequences(SessionActions);
         DebugWithTimestamp('InitializeTheme');
-        UI.InitializeTheme(Register);
+        UI.InitializeTheme(POSUnit);
         DebugWithTimestamp('InitializeAdminTemplates');
-        UI.InitializeAdministrativeTemplates(Register);
+        UI.InitializeAdministrativeTemplates(POSUnit);
         InitializedUI := true;
     end;
 
@@ -143,17 +142,17 @@ codeunit 6150700 "NPR POS Session"
         UI: Codeunit "NPR POS UI Management";
         PreviousRegisterNo: Code[10];
     begin
-        PreviousRegisterNo := Register."Register No.";
-        Setup.GetRegisterRecord(Register);
+        PreviousRegisterNo := POSUnit."No.";
+        Setup.GetPOSUnit(POSUnit);
 
         if (ResendMenus) then begin
             Setup.GetSalespersonRecord(Salesperson);
 
             UI.Initialize(FrontEnd);
-            UI.InitializeMenus(Register, Salesperson, This);
+            UI.InitializeMenus(POSUnit, Salesperson, This);
 
-            if (PreviousRegisterNo <> Register."Register No.") then
-                UI.InitializeLogo(Register);
+            if (PreviousRegisterNo <> POSUnit."No.") then
+                UI.InitializeLogo(POSUnit);
 
         end;
         StartPOSSession();
@@ -214,8 +213,8 @@ codeunit 6150700 "NPR POS Session"
     begin
         Clear(Sale);
         Setup.Initialize(UserId);
-        Setup.GetRegisterRecord(Register);
-        Sale.InitializeAtLogin(Register, Setup);
+        Setup.GetPOSUnit(POSUnit);
+        Sale.InitializeAtLogin(POSUnit, Setup);
     end;
 
     //#endregion
@@ -296,13 +295,13 @@ codeunit 6150700 "NPR POS Session"
         TransactionNo: Text;
     begin
         Clear(Sale);
-        Sale.InitializeNewSale(Register, FrontEnd, Setup, Sale);
+        Sale.InitializeNewSale(POSUnit, FrontEnd, Setup, Sale);
     end;
 
     procedure ResumeTransaction(SalePOS: Record "NPR Sale POS")
     begin
         Clear(Sale);
-        Sale.ResumeExistingSale(SalePOS, Register, FrontEnd, Setup, Sale);
+        Sale.ResumeExistingSale(SalePOS, POSUnit, FrontEnd, Setup, Sale);
     end;
 
     procedure BeginAction("Action": Text): Guid

@@ -36,9 +36,11 @@ table 6059990 "NPR Retail Admin Cue"
         }
         field(60; "Cash Registers"; Integer)
         {
-            CalcFormula = Count("NPR Register");
+            CalcFormula = Count("NPR POS Unit");
             Caption = 'Cash Registers';
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use POS Units instead of Cash Registers';
         }
         field(70; "POS Payment Bins"; Integer)
         {

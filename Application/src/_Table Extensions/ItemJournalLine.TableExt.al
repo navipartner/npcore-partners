@@ -43,7 +43,7 @@ tableextension 6014452 "NPR Item Journal Line" extends "Item Journal Line"
         }
         field(6014413; "NPR Register Number"; Code[20])
         {
-            Caption = 'Cash Register No.';
+            Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
