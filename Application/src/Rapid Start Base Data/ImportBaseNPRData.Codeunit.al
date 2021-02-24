@@ -20,7 +20,7 @@ codeunit 6014602 "NPR Import Base NPR Data"
         if autoRapidstartImportLog.Get(packageName) then
             exit;
 
-        BaseUri := AzureKeyVaultMgt.GetSecret('NpRetailBaseDataBaseUrl');
+        BaseUri := 'https://npretailbasedata.blob.core.windows.net';
         Secret := AzureKeyVaultMgt.GetSecret('NpRetailBaseDataSecret');
 
         BindSubscription(rapidStartBaseDataMgt);
