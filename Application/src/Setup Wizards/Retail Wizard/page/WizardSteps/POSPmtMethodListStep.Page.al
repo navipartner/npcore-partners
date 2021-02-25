@@ -12,67 +12,62 @@ page 6014687 "NPR POS Pmt. Method List Step"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field("Processing Type"; "Processing Type")
+                field("Processing Type"; Rec."Processing Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Processing Type field';
                 }
-                field("Currency Code2"; "Currency Code")
+                field("Currency Code2"; Rec."Currency Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Currency Code field';
                 }
-                field("Vouched By"; "Vouched By")
+                field("Vouched By"; Rec."Vouched By")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Vouched By field';
                 }
-                field("Is Finance Agreement"; "Is Finance Agreement")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Is Finance Agreement field';
-                }
-                field("Include In Counting"; "Include In Counting")
+                field("Include In Counting"; Rec."Include In Counting")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Include In Counting field';
                 }
-                field("Bin for Virtual-Count"; "Bin for Virtual-Count")
+                field("Bin for Virtual-Count"; Rec."Bin for Virtual-Count")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Bin for Virtual-Count field';
                 }
-                field("Post Condensed"; "Post Condensed")
+                field("Post Condensed"; Rec."Post Condensed")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Post Condensed field';
                 }
-                field("Condensed Posting Description"; "Condensed Posting Description")
+                field("Condensed Posting Description"; Rec."Condensed Posting Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Condensed Posting Description field';
                 }
-                field("Rounding Precision"; "Rounding Precision")
+                field("Rounding Precision"; Rec."Rounding Precision")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Rounding Precision field';
                 }
-                field("Rounding Type"; "Rounding Type")
+                field("Rounding Type"; Rec."Rounding Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Rounding Type field';
                 }
-                field("Rounding Gains Account"; "Rounding Gains Account")
+                field("Rounding Gains Account"; Rec."Rounding Gains Account")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Rounding Gains Account field';
                 }
-                field("Rounding Losses Account"; "Rounding Losses Account")
+                field("Rounding Losses Account"; Rec."Rounding Losses Account")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Rounding Losses Account field';

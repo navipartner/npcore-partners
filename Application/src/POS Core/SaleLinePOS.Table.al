@@ -2352,9 +2352,7 @@ table 6014406 "NPR Sale Line POS"
             Error(Text001, "No.");
 
         POSPaymentMethod.TestField("Block POS Payment", false);
-        if POSPaymentMethod."Global Dimension 1 Code" <> '' then
-            POSPaymentMethod.TestField("Global Dimension 1 Code", POSUnit."Global Dimension 1 Code");
-
+       
         if POSPaymentMethod."Processing Type" <> POSPaymentMethod."Processing Type"::CUSTOMER then
             exit;
         GetPOSHeader;

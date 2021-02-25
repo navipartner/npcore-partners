@@ -113,7 +113,7 @@ codeunit 6150725 "NPR POS Action: Payment"
             Error(PaymentTypeNotFound, POSPaymentMethod.TableCaption, PaymentNo, Setup.GetPOSUnitNo());
 
         if not ReturnPOSPaymentMethod.Get(POSPaymentMethod."Return Payment Method Code") then
-            Error(PaymentTypeNotFound, ReturnPOSPaymentMethod.TableCaption, POSPaymentMethod."Return Payment Method Code", Setup.GetPOSUnitNo());
+            POSPaymentMethod.Testfield("Return Payment Method Code");
 
         OnBeforeActionWorkflow(POSPaymentMethod, Parameters, POSSession, FrontEnd, Context, SubTotal, Handled);
 
