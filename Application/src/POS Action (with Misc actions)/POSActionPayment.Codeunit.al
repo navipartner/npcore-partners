@@ -73,7 +73,7 @@ codeunit 6150725 "NPR POS Action: Payment"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.3');
+        exit('1.6');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -94,6 +94,7 @@ codeunit 6150725 "NPR POS Action: Payment"
 
             Sender.RegisterWorkflowStep('capture_payment', 'respond();');
             Sender.RegisterWorkflowStep('tryEndSale', 'respond();');
+            Sender.RegisterWorkflowStep('showEftError', 'context.eft_error && message ({caption: context.eft_error});');
 
             Sender.RegisterWorkflow(true);
             Sender.RegisterDataBinding();
@@ -781,34 +782,35 @@ codeunit 6150725 "NPR POS Action: Payment"
                 if ((SecondaryEFTTransactionRequest."Pepper Transaction Type Code" = EFTTransactionRequest."Pepper Transaction Type Code") and
                   (SecondaryEFTTransactionRequest."Pepper Trans. Subtype Code" = EFTTransactionRequest."Pepper Trans. Subtype Code") and
                   (SecondaryEFTTransactionRequest."Amount Input" = EFTTransactionRequest."Amount Input")) then begin
+                    SetEftError(SecondaryEFTTransactionRequest, POSSession); //TODO: Remove workaround to BC17 message bug
                     exit(not SecondaryEFTTransactionRequest.Successful);
                 end;
             end;
 
+            SetEftError(EFTTransactionRequest, POSSession);  //TODO: Remove workaround to BC17 message bug
             exit(true);
         end;
 
         exit(false);
     end;
 
-    local procedure "--"()
-    begin
-    end;
-
-    procedure CalculateForeignAmount(PaymentTypePOS: Record "NPR Payment Type POS"; AmountLCY: Decimal) Amount: Decimal
+    local procedure SetEftError(EftTransactionRequest: Record "NPR EFT Transaction Request"; POSSession: Codeunit "NPR POS Session")
     var
-        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        TRX_ERROR: Label '%1 failed\%2\%3\%4';
+        POSFrontEnd: Codeunit "NPR POS Front End Management";
+        Context: Codeunit "NPR POS JSON Management";
     begin
+        //TODO: Cleanup Workaround to BC17 message bug
 
-        exit(POSPaymentLine.CalculateForeignAmount(PaymentTypePOS, AmountLCY));
-    end;
+        if (not EftTransactionRequest.Successful) then begin
+            if (EftTransactionRequest."Self Service") and (not EftTransactionRequest."External Result Known") then begin
+                error(TRX_ERROR, Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
+            end;
 
-    procedure RoundAmount(PaymentTypePOS: Record "NPR Payment Type POS"; Amount: Decimal): Decimal
-    var
-        POSPaymentLine: Codeunit "NPR POS Payment Line";
-    begin
-
-        exit(POSPaymentLine.RoundAmount(PaymentTypePOS, Amount));
+            POSSession.GetFrontEnd(POSFrontEnd, true);
+            Context.SetContext('eft_error', StrSubstNo(TRX_ERROR, Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error"));
+            POSFrontEnd.SetActionContext(ActionCode(), Context);
+        end
     end;
 
     local procedure SuggestAmount(SalesAmount: Decimal; PaidAmount: Decimal; PaymentType: Record "NPR Payment Type POS"; ReturnPaymentType: Record "NPR Payment Type POS"; AllowNegativePaymentBalance: Boolean): Decimal
