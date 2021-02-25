@@ -14,74 +14,68 @@ page 6150618 "NPR POS Payment Method List"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field("Processing Type"; "Processing Type")
+                field("Processing Type"; Rec."Processing Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Processing Type field';
                 }
-                field("Currency Code"; "Currency Code")
+                field("Currency Code"; Rec."Currency Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Currency Code field';
                 }
-                field("Include In Counting"; "Include In Counting")
+                field("Include In Counting"; Rec."Include In Counting")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Include In Counting field';
                 }
-                field("Bin for Virtual-Count"; "Bin for Virtual-Count")
+                field("Bin for Virtual-Count"; Rec."Bin for Virtual-Count")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Bin for Virtual-Count field';
                 }
-                field("Rounding Gains Account"; "Rounding Gains Account")
+                field("Rounding Gains Account"; Rec."Rounding Gains Account")
                 {
                     ApplicationArea = All;
                     Visible = true;
                     ToolTip = 'Specifies the value of the Rounding Gains Account field';
                 }
-                field("Rounding Losses Account"; "Rounding Losses Account")
+                field("Rounding Losses Account"; Rec."Rounding Losses Account")
                 {
                     ApplicationArea = All;
                     Visible = true;
                     ToolTip = 'Specifies the value of the Rounding Losses Account field';
                 }
-                field("Vouched By"; "Vouched By")
+                field("Vouched By"; Rec."Vouched By")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Vouched By field';
                 }
-                field("Is Finance Agreement"; "Is Finance Agreement")
-                {
-                    ApplicationArea = All;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Is Finance Agreement field';
-                }
-                field("Post Condensed"; "Post Condensed")
+                field("Post Condensed"; Rec."Post Condensed")
                 {
                     ApplicationArea = All;
                     Visible = true;
                     ToolTip = 'Specifies the value of the Post Condensed field';
                 }
-                field("Condensed Posting Description"; "Condensed Posting Description")
+                field("Condensed Posting Description"; Rec."Condensed Posting Description")
                 {
                     ApplicationArea = All;
                     Visible = true;
                     ToolTip = 'Specifies the value of the Condensed Posting Description field';
                 }
-                field("Rounding Precision"; "Rounding Precision")
+                field("Rounding Precision"; Rec."Rounding Precision")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Rounding Precision field';
                 }
-                field("Rounding Type"; "Rounding Type")
+                field("Rounding Type"; Rec."Rounding Type")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -100,7 +94,7 @@ page 6150618 "NPR POS Payment Method List"
                 Caption = 'POS Posting Setup';
                 Image = GeneralPostingSetup;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Posting Setup";
@@ -116,7 +110,7 @@ page 6150618 "NPR POS Payment Method List"
                     Caption = 'POS Payment Lines';
                     Image = LedgerEntries;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Payment Line List";
