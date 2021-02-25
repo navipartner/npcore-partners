@@ -37,10 +37,13 @@ table 6060090 "NPR MM Admis. Service Setup"
             Caption = 'Guest Avatar';
             DataClassification = CustomerContent;
             SubType = Bitmap;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore. Replaced by "Guest Avatar Image" field';
+            ObsoleteTag = 'Deprecated field type';
         }
         field(16; "Web Service Is Published"; Boolean)
         {
-            CalcFormula = Exist ("Web Service" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Exist("Web Service" WHERE("Object Type" = CONST(Codeunit),
                                                      "Service Name" = CONST('admission_service')));
             Caption = 'Web Service Is Published';
             Editable = false;
@@ -56,12 +59,33 @@ table 6060090 "NPR MM Admis. Service Setup"
             Caption = 'Turnstile Default Image';
             DataClassification = CustomerContent;
             SubType = Bitmap;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore. Replaced by "Default Turnstile Image" field';
+            ObsoleteTag = 'Deprecated field type';
         }
         field(19; "Turnstile Error Image"; BLOB)
         {
             Caption = 'Turnstile Error Image';
             DataClassification = CustomerContent;
             SubType = Bitmap;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore. Replaced by "Error Image of Turnstile" field';
+            ObsoleteTag = 'Deprecated field type';
+        }
+        field(20; "Guest Avatar Image"; Media)
+        {
+            Caption = 'Guest Avatar';
+            DataClassification = CustomerContent;
+        }
+        field(21; "Default Turnstile Image"; Media)
+        {
+            Caption = 'Default Turnstile Image';
+            DataClassification = CustomerContent;
+        }
+        field(22; "Error Image of Turnstile"; Media)
+        {
+            Caption = 'Turnstile Error Image';
+            DataClassification = CustomerContent;
         }
     }
 
@@ -70,10 +94,6 @@ table 6060090 "NPR MM Admis. Service Setup"
         key(Key1; "No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 
