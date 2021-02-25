@@ -3,7 +3,7 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
     Caption = 'POS Payment Bin Checkpoint';
     DeleteAllowed = false;
     InsertAllowed = false;
-    PageType = Card;
+    PageType = List;
     UsageCategory = Administration;
     ApplicationArea = All;
     SourceTable = "NPR POS Payment Bin Checkp.";
@@ -14,267 +14,274 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
         {
             group(Counting)
             {
-                Editable = ViewMode = FALSE;
-                Visible = ShowCountingSection;
-                field(PaymentTypeNo; Rec."Payment Type No.")
+                repeater(Control6014417)
                 {
-                    ApplicationArea = All;
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Payment Type No. field';
-                }
-                field(Description; Rec.Description)
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Description field';
-                }
-                field(PaymentBinNo; Rec."Payment Bin No.")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Payment Bin No. field';
-                }
-                field(PaymentMethodNo; Rec."Payment Method No.")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Payment Method No. field';
-                }
-                field(CountedAmountInclFloat; Rec."Counted Amount Incl. Float")
-                {
-                    ApplicationArea = All;
-                    MinValue = 0;
-                    ToolTip = 'Specifies the value of the Counted Amount Incl. Float field';
+                    Editable = ViewMode = FALSE;
+                    ShowCaption = false;
+                    Visible = ShowCountingSection;
+                    field(PaymentTypeNo; Rec."Payment Type No.")
+                    {
+                        ApplicationArea = All;
+                        Editable = false;
+                        ToolTip = 'Specifies the value of the Payment Type No. field';
+                    }
+                    field(Description; Rec.Description)
+                    {
+                        ApplicationArea = All;
+                        Editable = false;
+                        ToolTip = 'Specifies the value of the Description field';
+                    }
+                    field(PaymentBinNo; Rec."Payment Bin No.")
+                    {
+                        ApplicationArea = All;
+                        Editable = false;
+                        Visible = false;
+                        ToolTip = 'Specifies the value of the Payment Bin No. field';
+                    }
+                    field(PaymentMethodNo; Rec."Payment Method No.")
+                    {
+                        ApplicationArea = All;
+                        Editable = false;
+                        Visible = false;
+                        ToolTip = 'Specifies the value of the Payment Method No. field';
+                    }
+                    field(CountedAmountInclFloat; Rec."Counted Amount Incl. Float")
+                    {
+                        ApplicationArea = All;
+                        MinValue = 0;
+                        ToolTip = 'Specifies the value of the Counted Amount Incl. Float field';
 
-                    trigger OnAssistEdit()
-                    begin
-                        OnAssistEditCounting();
-                    end;
+                        trigger OnAssistEdit()
+                        begin
+                            OnAssistEditCounting();
+                        end;
 
-                    trigger OnValidate()
-                    begin
-                        CountingDifference := CalculatedDifference();
-                        CalculateNewFloatAmount();
-                        CurrPage.Update(true);
-                    end;
-                }
-                field(CalculatedAmountInclFloat; Rec."Calculated Amount Incl. Float")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    Visible = NOT IsBlindCount;
-                    ToolTip = 'Specifies the value of the Calculated Amount Incl. Float field';
-                }
-                field(CountingDifference; CountingDifference)
-                {
-                    ApplicationArea = All;
-                    Caption = 'Difference';
-                    Style = Unfavorable;
-                    StyleExpr = CountingDifference <> 0;
-                    Visible = NOT IsBlindCount;
-                    ToolTip = 'Specifies the value of the Difference field';
+                        trigger OnValidate()
+                        begin
+                            CountingDifference := CalculatedDifference();
+                            CalculateNewFloatAmount();
+                            CurrPage.Update(true);
+                        end;
+                    }
+                    field(CalculatedAmountInclFloat; Rec."Calculated Amount Incl. Float")
+                    {
+                        ApplicationArea = All;
+                        Editable = false;
+                        Visible = NOT IsBlindCount;
+                        ToolTip = 'Specifies the value of the Calculated Amount Incl. Float field';
+                    }
+                    field(CountingDifference; CountingDifference)
+                    {
+                        ApplicationArea = All;
+                        Caption = 'Difference';
+                        Style = Unfavorable;
+                        StyleExpr = CountingDifference <> 0;
+                        Visible = NOT IsBlindCount;
+                        ToolTip = 'Specifies the value of the Difference field';
 
-                    trigger OnValidate()
-                    begin
-                        Rec."Counted Amount Incl. Float" := Rec."Calculated Amount Incl. Float" - CountingDifference;
-                        CountingDifference := CalculatedDifference();
-                        CalculateNewFloatAmount();
-                        CurrPage.Update(true);
-                    end;
-                }
-                field(Comment1; Rec.Comment)
-                {
-                    ApplicationArea = All;
-                    Visible = NOT IsBlindCount;
-                    ToolTip = 'Specifies the value of the Comment field';
+                        trigger OnValidate()
+                        begin
+                            Rec."Counted Amount Incl. Float" := Rec."Calculated Amount Incl. Float" - CountingDifference;
+                            CountingDifference := CalculatedDifference();
+                            CalculateNewFloatAmount();
+                            CurrPage.Update(true);
+                        end;
+                    }
+                    field(Comment1; Rec.Comment)
+                    {
+                        ApplicationArea = All;
+                        Visible = NOT IsBlindCount;
+                        ToolTip = 'Specifies the value of the Comment field';
+                    }
                 }
             }
             group("Closing & Transfer")
             {
-                Editable = ViewMode = FALSE;
-                Visible = ShowClosingSection;
-                field("Payment Type No."; Rec."Payment Type No.")
+                repeater(Control6014403)
                 {
-                    ApplicationArea = All;
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Payment Type No. field';
-                }
-                field("Payment Method No."; Rec."Payment Method No.")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Payment Method No. field';
-                }
-                field("Payment Bin No."; Rec."Payment Bin No.")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Payment Bin No. field';
-                }
-                field("Float Amount"; Rec."Float Amount")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Float Amount field';
-                }
-                field("Counted Amount Incl. Float"; Rec."Counted Amount Incl. Float")
-                {
-                    ApplicationArea = All;
-                    MinValue = 0;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Counted Amount Incl. Float field';
+                    Editable = ViewMode = FALSE;
+                    ShowCaption = false;
+                    Visible = ShowClosingSection;
+                    field("Payment Type No."; Rec."Payment Type No.")
+                    {
+                        ApplicationArea = All;
+                        Editable = false;
+                        ToolTip = 'Specifies the value of the Payment Type No. field';
+                    }
+                    field("Payment Method No."; Rec."Payment Method No.")
+                    {
+                        ApplicationArea = All;
+                        Editable = false;
+                        Visible = false;
+                        ToolTip = 'Specifies the value of the Payment Method No. field';
+                    }
+                    field("Payment Bin No."; Rec."Payment Bin No.")
+                    {
+                        ApplicationArea = All;
+                        Editable = false;
+                        Visible = false;
+                        ToolTip = 'Specifies the value of the Payment Bin No. field';
+                    }
+                    field("Float Amount"; Rec."Float Amount")
+                    {
+                        ApplicationArea = All;
+                        Editable = false;
+                        ToolTip = 'Specifies the value of the Float Amount field';
+                    }
+                    field("Counted Amount Incl. Float"; Rec."Counted Amount Incl. Float")
+                    {
+                        ApplicationArea = All;
+                        MinValue = 0;
+                        Visible = false;
+                        ToolTip = 'Specifies the value of the Counted Amount Incl. Float field';
 
-                    trigger OnAssistEdit()
-                    begin
-                        OnAssistEditCounting();
-                    end;
+                        trigger OnAssistEdit()
+                        begin
+                            OnAssistEditCounting();
+                        end;
 
-                    trigger OnValidate()
-                    begin
-                        CalculateNewFloatAmount();
-                        CurrPage.Update(true);
-                    end;
-                }
-                field("Transfer In Amount"; Rec."Transfer In Amount")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Transfer In Amount field';
-                }
-                field("Transfer Out Amount"; Rec."Transfer Out Amount")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Transfer Out Amount field';
-                }
-                field(NetTransfer; NetTransfer)
-                {
-                    ApplicationArea = All;
-                    Caption = 'Transfered Amount';
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Transfered Amount field';
-                }
-                field("Calculated Amount Incl. Float"; Rec."Calculated Amount Incl. Float")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    Visible = NOT IsBlindCount;
-                    ToolTip = 'Specifies the value of the Calculated Amount Incl. Float field';
-                }
-                field("New Float Amount"; Rec."New Float Amount")
-                {
-                    ApplicationArea = All;
-                    Editable = PageMode = PageMode::FINAL_COUNT;
-                    MinValue = 0;
-                    Style = Strong;
-                    StyleExpr = TRUE;
-                    ToolTip = 'Specifies the value of the New Float Amount field';
+                        trigger OnValidate()
+                        begin
+                            CalculateNewFloatAmount();
+                            CurrPage.Update(true);
+                        end;
+                    }
+                    field("Transfer In Amount"; Rec."Transfer In Amount")
+                    {
+                        ApplicationArea = All;
+                        Editable = false;
+                        Visible = false;
+                        ToolTip = 'Specifies the value of the Transfer In Amount field';
+                    }
+                    field("Transfer Out Amount"; Rec."Transfer Out Amount")
+                    {
+                        ApplicationArea = All;
+                        Editable = false;
+                        Visible = false;
+                        ToolTip = 'Specifies the value of the Transfer Out Amount field';
+                    }
+                    field(NetTransfer; NetTransfer)
+                    {
+                        ApplicationArea = All;
+                        Caption = 'Transfered Amount';
+                        Editable = false;
+                        ToolTip = 'Specifies the value of the Transfered Amount field';
+                    }
+                    field("Calculated Amount Incl. Float"; Rec."Calculated Amount Incl. Float")
+                    {
+                        ApplicationArea = All;
+                        Editable = false;
+                        Visible = NOT IsBlindCount;
+                        ToolTip = 'Specifies the value of the Calculated Amount Incl. Float field';
+                    }
+                    field("New Float Amount"; Rec."New Float Amount")
+                    {
+                        ApplicationArea = All;
+                        Editable = PageMode = PageMode::FINAL_COUNT;
+                        MinValue = 0;
+                        Style = Strong;
+                        StyleExpr = TRUE;
+                        ToolTip = 'Specifies the value of the New Float Amount field';
 
-                    trigger OnValidate()
-                    begin
-                        Rec."Bank Deposit Amount" := Rec."Counted Amount Incl. Float" - Rec."Move to Bin Amount" - Rec."New Float Amount";
+                        trigger OnValidate()
+                        begin
+                            Rec."Bank Deposit Amount" := Rec."Counted Amount Incl. Float" - Rec."Move to Bin Amount" - Rec."New Float Amount";
 
-                        if (Rec."Bank Deposit Amount" < 0) then
-                            Error(INVALID_AMOUNT, Rec."New Float Amount");
+                            if (Rec."Bank Deposit Amount" < 0) then
+                                Error(INVALID_AMOUNT, Rec."New Float Amount");
 
-                        SelectBankBin();
-                        SelectSafeBin();
-                        CurrPage.Update(true);
-                    end;
-                }
-                field("Bank Deposit Amount"; Rec."Bank Deposit Amount")
-                {
-                    ApplicationArea = All;
-                    Style = Unfavorable;
-                    StyleExpr = InvalidDistribution;
-                    ToolTip = 'Specifies the value of the Bank Deposit Amount field';
+                            SelectBankBin();
+                            SelectSafeBin();
+                            CurrPage.Update(true);
+                        end;
+                    }
+                    field("Bank Deposit Amount"; Rec."Bank Deposit Amount")
+                    {
+                        ApplicationArea = All;
+                        Style = Unfavorable;
+                        StyleExpr = InvalidDistribution;
+                        ToolTip = 'Specifies the value of the Bank Deposit Amount field';
 
-                    trigger OnValidate()
-                    begin
-                        CalculateNewFloatAmount();
-                        SelectBankBin();
-                        CurrPage.Update(true);
-                    end;
-                }
-                field("Bank Deposit Bin Code"; Rec."Bank Deposit Bin Code")
-                {
-                    ApplicationArea = All;
-                    ShowMandatory = "Bank Deposit Amount" <> 0;
-                    ToolTip = 'Specifies the value of the Bank Deposit Bin Code field';
-                }
-                field("Bank Deposit Reference"; Rec."Bank Deposit Reference")
-                {
-                    ApplicationArea = All;
-                    ShowMandatory = "Bank Deposit Amount" <> 0;
-                    ToolTip = 'Specifies the value of the Bank Deposit Reference field';
-                }
-                field("Move to Bin Amount"; Rec."Move to Bin Amount")
-                {
-                    ApplicationArea = All;
-                    Style = Unfavorable;
-                    StyleExpr = InvalidDistribution;
-                    ToolTip = 'Specifies the value of the Move to Bin Amount field';
+                        trigger OnValidate()
+                        begin
+                            CalculateNewFloatAmount();
+                            SelectBankBin();
+                            CurrPage.Update(true);
+                        end;
+                    }
+                    field("Bank Deposit Bin Code"; Rec."Bank Deposit Bin Code")
+                    {
+                        ApplicationArea = All;
+                        ShowMandatory = "Bank Deposit Amount" <> 0;
+                        ToolTip = 'Specifies the value of the Bank Deposit Bin Code field';
+                    }
+                    field("Bank Deposit Reference"; Rec."Bank Deposit Reference")
+                    {
+                        ApplicationArea = All;
+                        ShowMandatory = "Bank Deposit Amount" <> 0;
+                        ToolTip = 'Specifies the value of the Bank Deposit Reference field';
+                    }
+                    field("Move to Bin Amount"; Rec."Move to Bin Amount")
+                    {
+                        ApplicationArea = All;
+                        Style = Unfavorable;
+                        StyleExpr = InvalidDistribution;
+                        ToolTip = 'Specifies the value of the Move to Bin Amount field';
 
-                    trigger OnValidate()
-                    begin
-                        CalculateNewFloatAmount();
-                        SelectSafeBin();
+                        trigger OnValidate()
+                        begin
+                            CalculateNewFloatAmount();
+                            SelectSafeBin();
 
-                        if (PageMode = PageMode::TRANSFER) then
-                            if ((Rec."Move to Bin Amount" <> 0) and (Rec."Include In Counting" = Rec."Include In Counting"::NO)) then
-                                Rec."Include In Counting" := Rec."Include In Counting"::YES;
+                            if (PageMode = PageMode::TRANSFER) then
+                                if ((Rec."Move to Bin Amount" <> 0) and (Rec."Include In Counting" = Rec."Include In Counting"::NO)) then
+                                    Rec."Include In Counting" := Rec."Include In Counting"::YES;
 
-                        CurrPage.Update(true);
-                    end;
-                }
-                field("Move to Bin Code"; Rec."Move to Bin Code")
-                {
-                    ApplicationArea = All;
-                    ShowMandatory = Rec."Move to bin amount" <> 0;
-                    ToolTip = 'Specifies the value of the Move to Bin No. field';
-                }
-                field("Move to Bin Reference"; Rec."Move to Bin Reference")
-                {
-                    ApplicationArea = All;
-                    ShowMandatory = Rec."Move to bin amount" <> 0;
-                    ToolTip = 'Specifies the value of the Move to Bin Trans. ID field';
-                }
-                field(Status; Rec.Status)
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Status field';
-                }
-                field("Checkpoint Bin Entry No."; Rec."Checkpoint Bin Entry No.")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Checkpoint Bin Entry No. field';
-                }
-                field("Payment Bin Entry Amount"; Rec."Payment Bin Entry Amount")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Payment Bin Entry Amount field';
-                }
-                field("Payment Bin Entry Amount (LCY)"; Rec."Payment Bin Entry Amount (LCY)")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Payment Bin Entry Amount (LCY) field';
+                            CurrPage.Update(true);
+                        end;
+                    }
+                    field("Move to Bin Code"; Rec."Move to Bin Code")
+                    {
+                        ApplicationArea = All;
+                        ShowMandatory = Rec."Move to bin amount" <> 0;
+                        ToolTip = 'Specifies the value of the Move to Bin No. field';
+                    }
+                    field("Move to Bin Reference"; Rec."Move to Bin Reference")
+                    {
+                        ApplicationArea = All;
+                        ShowMandatory = Rec."Move to bin amount" <> 0;
+                        ToolTip = 'Specifies the value of the Move to Bin Trans. ID field';
+                    }
+                    field(Status; Rec.Status)
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Status field';
+                    }
+                    field("Checkpoint Bin Entry No."; Rec."Checkpoint Bin Entry No.")
+                    {
+                        ApplicationArea = All;
+                        Editable = false;
+                        Visible = false;
+                        ToolTip = 'Specifies the value of the Checkpoint Bin Entry No. field';
+                    }
+                    field("Payment Bin Entry Amount"; Rec."Payment Bin Entry Amount")
+                    {
+                        ApplicationArea = All;
+                        Editable = false;
+                        Visible = false;
+                        ToolTip = 'Specifies the value of the Payment Bin Entry Amount field';
+                    }
+                    field("Payment Bin Entry Amount (LCY)"; Rec."Payment Bin Entry Amount (LCY)")
+                    {
+                        ApplicationArea = All;
+                        Editable = false;
+                        Visible = false;
+                        ToolTip = 'Specifies the value of the Payment Bin Entry Amount (LCY) field';
+                    }
                 }
             }
         }
     }
-
     actions
     {
         area(processing)
