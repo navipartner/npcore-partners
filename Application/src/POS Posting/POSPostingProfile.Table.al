@@ -18,7 +18,7 @@ table 6150653 "NPR POS Posting Profile"
             Caption = 'Description';
             DataClassification = CustomerContent;
         }
-        field(20; "Default POS Entry No. Series"; Code[10])
+        field(20; "Default POS Entry No. Series"; Code[20])
         {
             Caption = 'Default POS Entry No. Series';
             DataClassification = CustomerContent;
@@ -111,7 +111,7 @@ table 6150653 "NPR POS Posting Profile"
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Payment Bin";
         }
-        field(150; "Gen. Bus. Posting Group"; Code[10])
+        field(150; "Gen. Bus. Posting Group"; Code[20])
         {
             Caption = 'Gen. Bus. Posting Group';
             DataClassification = CustomerContent;
@@ -126,13 +126,13 @@ table 6150653 "NPR POS Posting Profile"
                         Validate("VAT Bus. Posting Group", GenBusPostingGrp."Def. VAT Bus. Posting Group");
             end;
         }
-        field(151; "VAT Bus. Posting Group"; Code[10])
+        field(151; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "VAT Business Posting Group";
         }
-        field(160; "POS Period Register No. Series"; Code[10])
+        field(160; "POS Period Register No. Series"; Code[20])
         {
             Caption = 'POS Period Register No. Series';
             DataClassification = CustomerContent;

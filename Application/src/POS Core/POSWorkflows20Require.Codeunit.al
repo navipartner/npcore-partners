@@ -101,7 +101,7 @@ codeunit 6150735 "NPR POS Workflows 2.0: Require"
     local procedure RequireImage(ID: Integer; JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         WebClientDependency: Record "NPR Web Client Dependency";
-        ImageCode: Code[20];
+        ImageCode: Code[10];
     begin
         JSON.SetScope('context', true);
         ImageCode := JSON.GetString('code', true);

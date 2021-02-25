@@ -25,7 +25,7 @@ table 6014498 "NPR Exchange Label"
             Caption = 'Batch No.';
             DataClassification = CustomerContent;
         }
-        field(5; "No. Series"; Code[10])
+        field(5; "No. Series"; Code[20])
         {
             Caption = 'No. Series';
             TableRelation = "No. Series";
@@ -174,7 +174,7 @@ table 6014498 "NPR Exchange Label"
     var
         NoSeriesMgt: Codeunit NoSeriesManagement;
 
-    procedure GetNoSeriesCode(): Code[10]
+    procedure GetNoSeriesCode(): Code[20]
     var
         ExchangeLabelSetup: Record "NPR Exchange Label Setup";
     begin

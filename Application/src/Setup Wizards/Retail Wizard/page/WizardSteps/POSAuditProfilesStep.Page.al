@@ -213,7 +213,7 @@ page 6014654 "NPR POS Audit Profiles Step"
             until POSAuditProfile.Next() = 0;
     end;
 
-    local procedure CheckIfNoAvailableInPOSAuditProfile(var POSAuditProfile: Record "NPR POS Audit Profile"; var WantedStartingNo: Code[10]) CalculatedNo: Code[10]
+    local procedure CheckIfNoAvailableInPOSAuditProfile(var POSAuditProfile: Record "NPR POS Audit Profile"; var WantedStartingNo: Code[20]) CalculatedNo: Code[20]
     var
         HelperFunctions: Codeunit "NPR Wizard Helper Functions";
     begin
@@ -222,7 +222,7 @@ page 6014654 "NPR POS Audit Profiles Step"
         POSAuditProfile.SetRange(Code, CalculatedNo);
 
         if POSAuditProfile.FindFirst() then begin
-            HelperFunctions.FormatCode(WantedStartingNo);
+            WantedStartingNo := HelperFunctions.FormatCode20(WantedStartingNo);
             CalculatedNo := CheckIfNoAvailableInPOSAuditProfile(POSAuditProfile, WantedStartingNo);
         end;
     end;

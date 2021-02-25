@@ -385,7 +385,7 @@ codeunit 6059972 "NPR Variety Clone Data"
         //+NPR5.36 [288696]
     end;
 
-    procedure GetNextVariantCode(ItemNo: Code[20]; Variant1Code: Code[20]; Variant2Code: Code[20]; Variant3Code: Code[20]; Variant4Code: Code[20]) NewVariantCode: Code[20]
+    procedure GetNextVariantCode(ItemNo: Code[20]; Variant1Code: Code[20]; Variant2Code: Code[20]; Variant3Code: Code[20]; Variant4Code: Code[20]) NewVariantCode: Code[10]
     var
         VarietySetup: Record "NPR Variety Setup";
         NoSeriesMgt: Codeunit NoSeriesManagement;
@@ -397,7 +397,7 @@ codeunit 6059972 "NPR Variety Clone Data"
         VarietySetup.Get();
         VarietySetup.TestField("Variant No. Series");
 
-        exit(NoSeriesMgt.GetNextNo(VarietySetup."Variant No. Series", Today, true));
+        exit(CopyStr(NoSeriesMgt.GetNextNo(VarietySetup."Variant No. Series", Today, true), 1, MaxStrLen(NewVariantCode)));
     end;
 
     procedure FillDescription(var ItemVariant: Record "Item Variant"; Item: Record Item)
@@ -472,7 +472,7 @@ codeunit 6059972 "NPR Variety Clone Data"
         end;
     end;
 
-    procedure InsertDefaultBarcode(ItemNo: Code[20]; VariantCode: Code[20]; CalledFromInsert: Boolean)
+    procedure InsertDefaultBarcode(ItemNo: Code[20]; VariantCode: Code[10]; CalledFromInsert: Boolean)
     var
         SkipCreateDefaultBarcode: Boolean;
         Handled: Boolean;
@@ -493,7 +493,7 @@ codeunit 6059972 "NPR Variety Clone Data"
         end;
     end;
 
-    procedure AddItemRef(ItemNo: Code[20]; VariantCode: Code[20])
+    procedure AddItemRef(ItemNo: Code[20]; VariantCode: Code[10])
     var
         NextCode: Code[20];
         NoSeriesMgt: Codeunit NoSeriesManagement;
@@ -519,7 +519,7 @@ codeunit 6059972 "NPR Variety Clone Data"
         //+VRT1.11
     end;
 
-    procedure InsertItemRef(ItemNo: Code[20]; VariantCode: Code[20]; Barcode: Code[20]; CrossRefType: Option " ",Customer,Vendor,"Bar Code"; CrossRefTypeNo: Code[20])
+    procedure InsertItemRef(ItemNo: Code[20]; VariantCode: Code[10]; Barcode: Code[20]; CrossRefType: Option " ",Customer,Vendor,"Bar Code"; CrossRefTypeNo: Code[20])
     var
         Item: Record Item;
         ItemRef: Record "Item Reference";
@@ -1059,7 +1059,7 @@ codeunit 6059972 "NPR Variety Clone Data"
             exit;
 
         VarietySetup.TestField("Variant No. Series");
-        NewVariantCode := NoSeriesMgt.GetNextNo(VarietySetup."Variant No. Series", Today, true);
+        NewVariantCode := CopyStr(NoSeriesMgt.GetNextNo(VarietySetup."Variant No. Series", Today, true), 1, MaxStrLen(NewVariantCode));
     end;
 
     local procedure GetUnitOfMeasure(ItemNo: Code[20]; ReturnType: Integer): Code[10]

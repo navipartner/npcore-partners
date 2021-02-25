@@ -68,7 +68,7 @@ table 6014419 "NPR Archive Sale Line POS"
             TableRelation = Location;
             DataClassification = CustomerContent;
         }
-        field(8; "Posting Group"; Code[10])
+        field(8; "Posting Group"; Code[20])
         {
             Caption = 'Posting Group';
             Editable = false;
@@ -258,25 +258,25 @@ table 6014419 "NPR Archive Sale Line POS"
             Caption = 'Invoice Discount Amount';
             DataClassification = CustomerContent;
         }
-        field(48; "Gen. Bus. Posting Group"; Code[10])
+        field(48; "Gen. Bus. Posting Group"; Code[20])
         {
             Caption = 'Gen. Bus. Posting Group';
             TableRelation = "Gen. Business Posting Group";
             DataClassification = CustomerContent;
         }
-        field(49; "Gen. Prod. Posting Group"; Code[10])
+        field(49; "Gen. Prod. Posting Group"; Code[20])
         {
             Caption = 'Gen. Prod. Posting Group';
             TableRelation = "Gen. Product Posting Group";
             DataClassification = CustomerContent;
         }
-        field(50; "VAT Bus. Posting Group"; Code[10])
+        field(50; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             TableRelation = "VAT Business Posting Group";
             DataClassification = CustomerContent;
         }
-        field(51; "VAT Prod. Posting Group"; Code[10])
+        field(51; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
             TableRelation = "VAT Product Posting Group";
@@ -371,7 +371,7 @@ table 6014419 "NPR Archive Sale Line POS"
             Caption = 'Tax Liable';
             DataClassification = CustomerContent;
         }
-        field(87; "Tax Group Code"; Code[10])
+        field(87; "Tax Group Code"; Code[20])
         {
             Caption = 'Tax Group Code';
             TableRelation = "Tax Group";
@@ -422,7 +422,7 @@ table 6014419 "NPR Archive Sale Line POS"
             Caption = 'Line Amount';
             DataClassification = CustomerContent;
         }
-        field(106; "VAT Identifier"; Code[10])
+        field(106; "VAT Identifier"; Code[20])
         {
             Caption = 'VAT Identifier';
             Editable = false;
@@ -686,7 +686,7 @@ table 6014419 "NPR Archive Sale Line POS"
             OptionMembers = "Normal VAT","Reverse Charge VAT","Full VAT","Sales Tax";
             DataClassification = CustomerContent;
         }
-        field(700; "NPRE Seating Code"; Code[10])
+        field(700; "NPRE Seating Code"; Code[20])
         {
             Caption = 'Seating Code';
             TableRelation = "NPR NPRE Seating";

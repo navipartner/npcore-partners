@@ -61,7 +61,7 @@ table 6060045 "NPR Registered Item Works."
             Caption = 'Print Labels';
             DataClassification = CustomerContent;
         }
-        field(97; "No. Series"; Code[10])
+        field(97; "No. Series"; Code[20])
         {
             Caption = 'No. Series';
             DataClassification = CustomerContent;

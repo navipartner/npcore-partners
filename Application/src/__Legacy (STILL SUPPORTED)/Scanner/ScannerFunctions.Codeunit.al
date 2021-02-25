@@ -37,7 +37,7 @@ codeunit 6014438 "NPR Scanner - Functions"
         MiksrabatLinie: Record "NPR Mixed Discount Line";
         dato: Date;
         tidspunkt: Time;
-        Variantkode: Code[20];
+        Variantkode: Code[10];
         //StockTakeWorkSheet: Record "NPR Stock-Take Worksheet";
         //StockTakeWorksheetLine: Record "NPR Stock-Take Worksheet Line";
         t001: Label 'Item number %1 doesn''t exist';
@@ -242,7 +242,7 @@ codeunit 6014438 "NPR Scanner - Functions"
 
     end;
 
-    local procedure getItem(var vnr: Code[30]; var beskr: Text[30]; var beskr2: Text[30]; var Varkode: Code[20]): Integer
+    local procedure getItem(var vnr: Code[30]; var beskr: Text[30]; var beskr2: Text[30]; var Varkode: Code[10]): Integer
     var
         vnr_orig: Text[30];
         ItemReference: Record "Item Reference";

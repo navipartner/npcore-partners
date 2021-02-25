@@ -3580,7 +3580,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
         exit(Membership."Entry No.");
     end;
 
-    local procedure CreateCustomerFromTemplate(CustomerNoSeriesCode: Code[10]; CustTemplateCode: Code[10]; ContTemplateCode: Code[10]; ExternalCustomerNo: Code[20]) CustomerNo: Code[20]
+    local procedure CreateCustomerFromTemplate(CustomerNoSeriesCode: Code[20]; CustTemplateCode: Code[10]; ContTemplateCode: Code[10]; ExternalCustomerNo: Code[20]) CustomerNo: Code[20]
     var
         Contact: Record Contact;
         ContBusRelation: Record "Contact Business Relation";
@@ -4415,7 +4415,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     end;
 
-    procedure GenerateExtCardNo(GeneratePattern: Text[30]; ExternalMemberNo: Code[20]; ExternalMembershipNo: Code[20]; NumberSeries: Code[10]) ExtCardNo: Code[50]
+    procedure GenerateExtCardNo(GeneratePattern: Text[30]; ExternalMemberNo: Code[20]; ExternalMembershipNo: Code[20]; NumberSeries: Code[20]) ExtCardNo: Code[50]
     var
         PosStartClause: Integer;
         PosEndClause: Integer;

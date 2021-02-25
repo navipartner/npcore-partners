@@ -80,7 +80,9 @@ page 6184500 "NPR CleanCash Setup List"
                 var
                     RequestType: Enum "NPR CleanCash Request Type";
                 begin
+#pragma warning disable AA0139
                     ExecuteCleanCashRequest(RequestType::IdentityRequest, Rec.Register);
+#pragma warning restore
                 end;
             }
 
@@ -97,7 +99,9 @@ page 6184500 "NPR CleanCash Setup List"
                 var
                     RequestType: Enum "NPR CleanCash Request Type";
                 begin
+#pragma warning disable AA0139
                     ExecuteCleanCashRequest(RequestType::StatusRequest, Rec.Register);
+#pragma warning restore
                 end;
             }
         }
@@ -111,7 +115,8 @@ page 6184500 "NPR CleanCash Setup List"
         RequestEntryNo: Integer;
         ResponseEntryNo: Integer;
     begin
-        CleanCash.CreateRequest(Rec.Register, RequestEntryNo);
+
+        CleanCash.CreateRequest(PosUnitNo, RequestEntryNo);
         CleanCashXccsp.HandleRequest(RequestEntryNo, ResponseEntryNo, true);
         CleanCashTransaction.Get(RequestEntryNo);
         page.Run(page::"NPR CleanCash Transaction Card", CleanCashTransaction);

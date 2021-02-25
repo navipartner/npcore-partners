@@ -377,9 +377,9 @@ codeunit 6150614 "NPR POS Create Entry"
         POSPaymentLine."POS Store Code" := SalePOS."POS Store Code";
         POSPaymentLine."POS Unit No." := SaleLinePOS."Register No.";
         POSPaymentLine."Document No." := SaleLinePOS."Sales Ticket No.";
-
+#pragma warning disable AA0139
         POSPaymentLine."POS Payment Method Code" := SaleLinePOS."No.";
-
+#pragma warning restore
         POSPaymentLine."POS Payment Bin Code" := SelectUnitBin(POSPaymentLine."POS Unit No.");
         POSPaymentLine."Retail ID" := SaleLinePOS."Retail ID";
 
@@ -526,7 +526,7 @@ codeunit 6150614 "NPR POS Create Entry"
         POSBalancingLine.Insert();
     end;
 
-    local procedure InsertBinTransfer(CheckpointEntry: Record "NPR POS Bin Entry"; TargetBinNo: Code[20]; TransactionAmount: Decimal; Reference: Text[50])
+    local procedure InsertBinTransfer(CheckpointEntry: Record "NPR POS Bin Entry"; TargetBinNo: Code[10]; TransactionAmount: Decimal; Reference: Text[50])
     var
         POSBinEntry: Record "NPR POS Bin Entry";
     begin
@@ -555,7 +555,7 @@ codeunit 6150614 "NPR POS Create Entry"
         POSBinEntry.Insert();
     end;
 
-    local procedure InsertBankTransfer(CheckpointEntry: Record "NPR POS Bin Entry"; TargetBinNo: Code[20]; TransactionAmount: Decimal; Reference: Text[50])
+    local procedure InsertBankTransfer(CheckpointEntry: Record "NPR POS Bin Entry"; TargetBinNo: Code[10]; TransactionAmount: Decimal; Reference: Text[50])
     var
         POSBinEntry: Record "NPR POS Bin Entry";
     begin
@@ -1104,7 +1104,7 @@ codeunit 6150614 "NPR POS Create Entry"
 
     end;
 
-    local procedure FillFiscalNo(var POSEntry: Record "NPR POS Entry"; NoSeriesCode: Code[10]; NoSeriesDate: Date)
+    local procedure FillFiscalNo(var POSEntry: Record "NPR POS Entry"; NoSeriesCode: Code[20]; NoSeriesDate: Date)
     var
         NoSeriesManagement: Codeunit NoSeriesManagement;
         POSAuditProfile: Record "NPR POS Audit Profile";

@@ -38,7 +38,7 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
         StraksBogf: Boolean;
         DebugPostingMsg: Boolean;
         ProgressVis: Boolean;
-        GlobalPostingNo: Code[10];
+        GlobalPostingNo: Code[20];
         GenJournalLine: Record "Gen. Journal Line";
         ItemJournalLine: Record "Item Journal Line";
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -214,7 +214,7 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
         end;
     end;
 
-    procedure PostTransaction(AccNo: Code[20]; Amount2: Decimal; CashRegisterNo: Code[10]; AccType: Integer; GlobalDimension1: Code[10]; ForceDesc: Text[50]; PostingDate: Date; var TempPost: Record "NPR HC Audit Roll Posting" temporary)
+    procedure PostTransaction(AccNo: Code[20]; Amount2: Decimal; CashRegisterNo: Code[10]; AccType: Integer; GlobalDimension1: Code[20]; ForceDesc: Text[50]; PostingDate: Date; var TempPost: Record "NPR HC Audit Roll Posting" temporary)
     var
         Bogf1: Label 'Todays changes %1 Register %2';
         Bogf2: Label 'Paind on %1 Register %2';

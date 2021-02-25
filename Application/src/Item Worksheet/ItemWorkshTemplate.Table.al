@@ -98,7 +98,7 @@ table 6060040 "NPR Item Worksh. Template"
                 TestField("Item No. Prefix", "Item No. Prefix"::"From Template");
             end;
         }
-        field(97; "No. Series"; Code[10])
+        field(97; "No. Series"; Code[20])
         {
             Caption = 'No. Series';
             DataClassification = CustomerContent;

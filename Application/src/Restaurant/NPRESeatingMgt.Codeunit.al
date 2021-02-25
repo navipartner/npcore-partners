@@ -50,7 +50,7 @@ codeunit 6150662 "NPR NPRE Seating Mgt."
         AdditionalFiltersSet := true;
     end;
 
-    procedure TrySetSeatingIsCleared(SeatingCode: Code[10]; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy")
+    procedure TrySetSeatingIsCleared(SeatingCode: Code[20]; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy")
     var
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         ServiceFlowProfile: Record "NPR NPRE Serv.Flow Profile";
@@ -68,7 +68,7 @@ codeunit 6150662 "NPR NPRE Seating Mgt."
         SetSeatingStatus(SeatingCode, ServiceFlowProfile."Seating Status after Clearing");
     end;
 
-    procedure SetSeatingIsReady(SeatingCode: Code[10])
+    procedure SetSeatingIsReady(SeatingCode: Code[20])
     var
         RestSetup: Record "NPR NPRE Restaurant Setup";
     begin
@@ -78,7 +78,7 @@ codeunit 6150662 "NPR NPRE Seating Mgt."
         SetSeatingStatus(SeatingCode, RestSetup."Seat.Status: Ready");
     end;
 
-    procedure SetSeatingIsOccupied(SeatingCode: Code[10])
+    procedure SetSeatingIsOccupied(SeatingCode: Code[20])
     var
         RestSetup: Record "NPR NPRE Restaurant Setup";
     begin

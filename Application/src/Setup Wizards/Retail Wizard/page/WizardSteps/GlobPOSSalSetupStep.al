@@ -121,7 +121,7 @@ page 6014682 "NPR Glob. POS Sal. Setup Step"
         NpGlobalPOSSalesSetup.SetRange(Code, CalculatedNo);
 
         if NpGlobalPOSSalesSetup.FindFirst() then begin
-            HelperFunctions.FormatCode(WantedStartingNo);
+            WantedStartingNo := HelperFunctions.FormatCode(WantedStartingNo);
             CalculatedNo := CheckIfNoAvailableInNpGlobalPOSSalesSetup(NpGlobalPOSSalesSetup, WantedStartingNo);
         end;
     end;

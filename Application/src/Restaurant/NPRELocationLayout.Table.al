@@ -5,7 +5,7 @@ table 6150685 "NPR NPRE Location Layout"
 
     fields
     {
-        field(1; "Code"; Code[10])
+        field(1; "Code"; Code[20])
         {
             Caption = 'Code';
             DataClassification = CustomerContent;

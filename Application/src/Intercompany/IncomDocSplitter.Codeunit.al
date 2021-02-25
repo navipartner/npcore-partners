@@ -98,7 +98,7 @@ codeunit 6060074 "NPR Incom. Doc. Splitter"
             until IncomingDocument.Next = 0;
     end;
 
-    local procedure CreateIncomingDoc(IncDocFileName: Text; VendorCode: Code[10])
+    local procedure CreateIncomingDoc(IncDocFileName: Text; VendorCode: Code[20])
     var
         IncomingDocument: Record "Incoming Document";
         IncomingDocumentAttachment: Record "Incoming Document Attachment";

@@ -608,7 +608,7 @@ codeunit 6150706 "NPR POS Sale Line"
     begin
     end;
 
-    procedure ConvertPriceToVAT(FromPricesInclVAT: Boolean; FromVATBusPostingGr: Code[10]; FromVATProdPostingGr: Code[10]; SaleLinePOS: Record "NPR Sale Line POS"; var UnitPrice: Decimal)
+    procedure ConvertPriceToVAT(FromPricesInclVAT: Boolean; FromVATBusPostingGr: Code[20]; FromVATProdPostingGr: Code[20]; SaleLinePOS: Record "NPR Sale Line POS"; var UnitPrice: Decimal)
     var
         Currency: Record Currency;
         VATPostingSetup: Record "VAT Posting Setup";

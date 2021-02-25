@@ -1,4 +1,4 @@
-codeunit 6151133 "NPR TM Ticket Wizard"
+﻿codeunit 6151133 "NPR TM Ticket Wizard"
 {
     // TM90.1.46/TSA /20200320 CASE 397084 Initial Version
 
@@ -99,7 +99,7 @@ codeunit 6151133 "NPR TM Ticket Wizard"
     begin
     end;
 
-    procedure CreateNumberSeries(NoSerieCode: Code[10]; StartNumber: Code[20]; TypeDescription: Text[20]): Code[10]
+    procedure CreateNumberSeries(NoSerieCode: Code[20]; StartNumber: Code[20]; TypeDescription: Text[20]): Code[20]
     var
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
@@ -138,14 +138,20 @@ codeunit 6151133 "NPR TM Ticket Wizard"
         ConfigTemplateHeader: Record "Config. Template Header";
         RecRef: RecordRef;
         ConfigTemplateMgt: Codeunit "Config. Template Management";
+        TypeCodeGenerated: Code[20];
     begin
 
         if (TicketType.Get(TypeCode)) then
             exit;
 
         TicketSetup.Get();
-        if (TypeCode = '<GENERATE>') then
-            TypeCode := GetNextNo(TicketSetup."Wizard Ticket Type No. Series");
+        if (TypeCode = '<GENERATE>') then begin
+            TypeCodeGenerated := GetNextNo(TicketSetup."Wizard Ticket Type No. Series");
+            if StrLen(TypeCodeGenerated) > 10 then
+                TypeCode := CopyStr(TypeCodeGenerated, StrLen(TypeCode) - 10, 10)
+            else
+                TypeCode := CopyStr(TypeCode, 1, 10);
+        end;
 
         TicketType.Code := TypeCode;
         TicketType.Insert(true);
@@ -408,7 +414,7 @@ codeunit 6151133 "NPR TM Ticket Wizard"
         Item.Modify(true);
     end;
 
-    local procedure GetNextNo(NoSeries: Code[10]): Code[20]
+    local procedure GetNextNo(NoSeries: Code[20]): Code[20]
     var
         NoSeriesManagement: Codeunit NoSeriesManagement;
     begin

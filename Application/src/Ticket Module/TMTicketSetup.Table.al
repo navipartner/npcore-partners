@@ -202,7 +202,7 @@ table 6060111 "NPR TM Ticket Setup"
             DataClassification = CustomerContent;
             Description = '//-TM1.38 [332109]';
         }
-        field(300; "Wizard Ticket Type No. Series"; Code[10])
+        field(300; "Wizard Ticket Type No. Series"; Code[20])
         {
             Caption = 'Wizard Ticket Type No. Series';
             DataClassification = CustomerContent;
@@ -220,7 +220,7 @@ table 6060111 "NPR TM Ticket Setup"
             DataClassification = CustomerContent;
             TableRelation = "Config. Template Header";
         }
-        field(310; "Wizard Adm. Code No. Series"; Code[10])
+        field(310; "Wizard Adm. Code No. Series"; Code[20])
         {
             Caption = 'Wizard Adm. Code No. Series';
             DataClassification = CustomerContent;
@@ -232,13 +232,13 @@ table 6060111 "NPR TM Ticket Setup"
             DataClassification = CustomerContent;
             TableRelation = "Config. Template Header";
         }
-        field(315; "Wizard Sch. Code No. Series"; Code[10])
+        field(315; "Wizard Sch. Code No. Series"; Code[20])
         {
             Caption = 'Wizard Sch. Code No. Series';
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
         }
-        field(320; "Wizard Item No. Series"; Code[10])
+        field(320; "Wizard Item No. Series"; Code[20])
         {
             Caption = 'Wizard Item No. Series';
             DataClassification = CustomerContent;

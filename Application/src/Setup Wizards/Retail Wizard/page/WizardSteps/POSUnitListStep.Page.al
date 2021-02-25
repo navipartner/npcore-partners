@@ -460,7 +460,7 @@ page 6014683 "NPR POS Unit List Step"
             Rec.Modify();
 
             if i = 1 then
-                HelperFunctions.FormatCode(LastNoUsed)
+                LastNoUsed := HelperFunctions.FormatCode(LastNoUsed)
             else
                 LastNoUsed := IncStr(LastNoUsed);
         end;
@@ -474,6 +474,7 @@ page 6014683 "NPR POS Unit List Step"
 
         if POSUnit.Get(WantedStartingNo) then begin
             HelperFunctions.FormatCode(WantedStartingNo);
+            WantedStartingNo := HelperFunctions.FormatCode(WantedStartingNo);
             CalculatedNo := CheckIfNoAvailableInPOSUnit(POSUnit, WantedStartingNo);
         end;
     end;

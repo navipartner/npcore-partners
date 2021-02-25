@@ -147,7 +147,7 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         POSSale: Codeunit "NPR POS Sale";
         WaiterPadPOSManagement: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
-        SeatingCode: Code[10];
+        SeatingCode: Code[20];
         NumberOfGuests: Integer;
         OpenWaiterPad: Boolean;
     begin

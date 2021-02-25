@@ -101,7 +101,7 @@ codeunit 85001 "NPR Library - Inventory"
 
     local procedure ItemNoSeriesSetup(var InventorySetup: Record "Inventory Setup")
     var
-        NoSeriesCode: Code[10];
+        NoSeriesCode: Code[20];
     begin
         InventorySetup.Get;
         NoSeriesCode := LibraryUtility.GetGlobalNoSeriesCode;

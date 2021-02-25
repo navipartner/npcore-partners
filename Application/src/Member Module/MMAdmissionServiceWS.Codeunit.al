@@ -151,7 +151,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
                     //        MMAdmissionServiceEntry."Ticket Type Description" := TMTicketType.Description;
                     //      END;
                     if Item.Get(TMTicket."Item No.") then begin
-                        MMAdmissionServiceEntry."Ticket Type Code" := Item."No.";
+                        MMAdmissionServiceEntry."Ticket Type Code" := Item."NPR Ticket Type";
                         if StrLen(Item.Description) > MaxStrLen(MMAdmissionServiceEntry."Ticket Type Description") then
                             MMAdmissionServiceEntry."Ticket Type Description" := CopyStr(Item.Description, 1, MaxStrLen(MMAdmissionServiceEntry."Ticket Type Description"))
                         else
@@ -754,7 +754,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
                     //        MMAdmissionServiceEntry."Ticket Type Description" := TMTicketType.Description;
                     //      END;
                     if Item.Get(TMTicket."Item No.") then begin
-                        MMAdmissionServiceEntry."Ticket Type Code" := Item."No.";
+                        MMAdmissionServiceEntry."Ticket Type Code" := Item."NPR Ticket Type";
                         if StrLen(Item.Description) > MaxStrLen(MMAdmissionServiceEntry."Ticket Type Description") then
                             MMAdmissionServiceEntry."Ticket Type Description" := CopyStr(Item.Description, 1, MaxStrLen(MMAdmissionServiceEntry."Ticket Type Description"))
                         else

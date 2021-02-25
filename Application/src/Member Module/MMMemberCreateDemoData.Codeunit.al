@@ -617,7 +617,7 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
     end;
 
 
-    local procedure CreateCommunitySetup(CommunityCode: Code[20]; SearchOrder: Option; UniqueIdentity: Option; UIViolation: Option; LogonCredentials: Option; CreateContacts: Boolean; CreateRenewNotification: Boolean; Description: Text; MembershipNoSeries: Code[10]; MemberNoSeries: Code[10]): Code[20];
+    local procedure CreateCommunitySetup(CommunityCode: Code[20]; SearchOrder: Option; UniqueIdentity: Option; UIViolation: Option; LogonCredentials: Option; CreateContacts: Boolean; CreateRenewNotification: Boolean; Description: Text; MembershipNoSeries: Code[20]; MemberNoSeries: Code[20]): Code[20];
     var
         MemberCommunity: Record "NPR MM Member Community";
     begin
@@ -720,7 +720,7 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
         exit(No);
     end;
 
-    local procedure CreateLoyaltyMembershipSetup(Code: Code[20]; Description: Text; CommunityCode: Code[20]; MembershipType: Option; LoyaltyCode: Code[20]; LoyaltyCard: Option; MemberInfo: Option; Perpetual: Boolean; RoleAssignment: Option; MemberCardinality: Integer; WelcomeNotification: Boolean; RenewNotification: Boolean; MemberCardNoSeries: Code[10]): Code[20];
+    local procedure CreateLoyaltyMembershipSetup(Code: Code[20]; Description: Text; CommunityCode: Code[20]; MembershipType: Option; LoyaltyCode: Code[20]; LoyaltyCard: Option; MemberInfo: Option; Perpetual: Boolean; RoleAssignment: Option; MemberCardinality: Integer; WelcomeNotification: Boolean; RenewNotification: Boolean; MemberCardNoSeries: Code[20]): Code[20];
     var
         MembershipSetup: Record "NPR MM Membership Setup";
         Community: Record "NPR MM Member Community";
@@ -818,7 +818,7 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
 
 
 
-    local procedure CreateNoSerie(NoSerieCode: Code[10]; StartNumber: Code[20])
+    local procedure CreateNoSerie(NoSerieCode: Code[20]; StartNumber: Code[20])
     var
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
@@ -853,9 +853,15 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
         exit(CreateDemoCustomerTemplate(GenerateCode10()));
     end;
 
-    local procedure GenerateCode10(): Code[20]
+    local procedure GenerateCode10(): Code[10]
+    var
+        GeneratedNumber: Code[20];
+        NoSeriesErr: Label 'Generated number %1 is greater than 10 characters. Please create number series with 10 or less characters.';
     begin
-        exit(GetNextNoFromSeries('C10'));
+        GeneratedNumber := GetNextNoFromSeries('C10');
+        if StrLen(GeneratedNumber) > 10 then
+            Error(NoSeriesErr, GeneratedNumber);
+        exit(CopyStr(GeneratedNumber, 1, 10));
     end;
 
     local procedure GenerateCode20(): Code[20]
@@ -884,7 +890,7 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
         end;
     end;
 
-    local procedure SetMembershipCardDetails(var MembershipSetup: Record "NPR MM Membership Setup"; NoSeriesCode: Code[10]);
+    local procedure SetMembershipCardDetails(var MembershipSetup: Record "NPR MM Membership Setup"; NoSeriesCode: Code[20]);
     begin
 
         MembershipSetup."Card Number Scheme" := MembershipSetup."Card Number Scheme"::GENERATED;

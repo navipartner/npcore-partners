@@ -1145,8 +1145,8 @@ codeunit 6060150 "NPR Event Management"
         Customer: Record Customer;
         Item: Record Item;
         Resource: Record Resource;
-        VATBusPostGroup: Code[10];
-        VATProdPostGroup: Code[10];
+        VATBusPostGroup: Code[20];
+        VATProdPostGroup: Code[20];
     begin
         Job.Get(JobPlanningLine."Job No.");
         if Customer.Get(Job."Bill-to Customer No.") then
@@ -1417,9 +1417,9 @@ codeunit 6060150 "NPR Event Management"
         Item: Record Item;
         DocumentDate: Date;
         DocumentNo: Code[20];
-        PostingGroup: Code[10];
-        GenBusPostGroup: Code[10];
-        GenProdPostGroup: Code[10];
+        PostingGroup: Code[20];
+        GenBusPostGroup: Code[20];
+        GenProdPostGroup: Code[20];
         Description: Text;
         Description2: Text;
         UnitOfMeasureCode: Code[10];

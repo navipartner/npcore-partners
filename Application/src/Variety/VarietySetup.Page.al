@@ -38,10 +38,10 @@ page 6059970 "NPR Variety Setup"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Create Variant Code From field';
                 }
-                field("Variant No. Series"; "Variant No. Series")
+                field("Variant No. Series"; Rec."Variant No. Series")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Variant Std. No. Serie field';
+                    ToolTip = 'Specifies the value of the Variant Std. No. Serie field. Number series must be maximum 10 characters long.';
                 }
             }
             group("Barcode (Item Cross Ref.)")

@@ -110,7 +110,7 @@ table 6014409 "NPR Gift Voucher"
             Caption = 'Cashed External';
             DataClassification = CustomerContent;
         }
-        field(32; "No. Series"; Code[10])
+        field(32; "No. Series"; Code[20])
         {
             Caption = 'No. Series';
             DataClassification = CustomerContent;

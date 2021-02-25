@@ -137,7 +137,7 @@ codeunit 6014492 "NPR MM Attempt Member Arrival"
 
     end;
 
-    local procedure TicketMakeReservation(ExternalItemNumber: Code[20]; AdmissionCode: Code[20]; MemberReference: Code[20]; ScannerStation: Code[20]; var Token: Text[100]; var ResponseMessage: Text) ReservationStatus: Boolean
+    local procedure TicketMakeReservation(ExternalItemNumber: Code[20]; AdmissionCode: Code[20]; MemberReference: Code[20]; ScannerStation: Code[10]; var Token: Text[100]; var ResponseMessage: Text) ReservationStatus: Boolean
     var
         xmltext: Text;
         TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
@@ -173,7 +173,7 @@ codeunit 6014492 "NPR MM Attempt Member Arrival"
 
     end;
 
-    local procedure TicketConfirmReservation(Token: Text[100]; ScannerStation: Code[20]; var TicketNumber: Code[20]; var ResponseMessage: Text) ConfirmationStatus: Boolean
+    local procedure TicketConfirmReservation(Token: Text[100]; ScannerStation: Code[10]; var TicketNumber: Code[20]; var ResponseMessage: Text) ConfirmationStatus: Boolean
     var
         xmltext: Text;
         TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;

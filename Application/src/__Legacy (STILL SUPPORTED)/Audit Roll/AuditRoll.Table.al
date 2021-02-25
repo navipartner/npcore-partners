@@ -76,7 +76,7 @@ table 6014407 "NPR Audit Roll"
             DataClassification = CustomerContent;
             TableRelation = Location;
         }
-        field(8; "Posting Group"; Code[10])
+        field(8; "Posting Group"; Code[20])
         {
             Caption = 'Posting Group';
             DataClassification = CustomerContent;
@@ -249,25 +249,25 @@ table 6014407 "NPR Audit Roll"
             Caption = 'Invoice Discount Amount';
             DataClassification = CustomerContent;
         }
-        field(48; "Gen. Bus. Posting Group"; Code[10])
+        field(48; "Gen. Bus. Posting Group"; Code[20])
         {
             Caption = 'Gen. Bus. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "Gen. Business Posting Group";
         }
-        field(49; "Gen. Prod. Posting Group"; Code[10])
+        field(49; "Gen. Prod. Posting Group"; Code[20])
         {
             Caption = 'Gen. Prod. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "Gen. Product Posting Group";
         }
-        field(50; "VAT Bus. Posting Group"; Code[10])
+        field(50; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "VAT Business Posting Group";
         }
-        field(51; "VAT Prod. Posting Group"; Code[10])
+        field(51; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
             DataClassification = CustomerContent;
@@ -389,7 +389,7 @@ table 6014407 "NPR Audit Roll"
             ObsoleteReason = 'Credit voucher table won''t be used anymore.';
             ObsoleteTag = 'NPR Credit Voucher';
         }
-        field(75; "Bin Code"; Code[10])
+        field(75; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
             DataClassification = CustomerContent;
@@ -413,7 +413,7 @@ table 6014407 "NPR Audit Roll"
             DataClassification = CustomerContent;
             Description = 'NPR5.31';
         }
-        field(87; "Tax Group Code"; Code[10])
+        field(87; "Tax Group Code"; Code[20])
         {
             Caption = 'Tax Group Code';
             DataClassification = CustomerContent;
@@ -1172,7 +1172,7 @@ table 6014407 "NPR Audit Roll"
         exit(NoOfSales);
     end;
 
-    procedure TransferFromSaleLinePOS(var SaleLinePOS: Record "NPR Sale Line POS"; Time2: Time; Code2: Code[20]; AuditDocType: Integer; AuditAdvanceNo: Code[20])
+    procedure TransferFromSaleLinePOS(var SaleLinePOS: Record "NPR Sale Line POS"; Time2: Time; Code2: Code[20]; AuditDocType: Integer; AuditAdvanceNo: Code[10])
     begin
         "No." := SaleLinePOS."No.";
         "Sale Date" := SaleLinePOS.Date;

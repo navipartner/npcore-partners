@@ -94,7 +94,7 @@ page 6060045 "NPR Item Search Page"
     var
         ItemNumberManagement: Codeunit "NPR Item Number Mgt.";
         FoundItem: Boolean;
-        VariantCode: Code[1];
+        VariantCode: Code[10];
         UnitOfMeasure: Code[10];
         ItemNo: Code[20];
         VendorNo: Code[20];

@@ -117,7 +117,9 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout"
             end;
 
             LocationLayout.INIT;
+
             LocationLayout.Code := NoSeriesManagement.GetNextNo(RestaurantSetup."Component No. Series", Today, true);
+
         end;
 
         TransferToLocationLayout(ComponentObject, LocationLayout);

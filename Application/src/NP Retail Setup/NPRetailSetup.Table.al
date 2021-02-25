@@ -20,7 +20,7 @@ table 6150613 "NPR NP Retail Setup"
             ObsoleteReason = 'This field won''t be used anymore.';
             ObsoleteTag = 'Moved to POS Posting Profile';
         }
-        field(150; "Sale Fiscal No. Series"; Code[10])
+        field(150; "Sale Fiscal No. Series"; Code[20])
         {
             Caption = 'Sale Fiscal No. Series';
             DataClassification = CustomerContent;
@@ -37,7 +37,7 @@ table 6150613 "NPR NP Retail Setup"
                 end;
             end;
         }
-        field(151; "Balancing Fiscal No. Series"; Code[10])
+        field(151; "Balancing Fiscal No. Series"; Code[20])
         {
             Caption = 'Balancing Fiscal No. Series';
             DataClassification = CustomerContent;
@@ -128,7 +128,7 @@ table 6150613 "NPR NP Retail Setup"
             Caption = 'Administrator Password';
             DataClassification = CustomerContent;
         }
-        field(6215; "Retail Journal No. Series"; Code[10])
+        field(6215; "Retail Journal No. Series"; Code[20])
         {
             Caption = 'Retail Journal No. Series';
             DataClassification = CustomerContent;

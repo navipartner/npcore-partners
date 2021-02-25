@@ -175,7 +175,7 @@ table 6150614 "NPR POS Store"
                 ValidateShortcutDimCode(2, "Global Dimension 2 Code");
             end;
         }
-        field(50; "Gen. Bus. Posting Group"; Code[10])
+        field(50; "Gen. Bus. Posting Group"; Code[20])
         {
             Caption = 'Gen. Bus. Posting Group';
             DataClassification = CustomerContent;
@@ -195,7 +195,7 @@ table 6150614 "NPR POS Store"
             Caption = 'Tax Liable';
             DataClassification = CustomerContent;
         }
-        field(53; "VAT Bus. Posting Group"; Code[10])
+        field(53; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
@@ -219,7 +219,7 @@ table 6150614 "NPR POS Store"
             OptionCaption = 'Post On Finalize Sale,Post on Close Register,No Posting';
             OptionMembers = "Post On Finalize Sale","Post on Close Register","No Posting";
         }
-        field(65; "POS Period Register No. Series"; Code[10])
+        field(65; "POS Period Register No. Series"; Code[20])
         {
             Caption = 'POS Period Register No. Series';
             DataClassification = CustomerContent;
@@ -228,7 +228,7 @@ table 6150614 "NPR POS Store"
             ObsoleteReason = 'Moved to dedicated POS Unit Profile';
             ObsoleteTag = 'NPR POS Store -> NPR POS Unit -> NPR POS Posting Profile';
         }
-        field(70; "POS Entry Doc. No. Series"; Code[10])
+        field(70; "POS Entry Doc. No. Series"; Code[20])
         {
             Caption = 'POS Entry Doc. No. Series';
             DataClassification = CustomerContent;

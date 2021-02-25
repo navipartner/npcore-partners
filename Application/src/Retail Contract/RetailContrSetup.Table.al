@@ -38,7 +38,7 @@ table 6014515 "NPR Retail Contr. Setup"
             TableRelation = "Item Tracking Code";
             DataClassification = CustomerContent;
         }
-        field(1000; "Warranty No. Series"; Code[10])
+        field(1000; "Warranty No. Series"; Code[20])
         {
             Caption = 'Warranty No. Series';
             Description = 'NPR5.30';

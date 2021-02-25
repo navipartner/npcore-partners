@@ -251,7 +251,7 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         SalesLine: Record "Sales Line";
         NpCsStore: Record "NPR NpCs Store";
         ReleaseSalesDoc: Codeunit "Release Sales Document";
-        ToStoreCode: Code[10];
+        ToStoreCode: Code[20];
         PrevRec: Text;
     begin
         xSalesHeader := SalesHeader;

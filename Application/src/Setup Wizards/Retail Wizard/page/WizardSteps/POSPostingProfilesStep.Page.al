@@ -137,7 +137,7 @@ page 6014681 "NPR POS Posting Profiles Step"
             until POSPOSPostingProfile.Next() = 0;
     end;
 
-    local procedure CheckIfNoAvailableInPOSPOSPostingProfile(var POSPOSPostingProfile: Record "NPR POS Posting Profile"; var WantedStartingNo: Code[10]) CalculatedNo: Code[10]
+    local procedure CheckIfNoAvailableInPOSPOSPostingProfile(var POSPOSPostingProfile: Record "NPR POS Posting Profile"; var WantedStartingNo: Code[20]) CalculatedNo: Code[20]
     var
         HelperFunctions: Codeunit "NPR Wizard Helper Functions";
     begin
@@ -146,7 +146,7 @@ page 6014681 "NPR POS Posting Profiles Step"
         POSPOSPostingProfile.SetRange(Code, CalculatedNo);
 
         if POSPOSPostingProfile.FindFirst() then begin
-            HelperFunctions.FormatCode(WantedStartingNo);
+            WantedStartingNo := HelperFunctions.FormatCode20(WantedStartingNo);
             CalculatedNo := CheckIfNoAvailableInPOSPOSPostingProfile(POSPOSPostingProfile, WantedStartingNo);
         end;
     end;

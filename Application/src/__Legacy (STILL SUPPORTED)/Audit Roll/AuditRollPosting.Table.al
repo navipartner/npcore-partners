@@ -63,7 +63,7 @@ table 6014424 "NPR Audit Roll Posting"
             TableRelation = Location;
             DataClassification = CustomerContent;
         }
-        field(8; "Posting Group"; Code[10])
+        field(8; "Posting Group"; Code[20])
         {
             Caption = 'Posting Group';
             Editable = false;
@@ -249,25 +249,25 @@ table 6014424 "NPR Audit Roll Posting"
             Caption = 'Invoice Discount Amount';
             DataClassification = CustomerContent;
         }
-        field(48; "Gen. Bus. Posting Group"; Code[10])
+        field(48; "Gen. Bus. Posting Group"; Code[20])
         {
             Caption = 'Gen. Bus. Posting Group';
             TableRelation = "Gen. Business Posting Group";
             DataClassification = CustomerContent;
         }
-        field(49; "Gen. Prod. Posting Group"; Code[10])
+        field(49; "Gen. Prod. Posting Group"; Code[20])
         {
             Caption = 'Gen. Prod. Posting Group';
             TableRelation = "Gen. Product Posting Group";
             DataClassification = CustomerContent;
         }
-        field(50; "VAT Bus. Posting Group"; Code[10])
+        field(50; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             TableRelation = "VAT Business Posting Group";
             DataClassification = CustomerContent;
         }
-        field(51; "VAT Prod. Posting Group"; Code[10])
+        field(51; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
             TableRelation = "VAT Product Posting Group";
@@ -367,7 +367,7 @@ table 6014424 "NPR Audit Roll Posting"
             ObsoleteReason = 'Credit voucher table won''t be used anymore.';
             ObsoleteTag = 'NPR Credit Voucher';
         }
-        field(75; "Bin Code"; Code[10])
+        field(75; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
             TableRelation = Bin;

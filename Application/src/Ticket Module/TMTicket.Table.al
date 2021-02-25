@@ -27,7 +27,7 @@ table 6059785 "NPR TM Ticket"
             TableRelation = "NPR TM Ticket Type";
             DataClassification = CustomerContent;
         }
-        field(3; "No. Series"; Code[10])
+        field(3; "No. Series"; Code[20])
         {
             Caption = 'No. Series';
             DataClassification = CustomerContent;

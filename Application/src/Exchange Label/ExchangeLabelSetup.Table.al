@@ -15,7 +15,7 @@ table 6014486 "NPR Exchange Label Setup"
             Caption = 'EAN Prefix Exhange Label';
             DataClassification = CustomerContent;
         }
-        field(30; "Exchange Label  No. Series"; Code[10])
+        field(30; "Exchange Label  No. Series"; Code[20])
         {
             Caption = 'Exchange Label Nos.';
             DataClassification = CustomerContent;

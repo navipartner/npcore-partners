@@ -87,7 +87,7 @@ table 6014400 "NPR Retail Setup"
             ObsoleteReason = 'Not used anymore. "NPR NP Retail Setup"."Source Code" used instead.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
-        field(51; "Posting No. Management"; Code[10])
+        field(51; "Posting No. Management"; Code[20])
         {
             Caption = 'Posting No. Management';
             DataClassification = CustomerContent;
@@ -97,7 +97,7 @@ table 6014400 "NPR Retail Setup"
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
-        field(52; "Used Goods No. Management"; Code[10])
+        field(52; "Used Goods No. Management"; Code[20])
         {
             Caption = 'Used Goods No. Management';
             DataClassification = CustomerContent;
@@ -107,7 +107,7 @@ table 6014400 "NPR Retail Setup"
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
-        field(53; "Internal EAN No. Management"; Code[10])
+        field(53; "Internal EAN No. Management"; Code[20])
         {
             Caption = 'Internal EAN No. Management';
             DataClassification = CustomerContent;
@@ -117,7 +117,7 @@ table 6014400 "NPR Retail Setup"
             ObsoleteReason = 'Moved to "NPR Variety Setup"."Internal EAN No. Series".';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
-        field(54; "Credit Voucher No. Management"; Code[10])
+        field(54; "Credit Voucher No. Management"; Code[20])
         {
             Caption = 'Credit Voucher No. Management';
             DataClassification = CustomerContent;
@@ -127,7 +127,7 @@ table 6014400 "NPR Retail Setup"
             ObsoleteReason = 'Credit voucher won''t be used anymore';
             ObsoleteTag = 'NPR Credit Voucher';
         }
-        field(55; "Gift Voucher No. Management"; Code[10])
+        field(55; "Gift Voucher No. Management"; Code[20])
         {
             Caption = 'Gift Voucher No. Management';
             DataClassification = CustomerContent;
@@ -137,7 +137,7 @@ table 6014400 "NPR Retail Setup"
             ObsoleteReason = 'Gift voucher won''t be used anymore';
             ObsoleteTag = 'NPR Gift Voucher';
         }
-        field(56; "External EAN-No. Management"; Code[10])  
+        field(56; "External EAN-No. Management"; Code[20])
         {
             Caption = 'External EAN-No. Management';
             DataClassification = CustomerContent;
@@ -323,7 +323,7 @@ table 6014400 "NPR Retail Setup"
             ObsoleteReason = 'Not used anymore. Defaults to true.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
-        field(501; "Variance No. Management"; Code[10])
+        field(501; "Variance No. Management"; Code[20])
         {
             Caption = 'Variance No. Management';
             DataClassification = CustomerContent;
@@ -334,7 +334,7 @@ table 6014400 "NPR Retail Setup"
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
-        field(502; "Mixed Discount No. Management"; Code[10])
+        field(502; "Mixed Discount No. Management"; Code[20])
         {
             Caption = 'Mixed Discount No. Management';
             DataClassification = CustomerContent;
@@ -344,7 +344,7 @@ table 6014400 "NPR Retail Setup"
             ObsoleteReason = 'Moved to "NPR Discount Priority"."Discount No. Series';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
-        field(503; "Period Discount Management"; Code[10])
+        field(503; "Period Discount Management"; Code[20])
         {
             Caption = 'Period Discount No. Management';
             DataClassification = CustomerContent;
@@ -354,7 +354,7 @@ table 6014400 "NPR Retail Setup"
             ObsoleteReason = 'Moved to "NPR Discount Priority"."Discount No. Series';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
-        field(504; "Customer Repair Management"; Code[10])
+        field(504; "Customer Repair Management"; Code[20])
         {
             Caption = 'Customer Repair Management';
             DataClassification = CustomerContent;
@@ -364,7 +364,7 @@ table 6014400 "NPR Retail Setup"
             ObsoleteReason = 'Moved to "NPR Retail Customer Repair Setup"."Customer Repair No. Series"';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
-        field(505; "Quantity Discount Nos."; Code[10])
+        field(505; "Quantity Discount Nos."; Code[20])
         {
             Caption = 'Quantity Discount Nos.';
             DataClassification = CustomerContent;
@@ -394,7 +394,7 @@ table 6014400 "NPR Retail Setup"
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
-        field(700; "Selection No. Series"; Code[10])
+        field(700; "Selection No. Series"; Code[20])
         {
             Caption = 'Selection Nos.';
             DataClassification = CustomerContent;
@@ -404,7 +404,7 @@ table 6014400 "NPR Retail Setup"
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
-        field(701; "Order  No. Series"; Code[10])
+        field(701; "Order  No. Series"; Code[20])
         {
             Caption = 'Order No.';
             DataClassification = CustomerContent;
@@ -414,7 +414,7 @@ table 6014400 "NPR Retail Setup"
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
-        field(703; "Rental Contract  No. Series"; Code[10])
+        field(703; "Rental Contract  No. Series"; Code[20])
         {
             Caption = 'Rental Contract Nos.';
             DataClassification = CustomerContent;
@@ -424,7 +424,7 @@ table 6014400 "NPR Retail Setup"
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
-        field(704; "Purchase Contract  No. Series"; Code[10])
+        field(704; "Purchase Contract  No. Series"; Code[20])
         {
             Caption = 'Purchase Contract Nos.';
             DataClassification = CustomerContent;
@@ -434,7 +434,7 @@ table 6014400 "NPR Retail Setup"
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
-        field(705; "Customization  No. Series"; Code[10])
+        field(705; "Customization  No. Series"; Code[20])
         {
             Caption = 'Customization Nos.';
             DataClassification = CustomerContent;
@@ -444,7 +444,7 @@ table 6014400 "NPR Retail Setup"
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
-        field(706; "Quote  No. Series"; Code[10])
+        field(706; "Quote  No. Series"; Code[20])
         {
             Caption = 'Quote Nos.';
             DataClassification = CustomerContent;
@@ -454,7 +454,7 @@ table 6014400 "NPR Retail Setup"
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
-        field(720; "Exchange Label  No. Series"; Code[10])
+        field(720; "Exchange Label  No. Series"; Code[20])
         {
             Caption = 'Exchange Label Nos.';
             DataClassification = CustomerContent;
@@ -464,7 +464,7 @@ table 6014400 "NPR Retail Setup"
             ObsoleteReason = 'Not used anymore, moved to "NPR Exchange Label Setup".';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
-        field(750; "Variant No. Series"; Code[10])
+        field(750; "Variant No. Series"; Code[20])
         {
             Caption = 'Variant Std. No. Serie';
             DataClassification = CustomerContent;
@@ -829,7 +829,7 @@ table 6014400 "NPR Retail Setup"
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
-        field(5043; "Cash Cust. No. Series"; Code[10])
+        field(5043; "Cash Cust. No. Series"; Code[20])
         {
             Caption = 'Cash Cust. No. Series';
             DataClassification = CustomerContent;
@@ -1528,7 +1528,7 @@ table 6014400 "NPR Retail Setup"
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
-        field(6215; "Retail Journal No. Management"; Code[10])
+        field(6215; "Retail Journal No. Management"; Code[20])
         {
             Caption = 'Credit Voucher No. Management';
             DataClassification = CustomerContent;
@@ -1667,7 +1667,7 @@ table 6014400 "NPR Retail Setup"
             ObsoleteReason = 'Not used anymore.';
             ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
-        field(6244; "Reason Code No. Series"; Code[10])
+        field(6244; "Reason Code No. Series"; Code[20])
         {
             Caption = 'Reason Code No. Series';
             DataClassification = CustomerContent;

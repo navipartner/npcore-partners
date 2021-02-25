@@ -74,7 +74,7 @@ table 6014417 "NPR Discount Priority"
             Editable = false;
             DataClassification = CustomerContent;
         }
-        field(40; "Discount No. Series"; Code[10])
+        field(40; "Discount No. Series"; Code[20])
         {
             Caption = 'Discount No. Series';
             TableRelation = "No. Series";
@@ -118,7 +118,7 @@ table 6014417 "NPR Discount Priority"
         end;
     end;
 
-    procedure CreateNoSeries(NoSeriesCode: Code[10]; FieldDescr: Text[50]; ManualNoSeries: Boolean)
+    procedure CreateNoSeries(NoSeriesCode: Code[20]; FieldDescr: Text[50]; ManualNoSeries: Boolean)
     var
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";

@@ -77,13 +77,13 @@ table 6150652 "NPR POS End of Day Profile"
             Description = 'NPR5.52';
             TableRelation = "NPR SMS Template Header";
         }
-        field(50; "Z-Report Number Series"; Code[10])
+        field(50; "Z-Report Number Series"; Code[20])
         {
             Caption = 'Z-Report Number Series';
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
         }
-        field(51; "X-Report Number Series"; Code[10])
+        field(51; "X-Report Number Series"; Code[20])
         {
             Caption = 'X-Report Number Series';
             DataClassification = CustomerContent;

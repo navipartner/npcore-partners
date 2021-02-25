@@ -534,7 +534,7 @@ codeunit 85014 "NPR Library - Member Module"
     end;
 
 
-    local procedure CreateCommunitySetup(CommunityCode: Code[20]; SearchOrder: Option; UniqueIdentity: Option; UIViolation: Option; LogonCredentials: Option; CreateContacts: Boolean; CreateRenewNotification: Boolean; Description: Text; MembershipNoSeries: Code[10]; MemberNoSeries: Code[10]): Code[20];
+    local procedure CreateCommunitySetup(CommunityCode: Code[20]; SearchOrder: Option; UniqueIdentity: Option; UIViolation: Option; LogonCredentials: Option; CreateContacts: Boolean; CreateRenewNotification: Boolean; Description: Text; MembershipNoSeries: Code[20]; MemberNoSeries: Code[20]): Code[20];
     var
         MemberCommunity: Record "NPR MM Member Community";
     begin
@@ -639,7 +639,7 @@ codeunit 85014 "NPR Library - Member Module"
         exit(No);
     end;
 
-    local procedure CreateLoyaltyMembershipSetup(Code: Code[20]; Description: Text; CommunityCode: Code[20]; MembershipType: Option; LoyaltyCode: Code[20]; LoyaltyCard: Option; MemberInfo: Option; Perpetual: Boolean; RoleAssignment: Option; MemberCardinality: Integer; WelcomeNotification: Boolean; RenewNotification: Boolean; MemberCardNoSeries: Code[10]): Code[20];
+    local procedure CreateLoyaltyMembershipSetup(Code: Code[20]; Description: Text; CommunityCode: Code[20]; MembershipType: Option; LoyaltyCode: Code[20]; LoyaltyCard: Option; MemberInfo: Option; Perpetual: Boolean; RoleAssignment: Option; MemberCardinality: Integer; WelcomeNotification: Boolean; RenewNotification: Boolean; MemberCardNoSeries: Code[20]): Code[20];
     var
         MembershipSetup: Record "NPR MM Membership Setup";
         Community: Record "NPR MM Member Community";
@@ -733,7 +733,7 @@ codeunit 85014 "NPR Library - Member Module"
         LoyaltyAlterMembership.Modify();
     end;
 
-    local procedure CreateNoSerie(NoSerieCode: Code[10]; StartNumber: Code[20])
+    local procedure CreateNoSerie(NoSerieCode: Code[20]; StartNumber: Code[20])
     var
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
@@ -821,7 +821,7 @@ codeunit 85014 "NPR Library - Member Module"
         end;
     end;
 
-    local procedure SetMembershipCardDetails(var MembershipSetup: Record "NPR MM Membership Setup"; NoSeriesCode: Code[10]);
+    local procedure SetMembershipCardDetails(var MembershipSetup: Record "NPR MM Membership Setup"; NoSeriesCode: Code[20]);
     begin
 
         MembershipSetup."Card Number Scheme" := MembershipSetup."Card Number Scheme"::GENERATED;

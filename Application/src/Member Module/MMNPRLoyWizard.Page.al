@@ -152,13 +152,13 @@ page 6151164 "NPR MM NPR Loy. Wizard"
 
     var
         PaymentMethodCode: Code[10];
-        CommunityCode: Code[10];
+        CommunityCode: Code[20];
         FS_Prefix: Code[10];
         ServiceBaseURL: Text;
         TenentName: Text;
         ServiceUser: Text;
         ServicePassword: Text;
-        GLAccount: Code[10];
+        GLAccount: Code[20];
         Description: Text;
         LoyaltyAuth: Text;
         LoyaltyCmpInSameDB: Boolean;
@@ -189,7 +189,7 @@ page 6151164 "NPR MM NPR Loy. Wizard"
         EarnRatio := 1;
     end;
 
-    procedure SetDefaults(pCommunityCode: Code[10]; pPrefix: Code[10])
+    procedure SetDefaults(pCommunityCode: Code[20]; pPrefix: Code[10])
     begin
 
         CommunityCode := pCommunityCode;
@@ -197,7 +197,7 @@ page 6151164 "NPR MM NPR Loy. Wizard"
         IsEditable := false;
     end;
 
-    procedure GetUserSetup(var vCommunityCode: Code[10]; var vMembershipCode: Code[10]; var vSystemPrefix: Code[10]; var vPaymentTypeCode: Code[10]; var vPaymentGLAccount: Code[10]; var vBaseUrl: Text; var vUsername: Text; var vPassword: Text; var vDescription: Text; var vAuthCode: Text; var vLoyaltyServerCompanyName: Text; var vEarnFactor: Decimal; var vBurnFactor: Decimal; var vTenant: Text)
+    procedure GetUserSetup(var vCommunityCode: Code[20]; var vMembershipCode: Code[20]; var vSystemPrefix: Code[10]; var vPaymentTypeCode: Code[10]; var vPaymentGLAccount: Code[20]; var vBaseUrl: Text; var vUsername: Text; var vPassword: Text; var vDescription: Text; var vAuthCode: Text; var vLoyaltyServerCompanyName: Text; var vEarnFactor: Decimal; var vBurnFactor: Decimal; var vTenant: Text)
     begin
 
         vCommunityCode := CommunityCode;

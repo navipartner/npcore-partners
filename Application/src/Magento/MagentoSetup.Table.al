@@ -224,7 +224,7 @@ table 6151401 "NPR Magento Setup"
             Caption = 'Custom Options Enabled';
             DataClassification = CustomerContent;
         }
-        field(131; "Custom Options No. Series"; Code[10])
+        field(131; "Custom Options No. Series"; Code[20])
         {
             Caption = 'Custom Options Nos.';
             DataClassification = CustomerContent;
