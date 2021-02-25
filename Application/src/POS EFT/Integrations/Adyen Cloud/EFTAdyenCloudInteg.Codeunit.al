@@ -358,10 +358,14 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
         POSPaymentMethod: Record "NPR POS Payment Method";
         EFTPaymentMapping: Codeunit "NPR EFT Payment Mapping";
     begin
+        /*
+        TODO: Cleanup workaround to BC17 message bug.
+
         if (not EftTransactionRequest.Successful) and
           ((not EftTransactionRequest."Self Service") or (not EftTransactionRequest."External Result Known")) then begin
             Message(TRX_ERROR, Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
         end;
+        */
 
         if EFTPaymentMapping.FindPaymentType(EftTransactionRequest, POSPaymentMethod) then begin
             EftTransactionRequest."POS Payment Type Code" := POSPaymentMethod.Code;

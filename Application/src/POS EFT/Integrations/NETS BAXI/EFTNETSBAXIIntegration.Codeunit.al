@@ -313,8 +313,13 @@ codeunit 6184540 "NPR EFT NETS BAXI Integration"
         POSPaymentMethod: Record "NPR POS Payment Method";
         EFTPaymentMapping: Codeunit "NPR EFT Payment Mapping";
     begin
+
+        /*
+        TODO: Cleanup workaround to BC17 message bug
+
         if not EftTransactionRequest.Successful then
             Message(TRX_ERROR, EftTransactionRequest."Integration Type", Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
+        */
 
         if EFTPaymentMapping.FindPaymentType(EftTransactionRequest, POSPaymentMethod) then begin
             EftTransactionRequest."POS Payment Type Code" := POSPaymentMethod.Code;
