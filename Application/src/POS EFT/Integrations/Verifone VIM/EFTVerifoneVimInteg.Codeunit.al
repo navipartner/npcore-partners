@@ -543,7 +543,9 @@ codeunit 6184526 "NPR EFT Verifone Vim Integ."
     begin
         if not EftTransactionRequest.Successful then begin
             if EftTransactionRequest."Processing Type" <> EftTransactionRequest."Processing Type"::AUXILIARY then begin
-                Message(TRX_ERROR, IntegrationType(), Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Description", EftTransactionRequest."NST Error");
+                //TODO: Clean up workaround to BC17 message bug
+                if not (EftTransactionRequest."Processing Type" in [EftTransactionRequest."Processing Type"::PAYMENT, EftTransactionRequest."Processing Type"::REFUND, EftTransactionRequest."Processing Type"::LOOK_UP]) then
+                    Message(TRX_ERROR, IntegrationType(), Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Description", EftTransactionRequest."NST Error");
             end else begin
                 Message(TRX_ERROR, IntegrationType(), Format(EftTransactionRequest."Auxiliary Operation Desc."), EftTransactionRequest."Result Description", EftTransactionRequest."NST Error");
             end;
