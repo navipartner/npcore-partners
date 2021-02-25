@@ -13,267 +13,243 @@ page 6014450 "NPR Mixed Discount"
             group(General)
             {
                 Caption = 'General';
-                group(Control6014423)
+                grid(Control6150664)
                 {
+                    GridLayout = Rows;
                     ShowCaption = false;
-                    field("Code"; Code)
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Code field';
-
-                        trigger OnAssistEdit()
-                        begin
-                            if Assistedit(xRec) then
-                                CurrPage.Update;
-                        end;
-                    }
-                    field(Description; Description)
-                    {
-                        ApplicationArea = All;
-                        Importance = Promoted;
-                        ToolTip = 'Specifies the value of the Description field';
-                    }
-                    group(Control6014409)
+                    group(Control1)
                     {
                         ShowCaption = false;
-                        Visible = ("Mix Type" <> 2);
-                        field("Mix Type"; "Mix Type")
+                        group(Control6014423)
                         {
-                            ApplicationArea = All;
-                            OptionCaption = 'Standard,Combination';
-                            ToolTip = 'Specifies the value of the Mix Type field';
+                            ShowCaption = false;
+                            field("Code"; Rec.Code)
+                            {
+                                ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the Code field';
 
-                            trigger OnValidate()
-                            begin
-                                UpdateLineView();
-                                CurrPage.Update(true);
-                            end;
+                                trigger OnAssistEdit()
+                                begin
+                                    if Rec.Assistedit(xRec) then
+                                        CurrPage.Update;
+                                end;
+                            }
+                            field(Description; Rec.Description)
+                            {
+                                ApplicationArea = All;
+                                Importance = Promoted;
+                                ToolTip = 'Specifies the value of the Description field';
+                            }
+                            group(Control6014409)
+                            {
+                                ShowCaption = false;
+                                Visible = (Rec."Mix Type" <> 2);
+                                field("Mix Type"; Rec."Mix Type")
+                                {
+                                    ApplicationArea = All;
+                                    OptionCaption = 'Standard,Combination';
+                                    ToolTip = 'Specifies the value of the Mix Type field';
+
+                                    trigger OnValidate()
+                                    begin
+                                        UpdateLineView();
+                                        CurrPage.Update(true);
+                                    end;
+                                }
+                            }
+                            group(Control6014410)
+                            {
+                                ShowCaption = false;
+                                Visible = (Rec."Mix Type" <> 1);
+                                group(Control6014428)
+                                {
+                                    ShowCaption = false;
+                                    Visible = (Rec."Discount Type" <> Rec."Discount Type"::"Multiple Discount Levels");
+                                    field(Lot; Rec.Lot)
+                                    {
+                                        ApplicationArea = All;
+                                        ToolTip = 'Define Quantity on Lines - All items and quantity on lines must be bought';
+
+                                        trigger OnValidate()
+                                        begin
+                                            UpdateLineView();
+                                            CurrPage.Update(true);
+                                        end;
+                                    }
+                                }
+                                group(Control6014413)
+                                {
+                                    ShowCaption = false;
+                                    Visible = (NOT Rec.Lot);
+                                    field("Min. Quantity"; Rec."Min. Quantity")
+                                    {
+                                        ApplicationArea = All;
+                                        ToolTip = 'Specifies the value of the Min. Quantity field';
+
+                                        trigger OnValidate()
+                                        begin
+                                            CurrPage.Update(true);
+                                        end;
+                                    }
+                                    field("Max. Quantity"; Rec."Max. Quantity")
+                                    {
+                                        ApplicationArea = All;
+                                        ToolTip = 'Specifies the value of the Max. Quantity field';
+                                    }
+                                }
+                            }
+                            group(Control6014422)
+                            {
+
+                                ShowCaption = false;
+                                Visible = (Rec."Mix Type" = 1) OR (Rec.Lot);
+                                field("CalcMinQty()"; Rec.CalcMinQty())
+                                {
+                                    ApplicationArea = All;
+                                    Caption = 'Item Qty. per Lot';
+                                    DecimalPlaces = 0 : 5;
+                                    ToolTip = 'Specifies the value of the Item Qty. per Lot field';
+
+                                    trigger OnValidate()
+                                    begin
+                                        CurrPage.Update(true);
+                                    end;
+                                }
+                            }
                         }
                     }
-                    group(Control6014410)
+                    grid(Control6150660)
                     {
+                        GridLayout = Rows;
                         ShowCaption = false;
-                        Visible = ("Mix Type" <> 1);
-                        group(Control6014428)
+                        group(Control2)
                         {
                             ShowCaption = false;
-                            Visible = ("Discount Type" <> "Discount Type"::"Multiple Discount Levels");
-                            field(Lot; Lot)
+                            group(Control6014420)
                             {
-                                ApplicationArea = All;
-                                ToolTip = 'Define Quantity on Lines - All items and quantity on lines must be bought';
+                                ShowCaption = false;
+                                Visible = (Rec."Mix Type" <> 2);
 
-                                trigger OnValidate()
-                                begin
-                                    UpdateLineView();
-                                    CurrPage.Update(true);
-                                end;
-                            }
-                        }
-                        group(Control6014413)
-                        {
-                            ShowCaption = false;
-                            Visible = (NOT Lot);
-                            field("Min. Quantity"; "Min. Quantity")
-                            {
-                                ApplicationArea = All;
-                                ToolTip = 'Specifies the value of the Min. Quantity field';
+                                field(Status; Rec.Status)
+                                {
+                                    ApplicationArea = All;
+                                    ToolTip = 'Specifies the value of the Status field';
+                                }
+                                field("Discount Type"; Rec."Discount Type")
+                                {
+                                    ApplicationArea = All;
+                                    ToolTip = 'Specifies the value of the Discount Type field';
 
-                                trigger OnValidate()
-                                begin
-                                    CurrPage.Update(true);
-                                end;
-                            }
-                            field("Max. Quantity"; "Max. Quantity")
-                            {
-                                ApplicationArea = All;
-                                ToolTip = 'Specifies the value of the Max. Quantity field';
-                            }
-                        }
-                    }
-                    group(Control6014422)
-                    {
-                        ShowCaption = false;
-                        Visible = ("Mix Type" = 1) OR (Lot);
-                        field("CalcMinQty()"; CalcMinQty())
-                        {
-                            ApplicationArea = All;
-                            Caption = 'Item Qty. per Lot';
-                            DecimalPlaces = 0 : 5;
-                            ToolTip = 'Specifies the value of the Item Qty. per Lot field';
+                                    trigger OnValidate()
+                                    begin
+                                        UpdateLineView();
+                                        CurrPage.Update(true);
+                                    end;
+                                }
+                                group(Control6014403)
+                                {
+                                    ShowCaption = false;
+                                    Visible = (Rec."Discount Type" = Rec."Discount Type"::"Total Amount per Min. Qty.");
+                                    field("Total Amount"; Rec."Total Amount")
+                                    {
+                                        ApplicationArea = All;
+                                        ToolTip = 'Specifies the value of the Total Amount field';
 
-                            trigger OnValidate()
-                            begin
-                                CurrPage.Update(true);
-                            end;
-                        }
-                    }
-                    group(Control6014420)
-                    {
-                        ShowCaption = false;
-                        Visible = ("Mix Type" <> 2);
-                        field("Discount Type"; "Discount Type")
-                        {
-                            ApplicationArea = All;
-                            ToolTip = 'Specifies the value of the Discount Type field';
+                                        trigger OnValidate()
+                                        begin
+                                            CurrPage.Update(true);
+                                        end;
+                                    }
+                                    field("Total Amount Excl. VAT"; Rec."Total Amount Excl. VAT")
+                                    {
+                                        ApplicationArea = All;
+                                        ToolTip = 'Specifies the value of the Total Amount Excl. VAT field';
+                                    }
+                                }
+                                group(Control6014426)
+                                {
+                                    ShowCaption = false;
+                                    Visible = (Rec."Discount Type" = Rec."Discount Type"::"Multiple Discount Levels");
+                                    field(DiscAmountExclVAT; Rec."Total Amount Excl. VAT")
+                                    {
+                                        ApplicationArea = All;
+                                        Caption = 'Discount Amount Excl. VAT';
+                                        ToolTip = 'Specifies the value of the Discount Amount Excl. VAT field';
 
-                            trigger OnValidate()
-                            begin
-                                UpdateLineView();
-                                CurrPage.Update(true);
-                            end;
-                        }
-                        group(Control6014403)
-                        {
-                            ShowCaption = false;
-                            Visible = ("Discount Type" = "Discount Type"::"Total Amount per Min. Qty.");
-                            field("Total Amount"; "Total Amount")
-                            {
-                                ApplicationArea = All;
-                                ToolTip = 'Specifies the value of the Total Amount field';
+                                        trigger OnValidate()
+                                        begin
+                                            CurrPage.Update;
+                                        end;
+                                    }
+                                }
+                                group(Control6014404)
+                                {
+                                    ShowCaption = false;
+                                    Visible = Rec."Discount Type" = Rec."Discount Type"::"Total Discount %";
+                                    field("Total Discount %"; Rec."Total Discount %")
+                                    {
+                                        ApplicationArea = All;
+                                        ToolTip = 'Specifies the value of the Total Discount % field';
 
-                                trigger OnValidate()
-                                begin
-                                    CurrPage.Update(true);
-                                end;
-                            }
-                            field("Total Amount Excl. VAT"; "Total Amount Excl. VAT")
-                            {
-                                ApplicationArea = All;
-                                ToolTip = 'Specifies the value of the Total Amount Excl. VAT field';
-                            }
-                        }
-                        group(Control6014426)
-                        {
-                            ShowCaption = false;
-                            Visible = ("Discount Type" = "Discount Type"::"Multiple Discount Levels");
-                            field(DiscAmountExclVAT; "Total Amount Excl. VAT")
-                            {
-                                ApplicationArea = All;
-                                Caption = 'Discount Amount Excl. VAT';
-                                ToolTip = 'Specifies the value of the Discount Amount Excl. VAT field';
+                                        trigger OnValidate()
+                                        begin
+                                            CurrPage.Update(true);
+                                        end;
+                                    }
+                                }
+                                group(Control6014405)
+                                {
+                                    ShowCaption = false;
+                                    Visible = Rec."Discount Type" = Rec."Discount Type"::"Total Discount Amt. per Min. Qty.";
+                                    field("Total Discount Amount"; Rec."Total Discount Amount")
+                                    {
+                                        ApplicationArea = All;
+                                        ToolTip = 'Specifies the value of the Total Discount Amount field';
 
-                                trigger OnValidate()
-                                begin
-                                    CurrPage.Update;  //NPR5.55 [412946]
-                                end;
-                            }
-                        }
-                        group(Control6014404)
-                        {
-                            ShowCaption = false;
-                            Visible = "Discount Type" = "Discount Type"::"Total Discount %";
-                            field("Total Discount %"; "Total Discount %")
-                            {
-                                ApplicationArea = All;
-                                ToolTip = 'Specifies the value of the Total Discount % field';
+                                        trigger OnValidate()
+                                        begin
+                                            CurrPage.Update(true);
+                                        end;
+                                    }
+                                }
+                                group(Control6014416)
+                                {
+                                    ShowCaption = false;
+                                    Visible = Rec."Discount Type" = Rec."Discount Type"::"Priority Discount per Min. Qty";
+                                    field("Item Discount Qty."; Rec."Item Discount Qty.")
+                                    {
+                                        ApplicationArea = All;
+                                        ToolTip = 'Specifies the value of the Item Discount Quantity field';
 
-                                trigger OnValidate()
-                                begin
-                                    CurrPage.Update(true);
-                                end;
-                            }
-                        }
-                        group(Control6014405)
-                        {
-                            ShowCaption = false;
-                            Visible = "Discount Type" = "Discount Type"::"Total Discount Amt. per Min. Qty.";
-                            field("Total Discount Amount"; "Total Discount Amount")
-                            {
-                                ApplicationArea = All;
-                                ToolTip = 'Specifies the value of the Total Discount Amount field';
+                                        trigger OnValidate()
+                                        begin
+                                            CurrPage.Update(true);
+                                        end;
+                                    }
+                                    field("Item Discount %"; Rec."Item Discount %")
+                                    {
+                                        ApplicationArea = All;
+                                        ToolTip = 'Specifies the value of the Item Discount % field';
 
-                                trigger OnValidate()
-                                begin
-                                    CurrPage.Update(true);
-                                end;
-                            }
-                        }
-                        group(Control6014416)
-                        {
-                            ShowCaption = false;
-                            Visible = "Discount Type" = "Discount Type"::"Priority Discount per Min. Qty";
-                            field("Item Discount Qty."; "Item Discount Qty.")
-                            {
-                                ApplicationArea = All;
-                                ToolTip = 'Specifies the value of the Item Discount Quantity field';
+                                        trigger OnValidate()
+                                        begin
+                                            CurrPage.Update(true);
+                                        end;
+                                    }
+                                }
 
-                                trigger OnValidate()
-                                begin
-                                    CurrPage.Update(true);
-                                end;
                             }
-                            field("Item Discount %"; "Item Discount %")
-                            {
-                                ApplicationArea = All;
-                                ToolTip = 'Specifies the value of the Item Discount % field';
 
-                                trigger OnValidate()
-                                begin
-                                    CurrPage.Update(true);
-                                end;
-                            }
-                        }
-                        group(Control6014407)
-                        {
-                            ShowCaption = false;
-                            Visible = ("Discount Type" <> "Discount Type"::"Total Discount Amt. per Min. Qty.") AND ("Discount Type" <> "Discount Type"::"Multiple Discount Levels") AND (NOT "Lot");
-                            field(MinimumDiscount; MixedDiscountMgt.CalcExpectedDiscAmount(Rec, false))
+                            group(Control6014411)
                             {
-                                ApplicationArea = All;
-                                Caption = 'Min. Discount Amount';
-                                ToolTip = 'Specifies the value of the Min. Discount Amount field';
+                                ShowCaption = false;
+                                Visible = Rec."Mix Type" <> 2;
+                                field("Block Custom Discount"; Rec."Block Custom Discount")
+                                {
+                                    ApplicationArea = All;
+                                    ToolTip = 'Specifies the value of the Block Custom Discount field';
+                                }
                             }
-                            field(MaximumDiscount; MixedDiscountMgt.CalcExpectedDiscAmount(Rec, true))
-                            {
-                                ApplicationArea = All;
-                                Caption = 'Max. Discount Amount';
-                                Editable = false;
-                                ToolTip = 'Specifies the value of the Max. Discount Amount field';
-                            }
-                        }
-                        group(Control6014417)
-                        {
-                            ShowCaption = false;
-                            Visible = ("Discount Type" <> "Discount Type"::"Total Discount Amt. per Min. Qty.") AND ("Lot");
-                            field(Discount; MixedDiscountMgt.CalcExpectedDiscAmount(Rec, true))
-                            {
-                                ApplicationArea = All;
-                                Caption = 'Discount Amount';
-                                Editable = false;
-                                ToolTip = 'Specifies the value of the Discount Amount field';
-                            }
-                        }
-                    }
-                }
-                group(Control6014401)
-                {
-                    ShowCaption = false;
-                    field("Created the"; "Created the")
-                    {
-                        ApplicationArea = All;
-                        Editable = false;
-                        ToolTip = 'Specifies the value of the Created Date field';
-                    }
-                    field("Last Date Modified"; "Last Date Modified")
-                    {
-                        ApplicationArea = All;
-                        Editable = false;
-                        ToolTip = 'Specifies the value of the Last Date Modified field';
-                    }
-                    group(Control6014411)
-                    {
-                        ShowCaption = false;
-                        Visible = "Mix Type" <> 2;
-                        field("Block Custom Discount"; "Block Custom Discount")
-                        {
-                            ApplicationArea = All;
-                            ToolTip = 'Specifies the value of the Block Custom Discount field';
-                        }
-                        field(Status; Status)
-                        {
-                            ApplicationArea = All;
-                            ToolTip = 'Specifies the value of the Status field';
                         }
                     }
                 }
@@ -281,35 +257,35 @@ page 6014450 "NPR Mixed Discount"
             group(Conditions)
             {
                 Caption = 'Conditions';
-                Visible = "Mix Type" <> 2;
+                Visible = Rec."Mix Type" <> 2;
                 group(Control6150614)
                 {
                     ShowCaption = false;
-                    field("Starting date"; "Starting date")
+                    field("Starting date"; Rec."Starting date")
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Start Date field';
                     }
-                    field("Ending date"; "Ending date")
+                    field("Ending date"; Rec."Ending date")
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the End Date field';
                     }
-                    field("Starting time"; "Starting time")
+                    field("Starting time"; Rec."Starting time")
                     {
                         ApplicationArea = All;
                         Visible = false;
                         ToolTip = 'Specifies the value of the Start Time field';
                     }
-                    field("Ending time"; "Ending time")
+                    field("Ending time"; Rec."Ending time")
                     {
                         ApplicationArea = All;
                         Visible = false;
                         ToolTip = 'Specifies the value of the End Time field';
                     }
-                    field("Customer Disc. Group Filter"; "Customer Disc. Group Filter")
+                    field("Customer Disc. Group Filter"; Rec."Customer Disc. Group Filter")
                     {
                         ApplicationArea = All;
                         AssistEdit = false;
@@ -317,18 +293,19 @@ page 6014450 "NPR Mixed Discount"
 
                         trigger OnAssistEdit()
                         begin
-                            FilterAssist(FieldNo("Customer Disc. Group Filter"));
+                            FilterAssist(Rec.FieldNo("Customer Disc. Group Filter"));
                         end;
                     }
                 }
-                group(Control6150618)
+            }
+
+            group(Control6150618)
+            {
+                ShowCaption = false;
+                part(Control6014425; "NPR Mixed Disc. Time Interv.")
                 {
-                    ShowCaption = false;
-                    part(Control6014425; "NPR Mixed Disc. Time Interv.")
-                    {
-                        SubPageLink = "Mix Code" = FIELD(Code);
-                        ApplicationArea = All;
-                    }
+                    SubPageLink = "Mix Code" = FIELD(Code);
+                    ApplicationArea = All;
                 }
             }
             part(DiscountLevels; "NPR Mixed Discount Levels")
@@ -343,6 +320,14 @@ page 6014450 "NPR Mixed Discount"
                 SubPageLink = Code = FIELD(Code);
                 UpdatePropagation = Both;
                 ApplicationArea = All;
+            }
+        }
+        area(factboxes)
+        {
+            part(MinimumDiscountFactBox; "NPR Mix Discount FactBox")
+            {
+                ApplicationArea = All;
+                Caption = 'Discount Amount';
             }
         }
     }
@@ -361,12 +346,6 @@ page 6014450 "NPR Mixed Discount"
                 ShortCutKey = 'Shift+Ctrl+D';
                 ApplicationArea = All;
                 ToolTip = 'Executes the Dimensions action';
-
-                trigger OnAction()
-                var
-                    DimMgt: Codeunit DimensionManagement;
-                begin
-                end;
             }
         }
         area(processing)
@@ -510,32 +489,7 @@ page 6014450 "NPR Mixed Discount"
                     var
                         RetailJournalMgt: Codeunit "NPR Retail Journal Code";
                     begin
-                        //-NPR5.46 [294354]
-                        // IF PAGE.RUNMODAL(PAGE::"Retail Journal List", "Retail Journal Header") <> ACTION::LookupOK THEN EXIT;
-                        //   MixedDiscountLine.SETRANGE(Code,Code);
-                        //  IF MixedDiscountLine.FIND('-') THEN REPEAT
-                        //     RetailJournalLine.RESET;
-                        //     RetailJournalLine.SETRANGE("No.", "Retail Journal Header"."No.");
-                        //     IF RetailJournalLine.FIND('+') THEN
-                        //        tempInt := RetailJournalLine."Line No." + 10000
-                        //     ELSE
-                        //       tempInt := 10000;
-                        //     tempAntal := MixedDiscountLine.COUNT;
-                        //
-                        //  RetailJournalLine."No.":= "Retail Journal Header"."No.";
-                        //  RetailJournalLine."Line No.":=tempInt;
-                        //  RetailJournalLine.VALIDATE("Item No.",MixedDiscountLine."No.");
-                        //  RetailJournalLine."Variant Code":= MixedDiscountLine."Variant Code";
-                        //  RetailJournalLine."Discount Type":= 2;
-                        //  RetailJournalLine."Discount Unit Price":= MixedDiscountLine."Unit price";
-                        //  //RetailJournalLine."Unit price":= MixedDiscountLine."Campaign Unit price";
-                        //  RetailJournalLine."Quantity to Print":= MixedDiscountLine.Quantity;
-                        //  RetailJournalLine."Discount Code":= MixedDiscountLine.Code;
-                        //  RetailJournalLine.INSERT(TRUE);
-                        // UNTIL MixedDiscountLine.NEXT=0;
-                        // MESSAGE(txt001, tempAntal);
                         RetailJournalMgt.Mix2RetailJnl(Code, '');
-                        //+NPR5.46 [294354]
                     end;
                 }
                 action("Copy campaign to Department Code")
@@ -557,23 +511,18 @@ page 6014450 "NPR Mixed Discount"
                         MixedDiscount1: Record "NPR Mixed Discount";
                         MixedDiscountLine1: Record "NPR Mixed Discount Line";
                     begin
-                        //-NPR5.30 [265244]
                         if PAGE.RunModal(PAGE::"NPR Mixed Discount List", MixedDiscount1) <> ACTION::LookupOK then exit;
-                        MixedDiscountLine1.Reset;
-                        MixedDiscountLine1.SetRange(Code, Code);
-                        MixedDiscountLine1.DeleteAll;
+                        MixedDiscountLine1.SetRange(Code, Rec.Code);
+                        MixedDiscountLine1.DeleteAll();
 
-                        MixedDiscountLine1.Reset;
                         MixedDiscountLine1.SetRange(Code, MixedDiscount1.Code);
-                        if MixedDiscountLine1.FindSet then
+                        if MixedDiscountLine1.FindSet() then
                             repeat
-                                MixedDiscountLine.Init;
+                                MixedDiscountLine.Init();
                                 MixedDiscountLine.TransferFields(MixedDiscountLine1);
-                                MixedDiscountLine.Code := Code;
+                                MixedDiscountLine.Code := Rec.Code;
                                 MixedDiscountLine.Insert(true);
-                            until MixedDiscountLine1.Next = 0;
-
-                        //+NPR5.30 [265244]
+                            until MixedDiscountLine1.Next() = 0;
                     end;
                 }
             }
@@ -586,8 +535,6 @@ page 6014450 "NPR Mixed Discount"
     end;
 
     trigger OnOpenPage()
-    var
-        "Miksrabat Hoved": Record "NPR Mixed Discount";
     begin
         UpdateLineView();
     end;
@@ -595,8 +542,6 @@ page 6014450 "NPR Mixed Discount"
     var
         Item: Record Item;
         MixedDiscountLine: Record "NPR Mixed Discount Line";
-        MixedDiscountMgt: Codeunit "NPR Mixed Discount Management";
-        MaxDiscount: Decimal;
         TxtCompressItems: Label 'Compressed to Item Discount Group';
         TxtCompChngeContinue: Label 'Compression will change one or more Item Disc. Group. Do you wish to continue?';
         DiscountLevelsApplicable: Boolean;
@@ -613,20 +558,20 @@ page 6014450 "NPR Mixed Discount"
             Error(ErrorNo1);
         Clear(MixedDiscountList);
         repeat
-            if MixedDiscountLine.Get(Code, Item."No.") then
+            if MixedDiscountLine.Get(Rec.Code, Item."No.") then
                 Error(ErrorNo2, Item."No.");
-            MixedDiscountLine.Init;
-            MixedDiscountLine.Code := Code;
+            MixedDiscountLine.Init();
+            MixedDiscountLine.Code := Rec.Code;
             MixedDiscountLine."No." := Item."No.";
             MixedDiscountLine.Quantity := 1;
             MixedDiscountLine.Description := Item.Description;
             MixedDiscountLine."Unit cost" := Item."Unit Cost";
             MixedDiscountLine."Unit price incl. VAT" := Item."Price Includes VAT";
-            MixedDiscountLine.Status := Status;
+            MixedDiscountLine.Status := Rec.Status;
             MixedDiscountLine."Unit price" := Item."Unit Price";
-            MixedDiscountLine.Insert;
-        until Item.Next = 0;
-        Message(OkMsg, Item.Count, Code);
+            MixedDiscountLine.Insert();
+        until Item.Next() = 0;
+        Message(OkMsg, Item.Count, Rec.Code);
     end;
 
     procedure CollapseToItemDiscGroup()
@@ -645,19 +590,19 @@ page 6014450 "NPR Mixed Discount"
 
         Clear(MixedDiscountLine);
         MixedDiscountLine.ClearMarks;
-        MixedDiscountLine.SetRange(Code, Code);
+        MixedDiscountLine.SetRange(Code, Rec.Code);
         if MixedDiscountLine.Find('-') then
             repeat
                 if MixedDiscountLine."Disc. Grouping Type" = MixedDiscountLine."Disc. Grouping Type"::Item then begin
                     Item.Reset;
                     if Item.Get(MixedDiscountLine."No.") then
                         if not Item."NPR Group sale" then begin
-                            Item."Item Disc. Group" := Code;
+                            Item."Item Disc. Group" := Rec.Code;
                             Item.Modify(true);
                             MixedDiscountLine.Mark(true);
                         end;
                 end;
-            until MixedDiscountLine.Next = 0;
+            until MixedDiscountLine.Next() = 0;
 
         MixedDiscountLine.MarkedOnly(true);
         MixedDiscountLine.DeleteAll(true);
@@ -665,16 +610,12 @@ page 6014450 "NPR Mixed Discount"
         MixedDiscountLine.ClearMarks;
         Clear(MixedDiscountLine);
         MixedDiscountLine.Init;
-        MixedDiscountLine.Validate(Code, Code);
+        MixedDiscountLine.Validate(Code, Rec.Code);
         MixedDiscountLine."Disc. Grouping Type" := MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group";
-        MixedDiscountLine."No." := Code;
+        MixedDiscountLine."No." := Rec.Code;
         MixedDiscountLine.Description := TxtCompressItems;
         if not MixedDiscountLine.Insert(true) then
             if MixedDiscountLine.Modify(true) then;
-    end;
-
-    local procedure "--- Filter Assist"()
-    begin
     end;
 
     local procedure GetFieldCaption(CaptionFieldNo: Integer) Caption: Text
@@ -750,9 +691,9 @@ page 6014450 "NPR Mixed Discount"
         CustomerDiscountGroup: Record "Customer Discount Group";
     begin
         case FilterFieldNo of
-            FieldNo("Customer Disc. Group Filter"):
+            Rec.FieldNo("Customer Disc. Group Filter"):
                 begin
-                    CustomerDiscountGroup.SetFilter(Code, "Customer Disc. Group Filter");
+                    CustomerDiscountGroup.SetFilter(Code, Rec."Customer Disc. Group Filter");
                     RecRef.GetTable(CustomerDiscountGroup);
                     exit(true);
                 end;
@@ -787,14 +728,10 @@ page 6014450 "NPR Mixed Discount"
         CurrRecRef.SetTable(Rec);
     end;
 
-    local procedure "--- View"()
-    begin
-    end;
-
     local procedure UpdateLineView()
     begin
         CurrPage.SubForm.PAGE.UpdateMixedDiscountView(Rec);
-        DiscountLevelsApplicable := "Discount Type" = "Discount Type"::"Multiple Discount Levels";  //NPR5.55 [412946]
+        DiscountLevelsApplicable := Rec."Discount Type" = Rec."Discount Type"::"Multiple Discount Levels";
     end;
 }
 
