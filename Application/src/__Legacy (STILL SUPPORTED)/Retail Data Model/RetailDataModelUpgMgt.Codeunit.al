@@ -57,9 +57,6 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
             exit;
 
         CreateLogEntry(StrSubstNo(DataModelUpgStartedTxt, NPRetailSetup."Data Model Build", GetCurrentDataModelBuild()), 0, 0, NPRetailSetup."Data Model Build");
-
-        NPRetailSetup."Prev. Data Model Build" := NPRetailSetup."Data Model Build";
-        NPRetailSetup."Last Data Model Build Upgrade" := CurrentDateTime();
         if not RunSilent then begin
             NPRetailSetup.Modify();
             CreateLogEntry(DataModelUpgEndedTxt, 0, 0, NPRetailSetup."Data Model Build");
@@ -161,8 +158,6 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
         CreateLogEntry(StrSubstNo('Data Model upgrade from Build Step %1 to Build Step %2 invoked from Re-Run action', FromBuildStep, ToBuildStep), 0, 0, -1);
         RunSilent := false;
         UpgradeDataModel(FromBuildStep, ToBuildStep);
-
-        NPRetailSetup."Last Data Model Build Upgrade" := CurrentDateTime;
         NPRetailSetup.Modify;
     end;
 

@@ -159,6 +159,9 @@ table 6150613 "NPR NP Retail Setup"
         {
             Caption = 'Last Data Model Build Upgrade';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(10002; "Last Data Model Build User ID"; Code[50])
         {
@@ -174,6 +177,9 @@ table 6150613 "NPR NP Retail Setup"
         {
             Caption = 'Prev. Data Model Build';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(10010; "Advanced POS Entries Activated"; Boolean)
         {
