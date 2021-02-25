@@ -1,10 +1,12 @@
-page 6059950 "NPR Display Setup"
+page 6059950 "NPR POS Display Profiles"
 {
     Caption = 'POS Display Profiles';
     PageType = List;
-    SourceTable = "NPR Display Setup";
+    Editable = false;    
     UsageCategory = Administration;
-    ApplicationArea = All;
+    ApplicationArea = All;    
+    SourceTable = "NPR Display Setup";
+    CardPageId = "NPR POS Display Profile";
 
     layout
     {
@@ -95,10 +97,5 @@ page 6059950 "NPR Display Setup"
             }
         }
     }
-
-    trigger OnOpenPage()
-    begin
-        Rec.InitDisplayContent();
-    end;
 }
 

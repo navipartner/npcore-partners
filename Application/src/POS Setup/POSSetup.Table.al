@@ -1,12 +1,5 @@
 table 6150707 "NPR POS Setup"
 {
-    // NPR5.37/TSA /20171024 CASE 293905 Added fields Lock POS Action Code, Unlock POS Action Code
-    // NPR5.39/TSA /20180126 CASE 303399 Added field OnBeforePaymentView Action
-    // NPR5.40/VB  /20180228 CASE 306347 Replacing BLOB-based temporary-table parameters with physical-table parameters
-    // NPR5.54/TSA /20200219 CASE 391850 Added Description
-    // NPR5.54/TSA /20200220 CASE 392121 Added "Idle Timeout Action Code"
-    // NPR5.55/TSA /20200417 CASE 400734 Added optionvalue for named workflow "Admin Menu Action Code"
-
     Caption = 'POS Setup';
     DataClassification = CustomerContent;
     LookupPageID = "NPR POS Setup List";
