@@ -660,6 +660,16 @@ page 6151245 "NPR Setup RC"
 
 
         }
+
+        area(Creation)
+        {
+            action(POSDragonglass)
+            {
+                ApplicationArea = All;
+                Caption = 'Open POS';
+                RunObject = Codeunit "NPR Open POS Page";
+            }
+        }
     }
 }
 
