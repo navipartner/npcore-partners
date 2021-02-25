@@ -77,7 +77,7 @@ table 6151422 "NPR Magento Custom Option"
             DataClassification = CustomerContent;
             InitValue = true;
         }
-        field(107; "No. Series"; Code[10])
+        field(107; "No. Series"; Code[20])
         {
             Caption = 'No. Series';
             DataClassification = CustomerContent;

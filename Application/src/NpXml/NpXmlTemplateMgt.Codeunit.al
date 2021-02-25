@@ -522,7 +522,7 @@ codeunit 6151556 "NPR NpXml Template Mgt."
         SetChildNpXmlElementsActive(NpXmlElement, Active);
     end;
 
-    procedure SetNpXmlFilterValue(TemplateCode: Code[10]; ElementLineNo: Integer; FieldNo: Integer; FilterValue: Text)
+    procedure SetNpXmlFilterValue(TemplateCode: Code[20]; ElementLineNo: Integer; FieldNo: Integer; FilterValue: Text)
     var
         NpXmlFilter: Record "NPR NpXml Filter";
     begin
@@ -768,7 +768,7 @@ codeunit 6151556 "NPR NpXml Template Mgt."
         //+NC1.21
     end;
 
-    procedure RestoreArchivedNpXmlTemplate(TemplateCode: Code[20]; VersionCode: Code[10]): Boolean
+    procedure RestoreArchivedNpXmlTemplate(TemplateCode: Code[20]; VersionCode: Code[20]): Boolean
     var
         NpXmlTemplate: Record "NPR NpXml Template";
         MemoryStream: DotNet NPRNetMemoryStream;

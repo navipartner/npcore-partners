@@ -7,7 +7,7 @@ table 6150665 "NPR NPRE Seating"
 
     fields
     {
-        field(1; "Code"; Code[10])
+        field(1; "Code"; Code[20])
         {
             Caption = 'Code';
             DataClassification = CustomerContent;

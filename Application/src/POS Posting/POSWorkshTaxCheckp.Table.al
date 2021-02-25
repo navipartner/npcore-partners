@@ -23,14 +23,14 @@ table 6150630 "NPR POS Worksh. Tax Checkp."
             DataClassification = CustomerContent;
             TableRelation = "Tax Jurisdiction";
         }
-        field(7; "Tax Group Code"; Code[10])
+        field(7; "Tax Group Code"; Code[20])
         {
             Caption = 'Tax Group Code';
             DataClassification = CustomerContent;
             Editable = false;
             TableRelation = "Tax Group";
         }
-        field(8; "VAT Identifier"; Code[10])
+        field(8; "VAT Identifier"; Code[20])
         {
             Caption = 'Tax Identifier';
             DataClassification = CustomerContent;

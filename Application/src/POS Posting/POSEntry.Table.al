@@ -313,7 +313,7 @@ table 6150621 "NPR POS Entry"
             Editable = false;
             FieldClass = FlowField;
         }
-        field(240; "Fiscal No. Series"; Code[10])
+        field(240; "Fiscal No. Series"; Code[20])
         {
             Caption = 'Fiscal No. Series';
             DataClassification = CustomerContent;

@@ -13,14 +13,14 @@ table 6014550 "NPR Package Module Config."
             Caption = 'Key';
             DataClassification = CustomerContent;
         }
-        field(2; "Normal No. Series"; Code[10])
+        field(2; "Normal No. Series"; Code[20])
         {
             Caption = 'Normal package label numbers';
             Description = 'Package Number Series (normal pakke)';
             TableRelation = "No. Series";
             DataClassification = CustomerContent;
         }
-        field(3; "COD No. Series"; Code[10])
+        field(3; "COD No. Series"; Code[20])
         {
             Caption = 'Cash on delivery package numbers';
             Description = 'Package Number Series for cash on delivery (postopkrævning)';
@@ -92,20 +92,20 @@ table 6014550 "NPR Package Module Config."
             TableRelation = "Shipping Agent Services".Code;
             DataClassification = CustomerContent;
         }
-        field(15; "CV No. Series"; Code[10])
+        field(15; "CV No. Series"; Code[20])
         {
             Caption = 'Recipient receipt package numbers';
             Description = 'Package Number Series for recipient receipt (modtagerkvittering)';
             DataClassification = CustomerContent;
         }
-        field(16; "DHL No. Series"; Code[10])
+        field(16; "DHL No. Series"; Code[20])
         {
             Caption = 'DHL package label numbers';
             Description = 'Package Number Series (DHL pakke)';
             TableRelation = "No. Series";
             DataClassification = CustomerContent;
         }
-        field(17; "DHL AWB No. Series"; Code[10])
+        field(17; "DHL AWB No. Series"; Code[20])
         {
             Caption = 'DHL AWB package label numbers';
             Description = 'Package Number Series (DHL pakke)';

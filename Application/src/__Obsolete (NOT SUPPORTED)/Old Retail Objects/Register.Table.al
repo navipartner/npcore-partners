@@ -167,7 +167,7 @@ table 6014401 "NPR Register"
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register to NPR POS Store';
         }
-        field(19; "VAT Gen. Business Post.Gr"; Code[10])
+        field(19; "VAT Gen. Business Post.Gr"; Code[20])
         {
             Caption = 'VAT Gen. Business Posting Group (Price)';
             DataClassification = CustomerContent;

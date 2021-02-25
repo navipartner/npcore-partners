@@ -856,7 +856,7 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
         PrintUnappliedEntries: Boolean;
         [InDataSet]
         ShowPrintRemaining: Boolean;
-        AgingBandCurrencyCode: Code[10];
+        AgingBandCurrencyCode: Code[20];
         CurrencyCode3: Code[10];
         FIKNo: Code[10];
         AgingBandEndingDate: Date;

@@ -52,7 +52,7 @@ table 6059784 "NPR TM Ticket Type"
             OptionMembers = INDIVIDUAL,GROUP;
             DataClassification = CustomerContent;
         }
-        field(30; "No. Series"; Code[10])
+        field(30; "No. Series"; Code[20])
         {
             Caption = 'No. Series';
             TableRelation = "No. Series";

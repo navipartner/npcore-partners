@@ -11,7 +11,7 @@ table 6150650 "NPR POS Audit Profile"
             Caption = 'Code';
             DataClassification = CustomerContent;
         }
-        field(10; "Sale Fiscal No. Series"; Code[10])
+        field(10; "Sale Fiscal No. Series"; Code[20])
         {
             Caption = 'Sale Fiscal No. Series';
             DataClassification = CustomerContent;
@@ -27,7 +27,7 @@ table 6150650 "NPR POS Audit Profile"
                 end;
             end;
         }
-        field(20; "Credit Sale Fiscal No. Series"; Code[10])
+        field(20; "Credit Sale Fiscal No. Series"; Code[20])
         {
             Caption = 'Credit Sale Fiscal No. Series';
             DataClassification = CustomerContent;
@@ -43,7 +43,7 @@ table 6150650 "NPR POS Audit Profile"
                 end;
             end;
         }
-        field(30; "Balancing Fiscal No. Series"; Code[10])
+        field(30; "Balancing Fiscal No. Series"; Code[20])
         {
             Caption = 'Balancing Fiscal No. Series';
             DataClassification = CustomerContent;
@@ -107,7 +107,7 @@ table 6150650 "NPR POS Audit Profile"
             DataClassification = CustomerContent;
             Description = 'NPR5.52';
         }
-        field(110; "Sales Ticket No. Series"; Code[10])
+        field(110; "Sales Ticket No. Series"; Code[20])
         {
             Caption = 'Sales Ticket No. Series';
             DataClassification = CustomerContent;

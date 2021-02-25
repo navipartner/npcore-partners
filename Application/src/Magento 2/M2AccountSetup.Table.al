@@ -27,7 +27,7 @@ table 6151150 "NPR M2 Account Setup"
             Caption = 'Contact Template Code';
             DataClassification = CustomerContent;
         }
-        field(40; "No. Series Ship-to Address"; Code[10])
+        field(40; "No. Series Ship-to Address"; Code[20])
         {
             Caption = 'No. Series Ship-to Address';
             DataClassification = CustomerContent;

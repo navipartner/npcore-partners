@@ -27,7 +27,7 @@ table 6059976 "NPR Variety Group"
             Caption = 'Description';
             DataClassification = CustomerContent;
         }
-        field(15; "No. Series"; Code[10])
+        field(15; "No. Series"; Code[20])
         {
             Caption = 'No. Series';
             DataClassification = CustomerContent;
@@ -478,7 +478,7 @@ table 6059976 "NPR Variety Group"
         //+NPR5.43 [317108]
     end;
 
-    procedure GetVariantCodeExample(): Code[10]
+    procedure GetVariantCodeExample(): Code[20]
     var
         Var1Value: Code[20];
         Var2Value: Code[20];
@@ -528,12 +528,12 @@ table 6059976 "NPR Variety Group"
         //+NPR5.43 [317108]
     end;
 
-    local procedure FormatValues(Value1: Code[10]; Sep1: Text; Value2: Code[10]; Sep2: Text; Value3: Code[10]): Code[10]
+    local procedure FormatValues(Value1: Code[20]; Sep1: Text; Value2: Code[20]; Sep2: Text; Value3: Code[20]): Code[20]
     var
         NewVariantCode: Code[50];
-        NewVar1Code: Code[10];
-        NewVar2Code: Code[10];
-        NewVar3Code: Code[10];
+        NewVar1Code: Code[20];
+        NewVar2Code: Code[20];
+        NewVar3Code: Code[20];
         CurrentLength: Integer;
     begin
         //-NPR5.43 [317108]

@@ -285,7 +285,7 @@ table 6150678 "NPR NPRE Kitchen Request"
         "Qty. per Unit of Measure" := WaiterPadLine."Qty. per Unit of Measure";
     end;
 
-    procedure SeatingCode(): Code[10]
+    procedure SeatingCode(): Code[20]
     var
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         KitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link";

@@ -99,7 +99,7 @@ page 6014673 "NPR Ean Box Setup Step"
             until EanBoxSetup.Next() = 0;
     end;
 
-    local procedure CheckIfNoAvailableInEanBoxSetup(var EanBoxSetup: Record "NPR Ean Box Setup"; var WantedStartingNo: Code[10]) CalculatedNo: Code[10]
+    local procedure CheckIfNoAvailableInEanBoxSetup(var EanBoxSetup: Record "NPR Ean Box Setup"; var WantedStartingNo: Code[20]) CalculatedNo: Code[20]
     var
         HelperFunctions: Codeunit "NPR Wizard Helper Functions";
     begin
@@ -108,7 +108,7 @@ page 6014673 "NPR Ean Box Setup Step"
         EanBoxSetup.SetRange(Code, CalculatedNo);
 
         if EanBoxSetup.FindFirst() then begin
-            HelperFunctions.FormatCode(WantedStartingNo);
+            WantedStartingNo := HelperFunctions.FormatCode20(WantedStartingNo);
             CalculatedNo := CheckIfNoAvailableInEanBoxSetup(EanBoxSetup, WantedStartingNo);
         end;
     end;

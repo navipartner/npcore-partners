@@ -21,7 +21,7 @@ codeunit 6150675 "NPR NPRE Restaur. Setup Proxy"
         Initialized := false;
     end;
 
-    procedure SetSeating(NewSeatingCode: Code[10])
+    procedure SetSeating(NewSeatingCode: Code[20])
     begin
         if NewSeatingCode = Seating.Code then
             exit;

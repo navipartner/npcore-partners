@@ -790,7 +790,7 @@ codeunit 6150633 "NPR POS Tax Calculation"
         TaxDetailFound: Boolean;
         LastTaxAreaCode: Code[20];
         LastTaxType: Integer;
-        LastTaxGroupCode: Code[10];
+        LastTaxGroupCode: Code[20];
         RoundTax: Option "To Nearest",Up,Down;
     begin
         with GlobalTempPOSTaxAmountLine do begin
@@ -967,7 +967,7 @@ codeunit 6150633 "NPR POS Tax Calculation"
           );
     end;
 
-    procedure HandleRoundTaxUpOrDown(var POSTaxAmountLine: Record "NPR POS Tax Amount Line"; RoundTax: Option "To Nearest",Up,Down; TotalTaxAmount: Decimal; TaxAreaCode: Code[20]; TaxGroupCode: Code[10])
+    procedure HandleRoundTaxUpOrDown(var POSTaxAmountLine: Record "NPR POS Tax Amount Line"; RoundTax: Option "To Nearest",Up,Down; TotalTaxAmount: Decimal; TaxAreaCode: Code[20]; TaxGroupCode: Code[20])
     var
         RoundedAmount: Decimal;
         RoundingError: Decimal;

@@ -19,7 +19,7 @@ table 6059771 "NPR Member Card Types"
             Caption = 'Description';
             DataClassification = CustomerContent;
         }
-        field(3; "Card No. Series"; Code[10])
+        field(3; "Card No. Series"; Code[20])
         {
             Caption = 'Card No. Series';
             Description = 'Nummerserie til point kort';

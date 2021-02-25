@@ -23,7 +23,7 @@ codeunit 6151159 "NPR MM NRP Loyalty Wizard"
         Password: Text;
         Prefix: Code[10];
         PaymentTypeCode: Code[10];
-        GL_Account: Code[10];
+        GL_Account: Code[20];
         Description: Text;
         AuthCode: Text;
         LoyaltyCompanyName: Text;
@@ -58,7 +58,7 @@ codeunit 6151159 "NPR MM NRP Loyalty Wizard"
         Message('Setup done. Proceed with POS setup.');
     end;
 
-    procedure SetCommunityCode(pCommunityCode: Code[10]; pPrefix: Code[10])
+    procedure SetCommunityCode(pCommunityCode: Code[20]; pPrefix: Code[10])
     begin
 
         gCommunityCode := pCommunityCode;
@@ -153,7 +153,7 @@ codeunit 6151159 "NPR MM NRP Loyalty Wizard"
         exit(LoyaltyCode);
     end;
 
-    local procedure CreatePOSPaymentMethod(PaymentTypeCode: Code[10]; GLAccountNo: Code[10]; FixedRate: Decimal): Code[10]
+    local procedure CreatePOSPaymentMethod(PaymentTypeCode: Code[10]; GLAccountNo: Code[20]; FixedRate: Decimal): Code[10]
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -222,7 +222,7 @@ codeunit 6151159 "NPR MM NRP Loyalty Wizard"
         end;
     end;
 
-    local procedure CreateEFTSetup(pPaymentTypeCode: Code[20])
+    local procedure CreateEFTSetup(pPaymentTypeCode: Code[10])
     var
         EFTSetup: Record "NPR EFT Setup";
         LoyaltyPointsPSPClient: Codeunit "NPR MM Loy. Point PSP (Client)";
@@ -283,7 +283,7 @@ codeunit 6151159 "NPR MM NRP Loyalty Wizard"
         end;
     end;
 
-    local procedure CreatePostingSetup(POSMethodCode: Code[20]; GLAccount: Code[20])
+    local procedure CreatePostingSetup(POSMethodCode: Code[10]; GLAccount: Code[20])
     var
         POSStore: Record "NPR POS Store";
         POSPostingSetup: Record "NPR POS Posting Setup";
@@ -341,7 +341,7 @@ codeunit 6151159 "NPR MM NRP Loyalty Wizard"
     begin
     end;
 
-    local procedure CreateNoSerie(NoSerieCode: Code[10]; StartNumber: Code[20]): Code[10]
+    local procedure CreateNoSerie(NoSerieCode: Code[20]; StartNumber: Code[20]): Code[20]
     var
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";

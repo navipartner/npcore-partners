@@ -4,7 +4,7 @@ codeunit 6060042 "NPR Item Number Mgt."
         ExternalBarcodeErr: Label '%1 is not an External Barcode because it starts with 2.', Comment = '%1 = Barcode';
         InternalBarcodeErr: Label '%1 is not an Internal Barcode because it does not start with 2.', Comment = '%1 = Barcode';
 
-    procedure FindItemInfo(ExternalItemNo: Text[50]; ExternalType: Option All,VendorItemNo,Barcode,CrossReference,AlternativeNo; SkipBlocked: Boolean; var UnitOfMeasure: Code[10]; var VendorNo: Code[20]; var ItemNo: Code[20]; var VariantCode: Code[20]) Found: Boolean
+    procedure FindItemInfo(ExternalItemNo: Text[50]; ExternalType: Option All,VendorItemNo,Barcode,CrossReference,AlternativeNo; SkipBlocked: Boolean; var UnitOfMeasure: Code[10]; var VendorNo: Code[20]; var ItemNo: Code[20]; var VariantCode: Code[10]) Found: Boolean
     var
         Item: Record Item;
         SKU: Record "Stockkeeping Unit";
@@ -34,7 +34,7 @@ codeunit 6060042 "NPR Item Number Mgt."
         exit(false);
     end;
 
-    local procedure FindItemInfoBlocked(ExternalItemNo: Text[50]; ExternalType: Option All,VendorItemNo,Barcode,CrossReference,AlternativeNo; Blocked: Boolean; var UnitOfMeasure: Code[10]; var VendorNo: Code[20]; var ItemNo: Code[20]; var VariantCode: Code[20]) Found: Boolean
+    local procedure FindItemInfoBlocked(ExternalItemNo: Text[50]; ExternalType: Option All,VendorItemNo,Barcode,CrossReference,AlternativeNo; Blocked: Boolean; var UnitOfMeasure: Code[10]; var VendorNo: Code[20]; var ItemNo: Code[20]; var VariantCode: Code[10]) Found: Boolean
     var
         Item: Record Item;
         SKU: Record "Stockkeeping Unit";

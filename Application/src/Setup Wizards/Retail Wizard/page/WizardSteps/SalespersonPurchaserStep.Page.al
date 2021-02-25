@@ -69,7 +69,7 @@ page 6014689 "NPR Salesperson/Purchaser Step"
         CalculatedNo := WantedStartingNo;
 
         if SalespersonPurchaser.Get(WantedStartingNo) then begin
-            HelperFunctions.FormatCode(WantedStartingNo);
+            WantedStartingNo := HelperFunctions.FormatCode(WantedStartingNo);
             CalculatedNo := CheckIfNoAvailableInSalespersonPurchaser(SalespersonPurchaser, WantedStartingNo);
         end;
     end;

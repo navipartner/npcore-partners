@@ -424,7 +424,7 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
     end;
 
 
-    local procedure CreateNoSerie(NoSerieCode: Code[10]; StartNumber: Code[20])
+    local procedure CreateNoSerie(NoSerieCode: Code[20]; StartNumber: Code[20])
     var
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
@@ -604,9 +604,9 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
         exit(TicketTypeCode);
     end;
 
-    local procedure GenerateCode10(): Code[20]
+    local procedure GenerateCode10(): Code[10]
     begin
-        exit(GetNextNoFromSeries('C1'));
+        exit(CopyStr(GetNextNoFromSeries('C1'), 1, 10));
     end;
 
     local procedure GenerateCode20(): Code[20]

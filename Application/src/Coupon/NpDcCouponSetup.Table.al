@@ -10,13 +10,13 @@ table 6151599 "NPR NpDc Coupon Setup"
             Caption = 'Primary Key';
             DataClassification = CustomerContent;
         }
-        field(10; "Coupon No. Series"; Code[10])
+        field(10; "Coupon No. Series"; Code[20])
         {
             Caption = 'Coupon No. Series';
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
         }
-        field(20; "Arch. Coupon No. Series"; Code[10])
+        field(20; "Arch. Coupon No. Series"; Code[20])
         {
             Caption = 'Posted Coupon No. Series';
             DataClassification = CustomerContent;

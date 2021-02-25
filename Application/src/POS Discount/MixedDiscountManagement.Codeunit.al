@@ -1408,7 +1408,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
         DiscountPriority.Insert(true);
     end;
 
-    procedure GetNoSeries(): Code[10]
+    procedure GetNoSeries(): Code[20]
     var
         DiscountPriority: Record "NPR Discount Priority";
         NoSeriesCodeTok: Label 'MIX-DISC', Locked = true;

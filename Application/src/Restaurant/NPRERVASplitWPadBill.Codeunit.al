@@ -42,7 +42,7 @@ codeunit 6150678 "NPR NPRE RVA: Split WPad/Bill"
     local procedure OnAction20(Action: Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);
     var
         POSSale: Codeunit "NPR POS Sale";
-        SeatingCode: Code[10];
+        SeatingCode: Code[20];
         WaiterPadCode: Code[20];
         IncludeAllWPads: Option No,Yes,Ask;
         ReturnToDefaultView: Boolean;
@@ -74,7 +74,7 @@ codeunit 6150678 "NPR NPRE RVA: Split WPad/Bill"
     local procedure GenerateSplitBillContext(Context: Codeunit "NPR POS JSON Management");
     var
         SeatingWPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
-        SeatingCode: Code[10];
+        SeatingCode: Code[20];
         WaiterPadCode: Code[20];
         IncludeAllWPads: Option No,Yes,Ask;
     begin

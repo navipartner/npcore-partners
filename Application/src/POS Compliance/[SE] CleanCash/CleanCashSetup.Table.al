@@ -61,7 +61,7 @@ table 6184500 "NPR CleanCash Setup"
 
         }
 
-        field(20; "CleanCash No. Series"; Code[10])
+        field(20; "CleanCash No. Series"; Code[20])
         {
             Caption = 'CleanCash No. Series';
             DataClassification = CustomerContent;

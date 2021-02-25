@@ -491,7 +491,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
     var
         Seating: Record "NPR NPRE Seating";
         SeatingManagement: Codeunit "NPR NPRE Seating Mgt.";
-        ChosenSeatingCode: Code[10];
+        ChosenSeatingCode: Code[20];
     begin
         ChosenSeatingCode := SeatingManagement.UILookUpSeating('', '');
         if ChosenSeatingCode = '' then
@@ -521,7 +521,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
     procedure FindSeating(JSON: Codeunit "NPR POS JSON Management"; var NPRESeating: Record "NPR NPRE Seating")
     var
         RestaurantCode: Code[20];
-        SeatingCode: Code[10];
+        SeatingCode: Code[20];
         SeatingManagement: Codeunit "NPR NPRE Seating Mgt.";
         LocationFilter: Text;
         SeatingFilter: Text;
@@ -546,7 +546,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         end;
     end;
 
-    local procedure GetSeatingCode(JSON: Codeunit "NPR POS JSON Management"; RestaurantCode: Code[20]) SeatingCode: Code[10]
+    local procedure GetSeatingCode(JSON: Codeunit "NPR POS JSON Management"; RestaurantCode: Code[20]) SeatingCode: Code[20]
     var
         SeatingManagement: Codeunit "NPR NPRE Seating Mgt.";
         SeatingFilter: Text;

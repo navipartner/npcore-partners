@@ -420,7 +420,7 @@ table 6014413 "NPR Period Discount"
         end;
     end;
 
-    local procedure GetNoSeries(): Code[10]
+    local procedure GetNoSeries(): Code[20]
     var
         PeriodDiscountMgt: Codeunit "NPR Period Discount Management";
     begin

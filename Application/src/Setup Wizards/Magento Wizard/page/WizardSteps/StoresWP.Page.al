@@ -135,7 +135,7 @@ page 6014522 "NPR Stores WP"
         MagStore.SetRange(Code, CalculatedNo);
 
         if MagStore.FindFirst() then begin
-            HelperFunctions.FormatCode(WantedStartingNo);
+            WantedStartingNo := HelperFunctions.FormatCode(WantedStartingNo);
             CalculatedNo := CheckIfNoAvailableInMagStore(MagStore, WantedStartingNo);
         end;
     end;

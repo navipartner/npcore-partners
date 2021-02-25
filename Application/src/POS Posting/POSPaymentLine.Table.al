@@ -162,7 +162,7 @@ table 6150623 "NPR POS Payment Line"
             Caption = 'Tax Liable';
             DataClassification = CustomerContent;
         }
-        field(87; "Tax Group Code"; Code[10])
+        field(87; "Tax Group Code"; Code[20])
         {
             Caption = 'Tax Group Code';
             DataClassification = CustomerContent;
@@ -190,13 +190,13 @@ table 6150623 "NPR POS Payment Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.38';
         }
-        field(95; "VAT Bus. Posting Group"; Code[10])
+        field(95; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "VAT Business Posting Group";
         }
-        field(96; "VAT Prod. Posting Group"; Code[10])
+        field(96; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
             DataClassification = CustomerContent;
@@ -212,7 +212,7 @@ table 6150623 "NPR POS Payment Line"
             Caption = 'VAT Base Amount';
             DataClassification = CustomerContent;
         }
-        field(106; "VAT Identifier"; Code[10])
+        field(106; "VAT Identifier"; Code[20])
         {
             Caption = 'VAT Identifier';
             DataClassification = CustomerContent;

@@ -197,7 +197,7 @@ table 6014439 "NPR Quantity Discount Header"
         end;
     end;
 
-    local procedure GetNoSeries(): Code[10]
+    local procedure GetNoSeries(): Code[20]
     var
         QuantityDiscountMgt: Codeunit "NPR Quantity Discount Mgt.";
     begin

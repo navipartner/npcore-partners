@@ -414,7 +414,9 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
             "POS Period Register No." := POSEntry."POS Period Register No.";
             case AuditRoll.Type of
                 AuditRoll.Type::Payment:
+#pragma warning disable AA0139
                     "POS Payment Method Code" := AuditRoll."No.";
+#pragma warning restore
                 else
                     Error('Payment Line Type %1 not implemented in migration (%2 %3 %4)', AuditRoll.Type, AuditRoll.TableName, AuditRoll.FieldName("Clustered Key"), AuditRoll."Clustered Key");
             end;

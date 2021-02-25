@@ -221,7 +221,7 @@ codeunit 6014415 "NPR Period Discount Management"
         DiscountPriority.Insert(true);
     end;
 
-    procedure GetNoSeries(): Code[10]
+    procedure GetNoSeries(): Code[20]
     var
         DiscountPriority: Record "NPR Discount Priority";
         NoSeriesCodeTok: Label 'PER-DISC', Locked = true;

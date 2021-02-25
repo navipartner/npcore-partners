@@ -218,7 +218,7 @@ table 6014509 "NPR Warranty Directory"
             Caption = 'Language Code';
             DataClassification = CustomerContent;
         }
-        field(63; "No. Series"; Code[10])
+        field(63; "No. Series"; Code[20])
         {
             Caption = 'No. Series';
             DataClassification = CustomerContent;
@@ -228,7 +228,7 @@ table 6014509 "NPR Warranty Directory"
             Caption = 'Job No.';
             DataClassification = CustomerContent;
         }
-        field(65; "Gen. Bus. Posting Group"; Code[10])
+        field(65; "Gen. Bus. Posting Group"; Code[20])
         {
             Caption = 'Gen. Bus. Posting Group';
             DataClassification = CustomerContent;
@@ -258,7 +258,7 @@ table 6014509 "NPR Warranty Directory"
             Caption = 'Price Group Code';
             DataClassification = CustomerContent;
         }
-        field(72; "VAT Bus. Posting Group"; Code[10])
+        field(72; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;

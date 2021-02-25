@@ -14,7 +14,7 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
         VATPerCent: Decimal;
         PricesInclVAT: Boolean;
         VATCalcType: Enum "Tax Calculation Type";
-        VATBusPostingGr: Code[10];
+        VATBusPostingGr: Code[20];
         QtyPerUOM: Decimal;
         PricesInCurrency: Boolean;
         CurrencyFactor: Decimal;
@@ -266,7 +266,7 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
             GLSetup.Get();
     end;
 
-    local procedure SetVAT(PriceInclVAT2: Boolean; VATPerCent2: Decimal; VATCalcType2: Enum "Tax Calculation Type"; VATBusPostingGr2: Code[10])
+    local procedure SetVAT(PriceInclVAT2: Boolean; VATPerCent2: Decimal; VATCalcType2: Enum "Tax Calculation Type"; VATBusPostingGr2: Code[20])
     begin
         PricesInclVAT := PriceInclVAT2;
         VATPerCent := VATPerCent2;
@@ -294,7 +294,7 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
         exit(MinQty <= Qty);
     end;
 
-    local procedure ConvertPriceToVAT(FromPricesInclVAT: Boolean; FromVATProdPostingGr: Code[10]; FromVATBusPostingGr: Code[10]; var UnitPrice: Decimal)
+    local procedure ConvertPriceToVAT(FromPricesInclVAT: Boolean; FromVATProdPostingGr: Code[20]; FromVATBusPostingGr: Code[20]; var UnitPrice: Decimal)
     var
         VATPostingSetup: Record "VAT Posting Setup";
         POSTaxCalculation: Codeunit "NPR POS Tax Calculation";

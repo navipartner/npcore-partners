@@ -108,7 +108,7 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         if RunInsert then WaiterPad.Insert(true);
     end;
 
-    procedure AddNewWaiterPadForSeating(SeatingCode: Code[10]; var WaiterPad: Record "NPR NPRE Waiter Pad"; var SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink") OK: Boolean
+    procedure AddNewWaiterPadForSeating(SeatingCode: Code[20]; var WaiterPad: Record "NPR NPRE Waiter Pad"; var SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink") OK: Boolean
     var
         Seating: Record "NPR NPRE Seating";
         SeatingMgt: Codeunit "NPR NPRE Seating Mgt.";

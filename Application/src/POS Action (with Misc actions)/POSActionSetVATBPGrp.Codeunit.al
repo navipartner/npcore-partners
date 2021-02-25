@@ -49,7 +49,7 @@ codeunit 6150824 "NPR POSAction: Set VAT B.P.Grp"
         SaleLine: Codeunit "NPR POS Sale Line";
         SalePOS: Record "NPR Sale POS";
         POSSale: Codeunit "NPR POS Sale";
-        VATBusPostingGroupValue: Code[10];
+        VATBusPostingGroupValue: Code[20];
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
@@ -73,7 +73,7 @@ codeunit 6150824 "NPR POSAction: Set VAT B.P.Grp"
         exit('1.0');
     end;
 
-    procedure List(Lookup: Boolean; ShowEmpty: Boolean): Code[10]
+    procedure List(Lookup: Boolean; ShowEmpty: Boolean): Code[20]
     var
         VATBusinessPostingGroups: Page "VAT Business Posting Groups";
         VATBusinessPostingGroup: Record "VAT Business Posting Group";

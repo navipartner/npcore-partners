@@ -331,7 +331,7 @@ table 6014405 "NPR Sale POS"
             Caption = 'Send Receipt Email';
             DataClassification = CustomerContent;
         }
-        field(74; "Gen. Bus. Posting Group"; Code[10])
+        field(74; "Gen. Bus. Posting Group"; Code[20])
         {
             Caption = 'Gen. Bus. Posting Group';
             DataClassification = CustomerContent;
@@ -515,7 +515,7 @@ table 6014405 "NPR Sale POS"
             DataClassification = CustomerContent;
             Description = 'NPR5.31';
         }
-        field(143; "VAT Bus. Posting Group"; Code[10])
+        field(143; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
@@ -642,7 +642,7 @@ table 6014405 "NPR Sale POS"
             Editable = false;
             FieldClass = FlowField;
         }
-        field(700; "NPRE Pre-Set Seating Code"; Code[10])
+        field(700; "NPRE Pre-Set Seating Code"; Code[20])
         {
             Caption = 'Pre-Set Seating Code';
             DataClassification = CustomerContent;

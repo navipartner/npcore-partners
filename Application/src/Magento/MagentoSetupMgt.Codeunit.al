@@ -823,7 +823,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
     var
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
-        NoSeriesCode: Code[10];
+        NoSeriesCode: Code[20];
     begin
         if (not MagentoSetup."Custom Options Enabled") or (MagentoSetup."Custom Options No. Series" <> '') then
             exit;

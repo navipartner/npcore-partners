@@ -5,7 +5,7 @@ table 6150662 "NPR NPRE Seat.: WaiterPadLink"
 
     fields
     {
-        field(1; "Seating Code"; Code[10])
+        field(1; "Seating Code"; Code[20])
         {
             Caption = 'Seating Code';
             DataClassification = CustomerContent;

@@ -21,7 +21,7 @@ table 6060093 "NPR MM Recur. Paym. Setup"
             Caption = 'PSP Recurring Plan ID';
             DataClassification = CustomerContent;
         }
-        field(20; "Document No. Series"; Code[10])
+        field(20; "Document No. Series"; Code[20])
         {
             Caption = 'Document No. Series';
             DataClassification = CustomerContent;

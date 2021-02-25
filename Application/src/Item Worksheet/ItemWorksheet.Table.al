@@ -77,7 +77,7 @@ table 6060041 "NPR Item Worksheet"
                 ItemWorksheetTemplate.TestField("Item No. Prefix", ItemWorksheetTemplate."Item No. Prefix"::"From Worksheet");
             end;
         }
-        field(97; "No. Series"; Code[10])
+        field(97; "No. Series"; Code[20])
         {
             Caption = 'No. Series';
             DataClassification = CustomerContent;

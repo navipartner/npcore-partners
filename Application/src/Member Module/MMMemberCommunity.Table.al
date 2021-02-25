@@ -26,19 +26,19 @@ table 6060132 "NPR MM Member Community"
             OptionCaption = 'Card,Member,Membership,All';
             OptionMembers = CARDNO,MEMBERNO,MEMBERSHIPNO,ALL;
         }
-        field(13; "External Membership No. Series"; Code[10])
+        field(13; "External Membership No. Series"; Code[20])
         {
             Caption = 'External Membership No. Series';
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
         }
-        field(14; "External Member No. Series"; Code[10])
+        field(14; "External Member No. Series"; Code[20])
         {
             Caption = 'External Member No. Series';
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
         }
-        field(15; "Customer No. Series"; Code[10])
+        field(15; "Customer No. Series"; Code[20])
         {
             Caption = 'Customer No. Series';
             DataClassification = CustomerContent;

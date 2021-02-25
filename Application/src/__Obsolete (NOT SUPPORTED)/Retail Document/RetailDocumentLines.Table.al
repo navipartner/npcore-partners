@@ -238,12 +238,12 @@ table 6014426 "NPR Retail Document Lines"
             Caption = 'VAT Calculation Type';
             DataClassification = CustomerContent;
         }
-        field(89; "VAT Bus. Posting Group"; Code[10])
+        field(89; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
         }
-        field(90; "VAT Prod. Posting Group"; Code[10])
+        field(90; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
             DataClassification = CustomerContent;
@@ -268,7 +268,7 @@ table 6014426 "NPR Retail Document Lines"
             Caption = 'VAT Difference';
             DataClassification = CustomerContent;
         }
-        field(106; "VAT Identifier"; Code[10])
+        field(106; "VAT Identifier"; Code[20])
         {
             Caption = 'VAT Identifier';
             DataClassification = CustomerContent;

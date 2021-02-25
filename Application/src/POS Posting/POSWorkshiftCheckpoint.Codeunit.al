@@ -11,7 +11,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         EntrySourceMethodOption: Option NA,AUDITROLL,BINENTRY;
         POSTING_ERROR: Label 'While posting end-of-day, the following error occured:\\%1';
 
-    procedure EndWorkshift(Mode: Option; UnitNo: Code[20]; DimensionSetId: Integer) PosEntryNo: Integer
+    procedure EndWorkshift(Mode: Option; UnitNo: Code[10]; DimensionSetId: Integer) PosEntryNo: Integer
     begin
         // Main function to end the workshift
         PosEntryNo := CloseWorkshiftWorker(Mode, UnitNo, DimensionSetId);
@@ -31,7 +31,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         // Pos Entry No:  can be zero
     end;
 
-    procedure BinTransfer(UsePosEntry: Boolean; WithPosting: Boolean; UnitNo: Code[20])
+    procedure BinTransfer(UsePosEntry: Boolean; WithPosting: Boolean; UnitNo: Code[10])
     var
         POSUnit: Record "NPR POS Unit";
         POSWorkshiftCheckpointPage: Page "NPR POS Workshift Checkp. Card";
@@ -87,7 +87,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
 
     end;
 
-    procedure CloseWorkshift(UsePosEntry: Boolean; WithPosting: Boolean; UnitNo: Code[20]) PosEntryNo: Integer
+    procedure CloseWorkshift(UsePosEntry: Boolean; WithPosting: Boolean; UnitNo: Code[10]) PosEntryNo: Integer
     var
         POSUnit: Record "NPR POS Unit";
         POSWorkshiftCheckpointPage: Page "NPR POS Workshift Checkp. Card";
@@ -105,7 +105,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         exit(CloseWorkshiftWithDimension(UsePosEntry, WithPosting, UnitNo, 0));
     end;
 
-    procedure CloseWorkshiftWithDimension(UsePosEntry: Boolean; WithPosting: Boolean; UnitNo: Code[20]; DimensionSetId: Integer) PosEntryNo: Integer
+    procedure CloseWorkshiftWithDimension(UsePosEntry: Boolean; WithPosting: Boolean; UnitNo: Code[10]; DimensionSetId: Integer) PosEntryNo: Integer
     var
         Mode: Option;
     begin
@@ -122,7 +122,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
 
     end;
 
-    local procedure CloseWorkshiftWorker(Mode: Option; UnitNo: Code[20]; DimensionSetId: Integer) PosEntryNo: Integer
+    local procedure CloseWorkshiftWorker(Mode: Option; UnitNo: Code[10]; DimensionSetId: Integer) PosEntryNo: Integer
     var
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         POSUnit: Record "NPR POS Unit";
@@ -279,7 +279,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         exit(ConfirmEoD);
     end;
 
-    local procedure CreateCheckpointWorker(Mode: Option; UnitNo: Code[20]) CheckPointEntryNo: Integer
+    local procedure CreateCheckpointWorker(Mode: Option; UnitNo: Code[10]) CheckPointEntryNo: Integer
     var
         POSUnit: Record "NPR POS Unit";
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
@@ -475,7 +475,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         exit(true);
     end;
 
-    local procedure CreateBalancingEntryAndPost(Mode: Option; UnitNo: Code[20]; CheckPointEntryNo: Integer; DimensionSetId: Integer) EntryNo: Integer
+    local procedure CreateBalancingEntryAndPost(Mode: Option; UnitNo: Code[10]; CheckPointEntryNo: Integer; DimensionSetId: Integer) EntryNo: Integer
     var
         POSUnit: Record "NPR POS Unit";
         POSEndofDayProfile: Record "NPR POS End of Day Profile";
@@ -612,7 +612,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
 
     end;
 
-    procedure CreateEndWorkshiftCheckpoint_POSEntry(POSUnitNo: Code[20]) CheckpointEntryNo: Integer
+    procedure CreateEndWorkshiftCheckpoint_POSEntry(POSUnitNo: Code[10]) CheckpointEntryNo: Integer
     var
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
     begin
@@ -828,7 +828,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
 
     end;
 
-    local procedure CalculateCheckpointStatistics(POSUnitNo: Code[20]; var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
+    local procedure CalculateCheckpointStatistics(POSUnitNo: Code[10]; var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     var
         PreviousUnitCheckpoint: Record "NPR POS Workshift Checkpoint";
         FromEntryNo: Integer;
@@ -862,7 +862,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         CalculateWorkshiftSummary(POSUnitNo, POSWorkshiftCheckpoint, FromEntryNo);
     end;
 
-    local procedure CalculateWorkshiftSummary(POSUnitNo: Code[20]; var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; FromPosEntryNo: Integer)
+    local procedure CalculateWorkshiftSummary(POSUnitNo: Code[10]; var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; FromPosEntryNo: Integer)
     var
         POSSalesLine: Record "NPR POS Sales Line";
         POSPaymentLine: Record "NPR POS Payment Line";
@@ -897,7 +897,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         FinalizeCheckpoint(POSWorkshiftCheckpoint);
     end;
 
-    local procedure SetGeneralStatistics(POSUnitNo: Code[20]; var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; FromPosEntryNo: Integer)
+    local procedure SetGeneralStatistics(POSUnitNo: Code[10]; var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; FromPosEntryNo: Integer)
     var
         POSEntry: Record "NPR POS Entry";
         DocDeleted: Boolean;

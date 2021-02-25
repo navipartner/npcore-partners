@@ -562,7 +562,9 @@ table 6014422 "NPR Retail Journal Line"
 
         POSSalesPriceCalcMgt.InitTempPOSItemSale(TempSaleLinePOS, TempSalePOS);
         if "Register No." <> '' then
+#pragma warning disable AA0139
             TempSalePOS."Register No." := "Register No."
+#pragma warning restore
         else
             TempSalePOS."Register No." := POSUnit.GetCurrentPOSUnit();
 
@@ -593,8 +595,9 @@ table 6014422 "NPR Retail Journal Line"
         TempSaleLinePOS.Silent := true;
         TempSaleLinePOS.Date := "Calculation Date";
         TempSaleLinePOS.Validate(Quantity, "Quantity for Discount Calc");
+#pragma warning disable AA0139        
         TempSaleLinePOS."Register No." := "Register No.";
-
+#pragma warning restore
         POSSalesPriceCalcMgt.FindItemPrice(TempSalePOS, TempSaleLinePOS);
         POSSalesDiscountCalcMgt.InitDiscountPriority(TMPDiscountPriority);
         TempSaleLinePOS2 := TempSaleLinePOS;

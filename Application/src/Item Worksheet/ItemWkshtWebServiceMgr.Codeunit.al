@@ -75,7 +75,7 @@ codeunit 6060049 "NPR Item Wksht. WebService Mgr"
         Commit;
     end;
 
-    local procedure FindWorksheetLine(VendorNo: Code[20]; VendorVATRegNo: Text; ItemNo: Code[20]; var ItemWorksheetTemplateCode: Code[20]; var ItemWorksheetCode: Code[20]; var ItemWorksheetLineNo: Integer)
+    local procedure FindWorksheetLine(VendorNo: Code[20]; VendorVATRegNo: Text; ItemNo: Code[20]; var ItemWorksheetTemplateCode: Code[10]; var ItemWorksheetCode: Code[10]; var ItemWorksheetLineNo: Integer)
     var
         ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
         ItemWorksheetTemplate2: Record "NPR Item Worksh. Template";

@@ -823,7 +823,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
             GenJnlPostBatch.Run(GenJournalLine);
     end;
 
-    local procedure InvoiceStoreWorker(JournalTemplateName: Code[20]; JournalBatchName: Code[20]; DocumentNo: Code[20]; LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup")
+    local procedure InvoiceStoreWorker(JournalTemplateName: Code[10]; JournalBatchName: Code[10]; DocumentNo: Code[20]; LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup")
     var
         GenJournalLine: Record "Gen. Journal Line";
         NoSeriesManagement: Codeunit NoSeriesManagement;

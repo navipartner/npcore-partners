@@ -141,7 +141,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         exit(TicketTypeCode);
     end;
 
-    local procedure CreateNoSerie(NoSerieCode: Code[10]; StartNumber: Code[20])
+    local procedure CreateNoSerie(NoSerieCode: Code[20]; StartNumber: Code[20])
     var
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";

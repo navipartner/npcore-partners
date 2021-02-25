@@ -636,7 +636,7 @@ report 6060042 "NPR Import Excel Item Worksh."
     var
         ItemWorksheetTemplate2: Record "NPR Item Worksh. Template";
         ItemWorksheet2: Record "NPR Item Worksheet";
-        PrefixCode: Code[10];
+        PrefixCode: Text;
     begin
         PrefixCode := '';
         if not ItemWorksheetTemplate2.Get(ItemWorksheetLineIn."Worksheet Template Name") then

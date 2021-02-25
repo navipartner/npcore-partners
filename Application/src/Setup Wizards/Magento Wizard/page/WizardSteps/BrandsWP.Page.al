@@ -100,7 +100,7 @@ page 6014552 "NPR Brands WP"
             until MagentoBrand.Next() = 0;
     end;
 
-    local procedure CheckIfNoAvailableInMagBrand(var MagBrand: Record "NPR Magento Brand"; var WantedStartingNo: Code[10]) CalculatedNo: Code[10]
+    local procedure CheckIfNoAvailableInMagBrand(var MagBrand: Record "NPR Magento Brand"; var WantedStartingNo: Code[20]) CalculatedNo: Code[20]
     var
         HelperFunctions: Codeunit "NPR Wizard Helper Functions";
     begin
@@ -109,7 +109,7 @@ page 6014552 "NPR Brands WP"
         MagBrand.SetRange(Id, CalculatedNo);
 
         if MagBrand.FindFirst() then begin
-            HelperFunctions.FormatCode(WantedStartingNo);
+            WantedStartingNo := HelperFunctions.FormatCode20(WantedStartingNo);
             CalculatedNo := CheckIfNoAvailableInMagBrand(MagBrand, WantedStartingNo);
         end;
     end;

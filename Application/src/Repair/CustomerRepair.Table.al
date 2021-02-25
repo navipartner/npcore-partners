@@ -332,7 +332,7 @@ table 6014504 "NPR Customer Repair"
             TableRelation = Location.Code;
             DataClassification = CustomerContent;
         }
-        field(100; "No. Series"; Code[10])
+        field(100; "No. Series"; Code[20])
         {
             Caption = 'No. Series';
             Description = '---';

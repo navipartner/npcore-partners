@@ -152,7 +152,7 @@ table 6060124 "NPR MM Membership Setup"
             OptionCaption = ' ,Check Digit';
             OptionMembers = "NONE",CHECKDIGIT;
         }
-        field(34; "Card Number No. Series"; Code[10])
+        field(34; "Card Number No. Series"; Code[20])
         {
             Caption = 'Card Number No. Series';
             DataClassification = CustomerContent;

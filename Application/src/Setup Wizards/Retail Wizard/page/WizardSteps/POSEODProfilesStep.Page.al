@@ -228,7 +228,7 @@ page 6014656 "NPR POS EOD Profiles Step"
             until POSEndOfDayProfile.Next() = 0;
     end;
 
-    local procedure CheckIfNoAvailableInPOSEndOfDayProfile(var POSEndOfDayProfile: Record "NPR POS End of Day Profile"; var WantedStartingNo: Code[10]) CalculatedNo: Code[10]
+    local procedure CheckIfNoAvailableInPOSEndOfDayProfile(var POSEndOfDayProfile: Record "NPR POS End of Day Profile"; var WantedStartingNo: Code[20]) CalculatedNo: Code[20]
     var
         HelperFunctions: Codeunit "NPR Wizard Helper Functions";
     begin
@@ -237,7 +237,7 @@ page 6014656 "NPR POS EOD Profiles Step"
         POSEndOfDayProfile.SetRange(Code, CalculatedNo);
 
         if POSEndOfDayProfile.FindFirst() then begin
-            HelperFunctions.FormatCode(WantedStartingNo);
+            WantedStartingNo := HelperFunctions.FormatCode20(WantedStartingNo);
             CalculatedNo := CheckIfNoAvailableInPOSEndOfDayProfile(POSEndOfDayProfile, WantedStartingNo);
         end;
     end;

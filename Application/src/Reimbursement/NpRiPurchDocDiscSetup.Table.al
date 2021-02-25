@@ -43,7 +43,7 @@ table 6151107 "NPR NpRi Purch.Doc.Disc. Setup"
             DataClassification = CustomerContent;
             TableRelation = "Gen. Product Posting Group";
         }
-        field(210; "Bal. VAT Prod. Posting Group"; Code[10])
+        field(210; "Bal. VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'Bal. VAT Prod. Posting Group';
             DataClassification = CustomerContent;

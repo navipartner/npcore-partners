@@ -99,7 +99,7 @@ table 6151371 "NPR CS Setup"
             DataClassification = CustomerContent;
             TableRelation = "Item Journal Template";
         }
-        field(28; "Phys. Inv Jour No. Series"; Code[10])
+        field(28; "Phys. Inv Jour No. Series"; Code[20])
         {
             Caption = 'Phys. Inv Jour No. Series';
             DataClassification = CustomerContent;

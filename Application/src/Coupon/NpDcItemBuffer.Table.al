@@ -20,7 +20,7 @@ table 6151604 "NPR NpDc Item Buffer"
             Caption = 'Item Group';
             DataClassification = CustomerContent;
         }
-        field(15; "Item Disc. Group"; Code[10])
+        field(15; "Item Disc. Group"; Code[20])
         {
             Caption = 'Item Disc. Group';
             DataClassification = CustomerContent;

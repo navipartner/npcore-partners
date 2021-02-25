@@ -12,7 +12,7 @@ table 6151120 "NPR GDPR Setup"
             Caption = 'Code';
             DataClassification = CustomerContent;
         }
-        field(10; "Agreement Nos."; Code[10])
+        field(10; "Agreement Nos."; Code[20])
         {
             Caption = 'Agreement Nos.';
             DataClassification = CustomerContent;

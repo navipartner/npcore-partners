@@ -17,7 +17,7 @@ table 6151172 "NPR NpGp Cross Company Setup"
             NotBlank = true;
             TableRelation = Location;
         }
-        field(20; "Gen. Bus. Posting Group"; Code[10])
+        field(20; "Gen. Bus. Posting Group"; Code[20])
         {
             Caption = 'Gen. Bus. Posting Group';
             DataClassification = CustomerContent;

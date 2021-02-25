@@ -255,7 +255,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         UpdateItemAttributes;
     end;
 
-    local procedure UpdateAndCopyVarieties(var ItemworkshLine: Record "NPR Item Worksheet Line"; VarietyNo: Integer; Variety: Code[20]; VarietyTableFrom: Code[20]; VarietyTableTo: Code[20]; CreateCopy: Boolean; CopyValues: Boolean)
+    local procedure UpdateAndCopyVarieties(var ItemworkshLine: Record "NPR Item Worksheet Line"; VarietyNo: Integer; Variety: Code[10]; VarietyTableFrom: Code[20]; VarietyTableTo: Code[20]; CreateCopy: Boolean; CopyValues: Boolean)
     var
         ItemWorksheetVariantLineToCreate: Record "NPR Item Worksh. Variant Line";
         VarietyGroup: Record "NPR Variety Group";
@@ -427,7 +427,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         end;
     end;
 
-    local procedure UpdateVarietyValue(ParType: Code[20]; ParTable: Code[20]; ParValue: Code[20]; ParSortOrder: Integer; ParDescription: Text[30])
+    local procedure UpdateVarietyValue(ParType: Code[10]; ParTable: Code[20]; ParValue: Code[20]; ParSortOrder: Integer; ParDescription: Text[30])
     var
         VarietyTable: Record "NPR Variety Table";
         VarietyValue: Record "NPR Variety Value";

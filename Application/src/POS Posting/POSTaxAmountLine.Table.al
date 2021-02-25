@@ -25,7 +25,7 @@ table 6150629 "NPR POS Tax Amount Line"
             DataClassification = CustomerContent;
             TableRelation = "Tax Jurisdiction";
         }
-        field(8; "VAT Identifier"; Code[10])
+        field(8; "VAT Identifier"; Code[20])
         {
             Caption = 'Tax Identifier';
             DataClassification = CustomerContent;
@@ -37,7 +37,7 @@ table 6150629 "NPR POS Tax Amount Line"
             DataClassification = CustomerContent;
             Editable = false;
         }
-        field(10; "Tax Group Code"; Code[10])
+        field(10; "Tax Group Code"; Code[20])
         {
             Caption = 'Tax Group Code';
             DataClassification = CustomerContent;

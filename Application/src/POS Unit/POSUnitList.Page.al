@@ -184,27 +184,18 @@ page 6150616 "NPR POS Unit List"
 
                 trigger OnAction()
                 begin
-                    CreateCheckpointWorker(true, true, "No.");
+                    CreateCheckpointWorker(true, true, Rec."No.");
                 end;
             }
         }
     }
 
-    local procedure CreateCheckpoint(UnitNo: Code[20])
-    var
-        NPRetailSetup: Record "NPR NP Retail Setup";
-    begin
-        if not (NPRetailSetup.Get()) then
-            exit;
 
-        CreateCheckpointWorker(true, false, UnitNo);
-    end;
-
-    local procedure CreateCheckpointWorker(UsePosEntry: Boolean; WithPosting: Boolean; UnitNo: Code[20])
+    local procedure CreateCheckpointWorker(UsePosEntry: Boolean; WithPosting: Boolean; UnitNo: Code[10])
     var
         POSCheckpointMgr: Codeunit "NPR POS Workshift Checkpoint";
     begin
-        POSCheckpointMgr.CloseWorkshift(UsePosEntry, WithPosting, "No.");
+        POSCheckpointMgr.CloseWorkshift(UsePosEntry, WithPosting, UnitNo);
     end;
 }
 

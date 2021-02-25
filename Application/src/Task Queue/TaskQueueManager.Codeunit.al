@@ -68,7 +68,7 @@ codeunit 6059901 "NPR Task Queue Manager"
         until (not TaskWorker.Active) or (not GetNextTask(TaskWorker, NextTaskQueue));
     end;
 
-    procedure LoginTaskWorker(TaskWorkerGroupCode: Code[20])
+    procedure LoginTaskWorker(TaskWorkerGroupCode: Code[10])
     var
         TaskWorker: Record "NPR Task Worker";
         TaskWorkerGroup: Record "NPR Task Worker Group";

@@ -350,7 +350,7 @@ table 6014411 "NPR Mixed Discount"
         end;
     end;
 
-    local procedure GetNoSeries(): Code[10]
+    local procedure GetNoSeries(): Code[20]
     var
         MixedDiscountMgt: Codeunit "NPR Mixed Discount Management";
     begin

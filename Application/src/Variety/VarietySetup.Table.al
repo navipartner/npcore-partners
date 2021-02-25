@@ -42,7 +42,7 @@ table 6059970 "NPR Variety Setup"
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
         }
-        field(23; "Alt. No. No. Series (V)"; Code[10])
+        field(23; "Alt. No. No. Series (V)"; Code[20])
         {
             Caption = 'Alt. No. No. Series (Variant)';
             DataClassification = CustomerContent;
@@ -56,7 +56,7 @@ table 6059970 "NPR Variety Setup"
             OptionCaption = ' ,EAN8,EAN13';
             OptionMembers = " ",EAN8,EAN13;
         }
-        field(31; "Item Cross Ref. No. Series (I)"; Code[10])
+        field(31; "Item Cross Ref. No. Series (I)"; Code[20])
         {
             Caption = 'Item Reference No. Series (Item)';
             DataClassification = CustomerContent;
@@ -68,7 +68,7 @@ table 6059970 "NPR Variety Setup"
             DataClassification = CustomerContent;
             InitValue = true;
         }
-        field(33; "Item Cross Ref. No. Series (V)"; Code[10])
+        field(33; "Item Cross Ref. No. Series (V)"; Code[20])
         {
             Caption = 'Item Reference No. Series (Variant)';
             DataClassification = CustomerContent;
@@ -94,7 +94,7 @@ table 6059970 "NPR Variety Setup"
             DataClassification = CustomerContent;
             Description = 'VRT1.11';
         }
-        field(53; "Internal EAN No. Series"; Code[10])
+        field(53; "Internal EAN No. Series"; Code[20])
         {
             Caption = 'Internal EAN No. Series';
             DataClassification = CustomerContent;
@@ -115,7 +115,7 @@ table 6059970 "NPR Variety Setup"
             MaxValue = 29;
             MinValue = 27;
         }
-        field(56; "External EAN No. Series"; Code[10])
+        field(56; "External EAN No. Series"; Code[20])
         {
             Caption = 'External EAN-No. Series';
             DataClassification = CustomerContent;
@@ -171,7 +171,7 @@ table 6059970 "NPR Variety Setup"
                 //+NPR5.43 [317108]
             end;
         }
-        field(750; "Variant No. Series"; Code[10])
+        field(750; "Variant No. Series"; Code[20])
         {
             Caption = 'Variant Std. No. Serie';
             DataClassification = CustomerContent;

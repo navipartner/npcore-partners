@@ -35,13 +35,13 @@ table 6151106 "NPR NpRi Provision Setup"
                 Validate("VAT Prod. Posting Group", GLAccount."VAT Prod. Posting Group");
             end;
         }
-        field(105; "Gen. Prod. Posting Group"; Code[10])
+        field(105; "Gen. Prod. Posting Group"; Code[20])
         {
             Caption = 'Gen. Prod. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "Gen. Product Posting Group";
         }
-        field(110; "VAT Prod. Posting Group"; Code[10])
+        field(110; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
             DataClassification = CustomerContent;
@@ -72,7 +72,7 @@ table 6151106 "NPR NpRi Provision Setup"
             DataClassification = CustomerContent;
             TableRelation = "Gen. Product Posting Group";
         }
-        field(210; "Bal. VAT Prod. Posting Group"; Code[10])
+        field(210; "Bal. VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'Bal. VAT Prod. Posting Group';
             DataClassification = CustomerContent;

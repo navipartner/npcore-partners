@@ -255,14 +255,14 @@ table 6150661 "NPR NPRE Waiter Pad Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
         }
-        field(71; "VAT Bus. Posting Group"; Code[10])
+        field(71; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             TableRelation = "VAT Business Posting Group";
         }
-        field(72; "VAT Prod. Posting Group"; Code[10])
+        field(72; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
             DataClassification = CustomerContent;

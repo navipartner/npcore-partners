@@ -114,7 +114,7 @@ table 6014406 "NPR Sale Line POS"
             DataClassification = CustomerContent;
             TableRelation = Location;
         }
-        field(8; "Posting Group"; Code[10])
+        field(8; "Posting Group"; Code[20])
         {
             Caption = 'Posting Group';
             DataClassification = CustomerContent;
@@ -606,25 +606,25 @@ table 6014406 "NPR Sale Line POS"
             Caption = 'Invoice Discount Amount';
             DataClassification = CustomerContent;
         }
-        field(48; "Gen. Bus. Posting Group"; Code[10])
+        field(48; "Gen. Bus. Posting Group"; Code[20])
         {
             Caption = 'Gen. Bus. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "Gen. Business Posting Group";
         }
-        field(49; "Gen. Prod. Posting Group"; Code[10])
+        field(49; "Gen. Prod. Posting Group"; Code[20])
         {
             Caption = 'Gen. Prod. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "Gen. Product Posting Group";
         }
-        field(50; "VAT Bus. Posting Group"; Code[10])
+        field(50; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "VAT Business Posting Group";
         }
-        field(51; "VAT Prod. Posting Group"; Code[10])
+        field(51; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
             DataClassification = CustomerContent;
@@ -785,7 +785,7 @@ table 6014406 "NPR Sale Line POS"
             DataClassification = CustomerContent;
             Description = 'NPR5.31';
         }
-        field(87; "Tax Group Code"; Code[10])
+        field(87; "Tax Group Code"; Code[20])
         {
             Caption = 'Tax Group Code';
             DataClassification = CustomerContent;
@@ -882,7 +882,7 @@ table 6014406 "NPR Sale Line POS"
                 "Line Amount" := Round("Line Amount", Currency."Amount Rounding Precision");
             end;
         }
-        field(106; "VAT Identifier"; Code[10])
+        field(106; "VAT Identifier"; Code[20])
         {
             Caption = 'VAT Identifier';
             DataClassification = CustomerContent;
@@ -1172,7 +1172,7 @@ table 6014406 "NPR Sale Line POS"
             Caption = 'VAT Calculation Type';
             DataClassification = CustomerContent;
         }
-        field(700; "NPRE Seating Code"; Code[10])
+        field(700; "NPRE Seating Code"; Code[20])
         {
             Caption = 'Seating Code';
             DataClassification = CustomerContent;

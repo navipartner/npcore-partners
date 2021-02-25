@@ -356,7 +356,7 @@ table 6014425 "NPR Retail Document Header"
             TableRelation = "Country/Region";
             DataClassification = CustomerContent;
         }
-        field(100; "No. Series"; Code[10])
+        field(100; "No. Series"; Code[20])
         {
             Caption = 'No. Series';
             DataClassification = CustomerContent;
