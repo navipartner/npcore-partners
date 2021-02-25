@@ -3,8 +3,6 @@ codeunit 6014400 "NPR Default Dimension Mgt."
     procedure UpdateGlobalDimCode(GlobalDimCodeNo: Integer; "Table ID": Integer; "No.": Code[20]; NewDimValue: Code[20])
     begin
         case "Table ID" of
-            DATABASE::"NPR POS Payment Method":
-                UpdatePOSPaymentMethodGlobalDimCode(GlobalDimCodeNo, "No.", NewDimValue);
             DATABASE::"NPR Item Group":
                 UpdateItemGroupGlobalDimCode(GlobalDimCodeNo, "No.", NewDimValue);
             DATABASE::"NPR Mixed Discount":
@@ -22,36 +20,7 @@ codeunit 6014400 "NPR Default Dimension Mgt."
         end;
     end;
 
-    procedure UpdatePaymentTypePOSGlobalDimCode(GlobalDimCodeNo: Integer; PaymentTypeNo: Code[20]; NewDimValue: Code[20])
-    var
-        POSPaymentMethod: Record "NPR POS Payment Method";
-    begin
-        if POSPaymentMethod.Get(PaymentTypeNo) then begin
-            case GlobalDimCodeNo of
-                1:
-                    POSPaymentMethod."Global Dimension 1 Code" := NewDimValue;
-                2:
-                    POSPaymentMethod."Global Dimension 2 Code" := NewDimValue;
-            end;
-            POSPaymentMethod.Modify(true);
-        end;
-    end;
-
-    procedure UpdatePOSPaymentMethodGlobalDimCode(GlobalDimCodeNo: Integer; PaymentTypeNo: Code[20]; NewDimValue: Code[20])
-    var
-        POSPaymentMethod: Record "NPR POS Payment Method";
-    begin
-        if POSPaymentMethod.Get(PaymentTypeNo) then begin
-            case GlobalDimCodeNo of
-                1:
-                    POSPaymentMethod."Global Dimension 1 Code" := NewDimValue;
-                2:
-                    POSPaymentMethod."Global Dimension 2 Code" := NewDimValue;
-            end;
-            POSPaymentMethod.Modify(true);
-        end;
-    end;
-
+    
     procedure UpdateItemGroupGlobalDimCode(GlobalDimCodeNo: Integer; ItemGroupNo: Code[20]; NewDimValue: Code[20])
     var
         ItemGroup: Record "NPR Item Group";

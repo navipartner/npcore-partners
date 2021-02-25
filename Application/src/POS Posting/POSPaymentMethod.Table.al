@@ -42,6 +42,7 @@ table 6150616 "NPR POS Payment Method"
         {
             Caption = 'Is Finance Agreement';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(28; "Account Type"; Enum "NPR POS Payment Method Account Type")
         {
@@ -180,11 +181,9 @@ table 6150616 "NPR POS Payment Method"
             Caption = 'Only used by Global Dimension 1';
             DataClassification = CustomerContent;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            ObsoleteState = Removed;
 
-            trigger OnValidate()
-            begin
-                ValidateShortcutDimCode(1, "Global Dimension 1 Code");
-            end;
+          
         }
         field(319; "Global Dimension 2 Code"; Code[20])
         {
@@ -192,11 +191,9 @@ table 6150616 "NPR POS Payment Method"
             Caption = 'Only used by Global Dimension 2';
             DataClassification = CustomerContent;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            ObsoleteState = Removed;
 
-            trigger OnValidate()
-            begin
-                ValidateShortcutDimCode(2, "Global Dimension 2 Code");
-            end;
+           
         }
         field(320; "Auto End Sale"; Boolean)
         {
@@ -247,26 +244,8 @@ table 6150616 "NPR POS Payment Method"
     begin
         POSPostingSetup.SetRange("POS Payment Method Code", Rec.Code);
         POSPostingSetup.DeleteAll(true);
-
-        DimMgt.DeleteDefaultDim(DATABASE::"NPR POS Payment Method", Rec.Code);
     end;
 
-    trigger OnInsert()
-    var
-        DimMgt: Codeunit DimensionManagement;
-    begin
-        DimMgt.UpdateDefaultDim(DATABASE::"NPR POS Payment Method", Rec.Code,
-                        Rec."Global Dimension 1 Code", Rec."Global Dimension 2 Code");
-    end;
-
-    local procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
-    var
-        DimMgt: Codeunit DimensionManagement;
-    begin
-        DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
-        DimMgt.SaveDefaultDim(DATABASE::"NPR POS Payment Method", Code, FieldNumber, ShortcutDimCode);
-        Modify();
-    end;
 
     internal procedure GetRoundingType(): Text[1]
     begin
