@@ -15,18 +15,6 @@ page 6150613 "NPR NP Retail Setup"
             {
                 Caption = 'System';
 
-                field("Last Data Model Build Upgrade"; Rec."Last Data Model Build Upgrade")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Last Data Model Build Upgrade field';
-                }
-                field("Prev. Data Model Build"; Rec."Prev. Data Model Build")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Prev. Data Model Build field';
-                }
             }
         }
     }
