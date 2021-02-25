@@ -12,7 +12,7 @@ table 6014483 "NPR RFID Setup"
             Caption = 'Primary Key';
             DataClassification = CustomerContent;
         }
-        field(10; "RFID Value No. Series"; Code[10])
+        field(10; "RFID Value No. Series"; Code[20])
         {
             Caption = 'RFID Value No. Series';
             TableRelation = "No. Series";

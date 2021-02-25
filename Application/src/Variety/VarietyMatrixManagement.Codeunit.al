@@ -356,7 +356,7 @@ codeunit 6059971 "NPR Variety Matrix Management"
             until RecRef2.Next = 0;
     end;
 
-    procedure GetIntFunc(VRTFieldSetup: Record "NPR Variety Field Setup"; LocationFilter: Code[10]; GD1: Code[10]; GD2: Code[10]): Text[250]
+    procedure GetIntFunc(VRTFieldSetup: Record "NPR Variety Field Setup"; LocationFilter: Code[10]; GD1: Code[20]; GD2: Code[20]): Text[250]
     var
         ItemRef: Record "Item Reference";
         ItemVar: Record "Item Variant";
@@ -392,7 +392,7 @@ codeunit 6059971 "NPR Variety Matrix Management"
         end;
     end;
 
-    procedure GetIntFunc2(VRTFieldSetup: Record "NPR Variety Field Setup"; LocationFilter: Code[10]; GD1: Code[10]; GD2: Code[10]): Text[250]
+    procedure GetIntFunc2(VRTFieldSetup: Record "NPR Variety Field Setup"; LocationFilter: Code[10]; GD1: Code[20]; GD2: Code[20]): Text[250]
     begin
         VRTFieldSetup.Type := VRTFieldSetup."Secondary Type";
         VRTFieldSetup."Table No." := VRTFieldSetup."Secondary Table No.";

@@ -89,7 +89,7 @@ report 6014601 "NPR Update Barcodes"
         IgnoreAltNo: Boolean;
         AddPrefix: Text;
 
-    local procedure InsertBarcode(ItemNo: Code[20]; VariantCode: Code[20]): Text
+    local procedure InsertBarcode(ItemNo: Code[20]; VariantCode: Code[10]): Text
     begin
         ItemReference.SetRange("Item No.", ItemNo);
         ItemReference.SetRange("Variant Code", VariantCode);

@@ -25,7 +25,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         EftPaymentFailed: Label 'Payment was declined.\\%2 (%1)';
         EFTSetup: Record "NPR EFT Setup";
 
-    local procedure InitializePepperSetup(RegisterNo: Code[20])
+    local procedure InitializePepperSetup(RegisterNo: Code[10])
     begin
 
         if (PepperSetupInitialized) then
@@ -884,7 +884,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
     begin
     end;
 
-    local procedure CreateBeginWorkshiftRequest(RegisterNo: Code[20]; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
+    local procedure CreateBeginWorkshiftRequest(RegisterNo: Code[10]; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
     begin
 
         Clear(EFTTransactionRequest);
@@ -900,7 +900,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         exit(EFTTransactionRequest.Insert());
     end;
 
-    local procedure CreateEndWorkshiftRequest(RegisterNo: Code[20]; SalesReceiptNo: Code[20]; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
+    local procedure CreateEndWorkshiftRequest(RegisterNo: Code[10]; SalesReceiptNo: Code[20]; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
     begin
 
         Clear(EFTTransactionRequest);
@@ -919,7 +919,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         exit(EFTTransactionRequest.Insert());
     end;
 
-    local procedure CreatePaymentOfGoodsRequest(RegisterNo: Code[20]; SalesReceiptNo: Code[20]; CurrencyCode: Code[10]; Amount: Decimal; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
+    local procedure CreatePaymentOfGoodsRequest(RegisterNo: Code[10]; SalesReceiptNo: Code[20]; CurrencyCode: Code[10]; Amount: Decimal; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
     var
         GLSetup: Record "General Ledger Setup";
     begin
@@ -947,7 +947,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         exit(EFTTransactionRequest.Insert());
     end;
 
-    local procedure CreateRecoveryTransactionRequest(RegisterNo: Code[20]; SalesReceiptNo: Code[20]; CurrencyCode: Code[10]; Amount: Decimal; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
+    local procedure CreateRecoveryTransactionRequest(RegisterNo: Code[10]; SalesReceiptNo: Code[20]; CurrencyCode: Code[10]; Amount: Decimal; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
     var
         GLSetup: Record "General Ledger Setup";
     begin
@@ -973,7 +973,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         exit(EFTTransactionRequest.Insert());
     end;
 
-    local procedure CreateRefundRequest(RegisterNo: Code[20]; SalesReceiptNo: Code[20]; CurrencyCode: Code[10]; Amount: Decimal; ReferenceNumber: Code[12]; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
+    local procedure CreateRefundRequest(RegisterNo: Code[10]; SalesReceiptNo: Code[20]; CurrencyCode: Code[10]; Amount: Decimal; ReferenceNumber: Code[12]; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
     var
         GLSetup: Record "General Ledger Setup";
     begin
@@ -1000,7 +1000,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         exit(EFTTransactionRequest.Insert());
     end;
 
-    local procedure CreateVoidPaymentOfGoodsRequest(RegisterNo: Code[20]; SalesReceiptNo: Code[20]; CurrencyCode: Code[10]; Amount: Decimal; ReferenceNumber: Code[12]; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
+    local procedure CreateVoidPaymentOfGoodsRequest(RegisterNo: Code[10]; SalesReceiptNo: Code[20]; CurrencyCode: Code[10]; Amount: Decimal; ReferenceNumber: Code[12]; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
     var
         GLSetup: Record "General Ledger Setup";
     begin
@@ -1029,7 +1029,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         exit(EFTTransactionRequest.Insert());
     end;
 
-    local procedure CreateAuxRequest(RegisterNo: Code[20]; AuxFunction: Option; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
+    local procedure CreateAuxRequest(RegisterNo: Code[10]; AuxFunction: Option; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
     begin
 
         Clear(EFTTransactionRequest);
@@ -1055,7 +1055,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         exit(EFTTransactionRequest.Insert());
     end;
 
-    local procedure CreateInstallRequest(RegisterNo: Code[20]; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
+    local procedure CreateInstallRequest(RegisterNo: Code[10]; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
     begin
 
         Clear(EFTTransactionRequest);
@@ -1075,7 +1075,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         exit(EFTTransactionRequest.Insert());
     end;
 
-    local procedure InitializeGenericRequest(RegisterNo: Code[20]; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    local procedure InitializeGenericRequest(RegisterNo: Code[10]; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     begin
 
         InitializePepperSetup(RegisterNo);

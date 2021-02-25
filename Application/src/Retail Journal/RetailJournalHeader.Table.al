@@ -27,7 +27,7 @@ table 6014451 "NPR Retail Journal Header"
             TableRelation = "Salesperson/Purchaser".Code;
             DataClassification = CustomerContent;
         }
-        field(6; "No. Series"; Code[10])
+        field(6; "No. Series"; Code[20])
         {
             Caption = 'No. Series';
             Editable = false;

@@ -300,7 +300,7 @@ table 6060042 "NPR Item Worksheet Line"
                     "Purch. Unit of Measure" := "Base Unit of Measure";
             end;
         }
-        field(23; "Inventory Posting Group"; Code[10])
+        field(23; "Inventory Posting Group"; Code[20])
         {
             Caption = 'Inventory Posting Group';
             DataClassification = CustomerContent;
@@ -524,7 +524,7 @@ table 6060042 "NPR Item Worksheet Line"
             OptionCaption = 'No,Yes,Undefined';
             OptionMembers = No,Yes,Undefined;
         }
-        field(89; "VAT Bus. Posting Group"; Code[10])
+        field(89; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
@@ -536,14 +536,14 @@ table 6060042 "NPR Item Worksheet Line"
                 Validate("VAT Prod. Posting Group");
             end;
         }
-        field(90; "VAT Bus. Posting Gr. (Price)"; Code[10])
+        field(90; "VAT Bus. Posting Gr. (Price)"; Code[20])
         {
             Caption = 'VAT Bus. Posting Gr. (Price)';
             DataClassification = CustomerContent;
             TableRelation = "VAT Business Posting Group";
             ValidateTableRelation = false;
         }
-        field(91; "Gen. Prod. Posting Group"; Code[10])
+        field(91; "Gen. Prod. Posting Group"; Code[20])
         {
             Caption = 'Gen. Prod. Posting Group';
             DataClassification = CustomerContent;
@@ -567,21 +567,21 @@ table 6060042 "NPR Item Worksheet Line"
             OptionCaption = 'No,Yes,Undefined';
             OptionMembers = No,Yes,Undefined;
         }
-        field(97; "No. Series"; Code[10])
+        field(97; "No. Series"; Code[20])
         {
             Caption = 'No. Series';
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
             ValidateTableRelation = false;
         }
-        field(98; "Tax Group Code"; Code[10])
+        field(98; "Tax Group Code"; Code[20])
         {
             Caption = 'Tax Group Code';
             DataClassification = CustomerContent;
             TableRelation = "Tax Group";
             ValidateTableRelation = false;
         }
-        field(99; "VAT Prod. Posting Group"; Code[10])
+        field(99; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
             DataClassification = CustomerContent;
@@ -1085,7 +1085,7 @@ table 6060042 "NPR Item Worksheet Line"
             Description = 'NPR5.25';
             MinValue = 0;
         }
-        field(5402; "Serial Nos."; Code[10])
+        field(5402; "Serial Nos."; Code[20])
         {
             Caption = 'Serial Nos.';
             DataClassification = CustomerContent;
@@ -1302,7 +1302,7 @@ table 6060042 "NPR Item Worksheet Line"
             TableRelation = "Item Tracking Code";
             ValidateTableRelation = false;
         }
-        field(6501; "Lot Nos."; Code[10])
+        field(6501; "Lot Nos."; Code[20])
         {
             Caption = 'Lot Nos.';
             DataClassification = CustomerContent;
@@ -1909,7 +1909,7 @@ table 6060042 "NPR Item Worksheet Line"
         end;
     end;
 
-    procedure FindItemNo(ItemRefNo: Code[50]; AltNo: Code[50]; VendorsItemNo: Code[20]; OurVendorNo: Code[20]; var OurItemNo: Code[20]; var OurVariantCode: Code[20]) found: Boolean
+    procedure FindItemNo(ItemRefNo: Code[50]; AltNo: Code[50]; VendorsItemNo: Code[20]; OurVendorNo: Code[20]; var OurItemNo: Code[20]; var OurVariantCode: Code[10]) found: Boolean
     var
         ItemRef: Record "Item Reference";
     begin
@@ -2409,7 +2409,7 @@ table 6060042 "NPR Item Worksheet Line"
         end;
     end;
 
-    local procedure InitItemWorksheetVarietyValue(var ItemWorksheetVarietyValue: Record "NPR Item Worksh. Variety Value"; LineType: Code[20]; LineTable: Code[20])
+    local procedure InitItemWorksheetVarietyValue(var ItemWorksheetVarietyValue: Record "NPR Item Worksh. Variety Value"; LineType: Code[10]; LineTable: Code[20])
     begin
         with ItemWorksheetVarietyValue do begin
             SetCurrentKey("Worksheet Template Name", "Worksheet Name", "Worksheet Line No.", Type, Table, "Sort Order");

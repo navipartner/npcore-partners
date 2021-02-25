@@ -104,7 +104,7 @@ codeunit 6014481 "NPR Sales Price Maint. Event"
         Campaign: Record Campaign;
         VATPct: Decimal;
         ChangeKey: Boolean;
-        VATBusPostingGrp: Code[10];
+        VATBusPostingGrp: Code[20];
         Currency: Record Currency;
         GeneralLedgerSetup: Record "General Ledger Setup";
         CurrencyFactor: Decimal;

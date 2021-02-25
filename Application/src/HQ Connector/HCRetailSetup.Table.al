@@ -38,7 +38,7 @@ table 6150904 "NPR HC Retail Setup"
             Description = 'Kildespor til bogf¢ring';
             TableRelation = "Source Code";
         }
-        field(51; "Posting No. Management"; Code[10])
+        field(51; "Posting No. Management"; Code[20])
         {
             Caption = 'Posting No. Management';
             DataClassification = CustomerContent;
@@ -81,7 +81,7 @@ table 6150904 "NPR HC Retail Setup"
             OptionCaption = ' ,Delete,Recreate,Custom';
             OptionMembers = " ",Delete,Recreate,Custom;
         }
-        field(700; "Selection No. Series"; Code[10])
+        field(700; "Selection No. Series"; Code[20])
         {
             Caption = 'Selection nos.';
             DataClassification = CustomerContent;
@@ -96,7 +96,7 @@ table 6150904 "NPR HC Retail Setup"
             OptionCaption = 'PER REGISTER,TOTAL';
             OptionMembers = "PER KASSE",SAMLET;
         }
-        field(4018; "Vat Bus. Posting Group"; Code[10])
+        field(4018; "Vat Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;

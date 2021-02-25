@@ -53,7 +53,9 @@ codeunit 6150921 "NPR UPG Credit Voucher"
                         RetailVoucherType.Code := RetailVoucherTypeCode;
                         RetailVoucherType.Init();
                         RetailVoucherType."Account No." := Register."Credit Voucher Account";
+#pragma warning disable AA0139
                         RetailVoucherType."Payment Type" := CreditVoucher."Payment Type No.";
+#pragma warning restore
                         RetailVoucherType.Description := CopyStr(RetailVoucherTypeDescLbl, 1, MaxStrLen(RetailVoucherType.Description));
                         RetailVoucherType.Insert();
                     end;

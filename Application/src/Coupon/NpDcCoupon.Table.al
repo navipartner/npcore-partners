@@ -83,7 +83,7 @@ table 6151591 "NPR NpDc Coupon"
             Caption = 'Ending Date';
             DataClassification = CustomerContent;
         }
-        field(40; "No. Series"; Code[10])
+        field(40; "No. Series"; Code[20])
         {
             Caption = 'No. Series';
             DataClassification = CustomerContent;

@@ -73,7 +73,7 @@ table 6059781 "NPR Sales Price Maint. Setup"
             Caption = 'Factor';
             DataClassification = CustomerContent;
         }
-        field(18; "VAT Bus. Posting Gr. (Price)"; Code[10])
+        field(18; "VAT Bus. Posting Gr. (Price)"; Code[20])
         {
             Caption = 'VAT Bus. Posting Gr. (Price)';
             TableRelation = "VAT Business Posting Group";

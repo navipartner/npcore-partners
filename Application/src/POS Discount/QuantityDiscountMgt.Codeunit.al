@@ -128,7 +128,7 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
         DiscountPriority.Insert(true);
     end;
 
-    procedure GetNoSeries(): Code[10]
+    procedure GetNoSeries(): Code[20]
     var
         DiscountPriority: Record "NPR Discount Priority";
         NoSeriesCodeTok: Label 'QTY-DISC', Locked = true;

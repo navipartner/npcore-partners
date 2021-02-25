@@ -56,13 +56,13 @@ table 6151145 "NPR M2 Price Calc. Buffer"
             DataClassification = CustomerContent;
             InitValue = true;
         }
-        field(11; "VAT Bus. Posting Gr. (Price)"; Code[10])
+        field(11; "VAT Bus. Posting Gr. (Price)"; Code[20])
         {
             Caption = 'VAT Bus. Posting Gr. (Price)';
             DataClassification = CustomerContent;
             TableRelation = "VAT Business Posting Group";
         }
-        field(12; "VAT Prod. Posting Group"; Code[10])
+        field(12; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
             DataClassification = CustomerContent;

@@ -57,25 +57,25 @@ table 6150634 "NPR POS Posting Buffer"
             Caption = 'Posting Date';
             DataClassification = CustomerContent;
         }
-        field(10; "Gen. Bus. Posting Group"; Code[10])
+        field(10; "Gen. Bus. Posting Group"; Code[20])
         {
             Caption = 'Gen. Bus. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "Gen. Business Posting Group";
         }
-        field(11; "Gen. Prod. Posting Group"; Code[10])
+        field(11; "Gen. Prod. Posting Group"; Code[20])
         {
             Caption = 'Gen. Prod. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "Gen. Product Posting Group";
         }
-        field(12; "VAT Bus. Posting Group"; Code[10])
+        field(12; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "VAT Business Posting Group";
         }
-        field(13; "VAT Prod. Posting Group"; Code[10])
+        field(13; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
             DataClassification = CustomerContent;
@@ -202,7 +202,7 @@ table 6150634 "NPR POS Posting Buffer"
             Caption = 'Tax Liable';
             DataClassification = CustomerContent;
         }
-        field(75; "Tax Group Code"; Code[10])
+        field(75; "Tax Group Code"; Code[20])
         {
             Caption = 'Tax Group Code';
             DataClassification = CustomerContent;

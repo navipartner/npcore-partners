@@ -246,7 +246,7 @@ xmlport 6151142 "NPR M2 Get Budget Entries"
         ResponseMessageId := Format(10);
     end;
 
-    local procedure GetBudgetEntriesWorker(BudgetName: Code[10]; CustomerNo: Code[20]; ItemNo: Code[20]; LocationCode: Code[10]; GlblDim1Code: Code[10]; GlblDim2Code: Code[10]; BudgetDim1Code: Code[10]; BudgetDim2Code: Code[10]; BudgetDim3Code: Code[10]; BudgetFromDate: Date; BudgetUntilDate: Date)
+    local procedure GetBudgetEntriesWorker(BudgetName: Code[10]; CustomerNo: Code[20]; ItemNo: Code[20]; LocationCode: Code[10]; GlblDim1Code: Code[20]; GlblDim2Code: Code[20]; BudgetDim1Code: Code[20]; BudgetDim2Code: Code[20]; BudgetDim3Code: Code[20]; BudgetFromDate: Date; BudgetUntilDate: Date)
     var
         ItemBudgetEntry: Record "Item Budget Entry";
     begin

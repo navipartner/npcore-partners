@@ -50,7 +50,7 @@ codeunit 6150850 "NPR POS Action: CK Payment"
     var
         Context: Codeunit "NPR POS JSON Management";
         JSON: Codeunit "NPR POS JSON Management";
-        PaymentNo: Code[20];
+        PaymentNo: Code[10];
         POSPaymentMethod: Record "NPR POS Payment Method";
         ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
         POSUnit: Record "NPR POS Unit";
@@ -74,9 +74,9 @@ codeunit 6150850 "NPR POS Action: CK Payment"
 
         if not CashKeeperSetup.Get(POSUnit."No.") then
             Error(CashkeeperNotFound, POSUnit."No.");
-
+#pragma warning disable AA0139
         PaymentNo := CashKeeperSetup."Payment Type";
-
+#pragma warning restore
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
 
@@ -95,7 +95,7 @@ codeunit 6150850 "NPR POS Action: CK Payment"
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         EFTHandled: Boolean;
-        PaymentTypeNo: Code[20];
+        PaymentTypeNo: Code[10];
         ConfirmId: Text;
         Confirmed: Boolean;
         JSON: Codeunit "NPR POS JSON Management";
@@ -149,7 +149,7 @@ codeunit 6150850 "NPR POS Action: CK Payment"
         end;
     end;
 
-    local procedure CreateTransaction(POSSession: Codeunit "NPR POS Session"; AmountToCapture: Decimal; PaymentTypeNo: Code[20]; NumpadAmount: Decimal): Boolean
+    local procedure CreateTransaction(POSSession: Codeunit "NPR POS Session"; AmountToCapture: Decimal; PaymentTypeNo: Code[10]; NumpadAmount: Decimal): Boolean
     var
         POSLine: Record "NPR Sale Line POS";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
@@ -234,8 +234,9 @@ codeunit 6150850 "NPR POS Action: CK Payment"
             Message(Txt002);
             exit(false);
         end;
-
+#pragma warning disable AA0139
         PaymentTypeNo := CashKeeperTransaction."Payment Type";
+#pragma warning restore        
         POSPaymentMethod.Get(PaymentTypeNo);
         UpdatePaymentLine(CashKeeperTransaction, POSPaymentMethod, Context, POSSession, FrontEnd);
         POSSession.RequestRefreshData();

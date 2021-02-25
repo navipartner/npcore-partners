@@ -51,7 +51,9 @@ codeunit 6150923 "NPR UPG Gift Voucher"
                         RetailVoucherType.Code := RetailVoucherTypeCode;
                         RetailVoucherType.Init();
                         RetailVoucherType."Account No." := Register."Gift Voucher Account";
+#pragma warning disable AA0139
                         RetailVoucherType."Payment Type" := GiftVoucher."Payment Type No.";
+#pragma warning restore
                         RetailVoucherType.Description := CopyStr(RetailVoucherTypeDescLbl, 1, MaxStrLen(RetailVoucherType.Description));
                         RetailVoucherType.Insert();
                     end;

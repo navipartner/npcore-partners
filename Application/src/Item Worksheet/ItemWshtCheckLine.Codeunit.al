@@ -47,7 +47,7 @@ codeunit 6060045 "NPR Item Wsht.-Check Line"
         ItemWkshtValidateTestRnr: Codeunit "NPR Item Wksht.Valid.Test Rnr.";
         ItemWshtRegisterLine: Codeunit "NPR Item Wsht.Register Line";
         IsUpdated: Boolean;
-        DefaultNoSeries: Code[10];
+        DefaultNoSeries: Code[20];
         ErrorText: Text;
     begin
         with ItemWkshtLine do begin

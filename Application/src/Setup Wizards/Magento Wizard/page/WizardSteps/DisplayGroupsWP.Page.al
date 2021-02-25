@@ -89,7 +89,7 @@ page 6014616 "NPR Display Groups WP"
             until MagentoDisplayGroup.Next() = 0;
     end;
 
-    local procedure CheckIfNoAvailableInMagDisplayGroup(var MagDisplayGroup: Record "NPR Magento Display Group"; var WantedStartingNo: Code[10]) CalculatedNo: Code[10]
+    local procedure CheckIfNoAvailableInMagDisplayGroup(var MagDisplayGroup: Record "NPR Magento Display Group"; var WantedStartingNo: Code[20]) CalculatedNo: Code[20]
     var
         HelperFunctions: Codeunit "NPR Wizard Helper Functions";
     begin
@@ -98,7 +98,7 @@ page 6014616 "NPR Display Groups WP"
         MagDisplayGroup.SetRange(Code, CalculatedNo);
 
         if MagDisplayGroup.FindFirst() then begin
-            HelperFunctions.FormatCode(WantedStartingNo);
+            WantedStartingNo := HelperFunctions.FormatCode20(WantedStartingNo);
             CalculatedNo := CheckIfNoAvailableInMagDisplayGroup(MagDisplayGroup, WantedStartingNo);
         end;
     end;

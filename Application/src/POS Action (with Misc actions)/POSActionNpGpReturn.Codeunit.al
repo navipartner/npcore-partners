@@ -374,7 +374,7 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
         JSON: Codeunit "NPR POS JSON Management";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        ReturnReasonCode: Code[20];
+        ReturnReasonCode: Code[10];
         FullSale: Boolean;
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);

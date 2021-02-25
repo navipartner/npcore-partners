@@ -1262,7 +1262,7 @@ codeunit 6060128 "NPR MM Member WebService"
         ImportType.Insert();
     end;
 
-    local procedure GetImportTypeCode(WebServiceCodeunitID: Integer; WebserviceFunction: Text): Code[10]
+    local procedure GetImportTypeCode(WebServiceCodeunitID: Integer; WebserviceFunction: Text): Code[20]
     var
         ImportType: Record "NPR Nc Import Type";
     begin

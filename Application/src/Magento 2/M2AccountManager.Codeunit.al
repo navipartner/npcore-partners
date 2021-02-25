@@ -1024,7 +1024,9 @@ codeunit 6151151 "NPR M2 Account Manager"
         TmpShiptoAddressRequest.FindSet();
         repeat
             ShiptoAddress."Customer No." := ContactBusinessRelation."No.";
+#pragma warning disable AA0139
             ShiptoAddress.Code := NoSeriesManagement.GetNextNo(AccountSetup."No. Series Ship-to Address", Today, true);
+#pragma warning restore
             ShiptoAddress.Insert(true);
 
             ShiptoAddress.TransferFields(TmpShiptoAddressRequest, false);
@@ -1344,7 +1346,7 @@ codeunit 6151151 "NPR M2 Account Manager"
         AuthenticationLog.Insert();
     end;
 
-    local procedure CreateNoSerie(NoSerieCode: Code[10]; StartNumber: Code[20]; Description: Text[30]): Code[10]
+    local procedure CreateNoSerie(NoSerieCode: Code[20]; StartNumber: Code[20]; Description: Text[30]): Code[20]
     var
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";

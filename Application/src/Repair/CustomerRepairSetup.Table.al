@@ -12,7 +12,7 @@ table 6014467 "NPR Customer Repair Setup"
             Caption = 'Primary Key';
             DataClassification = CustomerContent;
         }
-        field(10; "Customer Repair No. Series"; Code[10])
+        field(10; "Customer Repair No. Series"; Code[20])
         {
             Caption = 'Customer Repair Management';
             DataClassification = CustomerContent;

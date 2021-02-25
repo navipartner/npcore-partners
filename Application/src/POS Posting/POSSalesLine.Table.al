@@ -74,7 +74,7 @@ table 6150622 "NPR POS Sales Line"
             DataClassification = CustomerContent;
             TableRelation = Location;
         }
-        field(13; "Posting Group"; Code[10])
+        field(13; "Posting Group"; Code[20])
         {
             Caption = 'Posting Group';
             DataClassification = CustomerContent;
@@ -211,13 +211,13 @@ table 6150622 "NPR POS Sales Line"
             Description = 'NPR5.36';
             TableRelation = Currency;
         }
-        field(74; "Gen. Bus. Posting Group"; Code[10])
+        field(74; "Gen. Bus. Posting Group"; Code[20])
         {
             Caption = 'Gen. Bus. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "Gen. Business Posting Group";
         }
-        field(75; "Gen. Prod. Posting Group"; Code[10])
+        field(75; "Gen. Prod. Posting Group"; Code[20])
         {
             Caption = 'Gen. Prod. Posting Group';
             DataClassification = CustomerContent;
@@ -251,7 +251,7 @@ table 6150622 "NPR POS Sales Line"
             Caption = 'Tax Liable';
             DataClassification = CustomerContent;
         }
-        field(87; "Tax Group Code"; Code[10])
+        field(87; "Tax Group Code"; Code[20])
         {
             Caption = 'Tax Group Code';
             DataClassification = CustomerContent;
@@ -262,13 +262,13 @@ table 6150622 "NPR POS Sales Line"
             Caption = 'Use Tax';
             DataClassification = CustomerContent;
         }
-        field(89; "VAT Bus. Posting Group"; Code[10])
+        field(89; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "VAT Business Posting Group";
         }
-        field(90; "VAT Prod. Posting Group"; Code[10])
+        field(90; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
             DataClassification = CustomerContent;
@@ -300,7 +300,7 @@ table 6150622 "NPR POS Sales Line"
             Description = 'NPR5.36';
             Editable = false;
         }
-        field(106; "VAT Identifier"; Code[10])
+        field(106; "VAT Identifier"; Code[20])
         {
             Caption = 'VAT Identifier';
             DataClassification = CustomerContent;
@@ -490,7 +490,7 @@ table 6150622 "NPR POS Sales Line"
             Editable = false;
             FieldClass = FlowField;
         }
-        field(700; "NPRE Seating Code"; Code[10])
+        field(700; "NPRE Seating Code"; Code[20])
         {
             Caption = 'Seating Code';
             DataClassification = CustomerContent;

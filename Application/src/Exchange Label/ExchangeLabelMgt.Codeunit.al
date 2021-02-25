@@ -38,20 +38,21 @@ codeunit 6014498 "NPR Exchange Label Mgt."
             DATABASE::"Sales Line":
                 begin
                     AssignOptionFieldValue(ExchangeLabel."Sales Header Type", RecRef, 'Document Type');
-                    AssignCodeFieldValue(ExchangeLabel."Sales Header No.", RecRef, 'Document No.');
-                    AssignCodeFieldValue(ExchangeLabel."Unit of Measure", RecRef, 'Unit of Measure');
+                    AssignCode20FieldValue(ExchangeLabel."Sales Header No.", RecRef, 'Document No.');
+                    AssignCode10FieldValue(ExchangeLabel."Unit of Measure", RecRef, 'Unit of Measure');
                 end;
             DATABASE::"NPR Sale Line POS":
                 begin
-                    AssignCodeFieldValue(ExchangeLabel."Register No.", RecRef, 'Register No.');
-                    AssignCodeFieldValue(ExchangeLabel."Sales Ticket No.", RecRef, 'Sales Ticket No.');
-                    AssignCodeFieldValue(ExchangeLabel."Unit of Measure", RecRef, 'Unit of Measure Code');
+                    AssignCode10FieldValue(ExchangeLabel."Register No.", RecRef, 'Register No.');
+                    AssignCode20FieldValue(ExchangeLabel."Sales Ticket No.", RecRef, 'Sales Ticket No.');
+                    AssignCode10FieldValue(ExchangeLabel."Unit of Measure", RecRef, 'Unit of Measure Code');
                 end;
         end;
 
         AssignIntegerFieldValue(ExchangeLabel."Sales Line No.", RecRef, 'Line No.');
-        AssignCodeFieldValue(ExchangeLabel."Item No.", RecRef, 'No.');
-        AssignCodeFieldValue(ExchangeLabel."Variant Code", RecRef, 'Variant Code');
+        AssignCode20FieldValue(ExchangeLabel."Item No.", RecRef, 'No.');
+        AssignCode10FieldValue(ExchangeLabel."Variant Code", RecRef, 'Variant Code');
+        //-NPR5.37 [292701]
         if PackagedBatch then
             AssignDecimalFieldValue(ExchangeLabel.Quantity, RecRef, 'Quantity')
         else
@@ -335,7 +336,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
             DATABASE::"Sales Line":
                 begin
                     AssignIntegerFieldValue(DocumentType, RecRef, 'Document Type');
-                    AssignCodeFieldValue(DocumentNo, RecRef, 'Document No.');
+                    AssignCode20FieldValue(DocumentNo, RecRef, 'Document No.');
                     AssignDecimalFieldValue(UnitPrice, RecRef, 'Unit Price');
                     AssignDecimalFieldValue(VATPct, RecRef, 'VAT %');
 
@@ -407,7 +408,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
         IntegerVal := FieldRef.Value;
     end;
 
-    local procedure AssignCodeFieldValue(var CodeVal: Code[20]; RecordRef: RecordRef; FieldName: Text[50])
+    local procedure AssignCode20FieldValue(var CodeVal: Code[20]; RecordRef: RecordRef; FieldName: Text[50])
     var
         FieldRef: FieldRef;
         FieldNo: Integer;
@@ -417,6 +418,15 @@ codeunit 6014498 "NPR Exchange Label Mgt."
         CodeVal := FieldRef.Value;
     end;
 
+    local procedure AssignCode10FieldValue(var CodeVal: Code[10]; RecordRef: RecordRef; FieldName: Text[50])
+    var
+        FieldRef: FieldRef;
+        FieldNo: Integer;
+    begin
+        FieldNo := GetFieldNo(RecordRef, FieldName);
+        FieldRef := RecordRef.Field(FieldNo);
+        CodeVal := FieldRef.Value;
+    end;
     local procedure AssignDecimalFieldValue(var DecimalVal: Decimal; RecordRef: RecordRef; FieldName: Text[50])
     var
         FieldRef: FieldRef;

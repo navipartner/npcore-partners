@@ -99,7 +99,7 @@ codeunit 6150708 "NPR POS Setup"
         exit(POSUnitRec."No.");
     end;
 
-    procedure Salesperson(): Code[10]
+    procedure Salesperson(): Code[20]
     begin
         exit(SalespersonRec.Code);
     end;

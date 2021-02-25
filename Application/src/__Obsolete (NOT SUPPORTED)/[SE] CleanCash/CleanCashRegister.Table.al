@@ -13,7 +13,7 @@ table 6184503 "NPR CleanCash Register"
             Caption = 'Cash Register No.';
             DataClassification = CustomerContent;
         }
-        field(2; "CleanCash No. Series"; Code[10])
+        field(2; "CleanCash No. Series"; Code[20])
         {
             Caption = 'CleanCash No. Series';
             DataClassification = CustomerContent;

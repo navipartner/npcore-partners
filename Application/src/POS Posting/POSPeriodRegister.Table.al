@@ -40,7 +40,7 @@ table 6150620 "NPR POS Period Register"
             Caption = 'Document No.';
             DataClassification = CustomerContent;
         }
-        field(6; "No. Series"; Code[10])
+        field(6; "No. Series"; Code[20])
         {
             Caption = 'No. Series';
             DataClassification = CustomerContent;
