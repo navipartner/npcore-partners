@@ -19,5 +19,32 @@
 			"${CodeCop}"
 		],
 		"al.ruleSetPath": "main.ruleset.json"
+	},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "Inject all action javascript files",
+				"detail": "Searches .al files for custom token //###NP_FILE_REPLACE:action.js### and replaces the line underneath with minified javascript if action.js file is found in same folder.",
+				"type": "shell",				
+				"command": "powershell",
+				"args": [   
+					"-ExecutionPolicy",
+					"Unrestricted",
+					"-NoProfile",
+					"-File",
+					"${cwd}\\.scripts\\inject_all_action_javascript.ps1"       
+				],
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"panel": "shared",
+					"showReuseMessage": true,
+					"clear": true,
+					"revealProblems": "always",							
+				},				
+				"problemMatcher": "$func-powershell-watch"
+			}
+		]
 	}
 }
