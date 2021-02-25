@@ -41,6 +41,8 @@ codeunit 6150921 "NPR UPG Credit Voucher"
 
         RetailVoucherTypeCode := 'CREDITVOUCHER_0000';
         repeat
+            Register.reset();
+            Register.setrange("Register No.", CreditVoucher."Register No.");
             if Register.FindSet() then
                 repeat
                     RetailVoucherType.SetRange("Account No.", Register."Credit Voucher Account");
