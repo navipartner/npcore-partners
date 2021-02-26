@@ -15,6 +15,7 @@ page 6151250 "NPR Retail Enter. Act - Ticket"
                 field("Issued Tickets"; Rec."Issued Tickets")
                 {
                     ApplicationArea = All;
+                    DrillDownPageId = "NPR TM Ticket List";
                     ToolTip = 'Specifies the value of the Issued Tickets field';
                 }
                 field("Ticket Requests"; Rec."Ticket Requests")
@@ -22,6 +23,18 @@ page 6151250 "NPR Retail Enter. Act - Ticket"
                     ApplicationArea = All;
                     DrillDownPageID = "NPR TM Ticket Request";
                     ToolTip = 'Specifies the value of the Ticket Requests field';
+                }
+                field("Ticket Types"; Rec."Ticket Types")
+                {
+                    ApplicationArea = All;
+                    DrillDownPageId = "NPR TM Ticket Type";
+                    ToolTip = 'Specifies the value of the Ticket Type field';
+                }
+                field("Ticket Admission BOM"; Rec."Ticket Admission BOM")
+                {
+                    ApplicationArea = All;
+                    DrillDownPageID = "NPR TM Ticket BOM";
+                    ToolTip = 'Specifies the value of the Ticket BOM field';
                 }
                 field("Ticket Schedules"; Rec."Ticket Schedules")
                 {
