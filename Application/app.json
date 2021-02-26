@@ -2,7 +2,7 @@
   "id": "992c2309-cca4-43cb-9e41-911f482ec088",
   "name": "NP Retail",
   "publisher": "NaviPartner",
-  "version": "1700.3.10.0",
+  "version": "1700.5.0.0",
   "brief": "Get an all-in-one app for checkout, payments, inventory management, and reports.",
   "description": "NP Retail is a POS solution seamlessly integrated into Business Central.",
   "privacyStatement": "https://www.navipartner.com/privacy-cookie-policy/",
@@ -30,6 +30,18 @@
     {
       "from": 6184471,
       "to": 6185470
+    }
+  ],
+  "internalsVisibleTo": [
+    {
+      "id": "51104d36-8375-4914-9e14-ee07a10ff455",
+      "name": "NP Retail Tests",
+      "publisher": "NaviPartner"
+    },
+    {
+      "id": "f15dfd3b-4489-4616-923f-9e5902395f40",
+      "name": "NP OIOUBL extension",
+      "publisher": "NaviPartner"
     }
   ],
   "contextSensitiveHelpUrl": "https://support.navipartner.com/",
