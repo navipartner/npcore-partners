@@ -470,16 +470,16 @@ codeunit 6060093 "NPR MM Admission Service WS"
         if MMAdmissionScannerStations.Get(ScannerStationId) then begin
             if MMAdmissionScannerStations.Activated then begin
 
-                MMAdmissionScannerStations.CalcFields("Turnstile Default Image", "Turnstile Error Image");
+                MMAdmissionScannerStations.CalcFields("Default Turnstile Image", "Error Image of Turnstile");
 
-                if MMAdmissionScannerStations."Turnstile Default Image".HasValue then begin
-                    MMAdmissionScannerStations."Turnstile Default Image".CreateInStream(InStrDefault);
+                if MMAdmissionScannerStations."Default Turnstile Image".HasValue then begin
+                    MMAdmissionScannerStations."Default Turnstile Image".ImportStream(InStrDefault, MMAdmissionScannerStations.FieldName("Default Turnstile Image"));
                     GetImageContentAndExtension(InStrDefault, PictureBase64Default, PictureExtensionDefault);
                     Clear(InStrDefault);
                 end;
 
-                if MMAdmissionScannerStations."Turnstile Error Image".HasValue then begin
-                    MMAdmissionScannerStations."Turnstile Error Image".CreateInStream(InStrError);
+                if MMAdmissionScannerStations."Error Image of Turnstile".HasValue then begin
+                    MMAdmissionScannerStations."Error Image of Turnstile".ImportStream(InStrError, MMAdmissionScannerStations.FieldName("Error Image of Turnstile"));
                     GetImageContentAndExtension(InStrError, PictureBase64Error, PictureExtensionError);
                     Clear(InStrError);
                 end;
@@ -488,16 +488,16 @@ codeunit 6060093 "NPR MM Admission Service WS"
 
         MMAdmissionServiceSetup.Get;
 
-        MMAdmissionServiceSetup.CalcFields("Turnstile Default Image", "Turnstile Error Image");
+        MMAdmissionServiceSetup.CalcFields("Default Turnstile Image", "Error Image of Turnstile");
 
-        if MMAdmissionServiceSetup."Turnstile Default Image".HasValue and (PictureBase64Default = '') then begin
-            MMAdmissionServiceSetup."Turnstile Default Image".CreateInStream(InStrDefault);
+        if MMAdmissionServiceSetup."Default Turnstile Image".HasValue and (PictureBase64Default = '') then begin
+            MMAdmissionServiceSetup."Default Turnstile Image".ImportStream(InStrDefault, MMAdmissionServiceSetup.FieldName("Default Turnstile Image"));
             GetImageContentAndExtension(InStrDefault, PictureBase64Default, PictureExtensionDefault);
             Clear(InStrDefault);
         end;
 
-        if MMAdmissionServiceSetup."Turnstile Error Image".HasValue and (PictureBase64Error = '') then begin
-            MMAdmissionServiceSetup."Turnstile Error Image".CreateInStream(InStrError);
+        if MMAdmissionServiceSetup."Error Image of Turnstile".HasValue and (PictureBase64Error = '') then begin
+            MMAdmissionServiceSetup."Error Image of Turnstile".ImportStream(InStrError, MMAdmissionServiceSetup.FieldName("Error Image of Turnstile"));
             GetImageContentAndExtension(InStrError, PictureBase64Error, PictureExtensionError);
             Clear(InStrError);
         end;
@@ -523,8 +523,8 @@ codeunit 6060093 "NPR MM Admission Service WS"
         Convert: DotNet NPRNetConvert;
         InStr: InStream;
     begin
-        MMAdmissionServiceSetup.CalcFields("Guest Avatar");
-        MMAdmissionServiceSetup."Guest Avatar".CreateInStream(InStr);
+        MMAdmissionServiceSetup.CalcFields("Guest Avatar Image");
+        MMAdmissionServiceSetup."Guest Avatar Image".ImportStream(InStr, MMAdmissionServiceSetup.FieldName("Guest Avatar Image"));
         MemoryStream := InStr;
         BinaryReader := BinaryReader.BinaryReader(InStr);
 
@@ -547,9 +547,9 @@ codeunit 6060093 "NPR MM Admission Service WS"
     begin
         if MMAdmissionScannerStations.Get(ScannerStationId) then begin
             if MMAdmissionScannerStations.Activated then begin
-                MMAdmissionScannerStations.CalcFields("Guest Avatar");
-                if MMAdmissionScannerStations."Guest Avatar".HasValue then begin
-                    MMAdmissionScannerStations."Guest Avatar".CreateInStream(InStr);
+                MMAdmissionScannerStations.CalcFields("Guest Avatar Image");
+                if MMAdmissionScannerStations."Guest Avatar Image".HasValue then begin
+                    MMAdmissionScannerStations."Guest Avatar Image".ImportStream(InStr, MMAdmissionScannerStations.FieldName("Guest Avatar Image"));
                     MemoryStream := InStr;
                     BinaryReader := BinaryReader.BinaryReader(InStr);
 
@@ -563,8 +563,8 @@ codeunit 6060093 "NPR MM Admission Service WS"
             end;
         end;
 
-        MMAdmissionServiceSetup.CalcFields("Guest Avatar");
-        MMAdmissionServiceSetup."Guest Avatar".CreateInStream(InStr);
+        MMAdmissionServiceSetup.CalcFields("Guest Avatar Image");
+        MMAdmissionServiceSetup."Guest Avatar Image".ImportStream(InStr, MMAdmissionServiceSetup.FieldName("Guest Avatar Image"));
         MemoryStream := InStr;
         BinaryReader := BinaryReader.BinaryReader(InStr);
 
@@ -819,5 +819,183 @@ codeunit 6060093 "NPR MM Admission Service WS"
 
         exit(MMAdmissionServiceLog."Return Value");
     end;
+
+    #region Admis. Scanner Stations
+    procedure ImportGuestAvatarImage(var AdminsScannerStation: Record "NPR MM Admis. Scanner Stations")
+    var
+        FileManagement: Codeunit "File Management";
+        FileName: Text;
+        ClientFileName: Text;
+        SelectPictureLbl: Label 'Select image.';
+    begin
+        ClientFileName := '';
+        FileName := FileManagement.UploadFile(SelectPictureLbl, ClientFileName);
+        if FileName = '' then
+            Error('');
+
+        Clear(AdminsScannerStation."Guest Avatar Image");
+        AdminsScannerStation."Guest Avatar Image".ImportFile(FileName, AdminsScannerStation.FieldCaption("Guest Avatar Image"));
+        AdminsScannerStation.Modify(true);
+    end;
+
+    procedure DeleteGuestAvatarImage(AdminsScannerStation: Record "NPR MM Admis. Scanner Stations")
+    var
+        DeleteImageQst: Label 'Do you want to delete %1?', Comment = '%1 = Guest Avatar Image';
+    begin
+        if not Confirm(DeleteImageQst, false, AdminsScannerStation.FieldCaption("Guest Avatar Image")) then
+            exit;
+
+        Clear(AdminsScannerStation."Guest Avatar Image");
+        AdminsScannerStation.Modify(true);
+    end;
+
+    procedure ImportTurnstileErrorImage(var AdminsScannerStation: Record "NPR MM Admis. Scanner Stations")
+    var
+        FileManagement: Codeunit "File Management";
+        FileName: Text;
+        ClientFileName: Text;
+        SelectPictureLbl: Label 'Select image.';
+    begin
+        AdminsScannerStation.Find();
+        ClientFileName := '';
+        FileName := FileManagement.UploadFile(SelectPictureLbl, ClientFileName);
+        if FileName = '' then
+            Error('');
+
+        Clear(AdminsScannerStation."Error Image of Turnstile");
+        AdminsScannerStation."Error Image of Turnstile".ImportFile(FileName, AdminsScannerStation.FieldCaption("Error Image of Turnstile"));
+        AdminsScannerStation.Modify(true);
+    end;
+
+    procedure DeleteTurnstileErrorImage(AdminsScannerStation: Record "NPR MM Admis. Scanner Stations")
+    var
+        DeleteImageQst: Label 'Do you want to delete %1?', Comment = '%1 = Turnstile Error Image';
+    begin
+        if not Confirm(DeleteImageQst, false, AdminsScannerStation.FieldCaption("Error Image of Turnstile")) then
+            exit;
+
+        Clear(AdminsScannerStation."Error Image of Turnstile");
+        AdminsScannerStation.Modify(true);
+    end;
+
+    procedure ImportDefaultTurnstileImage(var AdminsScannerStation: Record "NPR MM Admis. Scanner Stations")
+    var
+        FileManagement: Codeunit "File Management";
+        FileName: Text;
+        ClientFileName: Text;
+        SelectPictureLbl: Label 'Select image.';
+    begin
+        AdminsScannerStation.Find();
+        ClientFileName := '';
+        FileName := FileManagement.UploadFile(SelectPictureLbl, ClientFileName);
+        if FileName = '' then
+            Error('');
+
+        Clear(AdminsScannerStation."Default Turnstile Image");
+        AdminsScannerStation."Default Turnstile Image".ImportFile(FileName, AdminsScannerStation.FieldCaption("Default Turnstile Image"));
+        AdminsScannerStation.Modify(true);
+    end;
+
+    procedure DeleteDefaultTurnstileImage(AdminsScannerStation: Record "NPR MM Admis. Scanner Stations")
+    var
+        DeleteImageQst: Label 'Do you want to delete %1?', Comment = '%1 = Default Turnstile Image';
+    begin
+        if not Confirm(DeleteImageQst, false, AdminsScannerStation.FieldCaption("Default Turnstile Image")) then
+            exit;
+
+        Clear(AdminsScannerStation."Default Turnstile Image");
+        AdminsScannerStation.Modify(true);
+    end;
+
+    #endregion
+    #region Admis. Service Setup
+
+    procedure ImportGuestAvatarImageToSetup(var AdminsServiceSetup: Record "NPR MM Admis. Service Setup")
+    var
+        FileManagement: Codeunit "File Management";
+        FileName: Text;
+        ClientFileName: Text;
+        SelectPictureLbl: Label 'Select image.';
+    begin
+        ClientFileName := '';
+        FileName := FileManagement.UploadFile(SelectPictureLbl, ClientFileName);
+        if FileName = '' then
+            Error('');
+
+        Clear(AdminsServiceSetup."Guest Avatar Image");
+        AdminsServiceSetup."Guest Avatar Image".ImportFile(FileName, AdminsServiceSetup.FieldCaption("Guest Avatar Image"));
+        AdminsServiceSetup.Modify(true);
+    end;
+
+    procedure DeleteGuestAvatarImageToSetup(AdminsServiceSetup: Record "NPR MM Admis. Service Setup")
+    var
+        DeleteImageQst: Label 'Do you want to delete %1?', Comment = '%1 = Guest Avatar Image';
+    begin
+        if not Confirm(DeleteImageQst, false, AdminsServiceSetup.FieldCaption("Guest Avatar Image")) then
+            exit;
+
+        Clear(AdminsServiceSetup."Guest Avatar Image");
+        AdminsServiceSetup.Modify(true);
+    end;
+
+    procedure ImportTurnstileErrorImageToSetup(var AdminsServiceSetup: Record "NPR MM Admis. Service Setup")
+    var
+        FileManagement: Codeunit "File Management";
+        FileName: Text;
+        ClientFileName: Text;
+        SelectPictureLbl: Label 'Select image.';
+    begin
+        AdminsServiceSetup.Find();
+        ClientFileName := '';
+        FileName := FileManagement.UploadFile(SelectPictureLbl, ClientFileName);
+        if FileName = '' then
+            Error('');
+
+        Clear(AdminsServiceSetup."Error Image of Turnstile");
+        AdminsServiceSetup."Error Image of Turnstile".ImportFile(FileName, AdminsServiceSetup.FieldCaption("Error Image of Turnstile"));
+        AdminsServiceSetup.Modify(true);
+    end;
+
+    procedure DeleteTurnstileErrorImageToSetup(AdminsServiceSetup: Record "NPR MM Admis. Service Setup")
+    var
+        DeleteImageQst: Label 'Do you want to delete %1?', Comment = '%1 = Turnstile Error Image';
+    begin
+        if not Confirm(DeleteImageQst, false, AdminsServiceSetup.FieldCaption("Error Image of Turnstile")) then
+            exit;
+
+        Clear(AdminsServiceSetup."Error Image of Turnstile");
+        AdminsServiceSetup.Modify(true);
+    end;
+
+    procedure ImportDefaultTurnstileImageToSetup(var AdminsServiceSetup: Record "NPR MM Admis. Service Setup")
+    var
+        FileManagement: Codeunit "File Management";
+        FileName: Text;
+        ClientFileName: Text;
+        SelectPictureLbl: Label 'Select image.';
+    begin
+        AdminsServiceSetup.Find();
+        ClientFileName := '';
+        FileName := FileManagement.UploadFile(SelectPictureLbl, ClientFileName);
+        if FileName = '' then
+            Error('');
+
+        Clear(AdminsServiceSetup."Default Turnstile Image");
+        AdminsServiceSetup."Default Turnstile Image".ImportFile(FileName, AdminsServiceSetup.FieldCaption("Default Turnstile Image"));
+        AdminsServiceSetup.Modify(true);
+    end;
+
+    procedure DeleteDefaultTurnstileImageToSetup(AdminsServiceSetup: Record "NPR MM Admis. Service Setup")
+    var
+        DeleteImageQst: Label 'Do you want to delete %1?', Comment = '%1 = Default Turnstile Image';
+    begin
+        if not Confirm(DeleteImageQst, false, AdminsServiceSetup.FieldCaption("Default Turnstile Image")) then
+            exit;
+
+        Clear(AdminsServiceSetup."Default Turnstile Image");
+        AdminsServiceSetup.Modify(true);
+    end;
+
+    #endregion
 }
 
