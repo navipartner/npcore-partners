@@ -64,8 +64,13 @@ codeunit 6150921 "NPR UPG Credit Voucher"
                         RetailVoucher.Init();
                         RetailVoucher.validate("Voucher Type", RetailVoucherType.Code);
                         RetailVoucher.Description := CopyStr(RetailVoucherDescLbl, 1, MaxStrLen(RetailVoucher.Description));
-                        RetailVoucher."Starting Date" := CreateDateTime(CreditVoucher."Issue Date", Time());
-                        RetailVoucher."Ending Date" := CreateDateTime(CreditVoucher."Expire Date", Time());
+
+                        if (CreditVoucher."Issue Date" <> 0D) then
+                            RetailVoucher."Starting Date" := CreateDateTime(CreditVoucher."Issue Date", Time());
+
+                        if (CreditVoucher."Expire Date" <> 0D) then
+                            RetailVoucher."Ending Date" := CreateDateTime(CreditVoucher."Expire Date", Time());
+
                         RetailVoucher."Reference No." := CreditVoucher."No.";
                         RetailVoucher."Customer No." := CreditVoucher."Customer No";
                         RetailVoucher.Address := CopyStr(CreditVoucher.Address, 1, MaxStrLen(RetailVoucher.Address));
