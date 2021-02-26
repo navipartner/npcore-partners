@@ -1,4 +1,4 @@
-page 6060080 "NPR Admis. Scanner Stat. Card"
+page 6014651 "NPR Admis. Scanner Stat. Card"
 {
 
     Caption = 'NPR MM Admis. Scanner Station Card';
