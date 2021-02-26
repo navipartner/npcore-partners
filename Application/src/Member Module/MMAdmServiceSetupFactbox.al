@@ -1,4 +1,4 @@
-page 6060082 "NPR Adm. Service Setup Factbox"
+page 6014653 "NPR Adm. Service Setup Factbox"
 {
 
     Caption = 'NPR MM Admis. Service Setup Factbox';

@@ -1,4 +1,4 @@
-page 6014456 "NPR Mix Discount FactBox"
+page 6014654 "NPR Mix Discount FactBox"
 {
 
     Caption = 'Mix Discount FactBox';

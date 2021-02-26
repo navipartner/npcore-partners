@@ -1,4 +1,4 @@
-page 6060081 "NPR Adm. Scanner Stat. Factbox"
+page 6014652 "NPR Adm. Scanner Stat. Factbox"
 {
 
     Caption = 'NPR MM Admis. Scanner Station Factbox';
