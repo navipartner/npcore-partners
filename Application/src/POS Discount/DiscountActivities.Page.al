@@ -25,28 +25,6 @@ page 6059987 "NPR Discount Activities"
                     DrillDownPageID = "NPR Campaign Discount List";
                     ToolTip = 'Specifies the value of the Period Discounts Active field';
                 }
-
-                actions
-                {
-                    action("New Mixed Discount")
-                    {
-                        Caption = 'New Mixed Discount';
-                        RunObject = Page "NPR Mixed Discount";
-                        RunPageMode = Create;
-                        ApplicationArea = All;
-                        Image = TileNew;
-                        ToolTip = 'Executes the New Mixed Discount action';
-                    }
-                    action("New Period Discount")
-                    {
-                        Caption = 'New Perioddiscount';
-                        RunObject = Page "NPR Campaign Discount";
-                        RunPageMode = Create;
-                        ApplicationArea = All;
-                        Image = TileBrickNew;
-                        ToolTip = 'Executes the New Perioddiscount action';
-                    }
-                }
             }
         }
     }
