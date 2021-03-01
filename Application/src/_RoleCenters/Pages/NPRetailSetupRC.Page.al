@@ -207,13 +207,6 @@ page 6151245 "NPR Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the EFT BIN Group List action';
                 }
-                action("Tax Free POS Units")
-                {
-                    Caption = 'Tax Free POS Units';
-                    RunObject = Page "NPR Tax Free POS Units";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Tax Free POS Units action';
-                }
                 action("Pepper Terminal Types")
                 {
                     Caption = 'Pepper Terminal Types';

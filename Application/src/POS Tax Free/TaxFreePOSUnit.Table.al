@@ -1,17 +1,18 @@
 table 6014641 "NPR Tax Free POS Unit"
 {
 
-    Caption = 'Tax Free POS Unit';
-    LookupPageID = "NPR Tax Free POS Units";
+    Caption = 'POS Tax Free Profile';
+    LookupPageID = "NPR POS Tax Free Profiles";
+    DrillDownPageId = "NPR POS Tax Free Profiles";
     DataClassification = CustomerContent;
 
     fields
     {
         field(1; "POS Unit No."; Code[10])
         {
-            Caption = 'POS Unit No.';
-            TableRelation = "NPR POS Unit"."No.";
+            Caption = 'Code';
             DataClassification = CustomerContent;
+            NotBlank = true;
         }
         field(2; "Handler ID"; Text[30])
         {

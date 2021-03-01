@@ -226,6 +226,13 @@ table 6150615 "NPR POS Unit"
             DataClassification = CustomerContent;
             TableRelation = "NPR Display Setup";
         }
+
+        field(630; "POS Tax Free Profile"; Code[10])
+        {
+            Caption = 'POS Tax Free Profile';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Tax Free POS Unit";
+        }
     }
 
     keys
@@ -317,6 +324,14 @@ table 6150615 "NPR POS Unit"
         if "POS Display Profile" = '' then
             exit;
         exit(DisplayProfile.Get("POS Display Profile"));
+    end;
+
+    procedure GetProfile(var TaxFreeProfile: Record "NPR Tax Free POS Unit"): Boolean
+    begin
+        Clear(TaxFreeProfile);
+        if "POS Tax Free Profile" = '' then
+            exit;
+        exit(TaxFreeProfile.Get("POS Tax Free Profile"));
     end;
 
     procedure GetCurrentPOSUnit(): Code[10]
