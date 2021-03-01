@@ -168,9 +168,14 @@
             "justification": "The Web client does not support displaying Repeater controls that contain FlowFilter fields!"
         },
         {
+            "id": "AW0008",
+            "action":"Error",
+            "justification": "The Web client does not support displaying Repeater controls in pages of type Card, Document, and ListPlus."
+        },
+        {
             "id": "AW0011",
             "action":"Error",
             "justification": "Add PromotedOnly=true to some or all promoted actions to avoid identical actions from appearing in both the promoted and default sections of the command bar."
-        }        
+        }         
     ]
 }
