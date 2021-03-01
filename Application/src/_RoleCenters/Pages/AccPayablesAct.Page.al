@@ -39,32 +39,6 @@ page 6151254 "NPR Acc. Payables Act"
                     DrillDownPageId = "Incoming Documents";
                     ToolTip = 'Specifies the value of the NPR Pending Inc. Documents field';
                 }
-
-                actions
-                {
-                    action("Edit Payment Journal")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Edit Payment Journal';
-                        RunObject = Page "Payment Journal";
-                        ToolTip = 'Pay your vendors by filling the payment journal automatically according to payments due, and potentially export all payment to your bank for automatic processing.';
-                    }
-                    action("New Purchase Credit Memo")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'New Purchase Credit Memo';
-                        RunObject = Page "Purchase Credit Memo";
-                        RunPageMode = Create;
-                        ToolTip = 'Specifies a new purchase credit memo so you can manage returned items to a vendor.';
-                    }
-                    action("Edit Purchase Journal")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Edit Purchase Journal';
-                        RunObject = Page "Purchase Journal";
-                        ToolTip = 'Post purchase invoices in a purchase journal that may already contain journal lines.';
-                    }
-                }
             }
             cuegroup("Document Approvals")
             {
