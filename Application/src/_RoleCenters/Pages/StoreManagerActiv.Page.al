@@ -23,26 +23,6 @@ page 6059983 "NPR Store Manager Activ."
                     DrillDownPageID = "Purchase Orders";
                     ToolTip = 'Specifies the value of the Open Purchase Orders field';
                 }
-
-                actions
-                {
-                    action("New Salesorder")
-                    {
-                        Caption = 'New Salesorder';
-                        RunObject = Page "Sales Order";
-                        RunPageMode = Create;
-                        ApplicationArea = All;
-                        ToolTip = 'Executes the New Salesorder action';
-                    }
-                    action("New Purchase Order")
-                    {
-                        Caption = 'New Purchase Order';
-                        RunObject = Page "Purchase Order";
-                        RunPageMode = Create;
-                        ApplicationArea = All;
-                        ToolTip = 'Executes the New Purchase Order action';
-                    }
-                }
             }
             cuegroup("Posted Documents")
             {

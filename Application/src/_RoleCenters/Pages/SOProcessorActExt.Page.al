@@ -26,26 +26,6 @@ page 6151262 "NPR SO Processor Act Ext"
                     DrillDownPageID = "Sales Order List";
                     ToolTip = 'Specifies the number of sales orders that are not fully posted.';
                 }
-
-                actions
-                {
-                    action("New Sales Quote")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'New Sales Quote';
-                        RunObject = Page "Sales Quote";
-                        RunPageMode = Create;
-                        ToolTip = 'Offer items or services to a customer.';
-                    }
-                    action("New Sales Order")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'New Sales Order';
-                        RunObject = Page "Sales Order";
-                        RunPageMode = Create;
-                        ToolTip = 'Create a new sales order for items or services that require partial posting.';
-                    }
-                }
             }
             cuegroup("Sales Orders Released Not Shipped")
             {
@@ -74,7 +54,7 @@ page 6151262 "NPR SO Processor Act Ext"
                         Rec.ShowOrders(Rec.FieldNo("Partially Shipped"));
                     end;
                 }
-                field(DelayedOrders; Delayed)
+                field(DelayedOrders; Rec.Delayed)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Delayed';
@@ -92,17 +72,6 @@ page 6151262 "NPR SO Processor Act Ext"
                     DecimalPlaces = 0 : 1;
                     Image = Calendar;
                     ToolTip = 'Specifies the number of days that your order deliveries are delayed on average.';
-                }
-
-                actions
-                {
-                    action(Navigate)
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Navigate';
-                        RunObject = Page Navigate;
-                        ToolTip = 'Find all entries and documents that exist for the document number and posting date on the selected entry or document.';
-                    }
                 }
             }
         }
@@ -145,7 +114,6 @@ page 6151262 "NPR SO Processor Act Ext"
     end;
 
     var
-        UserTaskManagement: Codeunit "User Task Management";
         ShowDocumentsPendingDodExchService: Boolean;
 
     local procedure CalculateCueFieldValues()
