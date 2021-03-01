@@ -1,6 +1,7 @@
 codeunit 6014450 "NPR E-mail Management"
 {
     var
+
         Text001: Label 'Enter recipient''s e-mail address:';
         Text002: Label 'E-mail has been sent.';
         Text003: Label 'The email may not be empty.';
@@ -270,6 +271,7 @@ codeunit 6014450 "NPR E-mail Management"
     procedure SendSmtpMessage(var RecRef: RecordRef; Silent: Boolean) ErrorMessage: Text[1024]
     var
         TransactionalEmail: Record "NPR Smart Email";
+        EmailLog: Record "NPR E-mail Log";
         TransactionalEmailMgt: Codeunit "NPR Transactional Email Mgt.";
         IStream: InStream;
         HandledByTransactional: Boolean;
@@ -277,7 +279,9 @@ codeunit 6014450 "NPR E-mail Management"
         FromAddress: Text;
         CCAddressList: List of [Text];
         BCCAddressList: List of [Text];
+        EmailLogPrepared: Boolean;
     begin
+        EmailLogPrepared := false;
         if TransactionalType = TransactionalType::Smart then
             if TransactionalEmail.Get(UseTransactionalEmailCode) then begin
                 SmtpMail.GetCC(CCAddressList);
@@ -318,13 +322,15 @@ codeunit 6014450 "NPR E-mail Management"
                             Clear(IStream);
                     end;
                 until AttachmentBuffer.Next = 0;
+            PrepareEmailLogEntry(EmailLog, RecRef);
+            EmailLogPrepared := true;
             SmtpMail.Send();
             ErrorMessage := SmtpMail.GetLastSendMailErrorText();
         end;
         AttachmentBuffer.DeleteAll;
 
         if ErrorMessage = '' then begin
-            AddEmailLogEntry(RecRef);
+            AddEmailLogEntry(EmailLog, RecRef, EmailLogPrepared);
             if Silent then
                 exit('')
             else begin
@@ -859,13 +865,12 @@ codeunit 6014450 "NPR E-mail Management"
 
     //--- Email Log ---
 
-    local procedure AddEmailLogEntry(RecRef: RecordRef)
+
+    local procedure PrepareEmailLogEntry(var EmailLog: Record "NPR E-mail Log"; RecRef: RecordRef)
     var
-        EmailLog: Record "NPR E-mail Log";
         Chr: array[2] of Char;
         i: Integer;
         MailAddresses: List of [Text];
-
     begin
         Chr[1] := 13;
         Chr[2] := 10;
@@ -879,6 +884,12 @@ codeunit 6014450 "NPR E-mail Management"
         EmailLog."Recipient E-mail" := CopyStr(List2Text(MailAddresses), 1, MaxStrLen(EmailLog."Recipient E-mail"));
         EmailLog."From E-mail" := CopyStr(SmtpMail.GetFrom(), 1, MaxStrLen(EmailLog."From E-mail"));
         EmailLog."E-mail subject" := CopyStr(SmtpMail.GetSubject(), 1, MaxStrLen(EmailLog."E-mail subject"));
+    end;
+
+    local procedure AddEmailLogEntry(EmailLog: Record "NPR E-mail Log"; RecRef: RecordRef; EmailLogPrepared: Boolean)
+    begin
+        if not EmailLogPrepared then
+            PrepareEmailLogEntry(EmailLog, RecRef);
         EmailLog.Insert(true);
     end;
 
