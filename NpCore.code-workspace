@@ -10,15 +10,44 @@
 		}
 	],
 	"settings": {
-		"al.compilationOptions": {			
-			"parallel": true
+		"al.compilationOptions": {
+			"parallel": true,
+			"generateReportLayout": true //If this is disabled we can have layouts being generated on someone elses machine.
 		},
 		"al.codeAnalyzers": [
 			"${AppSourceCop}",
 			"${UICop}",
 			"${CodeCop}"
 		],
-		"al.ruleSetPath": "main.ruleset.json"
+		"al.ruleSetPath": "main.ruleset.json",
+		"al.useLegacyRuntime": false,
+		"al.assemblyProbingPaths": [
+			"./.netpackages",
+			"C:/Windows/Microsoft.NET/Framework64"
+		],
+		"CRS.FileNamePattern": "<ObjectNameShort>.<ObjectTypeShortPascalCase>.al",
+		"CRS.FileNamePatternExtensions": "<ObjectNameShort>.<ObjectTypeShortPascalCase>.al",
+		"CRS.FileNamePatternPageCustomizations": "<ObjectNameShort>.<ObjectTypeShortPascalCase>.al",
+		"CRS.RenameWithGit": false,
+		"CRS.ObjectNamePrefix": "NPR ",
+		"CRS.RemovePrefixFromFilename": true,
+		"CRS.DisableCRSSnippets": true,
+		"CRS.OnSaveAlFileAction": "Rename",
+	},
+	"extensions": {
+		"recommendations": [
+			"ms-dynamics-smb.al",
+			"dkundel.vscode-new-file", //Set this on ctrl+n shortcut instead of default untitled tab for easy .al file creation - don't type a name upfront, let CRS rename the file after you've used a snippet to create it.
+			"coenraads.bracket-pair-colorizer-2",
+			"eamodio.gitlens",
+			"donjayamanne.githistory",
+			"ms-vsliveshare.vsliveshare", //Much better remote code discussions than screen sharing
+			"wayou.vscode-todo-highlight",
+			"andrzejzwierzchowski.al-code-outline", //Code actions, icon browser
+			"davidfeldhoff.al-codeactions", //Code actions
+			"wbrakowski.al-navigator", //Code actions
+			"waldo.crs-al-language-extension" //Auto file naming with proper prefix
+		]
 	},
 	"tasks": {
 		"version": "2.0.0",
@@ -34,6 +63,28 @@
 					"-NoProfile",
 					"-File",
 					"${cwd}\\.scripts\\inject_all_action_javascript.ps1"       
+				],
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"panel": "shared",
+					"showReuseMessage": true,
+					"clear": true,
+					"revealProblems": "always",							
+				},				
+				"problemMatcher": "$func-powershell-watch"
+			},
+			{
+				"label": "Download Dependencies",
+				"detail": "Downloads .NET dependencies, necessary for compilation",
+				"type": "shell",				
+				"command": "powershell",
+				"args": [   
+					"-ExecutionPolicy",
+					"Unrestricted",
+					"-NoProfile",
+					"-File",
+					"${cwd}\\.scripts\\download_compile_dependencies.ps1"       
 				],
 				"presentation": {
 					"echo": true,
