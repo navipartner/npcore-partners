@@ -310,37 +310,8 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
     end;
 
     trigger OnClosePage()
-    var
-        HaveError: Boolean;
     begin
-        if (PageMode = PageMode::PRELIMINARY_COUNT) then begin
-            Rec.ModifyAll(Status, Rec.Status::READY);
-            exit;
-        end;
-
-        HaveError := false;
-        if (Rec.FindSet()) then begin
-            repeat
-                HaveError := HaveError or
-                 (Rec."Counted Amount Incl. Float" - Rec."Bank Deposit Amount" - Rec."Move to Bin Amount" <> Rec."New Float Amount");
-            until (Rec.Next() = 0);
-        end;
-
-        if (not HaveError) then begin
-            Rec.SetFilter(Status, '=%1', Rec.Status::WIP);
-            if (not Rec.IsEmpty()) then begin
-                if (PageMode = PageMode::TRANSFER) then
-                    if (Confirm(TextFinishTransfer, true)) then
-                        Rec.ModifyAll(Status, Rec.Status::READY);
-
-
-                if (PageMode = PageMode::FINAL_COUNT) then begin
-                    Rec.SetFilter("Include In Counting", '<>%1', Rec."Include In Counting"::NO);
-                    if (Confirm(TextFinishCountingandPost, true)) then
-                        Rec.ModifyAll(Status, Rec.Status::READY);
-                end;
-            end;
-        end;
+        DoOnClosePageProcessing();
     end;
 
     trigger OnModifyRecord(): Boolean
@@ -350,91 +321,8 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
     end;
 
     trigger OnOpenPage()
-    var
-        POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
-        POSPaymentMethod: Record "NPR POS Payment Method";
-        POSPaymentBin: Record "NPR POS Payment Bin";
     begin
-        case PageMode of
-            PageMode::TRANSFER:
-                Rec.ModifyAll(Type, POSPaymentBinCheckpoint.Type::TRANSFER);
-            PageMode::FINAL_COUNT:
-                Rec.ModifyAll(Type, POSPaymentBinCheckpoint.Type::ZREPORT);
-            PageMode::PRELIMINARY_COUNT:
-                Rec.ModifyAll(Type, POSPaymentBinCheckpoint.Type::XREPORT);
-        end;
-
-        if (PageMode = PageMode::FINAL_COUNT) then begin
-            POSPaymentBinCheckpoint.CopyFilters(Rec);
-            POSPaymentBinCheckpoint.SetFilter("Include In Counting", '=%1', POSPaymentBinCheckpoint."Include In Counting"::VIRTUAL);
-            if (POSPaymentBinCheckpoint.FindSet()) then begin
-                repeat
-                    POSPaymentMethod.Get(POSPaymentBinCheckpoint."Payment Method No.");
-                    if (POSPaymentMethod."Bin for Virtual-Count" = '') then
-                        Error(AutoCountBin, POSPaymentMethod.TableCaption, POSPaymentMethod."Include In Counting", POSPaymentMethod.FieldCaption("Bin for Virtual-Count"));
-
-                    POSPaymentBin.Get(POSPaymentMethod."Bin for Virtual-Count");
-
-                    POSPaymentBinCheckpoint."Counted Amount Incl. Float" := POSPaymentBinCheckpoint."Calculated Amount Incl. Float";
-
-                    POSPaymentBinCheckpoint."Move to Bin Code" := POSPaymentMethod."Bin for Virtual-Count";
-                    POSPaymentBinCheckpoint.Validate("Move to Bin Amount", POSPaymentBinCheckpoint."Counted Amount Incl. Float");
-                    POSPaymentBinCheckpoint."Move to Bin Reference" := StrSubstNo('%1:%2', POSPaymentBinCheckpoint."Payment Method No.", CopyStr(UpperCase(DelChr(Format(CreateGuid), '=', '{}-')), 1, 7));
-                    POSPaymentBinCheckpoint."New Float Amount" := 0;
-                    POSPaymentBinCheckpoint.Comment := AutoCount;
-                    POSPaymentBinCheckpoint.Status := POSPaymentBinCheckpoint.Status::READY;
-                    POSPaymentBinCheckpoint.Modify();
-
-                until (POSPaymentBinCheckpoint.Next() = 0);
-            end;
-
-            POSPaymentBinCheckpoint.Reset();
-            POSPaymentBinCheckpoint.CopyFilters(Rec);
-            POSPaymentBinCheckpoint.SetFilter("Calculated Amount Incl. Float", '<%1', 0);
-            POSPaymentBinCheckpoint.SetFilter("Include In Counting", '<>%1', POSPaymentBinCheckpoint."Include In Counting"::VIRTUAL);
-            if (POSPaymentBinCheckpoint.FindSet()) then begin
-                repeat
-                    POSPaymentBinCheckpoint.Validate("Counted Amount Incl. Float", 0);
-                    POSPaymentBinCheckpoint.Status := POSPaymentBinCheckpoint.Status::READY;
-                    POSPaymentBinCheckpoint."New Float Amount" := 0;
-                    POSPaymentBinCheckpoint.Comment := AutoCount;
-                    POSPaymentBinCheckpoint.Modify();
-                until (POSPaymentBinCheckpoint.Next() = 0);
-            end;
-        end;
-
-        if (IsBlindCount) then begin
-            POSPaymentBinCheckpoint.Reset();
-            POSPaymentBinCheckpoint.CopyFilters(Rec);
-            POSPaymentBinCheckpoint.SetFilter("Include In Counting", '=%1', POSPaymentBinCheckpoint."Include In Counting"::YES);
-            if (POSPaymentBinCheckpoint.FindSet()) then
-                repeat
-                    POSPaymentBinCheckpoint."New Float Amount" := 0;
-                    POSPaymentBinCheckpoint.Modify();
-                until (POSPaymentBinCheckpoint.Next() = 0);
-        end;
-
-        case PageMode of
-            PageMode::FINAL_COUNT:
-                Rec.SetFilter("Include In Counting", '<>%1&<>%2', Rec."Include In Counting"::NO, Rec."Include In Counting"::VIRTUAL);
-            PageMode::PRELIMINARY_COUNT:
-                Rec.SetFilter("Include In Counting", '<>%1', Rec."Include In Counting"::NO);
-            PageMode::TRANSFER:
-                ;
-            PageMode::VIEW:
-                Rec.SetFilter("Include In Counting", '<>%1', Rec."Include In Counting"::NO);
-        end;
-
-        if (PageMode = PageMode::TRANSFER) then begin
-            POSPaymentBinCheckpoint.CopyFilters(Rec);
-            if (POSPaymentBinCheckpoint.FindSet()) then begin
-                repeat
-                    POSPaymentBinCheckpoint.Validate("Counted Amount Incl. Float", POSPaymentBinCheckpoint."Calculated Amount Incl. Float");
-                    POSPaymentBinCheckpoint.Modify();
-
-                until (POSPaymentBinCheckpoint.Next() = 0);
-            end;
-        end;
+        DoOnOpenPageProcessing();
     end;
 
     var
@@ -690,5 +578,131 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
     begin
         IsBlindCount := HideFields;
     end;
+
+    procedure DoOnOpenPageProcessing()
+    var
+        POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        POSPaymentBin: Record "NPR POS Payment Bin";
+    begin
+        case PageMode of
+            PageMode::TRANSFER:
+                Rec.ModifyAll(Type, POSPaymentBinCheckpoint.Type::TRANSFER);
+            PageMode::FINAL_COUNT:
+                Rec.ModifyAll(Type, POSPaymentBinCheckpoint.Type::ZREPORT);
+            PageMode::PRELIMINARY_COUNT:
+                Rec.ModifyAll(Type, POSPaymentBinCheckpoint.Type::XREPORT);
+        end;
+
+        if (PageMode = PageMode::FINAL_COUNT) then begin
+            POSPaymentBinCheckpoint.CopyFilters(Rec);
+            POSPaymentBinCheckpoint.SetFilter("Include In Counting", '=%1', POSPaymentBinCheckpoint."Include In Counting"::VIRTUAL);
+            if (POSPaymentBinCheckpoint.FindSet()) then begin
+                repeat
+                    POSPaymentMethod.Get(POSPaymentBinCheckpoint."Payment Method No.");
+                    if (POSPaymentMethod."Bin for Virtual-Count" = '') then
+                        Error(AutoCountBin, POSPaymentMethod.TableCaption, POSPaymentMethod."Include In Counting", POSPaymentMethod.FieldCaption("Bin for Virtual-Count"));
+
+                    POSPaymentBin.Get(POSPaymentMethod."Bin for Virtual-Count");
+
+                    POSPaymentBinCheckpoint."Counted Amount Incl. Float" := POSPaymentBinCheckpoint."Calculated Amount Incl. Float";
+
+                    POSPaymentBinCheckpoint."Move to Bin Code" := POSPaymentMethod."Bin for Virtual-Count";
+                    POSPaymentBinCheckpoint.Validate("Move to Bin Amount", POSPaymentBinCheckpoint."Counted Amount Incl. Float");
+                    POSPaymentBinCheckpoint."Move to Bin Reference" := StrSubstNo('%1:%2', POSPaymentBinCheckpoint."Payment Method No.", CopyStr(UpperCase(DelChr(Format(CreateGuid), '=', '{}-')), 1, 7));
+                    POSPaymentBinCheckpoint."New Float Amount" := 0;
+                    POSPaymentBinCheckpoint.Comment := AutoCount;
+                    POSPaymentBinCheckpoint.Status := POSPaymentBinCheckpoint.Status::READY;
+                    POSPaymentBinCheckpoint.Modify();
+
+                until (POSPaymentBinCheckpoint.Next() = 0);
+            end;
+
+            POSPaymentBinCheckpoint.Reset();
+            POSPaymentBinCheckpoint.CopyFilters(Rec);
+            POSPaymentBinCheckpoint.SetFilter("Calculated Amount Incl. Float", '<%1', 0);
+            POSPaymentBinCheckpoint.SetFilter("Include In Counting", '<>%1', POSPaymentBinCheckpoint."Include In Counting"::VIRTUAL);
+            if (POSPaymentBinCheckpoint.FindSet()) then begin
+                repeat
+                    POSPaymentBinCheckpoint.Validate("Counted Amount Incl. Float", 0);
+                    POSPaymentBinCheckpoint.Status := POSPaymentBinCheckpoint.Status::READY;
+                    POSPaymentBinCheckpoint."New Float Amount" := 0;
+                    POSPaymentBinCheckpoint.Comment := AutoCount;
+                    POSPaymentBinCheckpoint.Modify();
+                until (POSPaymentBinCheckpoint.Next() = 0);
+            end;
+        end;
+
+        if (IsBlindCount) then begin
+            POSPaymentBinCheckpoint.Reset();
+            POSPaymentBinCheckpoint.CopyFilters(Rec);
+            POSPaymentBinCheckpoint.SetFilter("Include In Counting", '=%1', POSPaymentBinCheckpoint."Include In Counting"::YES);
+            if (POSPaymentBinCheckpoint.FindSet()) then
+                repeat
+                    POSPaymentBinCheckpoint."New Float Amount" := 0;
+                    POSPaymentBinCheckpoint.Modify();
+                until (POSPaymentBinCheckpoint.Next() = 0);
+        end;
+
+        case PageMode of
+            PageMode::FINAL_COUNT:
+                Rec.SetFilter("Include In Counting", '<>%1&<>%2', Rec."Include In Counting"::NO, Rec."Include In Counting"::VIRTUAL);
+            PageMode::PRELIMINARY_COUNT:
+                Rec.SetFilter("Include In Counting", '<>%1', Rec."Include In Counting"::NO);
+            PageMode::TRANSFER:
+                ;
+            PageMode::VIEW:
+                Rec.SetFilter("Include In Counting", '<>%1', Rec."Include In Counting"::NO);
+        end;
+
+        if (PageMode = PageMode::TRANSFER) then begin
+            POSPaymentBinCheckpoint.CopyFilters(Rec);
+            if (POSPaymentBinCheckpoint.FindSet()) then begin
+                repeat
+                    POSPaymentBinCheckpoint.Validate("Counted Amount Incl. Float", POSPaymentBinCheckpoint."Calculated Amount Incl. Float");
+                    POSPaymentBinCheckpoint.Modify();
+
+                until (POSPaymentBinCheckpoint.Next() = 0);
+            end;
+        end;
+    end;
+
+
+    procedure DoOnClosePageProcessing(): Boolean
+    var
+        HaveError: Boolean;
+    begin
+        if (PageMode = PageMode::PRELIMINARY_COUNT) then begin
+            Rec.ModifyAll(Status, Rec.Status::READY);
+            exit;
+        end;
+
+        HaveError := false;
+        if (Rec.FindSet()) then begin
+            repeat
+                HaveError := HaveError or
+                 (Rec."Counted Amount Incl. Float" - Rec."Bank Deposit Amount" - Rec."Move to Bin Amount" <> Rec."New Float Amount");
+            until (Rec.Next() = 0);
+        end;
+
+        if (not HaveError) then begin
+            Rec.SetFilter(Status, '=%1', Rec.Status::WIP);
+            if (not Rec.IsEmpty()) then begin
+                if (PageMode = PageMode::TRANSFER) then
+                    if (Confirm(TextFinishTransfer, true)) then
+                        Rec.ModifyAll(Status, Rec.Status::READY);
+
+
+                if (PageMode = PageMode::FINAL_COUNT) then begin
+                    Rec.SetFilter("Include In Counting", '<>%1', Rec."Include In Counting"::NO);
+                    if (Confirm(TextFinishCountingandPost, true)) then
+                        Rec.ModifyAll(Status, Rec.Status::READY);
+                end;
+            end;
+        end;
+
+        exit(HaveError);
+    end;
+
 }
 

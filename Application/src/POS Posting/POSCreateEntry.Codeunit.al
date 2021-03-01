@@ -377,9 +377,13 @@ codeunit 6150614 "NPR POS Create Entry"
         POSPaymentLine."POS Store Code" := SalePOS."POS Store Code";
         POSPaymentLine."POS Unit No." := SaleLinePOS."Register No.";
         POSPaymentLine."Document No." := SaleLinePOS."Sales Ticket No.";
+
 #pragma warning disable AA0139
+        if (not POSPaymentMethod.Get(SaleLinePOS."No.")) then
+            POSPaymentMethod.Init();
         POSPaymentLine."POS Payment Method Code" := SaleLinePOS."No.";
 #pragma warning restore
+
         POSPaymentLine."POS Payment Bin Code" := SelectUnitBin(POSPaymentLine."POS Unit No.");
         POSPaymentLine."Retail ID" := SaleLinePOS."Retail ID";
 
@@ -394,7 +398,6 @@ codeunit 6150614 "NPR POS Create Entry"
         POSPaymentLine."Amount (LCY)" := SaleLinePOS."Amount Including VAT";
         POSPaymentLine."Amount (Sales Currency)" := SaleLinePOS."Amount Including VAT"; //Sales Currency is always LCY for now
         POSPaymentLine."Currency Code" := POSPaymentMethod."Currency Code";
-
 
         POSPaymentLine."Orig. POS Sale ID" := SaleLinePOS."Orig. POS Sale ID";
         POSPaymentLine."Orig. POS Line No." := SaleLinePOS."Orig. POS Line No.";
