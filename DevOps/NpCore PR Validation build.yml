@@ -25,7 +25,7 @@ jobs:
 - template: YAML/Templates/Job/CreateBCContainer.yml@scriptsRepo
   parameters:
     timeoutInMinutes: 180
-    containerImageName: mcr.microsoft.com/dynamicsnav:10.0.17763.1397-generic
+    containerImageName: mcr.microsoft.com/businesscentral:10.0.17763.1757
     pipelineConfig: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/PipelineConfig-Insider.json'
     containerName: $(containerName)
     serverInstanceName: $(serverInstanceName)
