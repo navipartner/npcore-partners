@@ -636,7 +636,7 @@ then begin
         ApplyDiscountOnLine(SaleLinePOS, "DiscType.DiscountAmt", DiscountAmount);
     end;
 
-    local procedure SetLineDiscountPctABS(var SaleLinePOS: Record "NPR Sale Line POS"; DiscountPct: Decimal)
+    procedure SetLineDiscountPctABS(var SaleLinePOS: Record "NPR Sale Line POS"; DiscountPct: Decimal)
     begin
         ApplyDiscountOnLine(SaleLinePOS, "DiscType.DiscountPct", DiscountPct);
     end;

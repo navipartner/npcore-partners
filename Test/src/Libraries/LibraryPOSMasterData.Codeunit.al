@@ -67,12 +67,12 @@ codeunit 85002 "NPR Library - POS Master Data"
             LibraryUtility.GetFieldLength(DATABASE::"NPR POS Payment Bin", POSPaymentBin.FieldNo(POSPaymentBin."No."))));
         POSPaymentBin.Insert(true);
 
-        CreatePOSPostingSetupSet('', '', POSPaymentBin."No.");
     end;
 
     procedure CreatePOSPaymentMethod(var POSPaymentMethod: Record "NPR POS Payment Method"; ProcessingType: Option; CurrencyCode: Code[10]; PostCondensed: Boolean)
     var
         ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
+        POSPaymentBin: Record "NPR POS Payment Bin";
         LibraryUtility: Codeunit "Library - Utility";
         LibraryRandom: Codeunit "Library - Random";
         LibraryERM: Codeunit "Library - ERM";
@@ -100,6 +100,10 @@ codeunit 85002 "NPR Library - POS Master Data"
             CreatePOSPaymentMethod(ReturnPOSPaymentMethod, POSPaymentMethod."Processing Type"::CASH, '', false);
             POSPaymentMethod."Return Payment Method Code" := ReturnPOSPaymentMethod.Code;
         end;
+
+        CreatePOSBin(POSPaymentBin);
+        POSPaymentMethod."Bin for Virtual-Count" := POSPaymentBin."No.";
+        POSPaymentMethod."Include In Counting" := POSPaymentMethod."Include In Counting"::VIRTUAL;
         POSPaymentMethod.Modify();
 
         CreatePOSPostingSetup(POSPaymentMethod);
@@ -330,6 +334,7 @@ codeunit 85002 "NPR Library - POS Master Data"
         NoSeriesLine: Record "No. Series Line";
         GeneralPostingSetup: Record "General Posting Setup";
         VATPostingSetup: Record "VAT Posting Setup";
+        POSPaymentBin: record "NPR POS Payment Bin";
     begin
         POSPostingProfile.Init;
         POSPostingProfile.Code := LibraryUtility.GenerateRandomCode20(POSPostingProfile.FieldNo(Code), Database::"NPR POS Posting Profile");
@@ -352,6 +357,9 @@ codeunit 85002 "NPR Library - POS Master Data"
         POSPostingProfile.Validate("Gen. Bus. Posting Group", GeneralPostingSetup."Gen. Bus. Posting Group");
         LibraryERM.CreateVATPostingSetupWithAccounts(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT", 25);
         POSPostingProfile.Validate("VAT Bus. Posting Group", VATPostingSetup."VAT Bus. Posting Group");
+
+        CreatePOSBin(POSPaymentBin);
+        POSPostingProfile."POS Payment Bin" := POSPaymentBin."No.";
 
         POSPostingProfile.Modify;
     end;

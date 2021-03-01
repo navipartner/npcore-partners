@@ -63,6 +63,42 @@ codeunit 85004 "NPR EFT Tests"
         AssertPaymentLine(EFTTransactionRequest."Sales Line ID", EFTTransactionRequest."Result Amount", true);
     end;
 
+    procedure GenericEFTPaymentSuccess(POSSession: Codeunit "NPR POS Session"; SalePOS: Record "NPR Sale POS"; PaymentAmount: Decimal)
+    var
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        NPRLibraryEFT: Codeunit "NPR Library - EFT";
+        EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
+        SaleLinePOS: Record "NPR Sale Line POS";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        Item: Record Item;
+        POSSale: Codeunit "NPR POS Sale";
+        EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
+    begin
+        // [Scenario] Add payment to an existing sales, can be used from by external test functions to add a successful EFT payment to sales
+        // [Given] POS, EFT & Payment setup
+        InitializeData();
+        _POSSession := POSSession;
+
+        // [Given] EFT mock integration set to simulate external approval
+        BindSubscription(EFTTestMockIntegration);
+        EFTTestMockIntegration.SetCreateRequestHandler(0);
+        EFTTestMockIntegration.SetDeviceResponseHandler(0);
+        EFTTestMockIntegration.SetPaymentConfirmationHandler(0);
+
+        // [When] Requesting to pay 
+        SetSessionActionStateBeforePayment();
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, PaymentAmount, '', SalePOS);
+        EFTTransactionRequest.Get(_LastTrxEntryNo);
+
+        // [Then] PaymentAmount LCY is the trx result and a payment line for the result was created.
+        EFTTransactionRequest.TestField("Result Amount", PaymentAmount);
+        EFTTransactionRequest.TestField(Successful, true);
+        EFTTransactionRequest.TestField("External Result Known", true);
+        EFTTransactionRequest.TestField("Result Processed", true);
+        AssertPaymentLine(EFTTransactionRequest."Sales Line ID", EFTTransactionRequest."Result Amount", true);
+    end;
+
     [Test]
     procedure PurchaseFailure()
     var

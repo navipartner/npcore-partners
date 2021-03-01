@@ -385,16 +385,20 @@ codeunit 6150725 "NPR POS Action: Payment"
     var
         AmountToCapture: Decimal;
     begin
-        AmountToCapture := 0;
+        AmountToCapture := AmountToCaptureLCY;
 
         if AmountToCaptureLCY = 0 then
             exit(true);
 
         POSPaymentLine.ValidateAmountBeforePayment(POSPaymentMethod, AmountToCaptureLCY);
 
-        POSLine."Amount Including VAT" := AmountToCaptureLCY;
-        POSPaymentLine.InsertPaymentLine(POSLine, AmountToCapture);
-
+        if (POSPaymentMethod."Fixed Rate" <> 0) then begin
+            POSLine."Amount Including VAT" := 0;
+            POSPaymentLine.InsertPaymentLine(POSLine, AmountToCapture);
+        end else begin
+            POSLine."Amount Including VAT" := AmountToCaptureLCY;
+            POSPaymentLine.InsertPaymentLine(POSLine, 0);
+        end;
         exit(true);
     end;
 
