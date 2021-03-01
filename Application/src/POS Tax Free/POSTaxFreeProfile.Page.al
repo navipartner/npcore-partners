@@ -1,19 +1,17 @@
-page 6014644 "NPR POS Tax Free Profiles"
+page 6059966 "NPR POS Tax Free Profile"
 {
-    Caption = 'POS Tax Free Profiles';
-    PageType = List;
+    Caption = 'POS Tax Free Profile';
+    PageType = Card;
+    UsageCategory = None;
     SourceTable = "NPR Tax Free POS Unit";
-    UsageCategory = Administration;
-    ApplicationArea = All;
-    Editable = false;
-    CardPageId = "NPR POS Tax Free Profile";
 
     layout
     {
         area(content)
         {
-            repeater(Group)
+            group(General)
             {
+                Caption = 'General';
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
                     ApplicationArea = All;
@@ -128,3 +126,4 @@ page 6014644 "NPR POS Tax Free Profiles"
         }
     }
 }
+
