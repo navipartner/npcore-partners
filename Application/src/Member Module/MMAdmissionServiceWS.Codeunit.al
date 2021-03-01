@@ -462,42 +462,49 @@ codeunit 6060093 "NPR MM Admission Service WS"
 
     procedure GetTurnstileImages(ScannerStationId: Code[10]; var PictureBase64Default: Text; var PictureExtensionDefault: Text; var PictureBase64Error: Text; var PictureExtensionError: Text): Text
     var
-        InStrDefault: InStream;
-        InStrError: InStream;
         MMAdmissionServiceSetup: Record "NPR MM Admis. Service Setup";
         MMAdmissionScannerStations: Record "NPR MM Admis. Scanner Stations";
+        TenantMedia: Record "Tenant Media";
+        InStrDefault: InStream;
+        InStrError: InStream;
     begin
         if MMAdmissionScannerStations.Get(ScannerStationId) then begin
             if MMAdmissionScannerStations.Activated then begin
 
-                MMAdmissionScannerStations.CalcFields("Default Turnstile Image", "Error Image of Turnstile");
-
-                if MMAdmissionScannerStations."Default Turnstile Image".HasValue then begin
-                    MMAdmissionScannerStations."Default Turnstile Image".ImportStream(InStrDefault, MMAdmissionScannerStations.FieldName("Default Turnstile Image"));
+                if TenantMedia.Get(MMAdmissionScannerStations."Default Turnstile Image".MediaId()) then
+                    TenantMedia.CalcFields(Content);
+                if TenantMedia.Content.HasValue then begin
+                    TenantMedia.Content.CreateInStream(InStrDefault);
                     GetImageContentAndExtension(InStrDefault, PictureBase64Default, PictureExtensionDefault);
                     Clear(InStrDefault);
                 end;
 
-                if MMAdmissionScannerStations."Error Image of Turnstile".HasValue then begin
-                    MMAdmissionScannerStations."Error Image of Turnstile".ImportStream(InStrError, MMAdmissionScannerStations.FieldName("Error Image of Turnstile"));
+                Clear(TenantMedia);
+                if TenantMedia.Get(MMAdmissionScannerStations."Error Image of Turnstile".MediaId()) then
+                    TenantMedia.CalcFields(Content);
+                if TenantMedia.Content.HasValue then begin
+                    TenantMedia.Content.CreateInStream(InStrError);
                     GetImageContentAndExtension(InStrError, PictureBase64Error, PictureExtensionError);
                     Clear(InStrError);
                 end;
             end;
         end;
 
-        MMAdmissionServiceSetup.Get;
-
-        MMAdmissionServiceSetup.CalcFields("Default Turnstile Image", "Error Image of Turnstile");
-
-        if MMAdmissionServiceSetup."Default Turnstile Image".HasValue and (PictureBase64Default = '') then begin
-            MMAdmissionServiceSetup."Default Turnstile Image".ImportStream(InStrDefault, MMAdmissionServiceSetup.FieldName("Default Turnstile Image"));
+        MMAdmissionServiceSetup.Get();
+        Clear(TenantMedia);
+        if TenantMedia.Get(MMAdmissionServiceSetup."Default Turnstile Image".MediaId()) then
+            TenantMedia.CalcFields(Content);
+        if TenantMedia.Content.HasValue and (PictureBase64Default = '') then begin
+            TenantMedia.Content.CreateInStream(InStrDefault);
             GetImageContentAndExtension(InStrDefault, PictureBase64Default, PictureExtensionDefault);
             Clear(InStrDefault);
         end;
 
-        if MMAdmissionServiceSetup."Error Image of Turnstile".HasValue and (PictureBase64Error = '') then begin
-            MMAdmissionServiceSetup."Error Image of Turnstile".ImportStream(InStrError, MMAdmissionServiceSetup.FieldName("Error Image of Turnstile"));
+        Clear(TenantMedia);
+        if TenantMedia.Get(MMAdmissionServiceSetup."Error Image of Turnstile".MediaId()) then
+            TenantMedia.CalcFields(Content);
+        if TenantMedia.Content.HasValue and (PictureBase64Error = '') then begin
+            TenantMedia.Content.CreateInStream(InStrError);
             GetImageContentAndExtension(InStrError, PictureBase64Error, PictureExtensionError);
             Clear(InStrError);
         end;
@@ -518,62 +525,47 @@ codeunit 6060093 "NPR MM Admission Service WS"
     local procedure GetAvatarImage(var MMAdmissionServiceSetup: Record "NPR MM Admis. Service Setup"; var Base64StringImage: Text) Success: Boolean
     var
         Member: Record "NPR MM Member";
-        BinaryReader: DotNet NPRNetBinaryReader;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Convert: DotNet NPRNetConvert;
+        TenantMedia: Record "Tenant Media";
+        Base64Convert: Codeunit "Base64 Convert";
         InStr: InStream;
     begin
-        MMAdmissionServiceSetup.CalcFields("Guest Avatar Image");
-        MMAdmissionServiceSetup."Guest Avatar Image".ImportStream(InStr, MMAdmissionServiceSetup.FieldName("Guest Avatar Image"));
-        MemoryStream := InStr;
-        BinaryReader := BinaryReader.BinaryReader(InStr);
-
-        Base64StringImage := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
-
-        MemoryStream.Dispose;
-        Clear(MemoryStream);
-
-        exit(true);
+        if TenantMedia.Get(MMAdmissionServiceSetup."Guest Avatar Image".MediaId()) then
+            TenantMedia.CalcFields(Content);
+        if TenantMedia.Content.HasValue then begin
+            TenantMedia.Content.CreateInStream(InStr);
+            Base64StringImage := Base64Convert.ToBase64(InStr);
+            exit(true);
+        end;
     end;
 
     local procedure GetAvatarImageV2(var MMAdmissionServiceSetup: Record "NPR MM Admis. Service Setup"; var Base64StringImage: Text; ScannerStationId: Code[10]) Success: Boolean
     var
         Member: Record "NPR MM Member";
-        BinaryReader: DotNet NPRNetBinaryReader;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Convert: DotNet NPRNetConvert;
-        InStr: InStream;
+        TenantMedia: Record "Tenant Media";
         MMAdmissionScannerStations: Record "NPR MM Admis. Scanner Stations";
+        Base64Convert: Codeunit "Base64 Convert";
+        InStr: InStream;
     begin
         if MMAdmissionScannerStations.Get(ScannerStationId) then begin
             if MMAdmissionScannerStations.Activated then begin
-                MMAdmissionScannerStations.CalcFields("Guest Avatar Image");
-                if MMAdmissionScannerStations."Guest Avatar Image".HasValue then begin
-                    MMAdmissionScannerStations."Guest Avatar Image".ImportStream(InStr, MMAdmissionScannerStations.FieldName("Guest Avatar Image"));
-                    MemoryStream := InStr;
-                    BinaryReader := BinaryReader.BinaryReader(InStr);
-
-                    Base64StringImage := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
-
-                    MemoryStream.Dispose;
-                    Clear(MemoryStream);
-
+                if TenantMedia.Get(MMAdmissionScannerStations."Guest Avatar Image".MediaId()) then
+                    TenantMedia.CalcFields(Content);
+                if TenantMedia.Content.HasValue then begin
+                    TenantMedia.Content.CreateInStream(InStr);
+                    Base64StringImage := Base64Convert.ToBase64(InStr);
                     exit(true);
                 end;
             end;
         end;
 
-        MMAdmissionServiceSetup.CalcFields("Guest Avatar Image");
-        MMAdmissionServiceSetup."Guest Avatar Image".ImportStream(InStr, MMAdmissionServiceSetup.FieldName("Guest Avatar Image"));
-        MemoryStream := InStr;
-        BinaryReader := BinaryReader.BinaryReader(InStr);
-
-        Base64StringImage := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
-
-        MemoryStream.Dispose;
-        Clear(MemoryStream);
-
-        exit(true);
+        Clear(TenantMedia);
+        if TenantMedia.Get(MMAdmissionServiceSetup."Guest Avatar Image".MediaId()) then
+            TenantMedia.CalcFields(Content);
+        if TenantMedia.Content.HasValue then begin
+            TenantMedia.Content.CreateInStream(InStr);
+            Base64StringImage := Base64Convert.ToBase64(InStr);
+            exit(true);
+        end;
     end;
 
     local procedure GetImageContentAndExtension(InS: InStream; var Base64: Text; var Extension: Text[10])
