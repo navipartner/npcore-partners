@@ -41,6 +41,8 @@ codeunit 6150923 "NPR UPG Gift Voucher"
 
         RetailVoucherTypeCode := 'GIFTVOUCHER_0000';
         repeat
+            Register.reset();
+            Register.setrange("Register No.", GiftVoucher."Register No.");
             if Register.FindSet() then
                 repeat
                     RetailVoucherType.SetRange("Account No.", Register."Gift Voucher Account");

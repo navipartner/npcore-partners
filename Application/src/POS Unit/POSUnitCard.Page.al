@@ -139,6 +139,11 @@ page 6150617 "NPR POS Unit Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Display Profile field';
                 }
+                field("POS Tax Free Profile"; Rec."POS Tax Free Profile")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Tax Free Profile field';
+                }
             }
         }
     }
