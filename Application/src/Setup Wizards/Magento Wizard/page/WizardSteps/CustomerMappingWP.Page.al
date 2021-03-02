@@ -14,7 +14,7 @@ page 6014523 "NPR Customer Mapping WP"
         {
             repeater(Group)
             {
-                field("Country/Region Code"; "Country/Region Code")
+                field("Country/Region Code"; Rec."Country/Region Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Country/Region Code field';
@@ -25,22 +25,22 @@ page 6014523 "NPR Customer Mapping WP"
                     begin
                         CountryRegions.LookupMode := true;
 
-                        if "Country/Region Code" <> '' then
-                            if CountryRegion.Get("Country/Region Code") then
+                        if Rec."Country/Region Code" <> '' then
+                            if CountryRegion.Get(Rec."Country/Region Code") then
                                 CountryRegions.SetRecord(CountryRegion);
 
                         if CountryRegions.RunModal() = Action::LookupOK then begin
                             CountryRegions.GetRecord(CountryRegion);
-                            "Country/Region Code" := CountryRegion.Code;
+                            Rec."Country/Region Code" := CountryRegion.Code;
 
-                            "Post Code" := '';
+                            Rec."Post Code" := '';
                             CityName := '';
 
                             CountryRegionName := CountryRegion.Name;
                         end;
                     end;
                 }
-                field("Post Code"; "Post Code")
+                field("Post Code"; Rec."Post Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Post Code field';
@@ -55,14 +55,14 @@ page 6014523 "NPR Customer Mapping WP"
                         PostCode.SetRange("Country/Region Code", "Country/Region Code");
                         if PostCode.FindSet() then;
 
-                        if "Post Code" <> '' then begin
-                            PostCode.SetRange(Code, "Post Code");
+                        if Rec."Post Code" <> '' then begin
+                            PostCode.SetRange(Code, Rec."Post Code");
                             PostCode.FindFirst();
                             PostCode.SetRange(Code);
                         end;
 
                         if Page.RunModal(Page::"Post Codes", PostCode) = Action::LookupOK then begin
-                            "Post Code" := PostCode.Code;
+                            Rec."Post Code" := PostCode.Code;
 
                             CityName := PostCode.City;
                         end;
@@ -82,28 +82,28 @@ page 6014523 "NPR Customer Mapping WP"
                     Editable = false;
                     ToolTip = 'Specifies the value of the City field';
                 }
-                field("Customer Template Code"; "Customer Template Code")
+                field("Customer Template Code"; Rec."Customer Template Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer Template Code field';
                     trigger OnLookup(var Text: Text): Boolean
                     var
-                        CustomerTemplate: Record "Customer Template";
-                        CustomerTemplates: Page "Customer Template List";
+                        CustomerTemplate: Record "Customer Templ.";
+                        CustomerTemplates: Page "Customer Templ. List";
                     begin
                         CustomerTemplates.LookupMode := true;
 
-                        if "Customer Template Code" <> '' then
-                            if CustomerTemplate.Get("Customer Template Code") then
+                        if Rec."Customer Template Code" <> '' then
+                            if CustomerTemplate.Get(Rec."Customer Template Code") then
                                 CustomerTemplates.SetRecord(CustomerTemplate);
 
                         if CustomerTemplates.RunModal() = Action::LookupOK then begin
                             CustomerTemplates.GetRecord(CustomerTemplate);
-                            "Customer Template Code" := CustomerTemplate.Code;
+                            Rec."Customer Template Code" := CustomerTemplate.Code;
                         end;
                     end;
                 }
-                field("Config. Template Code"; "Config. Template Code")
+                field("Config. Template Code"; Rec."Config. Template Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Config. Template Code field';
@@ -114,18 +114,18 @@ page 6014523 "NPR Customer Mapping WP"
                     begin
                         ConfigTemplates.LookupMode := true;
 
-                        if "Config. Template Code" <> '' then
+                        if Rec."Config. Template Code" <> '' then
                             ConfigTemplateHdr.SetRange("Table ID", 18);
                         if ConfigTemplateHdr.FindSet() then;
                         ConfigTemplates.SetRecord(ConfigTemplateHdr);
 
-                        if "Config. Template Code" <> '' then
-                            if ConfigTemplateHdr.Get("Config. Template Code") then
+                        if Rec."Config. Template Code" <> '' then
+                            if ConfigTemplateHdr.Get(Rec."Config. Template Code") then
                                 ConfigTemplates.SetRecord(ConfigTemplateHdr);
 
                         if ConfigTemplates.RunModal() = Action::LookupOK then begin
                             ConfigTemplates.GetRecord(ConfigTemplateHdr);
-                            "Config. Template Code" := ConfigTemplateHdr.Code;
+                            Rec."Config. Template Code" := ConfigTemplateHdr.Code;
                         end;
                     end;
                 }

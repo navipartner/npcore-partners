@@ -3,7 +3,7 @@ codeunit 6151402 "NPR Magento Mgt."
     var
         MagentoSetup: Record "NPR Magento Setup";
 
-    procedure GetCustTemplate(Customer: Record Customer) TemplateCode: Code[10]
+    procedure GetCustTemplate(Customer: Record Customer) TemplateCode: Code[20]
     var
         MagentoSetup: Record "NPR Magento Setup";
         MagentoCustomerMapping: Record "NPR Magento Customer Mapping";

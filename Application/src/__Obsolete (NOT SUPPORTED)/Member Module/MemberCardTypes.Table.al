@@ -74,10 +74,10 @@ table 6059771 "NPR Member Card Types"
             Caption = 'Card Expiration Formula';
             DataClassification = CustomerContent;
         }
-        field(55; "Customer Template"; Code[10])
+        field(55; "Customer Template"; Code[20])
         {
             Caption = 'Customer Template';
-            TableRelation = "Customer Template";
+            TableRelation = "Customer Templ.";
             DataClassification = CustomerContent;
         }
         field(60; "Member Name Required"; Boolean)

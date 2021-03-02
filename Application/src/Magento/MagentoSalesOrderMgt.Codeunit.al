@@ -189,7 +189,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
     local procedure InsertCustomer(XmlElement: XmlElement; IsContactCustomer: Boolean; var Customer: Record Customer): Boolean
     var
         ConfigTemplateHeader: Record "Config. Template Header";
-        CustTemplate: Record "Customer Template";
+        CustTemplate: Record "Customer Templ.";
         ConfigTemplateMgt: Codeunit "Config. Template Management";
         UpdateContFromCust: Codeunit "CustCont-Update";
         RecRef: RecordRef;
@@ -200,7 +200,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         NewCust: Boolean;
         PrevCust: Text;
         EanNo: Text;
-        CustTemplateCode: Code[10];
+        CustTemplateCode: Code[20];
         CustNo: Code[20];
     begin
         Initialize;

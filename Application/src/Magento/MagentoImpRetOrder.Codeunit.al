@@ -98,7 +98,7 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
     local procedure InsertCustomer(XmlElement: XmlElement; IsContactCustomer: Boolean; var Customer: Record Customer): Boolean
     var
         ConfigTemplateHeader: Record "Config. Template Header";
-        CustTemplate: Record "Customer Template";
+        CustTemplate: Record "Customer Templ.";
         ConfigTemplateMgt: Codeunit "Config. Template Management";
         RecRef: RecordRef;
         ExternalCustomerNo: Text;
@@ -107,7 +107,7 @@ codeunit 6151420 "NPR Magento Imp. Ret. Order"
         VATBusPostingGroup: Code[20];
         NewCust: Boolean;
         PrevCust: Text;
-        CustTemplateCode: Code[10];
+        CustTemplateCode: Code[20];
     begin
         Initialize;
         ExternalCustomerNo := NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'customer_no', false);
