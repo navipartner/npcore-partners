@@ -95,6 +95,8 @@ tableextension 6014424 "NPR Vendor" extends Vendor
         }
         field(6014415; "NPR Document Processing"; Option)
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Standard field Document Sending Profile is used.';
             Caption = 'Document Processing';
             DataClassification = CustomerContent;
             Description = 'PN1.00';

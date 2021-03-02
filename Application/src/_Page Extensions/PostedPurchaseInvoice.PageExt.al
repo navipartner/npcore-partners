@@ -9,12 +9,6 @@ pageextension 6014411 "NPR Posted Purchase Invoice" extends "Posted Purchase Inv
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the NPR Pay-to E-mail field';
             }
-            field("NPR Document Processing"; "NPR Document Processing")
-            {
-                ApplicationArea = All;
-                Editable = false;
-                ToolTip = 'Specifies the value of the NPR Document Processing field';
-            }
         }
     }
 }

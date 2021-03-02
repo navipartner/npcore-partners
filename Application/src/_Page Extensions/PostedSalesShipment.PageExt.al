@@ -70,12 +70,6 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the NPR Bill-to E-mail field';
             }
-            field("NPR Document Processing"; "NPR Document Processing")
-            {
-                ApplicationArea = All;
-                Editable = false;
-                ToolTip = 'Specifies the value of the NPR Document Processing field';
-            }
         }
     }
     actions
@@ -115,14 +109,14 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
                     Caption = 'Create Pacsoft Shipment Document';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Create Pacsoft Shipment Document action';
-                    Image = CreateDocument; 
+                    Image = CreateDocument;
                 }
                 action("NPR PrintShipmentDocument")
                 {
                     Caption = 'Print Shipment Document';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Print Shipment Document action';
-                    Image = Print; 
+                    Image = Print;
                 }
             }
         }

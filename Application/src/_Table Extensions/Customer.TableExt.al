@@ -1,18 +1,5 @@
 tableextension 6014423 "NPR Customer" extends Customer
 {
-    // NPR7.100.000/LS/220114  : Retail Merge
-    //                           Added Fields : 6014400..6060150
-    // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
-    //   - Added Field 6014415 "Document Processing" for defining Print action on Sales Doc. Posting.
-    // NPR70.00.02.00/MH/20150216  CASE 204110 Removed NaviShop References (WS).
-    // MAG1.04/MH/20150216  CASE 199932 Added field 6059800 "External Customer No."
-    // MAG1.08/MH/20150311  CASE 206395 Added Field 6059825 "Webshop Display Group"
-    // PN1.08/MHA/20151214  CASE 228859 Pdf2Nav (New Version List)
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // NPR5.48/TSA /20181219 CASE 320424 Added Fields "Magento Shipping Group", "Magento Payment Group", "Magento Store Code"
-    // MAG2.20/MHA /20190426 CASE 320423 Added Validation and Lookup to Fields "Magento Display Group", "Magento Shipping Group", "Magento Payment Group"
-    // NPR5.52/ZESO/20190925 CASE 358656 Added Fields Anonymized,Anonymized Date and To Anonymize
-    // NPR5.53/ZESO/20200115 CASE 358656 Added Field To Anonymize On
     fields
     {
         field(6014400; "NPR Type"; Option)
@@ -63,6 +50,8 @@ tableextension 6014423 "NPR Customer" extends Customer
         }
         field(6014415; "NPR Document Processing"; Option)
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Use standard field Document Sending Profile';
             Caption = 'Document Processing';
             DataClassification = CustomerContent;
             Description = 'PN1.00';
@@ -131,18 +120,14 @@ tableextension 6014423 "NPR Customer" extends Customer
             var
                 M2AccountLookupMgt: Codeunit "NPR M2 Account Lookup Mgt.";
             begin
-                //-MAG2.20 [320423]
                 M2AccountLookupMgt.LookupDisplayGroup(Rec);
-                //+MAG2.20 [320423]
             end;
 
             trigger OnValidate()
             var
                 M2AccountLookupMgt: Codeunit "NPR M2 Account Lookup Mgt.";
             begin
-                //-MAG2.20 [320423]
                 M2AccountLookupMgt.ValidateDisplayGroup(Rec);
-                //+MAG2.20 [320423]
             end;
         }
         field(6151460; "NPR Magento Shipping Group"; Text[30])
@@ -155,18 +140,14 @@ tableextension 6014423 "NPR Customer" extends Customer
             var
                 M2AccountLookupMgt: Codeunit "NPR M2 Account Lookup Mgt.";
             begin
-                //-MAG2.20 [320423]
                 M2AccountLookupMgt.LookupShippingGroup(Rec);
-                //+MAG2.20 [320423]
             end;
 
             trigger OnValidate()
             var
                 M2AccountLookupMgt: Codeunit "NPR M2 Account Lookup Mgt.";
             begin
-                //-MAG2.20 [320423]
                 M2AccountLookupMgt.ValidateShippingGroup(Rec);
-                //+MAG2.20 [320423]
             end;
         }
         field(6151465; "NPR Magento Payment Group"; Text[30])
@@ -179,18 +160,14 @@ tableextension 6014423 "NPR Customer" extends Customer
             var
                 M2AccountLookupMgt: Codeunit "NPR M2 Account Lookup Mgt.";
             begin
-                //-MAG2.20 [320423]
                 M2AccountLookupMgt.LookupPaymentGroup(Rec);
-                //+MAG2.20 [320423]
             end;
 
             trigger OnValidate()
             var
                 M2AccountLookupMgt: Codeunit "NPR M2 Account Lookup Mgt.";
             begin
-                //-MAG2.20 [320423]
                 M2AccountLookupMgt.ValidatePaymentGroup(Rec);
-                //+MAG2.20 [320423]
             end;
         }
         field(6151470; "NPR Magento Store Code"; Text[30])
@@ -204,20 +181,15 @@ tableextension 6014423 "NPR Customer" extends Customer
             var
                 M2AccountLookupMgt: Codeunit "NPR M2 Account Lookup Mgt.";
             begin
-                //-MAG2.20 [320423]
                 M2AccountLookupMgt.LookupMagentoStore(Rec);
-                //+MAG2.20 [320423]
             end;
 
             trigger OnValidate()
             var
                 M2AccountLookupMgt: Codeunit "NPR M2 Account Lookup Mgt.";
             begin
-                //-MAG2.20 [320423]
                 M2AccountLookupMgt.ValidateMagentoStore(Rec);
-                //+MAG2.20 [320423]
             end;
         }
     }
 }
-

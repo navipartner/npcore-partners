@@ -43,11 +43,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the NPR Bill-to E-mail field';
             }
-            field("NPR Document Processing"; "NPR Document Processing")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the NPR Document Processing field';
-            }
         }
         addafter("Shipping Advice")
         {

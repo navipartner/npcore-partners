@@ -18,6 +18,8 @@ tableextension 6014411 "NPR Purch. Inv. Header" extends "Purch. Inv. Header"
         }
         field(6014415; "NPR Document Processing"; Option)
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Document Sending Profile from Vendor is used.';
             Caption = 'Document Processing';
             DataClassification = CustomerContent;
             Description = 'PN1.00';

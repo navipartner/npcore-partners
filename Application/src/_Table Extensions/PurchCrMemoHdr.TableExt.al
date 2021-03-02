@@ -18,6 +18,8 @@ tableextension 6014414 "NPR Purch. Cr. Memo Hdr." extends "Purch. Cr. Memo Hdr."
         }
         field(6014415; "NPR Document Processing"; Option)
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Document Sending Profile from Vendor is used.';
             Caption = 'Document Processing';
             DataClassification = CustomerContent;
             Description = 'PN1.00';
