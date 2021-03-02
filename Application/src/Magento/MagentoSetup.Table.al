@@ -368,11 +368,11 @@ table 6151401 "NPR Magento Setup"
             DataClassification = CustomerContent;
             TableRelation = "Customer Posting Group";
         }
-        field(515; "Customer Template Code"; Code[10])
+        field(515; "Customer Template Code"; Code[20])
         {
             Caption = 'Customer Template Code';
             DataClassification = CustomerContent;
-            TableRelation = "Customer Template";
+            TableRelation = "Customer Templ.";
         }
         field(517; "Customer Config. Template Code"; Code[10])
         {
