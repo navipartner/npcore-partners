@@ -11,6 +11,9 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         Text006: Label 'No protocol codeunit responded to %1 method, sender ''%2'', event ''%3''. Protocol user interface %4 will now be aborted.';
         Text007: Label 'No protocol codeunit responded to Timer request. Protocol user interface %1 will now be aborted.';
         TextErrorMustNotRunThisCodeunit: Label 'You must not run this codeunit directly. This codeunit is intended to be run only from within itself.', Locked = true; // This is development type of error, do not translate!
+        ReadingParametersFailedErr: Label 'accessing parameters for workflow %1';
+        ReadingWorkflowIdErr: Label 'reading workflow ID';
+        ReadingActionNameErr: Label 'reading action name';
 
         OnRunType: Option InvokeAction,BeforeWorkflow;
         OnRunInitialized: Boolean;
@@ -79,12 +82,12 @@ codeunit 6150701 "NPR POS JavaScript Interface"
     begin
         OnBeforeWorkflow(POSAction, Parameters, POSSession, FrontEnd, Handled);
         if Handled then
-            FrontEnd.ReportBug(StrSubstNo(Text005, 'OnBeforeWorkflow'));
+            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text005, 'OnBeforeWorkflow'));
 
         Handled := false;
         OnAction(POSAction, '', Parameters, POSSession, FrontEnd, Handled);
         if Handled then
-            FrontEnd.ReportBug(StrSubstNo(Text005, 'OnAction'));
+            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text005, 'OnAction'));
     end;
 
     procedure InvokeAction("Action": Text; WorkflowStep: Text; WorkflowId: Integer; ActionId: Integer; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS JavaScript Interface")
@@ -112,7 +115,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         POSSession.SetInAction(false);
 
         if not Handled and Success then
-            FrontEnd.ReportBug(StrSubstNo(Text001, Action));
+            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text001, Action));
 
         if Success then begin
             OnAfterInvokeAction(POSAction, WorkflowStep, Context, POSSession, FrontEnd);
@@ -226,7 +229,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
     begin
         DataMgt.OnRefreshDataSet(POSSession, DataSource, DataSet, FrontEnd, Handled);
         if not Handled then
-            FrontEnd.ReportBug(StrSubstNo(Text004, 'OnRefreshDataSet', DataSource.Id));
+            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text004, 'OnRefreshDataSet', DataSource.Id));
         DataMgt.OnAfterRefreshDataSet(POSSession, DataSource, DataSet, FrontEnd);
     end;
 
@@ -242,9 +245,9 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         JsonKey: Text;
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        if not JSON.SetScope('data', false) then
+        if not JSON.SetScope('data') then
             exit;
-        if not JSON.SetScope('positions', false) then
+        if not JSON.SetScope('positions') then
             exit;
 
         JSON.GetJObject(JObject);
@@ -271,7 +274,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
     begin
         Data.OnSetPosition(DataSet.DataSource, Position, POSSession, Handled);
         if not Handled then
-            FrontEnd.ReportBug(StrSubstNo(Text004, 'OnSetPosition', DataSet.DataSource));
+            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text004, 'OnSetPosition', DataSet.DataSource));
     end;
 
     local procedure Method_AbortWorkflow(FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
@@ -280,7 +283,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         WorkflowID: Integer;
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        WorkflowID := JSON.GetInteger('id', true);
+        WorkflowID := JSON.GetIntegerOrFail('id', ReadingWorkflowIdErr);
         if WorkflowID > 0 then
             FrontEnd.AbortWorkflow(WorkflowID);
     end;
@@ -297,7 +300,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         ParametersToken: JsonToken;
         Parameters: JsonObject;
         Signal: Codeunit "NPR Front-End: WkfCallCompl.";
-        "Action": Text;
+        ActionName: Text;
         WorkflowId: Integer;
         Handled: Boolean;
         Success: Boolean;
@@ -307,12 +310,12 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         ApplyDataState(Context, POSSession, FrontEnd);
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        Action := JSON.GetString('action', true);
-        WorkflowId := JSON.GetInteger('workflowId', true);
-        JSON.GetJToken(ParametersToken, 'parameters', true);
+        ActionName := JSON.GetStringOrFail('action', ReadingActionNameErr);
+        WorkflowId := JSON.GetIntegerOrFail('workflowId', ReadingWorkflowIdErr);
+        ParametersToken := JSON.GetJTokenOrFail('parameters', StrSubstNo(ReadingParametersFailedErr, ActionName));
         Parameters := ParametersToken.AsObject();
 
-        POSSession.RetrieveSessionAction(Action, POSAction);
+        POSSession.RetrieveSessionAction(ActionName, POSAction);
         FrontEnd.WorkflowBackEndStepBegin(WorkflowId, 0);
         Stopwatch.Start('Before');
 
@@ -325,7 +328,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
             if Success then begin
                 Signal.SignalFailure(WorkflowId, 0);
                 FrontEnd.WorkflowCallCompleted(Signal);
-                FrontEnd.ReportBug(StrSubstNo(Text003, Action));
+                FrontEnd.ReportBugAndThrowError(StrSubstNo(Text003, ActionName));
             end else begin
                 Signal.SignalFailureAndThrowError(WorkflowId, 0, GetLastErrorText);
                 FrontEnd.WorkflowCallCompleted(Signal);
@@ -366,13 +369,14 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         ActionName: Text;
         Step: Text;
         Success: Boolean;
+        ReadingDeviceResponseErr: Label 'reading from device response';
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        Method := JSON.GetString('id', true);
-        Success := JSON.GetBoolean('success', true);
-        Response := JSON.GetString('response', true);
-        ActionName := JSON.GetString('action', true);
-        Step := JSON.GetString('step', true);
+        Method := JSON.GetStringOrFail('id', ReadingDeviceResponseErr);
+        Success := JSON.GetBooleanOrFail('success', ReadingDeviceResponseErr);
+        Response := JSON.GetStringOrFail('response', ReadingDeviceResponseErr);
+        ActionName := JSON.GetStringOrFail('action', ReadingDeviceResponseErr);
+        Step := JSON.GetStringOrFail('step', ReadingDeviceResponseErr);
 
         POSSession.GetStargate(Stargate);
         if Success then
@@ -391,22 +395,23 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         Step: Text;
         Callback: Boolean;
         Forced: Boolean;
+        ReadingFromProtocolMethodErr: Label 'reading from Protocol method context';
     begin
         POSSession.GetStargate(Stargate);
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        SerializedArguments := JSON.GetString('arguments', true);
-        ActionName := JSON.GetString('action', true);
-        Step := JSON.GetString('step', true);
+        SerializedArguments := JSON.GetStringOrFail('arguments', ReadingFromProtocolMethodErr);
+        ActionName := JSON.GetStringOrFail('action', ReadingFromProtocolMethodErr);
+        Step := JSON.GetStringOrFail('step', ReadingFromProtocolMethodErr);
 
-        if JSON.GetBoolean('closeProtocol', false) then begin
-            Forced := JSON.GetBoolean('forced', true);
+        if JSON.GetBoolean('closeProtocol') then begin
+            Forced := JSON.GetBooleanOrFail('forced', ReadingFromProtocolMethodErr);
             Stargate.AppGatewayProtocolClosed(ActionName, Step, SerializedArguments, Forced, FrontEnd);
             exit;
         end;
 
-        EventName := JSON.GetString('event', true);
-        Callback := JSON.GetBoolean('callback', true);
+        EventName := JSON.GetStringOrFail('event', ReadingFromProtocolMethodErr);
+        Callback := JSON.GetBooleanOrFail('callback', ReadingFromProtocolMethodErr);
         Stargate.AppGatewayProtocol(ActionName, Step, EventName, SerializedArguments, Callback, FrontEnd);
     end;
 
@@ -416,11 +421,12 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         HardwareId: Text;
         SessionName: Text;
         HostName: Text;
+        ReadingFrontEndIdErr: Label 'reading from FrontEndId method';
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        HardwareId := JSON.GetString('hardware', true);
-        SessionName := JSON.GetString('session', false);
-        HostName := JSON.GetString('host', false);
+        HardwareId := JSON.GetStringOrFail('hardware', ReadingFrontEndIdErr);
+        SessionName := JSON.GetString('session');
+        HostName := JSON.GetString('host');
         POSSession.InitializeSessionId(HardwareId, SessionName, HostName);
         FrontEnd.HardwareInitializationComplete();
     end;
@@ -440,9 +446,10 @@ codeunit 6150701 "NPR POS JavaScript Interface"
     var
         JSON: Codeunit "NPR POS JSON Management";
         KeyPressed: Text;
+        ReadingFromKeyPressErr: Label 'reading from KeyPress method context';
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        KeyPressed := JSON.GetString('key', true);
+        KeyPressed := JSON.GetStringOrFail('key', ReadingFromKeyPressErr);
 
         POSSession.ProcessKeyPress(KeyPressed);
     end;
@@ -456,11 +463,12 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         ErrorMessage: Text;
         Handled: Boolean;
         IsTimer: Boolean;
+        ReadingFromProtocolUIResponseErr: Label 'reading from protocol UI response';
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        Evaluate(ModelID, JSON.GetString('modelId', true));
-        Sender := JSON.GetString('sender', true);
-        EventName := JSON.GetString('event', true);
+        Evaluate(ModelID, JSON.GetStringOrFail('modelId', ReadingFromProtocolUIResponseErr));
+        Sender := JSON.GetStringOrFail('sender', ReadingFromProtocolUIResponseErr);
+        EventName := JSON.GetStringOrFail('event', ReadingFromProtocolUIResponseErr);
 
         if (Sender = 'n$_timer') and (EventName = 'n$_timer') then begin
             IsTimer := true;
@@ -475,7 +483,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
                 ErrorMessage := StrSubstNo(Text006, 'ProtocolUIResponse', Sender, EventName, ModelID);
 
             FrontEnd.CloseModel(ModelID);
-            FrontEnd.ReportBug(ErrorMessage);
+            FrontEnd.ReportBugAndThrowError(ErrorMessage);
         end;
     end;
 

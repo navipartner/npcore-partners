@@ -110,7 +110,7 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order"
         Sorting: Option "Entry No.","Reference No.","Processing expires at";
     begin
         SetUnprocessedFilter(LocationFilter, NpCsDocument);
-        case JSON.GetIntegerParameter('Sorting', false) of
+        case JSON.GetIntegerParameter('Sorting') of
             Sorting::"Entry No.":
                 begin
                     NpCsDocument.SetCurrentKey("Entry No.");
@@ -132,7 +132,7 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order"
         POSStore: Record "NPR POS Store";
         POSSetup: Codeunit "NPR POS Setup";
     begin
-        case JSON.GetIntegerParameter('Location From', true) of
+        case JSON.GetIntegerParameterOrFail('Location From', ActionCode()) of
             0:
                 begin
                     POSSession.GetSetup(POSSetup);
@@ -141,7 +141,7 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order"
                 end;
             1:
                 begin
-                    LocationFilter := UpperCase(JSON.GetStringParameter('Location Filter', true));
+                    LocationFilter := UpperCase(JSON.GetStringParameterOrFail('Location Filter', ActionCode()));
                 end;
         end;
 

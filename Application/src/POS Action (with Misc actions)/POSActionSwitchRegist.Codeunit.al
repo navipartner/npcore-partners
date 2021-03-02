@@ -5,6 +5,7 @@ codeunit 6150804 "NPR POS Action: Switch Regist."
         Prompt_EnterRegister: Label 'Enter Register';
         Text000: Label 'User %1 is not allowed to Switch to Register %2';
         Text001: Label 'User %1 is not allowed to Switch Register';
+        ReadingErr: Label 'reading in %1';
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
@@ -62,7 +63,7 @@ codeunit 6150804 "NPR POS Action: Switch Regist."
                 begin
                     Handled := true;
                     JSON.InitializeJObjectParser(Context, FrontEnd);
-                    NewRegisterNo := CopyStr(JSON.GetString('value', true), 1, MaxStrLen(NewRegisterNo));
+                    NewRegisterNo := CopyStr(JSON.GetStringOrFail('value', StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(NewRegisterNo));
                     SwitchRegister(Context, POSSession, FrontEnd, NewRegisterNo);
                 end;
         end;
@@ -150,4 +151,3 @@ codeunit 6150804 "NPR POS Action: Switch Regist."
         POSUnit.SetFilter("No.", Rec."NPR Register Switch Filter");
     end;
 }
-

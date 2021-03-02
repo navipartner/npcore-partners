@@ -1,15 +1,5 @@
 codeunit 6150863 "NPR POS Action: Doc. Prepay"
 {
-    // NPR5.50/MMV /20181105 CASE 300557 Created object
-    // NPR5.51/ALST/20190705 CASE 357848 added possibility to choose amount instead of percentage
-    // NPR5.52/MMV /20191004 CASE 352473 Added better pdf2nav & send support.
-    //                                   Fixed prepayment VAT.
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'Create a prepayment line for a sales order. Prepayment invoice will be posted & applied immediately upon sale end.';
         ERRDOCTYPE: Label 'Wrong Document Type. Document Type is set to %1. It must be one of %2, %3, %4 or %5';
@@ -43,7 +33,7 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.2'); //NPR5.52 [352473]
+        exit('1.2');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -56,21 +46,17 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
               ActionVersion(),
               Sender.Type::Generic,
               Sender."Subscriber Instances Allowed"::Multiple) then begin
-                //-NPR5.52 [352473]
                 RegisterWorkflowStep('prepaymentPct', 'param.Dialog && !param.InputIsAmount && numpad(labels.prepaymentDialogTitle, labels.prepaymentPctLead, param.FixedValue).cancel(abort);');
                 RegisterWorkflowStep('prepaymentAmount', 'param.Dialog && param.InputIsAmount && numpad(labels.prepaymentDialogTitle, labels.prepaymentAmountLead, param.FixedValue).cancel(abort);');
-                //+NPR5.52 [352473]
                 RegisterWorkflowStep('PrepayDocument', 'respond();');
                 RegisterWorkflow(false);
 
-                //-NPR5.52 [352473]
                 RegisterBooleanParameter('InputIsAmount', false);
                 RegisterBooleanParameter('Dialog', true);
                 RegisterDecimalParameter('FixedValue', 0);
                 RegisterBooleanParameter('SendDocument', false);
                 RegisterBooleanParameter('Pdf2NavDocument', false);
                 RegisterBooleanParameter('PrintDocument', false);
-                //+NPR5.52 [352473]
                 RegisterBooleanParameter('SelectCustomer', true);
             end;
         end;
@@ -81,11 +67,9 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
     var
         UI: Codeunit "NPR POS UI Management";
     begin
-        //+NPR5.52 [352473]
         Captions.AddActionCaption(ActionCode, 'prepaymentDialogTitle', TextPrepaymentTitle);
         Captions.AddActionCaption(ActionCode, 'prepaymentPctLead', TextPrepaymentPctLead);
         Captions.AddActionCaption(ActionCode, 'prepaymentAmtLead', TextPrepaymentAmountLead);
-        //+NPR5.52 [352473]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -105,12 +89,12 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        PrintPrepaymentDocument := JSON.GetBooleanParameter('PrintDocument', true);
-        SelectCustomer := JSON.GetBooleanParameter('SelectCustomer', true);
+        PrintPrepaymentDocument := JSON.GetBooleanParameterOrFail('PrintDocument', ActionCode());
+        SelectCustomer := JSON.GetBooleanParameterOrFail('SelectCustomer', ActionCode());
         PrepaymentValue := GetPrepaymentValue(JSON);
-        Send := JSON.GetBooleanParameter('SendDocument', true);
-        Pdf2Nav := JSON.GetBooleanParameter('Pdf2NavDocument', true);
-        InputIsAmount := JSON.GetBooleanParameter('InputIsAmount', true);
+        Send := JSON.GetBooleanParameterOrFail('SendDocument', ActionCode());
+        Pdf2Nav := JSON.GetBooleanParameterOrFail('Pdf2NavDocument', ActionCode());
+        InputIsAmount := JSON.GetBooleanParameterOrFail('InputIsAmount', ActionCode());
 
         if not CheckCustomer(POSSession, SelectCustomer) then
             exit;
@@ -169,32 +153,30 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
     var
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
     begin
-        //-NPR5.52 [352473]
         RetailSalesDocMgt.CreatePrepaymentLine(POSSession, SalesHeader, PrepaymentValue, Print, Send, Pdf2Nav, true, ValueIsAmount);
-        //+NPR5.52 [352473]
     end;
 
     procedure GetPrepaymentValue(var JSON: Codeunit "NPR POS JSON Management"): Decimal
     begin
-        //-NPR5.52 [352473]
-        if JSON.GetBooleanParameter('Dialog', true) then begin
-            if JSON.GetBooleanParameter('InputIsAmount', true) then begin
+        if JSON.GetBooleanParameterOrFail('Dialog', ActionCode()) then begin
+            if JSON.GetBooleanParameterOrFail('InputIsAmount', ActionCode()) then begin
                 exit(GetNumpad(JSON, 'prepaymentAmount'));
             end else begin
                 exit(GetNumpad(JSON, 'prepaymentPct'));
             end;
         end else
-            exit(JSON.GetDecimalParameter('FixedValue', true));
-        //+NPR5.52 [352473]
+            exit(JSON.GetDecimalParameterOrFail('FixedValue', ActionCode()));
     end;
 
     local procedure GetNumpad(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Decimal
+    var
+        ReadingErr: Label 'reading in %1';
     begin
-        JSON.SetScope('/', true);
-        if (not JSON.SetScope('$' + Path, false)) then
+        JSON.SetScopeRoot();
+        if (not JSON.SetScope('$' + Path)) then
             exit(0);
 
-        exit(JSON.GetDecimal('numpad', true));
+        exit(JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, ActionCode())));
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
@@ -203,7 +185,6 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
         if POSParameterValue."Action Code" <> ActionCode then
             exit;
 
-        //-NPR5.52 [352473]
         case POSParameterValue.Name of
             'Dialog':
                 Caption := CaptionPrepaymentDlg;
@@ -220,7 +201,6 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
             'Pdf2NavDocument':
                 Caption := CaptionPdf2NavDocument;
         end;
-        //+NPR5.52 [352473]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', false, false)]
@@ -229,7 +209,6 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
         if POSParameterValue."Action Code" <> ActionCode then
             exit;
 
-        //-NPR5.52 [352473]
         case POSParameterValue.Name of
             'Dialog':
                 Caption := DescPrepaymentDlg;
@@ -246,7 +225,6 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
             'Pdf2NavDocument':
                 Caption := DescPdf2NavDocument;
         end;
-        //+NPR5.52 [352473]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterOptionStringCaption', '', false, false)]
@@ -259,4 +237,3 @@ codeunit 6150863 "NPR POS Action: Doc. Prepay"
         end;
     end;
 }
-

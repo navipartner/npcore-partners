@@ -63,7 +63,7 @@ codeunit 6060108 "NPR MM POS Action: BackEnd Fun"
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        ItemNumber := JSON.GetStringParameter('MembershipSalesSetupItemNumber', true);
+        ItemNumber := JSON.GetStringParameterOrFail('MembershipSalesSetupItemNumber', ActionCode());
         CreateMembership(ItemNumber);
     end;
 

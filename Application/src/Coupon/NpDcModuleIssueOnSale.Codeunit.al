@@ -280,7 +280,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         if not SelectCouponType(CouponTypeCode) then
             Error('');
 
-        JSON.SetScope('parameters', true);
+        JSON.SetScopeParameters(IssueCouponActionCode());
         JSON.SetContext('CouponTypeCode', CouponTypeCode);
         FrontEnd.SetActionContext(IssueCouponActionCode(), JSON);
     end;
@@ -293,15 +293,17 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         POSSale: Codeunit "NPR POS Sale";
         CouponTypeCode: Text;
         Quantity: Integer;
+        ReadingFromActionIssueCoupon: Label 'reading in OnActionIssueCoupon';
+        SettingScopeErr: Label 'setting scope';
     begin
-        CouponTypeCode := UpperCase(JSON.GetString('CouponTypeCode', true));
+        CouponTypeCode := UpperCase(JSON.GetStringOrFail('CouponTypeCode', ReadingFromActionIssueCoupon));
         CouponType.Get(CouponTypeCode);
 
-        JSON.SetScope('/', true);
-        JSON.SetScope('$qty_input', true);
-        Quantity := JSON.GetInteger('numpad', true);
+        JSON.SetScopeRoot();
+        JSON.SetScope('$qty_input', SettingScopeErr);
+        Quantity := JSON.GetIntegerOrFail('numpad', ReadingFromActionIssueCoupon);
 
-        if JSON.GetBooleanParameter('InstantIssue', false) then begin
+        if JSON.GetBooleanParameter('InstantIssue') then begin
             NpDcModuleIssueDefault.IssueCoupons(CouponType, Quantity);
             exit;
         end;

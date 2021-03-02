@@ -8,6 +8,12 @@ codeunit 6150744 "NPR POS Keyboard Binding Mgt."
         NoSuchKeyBindErr: Label 'Keybind %1 isn''t supported.';
         KeyBindFormatErr: Label 'Keybind must begin with a supported key.';
         ProcessNotSupportedErr: Label 'This process is no longer supported.';
+        ReadingErr: Label 'reading in %1';
+
+    local procedure MethodName(): Text
+    begin
+        exit('KeyPress');
+    end;
 
     procedure DiscoverKeyboardBindings(var KeyboardBindings: List of [Text])
     var
@@ -325,12 +331,12 @@ codeunit 6150744 "NPR POS Keyboard Binding Mgt."
         JSON: Codeunit "NPR POS JSON Management";
         KeyPressed: Text;
     begin
-        if not (Method = 'KeyPress') then
+        if not (Method = MethodName()) then
             exit;
 
         Handled := true;
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        KeyPressed := JSON.GetString('key', true);
+        KeyPressed := JSON.GetStringOrFail('key', StrSubstNo(ReadingErr, MethodName()));
 
         OnInvokeKeyPress(KeyPressed, POSSession, FrontEnd, Handled);
     end;
@@ -345,4 +351,3 @@ codeunit 6150744 "NPR POS Keyboard Binding Mgt."
     begin
     end;
 }
-

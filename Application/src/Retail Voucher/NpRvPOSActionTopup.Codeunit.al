@@ -8,6 +8,8 @@ codeunit 6151023 "NPR NpRv POS Action Top-up"
         Text004: Label 'Enter Discount Amount:';
         Text005: Label 'Enter Discount Percent:';
         Text006: Label 'Top-up is not allowed for Retail Voucher %1';
+        ReadingErr: Label 'reading in %1';
+        SettingScopeErr: Label 'setting scope in %1';
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
     local procedure OnDiscoverActions(var Sender: Record "NPR POS Action")
@@ -134,11 +136,11 @@ codeunit 6151023 "NPR NpRv POS Action Top-up"
         VoucherTypeFilter: Text;
         ReferenceNo: Text;
     begin
-        VoucherTypeFilter := JSON.GetStringParameter('VoucherTypeFilter', false);
+        VoucherTypeFilter := JSON.GetStringParameter('VoucherTypeFilter');
 
-        JSON.SetScope('/', true);
-        JSON.SetScope('$voucher_input', true);
-        ReferenceNo := UpperCase(JSON.GetString('input', true));
+        JSON.SetScopeRoot();
+        JSON.SetScope('$voucher_input', StrSubstNo(SettingScopeErr, ActionCode()));
+        ReferenceNo := UpperCase(JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, ActionCode())));
 
         NpRvVoucher.SetFilter("Voucher Type", VoucherTypeFilter);
         NpRvVoucher.SetFilter("Reference No.", '=%1', ReferenceNo);
@@ -155,8 +157,8 @@ codeunit 6151023 "NPR NpRv POS Action Top-up"
         NpRvVoucher: Record "NPR NpRv Voucher";
         VoucherNo: Text;
     begin
-        JSON.SetScope('/', true);
-        VoucherNo := JSON.GetString('VoucherNo', false);
+        JSON.SetScopeRoot();
+        VoucherNo := JSON.GetString('VoucherNo');
         NpRvVoucher.Get(VoucherNo);
         PAGE.RunModal(PAGE::"NPR NpRv Voucher Card", NpRvVoucher);
     end;
@@ -170,8 +172,8 @@ codeunit 6151023 "NPR NpRv POS Action Top-up"
         VoucherNo: Text;
         DiscountType: Text;
     begin
-        JSON.SetScope('/', true);
-        VoucherNo := JSON.GetString('VoucherNo', false);
+        JSON.SetScopeRoot();
+        VoucherNo := JSON.GetString('VoucherNo');
         NpRvVoucher.Get(VoucherNo);
 
         POSSession.GetSaleLine(POSSaleLine);
@@ -184,25 +186,25 @@ codeunit 6151023 "NPR NpRv POS Action Top-up"
         POSSaleLine.InsertLine(SaleLinePOS);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        JSON.SetScope('/', true);
-        JSON.SetScope('$amt_input', true);
-        SaleLinePOS."Unit Price" := JSON.GetDecimal('numpad', true);
+        JSON.SetScopeRoot();
+        JSON.SetScope('$amt_input', StrSubstNo(SettingScopeErr, ActionCode()));
+        SaleLinePOS."Unit Price" := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, ActionCode()));
 
-        JSON.SetScope('/', true);
-        JSON.SetScope('parameters', true);
-        DiscountType := JSON.GetString('DiscountType', true);
+        JSON.SetScopeRoot();
+        JSON.SetScopeParameters(ActionCode());
+        DiscountType := JSON.GetStringOrFail('DiscountType', StrSubstNo(ReadingErr, ActionCode()));
         case DiscountType of
             '0':
                 begin
-                    JSON.SetScope('/', true);
-                    JSON.SetScope('$discount_input', true);
-                    SaleLinePOS."Discount Amount" := JSON.GetDecimal('numpad', true) * SaleLinePOS.Quantity;
+                    JSON.SetScopeRoot();
+                    JSON.SetScope('$discount_input', StrSubstNo(SettingScopeErr, ActionCode()));
+                    SaleLinePOS."Discount Amount" := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, ActionCode())) * SaleLinePOS.Quantity;
                 end;
             '1':
                 begin
-                    JSON.SetScope('/', true);
-                    JSON.SetScope('$discount_input', true);
-                    SaleLinePOS."Discount %" := JSON.GetDecimal('numpad', true);
+                    JSON.SetScopeRoot();
+                    JSON.SetScope('$discount_input', StrSubstNo(SettingScopeErr, ActionCode()));
+                    SaleLinePOS."Discount %" := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, ActionCode()));
                 end;
         end;
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
@@ -245,4 +247,3 @@ codeunit 6151023 "NPR NpRv POS Action Top-up"
         exit('1.0');
     end;
 }
-

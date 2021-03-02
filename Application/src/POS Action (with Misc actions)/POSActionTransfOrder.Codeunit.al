@@ -1,9 +1,5 @@
 codeunit 6150731 "NPR POS Action: Transf. Order"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is a built-in action for handling Transfer Orders';
         CreateNewRecordCaption: Label 'Create new record with "%1" and "%2"';
@@ -18,6 +14,7 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
         ReportSelectionRetail: Record "NPR Report Selection Retail";
         DefaultTransferToCodeCaption: Label 'Default Transfer-to Code';
         DefaultTransferToCodeDescription: Label 'Default Transfer-to location code for newly created transfer orders';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -71,8 +68,8 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('parameters', true);
-        UsePOSLocationAs := JSON.GetInteger('Register Location', true);
+        JSON.SetScopeParameters(ActionCode());
+        UsePOSLocationAs := JSON.GetIntegerOrFail('Register Location', StrSubstNo(ReadingErr, ActionCode()));
 
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
@@ -85,14 +82,14 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
                 TransferToFilter := POSStore."Location Code";
         end;
 
-        if JSON.GetBooleanParameter('NewRecord', true) then begin
+        if JSON.GetBooleanParameterOrFail('NewRecord', ActionCode()) then begin
             if Confirm(CreateNewRecordCaption, true, TransferHeader.FieldCaption("Transfer-from Code"), TransferHeader.FieldCaption("Shortcut Dimension 1 Code")) then
-                AddNewRecord(Posstore, POSUnit, JSON.GetStringParameter('DefaultTransferToCode', false));
+                AddNewRecord(Posstore, POSUnit, JSON.GetStringParameter('DefaultTransferToCode'));
         end else begin
             if TransferFromFilter = '' then
-                TransferFromFilter := JSON.GetString('Transfer-from Filter', true);
+                TransferFromFilter := JSON.GetStringOrFail('Transfer-from Filter', StrSubstNo(ReadingErr, ActionCode()));
             if TransferToFilter = '' then
-                TransferToFilter := JSON.GetString('Transfer-to Filter', true);
+                TransferToFilter := JSON.GetStringOrFail('Transfer-to Filter', StrSubstNo(ReadingErr, ActionCode()));
 
             if TransferFromFilter <> '' then
                 TransferHeader.SetFilter("Transfer-from Code", TransferFromFilter);

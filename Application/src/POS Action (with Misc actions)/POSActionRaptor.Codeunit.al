@@ -93,7 +93,7 @@ codeunit 6150875 "NPR POS Action: Raptor"
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.TestField("Customer No.");
 
-        RaptorActionCode := Context.GetStringParameter('RaptorActionCode', false);
+        RaptorActionCode := Context.GetStringParameter('RaptorActionCode');
         if RaptorActionCode <> '' then
             RaptorAction.Get(RaptorActionCode)
         else

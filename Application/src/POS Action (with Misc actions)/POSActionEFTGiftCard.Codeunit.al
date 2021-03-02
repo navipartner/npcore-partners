@@ -15,6 +15,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
         DESC_QTY_PROMPT: Label 'Prompt for number of gift cards to load';
         CAPTION_DISC_PROMPT: Label 'Discount Percent Prompt';
         DESC_DISC_PROMPT: Label 'Prompt for discount percentage to use for gift card';
+        ReadingErr: Label 'reading in %1 of %2';
 
     local procedure ActionCode(): Text
     begin
@@ -23,7 +24,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.3'); //-+NPR5.53 [375525]
+        exit('1.3');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -36,7 +37,6 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
               ActionVersion(),
               Sender.Type::Generic,
               Sender."Subscriber Instances Allowed"::Multiple) then begin
-                //-NPR5.53 [375525]
                 RegisterWorkflowStep('QuantityPrompt', 'param.PromptQuantity && intpad({caption: labels.EftGiftcardCaptionQuantity, value: 1}).cancel(abort);');
                 RegisterWorkflowStep('AmountPrompt', 'numpad({caption: labels.EftGiftcardCaptionAmount}).cancel(abort);');
                 RegisterWorkflowStep('DiscountPctPrompt', 'param.PromptDiscountPct && numpad({caption: labels.EftGiftcardCaptionDiscount}).cancel(abort);');
@@ -45,16 +45,13 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
                 RegisterWorkflowStep('LoadGiftCardAndInsertLine', 'respond();');
                 RegisterWorkflowStep('InsertDiscountLine', 'respond();');
                 RegisterWorkflowStep('GiftCardLoopIterate', 'respond();');
-                //+NPR5.53 [375525]
 
                 RegisterWorkflowStep('RefreshUI', 'respond()');
                 RegisterWorkflow(false);
 
                 RegisterTextParameter('PaymentType', '');
-                //-NPR5.53 [375525]
                 RegisterBooleanParameter('PromptDiscountPct', false);
                 RegisterBooleanParameter('PromptQuantity', false);
-                //+NPR5.53 [375525]
             end;
         end;
     end;
@@ -62,11 +59,9 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
-        //-NPR5.53 [375525]
         Captions.AddActionCaption(ActionCode, 'EftGiftcardCaptionAmount', GIFTCARD_CAPTION_AMOUNT);
         Captions.AddActionCaption(ActionCode, 'EftGiftcardCaptionDiscount', GIFTCARD_CAPTION_DISCOUNT);
         Captions.AddActionCaption(ActionCode, 'EftGiftcardCaptionQuantity', GIFTCARD_CAPTION_QTY);
-        //+NPR5.53 [375525]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -83,7 +78,6 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
             exit;
         Handled := true;
 
-        //-NPR5.53 [375525]
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
         case WorkflowStep of
@@ -98,27 +92,24 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
             'GiftCardLoopIterate':
                 GiftCardLoopIterate(POSSession, FrontEnd);
         end;
-        //-NPR5.53 [375525]
     end;
 
     local procedure GetNumpadValue(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Decimal
     begin
-        JSON.SetScope('/', true);
-        if (not JSON.SetScope('$' + Path, false)) then
+        JSON.SetScopeRoot();
+        if (not JSON.SetScope('$' + Path)) then
             exit(0);
 
-        exit(JSON.GetDecimal('numpad', true));
+        exit(JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, 'GetNumpadValue', ActionCode())));
     end;
 
     local procedure GetIntpadValue(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Decimal
     begin
-        //-NPR5.53 [375525]
-        JSON.SetScope('/', true);
-        if (not JSON.SetScope('$' + Path, false)) then
+        JSON.SetScopeRoot();
+        if (not JSON.SetScope('$' + Path)) then
             exit(0);
 
-        exit(JSON.GetDecimal('numpad', true));
-        //+NPR5.53 [375525]
+        exit(JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, 'GetInpadValue', ActionCode())));
     end;
 
     local procedure PrepareGiftCardLoop(POSSession: Codeunit "NPR POS Session"; JSON: Codeunit "NPR POS JSON Management")
@@ -128,20 +119,16 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
         DiscountPercent: Decimal;
         NoOfVouchers: Integer;
     begin
-        //-NPR5.54 [364340]
         PrepareGiftCardLoopJSONParse(JSON, PaymentType, Amount, DiscountPercent, NoOfVouchers);
         PrepareGiftCardLoopBusinessLogic(POSSession, PaymentType, Amount, DiscountPercent, NoOfVouchers);
-        //-NPR5.54 [364340]
     end;
 
     local procedure PrepareGiftCardLoopJSONParse(JSON: Codeunit "NPR POS JSON Management"; var PaymentType: Text; var Amount: Decimal; var DiscountPercent: Decimal; var NoOfVouchers: Integer)
     begin
-        //-NPR5.54 [364340]
-        PaymentType := JSON.GetStringParameter('PaymentType', true);
+        PaymentType := JSON.GetStringParameterOrFail('PaymentType', ActionCode());
         Amount := GetNumpadValue(JSON, 'AmountPrompt');
         DiscountPercent := GetNumpadValue(JSON, 'DiscountPctPrompt');
         NoOfVouchers := GetIntpadValue(JSON, 'QuantityPrompt');
-        //+NPR5.54 [364340]
     end;
 
     procedure PrepareGiftCardLoopBusinessLogic(POSSession: Codeunit "NPR POS Session"; PaymentType: Text; Amount: Decimal; DiscountPercent: Decimal; NoOfVouchers: Integer)
@@ -149,7 +136,6 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR Sale POS";
     begin
-        //-NPR5.54 [364340]
         if NoOfVouchers = 0 then
             NoOfVouchers := 1;
 
@@ -162,7 +148,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        
+
         POSSession.ClearActionState();
         POSSession.BeginAction(ActionCode());
         POSSession.StoreActionState('eft_gift_card_payment_type', PaymentType);
@@ -170,7 +156,6 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
         POSSession.StoreActionState('eft_gift_card_discount_percent', DiscountPercent);
         POSSession.StoreActionState('eft_gift_card_total_number', NoOfVouchers);
         POSSession.StoreActionState('eft_gift_card_current_number', 1);
-        //+NPR5.54 [364340]
     end;
 
     procedure LoadGiftCard(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Integer
@@ -185,7 +170,6 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
         POSPaymentMethod: Record "NPR POS Payment Method";
         EFTPaymentMgt: Codeunit "NPR EFT Transaction Mgt.";
     begin
-        //-NPR5.53 [375525]
         POSSession.RetrieveActionState('eft_gift_card_amount', Variant);
         Amount := Variant;
         POSSession.RetrieveActionState('eft_gift_card_payment_type', Variant);
@@ -196,15 +180,10 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
         POSPaymentMethod.Get(PaymentType);
         EFTSetup.FindSetup(SalePOS."Register No.", POSPaymentMethod.Code);
 
-        //-NPR5.54 [364340]
         EftEntryNo := EFTPaymentMgt.StartGiftCardLoad(EFTSetup, Amount, '', SalePOS);
-        //+NPR5.54 [364340]
         POSSession.StoreActionState('eft_gift_card_entry_no', EftEntryNo);
-        //+NPR5.53 [375525]
 
-        //-NPR5.54 [364340]
         exit(EftEntryNo);
-        //+NPR5.54 [364340]
     end;
 
     procedure InsertVoucherDiscountLine(POSSession: Codeunit "NPR POS Session"): Guid
@@ -220,7 +199,6 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
         Currency: Record Currency;
         Variant: Variant;
     begin
-        //-NPR5.53 [375525]
         POSSession.RetrieveActionState('eft_gift_card_entry_no', Variant);
         EftEntryNo := Variant;
         POSSession.RetrieveActionState('eft_gift_card_discount_percent', Variant);
@@ -228,14 +206,12 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
         POSSession.RetrieveActionState('eft_gift_card_amount', Variant);
         Amount := Variant;
 
-        //-NPR5.54 [364340]
         EFTTransactionRequest.Get(EftEntryNo);
         if (not EFTTransactionRequest.Successful) or (EFTTransactionRequest."Result Amount" = 0) or (EFTTransactionRequest."Processing Type" <> EFTTransactionRequest."Processing Type"::GIFTCARD_LOAD) then begin
             Error('');
         end;
         EFTTransactionRequest.TestField(Successful);
         EFTTransactionRequest.TestField("Result Amount");
-        //+NPR5.54 [364340]
 
         if DiscountPercent = 0 then
             exit;
@@ -263,11 +239,8 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
         POSSaleLine.InsertLineRaw(SaleLinePOS, true);
 
         POSSession.RequestRefreshData();
-        //+NPR5.53 [375525]
 
-        //-NPR5.54 [364340]
         exit(SaleLinePOS."Retail ID");
-        //+NPR5.54 [364340]
     end;
 
     local procedure GiftCardLoopIterate(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -276,7 +249,6 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
         CurrentNumber: Integer;
         Variant: Variant;
     begin
-        //-NPR5.53 [375525]
         POSSession.RetrieveActionState('eft_gift_card_total_number', Variant);
         TotalNumber := Variant;
         POSSession.RetrieveActionState('eft_gift_card_current_number', Variant);
@@ -287,7 +259,6 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
 
         POSSession.StoreActionState('eft_gift_card_current_number', CurrentNumber + 1);
         FrontEnd.ContinueAtStep('LoadGiftCardAndInsertLine');
-        //+NPR5.53 [375525]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
@@ -299,12 +270,10 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
         case POSParameterValue.Name of
             'PaymentType':
                 Caption := CaptionPaymentType;
-            //-NPR5.53 [375525]
             'PromptDiscountPct':
                 Caption := CAPTION_DISC_PROMPT;
             'PromptQuantity':
                 Caption := CAPTION_QTY_PROMPT;
-        //+NPR5.53 [375525]
         end;
     end;
 
@@ -317,12 +286,10 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
         case POSParameterValue.Name of
             'PaymentType':
                 Caption := DescPaymentType;
-            //-NPR5.53 [375525]
             'PromptDiscountPct':
                 Caption := DESC_DISC_PROMPT;
             'PromptQuantity':
                 Caption := DESC_QTY_PROMPT;
-        //+NPR5.53 [375525]
         end;
     end;
 
@@ -363,4 +330,3 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
         end;
     end;
 }
-

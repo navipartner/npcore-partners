@@ -1,18 +1,10 @@
 codeunit 6150836 "NPR POS Action: UnlockPOS"
 {
-    // NPR5.37/TSA /20171024 CASE 293905 POS Action - Unlock POS, initial version
-    // NPR5.38/NPKNAV/20180126  CASE 297087 Transport NPR5.38 - 26 January 2018
-    // NPR5.39/TSA /20180214 CASE 305106 Disallow blank password, update current sale with new sales person
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This built in function unlocks the POS';
         IllegalPassword: Label 'Illegal password.';
         ChangeSalesperson: Label 'The POS is logged in by a different salesperson. Do you want to change salesperson?';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Code[20]
     begin
@@ -63,7 +55,7 @@ codeunit 6150836 "NPR POS Action: UnlockPOS"
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        Type := JSON.GetString('type', true);
+        Type := JSON.GetStringOrFail('type', StrSubstNo(ReadingErr, ActionCode()));
 
         Clear(SalespersonPurchaser);
         RetailSetup.Get();
@@ -71,7 +63,7 @@ codeunit 6150836 "NPR POS Action: UnlockPOS"
         case Type of
             'SalespersonCode':
                 begin
-                    Password := JSON.GetString('password', true);
+                    Password := JSON.GetStringOrFail('password', StrSubstNo(ReadingErr, ActionCode()));
 
                     SalespersonPurchaser.SetFilter("NPR Register Password", '=%1', Password);
                     PasswordValid := SalespersonPurchaser.FindFirst();
@@ -118,4 +110,3 @@ codeunit 6150836 "NPR POS Action: UnlockPOS"
         POSSession.ChangeViewSale();
     end;
 }
-

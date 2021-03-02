@@ -1,12 +1,5 @@
 codeunit 6150816 "NPR POSAction: VAT Refusion"
 {
-    // NPR5.32/NPKNAV/20170526  CASE 269014 Transport NPR5.32 - 26 May 2017
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is a built in function for handling VAT refussion';
         Setup: Codeunit "NPR POS Setup";
@@ -16,6 +9,7 @@ codeunit 6150816 "NPR POSAction: VAT Refusion"
         TEXTConfrmRefussionLead: Label 'VAT Refussion payment of amount %1 are being added.\\Press Yes to add refussion payment. Press No to abort.';
         TEXTRefussionNotPos_title: Label 'VAT Refussion is not possible';
         TEXTRefussionNotPos_lead: Label 'VAT Amount can not be zero for VAT Refussion';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -96,7 +90,7 @@ codeunit 6150816 "NPR POSAction: VAT Refusion"
         //Check pos payment type
         JSON.InitializeJObjectParser(Parameters, FrontEnd);
         POSSession.GetPaymentLine(POSPaymentLine);
-        NPRPOSPaymentMethod.Get(JSON.GetString('PaymentTypePOSCode', true));
+        NPRPOSPaymentMethod.Get(JSON.GetStringOrFail('PaymentTypePOSCode', StrSubstNo(ReadingErr, ActionCode())));
 
         ValidateMinMaxAmount(NPRPOSPaymentMethod, TotalVATOnSale);
 
@@ -132,15 +126,15 @@ codeunit 6150816 "NPR POSAction: VAT Refusion"
 
         //Get payment type
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('parameters', true);
+        JSON.SetScopeParameters(ActionCode());
         POSSession.GetPaymentLine(POSPaymentLine);
-        POSPaymentLine.GetPOSPaymentMethod(POSPaymentMethod, JSON.GetString('PaymentTypePOSCode', true));
+        POSPaymentLine.GetPOSPaymentMethod(POSPaymentMethod, JSON.GetStringOrFail('PaymentTypePOSCode', StrSubstNo(ReadingErr, ActionCode())));
         POSPaymentMethod.Get(POSPaymentMethod.Code);
 
         //Get amount and add to payment line
         JSON.InitializeJObjectParser(Context, FrontEnd);
         PaymentLinePOS."No." := POSPaymentMethod.Code;
-        PaymentLinePOS."Amount Including VAT" := JSON.GetDecimal('VATAmount', true);
+        PaymentLinePOS."Amount Including VAT" := JSON.GetDecimalOrFail('VATAmount', StrSubstNo(ReadingErr, ActionCode()));
         POSPaymentLine.InsertPaymentLine(PaymentLinePOS, 0);
 
         POSSession.RequestRefreshData();
@@ -153,8 +147,6 @@ codeunit 6150816 "NPR POSAction: VAT Refusion"
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         PaymentLinePOS: Record "NPR Sale Line POS";
     begin
-        //SalePOS."Price including VAT";
-        //Register No.,Sales Ticket No.,Date,Sale Type,Line No.
         SaleLinePOS.Reset;
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
@@ -185,4 +177,3 @@ codeunit 6150816 "NPR POSAction: VAT Refusion"
                 Error(MaxAmountLimit, NPRPOSPaymentMethod.Description, NPRPOSPaymentMethod."Minimum Amount");
     end;
 }
-

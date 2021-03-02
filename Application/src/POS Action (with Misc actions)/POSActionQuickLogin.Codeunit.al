@@ -1,8 +1,8 @@
 codeunit 6150845 "NPR POS Action: Quick Login"
 {
-
     var
         Text000: Label 'Quick Login - change Salesperson on current POS Sale';
+        ReadingErr: Label 'reading in %1';
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
@@ -20,7 +20,7 @@ codeunit 6150845 "NPR POS Action: Quick Login"
             Sender.RegisterTextParameter('FixedSalespersonCode', '');
             Sender.RegisterBooleanParameter('LookupSalespersonCode', true);
             Sender.RegisterWorkflow(false);
-            end;
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -53,8 +53,8 @@ codeunit 6150845 "NPR POS Action: Quick Login"
     var
         SalespersonCode: Code[20];
     begin
-        JSON.SetScope('parameters', true);
-        SalespersonCode := JSON.GetString('FixedSalespersonCode', true);
+        JSON.SetScopeParameters(ActionCode());
+        SalespersonCode := JSON.GetStringOrFail('FixedSalespersonCode', StrSubstNo(ReadingErr, ActionCode()));
         if SalespersonCode = '' then
             exit;
 
@@ -107,4 +107,3 @@ codeunit 6150845 "NPR POS Action: Quick Login"
         exit('1.0');
     end;
 }
-

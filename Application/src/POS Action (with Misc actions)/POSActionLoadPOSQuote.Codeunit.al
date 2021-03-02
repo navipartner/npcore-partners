@@ -1,13 +1,10 @@
 codeunit 6151005 "NPR POS Action: Load POS Quote"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Load POS Sale from POS Quote';
         Text001: Label 'POS Quote';
         CannotLoad: Label 'The POS Quote is missing essential data and cannot be loaded.';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -98,10 +95,10 @@ codeunit 6151005 "NPR POS Action: Load POS Quote"
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        Filter := JSON.GetIntegerParameter('Filter', true);
+        Filter := JSON.GetIntegerParameterOrFail('Filter', ActionCode());
         POSQuoteMgt.SetSalePOSFilter(SalePOS, POSQuoteEntry, Filter);
 
-        SalesTicketNo := JSON.GetString('SalesTicketNo', false);
+        SalesTicketNo := JSON.GetString('SalesTicketNo');
         if SalesTicketNo = '' then begin
             if PAGE.RunModal(0, POSQuoteEntry) <> ACTION::LookupOK then
                 exit;
@@ -131,7 +128,7 @@ codeunit 6151005 "NPR POS Action: Load POS Quote"
         PageMgt: Codeunit "Page Management";
         QuoteEntryNo: BigInteger;
     begin
-        QuoteEntryNo := JSON.GetInteger('quote_entry_no', false);
+        QuoteEntryNo := JSON.GetInteger('quote_entry_no');
         if QuoteEntryNo = 0 then
             exit;
 
@@ -160,7 +157,7 @@ codeunit 6151005 "NPR POS Action: Load POS Quote"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         QuoteEntryNo: BigInteger;
     begin
-        QuoteEntryNo := JSON.GetInteger('quote_entry_no', true);
+        QuoteEntryNo := JSON.GetIntegerOrFail('quote_entry_no', StrSubstNo(ReadingErr, ActionCode()));
         POSQuoteEntry.Get(QuoteEntryNo);
 
         POSSession.GetSale(POSSale);

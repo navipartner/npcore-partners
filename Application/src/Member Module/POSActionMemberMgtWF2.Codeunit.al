@@ -125,7 +125,7 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         FunctionId: Integer;
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
-        FunctionId := Context.GetIntegerParameter('Function', false);
+        FunctionId := Context.GetIntegerParameter('Function');
 
         JsonText := '{}';
         case FunctionId of
@@ -176,8 +176,8 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         ResponseMessage: Text;
     begin
 
-        ExternalMemberCardNo := Context.GetString('memberCardInput', false);
-        FrontEndInputMethod := Context.GetInteger('DialogPrompt', false);
+        ExternalMemberCardNo := Context.GetString('memberCardInput');
+        FrontEndInputMethod := Context.GetInteger('DialogPrompt');
 
         GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, Membership, MemberCard, true);
 
@@ -230,8 +230,8 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         FrontEndInputMethod: Option;
         ExternalMemberCardNo: Text;
     begin
-        ExternalMemberCardNo := Context.GetString('memberCardInput', false);
-        FrontEndInputMethod := Context.GetInteger('DialogPrompt', false);
+        ExternalMemberCardNo := Context.GetString('memberCardInput');
+        FrontEndInputMethod := Context.GetInteger('DialogPrompt');
 
         GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, Membership, MemberCard, true);
 
@@ -269,8 +269,8 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         MEMBERSHIP_ENTRIES: Label 'Membership Entries.';
         MembershipEntriesJsonText: Text;
     begin
-        ExternalMemberCardNo := Context.GetString('memberCardInput', false);
-        FrontEndInputMethod := Context.GetInteger('DialogPrompt', false);
+        ExternalMemberCardNo := Context.GetString('memberCardInput');
+        FrontEndInputMethod := Context.GetInteger('DialogPrompt');
 
         GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, Membership, MemberCard, false);
 
@@ -306,10 +306,11 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         MemberInfoEntryNo: Integer;
         ADMIT_MEMBERS: Label 'Do you want to admit the member(s) automatically?';
         ExternalMemberCardNo: Text;
+        ExecutingMembershipAlterationErr: Label 'executing membership alteration';
     begin
-        ItemNo := Context.GetString('itemNumber', true);
+        ItemNo := Context.GetStringOrFail('itemNumber', ExecutingMembershipAlterationErr);
 
-        ExternalMemberCardNo := Context.GetString('memberCardInput', false);
+        ExternalMemberCardNo := Context.GetString('memberCardInput');
         GetMembershipFromCardNumberWithUI(MemberSelectionMethod::NO_PROMPT, ExternalMemberCardNo, Membership, MemberCard, false);
 
         case AlterationType of
@@ -400,8 +401,8 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         FrontEndInputMethod: Option;
         MEMBERSHIP_NOT_SELECTED: Label 'No membership was selected.';
     begin
-        ExternalMemberCardNo := Context.GetString('memberCardInput', false);
-        FrontEndInputMethod := Context.GetInteger('DialogPrompt', false);
+        ExternalMemberCardNo := Context.GetString('memberCardInput');
+        FrontEndInputMethod := Context.GetInteger('DialogPrompt');
 
         if ((FrontEndInputMethod = MemberSelectionMethod::NO_PROMPT) and (ExternalMemberCardNo = '')) then
             if (not SelectMemberCardUI(ExternalMemberCardNo)) then
@@ -429,9 +430,9 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         ExternalMemberCardNo: Text;
 
     begin
-        FunctionId := Context.GetIntegerParameter('Function', false);
+        FunctionId := Context.GetIntegerParameter('Function');
 
-        ExternalMemberCardNo := Context.GetString('memberCardInput', false);
+        ExternalMemberCardNo := Context.GetString('memberCardInput');
         GetMembershipFromCardNumberWithUI(MemberSelectionMethod::NO_PROMPT, ExternalMemberCardNo, Membership, MemberCard, false);
 
         MembershipAlterationSetup.setfilter("From Membership Code", '=%1', Membership."Membership Code");

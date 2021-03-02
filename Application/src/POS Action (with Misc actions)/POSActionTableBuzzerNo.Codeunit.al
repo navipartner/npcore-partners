@@ -1,17 +1,10 @@
 codeunit 6150780 "NPR POS Action: TableBuzzerNo"
 {
-    // NPR5.36/TSA /20170904 CASE 288568 Added option to control input dialo
-    // NPR5.43/THRO/20180531 CASE 317458 Added option to control Comment text
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'Insert a table buzzer number ';
         Prompt_EnterComment: Label 'Enter Table Buzzer Number';
         BuzzerText: Label 'Table Buzzer %1';
+        ReadingErr: Label 'reading in %1';
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
@@ -24,15 +17,10 @@ codeunit 6150780 "NPR POS Action: TableBuzzerNo"
               Sender.Type::Generic,
               Sender."Subscriber Instances Allowed"::Multiple)
             then begin
-                //-NPR5.36 [288568]
-                //RegisterWorkflowStep('', 'input(labels.prompt).respond();');
                 RegisterWorkflowStep('textfield', 'if (param.DialogType == param.DialogType["TextField"]) {input(labels.prompt).respond();}');
                 RegisterWorkflowStep('numpad', 'if (param.DialogType == param.DialogType["Numpad"]) {numpad(labels.prompt).respond();}');
                 RegisterOptionParameter('DialogType', 'TextField,Numpad', 'TextField');
-                //+NPR5.36 [288568]
-                //-NPR5.43 [317458]
                 RegisterTextParameter('CommentTextPattern', '');
-                //+NPR5.43 [317458]
                 RegisterWorkflow(false);
             end;
     end;
@@ -65,17 +53,13 @@ codeunit 6150780 "NPR POS Action: TableBuzzerNo"
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        //-NPR5.43 [317458]
-        CommentTextPattern := JSON.GetStringParameter('CommentTextPattern', true);
+        CommentTextPattern := JSON.GetStringParameterOrFail('CommentTextPattern', ActionCode());
         if CommentTextPattern = '' then
             CommentTextPattern := BuzzerText;
-        //+NPR5.43 [317458]
 
         with Line do begin
             Type := Type::Comment;
-            //-NPR5.43 [317458]
-            Description := StrSubstNo(CommentTextPattern, JSON.GetString('value', true));
-            //+NPR5.43 [317458]
+            Description := StrSubstNo(CommentTextPattern, JSON.GetStringOrFail('value', StrSubstNo(ReadingErr, ActionCode())));
         end;
 
         POSSession.GetSaleLine(SaleLine);
@@ -91,9 +75,6 @@ codeunit 6150780 "NPR POS Action: TableBuzzerNo"
 
     local procedure ActionVersion(): Text
     begin
-        //-NPR5.43 [317458]
         exit('1.2');
-        //+NPR5.43 [317458]
     end;
 }
-

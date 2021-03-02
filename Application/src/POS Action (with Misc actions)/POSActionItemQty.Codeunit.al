@@ -99,21 +99,21 @@ codeunit 6150856 "NPR POS Action: Item Qty."
         Barcode: Text;
         ItemNo: Text;
     begin
-        if not JSON.SetScope('/', false) then
+        if not JSON.SetScope('/') then
             exit(false);
-        if not JSON.SetScope('parameters', false) then
+        if not JSON.SetScope('parameters') then
             exit(false);
-        ItemNoBegin := JSON.GetIntegerParameter('Item_No_Begin', false);
-        ItemNoEnd := JSON.GetIntegerParameter('Item_No_End', false);
+        ItemNoBegin := JSON.GetIntegerParameter('Item_No_Begin');
+        ItemNoEnd := JSON.GetIntegerParameter('Item_No_End');
         if ItemNoBegin <= 0 then
             exit(false);
         if ItemNoBegin > ItemNoEnd then
             exit(false);
 
-        JSON.SetScope('/', false);
-        if not JSON.SetScope('$barcode', false) then
+        JSON.SetScope('/');
+        if not JSON.SetScope('$barcode') then
             exit(false);
-        Barcode := UpperCase(JSON.GetString('input', false));
+        Barcode := UpperCase(JSON.GetString('input'));
         if Barcode = '' then
             exit(false);
 
@@ -131,17 +131,17 @@ codeunit 6150856 "NPR POS Action: Item Qty."
         QuantityDecimalPosition: Integer;
         Barcode: Text;
     begin
-        if not JSON.SetScope('/', false) then
+        if not JSON.SetScope('/') then
             exit(false);
-        if not JSON.SetScope('parameters', false) then
+        if not JSON.SetScope('parameters') then
             exit(false);
-        QuantityBegin := JSON.GetIntegerParameter('Quantity_Begin', false);
-        QuantityEnd := JSON.GetIntegerParameter('Quantity_End', false);
-        QuantityDecimalPosition := JSON.GetIntegerParameter('Quantity_Decimal_Position', false);
-        JSON.SetScope('/', false);
-        if not JSON.SetScope('$barcode', false) then
+        QuantityBegin := JSON.GetIntegerParameter('Quantity_Begin');
+        QuantityEnd := JSON.GetIntegerParameter('Quantity_End');
+        QuantityDecimalPosition := JSON.GetIntegerParameter('Quantity_Decimal_Position');
+        JSON.SetScope('/');
+        if not JSON.SetScope('$barcode') then
             exit(false);
-        Barcode := JSON.GetString('input', false);
+        Barcode := JSON.GetString('input');
         if Barcode = '' then
             exit;
 

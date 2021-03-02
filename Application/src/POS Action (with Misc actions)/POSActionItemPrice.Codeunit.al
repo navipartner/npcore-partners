@@ -1,16 +1,5 @@
 codeunit 6150852 "NPR POS Action - Item Price"
 {
-    // 
-    // NPR5.41/TSA /20180419 CASE 309052 Initial Version
-    // NPR5.41/TSA /20180423 CASE 309052 Adding handling of expanded BOM and associated items, causing multiple lines to added to POS
-    // NPR5.43/MHA /20180621 CASE 319231 Added parameters to extend Item lookup and enable display of Amount Excl. Vat
-    // NPR5.49/TJ  /20190201 CASE 335739 Using POS View Profile instead of Register
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This action prompts for a numeric item number, and shows the price';
         ValueSelection: Option LIST,"FIXED";
@@ -19,6 +8,7 @@ codeunit 6150852 "NPR POS Action - Item Price"
         Caption: Label 'Item Number';
         PriceQuery: Label 'Price Query';
         PriceInfoHtml: Label '<center><table border="0"><tr><td align="left">%1</td><td align="right"><h2>%2</h2></td></tr><tr><td align="left">%3</td><td align="right"><h2>%4</h2></td></tr><tr><td align="left">%5</td><td align="right"><h2>%6</h2></td></tr></table>';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -27,10 +17,7 @@ codeunit 6150852 "NPR POS Action - Item Price"
 
     local procedure ActionVersion(): Text
     begin
-        //-NPR5.43 [319231]
         exit('1.3');
-        //+NPR5.43 [319231]
-        exit('1.2');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -50,10 +37,8 @@ codeunit 6150852 "NPR POS Action - Item Price"
             Sender.RegisterWorkflowStep('showinfo', 'message ({title: context.confirm_title, caption: context.confirm_message});');
             Sender.RegisterWorkflow(false);
 
-            //-NPR5.43 [319231]
             Sender.RegisterBooleanParameter('priceExclVat', false);
             Sender.RegisterOptionParameter('itemIdentifyerType', 'ItemNo,ItemCrossReference,ItemSearch', 'ItemNo');
-            //+NPR5.43 [319231]
         end;
     end;
 
@@ -108,12 +93,11 @@ codeunit 6150852 "NPR POS Action - Item Price"
 
                     if not POSSession.RetrieveSessionAction('ITEM', POSAction) then
                         POSAction.Get('ITEM');
-                    JSON.SetScope('parameters', true);
-                    ItemIdentifyerType := JSON.GetString('itemIdentifyerType', false);
-                    JSON.SetScope('/', true);
+                    JSON.SetScopeParameters(ActionCode());
+                    ItemIdentifyerType := JSON.GetString('itemIdentifyerType');
+                    JSON.SetScopeRoot();
                     if ItemIdentifyerType <> '' then
                         POSAction.SetWorkflowInvocationParameter('itemIdentifyerType', ItemIdentifyerType, FrontEnd);
-                    //+NPR5.43 [319231]
                     POSAction.SetWorkflowInvocationParameter('itemNo', CopyStr(GetNumpad(JSON, 'itemnumber'), 1, MaxStrLen(Item."No.")), FrontEnd);
                     FrontEnd.InvokeWorkflow(POSAction);
 
@@ -121,7 +105,7 @@ codeunit 6150852 "NPR POS Action - Item Price"
 
             'gatherinfo':
                 begin
-                    LineNumber := JSON.GetInteger('LastSaleLineNoBeforeAddItem', true);
+                    LineNumber := JSON.GetIntegerOrFail('LastSaleLineNoBeforeAddItem', StrSubstNo(ReadingErr, ActionCode()));
 
                     POSSession.GetSale(POSSale);
                     POSSale.GetCurrentSale(SalePOS);
@@ -135,9 +119,9 @@ codeunit 6150852 "NPR POS Action - Item Price"
                       SaleLinePOS.FieldCaption("No."), SaleLinePOS."No.",
                       SaleLinePOS.FieldCaption(Description), StrSubstNo('%1<br><h4>%2</h4>', SaleLinePOS.Description, SaleLinePOS."Description 2"),
                       SaleLinePOS.FieldCaption("Amount Including VAT"), SaleLinePOS."Amount Including VAT"));
-                    JSON.SetScope('parameters', true);
-                    PriceExclVat := JSON.GetBoolean('priceExclVat', false);
-                    JSON.SetScope('/', true);
+                    JSON.SetScopeParameters(ActionCode());
+                    PriceExclVat := JSON.GetBoolean('priceExclVat');
+                    JSON.SetScopeRoot();
                     if PriceExclVat then
                         JSON.SetContext('confirm_message', StrSubstNo(PriceInfoHtml,
                           SaleLinePOS.FieldCaption("No."), SaleLinePOS."No.",
@@ -166,14 +150,10 @@ codeunit 6150852 "NPR POS Action - Item Price"
 
     local procedure GetNumpad(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
     begin
-
-        if (not JSON.SetScopeRoot(false)) then
+        JSON.SetScopeRoot();
+        if (not JSON.SetScope('$' + Path)) then
             exit('');
 
-        if (not JSON.SetScope('$' + Path, false)) then
-            exit('');
-
-        exit(JSON.GetString('input', false));
+        exit(JSON.GetString('input'));
     end;
 }
-

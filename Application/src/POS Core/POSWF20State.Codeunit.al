@@ -32,7 +32,7 @@ codeunit 6150734 "NPR POS WF 2.0: State"
             Object := StoreActionStateRecRef(Object);
 
         if not TryStoreActionState(ActionCode + '.' + Key, Object) then
-            FrontEnd.ReportBug(StrSubstNo(Text003, ActionCode, GetLastErrorText));
+            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text003, ActionCode, GetLastErrorText));
     end;
 
     procedure RetrieveActionState("Key": Text; var "Object": Variant)

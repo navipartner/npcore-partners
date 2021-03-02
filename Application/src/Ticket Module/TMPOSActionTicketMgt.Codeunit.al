@@ -1,9 +1,5 @@
 codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         ILLEGAL_VALUE: Label 'Value %1 is not a valid %2.';
         TICKET_NUMBER: Label 'Ticket Number';
@@ -64,7 +60,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
                                     'Revoke Reservation,Edit Reservation,Reconfirm Reservation,' +
                                     'Edit Ticketholder,' +
                                   'Change Confirmed Ticket Quantity,Pickup Ticket Reservation,Convert To Membership,' +
-                                  'Register Departure'; 
+                                  'Register Departure';
 
             for N := 1 to 10 do
                 JSArr += StrSubstNo('"%1",', SelectStr(N, FunctionOptionString));
@@ -83,7 +79,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
             Sender.RegisterOptionParameter('Function', FunctionOptionString, 'Register Arrival');
             Sender.RegisterTextParameter('Admission Code', '');
             Sender.RegisterTextParameter('DefaultTicketNumber', '');
-            Sender.RegisterBooleanParameter('PrintTicketOnArrival', false); 
+            Sender.RegisterBooleanParameter('PrintTicketOnArrival', false);
 
         end;
 
@@ -98,7 +94,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
                                     'Revoke Reservation,Edit Reservation,Reconfirm Reservation,' +
                                     'Edit Ticketholder,' +
                                   'Change Confirmed Ticket Quantity,Pickup Ticket Reservation,Convert To Membership,' +
-                                  'Register Departure'; 
+                                  'Register Departure';
             for N := 1 to 10 do
                 OptionsNameArray += StrSubstNo('"%1",', SelectStr(N, FunctionOptionString));
             OptionsNameArray := StrSubstNo('var optionNames = [%1];', CopyStr(OptionsNameArray, 1, StrLen(OptionsNameArray) - 1));
@@ -168,14 +164,15 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         SaleLinePOS: Record "NPR Sale Line POS";
         FunctionId: Integer;
         DefaultTicketNumber: Text;
+        BeforeWorkflowErr: Label 'executing OnBeforeWorkflow of %1';
     begin
 
         if (not Action.IsThisAction(ActionCode(''))) then
             exit;
 
         JSON.InitializeJObjectParser(Parameters, FrontEnd);
-        FunctionId := JSON.GetInteger('Function', true);
-        DefaultTicketNumber := JSON.GetString('DefaultTicketNumber', false);
+        FunctionId := JSON.GetIntegerOrFail('Function', StrSubstNo(BeforeWorkflowErr, ActionCode('')));
+        DefaultTicketNumber := JSON.GetString('DefaultTicketNumber');
 
         if (FunctionId < 0) then
             FunctionId := 1;
@@ -231,14 +228,14 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        FunctionId := JSON.GetIntegerParameter('Function', true);
+        FunctionId := JSON.GetIntegerParameterOrFail('Function', ActionCode(''));
         if (FunctionId < 0) then
             FunctionId := 0;
 
-        AdmissionCode := JSON.GetStringParameter('Admission Code', false);
-        DefaultTicketNumber := JSON.GetStringParameter('DefaultTicketNumber', false);
+        AdmissionCode := JSON.GetStringParameter('Admission Code');
+        DefaultTicketNumber := JSON.GetStringParameter('DefaultTicketNumber');
         TicketReference := CopyStr(GetInput(JSON, 'ticketreference'), 1, MaxStrLen(TicketReference));
-        WithTicketPrint := JSON.GetBooleanParameter('PrintTicketOnArrival', false); //-+TM1.47 [356582]
+        WithTicketPrint := JSON.GetBooleanParameter('PrintTicketOnArrival'); //-+TM1.47 [356582]
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
@@ -423,22 +420,22 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         WithTicketPrint: Boolean;
     begin
 
-        FunctionId := Context.GetIntegerParameter('Function', true);
+        FunctionId := Context.GetIntegerParameterOrFail('Function', ActionCode(''));
         if (FunctionId < 0) then
             FunctionId := 1;
 
-        AdmissionCode := Context.GetStringParameter('Admission Code', false);
-        DefaultTicketNumber := Context.GetStringParameter('DefaultTicketNumber', false);
-        WithTicketPrint := Context.GetBooleanParameter('PrintTicketOnArrival', false); //-+TM1.47 [356582]
+        AdmissionCode := Context.GetStringParameter('Admission Code');
+        DefaultTicketNumber := Context.GetStringParameter('DefaultTicketNumber');
+        WithTicketPrint := Context.GetBooleanParameter('PrintTicketOnArrival'); //-+TM1.47 [356582]
 
-        Context.SetScope('', true);
-        Context.SetScope('TicketReference', false);
-        TicketReference := Context.GetString('value', false);
+        Context.SetScopeRoot();
+        Context.SetScope('TicketReference');
+        TicketReference := Context.GetString('value');
 
-        Context.SetScopeRoot(true);
-        Context.SetScope('ticketnumber', false);
+        Context.SetScopeRoot();
+        Context.SetScope('ticketnumber');
         if (DefaultTicketNumber = '') then begin
-            ExternalTicketNumber := CopyStr(Context.GetString('value', false), 1, MaxStrLen(ExternalTicketNumber));
+            ExternalTicketNumber := CopyStr(Context.GetString('value'), 1, MaxStrLen(ExternalTicketNumber));
         end else begin
             ExternalTicketNumber := CopyStr(DefaultTicketNumber, 1, MaxStrLen(ExternalTicketNumber));
             if (FunctionId = 1) then begin
@@ -447,7 +444,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
             end;
         end;
 
-        Context.SetScopeRoot(true);
+        Context.SetScopeRoot();
 
         case WorkflowStep of
             'ConfigureWorkflow':
@@ -642,7 +639,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
             exit;
         end;
 
-        
+
         //IF (SaleLinePOS.Quantity < 0) THEN
         //  ERROR (DELETE_SINGLE_ERROR);
 
@@ -723,7 +720,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
 
                 //AquireTicketParticipant (Token, ExternalMemberNo);
                 AquireTicketParticipant(Token, ExternalMemberNo, false);
-               
+
                 if (GetTicketUnitPrice(Token, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) then begin
                     SaleLinePOS.Validate("Unit Price", TicketUnitPrice);
                     SaleLinePOS.UpdateAmounts(SaleLinePOS);
@@ -777,7 +774,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
             //      END;
             //    END;
             if (POSSession.IsActiveSession(FrontEnd)) then
-                SeatingUI.ShowSelectSeatUI(FrontEnd, Token, false); 
+                SeatingUI.ShowSelectSeatUI(FrontEnd, Token, false);
 
             exit(1);
         end;
@@ -1080,7 +1077,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
 
         QtyChanged := TicketManagement.AttemptChangeConfirmedTicketQuantity(Ticket."No.", AdmissionCode, NewTicketQty, ResponseMessage);
 
-        JSON.SetScope('/', true);
+        JSON.SetScopeRoot();
         JSON.SetContext('Verbose', (not QtyChanged));
         if (not QtyChanged) then
             JSON.SetContext('VerboseMessage', ResponseMessage);
@@ -1416,21 +1413,21 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
     local procedure GetInput(var JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
     begin
 
-        JSON.SetScope('/', true);
-        if (not JSON.SetScope('$' + Path, false)) then
+        JSON.SetScopeRoot();
+        if (not JSON.SetScope('$' + Path)) then
             exit('');
 
-        exit(JSON.GetString('input', false));
+        exit(JSON.GetString('input'));
     end;
 
     local procedure GetInteger(var JSON: Codeunit "NPR POS JSON Management"; Path: Text): Integer
     begin
 
-        JSON.SetScope('/', true);
-        if (not JSON.SetScope('$' + Path, false)) then
+        JSON.SetScopeRoot();
+        if (not JSON.SetScope('$' + Path)) then
             exit(0);
 
-        exit(JSON.GetInteger('numpad', false));
+        exit(JSON.GetInteger('numpad'));
     end;
 
     local procedure IsTicketSalesLine(SaleLinePOS: Record "NPR Sale Line POS"): Boolean
@@ -1530,4 +1527,3 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         exit(CODEUNIT::"NPR TM POS Action: Ticket Mgt.");
     end;
 }
-

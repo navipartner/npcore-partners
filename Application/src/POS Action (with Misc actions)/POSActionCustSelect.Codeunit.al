@@ -56,10 +56,10 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        CustomerTableView := JSON.GetStringParameter('CustomerTableView', true);
-        CustomerLookupPage := JSON.GetIntegerParameter('CustomerLookupPage', true);
-        Operation := JSON.GetIntegerParameter('Operation', true);
-        SpecificCustomerNo := JSON.GetStringParameter('customerNo', true);
+        CustomerTableView := JSON.GetStringParameterOrFail('CustomerTableView', ActionCode());
+        CustomerLookupPage := JSON.GetIntegerParameterOrFail('CustomerLookupPage', ActionCode());
+        Operation := JSON.GetIntegerParameterOrFail('Operation', ActionCode());
+        SpecificCustomerNo := JSON.GetStringParameterOrFail('customerNo', ActionCode());
 
         case Operation of
             Operation::Attach:
@@ -257,4 +257,3 @@ codeunit 6150865 "NPR POS Action: Cust. Select"
         exit('CUSTOMERNO');
     end;
 }
-

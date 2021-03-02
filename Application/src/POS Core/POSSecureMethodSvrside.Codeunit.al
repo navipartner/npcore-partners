@@ -1,13 +1,5 @@
 codeunit 6150736 "NPR POS Secure Method Svrside"
 {
-    // NPR5.43/VB  /20180611  CASE 314603 Implemented secure method behavior functionality.
-    // NPR5.46/TSA /20180914 CASE 314603 Adding the system default security methods
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text001: Label 'No handler responded to server-side password validation event for %1.';
         FrontEndCached: Codeunit "NPR POS Front End Management";
@@ -19,6 +11,12 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
         Text006: Label 'You are not authorized to execute this action. Function requires %1';
         Text007: Label 'A supervisor salesperson is required for this action.';
         Text008: Label 'Retail Setup Admin Password.';
+        ReadingErr: Label 'reading in %1';
+
+    local procedure MethodName(): Text
+    begin
+        exit('SecureMethod');
+    end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnCustomMethod', '', false, false)]
     local procedure OnCustomMethod_SecureMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
@@ -27,7 +25,7 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
         SecureMethod: Text;
         ActionHandled: Boolean;
     begin
-        if Method <> 'SecureMethod' then
+        if Method <> MethodName() then
             exit;
 
         Handled := true;
@@ -35,14 +33,14 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
         FrontEndCached := FrontEnd;
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        case JSON.GetString('action', true) of
+        case JSON.GetStringOrFail('action', StrSubstNo(ReadingErr, MethodName())) of
             'validate':
                 begin
-                    SecureMethod := JSON.GetString('method', true);
-                    RequestId := JSON.GetInteger('requestId', true);
-                    OnSecureMethodValidatePassword(SecureMethod, JSON.GetString('password', true), ActionHandled);
+                    SecureMethod := JSON.GetStringOrFail('method', StrSubstNo(ReadingErr, MethodName()));
+                    RequestId := JSON.GetIntegerOrFail('requestId', StrSubstNo(ReadingErr, MethodName()));
+                    OnSecureMethodValidatePassword(SecureMethod, JSON.GetStringOrFail('password', StrSubstNo(ReadingErr, MethodName())), ActionHandled);
                     if not ActionHandled then
-                        FrontEnd.ReportBug(StrSubstNo(Text001, SecureMethod));
+                        FrontEnd.ReportBugAndThrowError(StrSubstNo(Text001, SecureMethod));
                 end;
         end;
     end;
@@ -62,10 +60,7 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
         FrontEndCached.ValidateSecureMethodPassword(RequestId, false, SkipUI, Reason, '');
     end;
 
-    local procedure "---System Default Security Methods"()
-    begin
-        // Following are the default security methods provided out-of-the-box
-    end;
+    #region Default security methods provided out-of-the-box
 
     procedure AnySalespersonMethodCode(): Code[10]
     begin
@@ -91,6 +86,8 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
     begin
         exit('ADMIN-PWD');
     end;
+
+    #endregion
 
     [EventSubscriber(ObjectType::Table, 6150725, 'OnDiscoverSecureMethods', '', true, true)]
     local procedure OnDiscoverSecureMethods(var Sender: Record "NPR POS Secure Method")
@@ -233,4 +230,3 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
         Sender.RejectPassword(false, Reason);
     end;
 }
-

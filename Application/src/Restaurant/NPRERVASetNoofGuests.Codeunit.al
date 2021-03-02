@@ -36,7 +36,7 @@ codeunit 6150686 "NPR NPRE RVA: Set No.of Guests"
 
         Handled := true;
 
-        WaiterPad."No." := Context.GetStringParameter('WaiterPadCode', true);
-        SeatingCode := Context.GetStringParameter('SeatingCode', true);
+        WaiterPad."No." := Context.GetStringParameterOrFail('WaiterPadCode', ActionCode());
+        SeatingCode := Context.GetStringParameterOrFail('SeatingCode', ActionCode());
     end;
 }

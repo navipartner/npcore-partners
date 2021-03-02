@@ -307,7 +307,7 @@ codeunit 6150700 "NPR POS Session"
     procedure BeginAction("Action": Text): Guid
     begin
         if ActionStateInAction then
-            FrontEnd.ReportBug(StrSubstNo(Text004, Action, ActionStateCurrentAction, ActionStateCurrentActionId));
+            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text004, Action, ActionStateCurrentAction, ActionStateCurrentActionId));
 
         ActionStateInAction := true;
         ActionState := ActionState.Dictionary();
@@ -324,7 +324,7 @@ codeunit 6150700 "NPR POS Session"
             Object := StoreActionStateRecRef(Object);
 
         if not TryStoreActionState(Key, Object) then
-            FrontEnd.ReportBug(StrSubstNo(Text003, ActionStateCurrentAction, GetLastErrorText));
+            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text003, ActionStateCurrentAction, GetLastErrorText));
     end;
 
     procedure RetrieveActionState("Key": Text; var "Object": Variant)
@@ -351,7 +351,7 @@ codeunit 6150700 "NPR POS Session"
     procedure EndAction("Action": Text; Id: Guid)
     begin
         if (Action <> ActionStateCurrentAction) or (Id <> ActionStateCurrentActionId) then
-            FrontEnd.ReportBug(StrSubstNo(Text005, Action, Id, ActionStateCurrentAction, ActionStateCurrentActionId));
+            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text005, Action, Id, ActionStateCurrentAction, ActionStateCurrentActionId));
 
         ClearActionState();
     end;
@@ -486,7 +486,7 @@ codeunit 6150700 "NPR POS Session"
         OnKeyPress(KeyPress, This, Setup, FrontEnd, Handled);
 
         if not Handled then
-            FrontEnd.ReportBug(StrSubstNo(Text006, KeyPress));
+            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text006, KeyPress));
     end;
 
     procedure IsInAction(): Boolean

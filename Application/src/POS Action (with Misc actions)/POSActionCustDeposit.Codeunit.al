@@ -10,6 +10,7 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
         DESC_DEPOSITTYPE: Label 'Select how deposit is entered';
         DESC_CUSTOMERVIEW: Label 'Pre-filtered customer entry view';
         OPTION_DEPOSITTYPE: Label 'Apply To Customer Entries,Invoice No. Prompt,Amount Prompt,Match Amount To Customer Balance,Cr. Memo No. Prompt';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -69,8 +70,8 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        DepositType := JSON.GetIntegerParameter('DepositType', true);
-        CustomerEntryView := JSON.GetStringParameter('CustomerEntryView', true);
+        DepositType := JSON.GetIntegerParameterOrFail('DepositType', ActionCode());
+        CustomerEntryView := JSON.GetStringParameterOrFail('CustomerEntryView', ActionCode());
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -219,20 +220,20 @@ codeunit 6150864 "NPR POS Action: Cust. Deposit"
 
     local procedure GetInput(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
     begin
-        JSON.SetScope('/', true);
-        if (not JSON.SetScope('$' + Path, false)) then
+        JSON.SetScopeRoot();
+        if (not JSON.SetScope('$' + Path)) then
             exit('');
 
-        exit(JSON.GetString('input', true));
+        exit(JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, ActionCode())));
     end;
 
     local procedure GetNumpad(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Decimal
     begin
-        JSON.SetScope('/', true);
-        if (not JSON.SetScope('$' + Path, false)) then
+        JSON.SetScopeRoot();
+        if (not JSON.SetScope('$' + Path)) then
             exit(0);
 
-        exit(JSON.GetDecimal('numpad', true));
+        exit(JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, ActionCode())));
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', false, false)]

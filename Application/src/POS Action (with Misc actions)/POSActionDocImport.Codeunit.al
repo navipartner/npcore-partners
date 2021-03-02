@@ -1,16 +1,5 @@
 codeunit 6150861 "NPR POS Action: Doc. Import"
 {
-    // NPR5.50/MMV /20181105 CASE 300557 New action, based on CU 6150815
-    // NPR5.53/ALPO/20191211 CASE 378678 Data source extension to have number of open sales orders available for displaying on a POS button
-    // NPR5.54/ALPO/20200127 CASE 387130 New parameter to predefine filter and view for sales order list
-    // NPR5.54/ALPO/20200305 CASE 387428 Possibility to filter list of available documents by location; use the same location filter to calculate number of open sales orders
-    //                                   Use customer from selected sales document, if none is preselected
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'Import an open standard NAV sales document to current POS sale and delete the document.';
         Setup: Codeunit "NPR POS Setup";
@@ -38,10 +27,7 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.3');  //NPR5.54 [387428]
-        //EXIT ('1.2');  //NPR5.54 [387130]
-        //EXIT ('1.1');  //NPR5.53 [378678]
-        //EXIT ('1.0');
+        exit('1.3');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -56,15 +42,13 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
               Sender."Subscriber Instances Allowed"::Multiple) then begin
                 RegisterWorkflowStep('ImportDocument', 'respond();');
                 RegisterWorkflow(false);
-                RegisterDataSourceBinding(ThisDataSource);  //NPR5.53 [378678]
+                RegisterDataSourceBinding(ThisDataSource);
 
                 RegisterOptionParameter('DocumentType', 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order', 'Order');
                 RegisterBooleanParameter('SelectCustomer', true);
-                RegisterTextParameter('SalesDocViewString', '');  //NPR5.54 [387130]
-                                                                  //-NPR5.54 [387428]
+                RegisterTextParameter('SalesDocViewString', '');
                 Sender.RegisterOptionParameter('LocationFrom', 'POS Store,Location Filter Parameter', 'POS Store');
                 Sender.RegisterTextParameter('LocationFilter', '');
-                //+NPR5.54 [387428]
             end;
         end;
     end;
@@ -86,38 +70,29 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        SelectCustomer := JSON.GetBooleanParameter('SelectCustomer', true);
-        DocumentType := JSON.GetIntegerParameter('DocumentType', true);
-        SalesDocViewString := JSON.GetStringParameter('SalesDocViewString', false);  //NPR5.54 [387130]
-        //-NPR5.54 [387428]
-        LocationSource := JSON.GetIntegerParameter('LocationFrom', true);
-        LocationFilter := JSON.GetStringParameter('LocationFilter', false);
-        //+NPR5.54 [387428]
+        SelectCustomer := JSON.GetBooleanParameterOrFail('SelectCustomer', ActionCode());
+        DocumentType := JSON.GetIntegerParameterOrFail('DocumentType', ActionCode());
+        SalesDocViewString := JSON.GetStringParameter('SalesDocViewString');
+        LocationSource := JSON.GetIntegerParameterOrFail('LocationFrom', ActionCode());
+        LocationFilter := JSON.GetStringParameter('LocationFilter');
 
         if not CheckCustomer(POSSession, SelectCustomer) then
             exit;
 
-        //IF NOT SelectDocument(POSSession, SalesHeader, DocumentType) THEN  //NPR5.54 [387130]-revoked
-        //-NPR5.54 [387130]
         if not
             SelectDocument(
               POSSession,
               SalesHeader,
               DocumentType,
               SalesDocViewString,
-              //-NPR5.54 [387428]
               LocationSource,
               LocationFilter)
-        //+NPR5.54 [387428]
         then
-            //+NPR5.54 [387130]
             exit;
 
-        //-NPR5.54 [387428]
         SalesHeader.TestField("Bill-to Customer No.");
         POSSession.GetSale(POSSale);
         SetPosSaleCustomer(POSSale, SalesHeader."Bill-to Customer No.");
-        //+NPR5.54 [387428]
 
         ImportFromDocument(Context, POSSession, FrontEnd, SalesHeader);
     end;
@@ -141,13 +116,7 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
         if PAGE.RunModal(0, Customer) <> ACTION::LookupOK then
             exit(false);
 
-        //-NPR5.54 [387428]-revoked
-        // SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
-        // SalePOS.VALIDATE("Customer No.", Customer."No.");
-        // SalePOS.MODIFY(TRUE);
-        // POSSale.RefreshCurrent();
-        //+NPR5.54 [387428]-revoked
-        SetPosSaleCustomer(POSSale, Customer."No.");  //NPR5.54 [387428]
+        SetPosSaleCustomer(POSSale, Customer."No.");
         Commit;
         exit(true);
     end;
@@ -156,7 +125,6 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
     var
         SalePOS: Record "NPR Sale POS";
     begin
-        //-NPR5.54 [387428]
         POSSale.GetCurrentSale(SalePOS);
         if SalePOS."Customer No." <> '' then
             exit;
@@ -165,7 +133,6 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
         SalePOS.Modify(true);
         POSSale.RefreshCurrent();
         POSSale.SetModified();
-        //+NPR5.54 [387428]
     end;
 
     local procedure SelectDocument(POSSession: Codeunit "NPR POS Session"; var SalesHeader: Record "Sales Header"; DocumentType: Integer; SalesDocViewString: Text; LocationSource: Option "POS Store","Location Filter Parameter"; LocationFilter: Text): Boolean
@@ -178,15 +145,12 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
-        //-NPR5.54 [387130]
         if SalesDocViewString <> '' then
             SalesHeader.SetView(SalesDocViewString);
         SalesHeader.FilterGroup(2);
-        //+NPR5.54 [387130]
         if SalePOS."Customer No." <> '' then
             SalesHeader.SetRange("Bill-to Customer No.", SalePOS."Customer No.");
         SalesHeader.SetRange("Document Type", DocumentType);
-        //-NPR5.54 [387428]
         case LocationSource of
             LocationSource::"POS Store":
                 begin
@@ -196,13 +160,9 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
         end;
         if LocationFilter <> '' then
             SalesHeader.SetFilter("Location Code", LocationFilter);
-        //+NPR5.54 [387428]
-        //-NPR5.54 [387130]
         SalesHeader.FilterGroup(0);
         if SalesHeader.FindFirst then;
         exit(RetailSalesDocImpMgt.SelectSalesDocument('', SalesHeader));
-        //+NPR5.54 [387130]
-        //EXIT(RetailSalesDocImpMgt.SelectSalesDocument(SalesHeader.GETVIEW(FALSE), SalesHeader));  //NPR5.54 [387130]-revoked
     end;
 
     local procedure ImportFromDocument(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var SalesHeader: Record "Sales Header")
@@ -231,13 +191,11 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
             'SelectCustomer':
                 Caption := CaptionSelectCustomer;
             'SalesDocViewString':
-                Caption := CaptionSalesView;  //NPR5.54 [387130]
-                                              //-NPR5.54 [387428]
+                Caption := CaptionSalesView;
             'LocationFrom':
                 Caption := CaptionLocationFrom;
             'LocationFilter':
                 Caption := CaptionLocationFilter;
-        //+NPR5.54 [387428]
         end;
     end;
 
@@ -253,13 +211,11 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
             'SelectCustomer':
                 Caption := DescSelectCustomer;
             'SalesDocViewString':
-                Caption := DescSalesView;  //NPR5.54 [387130]
-                                           //-NPR5.54 [387428]
+                Caption := DescSalesView;
             'LocationFrom':
                 Caption := DescLocationFrom;
             'LocationFilter':
                 Caption := DescLocationFilter;
-        //+NPR5.54 [387428]
         end;
     end;
 
@@ -273,7 +229,7 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
             'DocumentType':
                 Caption := OptionDocType;
             'LocationFrom':
-                Caption := OptionLocationFrom;  //NPR5.54 [387428]
+                Caption := OptionLocationFrom;
         end;
     end;
 
@@ -285,7 +241,6 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
         LocationList: Page "Location List";
         FilterPageBuilder: FilterPageBuilder;
     begin
-        //-NPR5.54 [387130]
         if POSParameterValue."Action Code" <> ActionCode then
             exit;
 
@@ -301,7 +256,6 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
                         POSParameterValue.Value := FilterPageBuilder.GetView(SalesHeader.TableCaption, false);
                 end;
 
-            //-NPR5.54 [387428]
             'LocationFilter':
                 begin
                     Clear(LocationList);
@@ -311,9 +265,7 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
                     if LocationList.RunModal = ACTION::LookupOK then
                         POSParameterValue.Value := LocationList.GetSelectionFilter();
                 end;
-        //+NPR5.54 [387428]
         end;
-        //+NPR5.54 [387130]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnValidateValue', '', false, false)]
@@ -321,7 +273,6 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
     var
         SalesHeader: Record "Sales Header";
     begin
-        //-NPR5.54 [387130]
         if POSParameterValue."Action Code" <> ActionCode then
             exit;
 
@@ -330,7 +281,6 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
                 if POSParameterValue.Value <> '' then
                     SalesHeader.SetView(POSParameterValue.Value);
         end;
-        //+NPR5.54 [387130]
     end;
 
     procedure "//Data Source Extension"()
@@ -339,23 +289,21 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
 
     local procedure ThisDataSource(): Text
     begin
-        exit('BUILTIN_SALE');  //NPR5.53 [378678]
+        exit('BUILTIN_SALE');
     end;
 
     local procedure ThisExtension(): Text
     begin
-        exit('SalesDoc');  //NPR5.53 [378678]
+        exit('SalesDoc');
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', true, false)]
     local procedure OnDiscoverDataSourceExtension(DataSourceName: Text; Extensions: List of [Text])
     begin
-        //-NPR5.53 [378678]
         if ThisDataSource <> DataSourceName then
             exit;
 
         Extensions.Add(ThisExtension);
-        //+NPR5.53 [378678]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', true, false)]
@@ -363,14 +311,12 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
     var
         DataType: Enum "NPR Data Type";
     begin
-        //-NPR5.53 [378678]
         if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
             exit;
 
         Handled := true;
 
         DataSource.AddColumn('OpenOrdersQty', 'Number of open sales orders', DataType::String, true);
-        //+NPR5.53 [378678]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', true, false)]
@@ -379,7 +325,6 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
         SalesHeader: Record "Sales Header";
         LocationFilter: Text;
     begin
-        //-NPR5.53 [378678]
         if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
             exit;
 
@@ -387,14 +332,11 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
 
         SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
         SalesHeader.SetRange(Status, SalesHeader.Status::Open);
-        //-NPR5.54 [387428]
         LocationFilter := GetPOSMenuButtonLocationFilter(POSSession);
         if LocationFilter <> '' then
             SalesHeader.SetFilter("Location Code", LocationFilter);
-        //+NPR5.54 [387428]
 
         DataRow.Add('OpenOrdersQty', SalesHeader.Count);
-        //+NPR5.53 [378678]
     end;
 
     local procedure GetPOSMenuButtonLocationFilter(POSSession: Codeunit "NPR POS Session"): Text
@@ -405,7 +347,6 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
         SalePOS: Record "NPR Sale POS";
         POSSale: Codeunit "NPR POS Sale";
     begin
-        //-NPR5.54 [387428]
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         POSMenuButton.SetRange("Action Code", ActionCode());
@@ -434,7 +375,5 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
         end;
 
         exit('');
-        //+NPR5.54 [387428]
     end;
 }
-

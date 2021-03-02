@@ -68,10 +68,10 @@ codeunit 6150724 "NPR POS Action - Change View"
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        ViewType := JSON.GetIntegerParameter('ViewType', true);
+        ViewType := JSON.GetIntegerParameterOrFail('ViewType', ActionCode());
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
-        POSDefaultUserView.SetDefault(ViewType, POSUnit."No.", JSON.GetStringParameter('ViewCode', false));
+        POSDefaultUserView.SetDefault(ViewType, POSUnit."No.", JSON.GetStringParameter('ViewCode'));
 
         POSSession.GetCurrentView(CurrentView);
 

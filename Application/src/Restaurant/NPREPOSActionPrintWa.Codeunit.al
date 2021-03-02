@@ -3,6 +3,7 @@ codeunit 6150661 "NPR NPRE POSAction: Print Wa."
     var
         Text000: Label 'Print waiterpad';
         NoWaiterpadsMsg: Label 'There are none or multiple waiterpads to print from!';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -171,8 +172,8 @@ codeunit 6150661 "NPR NPRE POSAction: Print Wa."
         HospitalityPrint: Codeunit "NPR NPRE Restaurant Print";
     begin
         NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
-        JSON.SetScope('/', true);
-        WaiterPadNo := JSON.GetString('waiterPadNo', true);
+        JSON.SetScopeRoot();
+        WaiterPadNo := JSON.GetStringOrFail('waiterPadNo', StrSubstNo(ReadingErr, ActionCode()));
         NPREWaiterPad.Get(WaiterPadNo);
         HospitalityPrint.PrintWaiterPadPreReceiptPressed(NPREWaiterPad);
     end;

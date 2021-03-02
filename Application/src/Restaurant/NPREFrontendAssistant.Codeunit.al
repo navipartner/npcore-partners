@@ -133,8 +133,8 @@ codeunit 6150679 "NPR NPRE Frontend Assistant"
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        RestaurantCode := JSON.GetString('restaurantId', false);
-        LocationCode := JSON.GetString('locationId', false);
+        RestaurantCode := JSON.GetString('restaurantId');
+        LocationCode := JSON.GetString('locationId');
 
         RefreshWaiterPadData(POSSession, FrontEnd, RestaurantCode, LocationCode);
     end;
@@ -151,7 +151,7 @@ codeunit 6150679 "NPR NPRE Frontend Assistant"
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        RestaurantCode := JSON.GetString('restaurantId', false);
+        RestaurantCode := JSON.GetString('restaurantId');
 
         RefreshRestaurantLayout(POSSession, FrontEnd, RestaurantCode);
     end;

@@ -142,7 +142,7 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         EntryNo: Integer;
     begin
         JSON.SetContext('/', false);
-        EntryNo := JSON.GetInteger('entry_no', false);
+        EntryNo := JSON.GetInteger('entry_no');
         if EntryNo = 0 then
             exit;
 
@@ -181,7 +181,7 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         until SalesLine.Next = 0;
 
         if NpCsDocument."Prepaid Amount" > 0 then begin
-            PrepaidText := JSON.GetStringParameter('Prepaid Text', false);
+            PrepaidText := JSON.GetStringParameter('Prepaid Text');
             if PrepaidText = '' then
                 PrepaidText := Text008;
             DeliverPrepaymentLine(NpCsDocument, NpCsSaleLinePOSReference, PrepaidText, POSSaleLine);
@@ -209,7 +209,7 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         until SalesInvLine.Next = 0;
 
         if NpCsDocument."Prepaid Amount" > 0 then begin
-            PrepaidText := JSON.GetStringParameter('Prepaid Text', false);
+            PrepaidText := JSON.GetStringParameter('Prepaid Text');
             if PrepaidText = '' then
                 PrepaidText := Text008;
             DeliverPrepaymentLine(NpCsDocument, NpCsSaleLinePOSReference, PrepaidText, POSSaleLine);
@@ -229,7 +229,7 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         if NpCsSaleLinePOSReference.FindFirst then
             Error(Text009, NpCsDocument."Document Type", NpCsDocument."Document No.");
 
-        DeliveryText := StrSubstNo(JSON.GetStringParameter('Delivery Text', false), NpCsDocument."Document Type", NpCsDocument."Reference No.");
+        DeliveryText := StrSubstNo(JSON.GetStringParameter('Delivery Text'), NpCsDocument."Document Type", NpCsDocument."Reference No.");
         if DeliveryText = '' then
             DeliveryText := StrSubstNo(Text006, NpCsDocument."Document Type", NpCsDocument."Reference No.");
         SaleLinePOS.Init;
@@ -487,11 +487,11 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
     var
         ReferenceNo: Text;
     begin
-        JSON.SetScope('/', false);
-        if not JSON.SetScope('$document_input', false) then
+        JSON.SetScope('/');
+        if not JSON.SetScope('$document_input') then
             exit(false);
 
-        ReferenceNo := CopyStr(JSON.GetString('input', false), 1, MaxStrLen(NpCsDocument."Reference No."));
+        ReferenceNo := CopyStr(JSON.GetString('input'), 1, MaxStrLen(NpCsDocument."Reference No."));
         if ReferenceNo = '' then
             exit(false);
 
@@ -512,7 +512,7 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         NpCsDocument.SetRange("Delivery Status", NpCsDocument."Delivery Status"::Ready);
         if LocationFilter <> '' then
             NpCsDocument.SetFilter("Location Code", LocationFilter);
-        case JSON.GetIntegerParameter('Sorting', false) of
+        case JSON.GetIntegerParameter('Sorting') of
             Sorting::"Entry No.":
                 begin
                     NpCsDocument.SetCurrentKey("Entry No.");
@@ -537,7 +537,7 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         POSStore: Record "NPR POS Store";
         POSSetup: Codeunit "NPR POS Setup";
     begin
-        case JSON.GetIntegerParameter('Location From', true) of
+        case JSON.GetIntegerParameterOrFail('Location From', ActionCode()) of
             0:
                 begin
                     POSSession.GetSetup(POSSetup);
@@ -546,7 +546,7 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
                 end;
             1:
                 begin
-                    LocationFilter := UpperCase(JSON.GetStringParameter('Location Filter', true));
+                    LocationFilter := UpperCase(JSON.GetStringParameterOrFail('Location Filter', ActionCode()));
                 end;
         end;
 

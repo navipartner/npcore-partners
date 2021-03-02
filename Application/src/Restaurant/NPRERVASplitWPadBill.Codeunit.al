@@ -78,10 +78,10 @@ codeunit 6150678 "NPR NPRE RVA: Split WPad/Bill"
         WaiterPadCode: Code[20];
         IncludeAllWPads: Option No,Yes,Ask;
     begin
-        WaiterPadCode := Context.GetStringParameter('WaiterPadCode', true);
-        IncludeAllWPads := Context.GetIntegerParameter('IncludeAllWPads', false);
+        WaiterPadCode := Context.GetStringParameterOrFail('WaiterPadCode', ActionCode());
+        IncludeAllWPads := Context.GetIntegerParameter('IncludeAllWPads');
         if IncludeAllWPads IN [IncludeAllWPads::Yes, IncludeAllWPads::Ask] then begin
-            SeatingCode := Context.GetStringParameter('SeatingCode', false);
+            SeatingCode := Context.GetStringParameter('SeatingCode');
             if SeatingCode = '' then
                 IncludeAllWPads := IncludeAllWPads::No
             else begin

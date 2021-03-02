@@ -39,7 +39,7 @@ codeunit 6150682 "NPR NPRE RVA: New WPad"
 
         Handled := true;
 
-        if Context.GetString('waiterpadInfo', false) = '' then
+        if Context.GetString('waiterpadInfo') = '' then
             exit;
 
         NewWaiterPad(POSSession, FrontEnd, Context);
@@ -61,7 +61,7 @@ codeunit 6150682 "NPR NPRE RVA: New WPad"
         NumberOfGuests: Integer;
         NotValidSettingErr: Label 'The provided seating code "%1" is invalid. A new waiterpad was not created.';
     begin
-        SeatingCode := Context.GetStringParameter('SeatingCode', true);
+        SeatingCode := Context.GetStringParameterOrFail('SeatingCode', ActionCode());
 
         if not Seating.Get(SeatingCode) then begin
             Message(NotValidSettingErr, SeatingCode);
@@ -81,7 +81,7 @@ codeunit 6150682 "NPR NPRE RVA: New WPad"
         NPREFrontendAssistant.RefreshWaiterPadData(POSSession, FrontEnd, SeatingLocation."Restaurant Code", '');
         NPREFrontendAssistant.RefreshWaiterPadContent(POSSession, FrontEnd, WaiterPad."No.");
 
-        if Context.GetBooleanParameter('SwitchToSaleView', false) then begin
+        if Context.GetBooleanParameter('SwitchToSaleView') then begin
             POSSession.GetSale(POSSale);
             POSSale.GetCurrentSale(SalePOS);
             SalePOS.Find;
@@ -103,11 +103,11 @@ codeunit 6150682 "NPR NPRE RVA: New WPad"
 
     local procedure GetConfigurableOption(Context: Codeunit "NPR POS JSON Management"; Scope: Text; "Key": Text): Text;
     begin
-        Context.SetScopeRoot(false);
+        Context.SetScopeRoot();
 
-        if (not Context.SetScope(Scope, false)) then
+        if (not Context.SetScope(Scope)) then
             exit('');
 
-        exit(Context.GetString("Key", false))
+        exit(Context.GetString("Key"))
     end;
 }

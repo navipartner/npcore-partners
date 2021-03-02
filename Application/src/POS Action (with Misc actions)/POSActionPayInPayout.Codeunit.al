@@ -1,21 +1,12 @@
 codeunit 6150809 "NPR POSAction: PayIn Payout"
 {
-    // NPR5.38/MHA /20180119  CASE 295072 Extended Workflow with Reason Code
-    // NPR5.48/TSA /20190207 CASE 345292 Added UpdateAmounts() to get correct VAT calculation
-    // NPR5.51/TSA /20190626 CASE 347057 Added a hard error if account calculates tax
-    // NPR5.51/TSA /20190626 CASE 347057 Removed hard error
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This built in function handles cash deposit / withdrawls from the till';
         PayOptionType: Option PAYIN,PAYOUT;
         AmountPrompt: Label 'Enter Amount.';
         DescriptionPrompt: Label 'Enter Description.';
         VATSetupError: Label 'Pay-in and Pay-out are cash transactions that must not use accounts that post VAT. Check setup for account %1.';
+        ReadingErr: Label 'reading in %1';
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
@@ -32,17 +23,13 @@ codeunit 6150809 "NPR POSAction: PayIn Payout"
                 RegisterWorkflowStep('amount', 'numpad (labels.Amount).cancel(abort);');
                 RegisterWorkflowStep('description', 'input({caption: labels.Description, value: context.accountdescription}).cancel(abort);');
                 RegisterWorkflowStep('handle', 'respond();');
-                //-NPR5.38 [295072]
                 RegisterWorkflowStep('FixedReasonCode', 'if (param.FixedReasonCode != "")  {respond()}');
                 RegisterWorkflowStep('LookupReasonCode', 'if (param.LookupReasonCode)  {respond()}');
-                //+NPR5.38 [295072]
                 RegisterWorkflow(false);
                 RegisterOptionParameter('Pay Option', 'Pay In,Payout', 'Payout');
-                //-NPR5.38 [295072]
                 RegisterTextParameter('FixedAccountCode', '');
                 RegisterTextParameter('FixedReasonCode', '');
                 RegisterBooleanParameter('LookupReasonCode', false);
-                //+NPR5.38 [295072]
             end;
     end;
 
@@ -66,25 +53,22 @@ codeunit 6150809 "NPR POSAction: PayIn Payout"
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('parameters', true);
-        PayOption := JSON.GetInteger('Pay Option', true);
+        JSON.SetScopeParameters(ActionCode());
+        PayOption := JSON.GetIntegerOrFail('Pay Option', StrSubstNo(ReadingErr, ActionCode()));
 
         if (PayOption = -1) then
             PayOption := 0;
 
         case WorkflowStep of
-            //-NPR5.38 [295072]
-            //'account' : SelectAccount (JSON, POSSession, FrontEnd);
             'account':
                 SelectAccount(JSON, FrontEnd);
-            //+NPR5.38 [295072]
             'handle':
                 begin
 
                     Description := GetInput(JSON, 'description');
                     Amount := GetDecimal(JSON, 'amount');
-                    JSON.SetScope('/', true);
-                    AccountNo := JSON.GetString('accountno', true);
+                    JSON.SetScopeRoot();
+                    AccountNo := JSON.GetStringOrFail('accountno', StrSubstNo(ReadingErr, ActionCode()));
 
                     case PayOption of
                         0:
@@ -97,12 +81,10 @@ codeunit 6150809 "NPR POSAction: PayIn Payout"
                     POSSession.RequestRefreshData();
 
                 end;
-            //-NPR5.38 [295072]
             'FixedReasonCode':
                 OnActionFixedReasonCode(JSON, POSSession);
             'LookupReasonCode':
                 OnActionLookupReasonCode(POSSession);
-        //+NPR5.38 [295072]
         end;
 
         Handled := true;
@@ -112,27 +94,23 @@ codeunit 6150809 "NPR POSAction: PayIn Payout"
     var
         ReasonCode: Code[10];
     begin
-        //-NPR5.38 [295072]
-        JSON.SetScope('/', true);
-        JSON.SetScope('parameters', true);
-        ReasonCode := JSON.GetString('FixedReasonCode', true);
+        JSON.SetScopeRoot();
+        JSON.SetScopeParameters(ActionCode());
+        ReasonCode := JSON.GetStringOrFail('FixedReasonCode', StrSubstNo(ReadingErr, ActionCode()));
         if ReasonCode = '' then
             exit;
 
         ApplyReasonCode(ReasonCode, POSSession);
-        //+NPR5.38 [295072]
     end;
 
     local procedure OnActionLookupReasonCode(POSSession: Codeunit "NPR POS Session")
     var
         ReasonCode: Record "Reason Code";
     begin
-        //-NPR5.38 [295072]
         if PAGE.RunModal(0, ReasonCode) <> ACTION::LookupOK then
             exit;
 
         ApplyReasonCode(ReasonCode.Code, POSSession);
-        //+NPR5.38 [295072]
     end;
 
     local procedure ActionCode(): Text
@@ -150,28 +128,19 @@ codeunit 6150809 "NPR POSAction: PayIn Payout"
         GLAccount: Record "G/L Account";
         AccountNo: Text;
     begin
-        //-NPR5.38 [295072]
-        // IF NOT (PAGE.RUNMODAL(PAGE::"Touch Screen - G/L Accounts", GLAccount) = ACTION::LookupOK) THEN
-        //  ERROR ('');
-        //
-        // Context.SetScope ('/', TRUE);
-        // Context.SetContext ('accountno', GLAccount."No.");
-        // Context.SetContext ('accountdescription', GLAccount.Name);
-        // FrontEnd.SetActionContext (ActionCode, Context);
-        JSON.SetScope('/', true);
-        JSON.SetScope('parameters', true);
-        AccountNo := UpperCase(JSON.GetString('FixedAccountCode', false));
+        JSON.SetScopeRoot();
+        JSON.SetScopeParameters(ActionCode());
+        AccountNo := UpperCase(JSON.GetString('FixedAccountCode'));
         if AccountNo <> '' then
             GLAccount.Get(AccountNo)
         else
             if PAGE.RunModal(PAGE::"NPR TouchScreen: G/L Accounts", GLAccount) <> ACTION::LookupOK then
                 Error('');
 
-        JSON.SetScope('/', true);
+        JSON.SetScopeRoot();
         JSON.SetContext('accountno', GLAccount."No.");
         JSON.SetContext('accountdescription', GLAccount.Name);
         FrontEnd.SetActionContext(ActionCode, JSON);
-        //+NPR5.38 [295072]
     end;
 
     local procedure RegisterAccountSales(POSSession: Codeunit "NPR POS Session"; AccountNo: Code[20]; Description: Text; Amount: Decimal; PayOption: Option)
@@ -198,9 +167,7 @@ codeunit 6150809 "NPR POSAction: PayIn Payout"
         POSSaleLine.GetCurrentSaleLine(Line);
         Line.Description := Description;
 
-        //-NPR5.48 [345292]
         Line.UpdateAmounts(Line);
-        //+NPR5.48 [345292]
 
         Line.Modify();
 
@@ -214,7 +181,6 @@ codeunit 6150809 "NPR POSAction: PayIn Payout"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
     begin
-        //-NPR5.38 [295072]
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         POSSession.GetSaleLine(POSSaleLine);
@@ -223,7 +189,6 @@ codeunit 6150809 "NPR POSAction: PayIn Payout"
         SaleLinePOS.SetSkipCalcDiscount(true);
         SaleLinePOS."Reason Code" := ReasonCode;
         SaleLinePOS.Modify(true);
-        //+NPR5.38 [295072]
     end;
 
     local procedure "--"()
@@ -233,21 +198,20 @@ codeunit 6150809 "NPR POSAction: PayIn Payout"
     local procedure GetInput(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
     begin
 
-        JSON.SetScope('/', true);
-        if (not JSON.SetScope('$' + Path, false)) then
+        JSON.SetScopeRoot();
+        if (not JSON.SetScope('$' + Path)) then
             exit('');
 
-        exit(JSON.GetString('input', true));
+        exit(JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, ActionCode())));
     end;
 
     local procedure GetDecimal(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Decimal
     begin
 
-        JSON.SetScope('/', true);
-        if (not JSON.SetScope('$' + Path, false)) then
+        JSON.SetScopeRoot();
+        if (not JSON.SetScope('$' + Path)) then
             exit(0);
 
-        exit(JSON.GetDecimal('numpad', true));
+        exit(JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, ActionCode())));
     end;
 }
-

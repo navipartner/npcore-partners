@@ -4,6 +4,13 @@ codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
         Text000: Label 'This action handles Scan Retail Vouchers (Payment).';
         Text001: Label 'Retail Voucher Payment';
         Text002: Label 'Enter Reference No.:';
+        ReadingErr: Label 'reading in %1';
+        SettingScopeErr: Label 'setting scope in %1';
+
+    local procedure ObjectIdentifier(): Text
+    begin
+        exit('Codeunit Scan POSAction Mgt.');
+    end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
     local procedure OnDiscoverActions(var Sender: Record "NPR POS Action")
@@ -127,12 +134,12 @@ codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         POSLine: Record "NPR Sale Line POS";
     begin
-        JSON.SetScope('parameters', true);
-        VoucherTypeCode := UpperCase(JSON.GetString('VoucherTypeCode', true));
+        JSON.SetScopeParameters(ObjectIdentifier());
+        VoucherTypeCode := UpperCase(JSON.GetStringOrFail('VoucherTypeCode', StrSubstNo(ReadingErr, ObjectIdentifier())));
 
-        JSON.SetScope('/', true);
-        JSON.SetScope('$voucher_input', true);
-        ReferenceNo := UpperCase(JSON.GetString('input', true));
+        JSON.SetScopeRoot();
+        JSON.SetScope('$voucher_input', StrSubstNo(SettingScopeErr, ObjectIdentifier()));
+        ReferenceNo := UpperCase(JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, ObjectIdentifier())));
         if ReferenceNo = '' then
             exit;
 
@@ -209,7 +216,7 @@ codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
         if Abs(Subtotal) > Abs(POSSetup.AmountRoundingPrecision) then
             exit;
 
-        VoucherTypeCode := UpperCase(JSON.GetString('VoucherType', true));
+        VoucherTypeCode := UpperCase(JSON.GetStringOrFail('VoucherType', StrSubstNo(ReadingErr, ObjectIdentifier())));
         NpRvVoucherType.Get(VoucherTypeCode);
         if not POSPaymentMethod.Get(NpRvVoucherType."Payment Type") then
             exit;
@@ -233,4 +240,3 @@ codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
         exit('1.0');
     end;
 }
-

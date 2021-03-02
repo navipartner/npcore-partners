@@ -1,9 +1,5 @@
 codeunit 6150808 "NPR POS Action: Quantity"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is a build in function to change quantity.';
         MUST_BE_POSITIVE: Label 'Quantity must be positive.';
@@ -14,6 +10,7 @@ codeunit 6150808 "NPR POS Action: Quantity"
         PriceCaption: Label 'Enter Unit Price:';
         WRONG_RETURN_QUANTITY: Label 'The maximum number of units to return for %1 is %2.';
         WRONG_QUANTITY: Label 'The minimum number of units to sell must be greater than zero.';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -100,8 +97,8 @@ codeunit 6150808 "NPR POS Action: Quantity"
         Handled := true;
 
         Context.InitializeJObjectParser(Parameters, FrontEnd);
-        Context.SetScope('/', true);
-        NegativeInput := Context.GetBoolean('NegativeInput', true);
+        Context.SetScopeRoot();
+        NegativeInput := Context.GetBooleanOrFail('NegativeInput', StrSubstNo(ReadingErr, ActionCode()));
         if not NegativeInput then
             exit;
 
@@ -141,11 +138,11 @@ codeunit 6150808 "NPR POS Action: Quantity"
             exit;
         end;
 
-        ReturnReasonCode := JSON.GetString('ReturnReasonCode', false);
+        ReturnReasonCode := JSON.GetString('ReturnReasonCode');
 
-        ConstraintOption := JSON.GetIntegerParameter('Constraint', true);
+        ConstraintOption := JSON.GetIntegerParameterOrFail('Constraint', ActionCode());
 
-        NegativeInput := JSON.GetBooleanParameter('NegativeInput', true);
+        NegativeInput := JSON.GetBooleanParameterOrFail('NegativeInput', ActionCode());
         Quantity := GetDecimal(JSON, 'PromptQuantity');
         UnitPrice := GetDecimal(JSON, 'PromptUnitPrice');
 
@@ -199,11 +196,11 @@ codeunit 6150808 "NPR POS Action: Quantity"
 
     local procedure GetDecimal(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Decimal
     begin
-        JSON.SetScope('/', true);
-        if (not JSON.SetScope('$' + Path, false)) then
+        JSON.SetScopeRoot();
+        if (not JSON.SetScope('$' + Path)) then
             exit(0);
 
-        exit(JSON.GetDecimal('numpad', true));
+        exit(JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, ActionCode())));
     end;
 
     local procedure SelectReturnReason(): Code[10]

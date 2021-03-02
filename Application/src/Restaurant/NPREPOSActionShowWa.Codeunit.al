@@ -1,5 +1,8 @@
 codeunit 6150669 "NPR NPRE POSAction: Show Wa."
 {
+    var
+        ReadingErr: Label 'reading in %1';
+
     local procedure ActionCode(): Text
     begin
         exit('SHOW_WAITER_PAD');
@@ -131,8 +134,8 @@ codeunit 6150669 "NPR NPRE POSAction: Show Wa."
         WaiterPadNo: Code[20];
     begin
         NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
-        JSON.SetScope('/', true);
-        WaiterPadNo := JSON.GetString('waiterPadNo', true);
+        JSON.SetScopeRoot();
+        WaiterPadNo := JSON.GetStringOrFail('waiterPadNo', StrSubstNo(ReadingErr, ActionCode()));
         NPREWaiterPad.Get(WaiterPadNo);
 
         NPREWaiterPadPOSMgt.UIShowWaiterPad(NPREWaiterPad);

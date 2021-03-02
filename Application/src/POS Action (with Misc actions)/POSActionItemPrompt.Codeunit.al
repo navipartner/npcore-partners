@@ -76,13 +76,11 @@ codeunit 6150843 "NPR POS Action: Item Prompt"
     local procedure GetNumpad(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
     begin
 
-        if (not JSON.SetScopeRoot(false)) then
+        JSON.SetScopeRoot();
+        if (not JSON.SetScope('$' + Path)) then
             exit('');
 
-        if (not JSON.SetScope('$' + Path, false)) then
-            exit('');
-
-        exit(JSON.GetString('numpad', false));
+        exit(JSON.GetString('numpad'));
     end;
 }
 

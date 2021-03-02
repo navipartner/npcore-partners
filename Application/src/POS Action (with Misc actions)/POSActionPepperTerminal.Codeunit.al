@@ -14,6 +14,7 @@ codeunit 6150779 "NPR POS Action: PepperTerminal"
         OpenOK: Label 'The terminal is now open.';
         CLoseOK: Label 'The terminal is now closed.';
         OtherCommandStringMenu: Label 'Activate Offline Mode,Deactivate Offline Mode';
+        ReadingErr: Label 'reading in %1';
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
@@ -63,16 +64,16 @@ codeunit 6150779 "NPR POS Action: PepperTerminal"
         POSSale.GetCurrentSale(SalePOS);
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('parameters', true);
-        CommandType := JSON.GetInteger('commandId', true);
+        JSON.SetScopeParameters(ActionCode());
+        CommandType := JSON.GetIntegerOrFail('commandId', StrSubstNo(ReadingErr, ActionCode()));
         if (CommandType = -1) then
             CommandType := CommandType::OPEN;
 
-        AuxCommand := JSON.GetInteger('auxCommand', false);
+        AuxCommand := JSON.GetInteger('auxCommand');
         if (AuxCommand = -1) then
             AuxCommand := 0; // StrMenu
 
-        OtherCommand := JSON.GetInteger('otherCommand', false);
+        OtherCommand := JSON.GetInteger('otherCommand');
         if (OtherCommand = -1) then
             OtherCommand := 0; // StrMenu
 

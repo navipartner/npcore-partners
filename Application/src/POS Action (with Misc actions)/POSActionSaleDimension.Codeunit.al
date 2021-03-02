@@ -1,19 +1,5 @@
 codeunit 6150826 "NPR POS Action: Sale Dimension"
 {
-    // 
-    // NPR5.34/TSA /20170711 CASE 283019 Initial Version
-    // NPR5.39/TSA /20180126 CASE 303399 Added ValueSelection parameters numpad and text pad and refactored to minimize code overhead
-    // NPR5.39/TSA /20180126 CASE 303399 Added ShowConfirmMessage and WithCreate parameters
-    // NPR5.44/MHA /20180702 CASE 320474 Added function LookupDimensionValue()
-    // NPR5.44/TSA /20180709 CASE 321303 Added RequestRefreshData
-    // NPR5.44/TSA /20180709 CASE 309900 Added StatisticsFrequency parameter to set on when this workflow is configured in the OnBeforePaymentView workflow
-    // NPR5.55/ALPO/20200528 CASE 406971 Sales view were not updated after a dimension change, if there were more than one line in the sale
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This Action updates the POS Sale Dimension with either a fixed value or provides a list of valid value';
         ValueSelection: Option LIST,"FIXED",PROMPT_N,PROMPT_A;
@@ -21,6 +7,7 @@ codeunit 6150826 "NPR POS Action: Sale Dimension"
         DIMCHANGED: Label 'Dimension code %1 changed from %2 to %3.';
         DIMSET: Label 'Dimension code %1 set to %2.';
         TITLE: Label 'Dimension and Statistics';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -42,12 +29,9 @@ codeunit 6150826 "NPR POS Action: Sale Dimension"
           Sender.Type::Generic,
           Sender."Subscriber Instances Allowed"::Multiple)
         then begin
-
-            //-NPR5.39 [303399]
             Sender.RegisterWorkflowStep('numeric_input', 'if (param.ValueSelection == 2) {numpad ({title: labels.Title, caption: context.CaptionText, value: ""}).cancel(abort);};');
             Sender.RegisterWorkflowStep('alpha_input', 'if (param.ValueSelection == 3) {input  ({title: labels.Title, caption: context.CaptionText, value: ""}).cancel(abort);};');
 
-            //+NPR5.39 [303399]
             Sender.RegisterWorkflowStep('step_1', 'respond();');
 
             Sender.RegisterOptionParameter('ValueSelection', 'List,Fixed,Numpad,Textpad', 'List');
@@ -56,9 +40,7 @@ codeunit 6150826 "NPR POS Action: Sale Dimension"
             Sender.RegisterTextParameter('DimensionCode', '');
             Sender.RegisterTextParameter('DimensionValue', '');
 
-            //-NPR5.44 [309900]
             Sender.RegisterIntegerParameter('StatisticsFrequency', 1);
-            //+NPR5.44 [309900]
 
             Sender.RegisterBooleanParameter('ShowConfirmMessage', false);
             Sender.RegisterBooleanParameter('CreateDimValue', false);
@@ -91,14 +73,14 @@ codeunit 6150826 "NPR POS Action: Sale Dimension"
         JSON.InitializeJObjectParser(Parameters, FrontEnd);
         GeneralLedgerSetup.Get();
 
-        DimensionSource := JSON.GetInteger('DimensionSource', true);
+        DimensionSource := JSON.GetIntegerOrFail('DimensionSource', StrSubstNo(ReadingErr, ActionCode()));
         case DimensionSource of
             DimensionSource::SHORTCUT1:
                 DimensionCode := GeneralLedgerSetup."Global Dimension 1 Code";
             DimensionSource::SHORTCUT2:
                 DimensionCode := GeneralLedgerSetup."Global Dimension 2 Code";
             DimensionSource::ANY:
-                DimensionCode := CopyStr(JSON.GetString('DimensionCode', true), 1, MaxStrLen(DimensionCode));
+                DimensionCode := CopyStr(JSON.GetStringOrFail('DimensionCode', StrSubstNo(ReadingErr, ActionCode())), 1, MaxStrLen(DimensionCode));
         end;
 
         CaptionText := DimensionCode;
@@ -133,28 +115,25 @@ codeunit 6150826 "NPR POS Action: Sale Dimension"
         POSSale.GetCurrentSale(SalePOS);
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('parameters', true);
+        JSON.SetScopeParameters(ActionCode());
 
-        //-NPR5.44 [309900]
         Randomize();
-        StatisticsFrequency := JSON.GetInteger('StatisticsFrequency', true);
+        StatisticsFrequency := JSON.GetIntegerOrFail('StatisticsFrequency', StrSubstNo(ReadingErr, ActionCode()));
         if (StatisticsFrequency < 1) then
             StatisticsFrequency := 1;
         if (Random(StatisticsFrequency) > 1) then
             exit;
-        //+NPR5.44 [309900]
 
-
-        ValueSelection := JSON.GetInteger('ValueSelection', true);
+        ValueSelection := JSON.GetIntegerOrFail('ValueSelection', StrSubstNo(ReadingErr, ActionCode()));
         if (ValueSelection = -1) then
             ValueSelection := ValueSelection::LIST;
 
-        DimensionSource := JSON.GetInteger('DimensionSource', true);
+        DimensionSource := JSON.GetIntegerOrFail('DimensionSource', StrSubstNo(ReadingErr, ActionCode()));
         if (DimensionSource = -1) then
             DimensionSource := DimensionSource::SHORTCUT1;
 
-        ShowMessage := JSON.GetBoolean('ShowConfirmMessage', true);
-        WithCreate := JSON.GetBoolean('CreateDimValue', true);
+        ShowMessage := JSON.GetBooleanOrFail('ShowConfirmMessage', StrSubstNo(ReadingErr, ActionCode()));
+        WithCreate := JSON.GetBooleanOrFail('CreateDimValue', StrSubstNo(ReadingErr, ActionCode()));
 
         POSSale.RefreshCurrent();
 
@@ -179,9 +158,6 @@ codeunit 6150826 "NPR POS Action: Sale Dimension"
                         end;
                     DimensionSource::ANY:
                         begin
-                            //-NPR5.44 [320474]
-                            //SalePOS.ShowDocDim ();
-                            //SalePOS.MODIFY ();
                             DimensionCode := CopyStr(GetParamterString(JSON, 'DimensionCode'), 1, MaxStrLen(DimensionCode));
                             if DimensionCode = '' then begin
                                 SalePOS.ShowDocDim();
@@ -189,17 +165,14 @@ codeunit 6150826 "NPR POS Action: Sale Dimension"
                             end else
                                 if LookupDimensionValue(DimensionCode, DimensionValue) then
                                     SetDimensionValue(JSON, POSSale, DimensionSource, WithCreate, DimensionValue);
-                            //+NPR5.44 [320474]
                         end;
                 end;
         end;
 
         POSSale.RefreshCurrent();
 
-        POSSale.SetModified;  //NPR5.55 [406971]
-        //-NPR5.44 [321303]
+        POSSale.SetModified;
         POSSession.RequestRefreshData();
-        //+NPR5.44 [321303]
 
         if (ShowMessage) and (StrMessage <> '') then
             Message(StrMessage);
@@ -209,7 +182,6 @@ codeunit 6150826 "NPR POS Action: Sale Dimension"
     var
         DimensionValue: Record "Dimension Value";
     begin
-        //-NPR5.44 [320474]
         DimensionValue.FilterGroup(2);
         DimensionValue.SetRange("Dimension Code", DimensionCode);
         DimensionValue.FilterGroup(0);
@@ -218,7 +190,6 @@ codeunit 6150826 "NPR POS Action: Sale Dimension"
 
         DimensionValueCode := DimensionValue.Code;
         exit(true);
-        //+NPR5.44 [320474]
     end;
 
     local procedure SetDimensionValue(JSON: Codeunit "NPR POS JSON Management"; var POSSale: Codeunit "NPR POS Sale"; DimSource: Option; WithCreate: Boolean; DimensionValue: Code[20]) StrMessage: Text
@@ -282,34 +253,26 @@ codeunit 6150826 "NPR POS Action: Sale Dimension"
 
     local procedure GetNumpad(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
     begin
-
-        if (not JSON.SetScopeRoot(false)) then
+        JSON.SetScopeRoot();
+        if (not JSON.SetScope('$' + Path)) then
             exit('');
 
-        if (not JSON.SetScope('$' + Path, false)) then
-            exit('');
-
-        exit(JSON.GetString('numpad', false));
+        exit(JSON.GetString('numpad'));
     end;
 
     local procedure GetInput(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
     begin
-
-        if (not JSON.SetScopeRoot(false)) then
+        JSON.SetScopeRoot();
+        if (not JSON.SetScope('$' + Path)) then
             exit('');
 
-        if (not JSON.SetScope('$' + Path, false)) then
-            exit('');
-
-        exit(JSON.GetString('input', false));
+        exit(JSON.GetString('input'));
     end;
 
     local procedure GetParamterString(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
     begin
-
-        JSON.SetScopeRoot(true);
-        JSON.SetScope('parameters', true);
-        exit(JSON.GetString(Path, true));
+        JSON.SetScopeRoot();
+        JSON.SetScopeParameters(ActionCode());
+        exit(JSON.GetStringOrFail(Path, StrSubstNo(ReadingErr, ActionCode())));
     end;
 }
-

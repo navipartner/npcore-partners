@@ -1,18 +1,12 @@
 codeunit 6150788 "NPR POS Action: PrintExchLabel"
 {
-    // NPR5.34/TSA /20170710 CASE 282999 Added function RegisterDataBinding(); to workflow
-    // NPR5.36/MMV /20170913 CASE 289442 Format date for XML
-    // NPR5.43/MMV /20180620 CASE 305061 Added use of new calendar dialog
-    // NPR5.45/JC  /20180820 CASE 323894 Validate if qty is negative to proceed or not
-    // NPR5.51/MMV /20190821 CASE 365704 Rewrote datetime parsing to workaround BC14 EVALUATE difference.
-
-
     var
         ActionDescription: Label 'This is a built-in action for printing exchange labels.';
         Title: Label 'Print Exchange Label';
         ValidFrom: Label 'Valid From Date';
         CalendarCaption: Label 'Select a valid from date and the lines to include';
         ErrorTxtQtyCannotbeNeg: Label 'Error! Quantity cannot be negative!';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -99,7 +93,7 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel"
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        PreventNegativeQty := JSON.GetBooleanParameter('PreventNegativeQty', false);
+        PreventNegativeQty := JSON.GetBooleanParameter('PreventNegativeQty');
         if PreventNegativeQty then begin
             POSSession.GetSaleLine(POSSaleLine);
             POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
@@ -108,12 +102,12 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel"
         end;
 
 
-        Setting := JSON.GetIntegerParameter('Setting', true);
+        Setting := JSON.GetIntegerParameterOrFail('Setting', ActionCode());
 
         case Setting of
             0, 1, 2:
                 begin
-                    Date := JSON.GetDate('value', true);
+                    Date := JSON.GetDateOrFail('value', StrSubstNo(ReadingErr, ActionCode()));
                     POSSession.GetSaleLine(POSSaleLine);
                     POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
                     PrintLines := SaleLinePOS;
@@ -121,7 +115,7 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel"
                 end;
             3, 4:
                 begin
-                    JSON.GetJsonObject('value', CalendarObject, true);
+                    JSON.GetJsonObjectOrFail('value', CalendarObject, StrSubstNo(ReadingErr, ActionCode()));
 
                     // TODO: CTRLUPGRADE refactor this to use JsonObject that CalendarObject now is
                     Error('CTRLUPRADE');
@@ -131,7 +125,7 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel"
                         exit;
         //-NPR5.51 [365704]
         //      EVALUATE(Date, CalendarObject.Item('Date').ToString);
-              JSON.SetScope('value', true);
+              JSON.SetScope('value', StrSubstNo(SettingScopeErr, ActionCode()));
               Date := JSON.GetDate('Date', true);
         //+NPR5.51 [365704]
 
@@ -148,4 +142,3 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel"
         ExchangeLabelMgt.PrintLabelsFromPOSWithoutPrompts(Setting, PrintLines, Date);
     end;
 }
-

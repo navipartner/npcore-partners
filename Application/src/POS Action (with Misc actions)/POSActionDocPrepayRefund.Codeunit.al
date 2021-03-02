@@ -1,16 +1,5 @@
 codeunit 6150872 "NPR POSAction: DocPrepayRefund"
 {
-    // NPR5.50/MMV /20181105 CASE 300557 Created object
-    // NPR5.52/MMV /20191004 CASE 352473 Added send & pdf2nav support.
-    // 
-    // This action does the reverse of action SALES_DOC_PREPAY.
-    // It should only be used when full refund of prepayment invoices via the POS is intended. If the prepayment invoice(s) was not actually paid, a credit memo should just be applied manually to cancel it.
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'Create a refund line for any paid prepayments of the selected line. A credit memo for all prepayment invoices will be posted upon POS sale end.';
         DescPrintDoc: Label 'Print standard report for prepayment credit note.';
@@ -32,7 +21,7 @@ codeunit 6150872 "NPR POSAction: DocPrepayRefund"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.2'); //NPR5.52 [352473]
+        exit('1.2');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -51,10 +40,8 @@ codeunit 6150872 "NPR POSAction: DocPrepayRefund"
                 RegisterBooleanParameter('PrintPrepaymentCreditNote', false);
                 RegisterBooleanParameter('DeleteDocumentAfterRefund', false);
                 RegisterBooleanParameter('SelectCustomer', true);
-                //-NPR5.52 [352473]
                 RegisterBooleanParameter('SendDocument', false);
                 RegisterBooleanParameter('Pdf2NavDocument', false);
-                //+NPR5.52 [352473]
             end;
         end;
     end;
@@ -75,13 +62,11 @@ codeunit 6150872 "NPR POSAction: DocPrepayRefund"
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        PrintPrepaymentCreditNote := JSON.GetBooleanParameter('PrintPrepaymentCreditNote', true);
-        DeleteDocumentAfterRefund := JSON.GetBooleanParameter('DeleteDocumentAfterRefund', true);
-        SelectCustomer := JSON.GetBooleanParameter('SelectCustomer', true);
-        //-NPR5.52 [352473]
-        Send := JSON.GetBooleanParameter('SendDocument', true);
-        Pdf2Nav := JSON.GetBooleanParameter('Pdf2NavDocument', true);
-        //+NPR5.52 [352473]
+        PrintPrepaymentCreditNote := JSON.GetBooleanParameterOrFail('PrintPrepaymentCreditNote', ActionCode());
+        DeleteDocumentAfterRefund := JSON.GetBooleanParameterOrFail('DeleteDocumentAfterRefund', ActionCode());
+        SelectCustomer := JSON.GetBooleanParameterOrFail('SelectCustomer', ActionCode());
+        Send := JSON.GetBooleanParameterOrFail('SendDocument', ActionCode());
+        Pdf2Nav := JSON.GetBooleanParameterOrFail('Pdf2NavDocument', ActionCode());
 
         if not CheckCustomer(POSSession, SelectCustomer) then
             exit;
@@ -89,9 +74,7 @@ codeunit 6150872 "NPR POSAction: DocPrepayRefund"
         if not SelectDocument(Context, POSSession, FrontEnd, SalesHeader) then
             exit;
 
-        //-NPR5.52 [352473]
         CreatePrepaymentRefundLine(POSSession, SalesHeader, PrintPrepaymentCreditNote, DeleteDocumentAfterRefund, Send, Pdf2Nav);
-        //+NPR5.52 [352473]
 
         POSSession.RequestRefreshData();
     end;
@@ -143,15 +126,10 @@ codeunit 6150872 "NPR POSAction: DocPrepayRefund"
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
         POSPrepaymentMgt: Codeunit "NPR POS Prepayment Mgt.";
     begin
-        //-NPR5.52 [352473]
-        // IF RetailSalesDocMgt.GetTotalPrepaidAmountNotDeducted(SalesHeader) <= 0 THEN
-        //  ERROR(NO_PREPAYMENT, SalesHeader."Document Type", SalesHeader."No.");
-        // RetailSalesDocMgt.CreatePrepaymentRefundLine(POSSession, SalesHeader, PrintPrepaymentCreditNote, TRUE, DeleteDocumentAfterRefund);
         if POSPrepaymentMgt.GetPrepaymentAmountToDeductInclVAT(SalesHeader) <= 0 then
             Error(NO_PREPAYMENT, SalesHeader."Document Type", SalesHeader."No.");
 
         RetailSalesDocMgt.CreatePrepaymentRefundLine(POSSession, SalesHeader, Print, Send, Pdf2Nav, true, DeleteDocumentAfterRefund);
-        //+NPR5.52 [352473]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
@@ -167,12 +145,10 @@ codeunit 6150872 "NPR POSAction: DocPrepayRefund"
                 Caption := CaptionDeleteAfter;
             'SelectCustomer':
                 Caption := CaptionSelectCustomer;
-            //-NPR5.52 [352473]
             'SendDocument':
                 Caption := CaptionSendDoc;
             'Pdf2NavDocument':
                 Caption := CaptionPdf2NavDoc;
-        //+NPR5.52 [352473]
         end;
     end;
 
@@ -189,12 +165,10 @@ codeunit 6150872 "NPR POSAction: DocPrepayRefund"
                 Caption := DescDeleteAfter;
             'SelectCustomer':
                 Caption := DescSelectCustomer;
-            //-NPR5.52 [352473]
             'SendDocument':
                 Caption := DescSendDoc;
             'Pdf2NavDocument':
                 Caption := DescPdf2NavDoc;
-        //+NPR5.52 [352473]
         end;
     end;
 
@@ -208,4 +182,3 @@ codeunit 6150872 "NPR POSAction: DocPrepayRefund"
         end;
     end;
 }
-

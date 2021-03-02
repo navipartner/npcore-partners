@@ -1,12 +1,5 @@
 codeunit 6150867 "NPR POS Action: Doc. Show"
 {
-    // NPR5.50/MMV /20181105 CASE 300557 Created object
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'Open sales document via list or from selected POS line.';
         CaptionSelectCustomer: Label 'Select Customer';
@@ -65,9 +58,9 @@ codeunit 6150867 "NPR POS Action: Doc. Show"
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        SelectType := JSON.GetIntegerParameter('SelectType', true);
-        SalesOrderViewString := JSON.GetStringParameter('SalesOrderViewString', true);
-        SelectCustomer := JSON.GetBooleanParameter('SelectCustomer', true);
+        SelectType := JSON.GetIntegerParameterOrFail('SelectType', ActionCode());
+        SalesOrderViewString := JSON.GetStringParameterOrFail('SalesOrderViewString', ActionCode());
+        SelectCustomer := JSON.GetBooleanParameterOrFail('SelectCustomer', ActionCode());
 
         if not CheckCustomer(POSSession, SelectCustomer) then
             exit;
@@ -207,4 +200,3 @@ codeunit 6150867 "NPR POS Action: Doc. Show"
         end;
     end;
 }
-

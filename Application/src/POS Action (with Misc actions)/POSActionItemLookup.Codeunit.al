@@ -4,6 +4,7 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
         ActionDescription: Label 'This is a built in function for handling lookup';
         Setup: Codeunit "NPR POS Setup";
         LookupType: Option Item,Customer,SKU;
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -73,9 +74,9 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('parameters', true);
+        JSON.SetScopeParameters(ActionCode());
 
-        LookupType := JSON.GetInteger('LookupType', true);
+        LookupType := JSON.GetIntegerOrFail('LookupType', StrSubstNo(ReadingErr, ActionCode()));
 
         case LookupType of
             LookupType::Item:
@@ -114,12 +115,12 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        JSON.SetScope('parameters', true);
-        ItemView := JSON.GetString('View', false);
+        JSON.SetScopeParameters(ActionCode());
+        ItemView := JSON.GetString('View');
         if ItemView <> '' then
             Item.SetView(ItemView);
 
-        LocationFilterOption := JSON.GetInteger('LocationFilter', false);
+        LocationFilterOption := JSON.GetInteger('LocationFilter');
         case LocationFilterOption of
             -1, 0:
                 Item.SetFilter("Location Filter", '=%1', GetStoreLocation(POSSession));
@@ -151,7 +152,7 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
         ItemView: Text;
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        ItemNo := JSON.GetString('selected_itemno', true);
+        ItemNo := JSON.GetStringOrFail('selected_itemno', StrSubstNo(ReadingErr, ActionCode()));
         if ItemNo = '' then begin
             exit;
         end else begin
@@ -175,12 +176,12 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSStore(POSStore);
 
-        JSON.SetScope('parameters', true);
-        SKUView := JSON.GetString('View', false);
+        JSON.SetScopeParameters(ActionCode());
+        SKUView := JSON.GetString('View');
         if SKUView <> '' then
             StockkeepingUnit.SetView(SKUView);
 
-        LocationFilterOption := JSON.GetInteger('LocationFilter', false);
+        LocationFilterOption := JSON.GetInteger('LocationFilter');
         case LocationFilterOption of
             -1, 0:
                 StockkeepingUnit.SetFilter("Location Code", '=%1', GetStoreLocation(POSSession));

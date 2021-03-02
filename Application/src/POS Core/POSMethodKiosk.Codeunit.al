@@ -1,5 +1,13 @@
 codeunit 6150741 "NPR POS Method - Kiosk"
 {
+    var
+        ReadingErr: Label 'reading in %1';
+
+    local procedure MethodName(): Text
+    begin
+        exit('UnlockKiosk')
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnCustomMethod', '', false, false)]
     local procedure OnUnlockKiosk(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
@@ -10,7 +18,7 @@ codeunit 6150741 "NPR POS Method - Kiosk"
         POSUnit: Record "NPR POS Unit";
         SSProfile: Record "NPR SS Profile";
     begin
-        if Method <> 'UnlockKiosk' then
+        if Method <> MethodName() then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -18,8 +26,8 @@ codeunit 6150741 "NPR POS Method - Kiosk"
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
         POSUnit.GetProfile(SSProfile);
-        Request.SetMethod('UnlockKiosk');
-        Request.GetContent().Add('confirmed', IsValidPIN(JSON.GetString('pin', true), SSProfile."Kiosk Mode Unlock PIN"));
+        Request.SetMethod(MethodName());
+        Request.GetContent().Add('confirmed', IsValidPIN(JSON.GetStringOrFail('pin', StrSubstNo(ReadingErr, MethodName())), SSProfile."Kiosk Mode Unlock PIN"));
         FrontEnd.InvokeFrontEndMethod(Request);
 
         Handled := true;
@@ -30,4 +38,3 @@ codeunit 6150741 "NPR POS Method - Kiosk"
         exit(PIN = UnlockPIN);
     end;
 }
-

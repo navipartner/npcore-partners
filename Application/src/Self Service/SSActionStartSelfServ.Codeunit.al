@@ -44,9 +44,9 @@ codeunit 6151286 "NPR SS Action: Start SelfServ."
 
         Handled := true;
 
-        SalesPersonCode := Context.GetStringParameter('SalespersonCode', true);
+        SalesPersonCode := Context.GetStringParameterOrFail('SalespersonCode', ActionCode());
 
-        LanguageCode := Context.GetStringParameter('LanguageCode', false);
+        LanguageCode := Context.GetStringParameter('LanguageCode');
         StartSelfService(POSSession, SalesPersonCode, LanguageCode);
     end;
 

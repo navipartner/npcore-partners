@@ -109,21 +109,21 @@ codeunit 6150857 "NPR POS Action: Item UnitPrice"
         Barcode: Text;
         ItemNo: Text;
     begin
-        if not JSON.SetScope('/', false) then
+        if not JSON.SetScope('/') then
             exit(false);
-        if not JSON.SetScope('parameters', false) then
+        if not JSON.SetScope('parameters') then
             exit(false);
-        ItemNoBegin := JSON.GetIntegerParameter('Item_No_Begin', false);
-        ItemNoEnd := JSON.GetIntegerParameter('Item_No_End', false);
+        ItemNoBegin := JSON.GetIntegerParameter('Item_No_Begin');
+        ItemNoEnd := JSON.GetIntegerParameter('Item_No_End');
         if ItemNoBegin <= 0 then
             exit(false);
         if ItemNoBegin > ItemNoEnd then
             exit(false);
 
-        JSON.SetScope('/', false);
-        if not JSON.SetScope('$barcode', false) then
+        JSON.SetScope('/');
+        if not JSON.SetScope('$barcode') then
             exit(false);
-        Barcode := UpperCase(JSON.GetString('input', false));
+        Barcode := UpperCase(JSON.GetString('input'));
         if Barcode = '' then
             exit(false);
 
@@ -141,17 +141,17 @@ codeunit 6150857 "NPR POS Action: Item UnitPrice"
         UnitPriceDecimalPosition: Integer;
         Barcode: Text;
     begin
-        if not JSON.SetScope('/', false) then
+        if not JSON.SetScope('/') then
             exit(false);
-        if not JSON.SetScope('parameters', false) then
+        if not JSON.SetScope('parameters') then
             exit(false);
-        UnitPriceBegin := JSON.GetIntegerParameter('UnitPrice_Begin', false);
-        UnitPriceEnd := JSON.GetIntegerParameter('UnitPrice_End', false);
-        UnitPriceDecimalPosition := JSON.GetIntegerParameter('UnitPrice_Decimal_Position', false);
-        JSON.SetScope('/', false);
-        if not JSON.SetScope('$barcode', false) then
+        UnitPriceBegin := JSON.GetIntegerParameter('UnitPrice_Begin');
+        UnitPriceEnd := JSON.GetIntegerParameter('UnitPrice_End');
+        UnitPriceDecimalPosition := JSON.GetIntegerParameter('UnitPrice_Decimal_Position');
+        JSON.SetScope('/');
+        if not JSON.SetScope('$barcode') then
             exit(false);
-        Barcode := JSON.GetString('input', false);
+        Barcode := JSON.GetString('input');
         if Barcode = '' then
             exit;
 

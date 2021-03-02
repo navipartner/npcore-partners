@@ -1,15 +1,8 @@
 codeunit 6150740 "NPR POS Method - Wysiwyg"
 {
-    // NPR5.40/VB  /20171206 CASE 255773 Front-end WYSIWYG editor support.
-    // 
-    // COMMENT FOR MERGE/RELEASE:
-    // - This codeunit is still in development. If it has been released, it's because we needed it for demo, but no individual #CASEID tracking tags will be included in changed code until this is fully completed and officially released.
-    // 
-    // DO NOT CHANGE THIS CODEUNIT! IF YOU BELIEVE THAT ANYTHING IN HERE SHOULD BE CHANGED, PLEASE CONTACT VJEKO AT npvb@navipartner.dk
-    // IF YOU CHANGE ANYTHING IN HERE, IT WILL BE LOST AT MY NEXT DEPLOYMENT, AS I AM NOT MERGING THIS CODEUNIT; I AM MERELY IMPORTING THE FOB.
-    // 
-    // NPR5.53/VB  /20190917  CASE 362777 Fixes a bug discovered during development of case 362777.
-
+    var
+        ReadingErr: Label 'executing WYSIWYG editor';
+        SettingScopeErr: Label 'setting scope in WYSIWYG editor';
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnCustomMethod', '', false, false)]
     local procedure OnWysiwygMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
@@ -26,7 +19,7 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         Request.SetMethod('WysiwygResponse');
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        RequestMethod := JSON.GetString('method', true);
+        RequestMethod := JSON.GetStringOrFail('method', ReadingErr);
         case RequestMethod of
             'save':
                 Success := SaveConfiguration(Request, JSON, POSSession, FrontEnd);
@@ -41,8 +34,8 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
             'lookup_popup':
                 Success := LookupPopup(Request, JSON, POSSession, FrontEnd);
         end;
-        JSON.SetScopeRoot(true);
-        Request.GetContent().Add('requestId', JSON.GetString('requestId', true));
+        JSON.SetScopeRoot();
+        Request.GetContent().Add('requestId', JSON.GetStringOrFail('requestId', ReadingErr));
         Request.GetContent().Add('success', Success);
 
         FrontEnd.InvokeFrontEndMethod(Request);
@@ -61,11 +54,11 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         POSAction.DiscoverActions();
         //+NPR5.53 [362777]
 
-        JSON.SetScope('data', true);
-        Length := JSON.GetInteger('length', true);
+        JSON.SetScope('data', StrSubstNo(SettingScopeErr));
+        Length := JSON.GetIntegerOrFail('length', ReadingErr);
         for i := 0 to Length - 1 do begin
-            JSON.SetScopePath(StrSubstNo('$.data.%1', i), true);
-            TargetType := JSON.GetString('targetType', false);
+            JSON.SetScopePath(StrSubstNo('$.data.%1', i), StrSubstNo(SettingScopeErr));
+            TargetType := JSON.GetString('targetType');
             case TargetType of
                 'button':
                     SaveButtonConfiguration(JSON);
@@ -80,9 +73,9 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         KeyId: Integer;
         ParentKeyId: Integer;
     begin
-        KeyMenu := JSON.GetString('keyMenu', true);
-        KeyId := JSON.GetInteger('keyId', false);
-        ParentKeyId := JSON.GetInteger('parentKeyId', false);
+        KeyMenu := JSON.GetStringOrFail('keyMenu', ReadingErr);
+        KeyId := JSON.GetInteger('keyId');
+        ParentKeyId := JSON.GetInteger('parentKeyId');
 
         if KeyId = 0 then begin
             CreateNewButton(KeyMenu, JSON, ParentKeyId)
@@ -122,20 +115,20 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         Background: Text;
         Modified: Boolean;
     begin
-        ActionMoniker := JSON.GetString('action', false);
+        ActionMoniker := JSON.GetString('action');
         if ActionMoniker = 'delete' then begin
             POSMenuButton.SetUnattendedDeleteFlag();
             POSMenuButton.Delete(true);
             exit;
         end;
 
-        Caption := JSON.GetString('caption', false);
+        Caption := JSON.GetString('caption');
         if Caption <> '' then begin
             POSMenuButton.Caption := Caption;
             Modified := true;
         end;
 
-        Type := JSON.GetString('type', false);
+        Type := JSON.GetString('type');
         if Type <> '' then begin
             Evaluate(POSMenuButton."Action Type", Type);
             POSMenuButton.Validate("Action Type");
@@ -145,7 +138,7 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         case POSMenuButton."Action Type" of
             POSMenuButton."Action Type"::Action:
                 begin
-                    ActionCode := JSON.GetString('action', false);
+                    ActionCode := JSON.GetString('action');
                     if ActionCode <> '' then begin
                         POSMenuButton.Validate("Action Code", ActionCode);
                         Modified := true;
@@ -155,7 +148,7 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
                 end;
             POSMenuButton."Action Type"::Item:
                 begin
-                    ActionCode := JSON.GetString('item', false);
+                    ActionCode := JSON.GetString('item');
                     if ActionCode <> '' then begin
                         POSMenuButton.Validate("Action Code", ActionCode);
                         Modified := true;
@@ -163,7 +156,7 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
                 end;
             POSMenuButton."Action Type"::PopupMenu:
                 begin
-                    ActionCode := JSON.GetString('popupMenu', false);
+                    ActionCode := JSON.GetString('popupMenu');
                     if ActionCode <> '' then begin
                         POSMenuButton.Validate("Action Code", ActionCode);
                         Modified := true;
@@ -171,52 +164,52 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
 
                     if JSON.HasProperty('columns') then begin
                         ParamValue.GetParameter(POSMenuButton.RecordId, POSMenuButton.ID, 'Columns');
-                        ParamValue.Validate(Value, JSON.GetString('columns', false));
+                        ParamValue.Validate(Value, JSON.GetString('columns'));
                         ParamValue.Modify;
                     end;
 
                     if JSON.HasProperty('rows') then begin
                         ParamValue.GetParameter(POSMenuButton.RecordId, POSMenuButton.ID, 'Rows');
-                        ParamValue.Validate(Value, JSON.GetString('rows', false));
+                        ParamValue.Validate(Value, JSON.GetString('rows'));
                         ParamValue.Modify;
                     end;
                 end;
         end;
 
-        Icon := JSON.GetString('icon', false);
+        Icon := JSON.GetString('icon');
         if Icon <> '' then begin
             POSMenuButton."Icon Class" := Icon;
             Modified := true;
         end;
 
-        Background := JSON.GetString('background', false);
+        Background := JSON.GetString('background');
         if Background <> '' then begin
             POSMenuButton."Background Color" := Background;
             Modified := true;
         end;
 
         if JSON.HasProperty('backgroundUrl') then begin
-            POSMenuButton."Background Image Url" := JSON.GetString('backgroundUrl', false);
+            POSMenuButton."Background Image Url" := JSON.GetString('backgroundUrl');
             Modified := true;
         end;
 
         if JSON.HasProperty('captionPosition') then begin
-            POSMenuButton."Caption Position" := JSON.GetInteger('captionPosition', false);
+            POSMenuButton."Caption Position" := JSON.GetInteger('captionPosition');
             Modified := true;
         end;
 
         if JSON.HasProperty('tooltip') then begin
-            POSMenuButton.Tooltip := JSON.GetString('tooltip', false);
+            POSMenuButton.Tooltip := JSON.GetString('tooltip');
             Modified := true;
         end;
 
         if JSON.HasProperty('column') then begin
-            POSMenuButton."Position X" := JSON.GetInteger('column', false);
+            POSMenuButton."Position X" := JSON.GetInteger('column');
             Modified := true;
         end;
 
         if JSON.HasProperty('row') then begin
-            POSMenuButton."Position Y" := JSON.GetInteger('row', false);
+            POSMenuButton."Position Y" := JSON.GetInteger('row');
             Modified := true;
         end;
 
@@ -231,8 +224,8 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         ActionCode: Code[20];
         Check: Boolean;
     begin
-        ActionCode := JSON.GetString('current', false);
-        Check := JSON.GetBoolean('check', false);
+        ActionCode := JSON.GetString('current');
+        Check := JSON.GetBoolean('check');
         if (ActionCode <> '') or Check then begin
             if POSSession.RetrieveSessionAction(ActionCode, POSAction) then begin
                 if Check then begin
@@ -264,8 +257,8 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         ItemNo: Code[20];
         Check: Boolean;
     begin
-        ItemNo := JSON.GetString('current', false);
-        Check := JSON.GetBoolean('check', false);
+        ItemNo := JSON.GetString('current');
+        Check := JSON.GetBoolean('check');
         if (ItemNo <> '') or Check then begin
             if Item.Get(ItemNo) then begin
                 if Check then begin
@@ -299,8 +292,8 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         CustNo: Code[20];
         Check: Boolean;
     begin
-        CustNo := JSON.GetString('current', false);
-        Check := JSON.GetBoolean('check', false);
+        CustNo := JSON.GetString('current');
+        Check := JSON.GetBoolean('check');
         if (CustNo <> '') or Check then begin
             if Cust.Get(CustNo) then begin
                 if Check then begin
@@ -339,10 +332,10 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         JsonText: Text;
     begin
         POSSession.DiscoverActionsOnce();
-        POSAction.Get(JSON.GetString('action', true));
+        POSAction.Get(JSON.GetStringOrFail('action', ReadingErr));
         CopyParametersFromActionToTempParam(POSAction.Code, TempParam);
 
-        ParamStr := JSON.GetString('parameters', false);
+        ParamStr := JSON.GetString('parameters');
         if ParamStr = '' then
             ParamStr := '{}';
         JObject.ReadFrom(ParamStr);
@@ -377,8 +370,8 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         MenuCode: Code[20];
         Check: Boolean;
     begin
-        MenuCode := JSON.GetString('current', false);
-        Check := JSON.GetBoolean('check', false);
+        MenuCode := JSON.GetString('current');
+        Check := JSON.GetBoolean('check');
         if (MenuCode <> '') or Check then begin
             if POSMenu.Get(MenuCode) then begin
                 if Check then begin
@@ -417,7 +410,7 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
     begin
         CopyParametersFromActionToTempParam(POSMenuButton."Action Code", TempParam);
         ScopeID := JSON.StoreScope;
-        if not JSON.SetScope('parameters', false) then
+        if not JSON.SetScope('parameters') then
             exit(false);
 
         if TempParam.FindSet then
@@ -432,7 +425,7 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
                     Param.Insert;
                 Param."Action Code" := TempParam."Action Code";
                 Param."Data Type" := TempParam."Data Type";
-                Param.Validate(Value, JSON.GetString(TempParam.Name, false));
+                Param.Validate(Value, JSON.GetString(TempParam.Name));
                 Param.Modify(false);
             until TempParam.Next = 0;
 
@@ -466,4 +459,3 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         EditParams.GetEditedData(TempParam);
     end;
 }
-

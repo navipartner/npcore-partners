@@ -37,8 +37,8 @@ codeunit 6150684 "NPR NPRE RVA: Set WPad Status"
 
         Handled := true;
 
-        WaiterPad."No." := Context.GetStringParameter('WaiterPadCode', true);
-        NewStatusCode := Context.GetStringParameter('StatusCode', false);
+        WaiterPad."No." := Context.GetStringParameterOrFail('WaiterPadCode', ActionCode());
+        NewStatusCode := Context.GetStringParameter('StatusCode');
         if NewStatusCode = '' then
             exit;
 

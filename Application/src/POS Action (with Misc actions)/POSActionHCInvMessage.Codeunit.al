@@ -1,12 +1,5 @@
 codeunit 6150914 "NPR POS Action: HC Inv.Message"
 {
-    // NPR5.38/BR  /20171206 CASE 297946 Initial Version
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This action makes remote call to aquire item price information ';
 
@@ -68,10 +61,10 @@ codeunit 6150914 "NPR POS Action: HC Inv.Message"
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        ExtLocationFilter := JSON.GetStringParameter('ExternalLocationFilter', false);
-        if JSON.GetBooleanParameter('UseShopLocationAsFilter', false) then
+        ExtLocationFilter := JSON.GetStringParameter('ExternalLocationFilter');
+        if JSON.GetBooleanParameter('UseShopLocationAsFilter') then
             ExtLocationFilter := SaleLinePOS."Location Code";
-        if JSON.GetBooleanParameter('ShowList', false) then
+        if JSON.GetBooleanParameter('ShowList') then
             ExtLocationFilter := 'LIST:' + ExtLocationFilter;
 
         SaleLinePOS.TestField(Type, SaleLinePOS.Type::Item);
@@ -90,4 +83,3 @@ codeunit 6150914 "NPR POS Action: HC Inv.Message"
             Message(ResponseText[1]);
     end;
 }
-

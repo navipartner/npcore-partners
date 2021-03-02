@@ -1,9 +1,5 @@
 codeunit 6150721 "NPR POS Action - Login"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is a built-in action for completing the login request passed on from the front end.';
         Text001: Label 'Unknown login type requested by JavaScript: %1.';
@@ -12,6 +8,7 @@ codeunit 6150721 "NPR POS Action - Login"
         IsEoD: Label 'The %1 %2 indicates that this %1 is being balanced and it can''t be opened at this time.';
         ContinueEoD: Label 'The %1 %2 is marked as being in balancing. Do you want to continue with balancing now?';
         ManagedPos: Label 'This POS is managed by POS Unit %1 [%2] and it is therefore required that %1 is opened prior to opening this POS.';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -58,7 +55,7 @@ codeunit 6150721 "NPR POS Action - Login"
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        Type := JSON.GetString('type', true);
+        Type := JSON.GetStringOrFail('type', StrSubstNo(ReadingErr, ActionCode()));
         POSSession.GetSetup(Setup);
 
         // Fallback - when framework is not providing the device identity
@@ -75,7 +72,7 @@ codeunit 6150721 "NPR POS Action - Login"
         case Type of
             'SalespersonCode':
                 begin
-                    Password := JSON.GetString('password', true);
+                    Password := JSON.GetStringOrFail('password', StrSubstNo(ReadingErr, ActionCode()));
                     if (DelChr(Password, '<=>', ' ') = '') then
                         Error('Illegal password.');
 
@@ -92,7 +89,7 @@ codeunit 6150721 "NPR POS Action - Login"
 
                 end;
             else
-                FrontEnd.ReportBug(StrSubstNo(Text001, Type));
+                FrontEnd.ReportBugAndThrowError(StrSubstNo(Text001, Type));
         end;
     end;
 

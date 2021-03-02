@@ -13,6 +13,7 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         Text003: Label 'Add new Bill';
         Text004: Label 'Approve';
         Text005: Label 'Cancel';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -177,8 +178,8 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         WaiterPadNo: Code[20];
     begin
         NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
-        JSON.SetScope('/', true);
-        WaiterPadNo := JSON.GetString('waiterPadNo', true);
+        JSON.SetScopeRoot();
+        WaiterPadNo := JSON.GetStringOrFail('waiterPadNo', StrSubstNo(ReadingErr, ActionCode()));
         NPREWaiterPad.Get(WaiterPadNo);
 
         CreateUserInterface(NPREWaiterPad);

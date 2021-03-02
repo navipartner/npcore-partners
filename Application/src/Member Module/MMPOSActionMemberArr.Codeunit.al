@@ -1,11 +1,5 @@
 codeunit 6060140 "NPR MM POS Action: Member Arr."
 {
-    // 
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This action handles member arrival functions.';
         MemberCardPrompt: Label 'Enter Member Card Number:';
@@ -92,8 +86,8 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        DefaultInputValue := JSON.GetStringParameter('DefaultInputValue', true);
-        DialogPrompt := JSON.GetIntegerParameter('DialogPrompt', true);
+        DefaultInputValue := JSON.GetStringParameterOrFail('DefaultInputValue', ActionCode());
+        DialogPrompt := JSON.GetIntegerParameterOrFail('DialogPrompt', ActionCode());
         if (DialogPrompt < 0) then
             DialogPrompt := 1;
 
@@ -119,16 +113,16 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
         end;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        POSWorkflowType := JSON.GetIntegerParameter('POSWorkflow', false);
+        POSWorkflowType := JSON.GetIntegerParameter('POSWorkflow');
         if (POSWorkflowType < 0) then
             POSWorkflowType := POSWorkflowMethod::POS;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        AdmissionCode := JSON.GetStringParameter('AdmissionCode', false);
+        AdmissionCode := JSON.GetStringParameter('AdmissionCode');
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        ConfirmMember := JSON.GetBooleanParameter('ConfirmMember', true);
+        ConfirmMember := JSON.GetBooleanParameterOrFail('ConfirmMember', ActionCode());
 
         if (DefaultInputValue <> '') then
             MemberCardNumber := DefaultInputValue;
@@ -202,14 +196,11 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
 
     local procedure GetInput(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
     begin
-
-        if (not JSON.SetScopeRoot(false)) then
+        JSON.SetScopeRoot();
+        if (not JSON.SetScope('$' + Path)) then
             exit('');
 
-        if (not JSON.SetScope('$' + Path, false)) then
-            exit('');
-
-        exit(JSON.GetString('input', false));
+        exit(JSON.GetString('input'));
     end;
 
     local procedure SelectMemberCardUI(var ExtMemberCardNo: Text[100]): Boolean
@@ -297,4 +288,3 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
 
     end;
 }
-

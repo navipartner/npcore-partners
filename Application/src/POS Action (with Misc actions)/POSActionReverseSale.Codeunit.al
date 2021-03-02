@@ -18,6 +18,8 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
         POSEntryMgt: Codeunit "NPR POS Entry Management";
         DimsNotCopied: Label 'Dimension copy is only supported, when Advanced Posting is activated.\Dimensions were not copied from the original sale.';
         Text00001: Label 'There already exists lines in the sales. Please delete the lines to fetch and customize the return sale.';
+        ReadingErr: Label 'reading in %1';
+        SettingScopeErr: Label 'setting scope in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -124,17 +126,17 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        JSON.SetScope('/', true);
-        JSON.SetScope('$receipt', true);
-        SalesTicketNo := JSON.GetString('input', true);
+        JSON.SetScopeRoot();
+        JSON.SetScope('$receipt', StrSubstNo(SettingScopeErr, ActionCode()));
+        SalesTicketNo := JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, ActionCode()));
         if (SalesTicketNo = '') then
             Error('That receipt is not valid for sales reversal.');
 
-        POSEntryMgt.DeObfuscateTicketNo(JSON.GetIntegerParameter('ObfucationMethod', false), SalesTicketNo);
+        POSEntryMgt.DeObfuscateTicketNo(JSON.GetIntegerParameter('ObfucationMethod'), SalesTicketNo);
         POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
         POSEntry.SetRange("Document No.", SalesTicketNo);
         if (not POSEntry.FindFirst()) then
-            Error(NotFound, JSON.GetString('input', true));
+            Error(NotFound, JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, ActionCode())));
 
         if (IsCompleteReversal(SalesTicketNo)) then
             Error(NOTHING_TO_RETURN, SalesTicketNo);
@@ -154,24 +156,24 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        JSON.SetScope('/', true);
-        JSON.SetScope('$receipt', true);
-        SalesTicketNo := JSON.GetString('input', true);
+        JSON.SetScopeRoot();
+        JSON.SetScope('$receipt', StrSubstNo(SettingScopeErr, ActionCode()));
+        SalesTicketNo := JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, ActionCode()));
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         POSSession.GetSaleLine(POSSaleLine);
 
-        POSEntryMgt.DeObfuscateTicketNo(JSON.GetIntegerParameter('ObfucationMethod', false), SalesTicketNo);
+        POSEntryMgt.DeObfuscateTicketNo(JSON.GetIntegerParameter('ObfucationMethod'), SalesTicketNo);
 
         SetCustomerOnReverseSale(SalePOS, SalesTicketNo);
 
-        JSON.SetScope('/', true);
+        JSON.SetScopeRoot();
 
         //This function heavily used audit roll and tried to do too much. It should just reverse the simple types like Item, GL. 
         //Any aux module needs to subscribe and handle itself like retail voucher etc.
         //RetailSalesCode.ReverseSalesTicket2(SalePOS, SalesTicketNo, ReturnReasonCode);
-        ReturnReasonCode := JSON.GetString('ReturnReasonCode', true);
+        ReturnReasonCode := JSON.GetStringOrFail('ReturnReasonCode', StrSubstNo(ReadingErr, ActionCode()));
         ReverseSalesTicket(SalePOS, SalesTicketNo, ReturnReasonCode);
 
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
@@ -184,7 +186,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
         if (ApplyMaxReturnQty(SalePOS, SalesTicketNo)) then
             Message(QTY_ADJUSTED);
 
-        if JSON.GetBooleanParameter('CopyHeaderDimensions', false) then
+        if JSON.GetBooleanParameter('CopyHeaderDimensions') then
             if CopyDimensions(SalePOS, SalesTicketNo) then begin
                 POSSale.Refresh(SalePOS);
                 POSSale.SetModified();

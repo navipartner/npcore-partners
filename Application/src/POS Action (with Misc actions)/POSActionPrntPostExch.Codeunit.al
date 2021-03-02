@@ -58,10 +58,10 @@ codeunit 6151177 "NPR POS Action: Prnt Post.Exch"
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('parameters', true);
+        JSON.SetScopeParameters(ActionCode());
 
-        LastSale := JSON.GetBooleanParameter('LastSale', true);
-        SingleLine := JSON.GetBooleanParameter('SingleLine', true);
+        LastSale := JSON.GetBooleanParameterOrFail('LastSale', ActionCode());
+        SingleLine := JSON.GetBooleanParameterOrFail('SingleLine', ActionCode());
 
         POSSession.GetSetup(POSSetup);
 
@@ -80,7 +80,7 @@ codeunit 6151177 "NPR POS Action: Prnt Post.Exch"
             Error(NoSaleLinesErr);
 
         RecordVar := POSSalesLine;
-        TemplateMgt.PrintTemplate(JSON.GetStringParameter('Template', true), RecordVar, 0);
+        TemplateMgt.PrintTemplate(JSON.GetStringParameterOrFail('Template', ActionCode()), RecordVar, 0);
 
         Handled := true;
     end;

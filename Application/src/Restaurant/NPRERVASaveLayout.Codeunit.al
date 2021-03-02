@@ -43,7 +43,7 @@ codeunit 6150683 "NPR NPRE RVA: Save Layout"
         JToken: JsonToken;
         LayoutName: Text;
     begin
-        LayoutName := Context.GetString('layout', false);
+        LayoutName := Context.GetString('layout');
         if LayoutName = '' then
             exit;
 

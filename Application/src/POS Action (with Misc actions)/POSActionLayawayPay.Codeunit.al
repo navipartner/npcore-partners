@@ -71,9 +71,9 @@ codeunit 6150869 "NPR POS Action: Layaway Pay"
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        OrderPaymentTermsFilter := JSON.GetStringParameter('OrderPaymentTermsFilter', true);
-        SelectionMethod := JSON.GetIntegerParameter('SelectionMethod', true);
-        SelectCustomer := JSON.GetBooleanParameter('SelectCustomer', true);
+        OrderPaymentTermsFilter := JSON.GetStringParameterOrFail('OrderPaymentTermsFilter', ActionCode());
+        SelectionMethod := JSON.GetIntegerParameterOrFail('SelectionMethod', ActionCode());
+        SelectCustomer := JSON.GetBooleanParameterOrFail('SelectCustomer', ActionCode());
 
         if not CheckCustomer(POSSession, SelectCustomer) then
             exit;

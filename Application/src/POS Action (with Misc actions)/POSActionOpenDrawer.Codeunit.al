@@ -2,6 +2,7 @@ codeunit 6150793 "NPR POS Action: Open Drawer"
 {
     var
         ActionDescription: Label 'This is a built-in action for opening the cash drawer';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -46,8 +47,8 @@ codeunit 6150793 "NPR POS Action: Open Drawer"
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('parameters', true);
-        CashDrawerNo := JSON.GetString('Cash Drawer No.', true);
+        JSON.SetScopeParameters(ActionCode());
+        CashDrawerNo := JSON.GetStringOrFail('Cash Drawer No.', StrSubstNo(ReadingErr, ActionCode()));
 
         POSSession.GetSetup(POSSetup);
         POSSession.GetSale(POSSale);

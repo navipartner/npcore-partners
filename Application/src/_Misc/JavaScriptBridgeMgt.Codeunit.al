@@ -91,9 +91,10 @@ codeunit 6150632 "NPR JavaScript Bridge Mgt."
         RegisterModuleRequest: JsonObject;
         Module: Text;
         Script: Text;
+        RequestModuleErr: Label 'reading from RequestModule context';
     begin
         JSON.InitializeJObjectParser(EventContent, FrontEnd);
-        Module := JSON.GetString('module', true);
+        Module := JSON.GetStringOrFail('module', RequestModuleErr);
 
         Script := Web.GetJavaScript(Module);
         if Script = '' then

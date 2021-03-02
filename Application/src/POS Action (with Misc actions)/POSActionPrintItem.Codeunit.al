@@ -1,20 +1,10 @@
 codeunit 6150789 "NPR POS Action: Print Item"
 {
-    // NPR5.34/TSA /20170710  CASE 282999 Added RegisterDataBinding to workflow
-    // NPR5.37/MMV /20171009  CASE 289725 Unify print flow.
-    // NPR5.37.01/MMV /20171113 CASE 296267 Use entered quantity in 'Selected Line' mode.
-    // NPR5.46/MHA /20181005  CASE 330714 Changed Label Quantity to ABS to enable print of negative quantities in PrintAllLines()
-    // NPR5.53/THRO/20200116  CASE 385790 Round up Quantity in PrintAllLines
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'Print item-based prints.';
         Title: Label 'Item Print';
         PrintQuantity: Label 'Quantity To Print';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -43,10 +33,7 @@ codeunit 6150789 "NPR POS Action: Print Item"
                 RegisterOptionParameter('LineSetting', 'All Lines,Selected Line', 'Selected Line');
                 RegisterOptionParameter('PrintType', 'Price,Shelf,Sign', 'Price');
 
-                //-NPR5.34 [282999]
                 RegisterDataBinding();
-                //+NPR5.34 [282999]
-
             end;
     end;
 
@@ -69,9 +56,9 @@ codeunit 6150789 "NPR POS Action: Print Item"
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        JSON.SetScope('parameters', true);
-        LineSetting := JSON.GetInteger('LineSetting', true);
-        PrintType := JSON.GetInteger('PrintType', true);
+        JSON.SetScopeParameters(ActionCode());
+        LineSetting := JSON.GetIntegerOrFail('LineSetting', StrSubstNo(ReadingErr, ActionCode()));
+        PrintType := JSON.GetIntegerOrFail('PrintType', StrSubstNo(ReadingErr, ActionCode()));
 
         case LineSetting of
             LineSetting::"All Lines":
@@ -103,15 +90,7 @@ codeunit 6150789 "NPR POS Action: Print Item"
 
             if FindSet then
                 repeat
-                    //-NPR5.37 [289725]
-                    //-NPR5.46 [330714]
-                    // LabelLibrary.ItemToRetailJnlLine("No.", "Variant Code", Quantity, GUID, RetailJnlLine);
-                    //-NPR5.53 [385790]
                     LabelLibrary.ItemToRetailJnlLine("No.", "Variant Code", Round(Abs(Quantity), 1, '>'), GUID, RetailJnlLine);
-                //+NPR5.53 [385790]
-                //+NPR5.46 [330714]
-                //SaleLineToRJL(GUID, RetailJnlLine, SaleLinePOS2);
-                //+NPR5.37 [289725]
                 until Next = 0;
         end;
 
@@ -136,29 +115,18 @@ codeunit 6150789 "NPR POS Action: Print Item"
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        QuantityInput := JSON.GetInteger('value', true);
+        QuantityInput := JSON.GetIntegerOrFail('value', StrSubstNo(ReadingErr, ActionCode()));
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
         GUID := CreateGuid();
 
-        //-NPR5.37 [289725]
-        //SaleLineToRJL(GUID, RetailJnlLine, SaleLinePOS);
-        //-NPR5.37.01 [296267]
-        //LabelLibrary.ItemToRetailJnlLine(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS.Quantity, GUID, RetailJnlLine);
         LabelLibrary.ItemToRetailJnlLine(SaleLinePOS."No.", SaleLinePOS."Variant Code", QuantityInput, GUID, RetailJnlLine);
-        //+NPR5.37.01 [296267]
-        //+NPR5.37 [289725]
 
         RetailJnlLine.SetRange("No.", GUID);
         if not RetailJnlLine.FindFirst then
             exit;
-
-        //-NPR5.37 [289725]
-        // RetailJnlLine.Quantity := QuantityInput;
-        // RetailJnlLine.MODIFY;
-        //+NPR5.37 [289725]
 
         PrintRJL(RetailJnlLine, PrintType);
 
@@ -184,4 +152,3 @@ codeunit 6150789 "NPR POS Action: Print Item"
         LabelLibrary.PrintRetailJournal(RetailJnlLine, ReportSelectionRetail."Report Type");
     end;
 }
-

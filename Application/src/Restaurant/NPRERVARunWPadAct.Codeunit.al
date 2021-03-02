@@ -37,7 +37,7 @@ codeunit 6150677 "NPR NPRE RVA: Run WPad Act."
 
         Handled := true;
 
-        ReturnToDefaultView := Context.GetBooleanParameter('ReturnToDefaultView', false);
+        ReturnToDefaultView := Context.GetBooleanParameter('ReturnToDefaultView');
 
         RunWaiterPadAction(Context);
 
@@ -62,8 +62,8 @@ codeunit 6150677 "NPR NPRE RVA: Run WPad Act."
         ServingStepToRequest: Code[10];
         WPadIsOpenedInPOSSale: Label 'The waiter pad is opened in a POS sale at the moment and might have unsaved changes. Are you sure you want to continue on running the action?';
     begin
-        WaiterPad."No." := Context.GetStringParameter('WaiterPadCode', true);
-        WPadAction := Context.GetIntegerParameter('WaiterPadAction', true);
+        WaiterPad."No." := Context.GetStringParameterOrFail('WaiterPadCode', ActionCode());
+        WPadAction := Context.GetIntegerParameterOrFail('WaiterPadAction', ActionCode());
 
         WaiterPad.Find;
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
@@ -80,7 +80,7 @@ codeunit 6150677 "NPR NPRE RVA: Run WPad Act."
 
             WPadAction::"Send Kitchen Order":
                 begin
-                    WPadLinesToSend := Context.GetIntegerParameter('LinesToSend', false);
+                    WPadLinesToSend := Context.GetIntegerParameter('LinesToSend');
                     RestaurantPrint.PrintWaiterPadPreOrderToKitchenPressed(WaiterPad, WPadLinesToSend = WPadLinesToSend::All);
                 end;
 
@@ -91,7 +91,7 @@ codeunit 6150677 "NPR NPRE RVA: Run WPad Act."
 
             WPadAction::"Request Specific Serving":
                 begin
-                    ServingStepToRequest := Context.GetStringParameter('ServingStep', false);
+                    ServingStepToRequest := Context.GetStringParameter('ServingStep');
                     if ServingStepToRequest = '' then
                         if not LookupServingStep(ServingStepToRequest) then
                             Error('');

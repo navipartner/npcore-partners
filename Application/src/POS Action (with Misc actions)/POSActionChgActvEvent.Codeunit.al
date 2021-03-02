@@ -62,13 +62,13 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        DialogType := JSON.GetIntegerParameter('DialogType', true);
+        DialogType := JSON.GetIntegerParameterOrFail('DialogType', ActionCode());
         if not (DialogType in [DialogType::TextField, DialogType::List]) then
             DialogType := DialogType::List;
-        ClearEvent := JSON.GetBooleanParameter('ClearEvent', false);
+        ClearEvent := JSON.GetBooleanParameter('ClearEvent');
         if ClearEvent then
             EventNo := '';
-        OnlyCurrentSale := JSON.GetBooleanParameter('OnlyCurrentSale', false);
+        OnlyCurrentSale := JSON.GetBooleanParameter('OnlyCurrentSale');
 
         if not ClearEvent then begin
             POSSession.GetSale(POSSale);
@@ -156,11 +156,10 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
 
     local procedure GetInput(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
     begin
-        if not JSON.SetScopeRoot(false) then
+        JSON.SetScopeRoot();
+        if not JSON.SetScope('$' + Path) then
             exit('');
-        if not JSON.SetScope('$' + Path, false) then
-            exit('');
-        exit(JSON.GetString('input', false));
+        exit(JSON.GetString('input'));
     end;
 
     local procedure SelectEventFromList(var EventNo: Code[20]): Boolean

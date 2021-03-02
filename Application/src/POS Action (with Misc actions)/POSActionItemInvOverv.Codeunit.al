@@ -69,8 +69,8 @@ codeunit 6150828 "NPR POS Action: ItemInv Overv."
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
         POSSession.GetCurrentView(CurrentView);
-        AllItems := JSON.GetBooleanParameter(AllItemsParTxt, false);
-        OnlyCurrrentLocation := JSON.GetBooleanParameter(OnlyCurrentLocParTxt, false);
+        AllItems := JSON.GetBooleanParameter(AllItemsParTxt);
+        OnlyCurrrentLocation := JSON.GetBooleanParameter(OnlyCurrentLocParTxt);
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);

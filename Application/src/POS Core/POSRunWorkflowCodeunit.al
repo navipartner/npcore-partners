@@ -1,5 +1,8 @@
 codeunit 6150748 "NPR POS Run Workflow"
 {
+    var
+        ReadingErr: Label 'reading in %1';
+
     procedure RunWorkflow(ActionCode: Code[20]; var Parameters: Record "NPR POS Parameter Value" temporary; Context: JsonObject) Result: Guid
     var
         Request: Codeunit "NPR Front-End: Generic";
@@ -28,28 +31,30 @@ codeunit 6150748 "NPR POS Run Workflow"
     local procedure RunWorkflowCompleted(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
+        MethodName: Label 'OnRunWorkflowCompleted', Locked = true;
     begin
-        if Method <> 'OnRunWorkflowCompleted' then
+        if Method <> MethodName then
             exit;
 
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        OnRunWorkflowCompleted(Method, JSON.GetString('id', true));
+        OnRunWorkflowCompleted(Method, JSON.GetStringOrFail('id', StrSubstNo(ReadingErr, MethodName)));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnCustomMethod', '', false, false)]
     local procedure RunWorkflowFailed(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
+        MethodName: Label 'OnRunWorkflowFailed', Locked = true;
     begin
-        if Method <> 'OnRunWorkflowFailed' then
+        if Method <> MethodName then
             exit;
 
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        OnRunWorkflowFailed(Method, JSON.GetString('id', true), JSON.GetString('error', true));
+        OnRunWorkflowFailed(Method, JSON.GetStringOrFail('id', StrSubstNo(ReadingErr, MethodName)), JSON.GetStringOrFail('error', StrSubstNo(ReadingErr, MethodName)));
     end;
 
     [BusinessEvent(false)]

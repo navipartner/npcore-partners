@@ -732,13 +732,14 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         JSON: Codeunit "NPR POS JSON Management";
         SaleLineOut: Codeunit "NPR POS Sale Line";
         CouponReferenceNo: Text;
+        ReadingScanCouponErr: Label 'reading from OnScanCoupon subscriber';
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
 
         Handled := true;
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        CouponReferenceNo := JSON.GetString('CouponCode', true);
+        CouponReferenceNo := JSON.GetStringOrFail('CouponCode', ReadingScanCouponErr);
         ScanCoupon(POSSession, CouponReferenceNo);
     end;
 

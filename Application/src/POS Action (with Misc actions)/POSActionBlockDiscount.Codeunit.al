@@ -1,13 +1,5 @@
 codeunit 6150838 "NPR POS Action: Block Discount"
 {
-    // NPR5.38/TSA /20171120 CASE 296709 Initial version
-    // NPR5.43/TSA /20180611 CASE 296709 Added formating for blocked lines
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This action toggles the state of "Custom Disc Block" field.';
         Title: Label 'Block / Unblock Discount';
@@ -99,12 +91,9 @@ codeunit 6150838 "NPR POS Action: Block Discount"
     [EventSubscriber(ObjectType::Codeunit, 6150853, 'OnGetLineStyle', '', false, false)]
     local procedure OnGetStyle(var Color: Text; var Weight: Text; var Style: Text; SaleLinePOS: Record "NPR Sale Line POS"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
-
-        //-NPR5.43 [296709]
         if (SaleLinePOS."Custom Disc Blocked") then begin
             Color := 'blue';
         end;
-        //+NPR5.43 [296709]
     end;
 
     local procedure VerifyPassword(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -112,12 +101,14 @@ codeunit 6150838 "NPR POS Action: Block Discount"
         JSON: Codeunit "NPR POS JSON Management";
         RetailSetup: Record "NPR NP Retail Setup";
         Password: Text;
+        SettingScopeErr: Label 'setting scope in VerifyPassword';
+        ReadingErr: Label 'reading scope in VerifyPassword';
     begin
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('/', true);
-        JSON.SetScope('$PasswordPrompt', true);
-        Password := JSON.GetString('input', true);
+        JSON.SetScopeRoot();
+        JSON.SetScope('$PasswordPrompt', SettingScopeErr);
+        Password := JSON.GetStringOrFail('input', ReadingErr);
 
         RetailSetup.Get();
         if (RetailSetup."Password on unblock discount" <> Password) then
@@ -139,10 +130,7 @@ codeunit 6150838 "NPR POS Action: Block Discount"
 
         SaleLinePOS.Modify();
 
-        //-NPR5.43 [296709]
         POSSaleLine.RefreshCurrent();
         POSSession.RequestRefreshData();
-        //+NPR5.43 [296709]
     end;
 }
-

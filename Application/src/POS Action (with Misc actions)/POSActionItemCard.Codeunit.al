@@ -68,10 +68,10 @@ codeunit 6150827 "NPR POS Action: Item Card"
             if LinePOS.Type = LinePOS.Type::Item then begin
                 if Item.Get(LinePOS."No.") then begin
                     Item.SetRecFilter;
-                    RetailItemCard.Editable(JSON.GetBooleanParameter('PageEditable', false));
+                    RetailItemCard.Editable(JSON.GetBooleanParameter('PageEditable'));
                     RetailItemCard.SetRecord(Item);
                     RetailItemCard.RunModal;
-                    if JSON.GetBooleanParameter('RefreshLine', false) then begin
+                    if JSON.GetBooleanParameter('RefreshLine') then begin
                         LinePOS.Validate("No.");
                         LinePOS.Modify(true);
                     end;

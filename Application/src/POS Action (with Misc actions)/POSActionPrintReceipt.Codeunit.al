@@ -6,6 +6,7 @@ codeunit 6150787 "NPR POS Action: Print Receipt"
         CurrentRegisterNo: Code[10];
         ReceiptListFilterOption: Option "None","POS Store","POS Unit",Salesperson;
         EnterReceiptNoLbl: Label 'Enter Receipt Number';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -71,10 +72,10 @@ codeunit 6150787 "NPR POS Action: Print Receipt"
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('parameters', true);
-        Setting := JSON.GetInteger('Setting', true);
-        ReceiptListFilterOption := JSON.GetIntegerParameter('ReceiptListFilter', false);
-        PresetTableView := JSON.GetStringParameter('ReceiptListView', false);
+        JSON.SetScopeParameters(ActionCode());
+        Setting := JSON.GetIntegerOrFail('Setting', StrSubstNo(ReadingErr, ActionCode()));
+        ReceiptListFilterOption := JSON.GetIntegerParameter('ReceiptListFilter');
+        PresetTableView := JSON.GetStringParameter('ReceiptListView');
 
         POSSession.GetSetup(POSSetup);
         CurrentRegisterNo := POSSetup.GetPOSUnitNo();
@@ -101,14 +102,14 @@ codeunit 6150787 "NPR POS Action: Print Receipt"
             Setting::"Choose Receipt",
             Setting::"Choose Receipt Large":
                 begin
-                    SelectionDialogType := JSON.GetIntegerParameter('SelectionDialogType', true);
+                    SelectionDialogType := JSON.GetIntegerParameterOrFail('SelectionDialogType', ActionCode());
                     if not (SelectionDialogType in [SelectionDialogType::TextField, SelectionDialogType::List]) then
                         SelectionDialogType := SelectionDialogType::List;
                     case SelectionDialogType of
                         SelectionDialogType::TextField:
                             begin
                                 SalesTicketNo := CopyStr(GetInput(JSON, 'ManualReceiptNo'), 1, MaxStrLen(SalesTicketNo));
-                                POSEntryMgt.DeObfuscateTicketNo(JSON.GetIntegerParameter('ObfuscationMethod', true), SalesTicketNo);
+                                POSEntryMgt.DeObfuscateTicketNo(JSON.GetIntegerParameterOrFail('ObfuscationMethod', ActionCode()), SalesTicketNo);
                             end;
                     end;
                     SalesTicketNo := ChooseReceiptPOSEntry(Setting, PresetTableView, ReceiptListFilterOption, FilterEntityCode, SalesTicketNo)
@@ -211,16 +212,16 @@ codeunit 6150787 "NPR POS Action: Print Receipt"
         if SalesTicketNo = '' then
             exit;
 
-        JSON.SetScopeRoot(false);
-        JSON.SetScope('parameters', true);
+        JSON.SetScopeRoot();
+        JSON.SetScopeParameters(ActionCode());
 
-        if JSON.GetBoolean('Print Tickets', true) then
+        if JSON.GetBooleanOrFail('Print Tickets', StrSubstNo(ReadingErr, ActionCode())) then
             TMTicketManagement.PrintTicketFromSalesTicketNo(SalesTicketNo);
 
-        if JSON.GetBoolean('Print Memberships', true) then
+        if JSON.GetBooleanOrFail('Print Memberships', StrSubstNo(ReadingErr, ActionCode())) then
             MMMemberRetailIntegration.PrintMembershipOnEndOfSales(SalesTicketNo);
 
-        if JSON.GetBoolean('Print Credit Voucher', true) then begin
+        if JSON.GetBooleanOrFail('Print Credit Voucher', StrSubstNo(ReadingErr, ActionCode())) then begin
             NpRvVoucher.SetRange("Issue Document Type", NpRvVoucher."Issue Document Type"::"Audit Roll");
             NpRvVoucher.SetRange("Issue Document No.", SalesTicketNo);
             if NpRvVoucher.FindSet then
@@ -229,7 +230,7 @@ codeunit 6150787 "NPR POS Action: Print Receipt"
                 until NpRvVoucher.Next = 0;
         end;
 
-        if JSON.GetBoolean('Print Terminal Receipt', true) then begin
+        if JSON.GetBooleanOrFail('Print Terminal Receipt', StrSubstNo(ReadingErr, ActionCode())) then begin
             EFTTransactionRequest.SetRange("Sales Ticket No.", SalesTicketNo);
             EFTTransactionRequest.SetRange("Register No.", RegisterNo);
             if EFTTransactionRequest.FindSet then
@@ -238,7 +239,7 @@ codeunit 6150787 "NPR POS Action: Print Receipt"
                 until EFTTransactionRequest.Next = 0;
         end;
 
-        if JSON.GetBoolean('Print Tax Free Voucher', false) then begin
+        if JSON.GetBoolean('Print Tax Free Voucher') then begin
             POSEntry.Reset;
             POSEntry.SetRange("System Entry", false);
             POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
@@ -252,10 +253,9 @@ codeunit 6150787 "NPR POS Action: Print Receipt"
 
     local procedure GetInput(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
     begin
-        if not JSON.SetScopeRoot(false) then
+        JSON.SetScopeRoot();
+        if not JSON.SetScope('$' + Path) then
             exit('');
-        if not JSON.SetScope('$' + Path, false) then
-            exit('');
-        exit(JSON.GetString('input', false));
+        exit(JSON.GetString('input'));
     end;
 }

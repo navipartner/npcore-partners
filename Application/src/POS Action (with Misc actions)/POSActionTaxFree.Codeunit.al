@@ -1,12 +1,5 @@
 codeunit 6150794 "NPR POS Action: Tax Free"
 {
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is a built-in action for toggling tax free before completing sale';
         Caption_Enabled: Label 'Enabled';
@@ -15,6 +8,7 @@ codeunit 6150794 "NPR POS Action: Tax Free"
         Caption_ReverseVoucher: Label 'Sales ticket %1 is linked to an active tax free voucher.\Proceed with void of voucher? "No" will cancel the reverse attempt';
         Caption_VoidCritical: Label 'WARNING: The tax free voucher linked to sales ticket %1 could not be voided!\Do you want to proceed with sales ticket reverse?';
         Error_CancelReverse: Label 'An active tax free voucher is linked to sales ticket %1. It must be voided if you are reversing the sales ticket!';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -23,7 +17,6 @@ codeunit 6150794 "NPR POS Action: Tax Free"
 
     local procedure ActionVersion(): Text
     begin
-        //EXIT('1.1');
         exit('1.2');
     end;
 
@@ -61,8 +54,8 @@ codeunit 6150794 "NPR POS Action: Tax Free"
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('parameters', true);
-        Setting := JSON.GetInteger('Operation', true);
+        JSON.SetScopeParameters(ActionCode());
+        Setting := JSON.GetIntegerOrFail('Operation', StrSubstNo(ReadingErr, ActionCode()));
 
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
@@ -239,4 +232,3 @@ codeunit 6150794 "NPR POS Action: Tax Free"
                 Error(Error_CancelReverse);
     end;
 }
-

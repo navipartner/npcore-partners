@@ -41,7 +41,7 @@ codeunit 6151280 "NPR SS Action - Qty Increase"
 
         Handled := true;
 
-        Qty := Context.GetDecimalParameter('increaseBy', true);
+        Qty := Context.GetDecimalParameterOrFail('increaseBy', ActionCode());
         IncreaseSalelineQuantity(POSSession, Qty);
     end;
 
