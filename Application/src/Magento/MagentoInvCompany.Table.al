@@ -105,9 +105,7 @@ table 6151410 "NPR Magento Inv. Company"
     end;
 
     [NonDebuggable]
-    procedure GetApiPassword(): Text
-    Var
-        PasswordValue: Text;
+    procedure GetApiPassword() PasswordValue: Text
     begin
         IsolatedStorage.Get("Api Password Key", DataScope::Company, PasswordValue);
     end;

@@ -618,9 +618,7 @@ table 6151401 "NPR Magento Setup"
     end;
 
     [NonDebuggable]
-    procedure GetApiPassword(): Text
-    Var
-        PasswordValue: Text;
+    procedure GetApiPassword() PasswordValue: Text
     begin
         IsolatedStorage.Get("Api Password Key", DataScope::Company, PasswordValue);
     end;
@@ -646,9 +644,7 @@ table 6151401 "NPR Magento Setup"
     end;
 
     [NonDebuggable]
-    procedure GetNavApiPassword(): Text
-    Var
-        PasswordValue: Text;
+    procedure GetNavApiPassword() PasswordValue: Text
     begin
         IsolatedStorage.Get("Managed Nav Api Password Key", DataScope::Company, PasswordValue);
     end;
