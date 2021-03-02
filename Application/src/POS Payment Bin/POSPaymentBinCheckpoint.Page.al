@@ -3,7 +3,7 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
     Caption = 'POS Payment Bin Checkpoint';
     DeleteAllowed = false;
     InsertAllowed = false;
-    PageType = Card;
+    PageType = List;
     UsageCategory = Administration;
     ApplicationArea = All;
     SourceTable = "NPR POS Payment Bin Checkp.";
@@ -301,7 +301,7 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
                 Ellipsis = true;
                 Image = CalculateRemainingUsage;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
