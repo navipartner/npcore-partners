@@ -2190,28 +2190,15 @@ codeunit 6060150 "NPR Event Management"
     local procedure ShowProcessedPOSDocument(JobPlanningLineInvoice: Record "Job Planning Line Invoice"; Posted: Boolean) HasEntries: Boolean
     var
         POSEntry: Record "NPR POS Entry";
-        AuditRoll: Record "NPR Audit Roll";
         NPRetailSetup: Record "NPR NP Retail Setup";
         AdvancedPostingActive: Boolean;
     begin
-        AdvancedPostingActive := NPRetailSetup.Get;
-        if AdvancedPostingActive then begin
-            POSEntry.SetRange("POS Unit No.", JobPlanningLineInvoice."NPR POS Unit No.");
-            POSEntry.SetRange("POS Store Code", JobPlanningLineInvoice."NPR POS Store Code");
-            POSEntry.SetRange("Document No.", JobPlanningLineInvoice."Document No.");
-            HasEntries := not POSEntry.IsEmpty;
-            if HasEntries then
-                PAGE.RunModal(0, POSEntry);
-        end else begin
-            AuditRoll.SetRange("Register No.", JobPlanningLineInvoice."NPR POS Unit No.");
-            if Posted then
-                AuditRoll.SetRange("Posted Doc. No.", JobPlanningLineInvoice."Document No.")
-            else
-                AuditRoll.SetRange("Sales Ticket No.", JobPlanningLineInvoice."Document No.");
-            HasEntries := not AuditRoll.IsEmpty;
-            if HasEntries then
-                PAGE.RunModal(0, AuditRoll);
-        end;
+        POSEntry.SetRange("POS Unit No.", JobPlanningLineInvoice."NPR POS Unit No.");
+        POSEntry.SetRange("POS Store Code", JobPlanningLineInvoice."NPR POS Store Code");
+        POSEntry.SetRange("Document No.", JobPlanningLineInvoice."Document No.");
+        HasEntries := not POSEntry.IsEmpty;
+        if HasEntries then
+            PAGE.RunModal(0, POSEntry);
         exit(HasEntries);
     end;
 

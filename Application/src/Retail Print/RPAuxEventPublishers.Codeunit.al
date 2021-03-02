@@ -9,21 +9,13 @@ codeunit 6014534 "NPR RP Aux: Event Publishers"
     end;
 
     var
-        ERROR_UNKNOWNTABLE: Label 'Template line has unknown table selected. Must be either %1 or %2';
-
-    local procedure "// Locals"()
-    begin
-    end;
+        ERROR_UNKNOWNTABLE: Label 'Template line has unknown table selected. Must be %1';
 
     local procedure AddFunction(var tmpRetailList: Record "NPR Retail List" temporary; Choice: Text)
     begin
         tmpRetailList.Number += 1;
         tmpRetailList.Choice := Choice;
         tmpRetailList.Insert;
-    end;
-
-    local procedure "// Event Publishers"()
-    begin
     end;
 
     [IntegrationEvent(false, false)]
@@ -64,7 +56,6 @@ codeunit 6014534 "NPR RP Aux: Event Publishers"
     [EventSubscriber(ObjectType::Table, 6014445, 'OnFunction', '', false, false)]
     local procedure OnFunction(CodeunitID: Integer; FunctionName: Text; var TemplateLine: Record "NPR RP Template Line"; RecID: RecordID; var Skip: Boolean; var Handled: Boolean)
     var
-        AuditRoll: Record "NPR Audit Roll";
         RecRef: RecordRef;
         ReceiptNo: Text;
         POSEntry: Record "NPR POS Entry";
@@ -74,49 +65,24 @@ codeunit 6014534 "NPR RP Aux: Event Publishers"
 
         Handled := true;
 
-        //-NPR5.40 [304639]
         RecRef := RecID.GetRecord();
-        //-NPR5.41 [308701]
         RecRef.Find;
-        //+NPR5.41 [308701]
         case RecRef.Number of
-            DATABASE::"NPR Audit Roll":
-                begin
-                    RecRef.SetTable(AuditRoll);
-                    ReceiptNo := AuditRoll."Sales Ticket No.";
-                end;
             DATABASE::"NPR POS Entry":
                 begin
                     RecRef.SetTable(POSEntry);
                     ReceiptNo := POSEntry."Document No.";
                 end;
             else
-                Error(ERROR_UNKNOWNTABLE, AuditRoll.TableCaption, POSEntry.TableCaption);
+                Error(ERROR_UNKNOWNTABLE, POSEntry.TableCaption);
         end;
-        //+NPR5.40 [304639]
 
         with TemplateLine do
             case FunctionName of
-                //-NPR5.40 [304639]
                 'RECEIPT_HEADER':
                     OnSalesReceiptHeader(TemplateLine, ReceiptNo);
                 'RECEIPT_FOOTER':
                     OnSalesReceiptFooter(TemplateLine, ReceiptNo);
-            //    'RECEIPT_HEADER' :
-            //      BEGIN
-            //        RecRef := RecID.GETRECORD();
-            //        RecRef.SETTABLE(AuditRoll);
-            //        AuditRoll.SETRECFILTER();
-            //        OnSalesReceiptHeader(TemplateLine, AuditRoll);
-            //      END;
-            //    'RECEIPT_FOOTER' :
-            //      BEGIN
-            //        RecRef := RecID.GETRECORD();
-            //        RecRef.SETTABLE(AuditRoll);
-            //        AuditRoll.SETRECFILTER();
-            //        OnSalesReceiptFooter(TemplateLine, AuditRoll);
-            //      END;
-            //+NPR5.40 [304639]
             end;
 
         Skip := true; //The actual template line does not need to print anything. The event subscribers might.

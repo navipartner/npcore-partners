@@ -99,20 +99,17 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
     [EventSubscriber(ObjectType::Table, 27, 'OnBeforeDeleteEvent', '', true, false)]
     local procedure OnBeforeDeleteEventLicenseCheck(var Rec: Record Item; RunTrigger: Boolean)
     var
-        AuditRoll: Record "NPR Audit Roll";
         MixedDiscountLine: Record "NPR Mixed Discount Line";
         PeriodDiscountLine: Record "NPR Period Discount Line";
         SalesLinePOS: Record "NPR Sale Line POS";
+        POSEntry: Record "NPR POS Entry";
     begin
         if not RunTrigger then
             exit;
 
-        AuditRoll.SetCurrentKey("Sale Type", Type, "No.", Posted);
-        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
-        AuditRoll.SetRange(Type, AuditRoll.Type::Item);
-        AuditRoll.SetRange("No.", Rec."No.");
-        AuditRoll.SetRange(Posted, false);
-        if AuditRoll.FindFirst then
+        POSEntry.SetRange("Customer No.", Rec."No.");
+        POSEntry.SetRange("Post Entry Status", POSEntry."Post Entry Status"::Unposted);
+        if POSEntry.FindFirst() then
             Error(Text003, Rec."No.");
 
         SalesLinePOS.SetRange("Sale Type", SalesLinePOS."Sale Type"::Sale);
