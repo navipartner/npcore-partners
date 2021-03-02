@@ -194,14 +194,6 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
         }
         moveafter("VAT Registration No."; "Tax Liable")
         moveafter("VAT Registration No."; "Tax Area Code")
-        addafter("Prepayment %")
-        {
-            field("NPR Document Processing"; "NPR Document Processing")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the NPR Document Processing field';
-            }
-        }
     }
     actions
     {

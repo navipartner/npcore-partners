@@ -309,11 +309,6 @@ page 6014518 "NPR Sales Order Pick"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Bill-to E-mail field';
                 }
-                field("Document Processing"; Rec."NPR Document Processing")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the NPR Document Processing field';
-                }
                 field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
                 {
                     ApplicationArea = All;

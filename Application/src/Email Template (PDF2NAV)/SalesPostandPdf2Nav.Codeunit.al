@@ -28,6 +28,8 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
     local procedure "Code"()
     var
         SalesSetup: Record "Sales & Receivables Setup";
+        DocSendProfile: Record "Document Sending Profile";
+        CustomerVar: Record Customer;
         SalesPostViaJobQueue: Codeunit "Sales Post via Job Queue";
         SendReportAsEmail: Boolean;
     begin
@@ -55,7 +57,9 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
             end;
 
             "Print Posted Documents" := true;
-            SendReportAsEmail := "NPR Document Processing" in ["NPR Document Processing"::Email, "NPR Document Processing"::PrintAndEmail];
+
+            DocSendProfile.GetDefaultForCustomer("Bill-to Customer No.", DocSendProfile);
+            SendReportAsEmail := DocSendProfile."E-Mail" <> DocSendProfile."E-Mail"::No;
 
             SalesSetup.Get;
             if SalesSetup."Post & Print with Job Queue" and not SendReportAsEmail then
@@ -75,7 +79,6 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
         CustomReportID: Integer;
         OrderPrinted: Boolean;
     begin
-
         Commit;
 
         SalesHeader.Copy(SalesHeader2);
@@ -168,15 +171,16 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
     local procedure HandleReport(ReportUsage: Enum "Report Selection Usage") Printed: Boolean
     var
         SalesPostandPdf2NavSetup: Record "NPR SalesPost Pdf2Nav Setup";
+        DocSendProfile: Record "Document Sending Profile";
         DoPrint: Boolean;
     begin
-        if SalesHeader."NPR Document Processing" in
-          [SalesHeader."NPR Document Processing"::Email, SalesHeader."NPR Document Processing"::PrintAndEmail] then
+        DocSendProfile.Init();
+        DocSendProfile.GetDefaultForCustomer(SalesHeader."Bill-to Customer No.", DocSendProfile);
+        if DocSendProfile."E-Mail" <> DocSendProfile."E-Mail"::No then
             EmailReport(ReportUsage);
-
-        if (SalesHeader."NPR Document Processing" in
-            [SalesHeader."NPR Document Processing"::Print, SalesHeader."NPR Document Processing"::PrintAndEmail]) then
+        if DocSendProfile.Printer <> DocSendProfile.Printer::No then
             DoPrint := true;
+
         if (not DoPrint) then begin
             if not SalesPostandPdf2NavSetup.Get then
                 SalesPostandPdf2NavSetup.Init;
@@ -189,8 +193,9 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
         if DoPrint then
             Printed := PrintReport(ReportUsage);
 
-        if SalesHeader."NPR Document Processing" = SalesHeader."NPR Document Processing"::OIO then
-            OIOReport(ReportUsage);
+        if (DocSendProfile."Electronic Document" <> DocSendProfile."Electronic Document"::No) or
+            (DocSendProfile.Disk <> DocSendProfile.Disk::No) then
+            OIOReport(ReportUsage, DocSendProfile);
     end;
 
     local procedure PrintReport(ReportUsage: Enum "Report Selection Usage") Printed: Boolean
@@ -240,20 +245,21 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
         end;
     end;
 
-    local procedure OIOReport(ReportUsage: Enum "Report Selection Usage")
-    var
-        NPRDocLocalizationProxy: Codeunit "NPR Doc. Localization Proxy";
+    local procedure OIOReport(ReportUsage: Enum "Report Selection Usage"; DocSendProfilePar: Record "Document Sending Profile")
     begin
+        DocSendProfilePar.Printer := DocSendProfilePar.Printer::No;
+        DocSendProfilePar."E-Mail" := DocSendProfilePar."E-Mail"::No;
+
         case ReportUsage of
             ReportSelection.Usage::"S.Cr.Memo":
                 begin
                     if SalesCrMemoHeader.Get(SalesCrMemoHeader."No.") then
-                        NPRDocLocalizationProxy.SaveXMLDocument(3, SalesCrMemoHeader."No.");
+                        SalesCrMemoHeader.SendProfile(DocSendProfilePar);
                 end;
             ReportSelection.Usage::"S.Invoice":
                 begin
                     if SalesInvHeader.Get(SalesInvHeader."No.") then
-                        NPRDocLocalizationProxy.SaveXMLDocument(1, SalesInvHeader."No.");
+                        SalesInvHeader.SendProfile(DocSendProfilePar);
                 end;
         end;
     end;
@@ -268,4 +274,3 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
         Mode := NewMode;
     end;
 }
-

@@ -18,11 +18,6 @@ pageextension 6014450 "NPR Purchase Quote" extends "Purchase Quote"
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the NPR Pay-to E-mail field';
             }
-            field("NPR Document Processing"; "NPR Document Processing")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the NPR Document Processing field';
-            }
         }
     }
     actions

@@ -329,8 +329,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         SalesHeader."Your Reference" := SalePOS.Reference;
         SalesHeader."External Document No." := SalePOS.Reference;
         SalesHeader.Validate("Location Code", GetLocationCode(SalePOS));
-        if Customer.Get(SalePOS."Customer No.") then
-            SalesHeader."NPR Document Processing" := Customer."NPR Document Processing";
         SalesHeader.Ship := Ship;
         SalesHeader.Invoice := Invoice;
         SalesHeader.Receive := Receive;

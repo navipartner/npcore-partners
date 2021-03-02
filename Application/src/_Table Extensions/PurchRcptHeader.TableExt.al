@@ -18,6 +18,8 @@ tableextension 6014409 "NPR Purch. Rcpt. Header" extends "Purch. Rcpt. Header"
         }
         field(6014415; "NPR Document Processing"; Option)
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Document Sending Profile from Vendor is used.';
             Caption = 'Document Processing';
             DataClassification = CustomerContent;
             Description = 'PN1.00';

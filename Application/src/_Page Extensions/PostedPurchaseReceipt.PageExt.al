@@ -20,12 +20,6 @@ pageextension 6014409 "NPR Posted Purchase Receipt" extends "Posted Purchase Rec
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the NPR Pay-to E-mail field';
             }
-            field("NPR Document Processing"; "NPR Document Processing")
-            {
-                ApplicationArea = All;
-                Editable = false;
-                ToolTip = 'Specifies the value of the NPR Document Processing field';
-            }
         }
     }
     actions
@@ -56,7 +50,7 @@ pageextension 6014409 "NPR Posted Purchase Receipt" extends "Posted Purchase Rec
                 Ellipsis = true;
                 Image = BinContent;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Retail Print action';
@@ -72,7 +66,7 @@ pageextension 6014409 "NPR Posted Purchase Receipt" extends "Posted Purchase Rec
                 Caption = 'Price Label';
                 Image = BinContent;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+Ctrl+L';

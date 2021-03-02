@@ -32,6 +32,8 @@ tableextension 6014403 "NPR Sales Shipment Header" extends "Sales Shipment Heade
         }
         field(6014415; "NPR Document Processing"; Option)
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Document Sending Profile from Customer is used.';
             Caption = 'Document Processing';
             Description = 'PN1.00';
             OptionCaption = 'Print,E-mail,OIO,Print and E-Mail';

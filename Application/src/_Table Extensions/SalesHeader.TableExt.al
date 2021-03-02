@@ -68,6 +68,8 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
         }
         field(6014415; "NPR Document Processing"; Option)
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Document Sending Profile from Customer is used.';
             Caption = 'Document Processing';
             DataClassification = CustomerContent;
             Description = 'PN1.00';

@@ -29,6 +29,8 @@ tableextension 6014407 "NPR Sales Cr.Memo Header" extends "Sales Cr.Memo Header"
         }
         field(6014415; "NPR Document Processing"; Option)
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Document Sending Profile from Customer is used.';
             Caption = 'Document Processing';
             Description = 'PN1.00';
             OptionCaption = 'Print,E-mail,OIO,Print and E-Mail';

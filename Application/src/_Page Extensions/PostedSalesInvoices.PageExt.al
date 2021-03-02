@@ -22,13 +22,6 @@ pageextension 6014416 "NPR Posted Sales Invoices" extends "Posted Sales Invoices
                 Visible = false;
                 ToolTip = 'Specifies the value of the NPR Bill-to E-mail field';
             }
-            field("NPR Document Processing"; "NPR Document Processing")
-            {
-                ApplicationArea = All;
-                Editable = false;
-                Visible = false;
-                ToolTip = 'Specifies the value of the NPR Document Processing field';
-            }
             field("NPR Magento Coupon"; "NPR Magento Coupon")
             {
                 ApplicationArea = All;

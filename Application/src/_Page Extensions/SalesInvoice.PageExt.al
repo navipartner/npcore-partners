@@ -18,11 +18,6 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the NPR Bill-to E-mail field';
             }
-            field("NPR Document Processing"; "NPR Document Processing")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the NPR Document Processing field';
-            }
         }
     }
     actions
@@ -67,7 +62,7 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                 Caption = 'Import from scanner';
                 Image = Import;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Import from scanner action';
 
@@ -107,7 +102,7 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                 Caption = 'Post and Pdf2Nav';
                 Image = PostSendTo;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Category6;
                 PromotedIsBig = true;
                 ToolTip = 'Post and handle as set up in ''Document Processing''';

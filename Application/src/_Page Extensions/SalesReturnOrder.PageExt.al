@@ -26,14 +26,6 @@ pageextension 6014472 "NPR Sales Return Order" extends "Sales Return Order"
                 ToolTip = 'Specifies the value of the NPR Magento Payment Amount field';
             }
         }
-        addafter("Shipment Date")
-        {
-            field("NPR Document Processing"; "NPR Document Processing")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the NPR Document Processing field';
-            }
-        }
         addafter("Ship-to Name")
         {
             field("NPR Ship-to Name 2"; "Ship-to Name 2")
@@ -68,7 +60,7 @@ pageextension 6014472 "NPR Sales Return Order" extends "Sales Return Order"
                 Caption = 'Post and Pdf2Nav';
                 Image = PostSendTo;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Post and handle as set up in ''Document Processing''';

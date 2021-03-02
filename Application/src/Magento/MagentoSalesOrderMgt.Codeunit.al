@@ -298,7 +298,6 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
 
             if Customer.Contact = '' then
                 Customer.Contact := 'X';
-            Customer."NPR Document Processing" := Customer."NPR Document Processing"::OIO;
         end;
         Customer."VAT Registration No." := NpXmlDomMgt.GetXmlText(XmlElement, 'vat_registration_no', MaxStrLen(Customer."VAT Registration No."), false);
         Customer."Prices Including VAT" := true;
@@ -558,8 +557,6 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
             SalesHeader."Ship-to Contact" := NpXmlDomMgt.GetXmlText(XmlElement2, 'contact', MaxStrLen(SalesHeader."Ship-to Contact"), false);
         end;
 
-        if Customer.GLN <> '' then
-            SalesHeader."NPR Document Processing" := SalesHeader."NPR Document Processing"::OIO;
         SalesHeader.Validate("Salesperson Code", MagentoSetup."Salesperson Code");
 
         if NpXmlDomMgt.GetElementBoolean(XmlElement, 'use_customer_salesperson', false) and (Customer."Salesperson Code" <> '') then

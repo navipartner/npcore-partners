@@ -142,14 +142,6 @@ pageextension 6014427 "NPR Vendor Card" extends "Vendor Card"
                 }
             }
         }
-        addafter("Prices Including VAT")
-        {
-            field("NPR Document Processing"; "NPR Document Processing")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the NPR Document Processing field';
-            }
-        }
     }
 
     var
