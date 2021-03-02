@@ -2,6 +2,8 @@ table 6014423 "NPR Period"
 {
     Caption = 'Period';
     DataClassification = CustomerContent;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Table is obsolete';
 
     fields
     {
@@ -106,7 +108,7 @@ table 6014423 "NPR Period"
         {
             Caption = 'Sales Ticket No.';
             Editable = false;
-            TableRelation = "NPR Audit Roll"."Sales Ticket No." WHERE(Type = CONST("Open/Close"));
+            TableRelation = "NPR POS Entry"."Document No.";
             DataClassification = CustomerContent;
         }
         field(16; "Opening Sales Ticket No."; Code[10])

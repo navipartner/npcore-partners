@@ -419,6 +419,18 @@ table 6150621 "NPR POS Entry"
         key(Key4; "Document No.")
         {
         }
+
+        key(Key5; "Customer No.", "Post Entry Status")
+        { }
+
+        key(Key6; "Salesperson Code", "Post Entry Status")
+        {
+        }
+        key(Key7; "Posting Date", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code")
+        {
+            SumIndexFields = "Amount Excl. Tax", "Amount Incl. Tax";
+            MaintainSqlIndex = false;
+        }
     }
 
     fieldgroups

@@ -1116,50 +1116,6 @@ codeunit 6059767 "NPR NaviDocs Management"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6059767, 'OnBeforeAddDocumentEntryExt', '', true, true)]
-    local procedure OnBeforeAddAuditRollDocumentEntry(var InsertedEntryNo: BigInteger; var RecRef: RecordRef; var HandlingProfile: Code[20]; var ReportNo: Integer; var Recipient: Text; var TemplateCode: Code[20]; var DelayUntil: DateTime)
-    var
-        AuditRoll: Record "NPR Audit Roll";
-        NaviDocsEntry: Record "NPR NaviDocs Entry";
-        TableMetadata: Record "Table Metadata";
-    begin
-        if InsertedEntryNo <> 0 then
-            exit;
-
-        if RecRef.Number <> DATABASE::"NPR Audit Roll" then
-            exit;
-
-        if not AuditRoll.Get(RecRef.RecordId) then
-            exit;
-
-        NaviDocsEntry.Init;
-        NaviDocsEntry."Entry No." := 0;
-        NaviDocsEntry.Validate("Record ID", RecRef.RecordId);
-        NaviDocsEntry.Validate("Table No.", RecRef.Number);
-        NaviDocsEntry."Document Description" := AuditRoll.TableCaption;
-        NaviDocsEntry."No." := AuditRoll."Sales Ticket No.";
-        NaviDocsEntry."Posting Date" := AuditRoll."Posting Date";
-
-        if StrLen(AuditRoll."Customer No.") > 0 then begin
-            NaviDocsEntry."No. (Recipient)" := AuditRoll."Customer No.";
-            case AuditRoll."Customer Type" of
-                AuditRoll."Customer Type"::"Ord.":
-                    NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
-                AuditRoll."Customer Type"::Cash:
-                    NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Contact;
-            end;
-        end;
-
-        NaviDocsEntry.Validate("Document Handling Profile", HandlingProfile);
-        NaviDocsEntry."E-mail (Recipient)" := Recipient;
-        NaviDocsEntry."Report No." := ReportNo;
-        NaviDocsEntry."Posting Date" := AuditRoll."Sale Date";
-        NaviDocsEntry."Delay sending until" := DelayUntil;
-        NaviDocsEntry."Template Code" := TemplateCode;
-        NaviDocsEntry.Insert(true);
-        InsertedEntryNo := NaviDocsEntry."Entry No.";
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6059767, 'OnBeforeAddDocumentEntryExt', '', true, true)]
     local procedure OnBeforeAddPOSEntryDocumentEntry(var InsertedEntryNo: BigInteger; var RecRef: RecordRef; var HandlingProfile: Code[20]; var ReportNo: Integer; var Recipient: Text; var TemplateCode: Code[20]; var DelayUntil: DateTime)
     var
         POSEntry: Record "NPR POS Entry";

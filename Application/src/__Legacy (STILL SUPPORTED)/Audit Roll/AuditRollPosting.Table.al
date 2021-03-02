@@ -2,6 +2,8 @@ table 6014424 "NPR Audit Roll Posting"
 {
     Caption = 'Audit Roll Posting';
     DataClassification = CustomerContent;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Replaced by POS Entry functionality';
 
     fields
     {
@@ -169,12 +171,6 @@ table 6014424 "NPR Audit Roll Posting"
             AutoFormatType = 1;
             Caption = 'Amount';
             DataClassification = CustomerContent;
-
-            trigger OnLookup()
-            var
-                Revisionsrulle: Record "NPR Audit Roll";
-            begin
-            end;
         }
         field(31; "Amount Including VAT"; Decimal)
         {

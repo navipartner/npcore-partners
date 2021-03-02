@@ -1,14 +1,5 @@
 codeunit 6014558 "NPR RP Data Join Buffer Mgt."
 {
-    trigger OnRun()
-    var
-        Buffer2: Record "NPR RP Data Join Buffer" temporary;
-        ParentDataItem: Record "NPR RP Data Items";
-        AuditRoll: Record "NPR Audit Roll";
-        RecRef: RecordRef;
-    begin
-    end;
-
     var
         Buffer: Record "NPR RP Data Join Buffer" temporary;
         RecIDBuffer: Record "NPR RP DataJoin Rec.ID Buffer" temporary;
@@ -16,10 +7,6 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
         CurrentDataItemName: Text;
         Error_InvalidTable: Label 'Invalid table was passed to template %1. It was expecting a table with ID %2';
         DecimalRounding: Option "2","3","4","5";
-
-    local procedure "// Construct buffer"()
-    begin
-    end;
 
     procedure ProcessDataJoin(var RecRefIn: RecordRef; Template: Code[20])
     var
@@ -60,10 +47,6 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
                 RecRef.Close();
             until ParentDataItem.Next = 0;
         end;
-    end;
-
-    procedure "// Accessors"()
-    begin
     end;
 
     procedure IsEmpty(): Boolean

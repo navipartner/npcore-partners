@@ -114,7 +114,6 @@ codeunit 6150808 "NPR POS Action: Quantity"
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        AuditRoll: Record "NPR Audit Roll";
         SaleLinePOS: Record "NPR Sale Line POS";
         JSON: Codeunit "NPR POS JSON Management";
         SaleLine: Codeunit "NPR POS Sale Line";
@@ -126,6 +125,7 @@ codeunit 6150808 "NPR POS Action: Quantity"
         ReturnReasonCode: Code[20];
         NegativeInput: Boolean;
         QtyCheck: Boolean;
+        POSSalesLine: Record "NPR POS Sales Line";
     begin
         if not Action.IsThisAction(ActionCode) then
             exit;
@@ -156,11 +156,11 @@ codeunit 6150808 "NPR POS Action: Quantity"
         SaleLine.GetCurrentSaleLine(SaleLinePOS);
 
         if (SaleLinePOS."Return Sale Sales Ticket No." <> '') then begin
-            AuditRoll.SetFilter("Sales Ticket No.", '=%1', SaleLinePOS."Return Sale Sales Ticket No.");
-            AuditRoll.SetFilter("Line No.", '=%1', SaleLinePOS."Line No.");
-            if (AuditRoll.FindFirst()) then
-                if (Abs(Quantity) > Abs(AuditRoll.Quantity)) then
-                    Error(WRONG_RETURN_QUANTITY, AuditRoll.Description, Abs(AuditRoll.Quantity));
+            POSSalesLine.SetRange("Document No.", SaleLinePOS."Return Sale Sales Ticket No.");
+            POSSalesLine.SetRange("Line No.", SaleLinePOS."Line No.");
+            if POSSalesLine.FindFirst() then
+                if Abs(Quantity) > Abs(POSSalesLine.Quantity) then
+                    Error(WRONG_RETURN_QUANTITY, POSSalesLine.Description, Abs(POSSalesLine.Quantity));
         end;
 
         case ConstraintOption of

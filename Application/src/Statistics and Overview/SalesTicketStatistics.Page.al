@@ -164,44 +164,42 @@ page 6014468 "NPR Sales Ticket Statistics"
         Dim1Filter: Code[20];
         Dim2Filter: Code[20];
         PeriodType: Option Day,Week,Month,Year;
-        AuditRoll: Record "NPR Audit Roll";
-        totalCount: Decimal;
+        TotalCount: Decimal;
+        POSEntry: Record "NPR POS Entry";
 
     local procedure SetDateFilter()
     begin
-        //-NPR4.10
         if AmountType = AmountType::"Net Change" then
-            AuditRoll.SetRange("Sale Date", "Period Start", "Period End")
+            POSEntry.SetRange("Posting Date", "Period Start", "Period End")
         else
-            AuditRoll.SetRange("Sale Date", 0D, "Period End");
-        //+NPR4.10
+            POSEntry.SetRange("Posting Date", 0D, "Period End");
     end;
 
-    procedure CalcAverage() "Average": Decimal
+    procedure CalcAverage() Result: Decimal
     var
         totalAmount: Decimal;
     begin
-        AuditRoll.SetFilter("Sale Type", '%1|%2', AuditRoll."Sale Type"::Sale, AuditRoll."Sale Type"::"Debit Sale");
-        totalCount := AuditRoll.GetNoOfSales();
-        AuditRoll.SetRange("Sale Type");
+        POSEntry.CalcSums("Amount Excl. Tax", "Amount Incl. Tax");
+        totalAmount := POSEntry."Amount Excl. Tax";
+        totalCount := POSEntry.Count();
 
         if totalCount <> 0 then
-            Average := totalAmount / totalCount
+            Result := TotalAmount / TotalCount
         else
-            Average := 0;
+            Result := 0;
     end;
 
     procedure SetDimensionFilters()
     begin
         if Dim1Filter <> '' then
-            AuditRoll.SetRange("Shortcut Dimension 1 Code", Dim1Filter)
+            POSEntry.SetRange("Shortcut Dimension 1 Code", Dim1Filter)
         else
-            AuditRoll.SetRange("Shortcut Dimension 1 Code");
+            POSEntry.SetRange("Shortcut Dimension 1 Code");
 
         if Dim2Filter <> '' then
-            AuditRoll.SetFilter("Shortcut Dimension 2 Code", Dim2Filter)
+            POSEntry.SetFilter("Shortcut Dimension 2 Code", Dim2Filter)
         else
-            AuditRoll.SetRange("Shortcut Dimension 2 Code");
+            POSEntry.SetRange("Shortcut Dimension 2 Code");
     end;
 }
 

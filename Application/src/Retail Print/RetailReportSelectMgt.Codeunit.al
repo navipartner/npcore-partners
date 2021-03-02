@@ -185,7 +185,6 @@ codeunit 6014581 "NPR Retail Report Select. Mgt."
     local procedure TestRecRefFilter(var RecRef: RecordRef; ObjectNo: Integer; RecordFilter: Text): Boolean
     var
         Item: Record Item;
-        AuditRoll: Record "NPR Audit Roll";
         RetailJournalLine: Record "NPR Retail Journal Line";
         ExchangeLabel: Record "NPR Exchange Label";
         SaleLinePOS: Record "NPR Sale Line POS";
@@ -200,19 +199,6 @@ codeunit 6014581 "NPR Retail Report Select. Mgt."
                         begin
                             Item.SetView(RecordFilter);
                             case RecRef.Number of
-                                DATABASE::"NPR Audit Roll":
-                                    begin
-                                        RecRef.SetTable(AuditRoll);
-                                        AuditRoll.SetRange(Type, AuditRoll.Type::Item);
-                                        if AuditRoll.FindSet then
-                                            repeat
-                                                Item.SetRange("No.", AuditRoll."No.");
-                                                if not Item.IsEmpty then
-                                                    AuditRoll.Mark(true);
-                                            until AuditRoll.Next = 0;
-                                        AuditRoll.MarkedOnly(true);
-                                        RecRef.GetTable(AuditRoll);
-                                    end;
                                 DATABASE::"NPR Retail Journal Line":
                                     begin
                                         RecRef.SetTable(RetailJournalLine);

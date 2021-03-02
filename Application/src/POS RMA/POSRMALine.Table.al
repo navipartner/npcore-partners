@@ -46,8 +46,7 @@ table 6150639 "NPR POS RMA Line"
         }
         field(1000; "FF Total Qty Sold"; Decimal)
         {
-            CalcFormula = Sum ("NPR Audit Roll".Quantity WHERE("Sales Ticket No." = FIELD("Sales Ticket No."),
-                                                           "Sale Type" = CONST(Sale),
+            CalcFormula = Sum("NPR POS Sales Line".Quantity WHERE("Document No." = FIELD("Sales Ticket No."),
                                                            Type = CONST(Item),
                                                            "No." = FIELD("Returned Item No."),
                                                            "Line No." = FIELD("Line No. Filter")));
@@ -57,7 +56,7 @@ table 6150639 "NPR POS RMA Line"
         }
         field(1010; "FF Total Qty Returned"; Decimal)
         {
-            CalcFormula = Sum ("NPR POS RMA Line"."Returned Quantity" WHERE("Sales Ticket No." = FIELD("Sales Ticket No."),
+            CalcFormula = Sum("NPR POS RMA Line"."Returned Quantity" WHERE("Sales Ticket No." = FIELD("Sales Ticket No."),
                                                                         "Returned Item No." = FIELD("Returned Item No."),
                                                                         "Return Line No." = FIELD("Line No. Filter")));
             Caption = 'FF Total Qty Returned';

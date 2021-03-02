@@ -587,23 +587,18 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
 
     local procedure OriginalSaleSuccessful(ReceiptNo: Text; RetailID: Guid): Boolean
     var
-        AuditRoll: Record "NPR Audit Roll";
         NPRetailSetup: Record "NPR NP Retail Setup";
         POSEntry: Record "NPR POS Entry";
     begin
-
         if NPRetailSetup.Get then begin
             POSEntry.SetRange("Retail ID", RetailID);
-
             POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
-
             exit(not POSEntry.IsEmpty);
         end;
 
-
-        AuditRoll.SetRange("Sales Ticket No.", ReceiptNo);
-        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Payment);
-        exit(not AuditRoll.IsEmpty);
+        POSEntry.SetRange("Document No.", ReceiptNo);
+        POSEntry.CalcFields("Payment Lines");
+        exit(POSEntry."Payment Lines" <> 0);
     end;
 
     local procedure MarkOriginalTransactionAsReversed(EFTTransactionRequest: Record "NPR EFT Transaction Request")

@@ -1,6 +1,6 @@
 codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 {
-    Permissions = TableData "NPR Audit Roll" = rimd;
+    Permissions = TableData "NPR POS Entry" = rimd;
     TableNo = "NPR Sale POS";
 
     trigger OnRun()
@@ -197,7 +197,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 
     procedure ProcessPOSSale(var SalePOS: Record "NPR Sale POS")
     var
-        AuditRoll: Record "NPR Audit Roll";
         SalesHeaderQoute: Record "Sales Header";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
@@ -211,7 +210,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         Success: Boolean;
         POSSalesDocumentOutputMgt: Codeunit "NPR POS Sales Doc. Output Mgt.";
-
+        POSEntry: Record "NPR POS Entry";
     begin
         CreateSalesHeader(SalePOS, SalesHeader);
 
@@ -744,7 +743,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 
     local procedure PrintRetailReceipt(SalePOS: Record "NPR Sale POS")
     var
-        AuditRoll: Record "NPR Audit Roll";
         POSEntry: Record "NPR POS Entry";
         NPRetailSetup: Record "NPR NP Retail Setup";
         RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";

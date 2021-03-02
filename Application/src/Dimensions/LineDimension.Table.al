@@ -196,16 +196,12 @@ table 6014430 "NPR Line Dimension"
     var
         Ekspedition: Record "NPR Sale POS";
         Ekspeditionlinie: Record "NPR Sale Line POS";
-        Revisionsrulle: Record "NPR Audit Roll";
     begin
-        //UpdateGlobalDimCode
-
         case "Table ID" of
             DATABASE::"NPR Sale POS":
                 begin
                     Ekspedition.SetRange("Register No.", Kassenr);
                     Ekspedition.SetRange("Sales Ticket No.", Bonnr);
-                    //IF Ekspedition.GET(Kassenr,Bonnr) THEN BEGIN
                     if Ekspedition.Find('-') then begin
                         case GlobalDimCodeNo of
                             1:
@@ -227,18 +223,6 @@ table 6014430 "NPR Line Dimension"
                         end;
                         Ekspeditionlinie.Modify(false);
                         //Ekspeditionlinie.MODIFY(TRUE);  //Henrik Ohm, 10/6/2005 - Failure due to terminal approved
-                    end;
-                end;
-            DATABASE::"NPR Audit Roll":
-                begin
-                    if Revisionsrulle.Get(Kassenr, Bonnr, EkspArt, LinjeNr, Nr, Dato2) then begin
-                        case GlobalDimCodeNo of
-                            1:
-                                Revisionsrulle."Shortcut Dimension 1 Code" := NewDimValue;
-                            2:
-                                Revisionsrulle."Shortcut Dimension 2 Code" := NewDimValue;
-                        end;
-                        Revisionsrulle.Modify(true);
                     end;
                 end;
         end;

@@ -96,13 +96,6 @@ codeunit 6014549 "NPR RP Line Print Mgt."
 
     SingleInstance = true;
 
-    trigger OnRun()
-    var
-        AuditRoll: Record "NPR Audit Roll";
-        Variant: Variant;
-    begin
-    end;
-
     var
         Buffer: Record "NPR RP Print Buffer" temporary;
         LinePrinter: Codeunit "NPR RP Line Printer Interf.";

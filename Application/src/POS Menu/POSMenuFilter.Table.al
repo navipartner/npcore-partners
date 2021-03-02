@@ -276,7 +276,6 @@ table 6150717 "NPR POS Menu Filter"
     var
         FilterRecRef: RecordRef;
         FilterRecVariant: Variant;
-        AuditRoll: Record "NPR Audit Roll";
         POSEntry: Record "NPR POS Entry";
         FilterValue: Code[10];
     begin
@@ -286,13 +285,6 @@ table 6150717 "NPR POS Menu Filter"
         FilterRecVariant := FilterRecRef;
 
         case TableNo of
-            DATABASE::"NPR Audit Roll":
-                begin
-                    AuditRoll.SetView(FilterRecRef.GetView);
-                    AuditRoll.CopyFilters(FilterRecVariant);
-                    AuditRoll.SetFilter("Register No.", '=%1', GetPosUnitNo());
-                    FilterStringText := AuditRoll.GetView();
-                end;
             DATABASE::"NPR POS Entry":
                 begin
                     POSEntry.SetView(FilterRecRef.GetView);

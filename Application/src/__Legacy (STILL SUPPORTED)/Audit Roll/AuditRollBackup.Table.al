@@ -165,12 +165,6 @@ table 6014538 "NPR Audit Roll Backup"
             AutoFormatType = 1;
             Caption = 'Amount';
             DataClassification = CustomerContent;
-
-            trigger OnLookup()
-            var
-                Revisionsrulle: Record "NPR Audit Roll";
-            begin
-            end;
         }
         field(31; "Amount Including VAT"; Decimal)
         {

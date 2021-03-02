@@ -56,9 +56,9 @@ codeunit 6151005 "NPR POS Action: Load POS Quote"
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     var
-        AuditRoll: Record "NPR Audit Roll";
+        POSEntry: Record "NPR POS Entry";
     begin
-        Captions.AddActionCaption(ActionCode(), 'SalesTicketNo', AuditRoll.FieldCaption("Sales Ticket No."));
+        Captions.AddActionCaption(ActionCode(), 'SalesTicketNo', POSEntry.FieldCaption("Document No."));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', true, true)]

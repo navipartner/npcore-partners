@@ -1864,27 +1864,23 @@ table 6014406 "NPR Sale Line POS"
 
     procedure CheckSerialNoAuditRoll(ItemNo: Code[20]; SerialNo: Code[20]; Positive: Boolean)
     var
-        AuditRoll: Record "NPR Audit Roll";
         Err001: Label '%2 %1 is already in stock but has not been posted yet';
         Err002: Label '%2 %1 has already been sold to a customer but is not yet posted';
+        POSEntry: Record "NPR POS Entry";
+        POSSalesLine: Record "NPR POS Sales Line";
+        p: Record "NPR POS Entry";
     begin
+        POSSalesLine.SetRange("Item Entry No.", 0);
+        POSSalesLine.SetRange("Serial No.", "Serial No.");
+        if POSSalesLine.FindFirst() then
+            POSSalesLine.CalcSums(Quantity);
+        TotalAuditRollQuantity := POSSalesLine.Quantity;
+
         if Positive then begin
-            AuditRoll.SetCurrentKey(Posted, "Serial No.");
-            AuditRoll.SetRange(Posted, false);
-            AuditRoll.SetRange("Serial No.", "Serial No.");
-            if AuditRoll.FindFirst then
-                AuditRoll.CalcSums(Quantity);
-            TotalAuditRollQuantity := AuditRoll.Quantity;
-            if AuditRoll.Quantity = -1 then
+            if POSSalesLine.Quantity = -1 then
                 Error(Err001, "Serial No.", FieldName("Serial No."));
         end else begin
-            AuditRoll.SetCurrentKey(Posted, "Serial No.");
-            AuditRoll.SetRange(Posted, false);
-            AuditRoll.SetRange("Serial No.", "Serial No.");
-            if AuditRoll.FindFirst then
-                AuditRoll.CalcSums(Quantity);
-            TotalAuditRollQuantity := AuditRoll.Quantity;
-            if AuditRoll.Quantity = 1 then
+            if POSSalesLine.Quantity = 1 then
                 Error(Err002, "Serial No.", FieldName("Serial No."));
         end;
     end;

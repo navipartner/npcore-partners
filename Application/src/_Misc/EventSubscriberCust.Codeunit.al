@@ -1,6 +1,6 @@
 codeunit 6014442 "NPR Event Subscriber (Cust)"
 {
-    Permissions = TableData "NPR Audit Roll" = rimd;
+    Permissions = TableData "NPR POS Entry" = rimd;
 
     var
         SalesSetup: Record "Sales & Receivables Setup";
@@ -33,12 +33,12 @@ codeunit 6014442 "NPR Event Subscriber (Cust)"
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeDeleteEvent', '', true, false)]
     local procedure OnBeforeDeleteEvent(var Rec: Record Customer; RunTrigger: Boolean)
     var
-        AuditRoll: Record "NPR Audit Roll";
         SalesLinePOS: Record "NPR Sale Line POS";
         SalesPOS: Record "NPR Sale POS";
         DeleteCustActiveCashErr: Label 'You can''t delete customer %1 as it is used on active cash payment.', Comment = '%1 = Customer';
         DeleteCustActiveSalesDocErr: Label 'You can''t delete customer %1 as it is used on an active sales document.', Comment = '%1 = Customer';
         DeleteCustActivePostedEntriesErr: Label 'You can''t delete customer %1 as there are one or more non posted entries.', Comment = '%1 = Customer';
+        POSEntry: Record "NPR POS Entry";
     begin
         if not RunTrigger then
             exit;
@@ -46,12 +46,9 @@ codeunit 6014442 "NPR Event Subscriber (Cust)"
         if Rec."No." = '' then
             exit;
 
-        AuditRoll.SetCurrentKey("Sale Type", Type, "No.", Posted);
-        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Deposit);
-        AuditRoll.SetRange(Type, AuditRoll.Type::Customer);
-        AuditRoll.SetRange("No.", Rec."No.");
-        AuditRoll.SetRange(Posted, false);
-        if AuditRoll.FindFirst() then
+        POSEntry.SetRange("Customer No.", Rec."No.");
+        POSEntry.SetRange("Post Entry Status", POSEntry."Post Entry Status"::Unposted);
+        if POSEntry.FindFirst() then
             Error(DeleteCustActivePostedEntriesErr, Rec."No.");
 
         SalesPOS.SetRange("Customer No.", Rec."No.");
@@ -68,20 +65,23 @@ codeunit 6014442 "NPR Event Subscriber (Cust)"
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterRenameEvent', '', true, false)]
     local procedure OnAfterRenameEvent(var Rec: Record Customer; var xRec: Record Customer; RunTrigger: Boolean)
     var
-        AuditRoll: Record "NPR Audit Roll";
         SalesLinePOS: Record "NPR Sale Line POS";
         SalesPOS: Record "NPR Sale POS";
+        POSEntry: Record "NPR POS Entry";
+        POSSalesLine: Record "NPR POS Sales Line";
     begin
         if not RunTrigger then
             exit;
 
-        AuditRoll.SetCurrentKey("Sale Type", Type, "No.", Posted);
-        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Deposit);
-        AuditRoll.SetRange(Type, AuditRoll.Type::Customer);
-        AuditRoll.SetRange("No.", xRec."No.");
-        AuditRoll.SetRange(Posted, false);
-        if AuditRoll.FindFirst() then
-            AuditRoll.ModifyAll("No.", Rec."No.");
+        POSEntry.SetRange("Customer No.", xRec."No.");
+        POSEntry.SetRange("Post Entry Status", POSEntry."Post Entry Status"::Unposted);
+        if POSEntry.FindSet() then begin
+            repeat
+                POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+                POSSalesLine.ModifyAll("Customer No.", Rec."No.");
+            until POSEntry.Next() = 0;
+            POSEntry.ModifyAll("Customer No.", Rec."No.");
+        end;
 
         if not RunTrigger then
             exit;

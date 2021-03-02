@@ -10,12 +10,13 @@ codeunit 6014404 "NPR Event Subscriber"
     [EventSubscriber(ObjectType::Table, Database::"Salesperson/Purchaser", 'OnAfterDeleteEvent', '', true, false)]
     local procedure SalespersonPurchaserOnAfterDeleteEvent(var Rec: Record "Salesperson/Purchaser"; RunTrigger: Boolean)
     var
-        AuditRoll: Record "NPR Audit Roll";
+        POSEntry: Record "NPR POS Entry";
     begin
         if RunTrigger then begin
-            AuditRoll.SetRange(Posted, false);
-            AuditRoll.SetRange("Salesperson Code", Rec.Code);
-            if not AuditRoll.IsEmpty() then
+            POSEntry.SetRange("Salesperson Code", Rec.Code);
+            POSEntry.SetFilter("Post Entry Status", '%1|%2', POSEntry."Post Entry Status"::Unposted,
+                POSEntry."Post Entry Status"::"Error while Posting");
+            if not POSEntry.IsEmpty then
                 Error(SalesPersonDeleteErr, Rec.Code);
         end;
     end;
