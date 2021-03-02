@@ -134,9 +134,7 @@ table 6151413 "NPR Magento Payment Gateway"
     end;
 
     [NonDebuggable]
-    procedure GetApiPassword(): Text
-    Var
-        PasswordValue: Text;
+    procedure GetApiPassword() PasswordValue: Text
     begin
         IsolatedStorage.Get("Api Password Key", DataScope::Company, PasswordValue);
     end;

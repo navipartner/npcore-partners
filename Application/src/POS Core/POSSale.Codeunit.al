@@ -1,30 +1,5 @@
 codeunit 6150705 "NPR POS Sale"
 {
-    trigger OnRun()
-    begin
-        case OnRunType of
-            // If somebody accidentally (or even intentionall) calls this codeunit without defining what kind of
-            // run type is needed, then codeunit simply exits
-            OnRunType::Undefined:
-                exit;
-
-            OnRunType::RunAfterEndSale:
-                begin
-                    InvokeOnFinishSaleWorkflow(Rec);
-                    Commit;
-                    OnAfterEndSale(OnRunXRec);
-                    Commit;
-                end;
-
-            OnRunType::OnFinishSale:
-                begin
-                    OnFinishSale(OnRunPOSSalesWorkflowStep, Rec);
-                    Commit;
-                end;
-
-        end;
-    end;
-
     var
         Rec: Record "NPR Sale POS";
         POSUnit: Record "NPR POS Unit";
@@ -33,6 +8,7 @@ codeunit 6150705 "NPR POS Sale"
         FrontEnd: Codeunit "NPR POS Front End Management";
         SaleLine: Codeunit "NPR POS Sale Line";
         PaymentLine: Codeunit "NPR POS Payment Line";
+        OnRunType: Enum "NPR POS Sale OnRunType";
         IsModified: Boolean;
         Initialized: Boolean;
         Ended: Boolean;
@@ -45,11 +21,6 @@ codeunit 6150705 "NPR POS Sale"
         EndedRoundingAmount: Decimal;
         Text000: Label 'During End Sale, after Audit Roll Insert, before Audit Roll Posting';
         ERROR_AFTER_END_SALE: Label 'An error occurred after the sale ended: %1';
-
-        // OnRun helper globals
-        OnRunType: Option Undefined,RunAfterEndSale,OnFinishSale;
-        OnRunPOSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
-        OnRunXRec: Record "NPR Sale POS";
 
     procedure InitializeAtLogin(POSUnitIn: Record "NPR POS Unit"; SetupIn: Codeunit "NPR POS Setup")
     begin
@@ -621,38 +592,36 @@ codeunit 6150705 "NPR POS Sale"
         POSResumeSale: Codeunit "NPR POS Resume Sale Mgt.";
     begin
         Rec := SalePOS_ToResume;
-        with Rec do begin
-            UpdateSaleDeviceID(Rec);
+        UpdateSaleDeviceID(Rec);
 
-            "Salesperson Code" := Setup.Salesperson();
-            if "Salesperson Code" <> SalePOS_ToResume."Salesperson Code" then
-                CreateDim(
-                  DATABASE::"NPR POS Unit", "Register No.",
-                  DATABASE::"NPR POS Store", "POS Store Code",
-                  DATABASE::Job, "Event No.",
-                  DATABASE::Customer, "Customer No.",
-                  DATABASE::"Salesperson/Purchaser", "Salesperson Code");
+        Rec."Salesperson Code" := Setup.Salesperson();
+        if Rec."Salesperson Code" <> SalePOS_ToResume."Salesperson Code" then
+            Rec.CreateDim(
+              DATABASE::"NPR POS Unit", Rec."Register No.",
+              DATABASE::"NPR POS Store", Rec."POS Store Code",
+              DATABASE::Job, Rec."Event No.",
+              DATABASE::Customer, Rec."Customer No.",
+              DATABASE::"Salesperson/Purchaser", Rec."Salesperson Code");
 
-            Modify(true);
+        Rec.Modify(true);
 
-            SaleLine.Init("Register No.", "Sales Ticket No.", This, Setup, FrontEnd);
-            SaleLinePOS.SetRange("Register No.", "Register No.");
-            SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-            SaleLinePOS.SetFilter(Type, '<>%1', SaleLinePOS.Type::Payment);
-            if not SaleLinePOS.IsEmpty then
-                SaleLine.SetLast();
+        SaleLine.Init(Rec."Register No.", Rec."Sales Ticket No.", This, Setup, FrontEnd);
+        SaleLinePOS.SetRange("Register No.", Rec."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
+        SaleLinePOS.SetFilter(Type, '<>%1', SaleLinePOS.Type::Payment);
+        if not SaleLinePOS.IsEmpty then
+            SaleLine.SetLast();
 
-            PaymentLine.Init("Register No.", "Sales Ticket No.", This, Setup, FrontEnd);
+        PaymentLine.Init(Rec."Register No.", Rec."Sales Ticket No.", This, Setup, FrontEnd);
 
-            FilterGroup := 2;
-            SetRange("Register No.", "Register No.");
-            SetRange("Sales Ticket No.", "Sales Ticket No.");
-            FilterGroup := 0;
+        Rec.FilterGroup := 2;
+        Rec.SetRange("Register No.", Rec."Register No.");
+        Rec.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
+        Rec.FilterGroup := 0;
 
-            IsModified := true;
+        IsModified := true;
 
-            POSResumeSale.LogSaleResume(Rec, SalePOS_ToResume."Sales Ticket No.");
-        end;
+        POSResumeSale.LogSaleResume(Rec, SalePOS_ToResume."Sales Ticket No.");
     end;
 
     procedure ResumeFromPOSQuote(POSQuoteNo: Integer): Boolean
@@ -680,23 +649,25 @@ codeunit 6150705 "NPR POS Sale"
         POSUnitIdentity: Record "NPR POS Unit Identity";
     begin
         Setup.GetPOSUnitIdentity(POSUnitIdentity);
-        with SalePOS do begin
-            if POSUnitIdentity."Entry No." = 0 then
-                "Device ID" := ''  //Configured using temporary pos unit identity
-            else
-                "Device ID" := POSUnitIdentity."Device ID";
-            "Host Name" := POSUnitIdentity."Host Name";
-            "User ID" := POSUnitIdentity."User ID";
-        end;
+        if POSUnitIdentity."Entry No." = 0 then
+            SalePOS."Device ID" := ''  //Configured using temporary pos unit identity
+        else
+            SalePOS."Device ID" := POSUnitIdentity."Device ID";
+        SalePOS."Host Name" := POSUnitIdentity."Host Name";
+        SalePOS."User ID" := POSUnitIdentity."User ID";
     end;
 
     local procedure RunAfterEndSale_OnRun(xRec: Record "NPR Sale POS") Success: Boolean;
+    var
+        POSAfterSaleExecution: Codeunit "NPR POS After Sale Execution";
     begin
-        OnRunType := OnRunType::RunAfterEndSale;
-        OnRunXRec := xRec;
+        POSAfterSaleExecution.OnRunTypeSet(OnRunType::RunAfterEndSale);
+        POSAfterSaleExecution.RecSet(Rec);
+        POSAfterSaleExecution.PosSaleCodeunitSet(This);
+        POSAfterSaleExecution.OnRunXRecSet(xRec);
         Commit();
-        Success := This.Run();
-        OnRunType := OnRunType::Undefined;
+        Success := POSAfterSaleExecution.Run();
+        POSAfterSaleExecution.OnRunTypeSet(OnRunType::Undefined);
     end;
 
     local procedure RunAfterEndSale(xRec: Record "NPR Sale POS")
@@ -768,7 +739,7 @@ codeunit 6150705 "NPR POS Sale"
     end;
 
     [IntegrationEvent(TRUE, false)]
-    local procedure OnAfterEndSale(SalePOS: Record "NPR Sale POS")
+    procedure OnAfterEndSale(SalePOS: Record "NPR Sale POS")
     begin
     end;
 
@@ -814,11 +785,15 @@ codeunit 6150705 "NPR POS Sale"
     end;
 
     local procedure InvokeOnFinishSaleSubscribers_OnRun(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step")
+    var
+        POSAfterSaleExecution: Codeunit "NPR POS After Sale Execution";
     begin
-        OnRunPOSSalesWorkflowStep := POSSalesWorkflowStep;
-        OnRunType := OnRunType::OnFinishSale;
-        if This.Run() then;
-        OnRunType := OnRunType::Undefined;
+        POSAfterSaleExecution.OnRunTypeSet(OnRunType::OnFinishSale);
+        POSAfterSaleExecution.OnRunPOSSalesWorkflowStepSet(POSSalesWorkflowStep);
+        POSAfterSaleExecution.RecSet(Rec);
+        POSAfterSaleExecution.PosSaleCodeunitSet(This);
+        if POSAfterSaleExecution.Run() then;
+        POSAfterSaleExecution.OnRunTypeSet(OnRunType::Undefined);
     end;
 
     procedure InvokeOnFinishSaleWorkflow(SalePOS: Record "NPR Sale POS")
@@ -847,7 +822,7 @@ codeunit 6150705 "NPR POS Sale"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnFinishSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
+    procedure OnFinishSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
     begin
     end;
 

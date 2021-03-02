@@ -1,27 +1,8 @@
 codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 {
     Permissions = TableData "NPR POS Entry" = rimd;
-    TableNo = "NPR Sale POS";
-
-    trigger OnRun()
-    begin
-        case FunctionToRun of
-            FunctionToRun::"Invoke OnFinishCreditSale Subsribers":
-                begin
-                    OnFinishCreditSale(POSSalesWorkflowStepGlobal, Rec);
-                end;
-        end;
-    end;
-
-    procedure SetInvokeOnFinishCreditSaleSubsribers(POSSalesWorkflowStepIn: Record "NPR POS Sales Workflow Step")
-    begin
-        FunctionToRun := FunctionToRun::"Invoke OnFinishCreditSale Subsribers";
-        POSSalesWorkflowStepGlobal := POSSalesWorkflowStepIn;
-    end;
 
     var
-        POSSalesWorkflowStepGlobal: Record "NPR POS Sales Workflow Step";
-        FunctionToRun: Option Default,"Invoke OnFinishCreditSale Subsribers";
         DocumentType: Enum "Sales Document Type";
         Ask: Boolean;
         Invoice: Boolean;
@@ -369,22 +350,20 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         SalesCommentLine: Record "Sales Comment Line";
         RetailComment: Record "NPR Retail Comment";
     begin
-        with SalePOS do begin
-            RetailComment.SetRange("Table ID", DATABASE::"NPR Sale POS");
-            RetailComment.SetRange("No.", "Register No.");
-            RetailComment.SetRange("No. 2", "Sales Ticket No.");
-            if RetailComment.FindSet then
-                repeat
-                    SalesCommentLine.Init;
-                    SalesCommentLine."Document Type" := SalesHeader."Document Type";
-                    SalesCommentLine."No." := SalesHeader."No.";
-                    SalesCommentLine."Line No." := RetailComment."Line No.";
-                    SalesCommentLine.Date := RetailComment.Date;
-                    SalesCommentLine.Code := RetailComment.Code;
-                    SalesCommentLine.Comment := RetailComment.Comment;
-                    SalesCommentLine.Insert(true);
-                until RetailComment.Next = 0;
-        end;
+        RetailComment.SetRange("Table ID", DATABASE::"NPR Sale POS");
+        RetailComment.SetRange("No.", SalePOS."Register No.");
+        RetailComment.SetRange("No. 2", SalePOS."Sales Ticket No.");
+        if RetailComment.FindSet then
+            repeat
+                SalesCommentLine.Init;
+                SalesCommentLine."Document Type" := SalesHeader."Document Type";
+                SalesCommentLine."No." := SalesHeader."No.";
+                SalesCommentLine."Line No." := RetailComment."Line No.";
+                SalesCommentLine.Date := RetailComment.Date;
+                SalesCommentLine.Code := RetailComment.Code;
+                SalesCommentLine.Comment := RetailComment.Comment;
+                SalesCommentLine.Insert(true);
+            until RetailComment.Next = 0;
     end;
 
     procedure CopySalesLines(var SaleLinePOS: Record "NPR Sale Line POS"; var SalesHeader: Record "Sales Header")
@@ -787,43 +766,41 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         Pdf2Nav: Boolean;
         POSSalesDocumentOutputMgt: Codeunit "NPR POS Sales Doc. Output Mgt.";
     begin
-        with SaleLinePOS do begin
-            SalesHeader.TestField("Document Type", SalesHeader."Document Type"::Order);
+        SalesHeader.TestField("Document Type", SalesHeader."Document Type"::Order);
 
-            if "Sales Doc. Prepay Is Percent" then
-                POSPrepaymentMgt.SetPrepaymentPercentageToPay(SalesHeader, true, "Sales Doc. Prepayment Value")
-            else
-                POSPrepaymentMgt.SetPrepaymentAmountToPayInclVAT(SalesHeader, true, "Sales Doc. Prepayment Value");
+        if SaleLinePOS."Sales Doc. Prepay Is Percent" then
+            POSPrepaymentMgt.SetPrepaymentPercentageToPay(SalesHeader, true, SaleLinePOS."Sales Doc. Prepayment Value")
+        else
+            POSPrepaymentMgt.SetPrepaymentAmountToPayInclVAT(SalesHeader, true, SaleLinePOS."Sales Doc. Prepayment Value");
 
-            Pdf2Nav := "Sales Document Pdf2Nav";
-            Send := "Sales Document Send";
-            Print := "Sales Document Print";
-            "Sales Document Prepayment" := false;
-            "Sales Document Print" := false;
-            "Sales Document Pdf2Nav" := false;
-            "Sales Document Send" := false;
-            Modify(true);
+        Pdf2Nav := SaleLinePOS."Sales Document Pdf2Nav";
+        Send := SaleLinePOS."Sales Document Send";
+        Print := SaleLinePOS."Sales Document Print";
+        SaleLinePOS."Sales Document Prepayment" := false;
+        SaleLinePOS."Sales Document Print" := false;
+        SaleLinePOS."Sales Document Pdf2Nav" := false;
+        SaleLinePOS."Sales Document Send" := false;
+        SaleLinePOS.Modify(true);
 
-            SalesPostPrepayments.Invoice(SalesHeader);
-            "Buffer Document Type" := "Buffer Document Type"::Invoice;
-            "Posted Sales Document Type" := "Posted Sales Document Type"::INVOICE;
-            "Posted Sales Document No." := SalesHeader."Last Prepayment No.";
-            Validate("Buffer Document No.", SalesHeader."Last Prepayment No.");
-            Modify(true);
+        SalesPostPrepayments.Invoice(SalesHeader);
+        SaleLinePOS."Buffer Document Type" := SaleLinePOS."Buffer Document Type"::Invoice;
+        SaleLinePOS."Posted Sales Document Type" := SaleLinePOS."Posted Sales Document Type"::INVOICE;
+        SaleLinePOS."Posted Sales Document No." := SalesHeader."Last Prepayment No.";
+        SaleLinePOS.Validate("Buffer Document No.", SalesHeader."Last Prepayment No.");
+        SaleLinePOS.Modify(true);
 
-            Commit;
+        Commit;
 
-            if Print then begin
-                POSSalesDocumentOutputMgt.PrintDocument(SalesHeader, 1);
-            end;
+        if Print then begin
+            POSSalesDocumentOutputMgt.PrintDocument(SalesHeader, 1);
+        end;
 
-            if Send then begin
-                POSSalesDocumentOutputMgt.SendDocument(SalesHeader, 1);
-            end;
+        if Send then begin
+            POSSalesDocumentOutputMgt.SendDocument(SalesHeader, 1);
+        end;
 
-            if Pdf2Nav then begin
-                POSSalesDocumentOutputMgt.SendPdf2NavDocument(SalesHeader, 1);
-            end;
+        if Pdf2Nav then begin
+            POSSalesDocumentOutputMgt.SendPdf2NavDocument(SalesHeader, 1);
         end;
     end;
 
@@ -839,42 +816,40 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         Pdf2Nav: Boolean;
         POSSalesDocumentOutputMgt: Codeunit "NPR POS Sales Doc. Output Mgt.";
     begin
-        with SaleLinePOS do begin
-            SalesHeader.TestField("Document Type", SalesHeader."Document Type"::Order);
-            DeleteAfter := "Sales Document Delete";
-            Print := "Sales Document Print";
-            Send := "Sales Document Send";
-            Pdf2Nav := "Sales Document Pdf2Nav";
-            "Sales Document Prepay. Refund" := false;
-            "Sales Document Delete" := false;
-            "Sales Document Print" := false;
-            "Sales Document Send" := false;
-            "Sales Document Pdf2Nav" := false;
-            Modify(true);
+        SalesHeader.TestField("Document Type", SalesHeader."Document Type"::Order);
+        DeleteAfter := SaleLinePOS."Sales Document Delete";
+        Print := SaleLinePOS."Sales Document Print";
+        Send := SaleLinePOS."Sales Document Send";
+        Pdf2Nav := SaleLinePOS."Sales Document Pdf2Nav";
+        SaleLinePOS."Sales Document Prepay. Refund" := false;
+        SaleLinePOS."Sales Document Delete" := false;
+        SaleLinePOS."Sales Document Print" := false;
+        SaleLinePOS."Sales Document Send" := false;
+        SaleLinePOS."Sales Document Pdf2Nav" := false;
+        SaleLinePOS.Modify(true);
 
-            SalesPostPrepayments.CreditMemo(SalesHeader);
-            "Posted Sales Document Type" := "Posted Sales Document Type"::CREDIT_MEMO;
-            "Posted Sales Document No." := SalesHeader."Last Prepmt. Cr. Memo No.";
-            "Buffer Document Type" := "Buffer Document Type"::"Credit Memo";
-            Validate("Buffer Document No.", SalesHeader."Last Prepmt. Cr. Memo No.");
-            Modify(true);
+        SalesPostPrepayments.CreditMemo(SalesHeader);
+        SaleLinePOS."Posted Sales Document Type" := SaleLinePOS."Posted Sales Document Type"::CREDIT_MEMO;
+        SaleLinePOS."Posted Sales Document No." := SalesHeader."Last Prepmt. Cr. Memo No.";
+        SaleLinePOS."Buffer Document Type" := SaleLinePOS."Buffer Document Type"::"Credit Memo";
+        SaleLinePOS.Validate("Buffer Document No.", SalesHeader."Last Prepmt. Cr. Memo No.");
+        SaleLinePOS.Modify(true);
 
-            if DeleteAfter then
-                SalesHeader.Delete(true);
+        if DeleteAfter then
+            SalesHeader.Delete(true);
 
-            Commit;
+        Commit;
 
-            if Print then begin
-                POSSalesDocumentOutputMgt.PrintDocument(SalesHeader, 2);
-            end;
+        if Print then begin
+            POSSalesDocumentOutputMgt.PrintDocument(SalesHeader, 2);
+        end;
 
-            if Send then begin
-                POSSalesDocumentOutputMgt.SendDocument(SalesHeader, 2);
-            end;
+        if Send then begin
+            POSSalesDocumentOutputMgt.SendDocument(SalesHeader, 2);
+        end;
 
-            if Pdf2Nav then begin
-                POSSalesDocumentOutputMgt.SendPdf2NavDocument(SalesHeader, 2);
-            end;
+        if Pdf2Nav then begin
+            POSSalesDocumentOutputMgt.SendPdf2NavDocument(SalesHeader, 2);
         end;
     end;
 
@@ -892,89 +867,87 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         Pdf2Nav: Boolean;
         POSSalesDocumentOutputMgt: Codeunit "NPR POS Sales Doc. Output Mgt.";
     begin
-        with SaleLinePOS do begin
-            if not (SalesHeader."Document Type" in [SalesHeader."Document Type"::Invoice, SalesHeader."Document Type"::Order, SalesHeader."Document Type"::"Credit Memo", SalesHeader."Document Type"::"Return Order"]) then
-                SalesHeader.FieldError("Document Type");
-            SalesHeader.Ship := "Sales Document Ship";
-            SalesHeader.Invoice := "Sales Document Invoice";
-            SalesHeader.Receive := "Sales Document Receive";
-            SalesHeader.Modify(true);
-            Print := "Sales Document Print";
-            Send := "Sales Document Send";
-            Pdf2Nav := "Sales Document Pdf2Nav";
+        if not (SalesHeader."Document Type" in [SalesHeader."Document Type"::Invoice, SalesHeader."Document Type"::Order, SalesHeader."Document Type"::"Credit Memo", SalesHeader."Document Type"::"Return Order"]) then
+            SalesHeader.FieldError("Document Type");
+        SalesHeader.Ship := SaleLinePOS."Sales Document Ship";
+        SalesHeader.Invoice := SaleLinePOS."Sales Document Invoice";
+        SalesHeader.Receive := SaleLinePOS."Sales Document Receive";
+        SalesHeader.Modify(true);
+        Print := SaleLinePOS."Sales Document Print";
+        Send := SaleLinePOS."Sales Document Send";
+        Pdf2Nav := SaleLinePOS."Sales Document Pdf2Nav";
 
-            "Sales Document Invoice" := false;
-            "Sales Document Ship" := false;
-            "Sales Document Receive" := false;
-            "Sales Document Print" := false;
-            "Sales Document Send" := false;
-            "Sales Document Pdf2Nav" := false;
-            Modify(true);
+        SaleLinePOS."Sales Document Invoice" := false;
+        SaleLinePOS."Sales Document Ship" := false;
+        SaleLinePOS."Sales Document Receive" := false;
+        SaleLinePOS."Sales Document Print" := false;
+        SaleLinePOS."Sales Document Send" := false;
+        SaleLinePOS."Sales Document Pdf2Nav" := false;
+        SaleLinePOS.Modify(true);
 
-            SalesPost.Run(SalesHeader);
+        SalesPost.Run(SalesHeader);
 
-            if SalesHeader.Invoice then begin
-                case SalesHeader."Document Type" of
-                    SalesHeader."Document Type"::Invoice:
-                        begin
-                            "Buffer Document Type" := "Buffer Document Type"::Invoice;
-                            if SalesHeader."Last Posting No." <> '' then
-                                Validate("Buffer Document No.", SalesHeader."Last Posting No.")
-                            else
-                                Validate("Buffer Document No.", SalesHeader."No.");
-                            "Posted Sales Document Type" := "Posted Sales Document Type"::INVOICE;
-                            "Posted Sales Document No." := "Buffer Document No.";
-                        end;
-                    SalesHeader."Document Type"::Order:
-                        begin
-                            "Buffer Document Type" := "Buffer Document Type"::Invoice;
-                            Validate("Buffer Document No.", SalesHeader."Last Posting No.");
-                            "Posted Sales Document Type" := "Posted Sales Document Type"::INVOICE;
-                            "Posted Sales Document No." := "Buffer Document No.";
-                        end;
-                    SalesHeader."Document Type"::"Credit Memo":
-                        begin
-                            "Buffer Document Type" := "Buffer Document Type"::"Credit Memo";
-                            if SalesHeader."Last Posting No." <> '' then
-                                Validate("Buffer Document No.", SalesHeader."Last Posting No.")
-                            else
-                                Validate("Buffer Document No.", SalesHeader."No.");
-                            "Posted Sales Document Type" := "Posted Sales Document Type"::CREDIT_MEMO;
-                            "Posted Sales Document No." := "Buffer Document No.";
-                        end;
-                    SalesHeader."Document Type"::"Return Order":
-                        begin
-                            "Buffer Document Type" := "Buffer Document Type"::"Credit Memo";
-                            Validate("Buffer Document No.", SalesHeader."Last Posting No.");
-                            "Posted Sales Document Type" := "Posted Sales Document Type"::CREDIT_MEMO;
-                            "Posted Sales Document No." := "Buffer Document No.";
-                        end;
-                end;
+        if SalesHeader.Invoice then begin
+            case SalesHeader."Document Type" of
+                SalesHeader."Document Type"::Invoice:
+                    begin
+                        SaleLinePOS."Buffer Document Type" := SaleLinePOS."Buffer Document Type"::Invoice;
+                        if SalesHeader."Last Posting No." <> '' then
+                            SaleLinePOS.Validate("Buffer Document No.", SalesHeader."Last Posting No.")
+                        else
+                            SaleLinePOS.Validate("Buffer Document No.", SalesHeader."No.");
+                        SaleLinePOS."Posted Sales Document Type" := SaleLinePOS."Posted Sales Document Type"::INVOICE;
+                        SaleLinePOS."Posted Sales Document No." := SaleLinePOS."Buffer Document No.";
+                    end;
+                SalesHeader."Document Type"::Order:
+                    begin
+                        SaleLinePOS."Buffer Document Type" := SaleLinePOS."Buffer Document Type"::Invoice;
+                        SaleLinePOS.Validate("Buffer Document No.", SalesHeader."Last Posting No.");
+                        SaleLinePOS."Posted Sales Document Type" := SaleLinePOS."Posted Sales Document Type"::INVOICE;
+                        SaleLinePOS."Posted Sales Document No." := SaleLinePOS."Buffer Document No.";
+                    end;
+                SalesHeader."Document Type"::"Credit Memo":
+                    begin
+                        SaleLinePOS."Buffer Document Type" := SaleLinePOS."Buffer Document Type"::"Credit Memo";
+                        if SalesHeader."Last Posting No." <> '' then
+                            SaleLinePOS.Validate("Buffer Document No.", SalesHeader."Last Posting No.")
+                        else
+                            SaleLinePOS.Validate("Buffer Document No.", SalesHeader."No.");
+                        SaleLinePOS."Posted Sales Document Type" := SaleLinePOS."Posted Sales Document Type"::CREDIT_MEMO;
+                        SaleLinePOS."Posted Sales Document No." := SaleLinePOS."Buffer Document No.";
+                    end;
+                SalesHeader."Document Type"::"Return Order":
+                    begin
+                        SaleLinePOS."Buffer Document Type" := SaleLinePOS."Buffer Document Type"::"Credit Memo";
+                        SaleLinePOS.Validate("Buffer Document No.", SalesHeader."Last Posting No.");
+                        SaleLinePOS."Posted Sales Document Type" := SaleLinePOS."Posted Sales Document Type"::CREDIT_MEMO;
+                        SaleLinePOS."Posted Sales Document No." := SaleLinePOS."Buffer Document No.";
+                    end;
             end;
+        end;
 
-            if SalesHeader.Ship then begin
-                "Delivered Sales Document Type" := "Delivered Sales Document Type"::SHIPMENT;
-                "Delivered Sales Document No." := SalesHeader."Last Shipping No.";
-            end;
-            if SalesHeader.Receive then begin
-                "Delivered Sales Document Type" := "Delivered Sales Document Type"::RETURN_RECEIPT;
-                "Delivered Sales Document No." := SalesHeader."Last Return Receipt No.";
-            end;
+        if SalesHeader.Ship then begin
+            SaleLinePOS."Delivered Sales Document Type" := SaleLinePOS."Delivered Sales Document Type"::SHIPMENT;
+            SaleLinePOS."Delivered Sales Document No." := SalesHeader."Last Shipping No.";
+        end;
+        if SalesHeader.Receive then begin
+            SaleLinePOS."Delivered Sales Document Type" := SaleLinePOS."Delivered Sales Document Type"::RETURN_RECEIPT;
+            SaleLinePOS."Delivered Sales Document No." := SalesHeader."Last Return Receipt No.";
+        end;
 
-            Modify(true);
-            Commit;
+        SaleLinePOS.Modify(true);
+        Commit;
 
-            if Print then begin
-                POSSalesDocumentOutputMgt.PrintDocument(SalesHeader, 0);
-            end;
+        if Print then begin
+            POSSalesDocumentOutputMgt.PrintDocument(SalesHeader, 0);
+        end;
 
-            if Send then begin
-                POSSalesDocumentOutputMgt.SendDocument(SalesHeader, 0);
-            end;
+        if Send then begin
+            POSSalesDocumentOutputMgt.SendDocument(SalesHeader, 0);
+        end;
 
-            if Pdf2Nav then begin
-                POSSalesDocumentOutputMgt.SendPdf2NavDocument(SalesHeader, 0);
-            end;
+        if Pdf2Nav then begin
+            POSSalesDocumentOutputMgt.SendPdf2NavDocument(SalesHeader, 0);
         end;
     end;
 
@@ -1079,33 +1052,31 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         POSSession.GetSaleLine(POSSaleLine);
         POSSale.GetCurrentSale(SalePOS);
 
-        with SaleLinePOS do begin
-            SetRange("Register No.", SalePOS."Register No.");
-            SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-            SetRange("Sales Document Sync. Posting", true);
-            SetFilter("Sales Document No.", '<>%1', '');
-            if not FindSet then
-                exit;
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetRange("Sales Document Sync. Posting", true);
+        SaleLinePOS.SetFilter("Sales Document No.", '<>%1', '');
+        if not SaleLinePOS.FindSet then
+            exit;
 
-            repeat
-                if SalesHeader.Get("Sales Document Type", "Sales Document No.") then begin
-                    case true of
-                        "Sales Document Prepayment":
-                            PostPrepaymentBeforePOSSaleEnd(SalesHeader, SaleLinePOS);
+        repeat
+            if SalesHeader.Get(SaleLinePOS."Sales Document Type", SaleLinePOS."Sales Document No.") then begin
+                case true of
+                    SaleLinePOS."Sales Document Prepayment":
+                        PostPrepaymentBeforePOSSaleEnd(SalesHeader, SaleLinePOS);
 
-                        "Sales Document Prepay. Refund":
-                            PostPrepaymentRefundBeforePOSSaleEnd(SalesHeader, SaleLinePOS);
+                    SaleLinePOS."Sales Document Prepay. Refund":
+                        PostPrepaymentRefundBeforePOSSaleEnd(SalesHeader, SaleLinePOS);
 
-                        "Sales Document Ship",
-                        "Sales Document Receive",
-                        "Sales Document Invoice":
-                            PostDocumentBeforePOSSaleEnd(SalesHeader, SaleLinePOS);
-                    end;
+                    SaleLinePOS."Sales Document Ship",
+                    SaleLinePOS."Sales Document Receive",
+                    SaleLinePOS."Sales Document Invoice":
+                        PostDocumentBeforePOSSaleEnd(SalesHeader, SaleLinePOS);
                 end;
-            until Next = 0;
+            end;
+        until SaleLinePOS.Next = 0;
 
-            POSSaleLine.RefreshCurrent();
-        end;
+        POSSaleLine.RefreshCurrent();
     end;
 
     local procedure OpenSalesDocCardAndSyncChangesBackToPOSSale(var SalesHeader: Record "Sales Header"; var SalePOS: Record "NPR Sale POS")
@@ -1172,25 +1143,23 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
         ICInOutboxMgt: Codeunit ICInboxOutboxMgt;
     begin
-        with SalesHeader do begin
-            if not (
-                ("Document Type" in ["Document Type"::Order, "Document Type"::"Return Order"]) and
-                ("IC Status" = "IC Status"::New) and "Send IC Document")
-            then
-                exit;
+        if not (
+    (SalesHeader."Document Type" in [SalesHeader."Document Type"::Order, SalesHeader."Document Type"::"Return Order"]) and
+    (SalesHeader."IC Status" = SalesHeader."IC Status"::New) and SalesHeader."Send IC Document")
+then
+            exit;
 
-            if (Status = Status::Open) and ApprovalsMgmt.IsSalesApprovalsWorkflowEnabled(SalesHeader) then  //must go through approval workflow first
-                exit;
+        if (SalesHeader.Status = SalesHeader.Status::Open) and ApprovalsMgmt.IsSalesApprovalsWorkflowEnabled(SalesHeader) then  //must go through approval workflow first
+            exit;
 
-            if "Sell-to IC Partner Code" <> '' then
-                ICPartner.Get("Sell-to IC Partner Code")
-            else
-                ICPartner.Get("Bill-to IC Partner Code");
-            if ICPartner."Inbox Type" = ICPartner."Inbox Type"::"No IC Transfer" then
-                exit;
+        if SalesHeader."Sell-to IC Partner Code" <> '' then
+            ICPartner.Get(SalesHeader."Sell-to IC Partner Code")
+        else
+            ICPartner.Get(SalesHeader."Bill-to IC Partner Code");
+        if ICPartner."Inbox Type" = ICPartner."Inbox Type"::"No IC Transfer" then
+            exit;
 
-            ICInOutboxMgt.SendSalesDoc(SalesHeader, false);
-        end;
+        ICInOutboxMgt.SendSalesDoc(SalesHeader, false);
     end;
 
     local procedure DoCustomerCreditCheck(SalesHeader: Record "Sales Header")
@@ -1222,7 +1191,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         POSUnit: Record "NPR POS Unit";
         POSSalesWorkflowSetEntry: Record "NPR POS Sales WF Set Entry";
         POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
-        SalesDocExpMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
+        CreditSalePostProcessing: Codeunit "NPR Credit Sale Post-Process";
     begin
         POSSalesWorkflowStep.SetCurrentKey("Sequence No.");
         if POSUnit.Get(SalePOS."Register No.") and (POSUnit."POS Sales Workflow Set" <> '') and
@@ -1237,19 +1206,14 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             exit;
 
         repeat
-            Clear(SalesDocExpMgt);
-            SalesDocExpMgt.SetInvokeOnFinishCreditSaleSubsribers(POSSalesWorkflowStep);
-            if SalesDocExpMgt.Run(SalePOS) then;
+            Clear(CreditSalePostProcessing);
+            CreditSalePostProcessing.SetInvokeOnFinishCreditSaleSubsribers(POSSalesWorkflowStep);
+            if CreditSalePostProcessing.Run(SalePOS) then;
         until POSSalesWorkflowStep.Next = 0;
     end;
 
     [IntegrationEvent(true, false)]
     local procedure OnAfterDebitSalePostEvent(SalePOS: Record "NPR Sale POS"; SalesHeader: Record "Sales Header"; Posted: Boolean; WriteInAuditRoll: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnFinishCreditSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
     begin
     end;
 }
