@@ -64,15 +64,6 @@ table 6014403 "NPR EFT Receipt"
             Caption = 'No. Printed';
             DataClassification = CustomerContent;
         }
-        field(101; "Sales Ticket amount"; Decimal)
-        {
-            CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE("Sale Type" = CONST(Payment),
-                                                                         "Sales Ticket No." = FIELD("Sales Ticket No."),
-                                                                         "Register No." = FIELD("Register No.")));
-            Caption = 'Sales Ticket amount';
-            Editable = false;
-            FieldClass = FlowField;
-        }
         field(110; "EFT Trans. Request Entry No."; Integer)
         {
             Caption = 'EFT Trans. Request Entry No.';

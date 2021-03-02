@@ -18,22 +18,11 @@ codeunit 6014526 "NPR RP Aux: SalesReceipt Calc."
         tmpRetailList.Insert;
     end;
 
-    local procedure AuditRollUnitPriceInclVATExclDiscount(AuditRoll: Record "NPR Audit Roll"): Decimal
-    begin
-        if AuditRoll.Quantity = 0 then
-            exit(0);
-        exit((AuditRoll."Amount Including VAT" + AuditRoll."Line Discount Amount") / AuditRoll.Quantity);
-    end;
-
     local procedure POSSalesLineUnitPriceInclVATExclDiscount(POSSalesLine: Record "NPR POS Sales Line"): Decimal
     begin
         if POSSalesLine.Quantity = 0 then
             exit(0);
         exit((POSSalesLine."Amount Incl. VAT (LCY)" + POSSalesLine."Line Discount Amount Incl. VAT") / POSSalesLine.Quantity);
-    end;
-
-    local procedure "// Event Subscribers"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Table, 6014445, 'OnBuildFunctionCodeunitList', '', false, false)]
@@ -62,7 +51,6 @@ codeunit 6014526 "NPR RP Aux: SalesReceipt Calc."
     var
         UsePOSEntry: Boolean;
         RecRef: RecordRef;
-        AuditRoll: Record "NPR Audit Roll";
         POSSalesLine: Record "NPR POS Sales Line";
         FunctionTxt: Text;
         Parameters: Text;
@@ -76,12 +64,6 @@ codeunit 6014526 "NPR RP Aux: SalesReceipt Calc."
         Handled := true;
 
         case RecID.TableNo of
-            DATABASE::"NPR Audit Roll":
-                begin
-                    RecRef := RecID.GetRecord();
-                    RecRef.Find;
-                    RecRef.SetTable(AuditRoll);
-                end;
             DATABASE::"NPR POS Sales Line":
                 begin
                     RecRef := RecID.GetRecord();
@@ -100,8 +82,6 @@ codeunit 6014526 "NPR RP Aux: SalesReceipt Calc."
         case FunctionTxt of
             'UNITPRICEINCLVATEXCLDISC':
                 case RecID.TableNo of
-                    DATABASE::"NPR Audit Roll":
-                        Result := AuditRollUnitPriceInclVATExclDiscount(AuditRoll);
                     DATABASE::"NPR POS Sales Line":
                         Result := POSSalesLineUnitPriceInclVATExclDiscount(POSSalesLine);
                 end;

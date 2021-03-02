@@ -94,7 +94,6 @@ codeunit 6150616 "NPR POS Post Item Entries"
         Item: Record Item;
         POSPeriodRegister: Record "NPR POS Period Register";
         ItemJnlPostLine: Codeunit "Item Jnl.-Post Line";
-        VendorReturnReason: Codeunit "NPR Vendor Return Reason";
         WMSManagement: Codeunit "WMS Management";
     begin
         OnBeforePostPOSSalesLineItemJnl(POSSalesLine);

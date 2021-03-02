@@ -474,7 +474,6 @@ page 6059988 "NPR Sale Stats Activities"
     var
         ValueEntry: Record "Value Entry";
         ItemLedgerEntry: Record "Item Ledger Entry";
-        AuditRoll: Record "NPR Audit Roll";
     begin
         //Calc()
         SetValueEntryFilter(ValueEntry);

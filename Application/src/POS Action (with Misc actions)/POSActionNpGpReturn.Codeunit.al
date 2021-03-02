@@ -494,36 +494,35 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
     local procedure VerifyReceiptForReversal(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management"; SalesTicketNo: Code[20])
     var
         JSON: Codeunit "NPR POS JSON Management";
-        AuditRoll: Record "NPR Audit Roll";
+        POSEntry: Record "NPR POS Entry";
         ReferenceNumber: Text;
     begin
         HandleReferenceNumber(Context, FrontEnd, ReferenceNumber);
 
-        AuditRoll.SetRange("Sales Ticket No.", SalesTicketNo);
-        if not AuditRoll.FindFirst then
+        POSEntry.SetRange("Document No.", SalesTicketNo);
+        if not POSEntry.FindFirst then
             Error(NotFoundErr, ReferenceNumber);
     end;
 
     local procedure SetCustomerOnReverseSale(var SalePOS: Record "NPR Sale POS"; var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary)
     var
-        AuditRoll: Record "NPR Audit Roll";
         POSSale: Codeunit "NPR POS Sale";
         Customer: Record Customer;
         Contact: Record Contact;
+        POSEntry: Record "NPR POS Entry";
+        POSSalesLine: Record "NPR POS Sales Line";
     begin
-        AuditRoll.SetRange("Register No.", TempNpGpPOSSalesEntry."POS Unit No.");
-        AuditRoll.SetRange("Sales Ticket No.", TempNpGpPOSSalesEntry."Document No.");
-        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
-        AuditRoll.SetRange(Type, AuditRoll.Type::Item);
-        AuditRoll.SetRange("Customer No.", '>%1', '');
-
-        if not AuditRoll.FindFirst then
+        POSEntry.SetRange("POS Unit No.", TempNpGpPOSSalesEntry."POS Unit No.");
+        POSEntry.SetRange("Document No.", TempNpGpPOSSalesEntry."Document No.");
+        POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
+        POSEntry.SetRange("Customer No.", '<>%1', '');
+        if not POSEntry.FindFirst() then
             exit;
 
-        if Customer.Get(AuditRoll."Customer No.") then begin
+        if Customer.Get(POSEntry."Customer No.") then begin
             SalePOS.Validate("Customer No.", Customer."No.");
         end else begin
-            if not Contact.Get(AuditRoll."Customer No.") then
+            if not Contact.Get(POSEntry."Customer No.") then
                 exit;
 
             SalePOS.Validate("Customer Type", SalePOS."Customer Type"::Cash);
