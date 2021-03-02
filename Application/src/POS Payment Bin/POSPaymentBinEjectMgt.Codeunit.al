@@ -185,7 +185,7 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
         Rec.Enabled := false;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Sales Doc. Exp. Mgt.", 'OnFinishCreditSale', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Credit Sale Post-Process", 'OnFinishCreditSale', '', true, true)]
     local procedure EjectPaymentBinOnCreditSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
     var
         NPRetailSetup: Record "NPR NP Retail Setup";

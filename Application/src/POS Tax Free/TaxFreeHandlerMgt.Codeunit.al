@@ -9,49 +9,7 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
     // 
     // Commit is used vigorously in this codeunit as it is assumed that handlers are acting on external systems.
 
-    trigger OnRun()
-    begin
-
-        ClearLastError();
-
-        OnRunHandled := true;
-
-        case OnRunFunction of
-            OnRunFunction::UnitAutoConfigure:
-                TaxFreeHandlerInterface.OnUnitAutoConfigure(OnRunTaxFreeRequest, OnRunSilent);
-            OnRunFunction::UnitTestConnection:
-                TaxFreeHandlerInterface.OnUnitTestConnection(OnRunTaxFreeRequest);
-            OnRunFunction::VoucherIssueFromPOSSale:
-                TaxFreeHandlerInterface.OnVoucherIssueFromPOSSale(OnRunTaxFreeRequest, OnRunSalesReceiptNo, OnRunSkipRecordHandling);
-            OnRunFunction::VoucherVoid:
-                TaxFreeHandlerInterface.OnVoucherVoid(OnRunTaxFreeRequest, OnRunTaxFreeVoucher);
-            OnRunFunction::VoucherReissue:
-                TaxFreeHandlerInterface.OnVoucherReissue(OnRunTaxFreeRequest, OnRunTaxFreeVoucher);
-            OnRunFunction::VoucherLookup:
-                TaxFreeHandlerInterface.OnVoucherLookup(OnRunTaxFreeRequest, OnRunVoucherNo);
-            OnRunFunction::VoucherPrint:
-                TaxFreeHandlerInterface.OnVoucherPrint(OnRunTaxFreeRequest, OnRunTaxFreeVoucher, OnRunIsRecentVoucher);
-            OnRunFunction::VoucherConsolidate:
-                TaxFreeHandlerInterface.OnVoucherConsolidate(OnRunTaxFreeRequest, OnRunTmpTaxFreeConsolidation);
-            OnRunFunction::IsValidTerminalIIN:
-                TaxFreeHandlerInterface.OnIsValidTerminalIIN(OnRunTaxFreeRequest, OnRunMaskedCardNo, OnRunIsForeignIIN);
-            OnRunFunction::IsStoredSaleEligible:
-                TaxFreeHandlerInterface.OnIsStoredSaleEligible(OnRunTaxFreeRequest, OnRunSalesReceiptNo, OnRunEligible);
-            OnRunFunction::IsActiveSaleEligible:
-                TaxFreeHandlerInterface.OnIsActiveSaleEligible(OnRunTaxFreeRequest, OnRunSalesReceiptNo, OnRunEligible);
-            else begin
-                    OnRunHandled := false;
-                    exit;
-                end;
-        end;
-
-        Commit();
-
-    end;
-
     var
-        TaxFreeGBI2: Codeunit "NPR Tax Free GB I2";
-        NPRTaxFreePTFPI: Codeunit "NPR Tax Free PTF PI";
         TaxFreeHandlerInterface: Interface "NPR Tax Free Handler Interface";
         Error_TaxFreeProcessing: Label 'An error occurred during tax free processing';
         Caption_ExistingVoucherFound: Label 'A tax free voucher already exists for this sale!\Please choose how to proceed:';
@@ -61,7 +19,6 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
         Caption_Workflow: Label 'Issue Tax Free Voucher';
         Error_MissingHandler: Label 'No handler is registered for ID %1';
         Error_NoVoucherInSession: Label 'No recent tax free voucher found for this session';
-        NotIfaceErr: Label 'Not correctly implemented handler %1.';
         Caption_Reissue: Label 'Reissue existing voucher';
         Error_NotEligible: Label 'Sale is not eligible for tax free voucher. VAT amount or sale date is outside the allowed limits.';
         Caption_UnitConfigured: Label 'Tax Free Unit configured';
@@ -71,20 +28,8 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
         Caption_EnvironmentWarning: Label 'WARNING:\The current environment is not set to production, but this tax free operation will impact an external service running in production!\Continue?';
 
         #region Replacing assert error
-        OnRunTmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary;
-        OnRunTaxFreeRequest: Record "NPR Tax Free Request";
-        OnRunTaxFreeVoucher: Record "NPR Tax Free Voucher";
-        OnRunEligible: Boolean;
-        OnRunHandled: Boolean;
-        OnRunIsForeignIIN: Boolean;
-        OnRunIsRecentVoucher: Boolean;
-        OnRunSilent: Boolean;
-        OnRunSkipRecordHandling: Boolean;
-        OnRunSalesReceiptNo: Code[20];
-        OnRunFunction: option FunctionNotSet,UnitAutoConfigure,UnitTestConnection,VoucherIssueFromPOSSale,VoucherVoid,VoucherReissue,VoucherLookup,VoucherPrint,VoucherConsolidate,IsStoredSaleEligible,IsValidTerminalIIN,IsActiveSaleEligible;
-        OnRunMaskedCardNo: Text;
-        OnRunVoucherNo: Text;
         ConstructorSet: Boolean;
+        OnRunFunction: Enum "NPR Tax Free OnRunFunction";
     #endregion
     procedure Constructor(TaxFreeHandlerID: Enum "NPR Tax Free Handler ID")
     begin
@@ -653,284 +598,242 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
         VoucherIssueFromPOSSale(SalePOS."Sales Ticket No.");
     end;
     #endregion
+
     #region assert error replacement functions
-    [IntegrationEvent(true, false)]
-    local procedure GetCodeunitReferenceToSelf(var ReferenceToSender: Codeunit "NPR Tax Free Handler Mgt.")
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Tax Free Handler Mgt.", 'GetCodeunitReferenceToSelf', '', true, true)]
-    local procedure ProvideCodeunitReferenceToSelf(var Sender: Codeunit "NPR Tax Free Handler Mgt."; var ReferenceToSender: Codeunit "NPR Tax Free Handler Mgt.")
-    begin
-        ReferenceToSender := Sender;
-    end;
-
     local procedure RunUnitAutoConfigureEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; Silent: Boolean; var Handled: Boolean)
     var
-        Self: Codeunit "NPR Tax Free Handler Mgt.";
+        TaxFreeExecute: Codeunit "NPR Tax Free Execute";
     begin
         Commit();
-        GetCodeunitReferenceToSelf(Self);
 
-        OnRunTaxFreeRequest.copy(TaxFreeRequest);
-        OnRunHandled := Handled;
-        OnRunSilent := Silent;
+        TaxFreeExecute.OnRunTaxFreeRequestGetSet(TaxFreeRequest, true);
+        TaxFreeExecute.OnRunHandledGetSet(Handled, true);
+        TaxFreeExecute.OnRunSilentSet(Silent);
+
         OnRunFunction := OnRunFunction::UnitAutoConfigure;
 
         Constructor(TaxFreeRequest."Handler ID Enum");
+        TaxFreeExecute.TaxFreeHandlerInterfaceSet(TaxFreeHandlerInterface);
 
-        OnRunTaxFreeRequest.Success := Self.Run();
+        TaxFreeExecute.OnRunTaxFreeRequestSuccessSet(TaxFreeExecute.Run());
 
-        TaxFreeRequest.copy(OnRunTaxFreeRequest);
-        Handled := OnRunHandled;
-
+        TaxFreeExecute.OnRunTaxFreeRequestGetSet(TaxFreeRequest, false);
+        TaxFreeExecute.OnRunHandledGetSet(Handled, false);
     end;
 
     local procedure RunUnitTestConnectionEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; var Handled: Boolean)
     var
-        Self: Codeunit "NPR Tax Free Handler Mgt.";
+        TaxFreeExecute: Codeunit "NPR Tax Free Execute";
     begin
         Commit();
-        GetCodeunitReferenceToSelf(Self);
 
-        OnRunTaxFreeRequest.copy(TaxFreeRequest);
-        OnRunHandled := Handled;
-        OnRunFunction := OnRunFunction::UnitTestConnection;
+        TaxFreeExecute.OnRunTaxFreeRequestGetSet(TaxFreeRequest, true);
+        TaxFreeExecute.OnRunHandledGetSet(Handled, true);
+        TaxFreeExecute.OnRunFunctionSet(OnRunFunction::UnitTestConnection);
 
         Constructor(TaxFreeRequest."Handler ID Enum");
+        TaxFreeExecute.TaxFreeHandlerInterfaceSet(TaxFreeHandlerInterface);
 
-        OnRunTaxFreeRequest.Success := Self.Run();
+        TaxFreeExecute.OnRunTaxFreeRequestSuccessSet(TaxFreeExecute.Run());
 
-        TaxFreeRequest.copy(OnRunTaxFreeRequest);
-        Handled := OnRunHandled;
-
+        TaxFreeExecute.OnRunTaxFreeRequestGetSet(TaxFreeRequest, false);
+        TaxFreeExecute.OnRunHandledGetSet(Handled, false);
     end;
 
     local procedure RunVoucherIssueFromPOSSaleEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesReceiptNo: Code[20]; var Handled: Boolean; var SkipRecordHandling: Boolean)
     var
-        Self: Codeunit "NPR Tax Free Handler Mgt.";
+        TaxFreeExecute: Codeunit "NPR Tax Free Execute";
     begin
         Commit();
-        GetCodeunitReferenceToSelf(Self);
 
-        OnRunTaxFreeRequest.copy(TaxFreeRequest);
-        OnRunTaxFreeRequest.TransferFields(TaxFreeRequest);
-        OnRunSalesReceiptNo := SalesReceiptNo;
-        OnRunHandled := Handled;
-        OnRunSkipRecordHandling := SkipRecordHandling;
-        OnRunFunction := OnRunFunction::VoucherIssueFromPOSSale;
+        TaxFreeExecute.OnRunTaxFreeRequestGetSet(TaxFreeRequest, true);
+        TaxFreeExecute.OnRunHandledGetSet(Handled, true);
+        TaxFreeExecute.OnRunFunctionSet(OnRunFunction::VoucherIssueFromPOSSale);
+        TaxFreeExecute.OnRunSalesReceiptNoSet(SalesReceiptNo);
+        TaxFreeExecute.OnRunSkipRecordHandlingGetSet(SkipRecordHandling, true);
 
         Constructor(TaxFreeRequest."Handler ID Enum");
+        TaxFreeExecute.TaxFreeHandlerInterfaceSet(TaxFreeHandlerInterface);
 
-        OnRunTaxFreeRequest.Success := Self.Run();
+        TaxFreeExecute.OnRunTaxFreeRequestSuccessSet(TaxFreeExecute.Run());
 
-        TaxFreeRequest.copy(OnRunTaxFreeRequest);
-        Handled := OnRunHandled;
-        SkipRecordHandling := OnRunSkipRecordHandling;
-
+        TaxFreeExecute.OnRunTaxFreeRequestGetSet(TaxFreeRequest, false);
+        TaxFreeExecute.OnRunHandledGetSet(Handled, false);
+        TaxFreeExecute.OnRunSkipRecordHandlingGetSet(SkipRecordHandling, false);
     end;
 
     local procedure RunVoucherVoidEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher"; var Handled: Boolean)
     var
-        Self: Codeunit "NPR Tax Free Handler Mgt.";
+        TaxFreeExecute: Codeunit "NPR Tax Free Execute";
     begin
         Commit();
-        GetCodeunitReferenceToSelf(Self);
 
-        OnRunTaxFreeRequest.copy(TaxFreeRequest);
-        OnRunTaxFreeVoucher.copy(TaxFreeVoucher);
-        OnRunHandled := Handled;
-        OnRunFunction := OnRunFunction::VoucherVoid;
+        TaxFreeExecute.OnRunTaxFreeRequestGetSet(TaxFreeRequest, true);
+        TaxFreeExecute.OnRunTaxFreeVoucherGetSet(TaxFreeVoucher, true);
+        TaxFreeExecute.OnRunHandledGetSet(Handled, true);
+        TaxFreeExecute.OnRunFunctionSet(OnRunFunction::VoucherVoid);
 
         Constructor(TaxFreeRequest."Handler ID Enum");
+        TaxFreeExecute.TaxFreeHandlerInterfaceSet(TaxFreeHandlerInterface);
 
-        OnRunTaxFreeRequest.Success := Self.Run();
+        TaxFreeExecute.OnRunTaxFreeRequestSuccessSet(TaxFreeExecute.Run());
 
-        TaxFreeRequest.copy(OnRunTaxFreeRequest);
-        Handled := OnRunHandled;
-
+        TaxFreeExecute.OnRunTaxFreeRequestGetSet(TaxFreeRequest, false);
+        TaxFreeExecute.OnRunHandledGetSet(Handled, false);
     end;
 
     local procedure RunVoucherReissueEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher"; var Handled: Boolean)
     var
-        Self: Codeunit "NPR Tax Free Handler Mgt.";
+        TaxFreeExecute: Codeunit "NPR Tax Free Execute";
     begin
         Commit();
-        GetCodeunitReferenceToSelf(Self);
 
-        OnRunTaxFreeRequest.copy(TaxFreeRequest);
-        OnRunTaxFreeVoucher.copy(TaxFreeVoucher);
-        OnRunHandled := Handled;
-        OnRunFunction := OnRunFunction::VoucherReissue;
+        TaxFreeExecute.OnRunTaxFreeRequestGetSet(TaxFreeRequest, true);
+        TaxFreeExecute.OnRunTaxFreeVoucherGetSet(TaxFreeVoucher, true);
+        TaxFreeExecute.OnRunHandledGetSet(Handled, true);
+        TaxFreeExecute.OnRunFunctionSet(OnRunFunction::VoucherReissue);
 
         Constructor(TaxFreeRequest."Handler ID Enum");
+        TaxFreeExecute.TaxFreeHandlerInterfaceSet(TaxFreeHandlerInterface);
 
-        OnRunTaxFreeRequest.Success := Self.Run();
+        TaxFreeExecute.OnRunTaxFreeRequestSuccessSet(TaxFreeExecute.Run());
 
-        TaxFreeRequest.copy(OnRunTaxFreeRequest);
-        Handled := OnRunHandled;
-
+        TaxFreeExecute.OnRunTaxFreeRequestGetSet(TaxFreeRequest, false);
+        TaxFreeExecute.OnRunHandledGetSet(Handled, false);
     end;
 
     local procedure RunVoucherLookupEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; VoucherNo: Text; var Handled: Boolean)
     var
-        Self: Codeunit "NPR Tax Free Handler Mgt.";
+        TaxFreeExecute: Codeunit "NPR Tax Free Execute";
     begin
         Commit();
-        GetCodeunitReferenceToSelf(Self);
 
-        OnRunTaxFreeRequest.copy(TaxFreeRequest);
-        OnRunTaxFreeRequest.TransferFields(TaxFreeRequest);
-        OnRunHandled := Handled;
-        OnRunFunction := OnRunFunction::VoucherLookup;
+        TaxFreeExecute.OnRunTaxFreeRequestGetSet(TaxFreeRequest, true);
+        TaxFreeExecute.OnRunHandledGetSet(Handled, true);
+        TaxFreeExecute.OnRunFunctionSet(OnRunFunction::VoucherLookup);
 
         Constructor(TaxFreeRequest."Handler ID Enum");
+        TaxFreeExecute.TaxFreeHandlerInterfaceSet(TaxFreeHandlerInterface);
 
-        OnRunTaxFreeRequest.Success := Self.Run();
+        TaxFreeExecute.OnRunTaxFreeRequestSuccessSet(TaxFreeExecute.Run());
 
-        TaxFreeRequest.copy(OnRunTaxFreeRequest);
-        Handled := OnRunHandled;
-
+        TaxFreeExecute.OnRunTaxFreeRequestGetSet(TaxFreeRequest, false);
+        TaxFreeExecute.OnRunHandledGetSet(Handled, false);
     end;
 
 
     local procedure RunVoucherPrintEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; TaxFreeVoucher: Record "NPR Tax Free Voucher"; IsRecentVoucher: Boolean; var Handled: Boolean)
     var
-        Self: Codeunit "NPR Tax Free Handler Mgt.";
+        TaxFreeExecute: Codeunit "NPR Tax Free Execute";
     begin
         Commit();
-        GetCodeunitReferenceToSelf(Self);
 
-        OnRunTaxFreeRequest.copy(TaxFreeRequest);
-        OnRunTaxFreeVoucher.copy(TaxFreeVoucher);
-        OnRunIsrecentVoucher := IsRecentVoucher;
-        OnRunHandled := Handled;
-        OnRunFunction := OnRunFunction::VoucherPrint;
+        TaxFreeExecute.OnRunTaxFreeRequestGetSet(TaxFreeRequest, true);
+        TaxFreeExecute.OnRunTaxFreeVoucherGetSet(TaxFreeVoucher, true);
+        TaxFreeExecute.OnRunHandledGetSet(Handled, true);
+        TaxFreeExecute.OnRunFunctionSet(OnRunFunction::VoucherPrint);
+        TaxFreeExecute.OnRunIsrecentVoucherSet(IsRecentVoucher);
 
         Constructor(TaxFreeRequest."Handler ID Enum");
+        TaxFreeExecute.TaxFreeHandlerInterfaceSet(TaxFreeHandlerInterface);
 
-        OnRunTaxFreeRequest.Success := Self.Run();
+        TaxFreeExecute.OnRunTaxFreeRequestSuccessSet(TaxFreeExecute.Run());
 
-        TaxFreeRequest.copy(OnRunTaxFreeRequest);
-        Handled := OnRunHandled;
-
+        TaxFreeExecute.OnRunTaxFreeRequestGetSet(TaxFreeRequest, false);
+        TaxFreeExecute.OnRunHandledGetSet(Handled, false);
     end;
 
     local procedure RunVoucherConsolidateEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; var tmpTaxFreeConsolidation: Record "NPR Tax Free Consolidation" temporary; var Handled: Boolean)
     var
-        Self: Codeunit "NPR Tax Free Handler Mgt.";
+        TaxFreeExecute: Codeunit "NPR Tax Free Execute";
     begin
         Commit();
-        GetCodeunitReferenceToSelf(Self);
 
-        OnRunTaxFreeRequest.copy(TaxFreeRequest);
-
-        OnRunTmpTaxFreeConsolidation.reset();
-        If (OnRunTmpTaxFreeConsolidation.IsTemporary()) then
-            OnRunTmpTaxFreeConsolidation.DeleteAll();
-
-        tmpTaxFreeConsolidation.reset;
-        if (tmpTaxFreeConsolidation.FindSet()) then begin
-            repeat
-                OnRunTmpTaxFreeConsolidation.TransferFields(tmpTaxFreeConsolidation, true);
-                if (not OnRunTmpTaxFreeConsolidation.Insert()) then;
-            until (tmpTaxFreeConsolidation.next() = 0);
-        end;
-
-        OnRunHandled := Handled;
-        OnRunFunction := OnRunFunction::VoucherConsolidate;
+        TaxFreeExecute.OnRunTaxFreeRequestGetSet(TaxFreeRequest, true);
+        TaxFreeExecute.OnRunHandledGetSet(Handled, true);
+        TaxFreeExecute.OnRunFunctionSet(OnRunFunction::VoucherConsolidate);
+        TaxFreeExecute.OnRunTmpTaxFreeConsolidationGetSet(tmpTaxFreeConsolidation, true);
 
         Constructor(TaxFreeRequest."Handler ID Enum");
+        TaxFreeExecute.TaxFreeHandlerInterfaceSet(TaxFreeHandlerInterface);
 
-        OnRunTaxFreeRequest.Success := Self.Run();
+        TaxFreeExecute.OnRunTaxFreeRequestSuccessSet(TaxFreeExecute.Run());
 
-        TaxFreeRequest.copy(OnRunTaxFreeRequest);
+        TaxFreeExecute.OnRunTaxFreeRequestGetSet(TaxFreeRequest, false);
 
         TmpTaxFreeConsolidation.reset();
         If (TmpTaxFreeConsolidation.IsTemporary()) then
             TmpTaxFreeConsolidation.DeleteAll();
 
-        OnRunTmpTaxFreeConsolidation.reset;
-        if (OnRunTmpTaxFreeConsolidation.FindSet()) then begin
-            repeat
-                TmpTaxFreeConsolidation.TransferFields(OnRunTmpTaxFreeConsolidation, true);
-                if (not TmpTaxFreeConsolidation.Insert()) then;
-            until (OnRunTmpTaxFreeConsolidation.next() = 0);
-        end;
+        TaxFreeExecute.OnRunTmpTaxFreeConsolidationGetSet(tmpTaxFreeConsolidation, true);
 
-        Handled := OnRunHandled;
-
+        TaxFreeExecute.OnRunHandledGetSet(Handled, false);
     end;
 
     local procedure RunIsValidTerminalIINEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; MaskedCardNo: Text; var IsForeignIIN: Boolean; var Handled: Boolean)
     var
-        Self: Codeunit "NPR Tax Free Handler Mgt.";
+        TaxFreeExecute: Codeunit "NPR Tax Free Execute";
     begin
         Commit();
-        GetCodeunitReferenceToSelf(Self);
 
-        OnRunTaxFreeRequest.copy(TaxFreeRequest);
-        OnRunMaskedCardNo := MaskedCardNo;
-        OnRunIsForeignIIN := IsForeignIIN;
-        OnRunHandled := Handled;
-        OnRunFunction := OnRunFunction::IsValidTerminalIIN;
+        TaxFreeExecute.OnRunTaxFreeRequestGetSet(TaxFreeRequest, true);
+        TaxFreeExecute.OnRunHandledGetSet(Handled, true);
+        TaxFreeExecute.OnRunFunctionSet(OnRunFunction::IsValidTerminalIIN);
+        TaxFreeExecute.OnRunMaskedCardNoSet(MaskedCardNo);
+        TaxFreeExecute.OnRunIsForeignIINGetSet(IsForeignIIN, true);
 
         Constructor(TaxFreeRequest."Handler ID Enum");
+        TaxFreeExecute.TaxFreeHandlerInterfaceSet(TaxFreeHandlerInterface);
 
-        OnRunTaxFreeRequest.Success := Self.Run();
+        TaxFreeExecute.OnRunTaxFreeRequestSuccessSet(TaxFreeExecute.Run());
 
-        TaxFreeRequest.copy(OnRunTaxFreeRequest);
-        IsForeignIIN := OnRunIsForeignIIN;
-        Handled := OnRunHandled;
-
+        TaxFreeExecute.OnRunTaxFreeRequestGetSet(TaxFreeRequest, false);
+        TaxFreeExecute.OnRunIsForeignIINGetSet(IsForeignIIN, false);
+        TaxFreeExecute.OnRunHandledGetSet(Handled, false);
     end;
 
     local procedure RunIsStoredSaleEligibleEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean; var Handled: Boolean)
     var
-        Self: Codeunit "NPR Tax Free Handler Mgt.";
+        TaxFreeExecute: Codeunit "NPR Tax Free Execute";
     begin
         Commit();
-        GetCodeunitReferenceToSelf(Self);
 
-        OnRunTaxFreeRequest.copy(TaxFreeRequest);
-        OnRunSalesReceiptNo := SalesTicketNo;
-        OnRunEligible := Eligible;
-        OnRunHandled := Handled;
-        OnRunFunction := OnRunFunction::IsStoredSaleEligible;
+        TaxFreeExecute.OnRunTaxFreeRequestGetSet(TaxFreeRequest, true);
+        TaxFreeExecute.OnRunHandledGetSet(Handled, true);
+        TaxFreeExecute.OnRunFunctionSet(OnRunFunction::IsStoredSaleEligible);
+        TaxFreeExecute.OnRunSalesReceiptNoSet(SalesTicketNo);
+        TaxFreeExecute.OnRunEligibleGetSet(Eligible, true);
 
         Constructor(TaxFreeRequest."Handler ID Enum");
+        TaxFreeExecute.TaxFreeHandlerInterfaceSet(TaxFreeHandlerInterface);
 
-        OnRunTaxFreeRequest.Success := Self.Run();
+        TaxFreeExecute.OnRunTaxFreeRequestSuccessSet(TaxFreeExecute.Run());
 
-        TaxFreeRequest.copy(OnRunTaxFreeRequest);
-        Eligible := OnRunEligible;
-        Handled := OnRunHandled;
-
+        TaxFreeExecute.OnRunTaxFreeRequestGetSet(TaxFreeRequest, false);
+        TaxFreeExecute.OnRunEligibleGetSet(Eligible, false);
+        TaxFreeExecute.OnRunHandledGetSet(Handled, false);
     end;
 
     local procedure RunIsActiveSaleEligibleEvent(var TaxFreeRequest: Record "NPR Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean; var Handled: Boolean)
     var
-        Self: Codeunit "NPR Tax Free Handler Mgt.";
+        TaxFreeExecute: Codeunit "NPR Tax Free Execute";
     begin
         Commit();
-        GetCodeunitReferenceToSelf(Self);
 
-        OnRunTaxFreeRequest.copy(TaxFreeRequest);
-        OnRunTaxFreeRequest.TransferFields(TaxFreeRequest);
-        OnRunSalesReceiptNo := SalesTicketNo;
-        OnRunEligible := Eligible;
-        OnRunHandled := Handled;
-        OnRunFunction := OnRunFunction::IsActiveSaleEligible;
+        TaxFreeExecute.OnRunTaxFreeRequestGetSet(TaxFreeRequest, true);
+        TaxFreeExecute.OnRunHandledGetSet(Handled, true);
+        TaxFreeExecute.OnRunFunctionSet(OnRunFunction::IsActiveSaleEligible);
+        TaxFreeExecute.OnRunSalesReceiptNoSet(SalesTicketNo);
+        TaxFreeExecute.OnRunEligibleGetSet(Eligible, true);
 
         Constructor(TaxFreeRequest."Handler ID Enum");
+        TaxFreeExecute.TaxFreeHandlerInterfaceSet(TaxFreeHandlerInterface);
 
-        OnRunTaxFreeRequest.Success := Self.Run();
+        TaxFreeExecute.OnRunTaxFreeRequestSuccessSet(TaxFreeExecute.Run());
 
-        TaxFreeRequest.copy(OnRunTaxFreeRequest);
-        TaxFreeRequest.TransferFields(OnRunTaxFreeRequest, true);
-        Eligible := OnRunEligible;
-        Handled := OnRunHandled;
-
+        TaxFreeExecute.OnRunTaxFreeRequestGetSet(TaxFreeRequest, false);
+        TaxFreeExecute.OnRunEligibleGetSet(Eligible, false);
+        TaxFreeExecute.OnRunHandledGetSet(Handled, false);
     end;
 
     #endregion
