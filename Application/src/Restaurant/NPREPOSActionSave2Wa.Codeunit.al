@@ -3,6 +3,7 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
     var
         Text000: Label 'Save POS Sale to Waiter Pad';
         Text001: Label 'No Water Pad exists on %1\Create new Water Pad?';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -202,12 +203,12 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
         ReturnToDefaultView: Boolean;
     begin
         NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
-        JSON.SetScope('/', true);
-        WaiterPadNo := JSON.GetString('waiterPadNo', true);
+        JSON.SetScopeRoot();
+        WaiterPadNo := JSON.GetStringOrFail('waiterPadNo', StrSubstNo(ReadingErr, ActionCode()));
         NPREWaiterPad.Get(WaiterPadNo);
 
-        OpenWaiterPad := JSON.GetBooleanParameter('OpenWaiterPad', false);
-        ReturnToDefaultView := JSON.GetBooleanParameter('ReturnToDefaultView', false);
+        OpenWaiterPad := JSON.GetBooleanParameter('OpenWaiterPad');
+        ReturnToDefaultView := JSON.GetBooleanParameter('ReturnToDefaultView');
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);

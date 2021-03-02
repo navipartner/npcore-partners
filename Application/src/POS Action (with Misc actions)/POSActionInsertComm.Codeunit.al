@@ -1,15 +1,9 @@
 codeunit 6150795 "NPR POS Action - Insert Comm."
 {
-    // NPR5.36/TSA /20170830 CASE 288574 Added DefaultDescription parameter and increase version
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'Insert a sales line comment. ';
         Prompt_EnterComment: Label 'Enter Comment';
+        ReadingErr: Label 'reading in %1';
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
@@ -22,8 +16,6 @@ codeunit 6150795 "NPR POS Action - Insert Comm."
               Sender.Type::Generic,
               Sender."Subscriber Instances Allowed"::Multiple)
             then begin
-                //-NPR5.36 [288574]
-                //RegisterWorkflowStep('', 'input(labels.prompt).respond();');
                 RegisterWorkflowStep('', 'if (param.EditDescription == param.EditDescription["Yes"]) {input({caption: labels.prompt, value: param.DefaultDescription}).respond();} else {context.value=param.DefaultDescription; respond();}');
                 RegisterTextParameter('DefaultDescription', '');
                 RegisterOptionParameter('EditDescription', 'Yes,No', 'Yes');
@@ -60,7 +52,7 @@ codeunit 6150795 "NPR POS Action - Insert Comm."
 
         with Line do begin
             Type := Type::Comment;
-            Description := JSON.GetString('value', true);
+            Description := JSON.GetStringOrFail('value', StrSubstNo(ReadingErr, ActionCode()));
         end;
 
         POSSession.GetSaleLine(SaleLine);
@@ -79,4 +71,3 @@ codeunit 6150795 "NPR POS Action - Insert Comm."
         exit('1.1');
     end;
 }
-

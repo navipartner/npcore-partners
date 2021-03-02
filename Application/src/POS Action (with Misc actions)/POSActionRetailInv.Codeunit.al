@@ -79,7 +79,7 @@ codeunit 6151086 "NPR POS Action - Retail Inv."
     var
         FixedInventorySetCode: Text;
     begin
-        FixedInventorySetCode := CopyStr(UpperCase(JSON.GetStringParameter('FixedInventorySetCode', false)), 1, MaxStrLen(RetailInventorySet.Code));
+        FixedInventorySetCode := CopyStr(UpperCase(JSON.GetStringParameter('FixedInventorySetCode')), 1, MaxStrLen(RetailInventorySet.Code));
         if (FixedInventorySetCode <> '') and RetailInventorySet.Get(FixedInventorySetCode) then
             exit(true);
 

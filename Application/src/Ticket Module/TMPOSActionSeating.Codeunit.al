@@ -66,7 +66,7 @@ codeunit 6151132 "NPR TM POS Action - Seating"
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('parameters', true);
+        JSON.SetScopeParameters(ActionCode());
 
         ShowSeating(FrontEnd, POSSession);
     end;

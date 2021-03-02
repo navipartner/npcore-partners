@@ -1,18 +1,5 @@
 codeunit 6151169 "NPR POS Action: NpGp Return"
 {
-    // NPR5.51/ALST/20190628 CASE 337539 New Object
-    // NPR5.52/ALST/20191009  CASE 372010 added permissions to service password
-    // NPR5.52/MHA /20191016 CASE 371388 "Global POS Sales Setup" moved from Np Retail Setup to POS Unit
-    // NPR5.53/ALST/20191106 CASE 372895 allow general Cross company setup entry
-    // NPR5.53/ALST/20191106 CASE 337539 removed setup check
-    // NPR5.53/ALST/20191119 CASE 376308 added event handler for EAN box
-    // NPR5.53/ALST/20191216 CASE 379255 changed EAN box handler
-    // NPR5.54/MMV /20200220 CASE 391871 Moved GUID creation from table subscribers to table trigger to have everything centralized.
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         TitleCaption: Label 'Return Item by Reference';
         RefNoPromptCaption: Label 'Cross Reference No.';
@@ -29,6 +16,8 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
         NotFoundErr: Label 'Return receipt reference number %1 not found.';
         ServicePasswordErr: Label 'Please check there is a password set up in %1';
         QuantityOverloadedErr: Label 'Quantity of items returned cannot exceed the original amount';
+        ReadingErr: Label 'reading in %1';
+        SettingScopeErr: Label 'setting scope in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -257,7 +246,7 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
         XmlElement2 := XmlElement.SelectSingleNode('ms:referenceNumber', XmlNamespaceManager);
         XmlElement2.InnerText := Format(ReferenceNo);
 
-        FullSale := JSON.GetBooleanParameter('ShowFullSale', true);
+        FullSale := JSON.GetBooleanParameterOrFail('ShowFullSale', ActionCode());
 
         XmlElement2 := XmlElement.SelectSingleNode('ms:fullSale', XmlNamespaceManager);
         XmlElement2.InnerText := Format(FullSale, 0, 9);
@@ -382,7 +371,7 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
-        FullSale := JSON.GetBooleanParameter('ShowFullSale', true);
+        FullSale := JSON.GetBooleanParameterOrFail('ShowFullSale', ActionCode());
 
         if not FullSale then
             TestQuantity(TempNpGpPOSSalesLine, SalePOS)
@@ -396,8 +385,8 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
 
         RetailItemSetup.Get();
         if (RetailItemSetup."Reason for Return Mandatory") then begin
-            JSON.SetScope('/', true);
-            ReturnReasonCode := JSON.GetString('ReturnReasonCode', true);
+            JSON.SetScopeRoot();
+            ReturnReasonCode := JSON.GetStringOrFail('ReturnReasonCode', StrSubstNo(ReadingErr, ActionCode()));
         end;
 
         UpdateLineNos(SalePOS, TempNpGpPOSSalesLine);
@@ -567,10 +556,10 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        ReferenceNumber := JSON.GetStringParameter('ReferenceBarcode', true);
+        ReferenceNumber := JSON.GetStringParameterOrFail('ReferenceBarcode', ActionCode());
         if ReferenceNumber = '' then begin
-            JSON.SetScope('$getReferenceNumber', true);
-            ReferenceNumber := JSON.GetString('numpad', true);
+            JSON.SetScope('$getReferenceNumber', StrSubstNo(SettingScopeErr, ActionCode()));
+            ReferenceNumber := JSON.GetStringOrFail('numpad', StrSubstNo(ReadingErr, ActionCode()));
         end;
 
         if CopyStr(ReferenceNumber, StrLen(ReferenceNumber) - 1) = 'XX' then

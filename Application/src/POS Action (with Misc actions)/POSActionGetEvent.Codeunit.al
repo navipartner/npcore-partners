@@ -52,6 +52,7 @@ codeunit 6060160 "NPR POS Action: Get Event"
     var
         JSON: Codeunit "NPR POS JSON Management";
         EventNo: Code[20];
+        ExecutingErr: Label 'executing %1';
     begin
         if not Action.IsThisAction(ActionCode) then
             exit;
@@ -67,7 +68,7 @@ codeunit 6060160 "NPR POS Action: Get Event"
                 begin
                     Handled := true;
                     JSON.InitializeJObjectParser(Context, FrontEnd);
-                    EventNo := CopyStr(JSON.GetString('value', true), 1, MaxStrLen(EventNo));
+                    EventNo := CopyStr(JSON.GetStringOrFail('value', StrSubstNo(ExecutingErr, ActionCode())), 1, MaxStrLen(EventNo));
                 end;
         end;
 

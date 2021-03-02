@@ -175,7 +175,7 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
     var
         StoreCodeFrom: Text;
     begin
-        StoreCodeFrom := StoreFromCodeOptionString(JSON.GetIntegerParameter('Store Code From', false));
+        StoreCodeFrom := StoreFromCodeOptionString(JSON.GetIntegerParameter('Store Code From'));
         case StoreCodeFrom of
             StoreFromCodeOptionString(0):
                 begin
@@ -245,7 +245,7 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         NpCsStore: Record "NPR NpCs Store";
         StoreCode: Text;
     begin
-        StoreCode := UpperCase(JSON.GetStringParameter('Store Code', false));
+        StoreCode := UpperCase(JSON.GetStringParameter('Store Code'));
         NpCsStore.Get(StoreCode);
 
         JSON.SetContext('from_store_code', NpCsStore.Code);
@@ -258,7 +258,7 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         LocationFilter: Text;
         LastRec: Text;
     begin
-        LocationFilter := UpperCase(JSON.GetStringParameter('Location Filter', false));
+        LocationFilter := UpperCase(JSON.GetStringParameter('Location Filter'));
         NpCsStore.SetRange("Local Store", true);
         NpCsStore.SetFilter("Location Code", LocationFilter);
         NpCsStore.FindLast;
@@ -289,7 +289,7 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         PrevRec: Text;
         FulFilledQty: Decimal;
     begin
-        FromStoreCode := UpperCase(JSON.GetString('from_store_code', false));
+        FromStoreCode := UpperCase(JSON.GetString('from_store_code'));
         FromNpCsStore.Get(FromStoreCode);
 
         POSSession.GetSale(POSSale);
@@ -403,7 +403,7 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         LastRec: Text;
         WorkflowCode: Text;
     begin
-        StoreCode := UpperCase(JSON.GetString('to_store_code', false));
+        StoreCode := UpperCase(JSON.GetString('to_store_code'));
         NpCsStore.Get(StoreCode);
 
         NpCsStoreWorkflowRelation.SetRange("Store Code", NpCsStore.Code);
@@ -468,11 +468,11 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         WorkflowCode: Text;
         PrepaymentPct: Decimal;
     begin
-        FromStoreCode := UpperCase(JSON.GetString('from_store_code', false));
+        FromStoreCode := UpperCase(JSON.GetString('from_store_code'));
         FromNpCsStore.Get(FromStoreCode);
-        ToStoreCode := UpperCase(JSON.GetString('to_store_code', false));
+        ToStoreCode := UpperCase(JSON.GetString('to_store_code'));
         ToNpCsStore.Get(ToStoreCode);
-        WorkflowCode := UpperCase(JSON.GetString('workflow_code', false));
+        WorkflowCode := UpperCase(JSON.GetString('workflow_code'));
         NpCsWorkflow.Get(WorkflowCode);
 
         ExportToDocument(JSON, POSSession, RetailSalesDocMgt);
@@ -514,7 +514,7 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         PrevRec := Format(SalePOS);
 
         SalePOS.Reference := SalePOS."Sales Ticket No.";
-        CustomerNo := JSON.GetString('customer_no', false);
+        CustomerNo := JSON.GetString('customer_no');
         SalePOS.Validate("Customer Type", SalePOS."Customer Type"::Ord);
         SalePOS.Validate("Customer No.", CustomerNo);
         SalePOS.TestField("Customer No.");
@@ -549,7 +549,7 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         RetailSalesDocMgt.SetTransferTaxSetup(true);
         RetailSalesDocMgt.SetOpenSalesDocAfterExport(false);
         RetailSalesDocMgt.SetWriteInAuditRoll(true);
-        RetailSalesDocMgt.SetCustomerCreditCheck(JSON.GetBooleanParameter('Check Customer Credit', false));
+        RetailSalesDocMgt.SetCustomerCreditCheck(JSON.GetBooleanParameter('Check Customer Credit'));
 
         POSSaleLine.CalculateBalance(AmountExclVAT, VATAmount, AmountInclVAT);
         RetailSalesDocMgt.SetDocumentTypeOrder();

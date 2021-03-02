@@ -1,9 +1,5 @@
 codeunit 6150859 "NPR POS Action: Doc. Export"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'Export current sale to a standard NAV sales document';
         ERRCUSTNOTSET: Label 'Customer must be set before working with Sales Document.';
@@ -113,6 +109,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         SpecLocationCodeMustBeSpecified: Label 'POS Action''s parameter ''Use Location From'' is set to ''Specific Location''. You must specify location code to be used for sale document as a parameter of the POS action (the parameter name is ''Use Specific Location Code'')';
         CaptionSendICOrderConfirmation: Label 'Send IC Order Cnfmn.';
         DescSendICOrderConfirmation: Label 'Send intercompany order confirmation immediately after sales document has been created. ';
+        ReadingErr: Label 'reading in %1 of %2';
 
 
     local procedure ActionCode(): Text
@@ -241,7 +238,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
 
         SalePOS.FindFirst;
 
-        if (JSON.GetBooleanParameter('SelectCustomer', true)) then begin
+        if (JSON.GetBooleanParameter('SelectCustomer')) then begin
             if not SelectCustomer(SalePOS, POSSale) then
                 SalePOS.TestField("Customer No.");
         end;
@@ -283,18 +280,18 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
         PrepaymentValue := GetPrepaymentValue(JSON);
-        JSON.SetScopeRoot(true);
+        JSON.SetScopeRoot();
 
-        PrepaymentIsAmount := JSON.GetBoolean('prepayment_is_amount', true);
-        PayAndPost := JSON.GetBoolean('pay_and_post', true);
-        FullPosting := JSON.GetBoolean('full_posting', true);
+        PrepaymentIsAmount := JSON.GetBooleanOrFail('prepayment_is_amount', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
+        PayAndPost := JSON.GetBooleanOrFail('pay_and_post', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
+        FullPosting := JSON.GetBooleanOrFail('full_posting', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
 
-        PrepaymentPdf2Nav := JSON.GetBooleanParameter('Pdf2NavPrepaymentDocument', true);
-        PrepaymentSend := JSON.GetBooleanParameter('SendPrepaymentDocument', true);
-        PayAndPostPdf2Nav := JSON.GetBooleanParameter('Pdf2NavPayAndPostDocument', true);
-        PayAndPostSend := JSON.GetBooleanParameter('SendPayAndPostDocument', true);
-        PrintPrepayment := JSON.GetBooleanParameter('PrintPrepaymentDocument', true);
-        PayAndPostPrint := JSON.GetBooleanParameter('PrintPayAndPostDocument', true);
+        PrepaymentPdf2Nav := JSON.GetBooleanParameterOrFail('Pdf2NavPrepaymentDocument', ActionCode());
+        PrepaymentSend := JSON.GetBooleanParameterOrFail('SendPrepaymentDocument', ActionCode());
+        PayAndPostPdf2Nav := JSON.GetBooleanParameterOrFail('Pdf2NavPayAndPostDocument', ActionCode());
+        PayAndPostSend := JSON.GetBooleanParameterOrFail('SendPayAndPostDocument', ActionCode());
+        PrintPrepayment := JSON.GetBooleanParameterOrFail('PrintPrepaymentDocument', ActionCode());
+        PayAndPostPrint := JSON.GetBooleanParameterOrFail('PrintPayAndPostDocument', ActionCode());
         if PrepaymentValue > 0 then begin
             //End sale, auto start new sale, and insert prepayment line.
             POSSession.StartTransaction();
@@ -318,7 +315,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
     begin
         if SalesHeader.Get(SalesHeader."Document Type", SalesHeader."No.") then begin //If document has been posted/deleted, we cannot pay parts of it.
-            if JSON.GetBooleanParameter('ShowDocumentPaymentMenu', true) then begin
+            if JSON.GetBooleanParameterOrFail('ShowDocumentPaymentMenu', ActionCode()) then begin
                 if RetailSalesDocImpMgt.DocumentIsSetToFullPosting(SalesHeader) then
                     Choice := StrMenu(PAYMENT_OPTION, 1, PAYMENT_OPTION_DESC)
                 else
@@ -363,9 +360,9 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                         end;
                 end;
             end else begin
-                JSON.SetContext('pay_and_post', JSON.GetBooleanParameter('PayAndPostInNextSale', true));
-                JSON.SetContext('prompt_prepayment', JSON.GetBooleanParameter('PrepaymentDialog', true));
-                JSON.SetContext('prepayment_is_amount', JSON.GetBooleanParameter('PrepaymentInputIsAmount', true));
+                JSON.SetContext('pay_and_post', JSON.GetBooleanParameterOrFail('PayAndPostInNextSale', ActionCode()));
+                JSON.SetContext('prompt_prepayment', JSON.GetBooleanParameterOrFail('PrepaymentDialog', ActionCode()));
+                JSON.SetContext('prepayment_is_amount', JSON.GetBooleanParameterOrFail('PrepaymentInputIsAmount', ActionCode()));
                 JSON.SetContext('full_posting', false);
             end;
         end else begin
@@ -380,7 +377,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
 
     local procedure ValidateSale(var SalePOS: Record "NPR Sale POS"; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; JSON: Codeunit "NPR POS JSON Management")
     begin
-        if JSON.GetBooleanParameter('BlockEmptySale', true) then begin
+        if JSON.GetBooleanParameterOrFail('BlockEmptySale', ActionCode()) then begin
             if not SaleLinesExists(SalePOS) then
                 Error(ERRNOSALELINES);
         end;
@@ -418,32 +415,32 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         LocationSource: Option Register,"POS Store","POS Sale",SpecificLocation;
         SpecificLocationCode: Code[10];
     begin
-        RetailSalesDocMgt.SetAsk(JSON.GetBooleanParameter('SetAsk', true));
-        RetailSalesDocMgt.SetPrint(JSON.GetBooleanParameter('SetPrint', true));
-        RetailSalesDocMgt.SetInvoice(JSON.GetBooleanParameter('SetInvoice', true));
-        RetailSalesDocMgt.SetReceive(JSON.GetBooleanParameter('SetReceive', true));
-        RetailSalesDocMgt.SetShip(JSON.GetBooleanParameter('SetShip', true));
-        RetailSalesDocMgt.SetSendPostedPdf2Nav(JSON.GetBooleanParameter('SetSendPdf2Nav', true));
-        RetailSalesDocMgt.SetRetailPrint(JSON.GetBooleanParameter('PrintRetailConfirmation', true));
-        RetailSalesDocMgt.SetAutoReserveSalesLine(JSON.GetBooleanParameter('SetAutoReserveSalesLine', true));
-        RetailSalesDocMgt.SetTransferSalesPerson(JSON.GetBooleanParameter('SetTransferSalesperson', true));
-        RetailSalesDocMgt.SetTransferPostingsetup(JSON.GetBooleanParameter('SetTransferPostingSetup', true));
-        RetailSalesDocMgt.SetTransferDimensions(JSON.GetBooleanParameter('SetTransferDimensions', true));
-        RetailSalesDocMgt.SetTransferPaymentMethod(JSON.GetBooleanParameter('SetTransferPaymentMethod', true));
-        RetailSalesDocMgt.SetTransferTaxSetup(JSON.GetBooleanParameter('SetTransferTaxSetup', true));
-        RetailSalesDocMgt.SetOpenSalesDocAfterExport(JSON.GetBooleanParameter('OpenDocumentAfterExport', true));
-        RetailSalesDocMgt.SetSendDocument(JSON.GetBooleanParameter('SetSend', true));
+        RetailSalesDocMgt.SetAsk(JSON.GetBooleanParameterOrFail('SetAsk', ActionCode()));
+        RetailSalesDocMgt.SetPrint(JSON.GetBooleanParameterOrFail('SetPrint', ActionCode()));
+        RetailSalesDocMgt.SetInvoice(JSON.GetBooleanParameterOrFail('SetInvoice', ActionCode()));
+        RetailSalesDocMgt.SetReceive(JSON.GetBooleanParameterOrFail('SetReceive', ActionCode()));
+        RetailSalesDocMgt.SetShip(JSON.GetBooleanParameterOrFail('SetShip', ActionCode()));
+        RetailSalesDocMgt.SetSendPostedPdf2Nav(JSON.GetBooleanParameterOrFail('SetSendPdf2Nav', ActionCode()));
+        RetailSalesDocMgt.SetRetailPrint(JSON.GetBooleanParameterOrFail('PrintRetailConfirmation', ActionCode()));
+        RetailSalesDocMgt.SetAutoReserveSalesLine(JSON.GetBooleanParameterOrFail('SetAutoReserveSalesLine', ActionCode()));
+        RetailSalesDocMgt.SetTransferSalesPerson(JSON.GetBooleanParameterOrFail('SetTransferSalesperson', ActionCode()));
+        RetailSalesDocMgt.SetTransferPostingsetup(JSON.GetBooleanParameterOrFail('SetTransferPostingSetup', ActionCode()));
+        RetailSalesDocMgt.SetTransferDimensions(JSON.GetBooleanParameterOrFail('SetTransferDimensions', ActionCode()));
+        RetailSalesDocMgt.SetTransferPaymentMethod(JSON.GetBooleanParameterOrFail('SetTransferPaymentMethod', ActionCode()));
+        RetailSalesDocMgt.SetTransferTaxSetup(JSON.GetBooleanParameterOrFail('SetTransferTaxSetup', ActionCode()));
+        RetailSalesDocMgt.SetOpenSalesDocAfterExport(JSON.GetBooleanParameterOrFail('OpenDocumentAfterExport', ActionCode()));
+        RetailSalesDocMgt.SetSendDocument(JSON.GetBooleanParameterOrFail('SetSend', ActionCode()));
         RetailSalesDocMgt.SetWriteInAuditRoll(true);
-        RetailSalesDocMgt.SetSendICOrderConf(JSON.GetBooleanParameter('SendICOrderConfirmation', false));
-        RetailSalesDocMgt.SetCustomerCreditCheck(JSON.GetBooleanParameter('CheckCustomerCredit', false));
+        RetailSalesDocMgt.SetSendICOrderConf(JSON.GetBooleanParameter('SendICOrderConfirmation'));
+        RetailSalesDocMgt.SetCustomerCreditCheck(JSON.GetBooleanParameter('CheckCustomerCredit'));
 
-        if JSON.GetBooleanParameter('SetShowCreationMessage', true) then
+        if JSON.GetBooleanParameterOrFail('SetShowCreationMessage', ActionCode()) then
             RetailSalesDocMgt.SetShowCreationMessage();
 
         POSSaleLine.CalculateBalance(AmountExclVAT, VATAmount, AmountInclVAT);
 
-        DocumentTypePozitive := JSON.GetIntegerParameter('SetDocumentType', true);
-        DocumentTypeNegative := JSON.GetIntegerParameter('SetNegBalDocumentType', true);
+        DocumentTypePozitive := JSON.GetIntegerParameterOrFail('SetDocumentType', ActionCode());
+        DocumentTypeNegative := JSON.GetIntegerParameterOrFail('SetNegBalDocumentType', ActionCode());
 
         if AmountInclVAT >= 0 then
             case DocumentTypePozitive of
@@ -466,8 +463,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                     Error(WrongNegativeSignErr, SelectStr(DocumentTypePozitive + 1, OptionDocTypePozitive));
             end;
 
-        LocationSource := JSON.GetIntegerParameter('UseLocationFrom', true);
-        SpecificLocationCode := JSON.GetStringParameter('UseSpecLocationCode', false);
+        LocationSource := JSON.GetIntegerParameterOrFail('UseLocationFrom', ActionCode());
+        SpecificLocationCode := JSON.GetStringParameter('UseSpecLocationCode');
         if (LocationSource = LocationSource::SpecificLocation) and (SpecificLocationCode = '') then
             Error(SpecLocationCodeMustBeSpecified);
         RetailSalesDocMgt.SetLocationSource(LocationSource, SpecificLocationCode);
@@ -475,10 +472,10 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
 
     local procedure GetPrepaymentValue(var JSON: Codeunit "NPR POS JSON Management"): Decimal
     begin
-        if JSON.GetBoolean('prompt_prepayment', true) then begin
+        if JSON.GetBooleanOrFail('prompt_prepayment', StrSubstNo(ReadingErr, 'GetPrepaymentValue', ActionCode())) then begin
             exit(GetNumpad(JSON, 'endSaleAndDocumentPayment'));
         end else begin
-            exit(JSON.GetDecimalParameter('FixedPrepaymentValue', true));
+            exit(JSON.GetDecimalParameterOrFail('FixedPrepaymentValue', ActionCode()));
         end;
     end;
 
@@ -515,7 +512,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
 
     local procedure SetPricesInclVAT(var SalePOS: Record "NPR Sale POS"; var JSON: Codeunit "NPR POS JSON Management")
     begin
-        if JSON.GetBooleanParameter('ForcePricesInclVAT', true) and (not SalePOS."Prices Including VAT") then begin
+        if JSON.GetBooleanParameterOrFail('ForcePricesInclVAT', ActionCode()) and (not SalePOS."Prices Including VAT") then begin
             SalePOS.Validate("Prices Including VAT", true);
             SalePOS.Modify(true);
         end;
@@ -541,20 +538,20 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
 
     local procedure GetInput(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
     begin
-        JSON.SetScope('/', true);
-        if (not JSON.SetScope('$' + Path, false)) then
+        JSON.SetScopeRoot();
+        if (not JSON.SetScope('$' + Path)) then
             exit('');
 
-        exit(JSON.GetString('input', true));
+        exit(JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, 'GetInput', ActionCode())));
     end;
 
     local procedure GetNumpad(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Decimal
     begin
-        JSON.SetScope('/', true);
-        if (not JSON.SetScope('$' + Path, false)) then
+        JSON.SetScopeRoot();
+        if (not JSON.SetScope('$' + Path)) then
             exit(0);
 
-        exit(JSON.GetDecimal('numpad', true));
+        exit(JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, 'GetNumpad', ActionCode())));
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]

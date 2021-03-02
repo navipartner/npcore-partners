@@ -1,16 +1,5 @@
 codeunit 6150848 "NPR POS Action: Adjust Inv."
 {
-    // NPR5.39/MHA /20180206  CASE 299736 Object created - Inventory Adjustment from POS
-    // NPR5.45/MHA /20180806  CASE 323812 Added Return Reason functionality
-    // NPR5.53/ALST/20191216  CASE 381438 possible to adjust negative or positive
-    // NPR5.55/ALST/20200420  CASE 400775 allow for third option in adjustment action (besides strictly positive or negative)
-    // NPR5.55/ALST/20200420  CASE 411559 changed captions
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Post Inventory Adjustment directly from POS';
         Text001: Label 'Adjust Inventory Quantity:';
@@ -31,25 +20,13 @@ codeunit 6150848 "NPR POS Action: Adjust Inv."
               "Subscriber Instances Allowed"::Multiple)
             then begin
                 RegisterWorkflowStep('PromptQuantity', 'numpad({title: context.adjust_description, caption: labels.QtyCaption, value: context.quantity}).cancel(abort);');
-                //-NPR5.45 [323812]
                 RegisterWorkflowStep('FixedReturnReason', 'if (param.FixedReturnReason != "")  {respond()}');
                 RegisterWorkflowStep('LookupReturnReason', 'if (param.LookupReturnReason)  {respond()}');
-                //+NPR5.45 [323812]
                 RegisterWorkflowStep('AdjustInventory', 'respond();');
 
-                //-NPR5.45 [323812]
                 RegisterTextParameter('FixedReturnReason', '');
                 RegisterBooleanParameter('LookupReturnReason', false);
-                //+NPR5.45 [323812]
-                //-NPR5.55 [400775]
-                //    //-NPR5.53 [381438]
-                //    RegisterBooleanParameter('NegativeInput', FALSE);
-                //    //+NPR5.53 [381438]
-                //-NPR5.55 [411559]
-                //RegisterOptionParameter('InputAdjustment','Negative Input Only,Positive Input Only,Both Negative and Positive Inputs','Both Negative and Positive Inputs');
                 RegisterOptionParameter('InputAdjustment', 'perform only Negative Adjustment,perform only Positive Adjustment,perform both Negative and Positive Adjustment', 'perform both Negative and Positive Adjustment');
-                //+NPR5.55 [411559]
-                //+NPR5.55 [400775]
                 RegisterWorkflow(true);
 
             end;
@@ -103,7 +80,6 @@ codeunit 6150848 "NPR POS Action: Adjust Inv."
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
         case WorkflowStep of
-            //-NPR5.45 [323815]
             'FixedReturnReason':
                 begin
                     Handled := true;
@@ -118,7 +94,6 @@ codeunit 6150848 "NPR POS Action: Adjust Inv."
                     FrontEnd.SetActionContext(ActionCode(), JSON);
                     exit;
                 end;
-            //+NPR5.45 [323815]
             'AdjustInventory':
                 begin
                     Handled := true;
@@ -133,51 +108,40 @@ codeunit 6150848 "NPR POS Action: Adjust Inv."
         Quantity: Decimal;
         ReturnReasonCode: Code[10];
         Test: Text;
+        SettingScopeErr: Label 'setting scope in OnActionAdjustInventory';
+        ReadingErr: Label 'reading in OnActionAdjustInventory';
     begin
-        JSON.SetScope('$PromptQuantity', true);
-        Quantity := JSON.GetDecimal('numpad', true);
+        JSON.SetScope('$PromptQuantity', SettingScopeErr);
+        Quantity := JSON.GetDecimalOrFail('numpad', ReadingErr);
         if Quantity = 0 then
             exit;
 
-        //-NPR5.45 [323812]
-        //PerformAdjustInventory(POSSession,Quantity);
-        JSON.SetScope('/', true);
-        ReturnReasonCode := JSON.GetString('ReturnReason', false);
+        JSON.SetScopeRoot();
+        ReturnReasonCode := JSON.GetString('ReturnReason');
 
-        //-NPR5.55 [400775]
-        // //-NPR5.53 [381438]
-        // Quantity := ABS(Quantity);
-        //
-        // JSON.SetScope('parameters',TRUE);
-        // IF JSON.GetBoolean('NegativeInput', FALSE) THEN
-        //  Quantity *= -1;
-        // //+NPR5.53 [381438]
-        JSON.SetScope('parameters', true);
-        case JSON.GetInteger('InputAdjustment', true) of
+        JSON.SetScopeParameters(ActionCode());
+        case JSON.GetIntegerOrFail('InputAdjustment', ReadingErr) of
             0:
                 Quantity := -Abs(Quantity);
             1:
                 Quantity := Abs(Quantity);
         end;
-        //+NPR5.55 [400775]
 
         PerformAdjustInventory(POSSession, Quantity, ReturnReasonCode);
-        //+NPR5.45 [323812]
     end;
 
     local procedure OnActionFixedReturnReason(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
         ReturnReasonCode: Code[10];
         DiscountType: Integer;
+        ReadingErr: Label 'reading in OnActionFixedReturnReason';
     begin
-        //-NPR5.45 [323812]
-        JSON.SetScope('parameters', true);
-        ReturnReasonCode := JSON.GetString('FixedReturnReason', true);
+        JSON.SetScopeParameters(ActionCode());
+        ReturnReasonCode := JSON.GetStringOrFail('FixedReturnReason', ReadingErr);
         if ReturnReasonCode = '' then
             exit;
 
         JSON.SetContext('ReturnReason', ReturnReasonCode);
-        //+NPR5.45 [323812]
     end;
 
     local procedure OnActionLookupReturnReason(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
@@ -186,15 +150,13 @@ codeunit 6150848 "NPR POS Action: Adjust Inv."
         ReturnReason: Record "Return Reason";
         DiscountType: Integer;
     begin
-        //-NPR5.45 [323812]
-        JSON.SetScope('parameters', true);
-        ReturnReasonCode := JSON.GetString('FixedReturnReason', false);
+        JSON.SetScopeParameters(ActionCode());
+        ReturnReasonCode := JSON.GetString('FixedReturnReason');
         if ReturnReason.Get(ReturnReasonCode) then;
         if PAGE.RunModal(0, ReturnReason) <> ACTION::LookupOK then
             exit;
 
         JSON.SetContext('ReturnReason', ReturnReason.Code);
-        //+NPR5.45 [323812]
     end;
 
     local procedure "-- Locals --"()
@@ -217,10 +179,7 @@ codeunit 6150848 "NPR POS Action: Adjust Inv."
         if not ConfirmAdjustInventory(SaleLinePOS, Quantity) then
             exit;
 
-        //-NPR5.45 [323812]
-        //CreateItemJnlLine(SalePOS,SaleLinePOS,Quantity,TempItemJnlLine);
         CreateItemJnlLine(SalePOS, SaleLinePOS, Quantity, ReturnReasonCode, TempItemJnlLine);
-        //+NPR5.45 [323812]
         PostItemJnlLine(TempItemJnlLine);
 
         Message(Text005, Quantity);
@@ -257,10 +216,8 @@ codeunit 6150848 "NPR POS Action: Adjust Inv."
         if Quantity < 0 then
             TempItemJnlLine.Validate("Entry Type", TempItemJnlLine."Entry Type"::"Negative Adjmt.");
         TempItemJnlLine.Validate(Quantity, Abs(Quantity));
-        //-NPR5.45 [323812]
         if ReturnReasonCode <> '' then
             TempItemJnlLine.Validate("Return Reason Code", ReturnReasonCode);
-        //+NPR5.45 [323812]
         TempItemJnlLine.Validate("Location Code", SaleLinePOS."Location Code");
         TempItemJnlLine.Validate("Shortcut Dimension 1 Code", SaleLinePOS."Shortcut Dimension 1 Code");
         TempItemJnlLine.Validate("Shortcut Dimension 2 Code", SaleLinePOS."Shortcut Dimension 2 Code");
@@ -282,16 +239,6 @@ codeunit 6150848 "NPR POS Action: Adjust Inv."
 
     local procedure ActionVersion(): Text
     begin
-        //-NPR5.55 [411559]
         exit('1.4');
-        //+NPR5.55 [411559]
-        //-NPR5.55 [400775]
-        exit('1.3');
-        //+NPR5.55 [400775]
-        //-NPR5.45 [323812]
-        exit('1.2');
-        //+NPR5.45 [323812]
-        exit('1.0');
     end;
 }
-

@@ -84,15 +84,15 @@ codeunit 6150842 "NPR POS Action - Set Sale VAT"
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        MinSaleAmountLimit := JSON.GetBooleanParameter('MinimumSaleAmountLimit', true);
-        MinSaleAmount := JSON.GetDecimalParameter('MinimumSaleAmount', true);
-        MaxSaleAmountLimit := JSON.GetBooleanParameter('MaximumSaleAmountLimit', true);
-        MaxSaleAmount := JSON.GetDecimalParameter('MaximumSaleAmount', true);
-        AddCommentLine := JSON.GetBooleanParameter('AddCommentLine', true);
+        MinSaleAmountLimit := JSON.GetBooleanParameterOrFail('MinimumSaleAmountLimit', ActionCode());
+        MinSaleAmount := JSON.GetDecimalParameterOrFail('MinimumSaleAmount', ActionCode());
+        MaxSaleAmountLimit := JSON.GetBooleanParameterOrFail('MaximumSaleAmountLimit', ActionCode());
+        MaxSaleAmount := JSON.GetDecimalParameterOrFail('MaximumSaleAmount', ActionCode());
+        AddCommentLine := JSON.GetBooleanParameterOrFail('AddCommentLine', ActionCode());
         //-NPR5.48 [333938]
-        GenBusPostingGroup := JSON.GetStringParameter('GenBusPostingGroup', true);
+        GenBusPostingGroup := JSON.GetStringParameterOrFail('GenBusPostingGroup', ActionCode());
         //+NPR5.48 [333938]
-        VATBusPostingGroup := JSON.GetStringParameter('VATBusPostingGroup', true);
+        VATBusPostingGroup := JSON.GetStringParameterOrFail('VATBusPostingGroup', ActionCode());
 
         CheckLimits(POSSession, MinSaleAmount, MinSaleAmountLimit, MaxSaleAmount, MaxSaleAmountLimit);
         //-NPR5.48 [333938]

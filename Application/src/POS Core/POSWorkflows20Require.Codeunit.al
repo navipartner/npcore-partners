@@ -2,6 +2,13 @@ codeunit 6150735 "NPR POS Workflows 2.0: Require"
 {
     var
         Text001: Label 'Custom Require method handler for require type "%1" was not found.';
+        ReadingErr: Label 'reading in %1';
+        SettingScopeErr: Label 'setting scope in %1';
+
+    local procedure MethodName(): Text
+    begin
+        exit('Require');
+    end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnCustomMethod', '', false, false)]
     local procedure OnRequire(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
@@ -11,13 +18,13 @@ codeunit 6150735 "NPR POS Workflows 2.0: Require"
         Type: Text;
         CustomHandled: Boolean;
     begin
-        if Method <> 'Require' then
+        if Method <> MethodName() then
             exit;
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        ID := JSON.GetInteger('id', true);
-        Type := JSON.GetString('type', true);
+        ID := JSON.GetIntegerOrFail('id', StrSubstNo(ReadingErr, MethodName()));
+        Type := JSON.GetStringOrFail('type', StrSubstNo(ReadingErr, MethodName()));
         case Type of
             'action':
                 RequireAction(POSSession, ID, JSON, FrontEnd);
@@ -28,7 +35,7 @@ codeunit 6150735 "NPR POS Workflows 2.0: Require"
             else begin
                     OnRequireCustom(ID, Type, JSON, FrontEnd, CustomHandled);
                     if not CustomHandled then begin
-                        FrontEnd.ReportBug(StrSubstNo(Text001, Type));
+                        FrontEnd.ReportBugAndThrowError(StrSubstNo(Text001, Type));
                         exit;
                     end;
                 end;
@@ -41,8 +48,8 @@ codeunit 6150735 "NPR POS Workflows 2.0: Require"
         Script: Text;
         ScriptId: Code[10];
     begin
-        JSON.SetScope('context', true);
-        ScriptId := JSON.GetString('script', true);
+        JSON.SetScope('context', StrSubstNo(SettingScopeErr, MethodName()));
+        ScriptId := JSON.GetStringOrFail('script', StrSubstNo(ReadingErr, MethodName()));
 
         if not WebClientDependency.Get(WebClientDependency.Type::JavaScript, ScriptId) then
             exit;
@@ -64,8 +71,8 @@ codeunit 6150735 "NPR POS Workflows 2.0: Require"
         ActionCode: Code[20];
         WorkflowJson: JsonObject;
     begin
-        JSON.SetScope('context', true);
-        ActionCode := JSON.GetString('action', true);
+        JSON.SetScope('context', StrSubstNo(SettingScopeErr, MethodName()));
+        ActionCode := JSON.GetStringOrFail('action', StrSubstNo(ReadingErr, MethodName()));
 
         if not POSSession.RetrieveSessionAction(ActionCode, POSAction) then begin
             if not POSAction.Get(ActionCode) or (POSAction."Workflow Engine Version" <> '2.0') or not POSAction.Workflow.HasValue then
@@ -103,8 +110,8 @@ codeunit 6150735 "NPR POS Workflows 2.0: Require"
         WebClientDependency: Record "NPR Web Client Dependency";
         ImageCode: Code[10];
     begin
-        JSON.SetScope('context', true);
-        ImageCode := JSON.GetString('code', true);
+        JSON.SetScope('context', StrSubstNo(SettingScopeErr, MethodName()));
+        ImageCode := JSON.GetStringOrFail('code', StrSubstNo(ReadingErr, MethodName()));
         FrontEnd.RequireResponse(ID, WebClientDependency.GetDataUri(ImageCode));
     end;
 

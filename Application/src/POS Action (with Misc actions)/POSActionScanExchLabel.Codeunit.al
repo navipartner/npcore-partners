@@ -1,16 +1,12 @@
 codeunit 6150830 "NPR POS Action: ScanExchLabel"
 {
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is a build in function to handle exchange labels.';
         InpTitle: Label 'Exchange Label';
         InpLead: Label 'Enter Exchange Label Barcode';
         ErrNotExchLabel: Label '%1 ';
+        ReadingErr: Label 'reading in %1';
+        SettingScopeErr: Label 'setting scope in %1';
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
@@ -47,18 +43,18 @@ codeunit 6150830 "NPR POS Action: ScanExchLabel"
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('/', true);
-        PromptForBarcode := JSON.GetBooleanParameter('PromptForBarcode', true);
+        JSON.SetScopeRoot();
+        PromptForBarcode := JSON.GetBooleanParameterOrFail('PromptForBarcode', ActionCode());
 
         if not PromptForBarcode then begin
-            ExchLabelBarcode := JSON.GetStringParameter('ExchLabelBarcode', false);
+            ExchLabelBarcode := JSON.GetStringParameter('ExchLabelBarcode');
             if ExchLabelBarcode = '' then begin
                 Handled := true;
                 exit;
             end;
         end else begin
-            JSON.SetScope('$prompt', true);
-            InputExchLabelBarcode := JSON.GetString('input', true);
+            JSON.SetScope('$prompt', StrSubstNo(SettingScopeErr, ActionCode()));
+            InputExchLabelBarcode := JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, ActionCode()));
             ExchLabelBarcode := InputExchLabelBarcode;
         end;
 
@@ -105,9 +101,6 @@ codeunit 6150830 "NPR POS Action: ScanExchLabel"
 
         CodeBarcode := CopyStr(iBarcode, 1, MaxStrLen(CodeBarcode));
 
-        // IF NOT ExchangeLabelManagement.BarCodeIsExchangeLabel(CodeBarcode) THEN BEGIN
-        //  ERROR(STRSUBSTNO(ErrNotExchLabel,iBarcode));
-        // END;
         if not BarCodeIsExchangeLabel(CodeBarcode) then
             Error(StrSubstNo(ErrNotExchLabel, iBarcode));
 
@@ -202,4 +195,3 @@ codeunit 6150830 "NPR POS Action: ScanExchLabel"
         exit(false);
     end;
 }
-

@@ -10,6 +10,8 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt."
         Text006: Label 'Enter Discount Percent:';
         QtyNotPositiveErr: Label 'You must specify a positive quantity.';
         ConfirmReenterQtyMsg: Label '\Do you want to re-enter the quantity?';
+        ReadingErr: Label 'reading in %1 of %2';
+        SettingScopeErr: Label 'setting scope in %1';
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
     local procedure OnDiscoverActions(var Sender: Record "NPR POS Action")
@@ -219,7 +221,7 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt."
         VoucherTypeCode: Text;
         DiscountType: Text;
     begin
-        VoucherTypeCode := UpperCase(JSON.GetString('VoucherTypeCode', true));
+        VoucherTypeCode := UpperCase(JSON.GetStringOrFail('VoucherTypeCode', StrSubstNo(ReadingErr, 'IssueVoucher', IssueVoucherActionCode())));
         VoucherType.Get(VoucherTypeCode);
 
         NpRvVoucherMgt.GenerateTempVoucher(VoucherType, TempVoucher);
@@ -230,34 +232,34 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt."
         SaleLinePOS.Validate(Type, SaleLinePOS.Type::"G/L Entry");
         SaleLinePOS.Validate("No.", VoucherType."Account No.");
         SaleLinePOS.Description := VoucherType.Description;
-        JSON.SetScope('/', true);
-        JSON.SetScope('$qty_input', true);
-        SaleLinePOS.Quantity := JSON.GetInteger('numpad', true);
+        JSON.SetScopeRoot();
+        JSON.SetScope('$qty_input', StrSubstNo(SettingScopeErr, IssueVoucherActionCode()));
+        SaleLinePOS.Quantity := JSON.GetIntegerOrFail('numpad', StrSubstNo(ReadingErr, 'IssueVoucher', IssueVoucherActionCode()));
         if SaleLinePOS.Quantity < 0 then
             Error(QtyNotPositiveErr);
 
         POSSaleLine.InsertLine(SaleLinePOS);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        JSON.SetScope('/', true);
-        JSON.SetScope('$amt_input', true);
-        SaleLinePOS."Unit Price" := JSON.GetDecimal('numpad', true);
+        JSON.SetScopeRoot();
+        JSON.SetScope('$amt_input', StrSubstNo(SettingScopeErr, IssueVoucherActionCode()));
+        SaleLinePOS."Unit Price" := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, 'IssueVoucher', IssueVoucherActionCode()));
 
-        JSON.SetScope('/', true);
-        JSON.SetScope('parameters', true);
-        DiscountType := JSON.GetString('DiscountType', true);
+        JSON.SetScopeRoot();
+        JSON.SetScopeParameters(IssueVoucherActionCode());
+        DiscountType := JSON.GetStringOrFail('DiscountType', StrSubstNo(ReadingErr, 'IssueVoucher', IssueVoucherActionCode()));
         case DiscountType of
             '0':
                 begin
-                    JSON.SetScope('/', true);
-                    JSON.SetScope('$discount_input', true);
-                    SaleLinePOS."Discount Amount" := JSON.GetDecimal('numpad', true) * SaleLinePOS.Quantity;
+                    JSON.SetScopeRoot();
+                    JSON.SetScope('$discount_input', StrSubstNo(SettingScopeErr, IssueVoucherActionCode()));
+                    SaleLinePOS."Discount Amount" := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, 'IssueVoucher', IssueVoucherActionCode())) * SaleLinePOS.Quantity;
                 end;
             '1':
                 begin
-                    JSON.SetScope('/', true);
-                    JSON.SetScope('$discount_input', true);
-                    SaleLinePOS."Discount %" := JSON.GetDecimal('numpad', true);
+                    JSON.SetScopeRoot();
+                    JSON.SetScope('$discount_input', StrSubstNo(SettingScopeErr, IssueVoucherActionCode()));
+                    SaleLinePOS."Discount %" := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, 'IssueVoucher', IssueVoucherActionCode()));
                 end;
         end;
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
@@ -295,15 +297,15 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt."
                     NpRvSalesLine.Validate("Contact No.", SalePOS."Customer No.");
                 end;
         end;
-        JSON.SetScope('/', true);
-        NpRvSalesLine."Send via Print" := JSON.GetBoolean('SendMethodPrint', false);
-        NpRvSalesLine."Send via E-mail" := JSON.GetBoolean('SendMethodEmail', false);
-        NpRvSalesLine."Send via SMS" := JSON.GetBoolean('SendMethodSMS', false);
-        if JSON.SetScope('$send_method_email', false) then
-            NpRvSalesLine."E-mail" := CopyStr(JSON.GetString('input', false), 1, MaxStrLen(NpRvSalesLine."E-mail"));
-        JSON.SetScope('/', true);
-        if JSON.SetScope('$send_method_sms', false) then
-            NpRvSalesLine."Phone No." := CopyStr(JSON.GetString('input', false), 1, MaxStrLen(NpRvSalesLine."Phone No."));
+        JSON.SetScopeRoot();
+        NpRvSalesLine."Send via Print" := JSON.GetBoolean('SendMethodPrint');
+        NpRvSalesLine."Send via E-mail" := JSON.GetBoolean('SendMethodEmail');
+        NpRvSalesLine."Send via SMS" := JSON.GetBoolean('SendMethodSMS');
+        if JSON.SetScope('$send_method_email') then
+            NpRvSalesLine."E-mail" := CopyStr(JSON.GetString('input'), 1, MaxStrLen(NpRvSalesLine."E-mail"));
+        JSON.SetScopeRoot();
+        if JSON.SetScope('$send_method_sms') then
+            NpRvSalesLine."Phone No." := CopyStr(JSON.GetString('input'), 1, MaxStrLen(NpRvSalesLine."Phone No."));
         NpRvSalesLine.Insert;
 
         NpRvVoucherMgt.SetSalesLineReferenceFilter(NpRvSalesLine, NpRvSalesLineReference);
@@ -349,7 +351,7 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt."
         VoucherTypeCode: Text;
         Selection: Integer;
     begin
-        VoucherTypeCode := CopyStr(UpperCase(JSON.GetString('VoucherTypeCode', true)), 1, MaxStrLen(VoucherType.Code));
+        VoucherTypeCode := CopyStr(UpperCase(JSON.GetStringOrFail('VoucherTypeCode', StrSubstNo(ReadingErr, 'SelectSendMethod', IssueVoucherActionCode()))), 1, MaxStrLen(VoucherType.Code));
         VoucherType.Get(VoucherTypeCode);
 
         POSSession.GetSale(POSSale);
@@ -392,7 +394,7 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt."
         if not SelectVoucherType(VoucherTypeCode) then
             Error('');
 
-        JSON.SetScope('parameters', true);
+        JSON.SetScopeParameters(IssueVoucherActionCode());
         JSON.SetContext('VoucherTypeCode', VoucherTypeCode);
         FrontEnd.SetActionContext(IssueVoucherActionCode(), JSON);
     end;
@@ -401,9 +403,9 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt."
     var
         Qty: Decimal;
     begin
-        JSON.SetScope('/', true);
-        JSON.SetScope('$qty_input', true);
-        Qty := JSON.GetInteger('numpad', true);
+        JSON.SetScopeRoot();
+        JSON.SetScope('$qty_input', StrSubstNo(SettingScopeErr, IssueVoucherActionCode()));
+        Qty := JSON.GetIntegerOrFail('numpad', StrSubstNo(ReadingErr, 'CheckQty', IssueVoucherActionCode()));
         if Qty <= 0 then begin
             if Confirm(QtyNotPositiveErr + ConfirmReenterQtyMsg, true) then
                 FrontEnd.ContinueAtStep('qty_input')

@@ -73,10 +73,10 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        CancellationFeeItemNo := JSON.GetStringParameter('CancellationFeeItemNo', true);
-        OrderPaymentTermsFilter := JSON.GetStringParameter('OrderPaymentTermsFilter', true);
-        SkipFeeInvoice := JSON.GetBooleanParameter('SkipFeeInvoice', true);
-        SelectCustomer := JSON.GetBooleanParameter('SelectCustomer', true);
+        CancellationFeeItemNo := JSON.GetStringParameterOrFail('CancellationFeeItemNo', ActionCode());
+        OrderPaymentTermsFilter := JSON.GetStringParameterOrFail('OrderPaymentTermsFilter', ActionCode());
+        SkipFeeInvoice := JSON.GetBooleanParameterOrFail('SkipFeeInvoice', ActionCode());
+        SelectCustomer := JSON.GetBooleanParameterOrFail('SelectCustomer', ActionCode());
 
         if not CheckCustomer(POSSession, SelectCustomer) then
             exit;

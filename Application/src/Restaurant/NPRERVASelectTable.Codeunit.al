@@ -48,7 +48,7 @@ codeunit 6150687 "NPR NPRE RVA: Select Table"
         case WorkflowStep of
             'SelectWaiterPad':
                 begin
-                    SeatingCode := Context.GetStringParameter('SeatingCode', true);
+                    SeatingCode := Context.GetStringParameterOrFail('SeatingCode', ActionCode());
                     Seating.Get(SeatingCode);
 
                     SeatingWaiterPadLink.SetRange("Seating Code", Seating.Code);

@@ -7,6 +7,7 @@ codeunit 6150860 "NPR POS Action: LoginButton"
         t004: Label 'The register has not been balanced since %1 and must be balanced before selling. Do you want to balance the register now?';
         IsEoD: Label 'The %1 %2 indicates that this %1 is being balanced and it can''t be opened at this time.';
         ContinueEoD: Label 'The %1 %2 is marked as being in balancing. Do you want to continue with balancing now?';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -60,7 +61,7 @@ codeunit 6150860 "NPR POS Action: LoginButton"
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        Type := JSON.GetString('type', false);
+        Type := JSON.GetString('type');
 
         POSSession.GetSetup(Setup);
 
@@ -84,7 +85,7 @@ codeunit 6150860 "NPR POS Action: LoginButton"
             'SalespersonCode':
                 begin
 
-                    Password := JSON.GetString('password', true);
+                    Password := JSON.GetStringOrFail('password', StrSubstNo(ReadingErr, ActionCode()));
                     if (DelChr(Password, '<=>', ' ') = '') then
                         Error('Illegal password.');
 
@@ -102,7 +103,7 @@ codeunit 6150860 "NPR POS Action: LoginButton"
 
             'Kiosk':
                 begin
-                    SalespersonCode := JSON.GetStringParameter('SalespersonCode', true);
+                    SalespersonCode := JSON.GetStringParameterOrFail('SalespersonCode', ActionCode());
                     if (SalespersonCode = '') then
                         SalespersonCode := 'KIOSK-01';
 
@@ -112,7 +113,7 @@ codeunit 6150860 "NPR POS Action: LoginButton"
                     OpenPosUnit(FrontEnd, Setup, POSSession);
                 end;
             else
-                FrontEnd.ReportBug(StrSubstNo(Text001, Type));
+                FrontEnd.ReportBugAndThrowError(StrSubstNo(Text001, Type));
         end;
     end;
 
@@ -218,4 +219,3 @@ codeunit 6150860 "NPR POS Action: LoginButton"
         exit(Today - DT2Date(POSWorkshiftCheckpoint."Created At"));
     end;
 }
-

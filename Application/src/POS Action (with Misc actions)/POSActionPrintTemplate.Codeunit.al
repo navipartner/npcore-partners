@@ -1,16 +1,8 @@
 codeunit 6150834 "NPR POS Action: Print Template"
 {
-    // NPR5.37/MMV /20171018 CASE 293503 Created object.
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is a built-in action for running a report';
-        ReportMissingError: Label 'That report was not found.';
-        POSSetup: Codeunit "NPR POS Setup";
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -57,10 +49,10 @@ codeunit 6150834 "NPR POS Action: Print Template"
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('parameters', true);
+        JSON.SetScopeParameters(ActionCode());
 
-        Template := JSON.GetString('Template', true);
-        RecordSetting := JSON.GetInteger('Record', true);
+        Template := JSON.GetStringOrFail('Template', StrSubstNo(ReadingErr, ActionCode()));
+        RecordSetting := JSON.GetIntegerOrFail('Record', StrSubstNo(ReadingErr, ActionCode()));
 
         case RecordSetting of
             RecordSetting::"Sale Line POS":
@@ -85,4 +77,3 @@ codeunit 6150834 "NPR POS Action: Print Template"
         Handled := true;
     end;
 }
-

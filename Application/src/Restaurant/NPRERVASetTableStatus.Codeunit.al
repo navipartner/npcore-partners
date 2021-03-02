@@ -37,8 +37,8 @@ codeunit 6150685 "NPR NPRE RVA: Set Table Status"
 
         Handled := true;
 
-        SeatingCode := Context.GetStringParameter('SeatingCode', true);
-        NewStatusCode := Context.GetStringParameter('StatusCode', false);
+        SeatingCode := Context.GetStringParameterOrFail('SeatingCode', ActionCode());
+        NewStatusCode := Context.GetStringParameter('StatusCode');
         if NewStatusCode = '' then
             exit;
 

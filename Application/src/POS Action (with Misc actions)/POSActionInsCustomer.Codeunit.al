@@ -48,8 +48,8 @@ codeunit 6150726 "NPR POSAction: Ins. Customer"
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('parameters', true);
-        CardPageId := JSON.GetInteger('CardPageId', false);
+        JSON.SetScopeParameters(ActionCode());
+        CardPageId := JSON.GetInteger('CardPageId');
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);

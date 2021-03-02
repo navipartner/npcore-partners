@@ -9,6 +9,8 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         Text005: Label 'Nothing to return';
         Text006: Label 'The amount of %1 is less that the Minimum Amount allowed (%2) to create a Voucher';
         Text007: Label 'Minimum Amount for %1 %2 is %3';
+        ReadingErr: Label 'reading in %1';
+        SettingScopeErr: Label 'setting scope in %1';
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
     local procedure OnDiscoverActions(var Sender: Record "NPR POS Action")
@@ -148,7 +150,7 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         ReturnAmount := SaleAmount - PaidAmount;
 
         Context.InitializeJObjectParser(Parameters, FrontEnd);
-        VoucherTypeCode := Context.GetString('VoucherTypeCode', false);
+        VoucherTypeCode := Context.GetString('VoucherTypeCode');
         NpRvVoucherType.Get(VoucherTypeCode);
         POSPaymentMethod.Get(NpRvVoucherType."Payment Type");
         if POSPaymentMethod."Rounding Precision" > 0 then
@@ -268,8 +270,8 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         if Abs(Subtotal) > Abs(POSSetup.AmountRoundingPrecision()) then
             exit;
 
-        JSON.SetScope('parameters', true);
-        VoucherTypeCode := UpperCase(JSON.GetString('VoucherTypeCode', true));
+        JSON.SetScopeParameters(ActionCode());
+        VoucherTypeCode := UpperCase(JSON.GetStringOrFail('VoucherTypeCode', StrSubstNo(ReadingErr, ActionCode())));
         NpRvVoucherType.Get(VoucherTypeCode);
         if not POSPaymentMethod.Get(NpRvVoucherType."Payment Type") then
             exit;
@@ -304,16 +306,16 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         SaleAmount: Decimal;
         SubTotal: Decimal;
     begin
-        JSON.SetScope('/', true);
-        Amount := JSON.GetDecimal('ReturnVoucherAmount', true);
+        JSON.SetScopeRoot();
+        Amount := JSON.GetDecimalOrFail('ReturnVoucherAmount', StrSubstNo(ReadingErr, ActionCode()));
         if Amount = 0 then
             exit;
 
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, SubTotal);
 
-        JSON.SetScope('/', true);
-        VoucherTypeCode := UpperCase(JSON.GetString('VoucherTypeCode', true));
+        JSON.SetScopeRoot();
+        VoucherTypeCode := UpperCase(JSON.GetStringOrFail('VoucherTypeCode', StrSubstNo(ReadingErr, ActionCode())));
         VoucherType.Get(VoucherTypeCode);
 
         ReturnAmount := PaidAmount - SaleAmount;
@@ -367,15 +369,15 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
                     NpRvSalesLine.Validate("Contact No.", SalePOS."Customer No.");
                 end;
         end;
-        JSON.SetScope('/', true);
-        NpRvSalesLine."Send via Print" := JSON.GetBoolean('SendMethodPrint', false);
-        NpRvSalesLine."Send via E-mail" := JSON.GetBoolean('SendMethodEmail', false);
-        NpRvSalesLine."Send via SMS" := JSON.GetBoolean('SendMethodSMS', false);
-        if JSON.SetScope('$send_method_email', false) then
-            NpRvSalesLine."E-mail" := CopyStr(JSON.GetString('input', false), 1, MaxStrLen(NpRvSalesLine."E-mail"));
-        JSON.SetScope('/', true);
-        if JSON.SetScope('$send_method_sms', false) then
-            NpRvSalesLine."Phone No." := CopyStr(JSON.GetString('input', false), 1, MaxStrLen(NpRvSalesLine."Phone No."));
+        JSON.SetScopeRoot();
+        NpRvSalesLine."Send via Print" := JSON.GetBoolean('SendMethodPrint');
+        NpRvSalesLine."Send via E-mail" := JSON.GetBoolean('SendMethodEmail');
+        NpRvSalesLine."Send via SMS" := JSON.GetBoolean('SendMethodSMS');
+        if JSON.SetScope('$send_method_email') then
+            NpRvSalesLine."E-mail" := CopyStr(JSON.GetString('input'), 1, MaxStrLen(NpRvSalesLine."E-mail"));
+        JSON.SetScopeRoot();
+        if JSON.SetScope('$send_method_sms') then
+            NpRvSalesLine."Phone No." := CopyStr(JSON.GetString('input'), 1, MaxStrLen(NpRvSalesLine."Phone No."));
         NpRvSalesLine."Voucher No." := TempVoucher."No.";
         NpRvSalesLine."Reference No." := TempVoucher."Reference No.";
         NpRvSalesLine.Description := TempVoucher.Description;
@@ -405,7 +407,7 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         if not SelectVoucherType(VoucherTypeCode) then
             Error('');
 
-        JSON.SetScope('parameters', true);
+        JSON.SetScopeParameters(ActionCode());
         JSON.SetContext('VoucherTypeCode', VoucherTypeCode);
         FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
@@ -417,14 +419,14 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         VoucherTypeCode: Text;
         Amount: Decimal;
     begin
-        JSON.SetScope('/', true);
-        VoucherTypeCode := UpperCase(JSON.GetString('VoucherTypeCode', true));
+        JSON.SetScopeRoot();
+        VoucherTypeCode := UpperCase(JSON.GetStringOrFail('VoucherTypeCode', StrSubstNo(ReadingErr, ActionCode())));
         VoucherType.Get(VoucherTypeCode);
         POSPaymentMethod.Get(VoucherType."Payment Type");
 
-        JSON.SetScope('/', true);
-        JSON.SetScope('$amt_input', true);
-        Amount := JSON.GetDecimal('numpad', true);
+        JSON.SetScopeRoot();
+        JSON.SetScope('$amt_input', StrSubstNo(SettingScopeErr, ActionCode()));
+        Amount := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, ActionCode()));
         if POSPaymentMethod."Rounding Precision" > 0 then
             Amount := Round(Amount, POSPaymentMethod."Rounding Precision");
 
@@ -462,7 +464,7 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         VoucherTypeCode: Text;
         Selection: Integer;
     begin
-        VoucherTypeCode := CopyStr(UpperCase(JSON.GetString('VoucherTypeCode', true)), 1, MaxStrLen(VoucherType.Code));
+        VoucherTypeCode := CopyStr(UpperCase(JSON.GetStringOrFail('VoucherTypeCode', StrSubstNo(ReadingErr, ActionCode()))), 1, MaxStrLen(VoucherType.Code));
         VoucherType.Get(VoucherTypeCode);
 
         POSSession.GetSale(POSSale);

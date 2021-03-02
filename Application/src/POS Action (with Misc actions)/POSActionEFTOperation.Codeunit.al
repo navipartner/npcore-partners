@@ -1,17 +1,5 @@
 codeunit 6150846 "NPR POS Action: EFT Operation"
 {
-    // NPR5.46/MMV /20181008 CASE 290734 Created object
-    // NPR5.48/MMV /20181221 CASE 340754 Added new list operation types for refund, void, lookup.
-    // NPR5.48/MMV /20190123 CASE 341237 Added support for new pause/resume skip events.
-    // NPR5.51/MMV /20190603 CASE 355433 Moved UnpauseWorkflowAfterResponse away from this codeunit
-    // NPR5.51/MMV /20190628 CASE 359385 Added support for giftcard load
-    // NPR5.54/MMV /20200226 CASE 364340 Consolidated pause/skip behaviour & all request types.
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is a template for POS Action';
         ERROR_SESSION: Label 'Critical Error: Session object could not be retrieved for EFT Operation';
@@ -25,7 +13,7 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.1'); //-+NPR5.48
+        exit('1.1');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -78,9 +66,9 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        OperationType := JSON.GetIntegerParameter('OperationType', true);
-        EftType := JSON.GetStringParameter('EftType', true);
-        PaymentType := JSON.GetStringParameter('PaymentType', true);
+        OperationType := JSON.GetIntegerParameterOrFail('OperationType', ActionCode());
+        EftType := JSON.GetStringParameterOrFail('EftType', ActionCode());
+        PaymentType := JSON.GetStringParameterOrFail('PaymentType', ActionCode());
 
         if PaymentType = '' then
             Error(ERROR_MISSING_PARAM, 'PaymentType');
@@ -93,52 +81,40 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
                 ReprintLastTransaction(EFTSetup, SalePOS);
             OperationType::LookupLast:
                 LookupLastTransaction(EFTSetup, SalePOS, FrontEnd);
-            //-NPR5.54 [364340]
             OperationType::OpenConn:
                 EFTTransactionMgt.StartBeginWorkshift(EFTSetup, SalePOS);
             OperationType::CloseConn:
                 EFTTransactionMgt.StartEndWorkshift(EFTSetup, SalePOS);
             OperationType::VerifySetup:
                 EFTTransactionMgt.StartVerifySetup(EFTSetup, SalePOS);
-            //+NPR5.54 [364340]
             OperationType::ShowTransactions:
                 ShowTransactions(EFTSetup, SalePOS);
             OperationType::AuxOperation:
                 begin
                     EFTSetup.TestField("EFT Integration Type", EftType);
-                    AuxId := JSON.GetIntegerParameter('AuxId', true);
-                    //-NPR5.54 [364340]
+                    AuxId := JSON.GetIntegerParameterOrFail('AuxId', ActionCode());
                     EFTTransactionMgt.StartAuxOperation(EFTSetup, SalePOS, AuxId);
-                    //+NPR5.54 [364340]
                 end;
             OperationType::LookupSpecific:
                 begin
-                    EntryNo := JSON.GetIntegerParameter('EntryNo', true);
-                    //-NPR5.54 [364340]
+                    EntryNo := JSON.GetIntegerParameterOrFail('EntryNo', ActionCode());
                     EFTTransactionMgt.StartLookup(EFTSetup, SalePOS, EntryNo);
-                    //+NPR5.54 [364340]
                 end;
             OperationType::VoidSpecific:
                 begin
-                    EntryNo := JSON.GetIntegerParameter('EntryNo', true);
-                    //-NPR5.54 [364340]
+                    EntryNo := JSON.GetIntegerParameterOrFail('EntryNo', ActionCode());
                     EFTTransactionMgt.StartVoid(EFTSetup, SalePOS, EntryNo, true);
-                    //+NPR5.54 [364340]
                 end;
             OperationType::RefundSpecific:
                 begin
-                    EntryNo := JSON.GetIntegerParameter('EntryNo', true);
-                    //-NPR5.54 [364340]
+                    EntryNo := JSON.GetIntegerParameterOrFail('EntryNo', ActionCode());
                     EFTTransactionMgt.StartReferencedRefund(EFTSetup, SalePOS, '', 0, EntryNo);
-                    //+NPR5.54 [364340]
                 end;
             OperationType::LookupList:
                 begin
                     if not SelectTransaction(EFTTransactionRequest) then
                         exit;
-                    //-NPR5.54 [364340]
                     EFTTransactionMgt.StartLookup(EFTSetup, SalePOS, EFTTransactionRequest."Entry No.");
-                    //+NPR5.54 [364340]
                 end;
             OperationType::VoidList:
                 begin
@@ -146,17 +122,13 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
                         exit;
                     if not VoidConfirm(EFTTransactionRequest) then
                         exit;
-                    //-NPR5.54 [364340]
                     EFTTransactionMgt.StartVoid(EFTSetup, SalePOS, EFTTransactionRequest."Entry No.", true);
-                    //+NPR5.54 [364340]
                 end;
             OperationType::RefundList:
                 begin
                     if not SelectTransaction(EFTTransactionRequest) then
                         exit;
-                    //-NPR5.54 [364340]
                     EFTTransactionMgt.StartReferencedRefund(EFTSetup, SalePOS, '', 0, EFTTransactionRequest."Entry No.");
-                    //+NPR5.54 [364340]
                 end;
         end;
     end;
@@ -174,14 +146,10 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
         Continue: Boolean;
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
     begin
-        //-NPR5.54 [364340]
         GetLastFinancialTransaction(LastEFTTransactionRequest, EFTSetup, SalePOS, false);
-        //+NPR5.54 [364340]
         if not VoidConfirm(LastEFTTransactionRequest) then
             Error('');
-        //-NPR5.54 [364340]
         EFTTransactionMgt.StartVoid(EFTSetup, SalePOS, LastEFTTransactionRequest."Entry No.", true);
-        //+NPR5.54 [364340]
     end;
 
     local procedure ReprintLastTransaction(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR Sale POS")
@@ -190,9 +158,7 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         LastEFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
-        //-NPR5.54 [364340]
         GetLastFinancialTransaction(LastEFTTransactionRequest, EFTSetup, SalePOS, true);
-        //+NPR5.54 [364340]
         LastEFTTransactionRequest.PrintReceipts(true);
     end;
 
@@ -203,10 +169,8 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
         LastEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
     begin
-        //-NPR5.54 [364340]
         GetLastFinancialTransaction(LastEFTTransactionRequest, EFTSetup, SalePOS, true);
         EFTTransactionMgt.StartLookup(EFTSetup, SalePOS, LastEFTTransactionRequest."Entry No.");
-        //+NPR5.54 [364340]
     end;
 
     local procedure ShowTransactions(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR Sale POS")
@@ -223,7 +187,6 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
     begin
         EFTTransactionRequest.SetRange("Register No.", SalePOS."Register No.");
         EFTTransactionRequest.SetRange("Integration Type", EFTSetup."EFT Integration Type");
-        //-NPR5.54 [364340]
         if IncludeVoidRequests then begin
             EFTTransactionRequest.SetFilter("Processing Type", '%1|%2|%3|%4',
                 EFTTransactionRequest."Processing Type"::PAYMENT,
@@ -236,7 +199,6 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
                 EFTTransactionRequest."Processing Type"::REFUND,
                 EFTTransactionRequest."Processing Type"::GIFTCARD_LOAD);
         end;
-        //+NPR5.54 [364340]
         EFTTransactionRequest.FindLast;
     end;
 
@@ -383,4 +345,3 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
         end;
     end;
 }
-

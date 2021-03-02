@@ -109,13 +109,13 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        FunctionId := JSON.GetIntegerParameter('Function', true);
+        FunctionId := JSON.GetIntegerParameterOrFail('Function', ActionCode());
         if (FunctionId < 0) then
             FunctionId := 0;
 
-        DefaultInputValue := JSON.GetStringParameter('DefaultInputValue', true);
+        DefaultInputValue := JSON.GetStringParameterOrFail('DefaultInputValue', ActionCode());
 
-        DialogPrompt := JSON.GetIntegerParameter('DialogPrompt', true);
+        DialogPrompt := JSON.GetIntegerParameterOrFail('DialogPrompt', ActionCode());
         if (DialogPrompt < 0) then
             DialogPrompt := 1;
 
@@ -698,11 +698,11 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     local procedure GetInput(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
     begin
 
-        JSON.SetScope('/', true);
-        if (not JSON.SetScope('$' + Path, false)) then
+        JSON.SetScopeRoot();
+        if (not JSON.SetScope('$' + Path)) then
             exit('');
 
-        exit(JSON.GetString('input', false));
+        exit(JSON.GetString('input'));
     end;
 
     local procedure AddItemToPOS(POSSession: Codeunit "NPR POS Session"; MemberInfoEntryNo: Integer; ExternalItemNo: Code[20]; Description: Text[100]; Description2: Text[100]; Quantity: Decimal; UnitPrice: Decimal; var SaleLinePOS: Record "NPR Sale Line POS")

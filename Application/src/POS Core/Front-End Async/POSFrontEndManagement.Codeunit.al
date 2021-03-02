@@ -124,7 +124,7 @@ codeunit 6150704 "NPR POS Front End Management"
     procedure ContinueAtStep(Step: Text)
     begin
         if CurrentWorkflowID = 0 then
-            ReportBug(StrSubstNo(Text011, Step));
+            ReportBugAndThrowError(StrSubstNo(Text011, Step));
 
         StepToContinueAt := Step;
     end;
@@ -181,7 +181,7 @@ codeunit 6150704 "NPR POS Front End Management"
     local procedure MakeSureFrameworkIsInitialized()
     begin
         if (not Initialized) THEN
-            ReportBug(Text013);
+            ReportBugAndThrowError(Text013);
     end;
 
     local procedure GetBugErrorMessage(Text: Text): Text
@@ -201,7 +201,7 @@ codeunit 6150704 "NPR POS Front End Management"
             exit;
 
         if not POSSession.RetrieveSessionAction(Name, POSAction) then
-            ReportBug(StrSubstNo(Text006, Name));
+            ReportBugAndThrowError(StrSubstNo(Text006, Name));
 
         Button."Action Type" := Button."Action Type"::Action;
         Button."Action Code" := POSAction.Code;
@@ -307,7 +307,7 @@ codeunit 6150704 "NPR POS Front End Management"
         Request.GetView(RequestView);
 
         if RequestView.Type = RequestView.Type::Uninitialized then
-            ReportBug(StrSubstNo(Text003, ViewType));
+            ReportBugAndThrowError(StrSubstNo(Text003, ViewType));
 
         POSSession.GetCurrentView(CurrView);
         case ViewType of
@@ -379,7 +379,11 @@ codeunit 6150704 "NPR POS Front End Management"
         InvokeFrontEndAsync(Request);
     end;
 
-    procedure ReportBug(ErrorText: Text)
+    /// <summary>
+    /// Reports a bug in AL code to the front-end, and then stops transaction with a runtime error.
+    /// </summary>
+    /// <param name="ErrorText"></param>
+    procedure ReportBugAndThrowError(ErrorText: Text)
     var
         Request: Codeunit "NPR Front-End: ReportBug";
     begin
@@ -732,12 +736,12 @@ codeunit 6150704 "NPR POS Front End Management"
         ErrorText: Text;
     begin
         if CurrentWorkflowID = 0 then
-            ReportBug(Text008);
+            ReportBugAndThrowError(Text008);
 
         if PausedWorkflowID > 0 then begin
             ErrorText := StrSubstNo(Text009, PausedWorkflowID, CurrentWorkflowID);
             AbortWorkflows();
-            ReportBug(ErrorText);
+            ReportBugAndThrowError(ErrorText);
         end;
 
         Pausing := true;
@@ -799,12 +803,12 @@ codeunit 6150704 "NPR POS Front End Management"
         ErrorText: Text;
     begin
         if PausedWorkflowID = 0 then
-            ReportBug(Text012);
+            ReportBugAndThrowError(Text012);
 
         if (CurrentWorkflowID <> PausedWorkflowID) and (CurrentWorkflowID <> 0) then begin
             ErrorText := StrSubstNo(Text010, PausedWorkflowID, CurrentWorkflowID);
             AbortWorkflows();
-            ReportBug(ErrorText);
+            ReportBugAndThrowError(ErrorText);
         end;
 
         MakeSureFrameworkIsInitialized();

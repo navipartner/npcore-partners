@@ -1,12 +1,5 @@
 codeunit 6150844 "NPR POS Action: Postcode Stats"
 {
-    // NPR5.39/TSA /20180126 CASE 303399 Initial Version
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This action prompts for a post code and store it on the sales header';
         ValueSelection: Option LIST,"FIXED";
@@ -94,14 +87,10 @@ codeunit 6150844 "NPR POS Action: Postcode Stats"
 
     local procedure GetNumpad(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
     begin
-
-        if (not JSON.SetScopeRoot(false)) then
+        JSON.SetScopeRoot();
+        if (not JSON.SetScope('$' + Path)) then
             exit('');
 
-        if (not JSON.SetScope('$' + Path, false)) then
-            exit('');
-
-        exit(JSON.GetString('input', false));
+        exit(JSON.GetString('input'));
     end;
 }
-

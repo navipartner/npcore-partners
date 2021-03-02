@@ -62,7 +62,7 @@ codeunit 6014493 "NPR MPOS Admission API"
         JSONtext := BuildJSONParams(MPOSProfile."Ticket Admission Web Url", '', '', '', Err_AdmissionFailed);
 
         JSONMgr.InitializeJObjectParser(Context, FrontEnd);
-        AdmissionCode := JSONMgr.GetStringParameter('AdmissionCode', false);
+        AdmissionCode := JSONMgr.GetStringParameter('AdmissionCode');
         JSBridge.SetParameters('Admission', JSONtext, AdmissionCode);
 
         JSBridge.RunModal;

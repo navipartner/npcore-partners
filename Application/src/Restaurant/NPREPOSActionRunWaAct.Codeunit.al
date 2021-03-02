@@ -57,9 +57,9 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        WPadAction := JSON.GetIntegerParameter('WaiterPadAction', true);
-        ClearSaleOnFinish := JSON.GetBooleanParameter('MoveSaleToWPadOnFinish', false);
-        ReturnToDefaultView := JSON.GetBooleanParameter('ReturnToDefaultView', false);
+        WPadAction := JSON.GetIntegerParameterOrFail('WaiterPadAction', ActionCode());
+        ClearSaleOnFinish := JSON.GetBooleanParameter('MoveSaleToWPadOnFinish');
+        ReturnToDefaultView := JSON.GetBooleanParameter('ReturnToDefaultView');
         if ReturnToDefaultView then
             ClearSaleOnFinish := true;
 
@@ -80,7 +80,7 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
 
                 WPadAction::"Send Kitchen Order":
                     begin
-                        WPadLinesToSend := JSON.GetIntegerParameter('LinesToSend', false);
+                        WPadLinesToSend := JSON.GetIntegerParameter('LinesToSend');
                         RestaurantPrint.PrintWaiterPadPreOrderToKitchenPressed(WaiterPad, WPadLinesToSend = WPadLinesToSend::All);
                     end;
 
@@ -91,7 +91,7 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
 
                 WPadAction::"Request Specific Serving":
                     begin
-                        ServingStepToRequest := JSON.GetStringParameter('ServingStep', false);
+                        ServingStepToRequest := JSON.GetStringParameter('ServingStep');
                         if ServingStepToRequest = '' then
                             if not LookupServingStep(ServingStepToRequest) then
                                 Error('');

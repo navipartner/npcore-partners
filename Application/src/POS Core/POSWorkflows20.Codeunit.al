@@ -114,7 +114,7 @@ codeunit 6150733 "NPR POS Workflows 2.0"
         POSSession.SetInAction(false);
 
         if not Handled then
-            FrontEnd20.ReportBug(StrSubstNo(Text001, Action));
+            FrontEnd20.ReportBugAndThrowError(StrSubstNo(Text001, Action));
 
         if Success then begin
             OnAfterInvokeAction(POSAction, WorkflowStep, Context, POSSession, FrontEnd20);

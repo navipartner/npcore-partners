@@ -72,7 +72,7 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if (not ItemAddOn.Get(Context.GetStringParameter('ItemAddOnNo', false))) then begin
+        if (not ItemAddOn.Get(Context.GetStringParameter('ItemAddOnNo'))) then begin
             if (SaleLinePOS.Type <> SaleLinePOS.Type::Item) then
                 exit;
             if (not Item.Get(SaleLinePOS."No.")) then
@@ -202,7 +202,7 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
         POSSession.GetSaleLine(POSSaleLine);
 
         MasterLineNumber := 0;
-        if (not ItemAddOn.Get(Context.GetStringParameter('ItemAddOnNo', false))) then begin
+        if (not ItemAddOn.Get(Context.GetStringParameter('ItemAddOnNo'))) then begin
             POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
             if (SaleLinePOS.Type <> SaleLinePOS.Type::Item) then
                 exit;
@@ -213,13 +213,13 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
             MasterLineNumber := SaleLinePOS."Line No.";
         end;
 
-        if (not Context.SetScope('userSelectedAddons', false)) then
+        if (not Context.SetScope('userSelectedAddons')) then
             exit;
 
         ItemAddOnLine.SetRange("AddOn No.", ItemAddOn."No.");
         if (ItemAddOnLine.FindSet()) then begin
             repeat
-                UserValue := Context.GetString(Format(ItemAddOnLine."Line No.", 0, 9), false);
+                UserValue := Context.GetString(Format(ItemAddOnLine."Line No.", 0, 9));
 
                 case ItemAddOnLine.Type of
                     ItemAddOnLine.Type::Quantity:
@@ -229,7 +229,7 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
                 end;
 
                 // Check if there is comment value
-                UserValue := Context.GetString(StrSubstNo('%1_text', Format(ItemAddOnLine."Line No.", 0, 9)), false);
+                UserValue := Context.GetString(StrSubstNo('%1_text', Format(ItemAddOnLine."Line No.", 0, 9)));
                 ApplyUserComment(UserValue, ItemAddOn, POSSaleLine);
 
             until (ItemAddOnLine.Next() = 0);

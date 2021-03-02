@@ -13,6 +13,12 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         WPInAnotherSale: Label 'Waiter pad %1 (seating %2) is being processed in another sale at the moment. If you continue, you will get only lines, which were not copied to the other sale.\Are you sure you want to continue?';
         CannotParkWPSale: Label 'Waiter pad related transaction cannot be parked. Please finish your work with the sale by moving it to the waiter pad instead.';
         SplitCancelled: Label 'The split process has been aborted.';
+        ReadingErr: Label 'reading in %1';
+
+    local procedure ObjectIdentifier(): Text
+    begin
+        exit('Codeunit Waiter Pad POS Mgt.');
+    end;
 
     procedure SplitBill(WaiterPad: Record "NPR NPRE Waiter Pad"; POSSession: Codeunit "NPR POS Session"; NumberOfGuests: Integer; CopyToSale: Boolean)
     var
@@ -526,15 +532,15 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         LocationFilter: Text;
         SeatingFilter: Text;
     begin
-        RestaurantCode := CopyStr(JSON.GetString('restaurantCode', false), 1, MaxStrLen(RestaurantCode));
+        RestaurantCode := CopyStr(JSON.GetString('restaurantCode'), 1, MaxStrLen(RestaurantCode));
         SeatingCode := GetSeatingCode(JSON, RestaurantCode);
         NPRESeating.Get(SeatingCode);
 
-        if not JSON.SetScope('parameters', false) then
+        if not JSON.SetScope('parameters') then
             exit;
 
-        SeatingFilter := JSON.GetString('SeatingFilter', false);
-        LocationFilter := JSON.GetString('LocationFilter', false);
+        SeatingFilter := JSON.GetString('SeatingFilter');
+        LocationFilter := JSON.GetString('LocationFilter');
         if LocationFilter = '' then
             LocationFilter := SeatingManagement.RestaurantSeatingLocationFilter(RestaurantCode);
         if (SeatingFilter <> '') or (LocationFilter <> '') then begin
@@ -553,22 +559,22 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
         LocationFilter: Text;
         NPRESeating: Record "NPR NPRE Seating";
     begin
-        SeatingCode := CopyStr(UpperCase(JSON.GetString('seatingCode', false)), 1, MaxStrLen(SeatingCode));
+        SeatingCode := CopyStr(UpperCase(JSON.GetString('seatingCode')), 1, MaxStrLen(SeatingCode));
         if SeatingCode <> '' then
             exit(SeatingCode);
 
-        JSON.SetScope('/', true);
-        JSON.SetScope('parameters', true);
-        if JSON.GetInteger('InputType', true) <> 2 then
+        JSON.SetScopeRoot();
+        JSON.SetScopeParameters(ObjectIdentifier());
+        if JSON.GetIntegerOrFail('InputType', StrSubstNo(ReadingErr, ObjectIdentifier())) <> 2 then
             exit('');
 
-        if JSON.GetBoolean('ShowOnlyActiveWaiPad', false) then begin
+        if JSON.GetBoolean('ShowOnlyActiveWaiPad') then begin
             NPRESeating.SetAutoCalcFields("Current Waiter Pad FF");
             NPRESeating.SetFilter("Current Waiter Pad FF", '<>%1', '');
             SeatingManagement.SetAddSeatingFilters(NPRESeating);
         end;
-        SeatingFilter := JSON.GetString('SeatingFilter', true);
-        LocationFilter := JSON.GetString('LocationFilter', true);
+        SeatingFilter := JSON.GetStringOrFail('SeatingFilter', StrSubstNo(ReadingErr, ObjectIdentifier()));
+        LocationFilter := JSON.GetStringOrFail('LocationFilter', StrSubstNo(ReadingErr, ObjectIdentifier()));
         if LocationFilter = '' then
             LocationFilter := SeatingManagement.RestaurantSeatingLocationFilter(RestaurantCode);
         SeatingCode := SeatingManagement.UILookUpSeating(SeatingFilter, LocationFilter);
