@@ -17,11 +17,6 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the NPR Pay-to E-mail field';
             }
-            field("NPR Document Processing"; "NPR Document Processing")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the NPR Document Processing field';
-            }
             field("NPR Sell-to Customer Name"; "NPR Sell-to Customer Name")
             {
                 ApplicationArea = All;

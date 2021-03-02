@@ -58,12 +58,6 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the NPR Bill-to E-mail field';
             }
-            field("NPR Document Processing"; "NPR Document Processing")
-            {
-                ApplicationArea = All;
-                Editable = false;
-                ToolTip = 'Specifies the value of the NPR Document Processing field';
-            }
         }
     }
     actions
@@ -111,7 +105,7 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
                 Caption = 'Consignor Label';
                 ApplicationArea = All;
                 ToolTip = 'Executes the Consignor Label action';
-                Image = Print; 
+                Image = Print;
             }
         }
     }

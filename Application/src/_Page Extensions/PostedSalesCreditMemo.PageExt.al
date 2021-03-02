@@ -54,12 +54,6 @@ pageextension 6014407 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the NPR Bill-to E-mail field';
             }
-            field("NPR Document Processing"; "NPR Document Processing")
-            {
-                ApplicationArea = All;
-                Editable = false;
-                ToolTip = 'Specifies the value of the NPR Document Processing field';
-            }
         }
     }
     actions

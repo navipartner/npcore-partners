@@ -9,7 +9,7 @@ report 6014550 "NPR Statement E-Mail"
     {
         dataitem(Customer; Customer)
         {
-            DataItemTableView = SORTING("No.") WHERE("NPR Document Processing" = FILTER(Email | PrintAndEmail));
+            DataItemTableView = SORTING("No.");
             RequestFilterFields = "No.", "Search Name", "Print Statements", "Currency Filter";
 
             trigger OnAfterGetRecord()
@@ -17,6 +17,7 @@ report 6014550 "NPR Statement E-Mail"
                 EmailAttachmentTemp: Record "NPR E-mail Attachment" temporary;
                 EmailTemplateHeader: Record "NPR E-mail Template Header";
                 ReportSelections: Record "Report Selections";
+                DocSendProfile: Record "Document Sending Profile";
                 EmailMgt: Codeunit "NPR E-mail Management";
                 RecRef: RecordRef;
                 FldRef: FieldRef;
@@ -26,6 +27,10 @@ report 6014550 "NPR Statement E-Mail"
                 Filename: Text[50];
                 SendToEmail: Text[250];
             begin
+                DocSendProfile.GetDefaultForCustomer(Customer."No.", DocSendProfile);
+                if DocSendProfile."E-Mail" = DocSendProfile."E-Mail"::No then
+                    CurrReport.Skip();
+
                 RecRef.GetTable(Customer);
                 ReportGenerated := false;
                 ReportSelections.SetRange(Usage, ReportSelections.Usage::"C.Statement");

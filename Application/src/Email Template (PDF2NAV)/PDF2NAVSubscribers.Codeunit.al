@@ -7,7 +7,6 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     begin
         if Customer.Get(Rec."Bill-to Customer No.") then begin
             Rec."NPR Bill-to E-mail" := Customer."E-Mail";
-            Rec."NPR Document Processing" := Customer."NPR Document Processing";
         end;
     end;
 
@@ -18,7 +17,6 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     begin
         if Vendor.Get(Rec."Pay-to Vendor No.") then begin
             Rec."NPR Pay-to E-mail" := Vendor."E-Mail";
-            Rec."NPR Document Processing" := Vendor."NPR Document Processing";
         end;
     end;
 
