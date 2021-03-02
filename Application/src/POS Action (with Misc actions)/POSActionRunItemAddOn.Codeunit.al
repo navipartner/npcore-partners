@@ -54,7 +54,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        BaseLineNo := JSON.GetIntegerParameter('BaseLineNo', false);
+        BaseLineNo := JSON.GetIntegerParameter('BaseLineNo');
 
         case WorkflowStep of
             'run_addons':

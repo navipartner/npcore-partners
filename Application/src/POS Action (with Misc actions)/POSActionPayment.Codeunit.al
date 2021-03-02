@@ -1,10 +1,5 @@
 codeunit 6150725 "NPR POS Action: Payment"
 {
-    // 
-    // This is the main POS Action for handling payments. To extend payment functionality, subscribe to the events
-    //  - OnBeforeActionWorkflow: to adapt the workflow to suit your payment method
-    //  - OnBeforeAction: to handle the payment before NPR does. When Handled == TRUE, NPR will not bother with the paymentmethod
-    //  - OnAfterAction:  to change NPR behaviour or provide functionality where NPR does not
     var
         ActionDescription: Label 'This is a built-in action for inserting a payment line into the current transaction';
         Setup: Codeunit "NPR POS Setup";
@@ -13,6 +8,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         TextVoucherLabel: Label 'Enter Voucher Number:';
         MissingImpl: Label 'Payment failed!\%1 = %2, %3 = %4 on %5 = %6 did not respond with being handled.\\Check the setup for %1 and %5.';
         NO_SALES_LINES: Label 'There are no sales lines in the POS. You must add at least one sales line before handling payment.';
+        ReadingErr: Label 'reading in %1';
 
     procedure ActionCode(): Text
     begin
@@ -105,7 +101,7 @@ codeunit 6150725 "NPR POS Action: Payment"
             POSSession.ChangeViewPayment();
 
         JSON.InitializeJObjectParser(Parameters, FrontEnd);
-        PaymentNo := JSON.GetString('paymentNo', true);
+        PaymentNo := JSON.GetStringOrFail('paymentNo', StrSubstNo(ReadingErr, ActionCode()));
 
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
@@ -219,8 +215,8 @@ codeunit 6150725 "NPR POS Action: Payment"
 
         POSSession.GetSetup(Setup);
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('parameters', true);
-        PaymentMethodCode := JSON.GetString('paymentNo', true);
+        JSON.SetScopeParameters(ActionCode());
+        PaymentMethodCode := JSON.GetStringOrFail('paymentNo', StrSubstNo(ReadingErr, ActionCode()));
 
         POSSession.GetPaymentLine(POSPaymentLine);
         if not POSPaymentMethod.Get(PaymentMethodCode) then
@@ -550,9 +546,9 @@ codeunit 6150725 "NPR POS Action: Payment"
         AmountToCapture: Decimal;
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        AmountToCapture := JSON.GetDecimal('amounttocapture', false);
-        if JSON.SetScope('$amount', false) then begin
-            AmountToCapture := JSON.GetDecimal('numpad', true);
+        AmountToCapture := JSON.GetDecimal('amounttocapture');
+        if JSON.SetScope('$amount') then begin
+            AmountToCapture := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, ActionCode()));
         end;
         exit(AmountToCapture);
     end;
@@ -562,8 +558,8 @@ codeunit 6150725 "NPR POS Action: Payment"
         JSON: Codeunit "NPR POS JSON Management";
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        if JSON.SetScope('$voucher', false) then begin
-            exit(JSON.GetString('input', true));
+        if JSON.SetScope('$voucher') then begin
+            exit(JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, ActionCode())));
         end;
         exit('');
     end;

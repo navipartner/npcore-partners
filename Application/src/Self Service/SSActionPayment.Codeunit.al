@@ -57,7 +57,7 @@ codeunit 6151291 "NPR SS Action: Payment"
         ForceAmount: Decimal;
     begin
         POSSession.GetSetup(POSSetup);
-        POSPaymentMethod.Get(Context.GetStringParameter('PaymentType', true));
+        POSPaymentMethod.Get(Context.GetStringParameterOrFail('PaymentType', ActionCode()));
 
         OnGetPaymentHandler(POSPaymentMethod, PaymentHandlerWorkflow, ForceAmount);
         if PaymentHandlerWorkflow = '' then begin
@@ -84,7 +84,7 @@ codeunit 6151291 "NPR SS Action: Payment"
         POSSession.GetSetup(POSSetup);
         POSSession.GetSale(POSSale);
 
-        POSPaymentMethod.Get(Context.GetStringParameter('PaymentType', true));
+        POSPaymentMethod.Get(Context.GetStringParameterOrFail('PaymentType', ActionCode()));
         ReturnPOSPaymentMethod.Get(POSPaymentMethod."Return Payment Method Code");
 
         POSSale.TryEndSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod);

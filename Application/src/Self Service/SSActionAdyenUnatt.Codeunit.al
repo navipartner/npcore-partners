@@ -3,6 +3,7 @@ codeunit 6184544 "NPR SS Action - Adyen Unatt."
     var
         ActionDescription: Label 'Adyen Cloud Unattended Transaction';
         DIALOG_CAPTION: Label 'Continue on terminal';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -91,7 +92,7 @@ codeunit 6184544 "NPR SS Action - Adyen Unatt."
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EftEntryNo: Integer;
     begin
-        EftEntryNo := Context.GetInteger('entryNo', true);
+        EftEntryNo := Context.GetIntegerOrFail('entryNo', StrSubstNo(ReadingErr, ActionCode()));
         EFTTransactionRequest.Get(EftEntryNo);
 
         EFTAdyenCloudProtocol.SendEftDeviceRequest(EFTTransactionRequest, false);
@@ -107,7 +108,7 @@ codeunit 6184544 "NPR SS Action - Adyen Unatt."
         EFTTrxBackgroundSessionMgt: Codeunit "NPR EFT Trx Bgd. Session Mgt";
         EftEntryNo: Integer;
     begin
-        EftEntryNo := Context.GetInteger('entryNo', true);
+        EftEntryNo := Context.GetIntegerOrFail('entryNo', StrSubstNo(ReadingErr, ActionCode()));
         if not EFTTrxBackgroundSessionMgt.ResponseExists(EftEntryNo) then
             exit(false);
 
@@ -131,4 +132,3 @@ codeunit 6184544 "NPR SS Action - Adyen Unatt."
         exit(DelChr(DIALOG_CAPTION, '=', '"'));
     end;
 }
-

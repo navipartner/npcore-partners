@@ -1,13 +1,5 @@
 codeunit 6150866 "NPR POS Action: Contact Select"
 {
-    // NPR5.50/MMV /20181105 CASE 300557 Created object
-    // NPR5.55/ALPO/20200813 CASE 419139 Front-end was not refreshed properly after multiple contact selection/removal runs
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'Attach or remove Contact from POS sale.';
         ERRDOCTYPE: Label 'Wrong Document Type. Document Type is set to %1. It must be one of %2, %3, %4 or %5';
@@ -65,9 +57,9 @@ codeunit 6150866 "NPR POS Action: Contact Select"
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        ContactTableView := JSON.GetStringParameter('ContactTableView', true);
-        ContactLookupPage := JSON.GetIntegerParameter('ContactLookupPage', true);
-        Operation := JSON.GetIntegerParameter('Operation', true);
+        ContactTableView := JSON.GetStringParameterOrFail('ContactTableView', ActionCode());
+        ContactLookupPage := JSON.GetIntegerParameterOrFail('ContactLookupPage', ActionCode());
+        Operation := JSON.GetIntegerParameterOrFail('Operation', ActionCode());
         case Operation of
             Operation::Attach:
                 AttachContact(POSSession, ContactTableView, ContactLookupPage);
@@ -211,4 +203,3 @@ codeunit 6150866 "NPR POS Action: Contact Select"
         end;
     end;
 }
-

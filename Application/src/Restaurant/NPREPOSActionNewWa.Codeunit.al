@@ -7,6 +7,7 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         Text003: Label 'Open new waiter pad?';
         Text004: Label 'New Waiter Pad';
         NumberOfGuestsLbl: Label 'Number of guests';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -134,7 +135,7 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
 
     local procedure OnActionSetNumberOfGuests(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
-        JSON.SetContext('numberOfGuests', JSON.GetString('numberOfGuests', false));
+        JSON.SetContext('numberOfGuests', JSON.GetString('numberOfGuests'));
         FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
@@ -151,8 +152,8 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         NumberOfGuests: Integer;
         OpenWaiterPad: Boolean;
     begin
-        SeatingCode := JSON.GetString('seatingCode', true);
-        NumberOfGuests := JSON.GetInteger('numberOfGuests', false);
+        SeatingCode := JSON.GetStringOrFail('seatingCode', StrSubstNo(ReadingErr, ActionCode()));
+        NumberOfGuests := JSON.GetInteger('numberOfGuests');
         NPRESeating.Get(SeatingCode);
 
         WaiterPadMgt.AddNewWaiterPadForSeating(NPRESeating.Code, NPREWaiterPad, NPRESeatingWaiterPadLink);

@@ -3,6 +3,7 @@ codeunit 6150667 "NPR NPRE POSAction: Get Wa."
     var
         Text000: Label 'Transfer Waiter Pad to POS Sale';
         ConfirmTableCaption: Label 'Are you sure you want to retrieve from %1?';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -102,7 +103,7 @@ codeunit 6150667 "NPR NPRE POSAction: Get Wa."
     begin
         NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
 
-        if JSON.GetBooleanParameter('WarnBeforeTableRetrieval', false) then
+        if JSON.GetBooleanParameter('WarnBeforeTableRetrieval') then
             if not Confirm(ConfirmTableCaption, true, NPRESeating.Description) then
                 Error('');
 
@@ -134,8 +135,8 @@ codeunit 6150667 "NPR NPRE POSAction: Get Wa."
         WaiterPadNo: Code[20];
     begin
         NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
-        JSON.SetScope('/', true);
-        WaiterPadNo := JSON.GetString('waiterPadNo', true);
+        JSON.SetScopeRoot();
+        WaiterPadNo := JSON.GetStringOrFail('waiterPadNo', StrSubstNo(ReadingErr, ActionCode()));
         NPREWaiterPad.Get(WaiterPadNo);
 
         NPREWaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(NPREWaiterPad, POSSession);

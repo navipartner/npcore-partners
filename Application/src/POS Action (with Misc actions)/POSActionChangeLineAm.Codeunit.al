@@ -1,12 +1,5 @@
 codeunit 6151175 "NPR POS Action: Change LineAm."
 {
-    // NPR5.51/ALST/20190627 CASE 358339 New Item - EAN box event for changing line amount
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescriptionCaption: Label 'This action is used to change line amount VIA EAN Box events';
         NoSaleLineErr: Label 'A sale line must exist in order to change the amount';
@@ -53,7 +46,7 @@ codeunit 6151175 "NPR POS Action: Change LineAm."
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        LineAmount := JSON.GetDecimalParameter('NewLineAmount', true);
+        LineAmount := JSON.GetDecimalParameterOrFail('NewLineAmount', ActionCode());
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -125,4 +118,3 @@ codeunit 6151175 "NPR POS Action: Change LineAm."
         exit('saleprice');
     end;
 }
-

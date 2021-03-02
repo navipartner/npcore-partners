@@ -42,7 +42,7 @@ codeunit 6151281 "NPR SS Action - Qty Decrease"
 
         Handled := true;
 
-        Qty := Context.GetDecimalParameter('decreaseBy', true);
+        Qty := Context.GetDecimalParameterOrFail('decreaseBy', ActionCode());
         DecreaseSalelineQuantity(POSSession, Qty);
     end;
 

@@ -133,6 +133,8 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         POSInfoManagement: Codeunit "NPR POS Info Management";
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR Sale POS";
+        SettingScopeErr: Label 'setting scope in %1';
+        ReadingErr: Label 'reading in %1';
     begin
         if not Action.IsThisAction(ActionCode) then
             exit;
@@ -140,13 +142,13 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         Handled := true;
         JSON.InitializeJObjectParser(Context, FrontEnd);
         //BoardingPassString := JSON.GetStringParameter('BoardingPassString',TRUE);
-        JSON.SetScope('$boardingpass_input', true);
-        BoardingPassString := JSON.GetString('input', true);
-        JSON.SetScope('/', true);
-        RequiredTravelToday := JSON.GetBooleanParameter('RequiredTravelToday', true);
-        RequiredLegAirPortCode := JSON.GetStringParameter('RequiredLegAirPortCode', true);
-        ShowTripMessage := JSON.GetBooleanParameter('ShowTripMessage', true);
-        InfoCode := JSON.GetStringParameter('InfoCode', true);
+        JSON.SetScope('$boardingpass_input', StrSubstNo(SettingScopeErr, ActionCode()));
+        BoardingPassString := JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, ActionCode()));
+        JSON.SetScopeRoot();
+        RequiredTravelToday := JSON.GetBooleanParameterOrFail('RequiredTravelToday', ActionCode());
+        RequiredLegAirPortCode := JSON.GetStringParameterOrFail('RequiredLegAirPortCode', ActionCode());
+        ShowTripMessage := JSON.GetBooleanParameterOrFail('ShowTripMessage', ActionCode());
+        InfoCode := JSON.GetStringParameterOrFail('InfoCode', ActionCode());
 
         DecodeBoardingPassString(BoardingPassString, RequiredLegAirPortCode, RequiredLegAirPortCodeInTrip, RequiredLegAirPortFlightDate, TravelStartDate, TravelEndDate, TravelDescription, TravelSaveString);
 

@@ -1,17 +1,8 @@
 codeunit 6150847 "NPR POS Action: RunPage (Item)"
 {
-    // NPR5.46/MHA /20181001  CASE 326620 Object created - Run Page with Item from Sale Line POS as Source Rec.
-    // NPR5.51/MHA /20190816  CASE 365332 Removed function OnLookupPageId()
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is a built-in action for running a page';
-        PageMissingError: Label 'That page was not found.';
-        POSSetup: Codeunit "NPR POS Setup";
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -70,7 +61,7 @@ codeunit 6150847 "NPR POS Action: RunPage (Item)"
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('parameters', true);
+        JSON.SetScopeParameters(ActionCode());
 
         case WorkflowStep of
             'run_page_item':
@@ -88,7 +79,7 @@ codeunit 6150847 "NPR POS Action: RunPage (Item)"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         PageId: Integer;
     begin
-        PageId := JSON.GetInteger('PageId', true);
+        PageId := JSON.GetIntegerOrFail('PageId', StrSubstNo(ReadingErr, ActionCode()));
         if PageId = 0 then
             exit;
 
@@ -113,4 +104,3 @@ codeunit 6150847 "NPR POS Action: RunPage (Item)"
         PAGE.RunModal(PageId, Item);
     end;
 }
-

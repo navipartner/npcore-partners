@@ -59,7 +59,7 @@ codeunit 6150681 "NPR NPRE RVA: Set R-View"
     var
         POSSale: Codeunit "NPR POS Sale";
     begin
-        if Context.GetBooleanParameter('ReturnToDefaultEndOfSaleView', false) then begin
+        if Context.GetBooleanParameter('ReturnToDefaultEndOfSaleView') then begin
             POSSession.GetSale(POSSale);
             POSSale.SelectViewForEndOfSale(POSSession);
         end else

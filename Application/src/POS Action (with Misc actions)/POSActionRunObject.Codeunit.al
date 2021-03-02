@@ -1,16 +1,8 @@
 codeunit 6150820 "NPR POS Action: Run Object"
 {
-    // NPR5.33/ANEN  /20170607 CASE 270854 Object created to support function for filtererd menu buttons in transcendance pos.
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is a built-in action for running a page';
-        PageMissingError: Label 'That page was not found.';
-        POSSetup: Codeunit "NPR POS Setup";
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -67,9 +59,9 @@ codeunit 6150820 "NPR POS Action: Run Object"
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('parameters', true);
+        JSON.SetScopeParameters(ActionCode());
 
-        MenuFilterCode := JSON.GetString('MenuFilterCode', true);
+        MenuFilterCode := JSON.GetStringOrFail('MenuFilterCode', StrSubstNo(ReadingErr, ActionCode()));
         RunObject(MenuFilterCode, POSSession);
         Handled := true;
     end;
@@ -87,4 +79,3 @@ codeunit 6150820 "NPR POS Action: Run Object"
         POSMenuFilter.RunObjectWithFilter(POSMenuFilter, POSSession);
     end;
 }
-

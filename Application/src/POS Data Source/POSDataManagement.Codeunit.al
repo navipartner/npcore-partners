@@ -142,7 +142,7 @@ codeunit 6150710 "NPR POS Data Management"
         if HasVariables then begin
             OnReadDataSourceVariables(POSSession, RecRef, DataSource.Id, DataRow, Handled);
             if not Handled then
-                FrontEnd.ReportBug(StrSubstNo(Text002, DataSource.Id));
+                FrontEnd.ReportBugAndThrowError(StrSubstNo(Text002, DataSource.Id));
 
             OnAfterReadDataSourceVariables(POSSession, RecRef, DataSource.Id, DataRow);
         end;
@@ -155,7 +155,7 @@ codeunit 6150710 "NPR POS Data Management"
                 Handled := false;
                 OnDataSourceExtensionReadData(DataSource.Id, Extension, RecRef, ExtensionDataRow, POSSession, FrontEnd, Handled);
                 if not Handled then
-                    FrontEnd.ReportBug(StrSubstNo(Text003, Extension, DataSource.Id, 'OnDataSourceExtensionReadData'));
+                    FrontEnd.ReportBugAndThrowError(StrSubstNo(Text003, Extension, DataSource.Id, 'OnDataSourceExtensionReadData'));
                 ExtensionKeys := ExtensionDataRow.Fields().Keys();
                 foreach ExtensionKey in ExtensionKeys do
                     DataRow.Add(StrSubstNo('%1.%2', Extension, ExtensionKey), ExtensionDataRow.Field(ExtensionKey));

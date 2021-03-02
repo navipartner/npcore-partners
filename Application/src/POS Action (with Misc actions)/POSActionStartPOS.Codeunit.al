@@ -1,9 +1,5 @@
 codeunit 6150858 "NPR POS Action: Start POS"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This action is executed when the POS Unit is in status closed, to verify BIN contents.';
         Title: Label 'Confirm Bin Contents.';
@@ -15,6 +11,8 @@ codeunit 6150858 "NPR POS Action: Start POS"
         WorkshiftWasClosed: Label 'The workshift was closed. Do you want to open a new workshift?';
         ConfirmBin: Label 'Do you agree?';
         ManagedPos: Label 'This POS is managed by POS Unit %1 [%2] and it is therefore required that %1 is opened prior to opening this POS.';
+        ReadingErr: Label 'reading in %1';
+        SettingScopeErr: Label 'setting scope in %1';
 
     local procedure ActionCode(): Code[20]
     begin
@@ -153,8 +151,8 @@ codeunit 6150858 "NPR POS Action: Start POS"
         case WorkflowStep of
             'ConfirmBin':
                 begin
-                    JSON.SetScope('$ConfirmBin', true);
-                    BinContentsConfirmed := JSON.GetBoolean('confirm', true);
+                    JSON.SetScope('$ConfirmBin', StrSubstNo(SettingScopeErr, ActionCode()));
+                    BinContentsConfirmed := JSON.GetBooleanOrFail('confirm', StrSubstNo(ReadingErr, ActionCode()));
 
                     if (not BinContentsConfirmed) then begin
                         if (POSUnit."POS End of Day Profile" <> '') then begin

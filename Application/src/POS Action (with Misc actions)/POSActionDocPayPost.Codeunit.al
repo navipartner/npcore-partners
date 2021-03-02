@@ -1,13 +1,5 @@
 codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
 {
-    // NPR5.50/MMV /20181105 CASE 300557 New action, based on CU 6150815
-    // NPR5.52/MMV /20191004 CASE 352473 Added send & pdf2nav support.
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'Create a payment line to balance an open sales order and post the order upon POS sale end.';
         CaptionPrintDocument: Label 'Print Document';
@@ -28,7 +20,7 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.2'); //NPR5.52 [352473]
+        exit('1.2');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -44,15 +36,11 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
                 RegisterWorkflowStep('PayAndPostDocument', 'respond();');
                 RegisterWorkflow(false);
 
-                //-NPR5.52 [352473]
                 RegisterBooleanParameter('PrintDocument', false);
-                //+NPR5.52 [352473]
                 RegisterBooleanParameter('OpenDocument', false);
                 RegisterBooleanParameter('SelectCustomer', true);
-                //-NPR5.52 [352473]
                 RegisterBooleanParameter('SendDocument', false);
                 RegisterBooleanParameter('Pdf2NavDocument', false);
-                //+NPR5.52 [352473]
             end;
         end;
     end;
@@ -73,13 +61,11 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        SelectCustomer := JSON.GetBooleanParameter('SelectCustomer', true);
-        OpenDocument := JSON.GetBooleanParameter('OpenDocument', true);
-        //-NPR5.52 [352473]
-        PrintDocument := JSON.GetBooleanParameter('PrintDocument', true);
-        Send := JSON.GetBooleanParameter('SendDocument', true);
-        Pdf2Nav := JSON.GetBooleanParameter('Pdf2NavDocument', true);
-        //+NPR5.52 [352473]
+        SelectCustomer := JSON.GetBooleanParameterOrFail('SelectCustomer', ActionCode());
+        OpenDocument := JSON.GetBooleanParameterOrFail('OpenDocument', ActionCode());
+        PrintDocument := JSON.GetBooleanParameterOrFail('PrintDocument', ActionCode());
+        Send := JSON.GetBooleanParameterOrFail('SendDocument', ActionCode());
+        Pdf2Nav := JSON.GetBooleanParameterOrFail('Pdf2NavDocument', ActionCode());
 
         if not CheckCustomer(POSSession, SelectCustomer) then
             exit;
@@ -90,9 +76,7 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
         if not ConfirmDocument(SalesHeader, OpenDocument) then
             exit;
 
-        //-NPR5.52 [352473]
         CreateDocumentPaymentLine(POSSession, SalesHeader, PrintDocument, Send, Pdf2Nav);
-        //+NPR5.52 [352473]
 
         POSSession.RequestRefreshData();
     end;
@@ -159,9 +143,7 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
         POSApplyCustomerEntries: Codeunit "NPR POS Apply Customer Entries";
         InvoiceNo: Text;
     begin
-        //-NPR5.52 [352473]
         RetailSalesDocImpMgt.SalesDocumentAmountToPOS(POSSession, SalesHeader, true, true, true, Print, Pdf2Nav, Send, true);
-        //+NPR5.52 [352473]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
@@ -177,12 +159,10 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
                 Caption := CaptionOpenDoc;
             'SelectCustomer':
                 Caption := CaptionSelectCustomer;
-            //-NPR5.52 [352473]
             'SendDocument':
                 Caption := CaptionSendDoc;
             'Pdf2NavDocument':
                 Caption := CaptionPdf2NavDoc;
-        //+NPR5.52 [352473]
         end;
     end;
 
@@ -199,12 +179,10 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
                 Caption := DescOpenDoc;
             'SelectCustomer':
                 Caption := DescSelectCustomer;
-            //-NPR5.52 [352473]
             'SendDocument':
                 Caption := DescSendDoc;
             'Pdf2NavDocument':
                 Caption := DescPdf2NavDoc;
-        //+NPR5.52 [352473]
         end;
     end;
 
@@ -218,4 +196,3 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post"
         end;
     end;
 }
-

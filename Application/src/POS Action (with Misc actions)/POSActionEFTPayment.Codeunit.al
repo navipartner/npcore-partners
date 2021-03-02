@@ -1,9 +1,5 @@
 codeunit 6184474 "NPR POS Action: EFT Payment"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'EFT Request Workflow';
 
@@ -60,13 +56,14 @@ codeunit 6184474 "NPR POS Action: EFT Payment"
         IntegrationWorkflow: Text;
         EftEntryNo: Integer;
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        PreparingErr: Label 'preparing request in %1';
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        POSPaymentMethod.Get(Context.GetString('paymentType', true));
+        POSPaymentMethod.Get(Context.GetStringOrFail('paymentType', StrSubstNo(PreparingErr, ActionCode())));
         EFTSetup.FindSetup(SalePOS."Register No.", POSPaymentMethod.Code);
 
-        EftEntryNo := EFTTransactionMgt.PreparePayment(EFTSetup, Context.GetDecimal('amount', true), '', SalePOS, IntegrationWorkflow);
+        EftEntryNo := EFTTransactionMgt.PreparePayment(EFTSetup, Context.GetDecimalOrFail('amount', StrSubstNo(PreparingErr, ActionCode())), '', SalePOS, IntegrationWorkflow);
         Context.SetContext('integrationWorkflow', IntegrationWorkflow);
         Context.SetContext('entryNo', EftEntryNo);
 
@@ -87,4 +84,3 @@ codeunit 6184474 "NPR POS Action: EFT Payment"
         PaymentHandler := ActionCode();
     end;
 }
-

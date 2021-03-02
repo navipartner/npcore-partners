@@ -167,11 +167,11 @@ table 6150703 "NPR POS Action"
         FrontEnd: Codeunit "NPR POS Front End Management";
     begin
         if ActionInDiscovery <> '' then
-            FrontEnd.ReportBug(StrSubstNo(Text002, Action, ActionInDiscovery));
+            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text002, Action, ActionInDiscovery));
 
         DiscoveredAction.Code := Action;
         if DiscoveredAction.Find then begin
-            FrontEnd.ReportBug(StrSubstNo(Text004, Action));
+            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text004, Action));
             exit;
         end;
         DiscoveredAction.Insert;
@@ -298,7 +298,7 @@ table 6150703 "NPR POS Action"
         WorkflowStep: JsonObject;
     begin
         if ActionInDiscovery = '' then
-            FrontEnd.ReportBug(Text001);
+            FrontEnd.ReportBugAndThrowError(Text001);
 
         RequireVersion10();
         WorkflowStep.Add('Label', Label);
@@ -313,7 +313,7 @@ table 6150703 "NPR POS Action"
         RequireVersion10();
 
         if Type = Type::BackEnd then
-            FrontEnd.ReportBug(StrSubstNo(Text003, Code, Type));
+            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text003, Code, Type));
 
         WorkflowObj.SetRequestContext(WithOnBeforeWorkflowEvent);
         StreamWorkflowToBlob();
@@ -331,7 +331,7 @@ table 6150703 "NPR POS Action"
         RequireVersion20();
 
         if Type = Type::BackEnd then
-            FrontEnd.ReportBug(StrSubstNo(Text003, Code, Type));
+            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text003, Code, Type));
 
         WorkflowStep.Add('Code', Code);
         WorkflowObj.Steps.Add(WorkflowStep);
@@ -528,14 +528,14 @@ table 6150703 "NPR POS Action"
         Parameter: Record "NPR POS Action Parameter";
     begin
         if not Parameter.Get(Code, Name) then
-            FrontEnd.ReportBug(StrSubstNo(Text005, Name, Code));
+            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text005, Name, Code));
 
         if ((Parameter."Data Type" = Parameter."Data Type"::Boolean) and (not Value.IsBoolean)) or
           (Parameter."Data Type" = Parameter."Data Type"::Date) and (not Value.IsDate) or
           (Parameter."Data Type" = Parameter."Data Type"::Decimal) and (not IsValueNumeric(Value)) or
           (Parameter."Data Type" = Parameter."Data Type"::Integer) and (not IsValueInteger(Value))
         then
-            FrontEnd.ReportBug(StrSubstNo(Text006, Parameter."Data Type", Name, Code));
+            FrontEnd.ReportBugAndThrowError(StrSubstNo(Text006, Parameter."Data Type", Name, Code));
     end;
 
     local procedure IsValueNumeric(Value: Variant): Boolean
@@ -591,7 +591,7 @@ table 6150703 "NPR POS Action"
         FrontEnd: Codeunit "NPR POS Front End Management";
     begin
         if Version20 then
-            FrontEnd.ReportBug(Text007);
+            FrontEnd.ReportBugAndThrowError(Text007);
     end;
 
     local procedure RequireVersion20()
@@ -599,7 +599,7 @@ table 6150703 "NPR POS Action"
         FrontEnd: Codeunit "NPR POS Front End Management";
     begin
         if not Version20 then
-            FrontEnd.ReportBug(Text008);
+            FrontEnd.ReportBugAndThrowError(Text008);
     end;
 
     [IntegrationEvent(TRUE, false)]

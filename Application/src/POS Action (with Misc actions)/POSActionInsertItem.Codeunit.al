@@ -17,6 +17,8 @@ codeunit 6150723 "NPR POS Action: Insert Item"
         ERROR_ITEMSEARCH: Label 'Could not find a matching item for input %1';
         COMMENT_UNKNOWN_TAG: Label 'Unknown RFID Tag %1';
         SerialSelectionFromList: Boolean;
+        ReadingErr: Label 'reading in %1 of %2';
+        SettingScopeErr: Label 'setting scope in %1';
 
     procedure ActionCode(): Text
     begin
@@ -119,13 +121,13 @@ codeunit 6150723 "NPR POS Action: Insert Item"
         ValidatedVariantCode: Text;
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        HasPrompted := JSON.GetBoolean('promptPrice', false) or JSON.GetBoolean('promptSerial', false);
-        JSON.SetScope('parameters', true);
-        ItemIdentifier := JSON.GetString('itemNo', true);
-        ItemIdentifierType := JSON.GetInteger('itemIdentifyerType', false);
-        ItemQuantity := JSON.GetDecimal('itemQuantity', false);
-        UsePresetUnitPrice := JSON.GetBoolean('usePreSetUnitPrice', false);
-        PresetUnitPrice := JSON.GetDecimal('preSetUnitPrice', false);
+        HasPrompted := JSON.GetBoolean('promptPrice') or JSON.GetBoolean('promptSerial');
+        JSON.SetScopeParameters(ActionCode());
+        ItemIdentifier := JSON.GetStringOrFail('itemNo', StrSubstNo(ReadingErr, 'Step_AddSalesLine', ActionCode()));
+        ItemIdentifierType := JSON.GetInteger('itemIdentifyerType');
+        ItemQuantity := JSON.GetDecimal('itemQuantity');
+        UsePresetUnitPrice := JSON.GetBoolean('usePreSetUnitPrice');
+        PresetUnitPrice := JSON.GetDecimal('preSetUnitPrice');
 
         if ItemIdentifierType < 0 then
             ItemIdentifierType := 0;
@@ -153,10 +155,10 @@ codeunit 6150723 "NPR POS Action: Insert Item"
         end;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('/', true);
-        UseSpecificTracking := JSON.GetBoolean('useSpecificTracking', false);
-        ValidatedSerialNumber := JSON.GetString('validatedSerialNumber', false);
-        ValidatedVariantCode := JSON.GetString('validatedVariantCode', false);
+        JSON.SetScopeRoot();
+        UseSpecificTracking := JSON.GetBoolean('useSpecificTracking');
+        ValidatedSerialNumber := JSON.GetString('validatedSerialNumber');
+        ValidatedVariantCode := JSON.GetString('validatedVariantCode');
         if ValidatedVariantCode <> '' then
             ItemReference."Variant Code" := CopyStr(ValidatedVariantCode, 1, MaxStrLen(ItemReference."Variant Code"));
 
@@ -165,19 +167,19 @@ codeunit 6150723 "NPR POS Action: Insert Item"
             SetUnitPrice := true;
         end else begin
             JSON.InitializeJObjectParser(Context, FrontEnd);
-            if (JSON.SetScope('$unitPrice', false)) then begin
-                UnitPrice := JSON.GetDecimal('numpad', true);
+            if (JSON.SetScope('$unitPrice')) then begin
+                UnitPrice := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, 'Step_AddSalesLine', ActionCode()));
                 SetUnitPrice := true;
             end;
         end;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        if JSON.SetScope('$itemTrackingOptional', false) then
-            InputSerial := JSON.GetString('input', false);
+        if JSON.SetScope('$itemTrackingOptional') then
+            InputSerial := JSON.GetString('input');
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        if JSON.SetScope('$editDescription', false) then
-            CustomDescription := JSON.GetString('input', false);
+        if JSON.SetScope('$editDescription') then
+            CustomDescription := JSON.GetString('input');
 
         AddItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, UnitPrice, SetUnitPrice, CustomDescription, InputSerial, UseSpecificTracking, ValidatedSerialNumber, POSSession, FrontEnd);
         //+NPR5.54 [364340]
@@ -199,13 +201,13 @@ codeunit 6150723 "NPR POS Action: Insert Item"
         ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('$itemTrackingForce', true);
-        SerialNumberInput := JSON.GetString('input', true);
+        JSON.SetScope('$itemTrackingForce', StrSubstNo(SettingScopeErr, ActionCode()));
+        SerialNumberInput := JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, 'Step_ItemTracking', ActionCode()));
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('parameters', true);
-        ItemIdentifier := JSON.GetString('itemNo', true);
-        ItemIdentifierType := JSON.GetInteger('itemIdentifyerType', false);
-        SerialSelectionFromList := JSON.GetBoolean('AllowToSelectSerialNoFromList', false);
+        JSON.SetScopeParameters(ActionCode());
+        ItemIdentifier := JSON.GetStringOrFail('itemNo', StrSubstNo(ReadingErr, 'Step_ItemTracking', ActionCode()));
+        ItemIdentifierType := JSON.GetInteger('itemIdentifyerType');
+        SerialSelectionFromList := JSON.GetBoolean('AllowToSelectSerialNoFromList');
 
         GetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType);
 
@@ -224,7 +226,7 @@ codeunit 6150723 "NPR POS Action: Insert Item"
             if not SerialNumberCanBeUsedForItem(ItemReference, SerialNumberInput, UserInformationErrorWarning) then begin
                 SerialNumberInput := '';
                 JSON.InitializeJObjectParser(Context, FrontEnd);
-                JSON.SetScope('/', true);
+                JSON.SetScopeRoot();
                 JSON.SetContext('itemTracking_instructions', UserInformationErrorWarning);
                 FrontEnd.SetActionContext(ActionCode, JSON);
                 FrontEnd.ContinueAtStep('itemTrackingForce');
@@ -234,7 +236,7 @@ codeunit 6150723 "NPR POS Action: Insert Item"
         //Serial number is validated correct and should be applied to line
         //Applying is done in finalize
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('/', true);
+        JSON.SetScopeRoot();
         JSON.SetContext('validatedSerialNumber', SerialNumberInput);
         JSON.SetContext('validatedVariantCode', ItemReference."Variant Code");
         JSON.InitializeJObjectParser(Context, FrontEnd);

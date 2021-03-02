@@ -2,6 +2,7 @@ codeunit 6150668 "NPR NPRE POSAction: Split Wa."
 {
     var
         Text000: Label 'Partially load Waiter Pad to POS Sale';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -167,8 +168,8 @@ codeunit 6150668 "NPR NPRE POSAction: Split Wa."
         WaiterPadNo: Code[20];
     begin
         NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
-        JSON.SetScope('/', true);
-        WaiterPadNo := JSON.GetString('waiterPadNo', true);
+        JSON.SetScopeRoot();
+        WaiterPadNo := JSON.GetStringOrFail('waiterPadNo', StrSubstNo(ReadingErr, ActionCode()));
         NPREWaiterPad.Get(WaiterPadNo);
 
         NPREWaiterPadPOSMgt.SplitBill(NPREWaiterPad, POSSession, 1, true);

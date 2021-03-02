@@ -35,7 +35,7 @@ codeunit 6150680 "NPR NPRE RVA: Get WPad"
 
         Handled := true;
 
-        WaiterPadCode := Context.GetStringParameter('WaiterPadCode', true);
+        WaiterPadCode := Context.GetStringParameterOrFail('WaiterPadCode', ActionCode());
 
         LoadWaiterPad(POSSession, FrontEnd, WaiterPadCode);
         SelectSalesView(POSSession);

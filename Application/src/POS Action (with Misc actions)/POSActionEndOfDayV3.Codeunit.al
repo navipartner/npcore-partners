@@ -86,10 +86,10 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        OpenUnit := JSON.GetBooleanParameter('Auto-Open Cash Drawer', false);
-        CashDrawerNo := JSON.GetStringParameter('Cash Drawer No.', false);
+        OpenUnit := JSON.GetBooleanParameter('Auto-Open Cash Drawer');
+        CashDrawerNo := JSON.GetStringParameter('Cash Drawer No.');
 
-        EndOfDayType := JSON.GetIntegerParameter('Type', true);
+        EndOfDayType := JSON.GetIntegerParameterOrFail('Type', ActionCode());
         if (EndOfDayType < 0) then
             EndOfDayType := 0;
 

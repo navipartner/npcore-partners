@@ -1,9 +1,5 @@
 codeunit 6150868 "NPR POS Action: Layaway Create"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'Create layaway of sales order via prepayment invoices.';
         TextDownpaymentPctTitle: Label 'Down payment';
@@ -26,6 +22,7 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
         DescInstalments: Label 'Number of instalments for layaway payment. Set to 1 if no fixed periods';
         DescOrderPaymentTerms: Label 'Payment Terms to use for the created order. Is used for filtering';
         DescPrepayPaymentTerms: Label 'Payment Terms to use for each prepayment invoice. Is used for due date calculation and filtering';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -97,11 +94,11 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
         DownpaymentPct := GetDownpaymentPct(JSON);
-        CreationFeeItemNo := JSON.GetStringParameter('CreationFeeItemNo', true);
-        ReserveItems := JSON.GetBooleanParameter('ReserveItems', true);
-        Instalments := JSON.GetIntegerParameter('Instalments', true);
-        OrderPaymentTerms := JSON.GetStringParameter('OrderPaymentTerms', true);
-        PrepaymentPaymentTerms := JSON.GetStringParameter('PrepaymentPaymentTerms', true);
+        CreationFeeItemNo := JSON.GetStringParameterOrFail('CreationFeeItemNo', ActionCode());
+        ReserveItems := JSON.GetBooleanParameterOrFail('ReserveItems', ActionCode());
+        Instalments := JSON.GetIntegerParameterOrFail('Instalments', ActionCode());
+        OrderPaymentTerms := JSON.GetStringParameterOrFail('OrderPaymentTerms', ActionCode());
+        PrepaymentPaymentTerms := JSON.GetStringParameterOrFail('PrepaymentPaymentTerms', ActionCode());
 
         if Instalments < 1 then
             Error(ErrorNoInstalments);
@@ -251,19 +248,19 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
 
     local procedure GetDownpaymentPct(var JSON: Codeunit "NPR POS JSON Management"): Decimal
     begin
-        if JSON.GetBooleanParameter('PromptDownpayment', true) then
+        if JSON.GetBooleanParameterOrFail('PromptDownpayment', ActionCode()) then
             exit(GetNumpad(JSON, 'DownpaymentPrompt'))
         else
-            exit(JSON.GetDecimalParameter('DownpaymentPercent', true));
+            exit(JSON.GetDecimalParameterOrFail('DownpaymentPercent', ActionCode()));
     end;
 
     local procedure GetNumpad(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Decimal
     begin
-        JSON.SetScope('/', true);
-        if (not JSON.SetScope('$' + Path, false)) then
+        JSON.SetScopeRoot();
+        if (not JSON.SetScope('$' + Path)) then
             exit(0);
 
-        exit(JSON.GetDecimal('numpad', true));
+        exit(JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, ActionCode())));
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]

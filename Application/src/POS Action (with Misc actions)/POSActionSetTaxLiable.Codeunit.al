@@ -1,17 +1,10 @@
 codeunit 6150823 "NPR POSAction: Set Tax Liable"
 {
-    // NPR9.00.00.5.32/JC  /20170613 CASE 277094 New POS Action for Setting Tax Liable
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'Set Tax Liable';
-        LookupType: Option "True","False";
         Title: Label 'Tax Liable property';
         Prompt: Label 'Set Tax Liable property?';
+        ReadingErr: Label 'reading in %1';
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
@@ -63,7 +56,7 @@ codeunit 6150823 "NPR POSAction: Set Tax Liable"
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        TaxLiableValue := JSON.GetBoolean('value', true);
+        TaxLiableValue := JSON.GetBooleanOrFail('value', StrSubstNo(ReadingErr, ActionCode()));
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -85,4 +78,3 @@ codeunit 6150823 "NPR POSAction: Set Tax Liable"
         exit('1.0');
     end;
 }
-

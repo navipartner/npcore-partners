@@ -2,10 +2,6 @@ codeunit 6151127 "NPR POS Action: Ins. ItemAddOn"
 {
     SingleInstance = true;
 
-    trigger OnRun()
-    begin
-    end;
-
     var
         CurrNpIaItemAddOn: Record "NPR NpIa Item AddOn";
         [WithEvents]
@@ -111,9 +107,10 @@ codeunit 6151127 "NPR POS Action: Ins. ItemAddOn"
         NpIaItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
         POSSale: Codeunit "NPR POS Sale";
         AddOnNo: Code[20];
+        ReadingErr: Label 'reading in %1 of %2';
     begin
-        JSON.SetScope('/', true);
-        AddOnNo := JSON.GetString('item_addon', true);
+        JSON.SetScopeRoot();
+        AddOnNo := JSON.GetStringOrFail('item_addon', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
         NpIaItemAddOn.Get(AddOnNo);
         NpIaItemAddOn.TestField(Enabled);
 

@@ -79,10 +79,11 @@ codeunit 6150851 "NPR POS Action: Bin Transfer"
         POSPostEntries: Codeunit "NPR POS Post Entries";
         POSEntryToPost: Record "NPR POS Entry";
         EntryNo: Integer;
+        ReadingErr: Label 'reading in TransferContentsToBin';
     begin
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        FromBinNo := JSON.GetString('FROM_BIN', true);
+        FromBinNo := JSON.GetStringOrFail('FROM_BIN', ReadingErr);
 
         //-NPR5.43 [310815]
         CheckpointEntryNo := POSWorkshiftCheckpoint.CreateEndWorkshiftCheckpoint_POSEntry(FromBinNo);
@@ -151,7 +152,7 @@ codeunit 6150851 "NPR POS Action: Bin Transfer"
     begin
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        SourceBinSelection := JSON.GetIntegerParameter('SourceBinSelection', true);
+        SourceBinSelection := JSON.GetIntegerParameterOrFail('SourceBinSelection', ActionCode());
         case SourceBinSelection of
             1:
                 FromBinNo := UserSelectBin(POSSession);
@@ -195,7 +196,7 @@ codeunit 6150851 "NPR POS Action: Bin Transfer"
     begin
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        exit(JSON.GetStringParameter('SourceBin', true));
+        exit(JSON.GetStringParameterOrFail('SourceBin', ActionCode()));
     end;
 
     local procedure GetDefaultUnitBin(POSSession: Codeunit "NPR POS Session"): Code[10]

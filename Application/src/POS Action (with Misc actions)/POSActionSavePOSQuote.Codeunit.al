@@ -117,11 +117,11 @@ codeunit 6151004 "NPR POS Action: SavePOSQuote"
         Commit;
         POSSale.SelectViewForEndOfSale(POSSession);
 
-        PrintAfterSave := JSON.GetBooleanParameter('PrintAfterSave', false);
+        PrintAfterSave := JSON.GetBooleanParameter('PrintAfterSave');
         if not PrintAfterSave then
             exit;
 
-        PrintTemplateCode := JSON.GetStringParameter('PrintTemplate', false);
+        PrintTemplateCode := JSON.GetStringParameter('PrintTemplate');
         if not RPTemplateHeader.Get(PrintTemplateCode) then
             exit;
         RPTemplateHeader.CalcFields("Table ID");

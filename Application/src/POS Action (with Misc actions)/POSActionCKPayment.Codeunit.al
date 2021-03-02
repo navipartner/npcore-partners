@@ -103,6 +103,7 @@ codeunit 6150850 "NPR POS Action: CK Payment"
         AmountToCapture: Decimal;
         NumpadAmount: Decimal;
         CashKeeperTransaction: Record "NPR CashKeeper Transaction";
+        ReadingErr: Label 'reading in %1';
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
@@ -121,8 +122,8 @@ codeunit 6150850 "NPR POS Action: CK Payment"
                 begin
                     POSSession.ClearActionState();
 
-                    PaymentTypeNo := JSON.GetString('paymenttypeno', true);
-                    AmountToCapture := JSON.GetDecimal('amounttocapture', true);
+                    PaymentTypeNo := JSON.GetStringOrFail('paymenttypeno', StrSubstNo(ReadingErr, ActionCode()));
+                    AmountToCapture := JSON.GetDecimalOrFail('amounttocapture', StrSubstNo(ReadingErr, ActionCode()));
                     NumpadAmount := AmountToCapture;
 
                     JSON.SetContext('TransactionRequest_EntryNo', '');

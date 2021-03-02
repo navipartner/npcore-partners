@@ -4,6 +4,7 @@ codeunit 6150829 "NPR POS Action: POS Info"
         ActionDescription: Label 'This built in function opens a page displaying the POS Information.';
         Title: Label 'Item Card';
         NotAllowed: Label 'Cannot open the Item Inventory Overview for this line.';
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -67,7 +68,7 @@ codeunit 6150829 "NPR POS Action: POS Info"
         CurrentView: Codeunit "NPR POS View";
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('parameters', true);
+        JSON.SetScopeParameters(ActionCode());
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -92,6 +93,6 @@ codeunit 6150829 "NPR POS Action: POS Info"
         end;
 
         POSInfoManagement.ProcessPOSInfoMenuFunction(
-          LinePOS, JSON.GetString('POSInfoCode', true), JSON.GetInteger('ApplicationScope', false), JSON.GetBoolean('ClearPOSInfo', false));
+          LinePOS, JSON.GetStringOrFail('POSInfoCode', StrSubstNo(ReadingErr, ActionCode())), JSON.GetInteger('ApplicationScope'), JSON.GetBoolean('ClearPOSInfo'));
     end;
 }

@@ -104,11 +104,11 @@ codeunit 6060146 "NPR MM POS Action: Member Loy."
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        FunctionId := JSON.GetIntegerParameter('Function', true);
+        FunctionId := JSON.GetIntegerParameterOrFail('Function', ActionCode());
         if (FunctionId < 0) then
             FunctionId := 0;
 
-        MemberCardNumber := JSON.GetStringParameter('DefaultInputValue', false);
+        MemberCardNumber := JSON.GetStringParameter('DefaultInputValue');
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -329,11 +329,11 @@ codeunit 6060146 "NPR MM POS Action: Member Loy."
     local procedure GetInput(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
     begin
 
-        JSON.SetScope('/', true);
-        if (not JSON.SetScope('$' + Path, false)) then
+        JSON.SetScopeRoot();
+        if (not JSON.SetScope('$' + Path)) then
             exit('');
 
-        exit(JSON.GetString('input', false));
+        exit(JSON.GetString('input'));
     end;
 
     local procedure SelectMemberCardUI(var ExtMemberCardNo: Text[100]): Boolean

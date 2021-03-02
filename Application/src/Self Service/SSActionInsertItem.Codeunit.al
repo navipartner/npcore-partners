@@ -17,6 +17,8 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         UnitPriceCaption: Label 'This is item is an item group. Specify the unit price for item.';
         TEXTitemTracking_lead: Label 'This item requires serial number, enter serial number.';
         UnitPriceTitle: Label 'Unit price is required';
+        ReadingErr: Label 'reading in %1 of %2';
+        SettingScopeErr: Label 'setting scope in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -134,14 +136,14 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch;
         ItemIdentifier: Text;
     begin
-        HasPrompted := JSON.GetBoolean('promptPrice', false) or JSON.GetBoolean('promptSerial', false);
+        HasPrompted := JSON.GetBoolean('promptPrice') or JSON.GetBoolean('promptSerial');
 
-        JSON.SetScope('parameters', true);
-        ItemIdentifier := JSON.GetString('itemNo', true);
-        ItemIdentifierType := JSON.GetInteger('itemIdentifyerType', false);
-        ItemQuantity := JSON.GetDecimal('itemQuantity', false);
-        UsePresetUnitPrice := JSON.GetBoolean('usePreSetUnitPrice', false);
-        PresetUnitPrice := JSON.GetDecimal('preSetUnitPrice', false);
+        JSON.SetScopeParameters(ActionCode());
+        ItemIdentifier := JSON.GetStringOrFail('itemNo', StrSubstNo(ReadingErr, 'Step_AddSalesLine', ActionCode()));
+        ItemIdentifierType := JSON.GetInteger('itemIdentifyerType');
+        ItemQuantity := JSON.GetDecimal('itemQuantity');
+        UsePresetUnitPrice := JSON.GetBoolean('usePreSetUnitPrice');
+        PresetUnitPrice := JSON.GetDecimal('preSetUnitPrice');
 
         if ItemIdentifierType < 0 then
             ItemIdentifierType := 0;
@@ -160,24 +162,24 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         SerialNoUsedOnPOSSaleLine: Boolean;
         UserInformationErrorWarning: Text;
     begin
-        JSON.SetScope('$itemTrackingForce', true);
-        SerialNumberInput := JSON.GetString('input', true);
+        JSON.SetScope('$itemTrackingForce', StrSubstNo(SettingScopeErr, ActionCode()));
+        SerialNumberInput := JSON.GetStringOrFail('input', StrSubstNo(ReadingErr, 'Step_AddItemTracking', ActionCode()));
 
-        JSON.SetScopeRoot(true);
-        JSON.SetScope('parameters', true);
-        ItemNo := JSON.GetString('itemNo', true);
+        JSON.SetScopeRoot();
+        JSON.SetScopeParameters(ActionCode());
+        ItemNo := JSON.GetStringOrFail('itemNo', StrSubstNo(ReadingErr, 'Step_ItemTracking', ActionCode()));
 
         if not SerialNumberCanBeUsedForItem(ItemNo, SerialNumberInput, UserInformationErrorWarning) then begin
             SerialNumberInput := '';
 
-            JSON.SetScope('/', true);
+            JSON.SetScopeRoot();
             JSON.SetContext('itemTracking_instructions', UserInformationErrorWarning);
             FrontEnd.SetActionContext(ActionCode, JSON);
             FrontEnd.ContinueAtStep('itemTrackingForce');
             exit;
         end;
 
-        JSON.SetScope('/', true);
+        JSON.SetScopeRoot();
         JSON.SetContext('validatedSerialNumber', SerialNumberInput);
 
         FrontEnd.SetActionContext(ActionCode, JSON);
@@ -194,10 +196,10 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch;
         ItemQuantity: Decimal;
     begin
-        JSON.SetScope('parameters', true);
-        ItemIdentifier := JSON.GetString('itemNo', true);
-        ItemIdentifierType := JSON.GetInteger('itemIdentifyerType', false);
-        ItemQuantity := JSON.GetDecimal('itemQuantity', false);
+        JSON.SetScopeParameters(ActionCode());
+        ItemIdentifier := JSON.GetStringOrFail('itemNo', StrSubstNo(ReadingErr, 'Step_DecreaseQuantity', ActionCode()));
+        ItemIdentifierType := JSON.GetInteger('itemIdentifyerType');
+        ItemQuantity := JSON.GetDecimal('itemQuantity');
 
         if ItemIdentifierType < 0 then
             ItemIdentifierType := 0;
@@ -214,11 +216,11 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch;
         ItemIdentifier: Text;
     begin
-        JSON.SetScope('parameters', true);
-        ItemIdentifier := JSON.GetString('itemNo', true);
-        ItemIdentifierType := JSON.GetInteger('itemIdentifyerType', false);
-        ItemQuantity := JSON.GetDecimal('itemQuantity', false);
-        JSON.SetScopeRoot(false);
+        JSON.SetScopeParameters(ActionCode());
+        ItemIdentifier := JSON.GetStringOrFail('itemNo', StrSubstNo(ReadingErr, 'Step_IncreaseQuantity', ActionCode()));
+        ItemIdentifierType := JSON.GetInteger('itemIdentifyerType');
+        ItemQuantity := JSON.GetDecimal('itemQuantity');
+        JSON.SetScopeRoot();
 
         if ItemIdentifierType < 0 then
             ItemIdentifierType := 0;
@@ -237,11 +239,11 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch;
         ItemQuantity: Decimal;
     begin
-        JSON.SetScope('parameters', true);
-        ItemIdentifier := JSON.GetString('itemNo', true);
-        ItemIdentifierType := JSON.GetInteger('itemIdentifyerType', false);
-        JSON.SetScopeRoot(false);
-        ItemQuantity := JSON.GetDecimal('specificQuantity', false);
+        JSON.SetScopeParameters(ActionCode());
+        ItemIdentifier := JSON.GetStringOrFail('itemNo', StrSubstNo(ReadingErr, 'Step_SetQuantity', ActionCode()));
+        ItemIdentifierType := JSON.GetInteger('itemIdentifyerType');
+        JSON.SetScopeRoot();
+        ItemQuantity := JSON.GetDecimal('specificQuantity');
 
         if ItemIdentifierType < 0 then
             ItemIdentifierType := 0;
@@ -317,28 +319,28 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         UnitPrice: Decimal;
         CustomDescription: Text;
     begin
-        JSON.SetScope('/', true);
-        UseSpecificTracking := JSON.GetBoolean('useSpecificTracking', false);
-        ValidatedSerialNumber := JSON.GetString('validatedSerialNumber', false);
+        JSON.SetScopeRoot();
+        UseSpecificTracking := JSON.GetBoolean('useSpecificTracking');
+        ValidatedSerialNumber := JSON.GetString('validatedSerialNumber');
 
         if UsePresetUnitPrice then begin
             UnitPrice := PresetUnitPrice;
             SetUnitPrice := true;
         end else begin
-            JSON.SetScopeRoot(true);
-            if (JSON.SetScope('$unitPrice', false)) then begin
-                UnitPrice := JSON.GetDecimal('numpad', true);
+            JSON.SetScopeRoot();
+            if (JSON.SetScope('$unitPrice')) then begin
+                UnitPrice := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, 'AddItemLine', ActionCode()));
                 SetUnitPrice := true;
             end;
         end;
 
-        JSON.SetScopeRoot(true);
-        if JSON.SetScope('$itemTrackingOptional', false) then
-            InputSerial := JSON.GetString('input', false);
+        JSON.SetScopeRoot();
+        if JSON.SetScope('$itemTrackingOptional') then
+            InputSerial := JSON.GetString('input');
 
-        JSON.SetScopeRoot(true);
-        if JSON.SetScope('$editDescription', false) then
-            CustomDescription := JSON.GetString('input', false);
+        JSON.SetScopeRoot();
+        if JSON.SetScope('$editDescription') then
+            CustomDescription := JSON.GetString('input');
 
         if ItemQuantity = 0 then
             ItemQuantity := 1;

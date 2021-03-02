@@ -1,18 +1,8 @@
 codeunit 6150810 "NPR POSAction: Run Report"
 {
-    // NPR5.32/NPKNAV/20170526  CASE 270854 Transport NPR5.32 - 26 May 2017
-    // NPR5.37/MMV /20171018 CASE 293503 Added missing SETRECFILTER
-    // NPR5.40/NPKNAV/20180330  CASE 308408 Transport NPR5.40 - 30 March 2018
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is a built-in action for running a report';
-        ReportMissingError: Label 'That report was not found.';
-        POSSetup: Codeunit "NPR POS Setup";
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -60,39 +50,29 @@ codeunit 6150810 "NPR POSAction: Run Report"
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('parameters', true);
+        JSON.SetScopeParameters(ActionCode());
 
-        ReportId := JSON.GetInteger('ReportId', true);
-        //-NPR5.40 [308408]
-        // RequestPage := JSON.GetBoolean ('RequestPage', TRUE);
-        RunRequestPage := JSON.GetBoolean('RequestPage', true);
-        //+NPR5.40 [308408]
-        RecordSetting := JSON.GetInteger('Record', true);
+        ReportId := JSON.GetIntegerOrFail('ReportId', StrSubstNo(ReadingErr, ActionCode()));
+        RunRequestPage := JSON.GetBooleanOrFail('RequestPage', StrSubstNo(ReadingErr, ActionCode()));
+        RecordSetting := JSON.GetIntegerOrFail('Record', StrSubstNo(ReadingErr, ActionCode()));
 
         case RecordSetting of
             RecordSetting::"Sale Line POS":
                 begin
                     POSSession.GetSaleLine(POSSaleLine);
                     POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-                    //-NPR5.37 [293503]
                     SaleLinePOS.SetRecFilter;
-                    //+NPR5.37 [293503]
                     Record := SaleLinePOS;
                 end;
             RecordSetting::"Sale POS":
                 begin
                     POSSession.GetSale(POSSale);
                     POSSale.GetCurrentSale(SalePOS);
-                    //-NPR5.37 [293503]
                     SalePOS.SetRecFilter;
-                    //+NPR5.37 [293503]
                     Record := SalePOS;
                 end;
         end;
-        //-NPR5.40 [308408]
-        //RunReport(ReportId, RequestPage, Record);
         RunReport(ReportId, RunRequestPage, Record);
-        //+NPR5.40 [308408]
         Handled := true;
     end;
 
@@ -106,10 +86,6 @@ codeunit 6150810 "NPR POSAction: Run Report"
     begin
         if ReportId = 0 then
             exit;
-        //-NPR5.40 [308408]
-        //ReportPrinterInterface.RunReport(ReportId, RequestPage, FALSE, Record);
         ReportPrinterInterface.RunReport(ReportId, RunRequestPage, false, Record);
-        //-NPR5.40 [308408]
     end;
 }
-

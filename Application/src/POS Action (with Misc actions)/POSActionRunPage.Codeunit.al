@@ -1,19 +1,8 @@
 codeunit 6150802 "NPR POS Action: Run Page"
 {
-    // NPR5.32/NPKNAV/20170526  CASE 270854 Transport NPR5.32 - 26 May 2017
-    // NPR5.39/BR  /20180126  CASE 303616 Added TableID and TableView
-    // NPR5.43/THRO/20180607  CASE 318038 Added Lookup and Validation for parameter TableView
-    // NPR5.44/MMV /20180724 CASE 323068 Removed object table check. Was incompatible with extensions.
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is a built-in action for running a page';
-        PageMissingError: Label 'That page was not found.';
-        POSSetup: Codeunit "NPR POS Setup";
+        ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
     begin
@@ -40,10 +29,8 @@ codeunit 6150802 "NPR POS Action: Run Page"
                 RegisterWorkflow(false);
                 RegisterIntegerParameter('PageId', 0);
                 RegisterBooleanParameter('RunModal', false);
-                //-NPR5.39 [303616]
                 RegisterIntegerParameter('TableID', 0);
                 RegisterTextParameter('TableView', '');
-                //+NPR5.39 [303616]
             end;
     end;
 
@@ -76,16 +63,13 @@ codeunit 6150802 "NPR POS Action: Run Page"
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('parameters', true);
+        JSON.SetScopeParameters(ActionCode());
 
-        PageId := JSON.GetInteger('PageId', true);
-        RunModal := JSON.GetBoolean('RunModal', true);
-        //-NPR5.39 [303616]
-        //RunPage(PageId,RunModal);
-        TableID := JSON.GetInteger('TableID', false);
-        TableView := JSON.GetString('TableView', false);
+        PageId := JSON.GetIntegerOrFail('PageId', StrSubstNo(ReadingErr, ActionCode()));
+        RunModal := JSON.GetBooleanOrFail('RunModal', StrSubstNo(ReadingErr, ActionCode()));
+        TableID := JSON.GetInteger('TableID');
+        TableView := JSON.GetString('TableView');
         RunPage(PageId, RunModal, TableID, TableView);
-        //+NPR5.39 [303616]
         Handled := true;
     end;
 
@@ -95,7 +79,6 @@ codeunit 6150802 "NPR POS Action: Run Page"
         POSParameterTableIDValue: Record "NPR POS Parameter Value";
         TableID: Integer;
     begin
-        //-NPR5.43 [318038]
         if (POSParameterValue."Action Code" <> ActionCode) or (POSParameterValue.Name <> 'TableView') or (POSParameterValue."Data Type" <> POSParameterValue."Data Type"::Text) then
             exit;
         POSParameterTableIDValue.SetRange("Table No.", POSParameterValue."Table No.");
@@ -109,7 +92,6 @@ codeunit 6150802 "NPR POS Action: Run Page"
                     POSParameterValue.Value := POSParameterValue.GetTableViewString(TableID, POSParameterValue.Value);
                     Handled := true;
                 end;
-        //+NPR5.43 [318038]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnValidateValue', '', true, true)]
@@ -119,7 +101,6 @@ codeunit 6150802 "NPR POS Action: Run Page"
         RecRef: RecordRef;
         TableID: Integer;
     begin
-        //-NPR5.43 [318038]
         if (POSParameterValue."Action Code" <> ActionCode) or (POSParameterValue.Name <> 'TableView') or (POSParameterValue."Data Type" <> POSParameterValue."Data Type"::Text) then
             exit;
         if POSParameterValue.Value <> '' then begin
@@ -136,7 +117,6 @@ codeunit 6150802 "NPR POS Action: Run Page"
                         POSParameterValue.Value := RecRef.GetView(false);
                     end;
         end;
-        //+NPR5.43 [318038]
     end;
 
     local procedure "-- Locals --"()
@@ -152,21 +132,11 @@ codeunit 6150802 "NPR POS Action: Run Page"
         if PageId = 0 then
             exit;
 
-        //-NPR5.44 [323068]
-        // Object.SETRANGE(Type,Object.Type::Page);
-        // Object.SETRANGE(ID,PageId);
-        // IF NOT Object.FINDSET THEN
-        //    ERROR(PageMissingError);
-        //+NPR5.44 [323068]
-
-        //-NPR5.39 [303616]
         if (TableID = 0) or (TableView = '') then begin
-            //+NPR5.39 [303616]
             if RunModal then
                 PAGE.RunModal(PageId)
             else
                 PAGE.Run(PageId);
-            //-NPR5.39 [303616]
         end else begin
             RecRef.Open(TableID);
             RecRef.SetView(TableView);
@@ -176,7 +146,5 @@ codeunit 6150802 "NPR POS Action: Run Page"
             else
                 PAGE.Run(PageId, RecRefVar);
         end;
-        //+NPR5.39 [303616]
     end;
 }
-

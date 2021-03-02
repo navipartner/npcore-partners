@@ -111,7 +111,7 @@ codeunit 6150716 "NPR POS Stargate Management"
         OnAppGatewayProtocol(FrontEnd, ActionName, StepName, EventName, SerializedData, DoCallback, ResponseData, Handled);
 
         if not Handled then
-            FrontEnd.ReportBug(
+            FrontEnd.ReportBugAndThrowError(
               StrSubstNo(
                 TextExpectedAppGatewayResponse,
                 ActionName,
@@ -129,7 +129,7 @@ codeunit 6150716 "NPR POS Stargate Management"
         OnAppGatewayProtocolClosed(FrontEnd, ActionName, StepName, SerializedData, Forced, Handled);
 
         if not Handled then
-            FrontEnd.ReportBug(
+            FrontEnd.ReportBugAndThrowError(
               StrSubstNo(
                 TextExpectedAppGatewayResponse,
                 ActionName,
@@ -288,7 +288,7 @@ codeunit 6150716 "NPR POS Stargate Management"
             ErrorResponse.ErrorMessage);
         ResetRequestState(ActionName);
         FrontEnd.AbortWorkflows();
-        FrontEnd.ReportBug(ErrorMessage);
+        FrontEnd.ReportBugAndThrowError(ErrorMessage);
     end;
 
     local procedure ThrowUnsupportedStargateMethodError(FrontEnd: Codeunit "NPR POS Front End Management"; Method: Text; ActionName: Text)
@@ -301,14 +301,14 @@ codeunit 6150716 "NPR POS Stargate Management"
             Method);
         ResetRequestState(ActionName);
         FrontEnd.AbortWorkflows();
-        FrontEnd.ReportBug(ErrorMessage);
+        FrontEnd.ReportBugAndThrowError(ErrorMessage);
     end;
 
     local procedure ThrowDeserializationError(Exception: DotNet NPRNetException; Type: DotNet NPRNetType; FrontEnd: Codeunit "NPR POS Front End Management"; ActionName: Text)
     begin
         ResetRequestState(ActionName);
         FrontEnd.AbortWorkflows();
-        FrontEnd.ReportBug(
+        FrontEnd.ReportBugAndThrowError(
           StrSubstNo(
             TextDeserializationError,
             Type.FullName,
@@ -320,7 +320,7 @@ codeunit 6150716 "NPR POS Stargate Management"
     begin
         ResetRequestState(ActionName);
         FrontEnd.AbortWorkflows();
-        FrontEnd.ReportBug(
+        FrontEnd.ReportBugAndThrowError(
           StrSubstNo(
             TextUnexpectedResponseTypeError,
             ExpectedType.FullName,
@@ -331,7 +331,7 @@ codeunit 6150716 "NPR POS Stargate Management"
     begin
         ResetRequestState(ActionName);
         FrontEnd.AbortWorkflows();
-        FrontEnd.ReportBug(
+        FrontEnd.ReportBugAndThrowError(
           StrSubstNo(
             TextTooManyAttemptsError,
             Method));

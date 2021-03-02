@@ -1,16 +1,5 @@
 codeunit 6150909 "NPR POS Action: HC Ext. Price"
 {
-    // NPR5.38/TSA /20171201  CASE 297859 Initial Version
-    // NPR5.43/MHA /20180628  CASE 318396 Added missing UpdateAmounts() in OnAction()
-    // NPR5.44/MHA /20180724  CASE 323000 Discount Code is set to 'HC' to enable detection of actual Manually applied Discount
-    // NPR5.44/MHA /20180724  CASE 323006 Added trigger OnAfterSetQuantity() in OnAction()
-    // NPR5.45/MHA /20180803  CASE 323705 UpdateSaleLinePOS() moved to Codeunit 6150910
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This action makes remote call to aquire item price information ';
 
@@ -60,8 +49,6 @@ codeunit 6150909 "NPR POS Action: HC Ext. Price"
         Handled := true;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        // JSON.SetScope('parameters',TRUE);
-        // XX := JSON.GetString('xx', TRUE);
 
         GeneralLedgerSetup.Get();
         POSSession.GetSale(POSSale);
@@ -94,36 +81,18 @@ codeunit 6150909 "NPR POS Action: HC Ext. Price"
         SaleLinePOS.FindSet();
         repeat
             TmpSalesLine.Get(TmpSalesLine."Document Type"::Quote, SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.");
-            //-NPR5.44 [323000]
-            //SaleLinePOS."Unit Price" := TmpSalesLine."Unit Price";
-            //
-            // IF (TmpSalesLine."Line Discount %" <> 0) THEN BEGIN
-            //  SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::Manual;
-            //  SaleLinePOS.VALIDATE ("Discount %", TmpSalesLine."Line Discount %");
-            // END;
-            ////-NPR5.43 [318396]
-            //SaleLinePOS.UpdateAmounts(SaleLinePOS);
-            ////+NPR5.43 [318396]
-            //SaleLinePOS.MODIFY ();
             PrevRec := Format(SaleLinePOS);
 
-            //-NPR5.45 [323705]
-            //UpdateSaleLinePOS(TmpSalesLine,SaleLinePOS);
             CustomerPriceManagement.UpdateSaleLinePOS(TmpSalesLine, SaleLinePOS);
-            //+NPR5.45 [323705]
             SaleLinePOS.UpdateAmounts(SaleLinePOS);
 
             if PrevRec <> Format(SaleLinePOS) then
                 SaleLinePOS.Modify;
-        //+NPR5.44 [323000]
         until (SaleLinePOS.Next() = 0);
 
         POSSaleLine.RefreshCurrent();
-        //-NPR5.44 [323006]
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         POSSaleLine.OnAfterSetQuantity(SaleLinePOS);
-        //+NPR5.44 [323006]
         POSSession.RequestRefreshData();
     end;
 }
-

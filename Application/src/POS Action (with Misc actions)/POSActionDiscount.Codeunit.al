@@ -1,9 +1,5 @@
 codeunit 6150792 "NPR POS Action - Discount"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is a built-in action for handling discount';
         TotalAmountLabel: Label 'Type in the total amount that you want for the whole sales';
@@ -37,6 +33,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         AddDimensionValueCode: Code[20];
         ApprovedBySalespersonCode: Code[20];
         DiscountReasonCode: Code[10];
+        ReadingErr: Label 'reading in %1 of %2';
 
     local procedure ActionCode(): Text
     begin
@@ -195,11 +192,11 @@ then begin
                     exit;
                 end;
         end;
-        Quantity := JSON.GetDecimal('quantity', true);
-        JSON.SetScope('parameters', true);
-        DiscountType := JSON.GetInteger('DiscountType', true);
-        PresetMultiLineDiscTarget := JSON.GetIntegerParameter('TotalDiscTargetLines', false);
-        DiscountGroupFilter := JSON.GetStringParameter('DiscountGroupFilter', true);
+        Quantity := JSON.GetDecimalOrFail('quantity', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
+        JSON.SetScopeParameters(ActionCode());
+        DiscountType := JSON.GetIntegerOrFail('DiscountType', StrSubstNo(ReadingErr, 'OnAction', ActionCode()));
+        PresetMultiLineDiscTarget := JSON.GetIntegerParameter('TotalDiscTargetLines');
+        DiscountGroupFilter := JSON.GetStringParameterOrFail('DiscountGroupFilter', ActionCode);
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -300,7 +297,7 @@ then begin
         Salesperson: Record "Salesperson/Purchaser";
         SalespersonPassword: Text;
     begin
-        SalespersonPassword := JSON.GetString('SalespersonPassword', true);
+        SalespersonPassword := JSON.GetStringOrFail('SalespersonPassword', StrSubstNo(ReadingErr, 'OnActionSalespersonPassword', ActionCode()));
         Salesperson.SetRange("NPR Register Password", SalespersonPassword);
         if not Salesperson.FindFirst then
             Error(Text004);
@@ -318,7 +315,7 @@ then begin
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        SalespersonPassword := JSON.GetString('CurrentSalespersonPassword', true);
+        SalespersonPassword := JSON.GetStringOrFail('CurrentSalespersonPassword', StrSubstNo(ReadingErr, 'OnActionCurrentSalespersonPassword', ActionCode()));
 
         Salesperson.SetRange(Code, SalePOS."Salesperson Code");
         Salesperson.SetRange("NPR Register Password", SalespersonPassword);
@@ -334,7 +331,7 @@ then begin
         Salesperson: Record "Salesperson/Purchaser";
         SupervisorPassword: Text;
     begin
-        SupervisorPassword := JSON.GetString('SupervisorPassword', true);
+        SupervisorPassword := JSON.GetStringOrFail('SupervisorPassword', StrSubstNo(ReadingErr, 'OnActionSupervisorPassword', ActionCode()));
         Salesperson.SetRange("NPR Register Password", SupervisorPassword);
         Salesperson.SetRange("NPR Supervisor POS", true);
         if not Salesperson.FindFirst then
@@ -348,8 +345,8 @@ then begin
     var
         ReasonCode: Code[10];
     begin
-        JSON.SetScope('parameters', true);
-        ReasonCode := JSON.GetString('FixedReasonCode', true);
+        JSON.SetScopeParameters(ActionCode());
+        ReasonCode := JSON.GetStringOrFail('FixedReasonCode', StrSubstNo(ReadingErr, 'OnActionFixedReasonCode', ActionCode()));
         if ReasonCode = '' then
             exit;
 
@@ -374,12 +371,12 @@ then begin
         DimensionCodeParameter: Text;
         DimensionValueParameter: Text;
     begin
-        JSON.SetScope('parameters', true);
-        DimensionCodeParameter := JSON.GetStringParameter('DimensionCode', true);
+        JSON.SetScopeParameters(ActionCode());
+        DimensionCodeParameter := JSON.GetStringParameterOrFail('DimensionCode', ActionCode());
         if DimensionCodeParameter = '' then
             exit;
 
-        DimensionValueParameter := JSON.GetStringParameter('DimensionValue', true);
+        DimensionValueParameter := JSON.GetStringParameterOrFail('DimensionValue', ActionCode());
         if DimensionValueParameter = '' then begin
             DimensionValue.SetRange("Dimension Code", DimensionCodeParameter);
             if PAGE.RunModal(0, DimensionValue) <> ACTION::LookupOK then
@@ -833,11 +830,11 @@ then begin
 
     local procedure GetAdditionalParams(JSON: Codeunit "NPR POS JSON Management")
     begin
-        JSON.SetScope('/', true);
-        ApprovedBySalespersonCode := JSON.GetString('approvedBySalesperson', false);
-        DiscountReasonCode := JSON.GetString('discountReasonCode', false);
-        AddDimensionCode := JSON.GetString('addDimensionCode', false);
-        AddDimensionValueCode := JSON.GetString('addDimensionValueCode', false);
+        JSON.SetScopeRoot();
+        ApprovedBySalespersonCode := JSON.GetString('approvedBySalesperson');
+        DiscountReasonCode := JSON.GetString('discountReasonCode');
+        AddDimensionCode := JSON.GetString('addDimensionCode');
+        AddDimensionValueCode := JSON.GetString('addDimensionValueCode');
     end;
 
     local procedure ApplyAdditionalParams(var SaleLinePOS: Record "NPR Sale Line POS")
@@ -850,7 +847,7 @@ then begin
             AddDimensionToDimensionSet(SaleLinePOS, AddDimensionCode, AddDimensionValueCode);
     end;
 
-    //--- Constants ---
+    #region Constants
 
     local procedure "DiscType.DiscountAmt"(): Integer
     begin
@@ -866,4 +863,6 @@ then begin
     begin
         exit(2);
     end;
+
+    #endregion
 }
