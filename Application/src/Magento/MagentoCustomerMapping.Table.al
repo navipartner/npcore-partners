@@ -21,11 +21,11 @@ table 6151445 "NPR Magento Customer Mapping"
             //This property is currently not supported
             ValidateTableRelation = false;
         }
-        field(10; "Customer Template Code"; Code[10])
+        field(10; "Customer Template Code"; Code[20])
         {
             Caption = 'Customer Template Code';
             DataClassification = CustomerContent;
-            TableRelation = "Customer Template";
+            TableRelation = "Customer Templ.";
         }
         field(20; "Config. Template Code"; Code[10])
         {
