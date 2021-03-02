@@ -262,7 +262,7 @@ codeunit 6150703 "NPR POS JSON Management"
             exit;
 
         JValue := JToken.AsValue();
-        Date := JValue.AsDate();
+        Date := DT2DATE(JValue.AsDateTime());
     end;
 
     procedure GetBackEndId(Context: JsonObject; POSSession: Codeunit "NPR POS Session") BackEndId: Guid
