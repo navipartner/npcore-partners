@@ -938,12 +938,8 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
     end;
 
     local procedure RegExReplaceS(Input: Text; SerialNo: Text) Output: Text
-    var
-        Pattern: Text;
     begin
-        Pattern := '(?<SerialNo>\[S\])';
-        Output := Pattern.Replace(Input, SerialNo);
-        exit(Output);
+        Output := Input.Replace('[S]', SerialNo);
     end;
 
     local procedure GenerateRandomChar() RandomChar: Char
