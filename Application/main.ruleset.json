@@ -8,6 +8,91 @@
             "justification": "The name of variables and parameters must be suffixed with the type or object name."
         },
         {
+            "id": "AA0087",
+            "action":"Error",
+            "justification": "Lowering permissions should only be used in tests."
+        },
+        {
+            "id": "AA0101",
+            "action":"Error",
+            "justification": "Use camel case property values in pages of type API."
+        },
+        {
+            "id": "AA0102",
+            "action":"Error",
+            "justification": "Use camel case name for field controls in pages of type API."
+        },
+        {
+            "id": "AA0103",
+            "action":"Error",
+            "justification": "Use camel case property values in queries of type API."
+        },
+        {
+            "id": "AA0104",
+            "action":"Error",
+            "justification": "Use camel case name for column controls in queries of type API."
+        },
+        {
+            "id": "AA0106",
+            "action":"Error",
+            "justification": "A page of type API can only refer to the same subpage once."
+        },
+        {
+            "id": "AA0161",
+            "action":"Error",
+            "justification": "Only use AssertError in Test Codeunits."
+        },
+        {
+            "id": "AA0203",
+            "action":"Error",
+            "justification": "To avoid confusion, do not give methods the same name as fields or actions in the same scope."
+        },
+        {
+            "id": "AA0216",
+            "action":"Error",
+            "justification": "Use a text constant for passing user messages and errors without concatenations."
+        },
+        {
+            "id": "AA0219",
+            "action":"Error",
+            "justification": "The Tooltip property of Fields must start with 'Specifies'."
+        },
+        {
+            "id": "AA0220",
+            "action":"Error",
+            "justification": "The value of the Tooltip property of Fields must be filled."
+        },
+        {
+            "id": "AA0222",
+            "action":"Error",
+            "justification": "SIFT index should not be used on primary or unique key."
+        },
+        {
+            "id": "AA0223",
+            "action":"Error",
+            "justification": "The value of the OptionCaption property of Fields must be filled in."
+        },
+        {
+            "id": "AA0226",
+            "action":"Error",
+            "justification": "The value of the Caption property of Fields must be filled in."
+        },
+        {
+            "id": "AA0235",
+            "action":"Error",
+            "justification": "When using 'OnInstallPerCompany' you should also add 'Company - Initialize'::'OnCompanyInitialize' event subscriber."
+        },
+        {
+            "id": "AA0241",
+            "action":"Error",
+            "justification": "Use all lowercase letters for reserved language keywords."
+        },
+        {
+            "id": "AA0242",
+            "action":"Error",
+            "justification": "Limit JIT loads by selecting all fields for load."
+        },
+        {
             "id": "AS0018",
             "action":"Hidden",
             "justification": "A procedure belonging to the public API should not be removed."
