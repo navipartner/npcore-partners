@@ -35,11 +35,9 @@ codeunit 85002 "NPR Library - POS Master Data"
     procedure CreatePOSStore(var POSStore: Record "NPR POS Store")
     var
         LibraryUtility: Codeunit "Library - Utility";
-        NPRetailSetup: Record "NPR NP Retail Setup";
         Location: Record Location;
         LibraryWarehouse: Codeunit "Library - Warehouse";
     begin
-        NPRetailSetup.Get;
         POSStore.Init;
         POSStore.Validate(
           Code,
@@ -366,11 +364,8 @@ codeunit 85002 "NPR Library - POS Master Data"
 
     local procedure CreateDefaultRetailSetup()
     var
-        RetailSetup: Record "NPR NP Retail Setup";
         RetailItemSetup: Record "NPR Retail Item Setup";
     begin
-        if not RetailSetup.Get then
-            RetailSetup.Insert;
 
         if not RetailItemSetup.Get() then
             RetailItemSetup.Insert();

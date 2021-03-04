@@ -93,13 +93,13 @@ table 6014451 "NPR Retail Journal Header"
     end;
 
     trigger OnInsert()
+    var
+    GuidVar: Code[40];
     begin
-        if "No." = '' then begin
-            RetailSetup.Get;
-            RetailSetup.TestField("Retail Journal No. Series");
-            NoSeriesMgt.InitSeries(RetailSetup."Retail Journal No. Series", xRec."No. Series", 0D, "No.", "No. Series");
-        end;
-
+        if Rec."No." = '' then begin
+            Evaluate(GuidVar,CreateGuid());
+            Rec."No." := GuidVar;        
+        end;    
         "Date of creation" := Today;
     end;
 
@@ -109,23 +109,8 @@ table 6014451 "NPR Retail Journal Header"
     end;
 
     var
-        RetailSetup: Record "NPR NP Retail Setup";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
         RetailJournalLine: Record "NPR Retail Journal Line";
 
-    procedure AssistEdit(old: Record "NPR Retail Journal Header"): Boolean
-    var
-        this: Record "NPR Retail Journal Header";
-    begin
-        this := Rec;
-        RetailSetup.Get;
-        RetailSetup.TestField("Retail Journal No. Series");
-        if NoSeriesMgt.SelectSeries(RetailSetup."Retail Journal No. Series", old."No. Series", this."No. Series") then begin
-            NoSeriesMgt.SetSeries(this."No.");
-            Rec := this;
-            exit(true);
-        end;
-    end;
 
     procedure SetPrintQuantityByInventory()
     begin

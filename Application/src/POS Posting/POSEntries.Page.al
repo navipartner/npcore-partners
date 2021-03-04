@@ -400,16 +400,8 @@ page 6150650 "NPR POS Entries"
         }
     }
 
-    trigger OnOpenPage()
-    var
-        NPRetailSetup: Record "NPR NP Retail Setup";
-    begin
-        if NPRetailSetup.Get then
-            AdvancedPostingOff := false;
-    end;
 
     var
-        AdvancedPostingOff: Boolean;
         TextPostItemEntries: Label 'Post Item Entries?';
         TextPostPosEntries: Label 'Post all other Entries?';
         TextPostCompressed: Label 'Post Compressed?';

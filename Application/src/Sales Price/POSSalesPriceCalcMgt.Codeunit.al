@@ -43,7 +43,6 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
 
     procedure FindItemPrice(SalePOS: Record "NPR Sale POS"; var SaleLinePOS: Record "NPR Sale Line POS")
     var
-        NPRetailSetup: Record "NPR NP Retail Setup";
         POSUnit: Record "NPR POS Unit";
         POSPricingProfile: Record "NPR POS Pricing Profile";
         Handled: Boolean;

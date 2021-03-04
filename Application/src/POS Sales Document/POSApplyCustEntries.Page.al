@@ -603,7 +603,6 @@ page 6014493 "NPR POS Apply Cust. Entries"
         Text019: Label 'Post application process has been canceled.';
         SaleLinePOS: Record "NPR Sale Line POS";
         BalancePOSLine: Boolean;
-        RetailSetup: Record "NPR NP Retail Setup";
 
     procedure SetGenJnlLine(NewGenJnlLine: Record "Gen. Journal Line"; ApplnTypeSelect: Integer)
     begin
@@ -1177,7 +1176,6 @@ page 6014493 "NPR POS Apply Cust. Entries"
 
     procedure SetSalesLine(NewGenJnlLine: Record "NPR Sale Line POS"; ApplnTypeSelect: Integer)
     begin
-        if RetailSetup.ReadPermission then begin
             SaleLinePOS := NewGenJnlLine;
             BalancePOSLine := true;
 
@@ -1194,7 +1192,6 @@ page 6014493 "NPR POS Apply Cust. Entries"
                         CustEntryApplID := NewGenJnlLine."Buffer ID"
                     end;
             end;
-        end;
     end;
 
     local procedure ExchangeAmountsOnLedgerEntry(Type: Option Direct,GenJnlLine,SalesHeader; CurrencyCode: Code[10]; var CalcCustLedgEntry: Record "Cust. Ledger Entry"; PostingDate: Date)

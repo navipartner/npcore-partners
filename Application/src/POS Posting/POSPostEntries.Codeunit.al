@@ -1372,7 +1372,6 @@ codeunit 6150615 "NPR POS Post Entries"
         CustPostingGr: Record "Customer Posting Group";
         POSTaxAmountLine: Record "NPR POS Tax Amount Line";
         TempPOSTaxAmountLine: Record "NPR POS Tax Amount Line" temporary;
-        NPRetailSetup: Record "NPR NP Retail Setup";
         Currency: Record Currency;
         GLSetup: Record "General Ledger Setup";
         NPRPOSPostingProfile: Record "NPR POS Posting Profile";
@@ -1385,7 +1384,6 @@ codeunit 6150615 "NPR POS Post Entries"
         FldRef: FieldRef;
         IsNALocalized: Boolean;
     begin
-        NPRetailSetup.Get;
         GLSetup.Get;
         RecRef.GetTable(GenJnlLine);
         IsNALocalized := RecRef.FieldExist(10011);

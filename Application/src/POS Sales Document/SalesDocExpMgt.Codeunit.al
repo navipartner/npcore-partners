@@ -721,7 +721,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
     local procedure PrintRetailReceipt(SalePOS: Record "NPR Sale POS")
     var
         POSEntry: Record "NPR POS Entry";
-        NPRetailSetup: Record "NPR NP Retail Setup";
         RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
         RecRef: RecordRef;
         ReportSelectionRetail: Record "NPR Report Selection Retail";
@@ -733,7 +732,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         if not RetailPrint then
             exit;
 
-        NPRetailSetup.Get;
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
         if not POSEntry.FindFirst then
             exit;

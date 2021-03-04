@@ -1017,8 +1017,6 @@ page 6014651 "NPR Retail Wizard"
     end;
 
     local procedure FinishAction();
-    var
-        RetailSetup: Record "NPR NP Retail Setup";
     begin
         CurrPage.CompanyInformationPG.Page.CreateCompanyInfoData();
         CurrPage.POSStoreListPG.Page.CreatePOSStoreData();
@@ -1039,11 +1037,6 @@ page 6014651 "NPR Retail Wizard"
         CurrPage.UserSetupPG.Page.CreateUserSetupData();
 
         SalespersonBuffer.DeleteAll();
-
-        if RetailSetup.IsEmpty and AnyDataToCreate then begin
-            RetailSetup.Init();
-            RetailSetup.Insert();
-        end;
 
         CurrPage.Close();
     end;
