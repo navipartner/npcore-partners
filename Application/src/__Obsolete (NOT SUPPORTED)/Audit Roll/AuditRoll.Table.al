@@ -53,22 +53,6 @@ table 6014407 "NPR Audit Roll"
             ELSE
             IF (Type = CONST(Item)) Item."No." WHERE(Blocked = CONST(false));
             ValidateTableRelation = false;
-
-            trigger OnValidate()
-            begin
-                case Type of
-                    Type::"G/L":
-                        begin
-                            TestField(Type, Type::"G/L");
-                            TestField(Posted, false);
-                            if "No." <> '*' then begin
-                                GLAccount.Get("No.");
-                                GLAccount.TestField("Direct Posting", true);
-                                GLAccount.TestField(Blocked, false);
-                            end;
-                        end;
-                end;
-            end;
         }
         field(7; Lokationskode; Code[10])
         {
@@ -343,17 +327,6 @@ table 6014407 "NPR Audit Roll"
             Caption = 'Shortcut Dimension 1 Code';
             DataClassification = CustomerContent;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
-
-            trigger OnLookup()
-            begin
-                LookUpShortcutDimCode(1, "Shortcut Dimension 1 Code");
-                Validate("Shortcut Dimension 1 Code", "Shortcut Dimension 1 Code");
-            end;
-
-            trigger OnValidate()
-            begin
-                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
-            end;
         }
         field(71; "Shortcut Dimension 2 Code"; Code[20])
         {
@@ -361,17 +334,6 @@ table 6014407 "NPR Audit Roll"
             Caption = 'Shortcut Dimension 2 Code';
             DataClassification = CustomerContent;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
-
-            trigger OnLookup()
-            begin
-                LookUpShortcutDimCode(2, "Shortcut Dimension 2 Code");
-                Validate("Shortcut Dimension 2 Code", "Shortcut Dimension 2 Code");
-            end;
-
-            trigger OnValidate()
-            begin
-                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
-            end;
         }
         field(72; "Offline - Gift voucher ref."; Code[20])
         {
@@ -1075,186 +1037,4 @@ table 6014407 "NPR Audit Roll"
         {
         }
     }
-
-    trigger OnDelete()
-    begin
-        NPRDimMgt.DeleteNPRDim(DATABASE::"NPR Audit Roll", "Register No.", "Sales Ticket No.", "Sale Date", "Sale Type", "Line No.", "No.");
-    end;
-
-    trigger OnInsert()
-    var
-        POSUnit: Record "NPR POS Unit";
-        InsertAllowed: Boolean;
-    begin
-        if POSUnit.Get("Register No.") then begin
-            InsertAllowed := false;
-            case POSUnit.Status of
-                POSUnit.Status::OPEN:
-                    begin
-                        InsertAllowed := true;
-                    end;
-                POSUnit.Status::CLOSED:
-                    begin
-                        if Type = Type::"Open/Close" then
-                            if not Balancing then
-                                InsertAllowed := true;
-                        if Balancing then
-                            InsertAllowed := true;
-
-                        if Type = Type::Cancelled then
-                            InsertAllowed := true;
-                    end;
-                POSUnit.Status::EOD:
-                    begin
-                        if Type = Type::"Open/Close" then
-                            if Balancing then
-                                InsertAllowed := true;
-                        if Type = Type::Cancelled then
-                            InsertAllowed := true;
-                    end;
-            end;
-
-            if not InsertAllowed then
-                Error(
-                  StrSubstNo(
-                    Text1060001,
-                    POSUnit.FieldCaption("No."),
-                    POSUnit."No.",
-                    POSUnit.FieldCaption(Status),
-                    POSUnit.Status,
-                    TableCaption,
-                    FieldCaption(Type),
-                    Type));
-        end;
-        if "Offline receipt no." = '' then
-            "Offline receipt no." := "Sales Ticket No.";
-    end;
-
-    var
-        AuditRoll: Record "NPR Audit Roll";
-        GLAccount: Record "G/L Account";
-        DimMgt: Codeunit DimensionManagement;
-        NPRDimMgt: Codeunit "NPR Dimension Mgt.";
-        HandleErrorUnderPrintReceipt: Boolean;
-        Text1060001: Label '%1 %2 has %3 %4. It is not possible to insert %5 with %6 %7.';
-        Text1060002: Label 'Error at insert into the audit roll. \Status = %2.';
-
-    procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
-    begin
-        if "Line No." <> 0 then
-            NPRDimMgt.SaveNPRDim(
-                DATABASE::"NPR Audit Roll", "Register No.", "Sales Ticket No.", "Sale Date",
-                "Sale Type", "Line No.", "No.", FieldNumber, ShortcutDimCode)
-        else
-            NPRDimMgt.SaveTempDim(FieldNumber, ShortcutDimCode);
-    end;
-
-    procedure LookUpShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
-    begin
-        NPRDimMgt.LookupDimValueCode(FieldNumber, ShortcutDimCode);
-    end;
-
-    procedure GetNoOfSales(): Integer
-    var
-        AuditRoll2: Record "NPR Audit Roll";
-        NoOfSales: Integer;
-        LastSalesTicketNo: Code[20];
-    begin
-        AuditRoll2.CopyFilters(Rec);
-
-        if AuditRoll2.FindSet then
-            repeat
-                if (AuditRoll2."Sales Ticket No." <> LastSalesTicketNo) then
-                    NoOfSales += 1;
-                LastSalesTicketNo := AuditRoll2."Sales Ticket No.";
-            until AuditRoll2.Next = 0;
-
-        exit(NoOfSales);
-    end;
-
-    procedure TransferFromSaleLinePOS(var SaleLinePOS: Record "NPR Sale Line POS"; Time2: Time; Code2: Code[20]; AuditDocType: Integer; AuditAdvanceNo: Code[10])
-    begin
-        "No." := SaleLinePOS."No.";
-        "Sale Date" := SaleLinePOS.Date;
-        Type := Type::"Debit Sale";
-        Lokationskode := SaleLinePOS."Location Code";
-        "Bin Code" := SaleLinePOS."Bin Code";
-        "Posting Group" := SaleLinePOS."Posting Group";
-        "Qty. Discount Code" := SaleLinePOS."Qty. Discount Code";
-        Description := SaleLinePOS.Description;
-        "Unit of Measure Code" := SaleLinePOS."Unit of Measure Code";
-        Quantity := SaleLinePOS.Quantity;
-        "Invoice (Qty)" := SaleLinePOS."Invoice (Qty)";
-        "To Ship (Qty)" := SaleLinePOS."To Ship (Qty)";
-        "Unit Price" := SaleLinePOS."Unit Price";
-        "Unit Cost (LCY)" := SaleLinePOS."Unit Cost (LCY)";
-        "VAT %" := SaleLinePOS."VAT %";
-        "Qty. Discount %" := SaleLinePOS."Qty. Discount %";
-        "Line Discount %" := SaleLinePOS."Discount %";
-        "Line Discount Amount" := SaleLinePOS."Discount Amount";
-        Amount := SaleLinePOS.Amount;
-        "Amount Including VAT" := SaleLinePOS."Amount Including VAT";
-        "Shortcut Dimension 1 Code" := SaleLinePOS."Shortcut Dimension 1 Code";
-        "Shortcut Dimension 2 Code" := SaleLinePOS."Shortcut Dimension 2 Code";
-        "Dimension Set ID" := SaleLinePOS."Dimension Set ID";
-
-        "Price Group Code" := SaleLinePOS."Customer Price Group";
-        "Serial No." := SaleLinePOS."Serial No.";
-        "Customer/Item Discount %" := SaleLinePOS."Customer/Item Discount %";
-        "Invoice to Customer No." := SaleLinePOS."Invoice to Customer No.";
-        "Invoice Discount Amount" := SaleLinePOS."Invoice Discount Amount";
-        "Gen. Bus. Posting Group" := SaleLinePOS."Gen. Bus. Posting Group";
-        "Gen. Prod. Posting Group" := SaleLinePOS."Gen. Prod. Posting Group";
-        "VAT Bus. Posting Group" := SaleLinePOS."VAT Bus. Posting Group";
-        "VAT Prod. Posting Group" := SaleLinePOS."VAT Prod. Posting Group";
-        "Currency Code" := SaleLinePOS."Currency Code";
-        Cost := SaleLinePOS.Cost;
-        "Unit Cost" := SaleLinePOS."Unit Cost";
-        "Variant Code" := SaleLinePOS."Variant Code";
-        "Salesperson Code" := "Salesperson Code";
-        "Discount Type" := SaleLinePOS."Discount Type";
-        "Discount Code" := SaleLinePOS."Discount Code";
-        "Discount Authorised by" := SaleLinePOS."Discount Authorised by";
-        "Customer No." := "Customer No.";
-        "Customer Type" := "Customer Type";
-        "Item Group" := SaleLinePOS."Item Group";
-        "Starting Time" := Time2;
-        "Closing Time" := Time;
-        "Document No." := Code2;
-        "Document Type" := AuditDocType;
-        "Allocated No." := AuditAdvanceNo;
-        "Variant Code" := SaleLinePOS."Variant Code";
-
-        "Order No. from Web" := SaleLinePOS."Order No. from Web";
-        "Order Line No. from Web" := SaleLinePOS."Order Line No. from Web";
-
-        if SaleLinePOS."Return Sale Sales Ticket No." <> '' then
-            "Reverseing Sales Ticket No." := SaleLinePOS."Return Sale Sales Ticket No.";
-        "Return Reason Code" := SaleLinePOS."Return Reason Code";
-
-        "Serial No. not Created" := SaleLinePOS."Serial No. not Created";
-    end;
-
-    procedure IncrementPrintedCount()
-    begin
-        if FindSet(true, false) then
-            repeat
-                "No. Printed" += 1;
-                Modify;
-            until Next = 0;
-    end;
-
-    procedure SetDimensions()
-    begin
-        "Dimension Set ID" :=
-          DimMgt.EditDimensionSet("Dimension Set ID", StrSubstNo('%1 %2 %3', "Register No.", "Sales Ticket No.", "Line No."));
-
-        DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-        Modify;
-        if (xRec."Shortcut Dimension 1 Code" <> "Shortcut Dimension 1 Code") then
-            Validate("Shortcut Dimension 1 Code");
-
-        if (xRec."Shortcut Dimension 2 Code" <> "Shortcut Dimension 2 Code") then
-            Validate("Shortcut Dimension 2 Code");
-    end;
 }

@@ -127,7 +127,6 @@ codeunit 6150614 "NPR POS Create Entry"
     local procedure InsertPOSEntry(var POSPeriodRegister: Record "NPR POS Period Register"; var SalePOS: Record "NPR Sale POS"; var POSEntry: Record "NPR POS Entry"; EntryType: Option)
     var
         Contact: Record Contact;
-        POSAuditRollIntegration: Codeunit "NPR POS-Audit Roll Integration";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         SaleLinePOS: Record "NPR Sale Line POS";
     begin
@@ -193,8 +192,6 @@ codeunit 6150614 "NPR POS Create Entry"
         end;
 
         POSEntry.Insert;
-
-        POSAuditRollIntegration.InsertAuditRollEntryLinkFromPOSEntry(POSEntry);
     end;
 
     local procedure InsertPOSSaleLine(SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS"; POSEntry: Record "NPR POS Entry"; ReverseSign: Boolean; var POSSalesLine: Record "NPR POS Sales Line")

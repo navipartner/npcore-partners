@@ -17,7 +17,6 @@ table 6150698 "NPR Audit Roll 2 POSEntry Link"
         {
             Caption = 'Audit Roll Clustered Key';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Audit Roll"."Clustered Key";
         }
         field(3; "POS Entry No."; Integer)
         {

@@ -30,7 +30,6 @@ codeunit 6060150 "NPR Event Management"
         JobRegisterInitialized: Boolean;
         POSDocPostType: Option " ","POS Entry","Audit Roll";
         POSEntryNo: Integer;
-        AuditRollPosting: Record "NPR Audit Roll Posting";
         SalesDocErr: Label 'The %1 %2 does not exist anymore. A printed copy of the document was created before the document was deleted.';
         POSDocProcessingErr: Label 'Document is currently being processed on POS. Please try again later.';
         POSDocErr: Label 'POS document %1 %2 no longer exists.';
@@ -1486,28 +1485,6 @@ codeunit 6060150 "NPR Event Management"
                                             ShortcutDimCode1 := SalesInvLine."Shortcut Dimension 1 Code";
                                             ShortcutDimCode2 := SalesInvLine."Shortcut Dimension 2 Code";
                                             DimSetID := SalesInvLine."Dimension Set ID";
-                                        end;
-                                    POSDocPostType::"Audit Roll":
-                                        begin
-                                            DocumentDate := AuditRollPosting."Sale Date";
-                                            DocumentNo := AuditRollPosting."Posted Doc. No.";
-                                            PostingGroup := AuditRollPosting."Posting Group";
-                                            GenBusPostGroup := AuditRollPosting."Gen. Bus. Posting Group";
-                                            GenProdPostGroup := AuditRollPosting."Gen. Prod. Posting Group";
-                                            Description := AuditRollPosting.Description;
-                                            UnitOfMeasureCode := AuditRollPosting.Unit;
-                                            QtyPerUoM := 1; //may need change if we introduce this to Audit Roll
-                                            LocationCode := AuditRollPosting.Lokationskode;
-                                            BinCode := AuditRollPosting."Bin Code";
-                                            ReasonCode := AuditRollPosting."Reason Code";
-                                            Quantity := AuditRollPosting.Quantity;
-                                            CurrencyCode := AuditRollPosting."Currency Code";
-                                            UnitCost := AuditRollPosting."Unit Cost";
-                                            UnitCostLCY := AuditRollPosting."Unit Cost (LCY)";
-                                            LineDiscPerc := AuditRollPosting."Line Discount %";
-                                            ShortcutDimCode1 := AuditRollPosting."Shortcut Dimension 1 Code";
-                                            ShortcutDimCode2 := AuditRollPosting."Shortcut Dimension 2 Code";
-                                            DimSetID := AuditRollPosting."Dimension Set ID";
                                         end;
                                     POSDocPostType::"POS Entry":
                                         begin
