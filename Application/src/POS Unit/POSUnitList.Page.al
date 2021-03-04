@@ -169,25 +169,6 @@ page 6150616 "NPR POS Unit List"
                 }
             }
         }
-        area(processing)
-        {
-            action("End Workshift (Prel)")
-            {
-                Caption = 'End Workshift (Prel)';
-                Ellipsis = true;
-                Image = Sales;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedIsBig = true;
-                ApplicationArea = All;
-                ToolTip = 'Executes the End Workshift (Prel) action';
-
-                trigger OnAction()
-                begin
-                    CreateCheckpointWorker(true, true, Rec."No.");
-                end;
-            }
-        }
     }
 
 

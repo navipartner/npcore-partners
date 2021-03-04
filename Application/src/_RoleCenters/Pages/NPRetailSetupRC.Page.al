@@ -345,6 +345,13 @@ page 6151245 "NPR Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Retail Print Template List action';
                 }
+                action("Report Selection Retail")
+                {
+                    Caption = 'Report Selection - Retail';
+                    RunObject = Page "NPR Retail Report Select. List";
+                    ApplicationArea = All; 
+                    ToolTip = 'Runs the page for selecting retail reports';
+                }
                 action("Object Output Selection")
                 {
                     Caption = 'Object Output Selection';
