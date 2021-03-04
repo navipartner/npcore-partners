@@ -35,13 +35,6 @@ table 6014423 "NPR Period"
             InitValue = 000000T;
             NotBlank = true;
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                if Period.Get("No." - 1) then
-                    if "Balancing Time" < Period."Balancing Time" then
-                        Error(Text1060000, "No.", Period."Balancing Time");
-            end;
         }
         field(5; "Last Date Active"; Date)
         {
@@ -521,17 +514,8 @@ table 6014423 "NPR Period"
     {
     }
 
-    trigger OnInsert()
-    begin
-        if Period.Find('+') then
-            "No." := Period."No." + 1
-        else
-            "No." := 1;
-    end;
-
     var
         Text1060000: Label 'Ending time for period %1 must be after %2 o''clock';
-        Period: Record "NPR Period";
         NPRDimMgt: Codeunit "NPR Dimension Mgt.";
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])

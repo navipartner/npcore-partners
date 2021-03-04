@@ -498,7 +498,6 @@ codeunit 6150615 "NPR POS Post Entries"
     var
         POSEntryToPost: Record "NPR POS Entry";
         POSPostItemEntries: Codeunit "NPR POS Post Item Entries";
-        POSAuditRollIntegration: Codeunit "NPR POS-Audit Roll Integration";
         POSPostItemTransaction: Codeunit "NPR POS Post Item Transaction";
         LineCount: Integer;
         NoOfRecords: Integer;
@@ -518,7 +517,6 @@ codeunit 6150615 "NPR POS Post Entries"
                     ProgressWindow.Update(11, Round(LineCount / NoOfRecords * 10000, 1));
                 end;
                 if (POSEntry."Post Item Entry Status" in [POSEntry."Post Item Entry Status"::Unposted, POSEntry."Post Item Entry Status"::"Error while Posting"]) then begin
-                    POSAuditRollIntegration.CheckPostingStatusFromPOSEntry(POSEntry, true, false);
                     if PostingDateExists then
                         POSPostItemEntries.SetPostingDate(ReplaceDocumentDate, ReplaceDocumentDate, PostingDate);
 

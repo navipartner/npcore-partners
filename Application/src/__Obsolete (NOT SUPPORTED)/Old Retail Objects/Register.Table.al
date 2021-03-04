@@ -320,7 +320,7 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
             ObsoleteReason = 'This table won''t be used anymore.';
-            ObsoleteTag = 'NPR Register';            
+            ObsoleteTag = 'NPR Register';
         }
         field(160; "Return Payment Type"; Code[10])
         {
@@ -661,53 +661,6 @@ table 6014401 "NPR Register"
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
         }
-        field(402; "Attendance Count in Audit Roll"; Integer)
-        {
-            CalcFormula = Count("NPR Audit Roll" WHERE("Register No." = FIELD("Register No."),
-                                                    "Sale Type" = CONST(Sale),
-                                                    "Line No." = CONST(1)));
-            Caption = 'Attendance Count in Audit Roll';
-            FieldClass = FlowField;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'This table won''t be used anymore.';
-            ObsoleteTag = 'NPR Register';
-        }
-        field(403; "Normal Sales in Audit Roll"; Decimal)
-        {
-            CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE(
-                                                                         "Register No." = FIELD("Register No."),
-                                                                         "Sale Type" = CONST(Sale),
-                                                                         Type = CONST(Item)));
-            Caption = 'Normal Sales in Audit Roll';
-            FieldClass = FlowField;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'This table won''t be used anymore.';
-            ObsoleteTag = 'NPR Register';
-        }
-        field(404; "Debit Sales in Audit Roll"; Decimal)
-        {
-            CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE(
-                                                                         "Register No." = FIELD("Register No."),
-                                                                         "Sale Type" = CONST("Debit Sale")));
-            Caption = 'Dabit Sales in Audit Roll';
-            Description = 'Calcformula rettet';
-            FieldClass = FlowField;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'This table won''t be used anymore.';
-            ObsoleteTag = 'NPR Register';
-        }
-        field(410; "Item Count in Audit Roll Debit"; Integer)
-        {
-            CalcFormula = Count("NPR Audit Roll" WHERE("Register No." = FIELD("Register No."),
-                                                    Type = CONST("Debit Sale"),
-                                                    "Line No." = CONST(2)));
-            Caption = 'Item Count in Audit Debit Roll';
-            Description = 'Calcformula rettet';
-            FieldClass = FlowField;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'This table won''t be used anymore.';
-            ObsoleteTag = 'NPR Register';
-        }
         field(411; "Sales Ticket Filter"; Code[20])
         {
             Caption = 'Sales Ticket Filter';
@@ -738,29 +691,6 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             OptionCaption = 'Day before 00:00pm,Manual';
             OptionMembers = Day,Manual;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'This table won''t be used anymore.';
-            ObsoleteTag = 'NPR Register';
-        }
-        field(503; "All Normal Sales in Audit Roll"; Decimal)
-        {
-            CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE(
-                                                                         "Sale Type" = CONST(Sale),
-                                                                         Type = CONST(Item)));
-            Caption = 'Normal Sales in Audit Roll';
-            FieldClass = FlowField;
-            ObsoleteState = Removed;
-            ObsoleteReason = 'This table won''t be used anymore.';
-            ObsoleteTag = 'NPR Register';
-        }
-        field(504; "All Debit Sales in Audit Roll"; Decimal)
-        {
-            CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE(
-                                                                         "Sale Type" = CONST("Debit Sale"),
-                                                                         Type = CONST(Item)));
-            Caption = 'Dabit Sales in Audit Roll';
-            Description = 'Calcformula rettet';
-            FieldClass = FlowField;
             ObsoleteState = Removed;
             ObsoleteReason = 'This table won''t be used anymore.';
             ObsoleteTag = 'NPR Register';
@@ -1127,21 +1057,6 @@ table 6014401 "NPR Register"
     fieldgroups
     {
     }
-
-    trigger OnDelete()
-    var
-        AuditRoll: Record "NPR Audit Roll";
-    begin
-        AuditRoll.SetRange("Register No.", "Register No.");
-        AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
-        if AuditRoll.FindLast then begin
-            if not Confirm(StrSubstNo(Text1060008, "Register No.", AuditRoll."Sale Date"), false) then
-                Error('');
-        end else begin
-            if not Confirm(StrSubstNo(Text1060009, "Register No."), false) then
-                Error('');
-        end;
-    end;
 
     trigger OnInsert()
     var
