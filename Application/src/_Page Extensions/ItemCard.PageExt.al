@@ -840,7 +840,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     PromotedOnly = true;
                     PromotedCategory = Category5;
                     Image = BinLedger;
-                    ShortcutKey = 'Shift+F8';
+                    ShortcutKey = 'Ctrl+Alt+L';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Price Label action';
 
