@@ -1,10 +1,5 @@
 page 6151555 "NPR NpXml Attributes"
 {
-    // NC1.00 /MHA /20150113  CASE 199932 Refactored object from Web - XML
-    // NC1.07 /MHA /20150309  CASE 206395 Added Field 140 Default Field Type
-    // NC2.00 /MHA /20160525  CASE 240005 NaviConnect
-    // NC2.03 /MHA /20170404  CASE 267094 Added field 5105 Namespace
-
     AutoSplitKey = true;
     Caption = 'Xml Attributes';
     DelayedInsert = true;
@@ -59,16 +54,6 @@ page 6151555 "NPR NpXml Attributes"
         }
     }
 
-    actions
-    {
-    }
-
-    trigger OnModifyRecord(): Boolean
-    var
-        XMLMappingAttribute: Record "NPR NpXml Attribute";
-    begin
-    end;
-
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         "Table No." := TableNo;
@@ -80,9 +65,7 @@ page 6151555 "NPR NpXml Attributes"
 
     procedure SetEnabledFilters(NpXmlTemplate: Record "NPR NpXml Template")
     begin
-        //-NC2.03 [267094]
         NamespacesEnabled := NpXmlTemplate."Namespaces Enabled";
-        //+NC2.03 [267094]
     end;
 
     procedure SetTableNo(NewTableNo: Integer)

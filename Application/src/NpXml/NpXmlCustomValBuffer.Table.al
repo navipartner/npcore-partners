@@ -1,9 +1,5 @@
 table 6151557 "NPR NpXml Custom Val. Buffer"
 {
-    // NC1.01/MH/20150122  CASE 199932 Object created - Value from Custom Codeunit should be stored here (Use Temp Table).
-    // NC1.07/MH/20150309  CASE 208131 Updated captions
-    // NC2.00/MHA/20160525  CASE 240005 NaviConnect
-
     Caption = 'NpXml Custom Value Buffer';
     DataClassification = CustomerContent;
 
@@ -51,10 +47,6 @@ table 6151557 "NPR NpXml Custom Val. Buffer"
         key(Key1; "Entry No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 
