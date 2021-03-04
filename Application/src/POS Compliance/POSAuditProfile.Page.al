@@ -16,6 +16,11 @@ page 6150626 "NPR POS Audit Profile"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
+                field("Sales Ticket No. Series"; Rec."Sales Ticket No. Series")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Ticket No. Series field';
+                }
                 field("Sale Fiscal No. Series"; Rec."Sale Fiscal No. Series")
                 {
                     ApplicationArea = All;
@@ -65,11 +70,6 @@ page 6150626 "NPR POS Audit Profile"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Do Not Print Receipt on Sale field';
-                }
-                field("Sales Ticket No. Series"; Rec."Sales Ticket No. Series")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Sales Ticket No. Series field';
                 }
             }
         }

@@ -1,7 +1,5 @@
 page 6014481 "NPR Retail Report Select. List"
 {
-    // NPR5.29/MMV /20161215 CASE 241549 Updated page with same columns as the regular retail report selection page.
-    //                                   Made editable.
 
     Caption = 'Report Type List - Retail';
     PageType = List;
@@ -88,8 +86,5 @@ page 6014481 "NPR Retail Report Select. List"
         }
     }
 
-    actions
-    {
-    }
 }
 
