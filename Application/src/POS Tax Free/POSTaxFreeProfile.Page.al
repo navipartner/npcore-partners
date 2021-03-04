@@ -17,6 +17,11 @@ page 6059966 "NPR POS Tax Free Profile"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
+                field(Description; Rec.Description)
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
+                }
                 field("Handler ID Enum"; Rec."Handler ID Enum")
                 {
                     ApplicationArea = All;

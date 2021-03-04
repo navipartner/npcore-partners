@@ -5,6 +5,7 @@ page 6150635 "NPR POS View Profiles"
     PageType = List;
     UsageCategory = Administration;
     ApplicationArea = All;
+    Editable = false;
     SourceTable = "NPR POS View Profile";
 
     layout
@@ -17,6 +18,11 @@ page 6150635 "NPR POS View Profiles"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
+                }
+                field(Description; Rec.Description)
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Client Formatting Culture ID"; Rec."Client Formatting Culture ID")
                 {

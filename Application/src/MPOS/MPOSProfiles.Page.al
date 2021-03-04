@@ -5,7 +5,8 @@ page 6150677 "NPR MPOS Profiles"
     ApplicationArea = All;
     SourceTable = "NPR MPOS Profile";
     Caption = 'MPOS Profiles';
-
+    Editable = false;
+    CardPageID = "NPR MPOS Profile Card";
     layout
     {
         area(content)

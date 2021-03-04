@@ -19,6 +19,11 @@ page 6151264 "NPR POS Unit Rcpt.Txt Profiles"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
+                field(Description; Rec.Description)
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
+                }
                 field(IsReceiptTextSet; IsReceiptTextSet)
                 {
                     Editable = false;

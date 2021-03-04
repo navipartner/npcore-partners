@@ -17,6 +17,11 @@ page 6059965 "NPR POS Display Profile"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
+                field(Description; Rec.Description)
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
+                }
                 field(Activate; Rec.Activate)
                 {
                     ApplicationArea = All;
@@ -111,6 +116,6 @@ page 6059965 "NPR POS Display Profile"
     trigger OnOpenPage()
     begin
         Rec.InitDisplayContent();
-    end;    
+    end;
 }
 

@@ -1,19 +1,17 @@
-page 6150637 "NPR POS End of Day Profiles"
+page 6150752 "NPR POS End of Day Prof. Card"
 {
-    Caption = 'POS End of Day Profile';
-    PageType = List;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    Caption = 'NPR POS End of Day Profile Card';
+    PageType = Card;
     SourceTable = "NPR POS End of Day Profile";
-    Editable = false;
-    CardPageID = "NPR POS End of Day Prof. Card";
+    UsageCategory = None;
 
     layout
     {
         area(content)
         {
-            repeater(Group)
+            group(General)
             {
+                Caption = 'General';
                 field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
@@ -89,5 +87,5 @@ page 6150637 "NPR POS End of Day Profiles"
         }
     }
 
-}
 
+}

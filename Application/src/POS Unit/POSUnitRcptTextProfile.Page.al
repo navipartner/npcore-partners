@@ -17,6 +17,11 @@ page 6151265 "NPR POS Unit Rcpt.Text Profile"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
+                field(Description; Rec.Description)
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
+                }
                 field("Break Line"; Rec."Break Line")
                 {
                     ApplicationArea = Advanced;

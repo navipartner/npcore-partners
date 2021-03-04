@@ -12,6 +12,11 @@ table 6150654 "NPR POS Unit Rcpt.Txt Profile"
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
         }
+        field(2; Description; Text[50])
+        {
+            Caption = 'Description';
+            DataClassification = CustomerContent;
+        }
         field(10; "Sales Ticket Line Text off"; Option)
         {
             Caption = 'Sales Ticket Line Text off';

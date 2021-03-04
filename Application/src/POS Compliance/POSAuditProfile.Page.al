@@ -11,10 +11,16 @@ page 6150626 "NPR POS Audit Profile"
         {
             group(General)
             {
+                Caption = 'General';
                 field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
+                }
+                field(Description; Rec.Description)
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Sales Ticket No. Series"; Rec."Sales Ticket No. Series")
                 {

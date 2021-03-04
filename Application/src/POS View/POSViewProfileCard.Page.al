@@ -11,10 +11,16 @@ page 6150636 "NPR POS View Profile Card"
         {
             group(General)
             {
+                Caption = 'General';
                 field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
+                }
+                field(Description; Rec.Description)
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Control6014403; Rec.Picture)
                 {
