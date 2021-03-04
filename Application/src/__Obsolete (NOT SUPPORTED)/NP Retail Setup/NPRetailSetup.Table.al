@@ -3,6 +3,7 @@ table 6150613 "NPR NP Retail Setup"
 
     Caption = 'NP Retail Setup';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
 
     fields
     {
@@ -25,24 +26,18 @@ table 6150613 "NPR NP Retail Setup"
             Caption = 'Sale Fiscal No. Series';
             DataClassification = CustomerContent;
             Description = 'NPR5.39';
-            TableRelation = "No. Series";
-
-            trigger OnValidate()
-            var
-                NoSeries: Record "No. Series";
-            begin
-                if "Sale Fiscal No. Series" <> '' then begin
-                    NoSeries.Get("Sale Fiscal No. Series");
-                    NoSeries.TestField("Default Nos.", true);
-                end;
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(151; "Balancing Fiscal No. Series"; Code[20])
         {
             Caption = 'Balancing Fiscal No. Series';
             DataClassification = CustomerContent;
             Description = 'NPR5.40';
-            TableRelation = "No. Series";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(160; "Fill Sale Fiscal No. On"; Option)
         {
@@ -51,12 +46,18 @@ table 6150613 "NPR NP Retail Setup"
             Description = 'NPR5.40';
             OptionCaption = 'All Sales,Successful Sales';
             OptionMembers = All,Successful;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(200; "Allow Zero Amount Sales"; Boolean)
         {
             Caption = 'Allow Zero Amount Sales';
             DataClassification = CustomerContent;
             Description = 'NPR5.42 [312104]';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(210; "Default POS Posting Profile"; Code[20])
         {
@@ -100,6 +101,9 @@ table 6150613 "NPR NP Retail Setup"
             Caption = 'Open Cash Register Password';
             DataClassification = CustomerContent;
             Description = 'kode til at åbne kasseskuffen';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(5061; "Unit Cost Control"; Option)
         {
@@ -108,12 +112,18 @@ table 6150613 "NPR NP Retail Setup"
             Description = 'Spærremuligheder til ændring af á pris';
             OptionCaption = 'Enabled,Disabled,Disabled if Quantity > 0,Disabled if xUnit Cost > Unit Cost,Disabled if Quantity > 0 and xUnit Cost > Unit Cost';
             OptionMembers = Enabled,Disabled,"Disabled if Quantity > 0","Disabled if xUnit Cost > Unit Cost","Disabled if Quantity > 0 and xUnit Cost > Unit Cost";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(5152; "Check Purchase Lines if vendor"; Boolean)
         {
             Caption = 'Check Purchase Lines If Vendor';
             DataClassification = CustomerContent;
             Description = 'Afg¢re om man på k¢bslinie skal checke om vare man taster tilh¢rer leverand¢re som man laver ordre for.';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(5154; "Salespersoncode on Salesdoc."; Option)
         {
@@ -122,23 +132,35 @@ table 6150613 "NPR NP Retail Setup"
             Description = 'Opsætning for sælgerkode på salgsbilag';
             OptionCaption = 'Forced,Free';
             OptionMembers = Forced,Free;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(6211; "Password on unblock discount"; Text[4])
         {
             Caption = 'Administrator Password';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(6215; "Retail Journal No. Series"; Code[20])
         {
             Caption = 'Retail Journal No. Series';
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(6233; "Costing Method Standard"; Enum "Costing Method")
         {
             Caption = 'Costing Method Std.';
             DataClassification = CustomerContent;
             InitValue = Standard;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(6270; "Margin and Turnover By Shop"; Option)
         {
@@ -146,6 +168,9 @@ table 6150613 "NPR NP Retail Setup"
             DataClassification = CustomerContent;
             OptionCaption = ' ,Dimension1,Dimension2';
             OptionMembers = " ",Dimension1,Dimension2;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field won''t be used anymore.';
+            ObsoleteTag = 'Cleanup NPR Retail Setup table';
         }
         field(10000; "Data Model Build"; Integer)
         {

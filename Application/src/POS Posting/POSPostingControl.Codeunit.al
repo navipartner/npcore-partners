@@ -59,7 +59,6 @@ codeunit 6150637 "NPR POS Posting Control"
 
     procedure AutomaticPostEntry(var POSEntry: Record "NPR POS Entry")
     var
-        NPRetailSetup: Record "NPR NP Retail Setup";
         POSPostingProfile: Record "NPR POS Posting Profile";
         POSUnit: Record "NPR POS Unit";
         ItemPost: Boolean;

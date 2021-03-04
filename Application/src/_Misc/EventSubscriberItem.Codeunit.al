@@ -20,7 +20,6 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
     [EventSubscriber(ObjectType::Table, 27, 'OnBeforeInsertEvent', '', true, false)]
     local procedure OnBeforeInsertEventLicenseCheck(var Rec: Record Item; RunTrigger: Boolean)
     var
-        NPRetailSetup: Record "NPR NP Retail Setup";
         RetailItemSetup: Record "NPR Retail Item Setup";
         InvtSetup: Record "Inventory Setup";
         ItemGroup: Record "NPR Item Group";
@@ -31,7 +30,6 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
             exit;
 
         GetSalesSetup;
-        NPRetailSetup.Get();
         RetailItemSetup.Get();
 
         if RetailItemSetup."Item Group on Creation" and (Rec."No." = '') and (Rec."NPR Item Group" = '') then begin
@@ -49,9 +47,6 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
                         Rec."Price Includes VAT" := TempItem."Price Includes VAT";
             end;
         end;
-
-        if not Rec."NPR Group sale" then
-            Rec."Costing Method" := NPRetailSetup."Costing Method Standard";
 
         if Rec."Price Includes VAT" and (SalesSetup."VAT Bus. Posting Gr. (Price)" <> '') then
             Rec."VAT Bus. Posting Gr. (Price)" := SalesSetup."VAT Bus. Posting Gr. (Price)";

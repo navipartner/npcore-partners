@@ -461,15 +461,9 @@ page 6184498 "NPR EFT Transaction Requests"
     end;
 
     trigger OnOpenPage()
-    var
-        NPRetailSetup: Record "NPR NP Retail Setup";
     begin
-        //-NPR5.54 [377533]
-        if NPRetailSetup.Get() then begin
             UsesPOSEntry := true;
-            SetAutoCalcFields("FF Moved to POS Entry");
-        end;
-        //+NPR5.54 [377533]
+        SetAutoCalcFields("FF Moved to POS Entry");
 
         if FindFirst then;
     end;

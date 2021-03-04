@@ -756,17 +756,6 @@ codeunit 6150705 "NPR POS Sale"
 
     #region OnFinishSale Workflow
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR NP Retail Setup", 'OnAfterInsertEvent', '', true, true)]
-    local procedure OnAfterInsertRetailSetup(var Rec: Record "NPR NP Retail Setup"; RunTrigger: Boolean)
-    var
-        POSSalesWorkflow: Record "NPR POS Sales Workflow";
-    begin
-        POSSalesWorkflow.OnDiscoverPOSSalesWorkflows();
-        if POSSalesWorkflow.FindSet then
-            repeat
-                POSSalesWorkflow.InitPOSSalesWorkflowSteps();
-            until POSSalesWorkflow.Next = 0;
-    end;
 
     local procedure OnFinishSaleCode(): Code[20]
     begin

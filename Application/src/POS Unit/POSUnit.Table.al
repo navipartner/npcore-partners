@@ -226,7 +226,16 @@ table 6150615 "NPR POS Unit"
             DataClassification = CustomerContent;
             TableRelation = "NPR Display Setup";
         }
-
+        field(5058; "Open Register Password"; Code[20])
+        {
+            Caption = 'Open Cash Register Password';
+            DataClassification = CustomerContent;
+        }
+        field(6211; "Password on unblock discount"; Text[4])
+        {
+            Caption = 'Administrator Password';
+            DataClassification = CustomerContent;
+        }
         field(630; "POS Tax Free Profile"; Code[10])
         {
             Caption = 'POS Tax Free Profile';

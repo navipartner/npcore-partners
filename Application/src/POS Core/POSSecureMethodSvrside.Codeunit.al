@@ -21,6 +21,8 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnCustomMethod', '', false, false)]
     local procedure OnCustomMethod_SecureMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
+        POSUnit: Record "NPR POS Unit";
+        POSSetup: Codeunit "NPR POS Setup";
         JSON: Codeunit "NPR POS JSON Management";
         SecureMethod: Text;
         ActionHandled: Boolean;
@@ -36,9 +38,11 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
         case JSON.GetStringOrFail('action', StrSubstNo(ReadingErr, MethodName())) of
             'validate':
                 begin
+                    POSSession.GetSetup(POSSetup);
+                    POSSetup.GetPOSUnit(POSUnit);
                     SecureMethod := JSON.GetStringOrFail('method', StrSubstNo(ReadingErr, MethodName()));
                     RequestId := JSON.GetIntegerOrFail('requestId', StrSubstNo(ReadingErr, MethodName()));
-                    OnSecureMethodValidatePassword(SecureMethod, JSON.GetStringOrFail('password', StrSubstNo(ReadingErr, MethodName())), ActionHandled);
+                    OnSecureMethodValidatePassword(SecureMethod, JSON.GetStringOrFail('password', StrSubstNo(ReadingErr, MethodName())),POSUnit, ActionHandled);
                     if not ActionHandled then
                         FrontEnd.ReportBugAndThrowError(StrSubstNo(Text001, SecureMethod));
                 end;
@@ -46,7 +50,7 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
     end;
 
     [BusinessEvent(TRUE)]
-    local procedure OnSecureMethodValidatePassword(Method: Text; Password: Text; var Handled: Boolean)
+    local procedure OnSecureMethodValidatePassword(Method: Text; Password: Text; POSUnit: Record "NPR POS Unit"; var Handled: Boolean)
     begin
     end;
 
@@ -101,7 +105,7 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150736, 'OnSecureMethodValidatePassword', '', true, true)]
-    local procedure OnValidatePassword(var Sender: Codeunit "NPR POS Secure Method Svrside"; Method: Text; Password: Text; var Handled: Boolean)
+    local procedure OnValidatePassword(var Sender: Codeunit "NPR POS Secure Method Svrside"; Method: Text; Password: Text; POSUnit: Record "NPR POS Unit"; var Handled: Boolean)
     begin
 
         Handled := true;
@@ -113,9 +117,9 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
             SupervisorSalespersonMethodCode():
                 ValidateSalespersonPassword(Sender, true, Password);
             RetailOpenRegisterPasswordMethodCode():
-                ValidateRetailSetupOpenRegisterPassword(Sender, Password);
+                ValidatePOSUnitOpenRegisterPassword(Sender, POSUnit, Password);
             RetaiAdminPasswordMethodCode():
-                ValidateRetailSetupAdminPassword(Sender, Password);
+                ValidatePOSUnitAdminPassword(Sender, POSUnit, Password);
             else
                 Handled := false;
         end;
@@ -186,12 +190,10 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
         ValidateSalespersonPassword(Sender, true, Password);
     end;
 
-    local procedure ValidateRetailSetupOpenRegisterPassword(var Sender: Codeunit "NPR POS Secure Method Svrside"; Password: Text): Boolean
+    local procedure ValidatePOSUnitOpenRegisterPassword(var Sender: Codeunit "NPR POS Secure Method Svrside"; POSUnit: Record "NPR POS Unit"; Password: Text): Boolean
     var
-        RetailSetup: Record "NPR NP Retail Setup";
         Reason: Text;
     begin
-
         Reason := StrSubstNo(Text006, Text005);
 
         if (Password = '') then begin
@@ -199,8 +201,7 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
             exit;
         end;
 
-        RetailSetup.Get();
-        if (Password = RetailSetup."Open Register Password") then begin
+        if (Password = POSUnit."Open Register Password") then begin
             Sender.ConfirmPassword('OpenReg');
             exit(true);
         end;
@@ -208,9 +209,8 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
         Sender.RejectPassword(false, Reason);
     end;
 
-    local procedure ValidateRetailSetupAdminPassword(var Sender: Codeunit "NPR POS Secure Method Svrside"; Password: Text): Boolean
+    local procedure ValidatePOSUnitAdminPassword(var Sender: Codeunit "NPR POS Secure Method Svrside"; POSUnit: Record "NPR POS Unit"; Password: Text): Boolean
     var
-        RetailSetup: Record "NPR NP Retail Setup";
         Reason: Text;
     begin
 
@@ -221,8 +221,7 @@ codeunit 6150736 "NPR POS Secure Method Svrside"
             exit;
         end;
 
-        RetailSetup.Get();
-        if (Password = RetailSetup."Password on unblock discount") then begin
+        if (Password = POSUnit."Password on unblock discount") then begin
             Sender.ConfirmPassword('SysAdmin');
             exit(true);
         end;

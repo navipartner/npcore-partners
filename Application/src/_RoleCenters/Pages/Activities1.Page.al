@@ -44,10 +44,6 @@ page 6151252 "NPR Activities 1"
         end;
         Rec.SetFilter("Date Filter", '=%1', WorkDate);
     end;
-
-    var
-        PING: Label '''';
-        NPRetailSetup: Record "NPR NP Retail Setup";
 }
 
 

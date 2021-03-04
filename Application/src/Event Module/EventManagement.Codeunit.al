@@ -2190,8 +2190,6 @@ codeunit 6060150 "NPR Event Management"
     local procedure ShowProcessedPOSDocument(JobPlanningLineInvoice: Record "Job Planning Line Invoice"; Posted: Boolean) HasEntries: Boolean
     var
         POSEntry: Record "NPR POS Entry";
-        NPRetailSetup: Record "NPR NP Retail Setup";
-        AdvancedPostingActive: Boolean;
     begin
         POSEntry.SetRange("POS Unit No.", JobPlanningLineInvoice."NPR POS Unit No.");
         POSEntry.SetRange("POS Store Code", JobPlanningLineInvoice."NPR POS Store Code");

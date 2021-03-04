@@ -255,7 +255,6 @@ table 6014406 "NPR Sale Line POS"
 
             trigger OnValidate()
             var
-                RetailSetup: Record "NPR NP Retail Setup";
                 ErrDisabled: Label 'Unit Cost is disabled';
                 ErrDisNo: Label 'Unit Cost is disabled for Quantity > 0';
                 ErrDisX: Label 'Unit Cost cannot be reduced';
@@ -265,7 +264,6 @@ table 6014406 "NPR Sale Line POS"
                 Err003: Label 'The sales price cannot be changed for this item';
                 TotalAmount: Decimal;
             begin
-                RetailSetup.Get;
                 POSUnitGlobal.Get("Register No.");
                 case Type of
                     Type::"G/L Entry":
@@ -280,34 +278,6 @@ table 6014406 "NPR Sale Line POS"
                             if "Unit Price" < 0 then
                                 Error(ErrItemBelow);
                             GetItem;
-
-                            if not Item."NPR Group sale" then begin
-                                case RetailSetup."Unit Cost Control" of
-                                    RetailSetup."Unit Cost Control"::Enabled:
-                                        begin
-                                        end;
-                                    RetailSetup."Unit Cost Control"::Disabled:
-                                        begin
-                                            if Quantity < 0 then
-                                                Error(ErrDisabled);
-                                        end;
-                                    RetailSetup."Unit Cost Control"::"Disabled if Quantity > 0":
-                                        begin
-                                            if Quantity > 0 then
-                                                Error(ErrDisNo);
-                                        end;
-                                    RetailSetup."Unit Cost Control"::"Disabled if xUnit Cost > Unit Cost":
-                                        begin
-                                            if xRec."Unit Price" > "Unit Price" then
-                                                Error(ErrDisX);
-                                        end;
-                                    RetailSetup."Unit Cost Control"::"Disabled if Quantity > 0 and xUnit Cost > Unit Cost":
-                                        begin
-                                            if not ((Quantity < 0) or ("Unit Price" >= FindItemSalesPrice())) then
-                                                Error(ErrDisX);
-                                        end;
-                                end;
-                            end;
 
                             "Eksp. Salgspris" := true;
                             GetAmount(Rec, Item, "Unit Price");
@@ -324,8 +294,7 @@ table 6014406 "NPR Sale Line POS"
                         begin
                             if Quantity = 0 then
                                 Error(Err001);
-                            if RetailSetup.Get then
-                                if "Price Includes VAT" then
+                                                            if "Price Includes VAT" then
                                     "Amount Including VAT" := Round("Unit Price" * Quantity, 0.01) - "Discount Amount"
                                 else
                                     "Amount Including VAT" := Round("Unit Price" * Quantity * (1 + "VAT %" / 100), 0.01);
