@@ -3,7 +3,7 @@ table 6059950 "NPR Display Setup"
     Caption = 'POS Display Profile';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Display Profiles";
-    LookupPageID = "NPR POS Display Profiles";    
+    LookupPageID = "NPR POS Display Profiles";
 
     fields
     {
@@ -12,6 +12,11 @@ table 6059950 "NPR Display Setup"
             Caption = 'Code';
             DataClassification = CustomerContent;
             NotBlank = true;
+        }
+        field(2; Description; Text[50])
+        {
+            Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(11; "Display Content Code"; Code[10])
         {

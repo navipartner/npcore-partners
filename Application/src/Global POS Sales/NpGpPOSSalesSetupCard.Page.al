@@ -12,15 +12,21 @@ page 6151172 "NPR NpGp POS Sales Setup Card"
         {
             group(General)
             {
+                Caption = 'General';
                 group(Control6014407)
                 {
                     ShowCaption = false;
-                    field("Code"; Code)
+                    field("Code"; Rec.Code)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Code field';
                     }
-                    field("Company Name"; "Company Name")
+                    field(Description; Rec.Description)
+                    {
+                        ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Description field';
+                    }
+                    field("Company Name"; Rec."Company Name")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Company Name field';
@@ -29,12 +35,12 @@ page 6151172 "NPR NpGp POS Sales Setup Card"
                 group(Control6014408)
                 {
                     ShowCaption = false;
-                    field("Service Url"; "Service Url")
+                    field("Service Url"; Rec."Service Url")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Service Url field';
                     }
-                    field("Service Username"; "Service Username")
+                    field("Service Username"; Rec."Service Username")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Service Username field';
@@ -48,9 +54,7 @@ page 6151172 "NPR NpGp POS Sales Setup Card"
 
                         trigger OnValidate()
                         begin
-                            //-NPR5.51 [337539]
-                            HandlePassword(Password);
-                            //+NPR5.51 [337539]
+                            Rec.HandlePassword(Password);
                         end;
                     }
 
@@ -68,7 +72,7 @@ page 6151172 "NPR NpGp POS Sales Setup Card"
                 Caption = 'Validate Global POS Sales Setup';
                 Image = Approve;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -89,8 +93,8 @@ page 6151172 "NPR NpGp POS Sales Setup Card"
 
     trigger OnAfterGetRecord()
     begin
-        if not IsNullGuid("Service Password") then begin
-            IsolatedStorage.Get("Service Password", DataScope::Company, Password);
+        if not IsNullGuid(Rec."Service Password") then begin
+            IsolatedStorage.Get(Rec."Service Password", DataScope::Company, Password);
         end;
     end;
 

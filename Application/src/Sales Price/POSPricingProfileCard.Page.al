@@ -1,18 +1,17 @@
-page 6150648 "NPR POS Pricing Profiles"
+page 6150728 "NPR POS Pricing Profile Card"
 {
-    PageType = List;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    Caption = 'POS Pricing Profile';
+    PageType = Card;
     SourceTable = "NPR POS Pricing Profile";
-    Caption = 'POS Pricing Profiles';
-    Editable = false;
-    CardPageID = "NPR POS Pricing Profile Card";
+    UsageCategory = None;
+
     layout
     {
         area(content)
         {
-            repeater(Group)
+            group(General)
             {
+                Caption = 'General';
                 field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
@@ -53,4 +52,6 @@ page 6150648 "NPR POS Pricing Profiles"
             }
         }
     }
+
+
 }

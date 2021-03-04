@@ -1,18 +1,17 @@
-page 6150625 "NPR POS NPRE Restaur. Profiles"
+page 6150743 "NPR POS Restaur. Profile Card"
 {
-    PageType = List;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    Caption = 'POS Restaur. Profile';
+    PageType = Card;
+    UsageCategory = None;
     SourceTable = "NPR POS NPRE Rest. Profile";
-    Caption = 'POS Restaur. Profiles';
-    CardPageId = "NPR POS Restaur. Profile Card";
-    Editable = false;
+
     layout
     {
         area(content)
         {
-            repeater(Group)
+            group(General)
             {
+                Caption = 'General';
                 field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
@@ -28,19 +27,11 @@ page 6150625 "NPR POS NPRE Restaur. Profiles"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Restaurant Code field';
                 }
-            }
-        }
-        area(factboxes)
-        {
-            systempart(Control6014406; Notes)
-            {
-                Visible = false;
-                ApplicationArea = All;
-            }
-            systempart(Control6014407; Links)
-            {
-                Visible = false;
-                ApplicationArea = All;
+                field("Default Seating Location"; Rec."Default Seating Location")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Default Seating Location field';
+                }
             }
         }
     }

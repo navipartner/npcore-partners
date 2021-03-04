@@ -1,18 +1,17 @@
-page 6150678 "NPR SS Profiles"
+page 6150699 "NPR SS Profile Card"
 {
-    PageType = List;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    Caption = 'POS Self Service Profile';
+    PageType = Card;
     SourceTable = "NPR SS Profile";
-    Caption = 'POS Self Service Profiles';
-    Editable = false;
-    CardPAgeID = "NPR SS Profile Card";
+    UsageCategory = None;
+
     layout
     {
         area(content)
         {
-            repeater(Group)
+            group(General)
             {
+                Caption = 'General';
                 field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
@@ -31,4 +30,6 @@ page 6150678 "NPR SS Profiles"
             }
         }
     }
+
+
 }

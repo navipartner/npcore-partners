@@ -61,6 +61,11 @@ table 6014641 "NPR Tax Free POS Unit"
             Caption = 'Store Voucher Prints';
             DataClassification = CustomerContent;
         }
+        field(11; Description; Text[50])
+        {
+            Caption = 'Description';
+            DataClassification = CustomerContent;
+        }
         field(40; "Handler ID Enum"; Enum "NPR Tax Free Handler ID")
         {
             Caption = 'Handler ID';

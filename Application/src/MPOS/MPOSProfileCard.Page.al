@@ -1,18 +1,17 @@
-page 6150678 "NPR SS Profiles"
+page 6150698 "NPR MPOS Profile Card"
 {
-    PageType = List;
-    UsageCategory = Administration;
-    ApplicationArea = All;
-    SourceTable = "NPR SS Profile";
-    Caption = 'POS Self Service Profiles';
-    Editable = false;
-    CardPAgeID = "NPR SS Profile Card";
+    Caption = 'MPOS Profile';
+    PageType = Card;
+    SourceTable = "NPR MPOS Profile";
+    UsageCategory = None;
+
     layout
     {
         area(content)
         {
-            repeater(Group)
+            group(General)
             {
+                Caption = 'General';
                 field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
@@ -23,12 +22,14 @@ page 6150678 "NPR SS Profiles"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Kiosk Mode Unlock PIN"; Rec."Kiosk Mode Unlock PIN")
+                field("Ticket Admission Web Url"; Rec."Ticket Admission Web Url")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Kios Mode Unlock PIN field';
+                    ToolTip = 'Specifies the value of the Ticket Admission Web Url field';
                 }
             }
         }
     }
+
+
 }
