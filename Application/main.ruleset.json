@@ -3,6 +3,11 @@
     "description": "These rules must be respected by all the AL code written within the company.",
     "rules": [
         {
+            "id": "AA0021",
+            "action":"Hidden",
+            "justification": "Variable declarations should be ordered by type."
+        },
+        {
             "id": "AA0072",
             "action":"Hidden",
             "justification": "The name of variables and parameters must be suffixed with the type or object name."
@@ -43,9 +48,34 @@
             "justification": "Only use AssertError in Test Codeunits."
         },
         {
+            "id": "AA0189",
+            "action":"Hidden",
+            "justification": "Only use a correct values of ApplicationArea."
+        },
+        {
+            "id": "AA0199",
+            "action":"Hidden",
+            "justification": "Use only a correct order for ApplicationArea."
+        },
+        {
+            "id": "AA0200",
+            "action":"Hidden",
+            "justification": "When ApplicationArea is set to 'All', no other values for ApplicationArea should be specified."
+        },
+        {
+            "id": "AA0201",
+            "action":"Hidden",
+            "justification": "When ApplicationArea is set to 'Basic', you must also specify 'Suite'."
+        },
+        {
             "id": "AA0203",
             "action":"Error",
             "justification": "To avoid confusion, do not give methods the same name as fields or actions in the same scope."
+        },
+        {
+            "id": "AA0215",
+            "action":"Hidden",
+            "justification": "Follow the style guide about the best practices for naming."
         },
         {
             "id": "AA0216",
@@ -91,6 +121,11 @@
             "id": "AA0242",
             "action":"Error",
             "justification": "Limit JIT loads by selecting all fields for load."
+        },
+        {
+            "id": "AA0448",
+            "action":"Hidden",
+            "justification": "You must use the FieldCaption method instead of the FieldName method and TableCaption method instead of TableName method."
         },
         {
             "id": "AS0018",
@@ -261,6 +296,7 @@
             "id": "AW0011",
             "action":"Error",
             "justification": "Add PromotedOnly=true to some or all promoted actions to avoid identical actions from appearing in both the promoted and default sections of the command bar."
-        }         
+        }  
+               
     ]
 }
