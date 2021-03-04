@@ -111,6 +111,11 @@ page 6150615 "NPR POS Store Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the VAT Customer No. field';
                 }
+                field("Posting Compression"; Rec."Posting Compression")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Posting Compression field';
+                }
                 field("Default POS Posting Setup"; Rec."Default POS Posting Setup")
                 {
                     ApplicationArea = All;
@@ -125,11 +130,6 @@ page 6150615 "NPR POS Store Card"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Tax Liable field';
-                }
-                field("Posting Compression"; Rec."Posting Compression")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Posting Compression field';
                 }
             }
             group(Profiles)
