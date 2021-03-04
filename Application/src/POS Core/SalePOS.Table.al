@@ -715,8 +715,8 @@ table 6014405 "NPR Sale POS"
     var
         POSPricingProfile: Record "NPR POS Pricing Profile";
     begin
-        GetPOSStore();
         GetPOSUnit();
+        GetPOSStore();
 
         POSUnit.GetProfile(POSPricingProfile);
         "Location Code" := POSStore."Location Code";
@@ -856,7 +856,12 @@ table 6014405 "NPR Sale POS"
 
     local procedure GetPOSStore()
     begin
-        if POSStore.Code <> "POS Store Code" then
-            POSStore.Get("POS Store Code");
+        if "POS Store Code" = '' then begin
+            if POSStore.Code <> POSUnit."POS Store Code" then
+                POSStore.get(POSUnit."POS Store Code")
+        end else begin
+            if POSStore.Code <> "POS Store Code" then
+                POSStore.Get("POS Store Code");
+        end;
     end;
 }
