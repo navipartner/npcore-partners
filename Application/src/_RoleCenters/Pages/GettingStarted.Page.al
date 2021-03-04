@@ -2,19 +2,19 @@ page 6014424 "NPR Getting Started"
 {
     Caption = 'Hi!';
     PageType = NavigatePage;
-    
+    UsageCategory = None;
+
     layout
     {
         area(Content)
         {
-            
+
             usercontrol(WelcomeWizard; "NPR Get Started Wizard")
             {
-                ApplicationArea = All;;
-                    
+                ApplicationArea = All;
                 trigger Ready()
                 begin
-                    CurrPage.WelcomeWizard.createlayout(TitleTxt,SubTitleTxt,ExplanationTxt,IntroTxt,IntroDescTxt,GetStartedTxt,GetStartedDescTxt,FindHelpTxt,FindHelpDescTxt);
+                    CurrPage.WelcomeWizard.createlayout(TitleTxt, SubTitleTxt, ExplanationTxt, IntroTxt, IntroDescTxt, GetStartedTxt, GetStartedDescTxt, FindHelpTxt, FindHelpDescTxt);
                 end;
 
                 trigger ThumbnailClicked(selection: Integer)
@@ -28,13 +28,13 @@ page 6014424 "NPR Getting Started"
                             Video.Play('https://www.youtube.com/embed/jUt3Bd5diMI');
                         3:
                             Video.Play('https://www.youtube.com/embed/kHz7Hdr-H4Y');
-                        
+
                     end;
                 end;
-                
-                
+
+
             }
-            
+
         }
     }
     actions
@@ -45,18 +45,20 @@ page 6014424 "NPR Getting Started"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Done!';
-                InFooterBar = True; 
-                Promoted = true; 
-                PromotedOnly = true; 
+                InFooterBar = True;
+                Promoted = true;
+                PromotedOnly = true;
+                Image = Completed;
+                ToolTip = 'Executes the Done! action';
                 trigger OnAction()
-                        begin 
-                            CurrPage.Close(); 
-                        end;
-                    
+                begin
+                    CurrPage.Close();
+                end;
+
             }
         }
     }
-    
+
     var
         FindHelpDescTxt: Label 'Know where to go for information';
         FindHelpTxt: Label 'Get Assistance';

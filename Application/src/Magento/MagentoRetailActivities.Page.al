@@ -21,6 +21,7 @@ page 6151481 "NPR Magento Retail Activities"
                         RunObject = Page "Sales Order";
                         RunPageMode = Create;
                         ApplicationArea = All;
+                        Image = TileNew;
                         ToolTip = 'Executes the New Sales Order action';
                     }
                     action("New Sales Quote")
@@ -29,6 +30,7 @@ page 6151481 "NPR Magento Retail Activities"
                         RunObject = Page "Sales Quote";
                         RunPageMode = Create;
                         ApplicationArea = All;
+                        Image = TileBrickNew;
                         ToolTip = 'Executes the New Sales Quote action';
                     }
                     action("New Sales Return Order")
@@ -37,6 +39,7 @@ page 6151481 "NPR Magento Retail Activities"
                         RunObject = Page "Sales Return Order";
                         RunPageMode = Create;
                         ApplicationArea = All;
+                        Image = TileBrickNearBy;
                         ToolTip = 'Executes the New Sales Return Order action';
                     }
                 }

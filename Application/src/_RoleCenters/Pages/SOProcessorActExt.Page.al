@@ -27,6 +27,31 @@ page 6151262 "NPR SO Processor Act Ext"
                     ToolTip = 'Specifies the number of sales orders that are not fully posted.';
                 }
             }
+            cuegroup(Control6014404)
+            {
+                Caption = 'Actions';
+                actions
+                {
+                    action("New Sales Quote")
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'New Sales Quote';
+                        RunObject = Page "Sales Quote";
+                        RunPageMode = Create;
+                        Image = TileNew;
+                        ToolTip = 'Offer items or services to a customer.';
+                    }
+                    action("New Sales Order")
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'New Sales Order';
+                        RunObject = Page "Sales Order";
+                        RunPageMode = Create;
+                        Image = TileNew;
+                        ToolTip = 'Create a new sales order for items or services that require partial posting.';
+                    }
+                }
+            }
             cuegroup("Sales Orders Released Not Shipped")
             {
                 Caption = 'Sales Orders Released Not Shipped';
@@ -72,6 +97,21 @@ page 6151262 "NPR SO Processor Act Ext"
                     DecimalPlaces = 0 : 1;
                     Image = Calendar;
                     ToolTip = 'Specifies the number of days that your order deliveries are delayed on average.';
+                }
+            }
+            cuegroup(Control555)
+            {
+                Caption = 'Actions';
+                actions
+                {
+                    action(Navigate)
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Navigate';
+                        RunObject = Page Navigate;
+                        Image = TileHelp;
+                        ToolTip = 'Find all entries and documents that exist for the document number and posting date on the selected entry or document.';
+                    }
                 }
             }
         }

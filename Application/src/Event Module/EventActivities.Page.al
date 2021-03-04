@@ -1,8 +1,5 @@
 page 6060153 "NPR Event Activities"
 {
-    // NPR5.29/NPKNAV/20170127  CASE 248723 Transport NPR5.29 - 27 januar 2017
-    // NPR5.31/TJ  /20170420 CASE 269162 Completelly restructured
-
     Caption = 'Activities';
     PageType = CardPart;
     UsageCategory = Administration;
@@ -25,7 +22,8 @@ page 6060153 "NPR Event Activities"
                         RunObject = Page "NPR Event Card";
                         RunPageMode = Create;
                         ApplicationArea = All;
-                        ToolTip = 'Creates a new event'; 
+                        Image = TileNew;
+                        ToolTip = 'Creates a new event';
                     }
                     action("New Customer")
                     {
@@ -33,6 +31,7 @@ page 6060153 "NPR Event Activities"
                         RunObject = Page "Customer Card";
                         RunPageMode = Create;
                         ApplicationArea = All;
+                        Image = TilePeople;
                         ToolTip = 'Creates a new customer';
                     }
                 }
@@ -40,53 +39,49 @@ page 6060153 "NPR Event Activities"
             cuegroup(Control7)
             {
                 ShowCaption = false;
-                field("Upcoming Events"; "Upcoming Events")
+                field("Upcoming Events"; Rec."Upcoming Events")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Upcoming Events field';
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownPage(FieldNo("Upcoming Events"));
+                        DrillDownPage(Rec.FieldNo("Upcoming Events"));
                     end;
                 }
-                field("Completed Events"; "Completed Events")
+                field("Completed Events"; Rec."Completed Events")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Completed Events field';
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownPage(FieldNo("Completed Events"));
+                        DrillDownPage(Rec.FieldNo("Completed Events"));
                     end;
                 }
-                field("Cancelled Events"; "Cancelled Events")
+                field("Cancelled Events"; Rec."Cancelled Events")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Cancelled Events field';
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownPage(FieldNo("Cancelled Events"));
+                        DrillDownPage(Rec.FieldNo("Cancelled Events"));
                     end;
                 }
             }
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnOpenPage()
     begin
-        Reset;
-        if not Get then begin
-            Init;
-            Insert;
+        Rec.Reset;
+        if not Rec.Get then begin
+            Rec.Init;
+            Rec.Insert;
         end;
 
-        SetFilter("Date Filter", '>=%1', WorkDate);
+        Rec.SetFilter("Date Filter", '>=%1', WorkDate);
     end;
 
     local procedure DrillDownPage(FieldNo2: Integer)
@@ -97,7 +92,7 @@ page 6060153 "NPR Event Activities"
         Job.SetRange("NPR Event", true);
         case FieldNo2 of
             Rec.FieldNo("Upcoming Events"):
-                Job.SetFilter("Starting Date", GetFilter("Date Filter"));
+                Job.SetFilter("Starting Date", Rec.GetFilter("Date Filter"));
             Rec.FieldNo("Completed Events"):
                 Job.SetRange("NPR Event Status", Job."NPR Event Status"::Completed);
             Rec.FieldNo("Cancelled Events"):
