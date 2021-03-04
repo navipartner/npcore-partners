@@ -72,6 +72,8 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
                 Error(NotAllowed, SalespersonPurchaser.Name);
         end;
 
+        Context.SetContext('PromptForReason', true);
+
         FrontEnd.SetActionContext(ActionCode, Context);
         Handled := true;
     end;
@@ -99,7 +101,6 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
                 end;
             'handle':
                 begin
-                    Error('Needs to be updated from audit roll to POS entry');
                     VerifyReceiptForReversal(Context, POSSession, FrontEnd);
                     CopySalesReceiptForReversal(Context, POSSession, FrontEnd);
                     POSSession.ChangeViewSale();
