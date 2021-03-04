@@ -10,7 +10,7 @@ codeunit 6060147 "NPR MM NPR Membership"
         InvalidXml: Label 'An invalid XML was returned:\%1';
         MemberCardValidation: Label 'Service %1 at %2 could not validate membercard %3.';
 
-    [EventSubscriber(ObjectType::Codeunit, 6060145, 'OnDiscoverExternalMembershipMgr', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Foreign Members. Mgr.", 'OnDiscoverExternalMembershipMgr', '', true, true)]
     local procedure OnDiscover(var Sender: Record "NPR MM Foreign Members. Setup")
     begin
 
@@ -26,7 +26,7 @@ codeunit 6060147 "NPR MM NPR Membership"
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060145, 'OnDispatchToReplicateForeignMemberCard', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Foreign Members. Mgr.", 'OnDispatchToReplicateForeignMemberCard', '', true, true)]
     local procedure OnValidateAndReplicateForeignMemberCardSubscriber(CommunityCode: Code[20]; ManagerCode: Code[20]; ForeignMembercardNumber: Text[100]; var IsValid: Boolean; var NotValidReason: Text; var IsHandled: Boolean)
     var
         ForeignMembershipSetup: Record "NPR MM Foreign Members. Setup";
@@ -66,8 +66,8 @@ codeunit 6060147 "NPR MM NPR Membership"
 
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060145, 'OnFormatForeignCardnumberFromScan', '', true, true)]
-    local procedure OnFormatScannedCardnumberSubscriber(CommunityCode: Code[20]; ManagerCode: Code[20]; ScannedCardNumber: Text[100]; var FormattedCardNumber: Text[50]; var IsHandled: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Foreign Members. Mgr.", 'OnFormatForeignCardnumberFromScan', '', true, true)]
+    local procedure OnFormatScannedCardnumberSubscriber(CommunityCode: Code[20]; ManagerCode: Code[20]; ScannedCardNumber: Text[100]; var FormattedCardNumber: Text[100]; var IsHandled: Boolean)
     var
         ForeignMembershipSetup: Record "NPR MM Foreign Members. Setup";
     begin
@@ -83,7 +83,7 @@ codeunit 6060147 "NPR MM NPR Membership"
                                  RemoveLocalPrefix(ForeignMembershipSetup."Remove Local Prefix", ScannedCardNumber));
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060145, 'OnShowSetup', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Foreign Members. Mgr.", 'OnShowSetup', '', true, true)]
     local procedure OnShowSetupSubscriber(CommunityCode: Code[20]; ManagerCode: Code[20])
     var
         NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup";
@@ -116,7 +116,7 @@ codeunit 6060147 "NPR MM NPR Membership"
 
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060145, 'OnShowDashboard', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Foreign Members. Mgr.", 'OnShowDashboard', '', true, true)]
     local procedure OnShowDashboardSubscriber(CommunityCode: Code[20]; ManagerCode: Code[20])
     begin
 
@@ -126,7 +126,7 @@ codeunit 6060147 "NPR MM NPR Membership"
         // No dashboard yet
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060145, 'OnSynchronizeLoyaltyPoints', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Foreign Members. Mgr.", 'OnSynchronizeLoyaltyPoints', '', true, true)]
     local procedure OnSynchronizeLoyaltyPointsSubscriber(CommunityCode: Code[20]; ManagerCode: Code[20]; MembershipEntryNo: Integer; ScannedCardNumber: Text[100])
     var
         IsValid: Boolean;
