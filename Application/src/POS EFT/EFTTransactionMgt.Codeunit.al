@@ -585,20 +585,13 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
         exit(not Annul);
     end;
 
-    local procedure OriginalSaleSuccessful(ReceiptNo: Text; RetailID: Guid): Boolean
-    var
-        NPRetailSetup: Record "NPR NP Retail Setup";
+    local procedure SaleSuccessful(ReceiptNo: Text; RetailID: Guid): Boolean
+    var        
         POSEntry: Record "NPR POS Entry";
     begin
-        if NPRetailSetup.Get then begin
-            POSEntry.SetRange("Retail ID", RetailID);
-            POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
-            exit(not POSEntry.IsEmpty);
-        end;
-
-        POSEntry.SetRange("Document No.", ReceiptNo);
-        POSEntry.CalcFields("Payment Lines");
-        exit(POSEntry."Payment Lines" <> 0);
+        POSEntry.SetRange("Retail ID", RetailID);
+        POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
+        exit(not POSEntry.IsEmpty);
     end;
 
     local procedure MarkOriginalTransactionAsReversed(EFTTransactionRequest: Record "NPR EFT Transaction Request")
@@ -719,7 +712,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
             EFTTransactionRequest.Get(EFTTransactionRequest."Recovered by Entry No.");
         end;
 
-        if (not OriginalSaleSuccessful(EFTTransactionRequest."Sales Ticket No.", EFTTransactionRequest."Sales ID")) and (EFTTransactionRequest."Sales ID" <> SalePOS."Retail ID") then begin
+        if (not SaleSuccessful(EFTTransactionRequest."Sales Ticket No.", EFTTransactionRequest."Sales ID")) and (EFTTransactionRequest."Sales ID" <> SalePOS."Retail ID") then begin
             Error(SALE_NOT_FOUND);
         end;
     end;
@@ -790,7 +783,7 @@ codeunit 6184473 "NPR EFT Transaction Mgt."
         POSEntry: Record "NPR POS Entry";
     begin
         if (EFTTransactionRequest."Result Amount" <> 0) then begin
-            if (OriginalSaleSuccessful(OriginalEFTTransactionRequest."Sales Ticket No.", OriginalEFTTransactionRequest."Sales ID")) then begin
+            if (SaleSuccessful(OriginalEFTTransactionRequest."Sales Ticket No.", OriginalEFTTransactionRequest."Sales ID")) then begin
                 Message(CAPTION_RECOVER_WARN,
                   EFTTransactionRequest."Integration Type",
                   OriginalEFTTransactionRequest."Sales Ticket No.",

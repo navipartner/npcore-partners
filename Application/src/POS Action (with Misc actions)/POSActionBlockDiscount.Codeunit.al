@@ -42,18 +42,18 @@ codeunit 6150838 "NPR POS Action: Block Discount"
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     var
-        RetailSetup: Record "NPR NP Retail Setup";
+        POSUnit: Record "NPR POS Unit";
     begin
 
         Captions.AddActionCaption(ActionCode, 'title', Title);
-        Captions.AddActionCaption(ActionCode, 'password', StrSubstNo(PasswordPrompt, RetailSetup.FieldCaption("Password on unblock discount")));
+        Captions.AddActionCaption(ActionCode, 'password', StrSubstNo(PasswordPrompt, POSUnit.FieldCaption("Password on unblock discount")));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
+        POSUnit: Record "NPR POS Unit";
         Setup: Codeunit "NPR POS Setup";
-        RetailSetup: Record "NPR NP Retail Setup";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         Context: Codeunit "NPR POS JSON Management";
     begin
@@ -63,8 +63,8 @@ codeunit 6150838 "NPR POS Action: Block Discount"
 
         Handled := true;
 
-        RetailSetup.Get();
-        Context.SetContext('ShowPasswordPrompt', RetailSetup."Password on unblock discount" <> '');
+        Setup.GetPOSUnit(POSUnit);
+        Context.SetContext('ShowPasswordPrompt', POSUnit."Password on unblock discount" <> '');
 
         FrontEnd.SetActionContext(ActionCode, Context);
     end;
@@ -98,8 +98,9 @@ codeunit 6150838 "NPR POS Action: Block Discount"
 
     local procedure VerifyPassword(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
+        POSUnit: Record "NPR POS Unit";
+        POSSetup: Codeunit "NPR POS Setup";
         JSON: Codeunit "NPR POS JSON Management";
-        RetailSetup: Record "NPR NP Retail Setup";
         Password: Text;
         SettingScopeErr: Label 'setting scope in VerifyPassword';
         ReadingErr: Label 'reading scope in VerifyPassword';
@@ -110,8 +111,9 @@ codeunit 6150838 "NPR POS Action: Block Discount"
         JSON.SetScope('$PasswordPrompt', SettingScopeErr);
         Password := JSON.GetStringOrFail('input', ReadingErr);
 
-        RetailSetup.Get();
-        if (RetailSetup."Password on unblock discount" <> Password) then
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetPOSUnit(POSUnit);
+        if (POSUnit."Password on unblock discount" <> Password) then
             Error('');
     end;
 

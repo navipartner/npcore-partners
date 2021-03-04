@@ -140,13 +140,8 @@ codeunit 6014404 "NPR Event Subscriber"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostSalesDoc', '', true, false)]
     local procedure SalesPostOnBeforePostSalesDoc(var SalesHeader: Record "Sales Header")
-    var
-        RetailSetup: Record "NPR NP Retail Setup";
     begin
-        if not RetailSetup.Get() then
-            RetailSetup.Init();
-        if RetailSetup."Salespersoncode on Salesdoc." = RetailSetup."Salespersoncode on Salesdoc."::Forced then
-            SalesHeader.TestField("Salesperson Code");
+        SalesHeader.TestField("Salesperson Code");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', false, false)]

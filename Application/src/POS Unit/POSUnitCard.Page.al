@@ -60,6 +60,19 @@ page 6150617 "NPR POS Unit Card"
                         CurrPage.Update();
                     end;
                 }
+                field("Open Register Password"; Rec."Open Register Password")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Open Cash Register Password field.';
+                    ExtendedDatatype = Masked;
+                }
+                field("Password on unblock discount"; Rec."Password on unblock discount")
+                {
+                    ApplicationArea = All;                  
+                    ToolTip = 'Specifies the value of the Administrator Password field.';
+                    ExtendedDatatype = Masked;
+                }
+
             }
             group(Profiles)
             {

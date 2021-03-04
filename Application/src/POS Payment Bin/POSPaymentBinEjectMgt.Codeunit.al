@@ -127,7 +127,6 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
 
     local procedure CarryOutPaymentBinEject(SalePOS: Record "NPR Sale POS"; Force: Boolean)
     var
-        NPRetailSetup: Record "NPR NP Retail Setup";
         POSPaymentBin: Record "NPR POS Payment Bin";
         POSUnit: Record "NPR POS Unit";
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -135,8 +134,6 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
     begin
         OpenDrawer := Force;
         if not OpenDrawer then begin
-            if not NPRetailSetup.Get then
-                exit;
             //Change below to just loop and fire open on all unique payment bin from pos payment lines when the payment bins are properly implemented on payments
             OpenDrawer := IsDrawerOpenRequiredPOSEntry(SalePOS);
             if not OpenDrawer then
@@ -188,7 +185,6 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Credit Sale Post-Process", 'OnFinishCreditSale', '', true, true)]
     local procedure EjectPaymentBinOnCreditSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
     var
-        NPRetailSetup: Record "NPR NP Retail Setup";
         OpenDrawer: Boolean;
         POSPaymentBin: Record "NPR POS Payment Bin";
         POSUnit: Record "NPR POS Unit";

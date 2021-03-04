@@ -772,12 +772,7 @@ codeunit 85014 "NPR Library - Member Module"
     var
         NprMasterData: Codeunit "NPR Library - POS Master Data";
         POSPostingProfile: Record "NPR POS Posting Profile";
-        RetailSetup: Record "NPR NP Retail Setup";
     begin
-
-        if (not RetailSetup.Get()) then
-            RetailSetup.Insert();
-
         NprMasterData.CreateDefaultPostingSetup(POSPostingProfile);
         WorkDate(Today);
 

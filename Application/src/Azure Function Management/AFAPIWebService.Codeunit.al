@@ -308,7 +308,6 @@ codeunit 6151572 "NPR AF API WebService"
         FRef: FieldRef;
         OStream: OutStream;
         Istream: InStream;
-        NPRetailSetup: Record "NPR NP Retail Setup";
         POSEntry: Record "NPR POS Entry";
         TempBlob: Codeunit "Temp Blob";
         Base64Convert: Codeunit "Base64 Convert";

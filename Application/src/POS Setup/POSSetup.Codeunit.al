@@ -145,10 +145,10 @@ codeunit 6150708 "NPR POS Setup"
 
     procedure CashDrawerPassword(CashDrawerNo: Text): Text
     var
-        RetailSetup: Record "NPR NP Retail Setup";
+        POSUnit: Record "NPR POS Unit";
     begin
-        RetailSetup.Get();
-        exit(RetailSetup."Open Register Password");
+        GetPOSUnit(POSUnit);
+        exit(POSUnit."Open Register Password");
     end;
 
     procedure RestaurantCode(): Code[20]
@@ -160,9 +160,7 @@ codeunit 6150708 "NPR POS Setup"
     var
         POSUnit: Record "NPR POS Unit";
     begin
-        //-NPR5.53 [371955]
         POSUnit.GetPostingProfile(POSUnitRec."No.", POSPostingProfile);
-        //+NPR5.53 [371955]
     end;
 
     local procedure FindPOSRestaurantProfile()

@@ -10,11 +10,9 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
         "Code": Code[10];
     begin
         RunSilent := false;
-        TestUpgradeDataModel();
     end;
 
     var
-        NPRetailSetup: Record "NPR NP Retail Setup";
         RunSilent: Boolean;
         TxtDefaultPaymentBinDescription: Label 'Cash Drawer %1';
         DataModelUpgInvokedTxt: Label 'Data Model upgrade invoked from Data Upgrade Per Company.';
@@ -35,36 +33,7 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
     begin
         RunSilent := true;
         CreateLogEntry(DataModelUpgInvokedTxt, 0, 0, -1);
-        TestUpgradeDataModel();
     end;
-
-    local procedure TestUpgradeDataModel()
-    begin
-        NPRetailSetup.LockTable();
-        if not NPRetailSetup.Get() then begin
-            NPRetailSetup.Init();
-            if not RunSilent then begin
-                NPRetailSetup.Insert();
-                CreateLogEntry(StrSubstNo(InitialExecutionTxt, NPRetailSetup.TableName()), 0, 0, 0);
-            end else begin
-                if not NPRetailSetup.Insert() then
-                    exit;
-                CreateLogEntry(StrSubstNo(InitialExecutionTxt, NPRetailSetup.TableName()), 0, 0, 0);
-            end;
-        end;
-
-        if NPRetailSetup."Data Model Build" >= GetCurrentDataModelBuild() then
-            exit;
-
-        CreateLogEntry(StrSubstNo(DataModelUpgStartedTxt, NPRetailSetup."Data Model Build", GetCurrentDataModelBuild()), 0, 0, NPRetailSetup."Data Model Build");
-        if not RunSilent then begin
-            NPRetailSetup.Modify();
-            CreateLogEntry(DataModelUpgEndedTxt, 0, 0, NPRetailSetup."Data Model Build");
-        end else
-            if NPRetailSetup.Modify() then
-                CreateLogEntry(DataModelUpgEndedTxt, 0, 0, NPRetailSetup."Data Model Build");
-    end;
-
     local procedure UpgradeDataModel(FromBuild: Integer; ToBuild: Integer): Integer
     var
         BuildStep: Integer;
@@ -152,13 +121,9 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
             if not Confirm('Re-run Data Model Upgrade from Build Step %1 to Build Step %2?', false, FromBuildStep, ToBuildStep) then
                 exit;
 
-        NPRetailSetup.LockTable;
-        NPRetailSetup.Get;
-
         CreateLogEntry(StrSubstNo('Data Model upgrade from Build Step %1 to Build Step %2 invoked from Re-Run action', FromBuildStep, ToBuildStep), 0, 0, -1);
         RunSilent := false;
         UpgradeDataModel(FromBuildStep, ToBuildStep);
-        NPRetailSetup.Modify;
     end;
 
     procedure ReRunFromLogEntry(DataModelUpgradeLogEntry: Record "NPR Data Model Upg. Log Entry")
@@ -180,14 +145,6 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
         HasRegistersWithLocationCode: Boolean;
         HasRegistersWithoutLocationCode: Boolean;
     begin
-
-        if TryOpenTable(RecRef, 6014400, 'Retail Setup') then begin
-            if RecRef.FindFirst then begin
-                if TryGetField(RecRef, FieldRef, 20, 'Posting Source Code') then
-                    NPRetailSetup."Source Code" := FieldRef.Value;
-            end;
-        end;
-
         if TryOpenTable(RecRef, 6014401, 'Register') then begin
             if not RecRef.FindSet then
                 CreateLogEntry(StrSubstNo('No existing cash registers found!', POSUnit.TableCaption, POSUnit."No."), 1, 1, 1)

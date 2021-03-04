@@ -8,44 +8,10 @@ codeunit 6014422 "NPR NP Retail Setup Upgrade"
 
     trigger OnUpgradePerCompany()
     begin
-        RemoveDefaultPostingProfile();
         RemoveSourceCode();
         UpgradeFiedsToDedicatedSetups();
     end;
 
-    local procedure DoRemoveDefaultPostingProfile()
-    var
-        POSUnit: Record "NPR POS Unit";
-        NPRNPRetailSetup: Record "NPR NP Retail Setup";
-    begin
-        if not NPRNPRetailSetup.Get() then
-            exit;
-
-        if NPRNPRetailSetup."Default POS Posting Profile" = '' then
-            exit;
-
-        if not POSUnit.FindSet() then
-            exit;
-
-        repeat
-            if POSUnit."POS Posting Profile" <> NPRNPRetailSetup."Default POS Posting Profile" then begin
-                POSUnit."POS Posting Profile" := NPRNPRetailSetup."Default POS Posting Profile";
-                POSUnit.Modify();
-            end;
-        until POSUnit.Next() = 0;
-    end;
-
-    local procedure RemoveDefaultPostingProfile()
-    var
-        UpgradeTag: Codeunit "Upgrade Tag";
-    begin
-        if UpgradeTag.HasUpgradeTag(RemoveDefaultPostingProfileLbl) then
-            exit;
-
-        DoRemoveDefaultPostingProfile();
-
-        UpgradeTag.SetUpgradeTag(RemoveDefaultPostingProfileLbl);
-    end;
 
     local procedure RemoveSourceCode()
     var
@@ -61,21 +27,10 @@ codeunit 6014422 "NPR NP Retail Setup Upgrade"
 
     local procedure DoRemoveSourceCode()
     var
-        NPRNPRetailSetup: Record "NPR NP Retail Setup";
         NPRPOSPostingProfile: Record "NPR POS Posting Profile";
     begin
-        if not NPRNPRetailSetup.Get() then
-            exit;
-
         if not NPRPOSPostingProfile.FindSet() then
             CreatePosPostingProfile(NPRPOSPostingProfile);
-        repeat
-            if NPRPOSPostingProfile."Source Code" <> NPRNPRetailSetup."Source Code" then begin
-                NPRPOSPostingProfile."Source Code" := NPRNPRetailSetup."Source Code";
-                NPRPOSPostingProfile.Modify();
-            end;
-        until NPRPOSPostingProfile.Next() = 0;
-
     end;
 
     local procedure CreatePosPostingProfile(var NPRPOSPostingProfile: Record "NPR POS Posting Profile")
@@ -96,12 +51,11 @@ codeunit 6014422 "NPR NP Retail Setup Upgrade"
 
         UpgradeVarietySetup();
         UpgradeDiscountPriority();
-        UpgradeNPRetailSetup();
         UpgradePOSViewProfile();
         UpgradeExchangeLabelSetup();
         UpgradeRetailItemSetup();
         UpgradeStaffSetup();
-
+        UpgradePOSUnit();
         UpgradeTag.SetUpgradeTag(UpgradeTagLbl);
     end;
 
@@ -153,28 +107,6 @@ codeunit 6014422 "NPR NP Retail Setup Upgrade"
         DiscountPriority.Modify();
     end;
 
-    local procedure UpgradeNPRetailSetup()
-    var
-        RetailSetup: Record "NPR Retail Setup";
-        NPRetailSetup: Record "NPR NP Retail Setup";
-    begin
-        if not RetailSetup.Get() then
-            exit;
-
-        if not NPRetailSetup.Get() then begin
-            NPRetailSetup.Init();
-            NPRetailSetup.Insert();
-        end;
-
-        NPRetailSetup."Margin and Turnover By Shop" := RetailSetup."Margin and Turnover By Shop";
-        NPRetailSetup."Costing Method Standard" := RetailSetup."Costing Method Standard";
-        NPRetailSetup."Retail Journal No. Series" := RetailSetup."Retail Journal No. Management";
-        NPRetailSetup."Salespersoncode on Salesdoc." := RetailSetup."Salespersoncode on Salesdoc.";
-        NPRetailSetup."Check Purchase Lines if vendor" := RetailSetup."Check Purchase Lines if vendor";
-        NPRetailSetup."Unit Cost Control" := RetailSetup."Unit Cost Control";
-        NPRetailSetup."Password on unblock discount" := RetailSetup."Password on unblock discount";
-        NPRetailSetup.Modify();
-    end;
 
     local procedure UpgradePOSViewProfile()
     var
@@ -263,5 +195,26 @@ codeunit 6014422 "NPR NP Retail Setup Upgrade"
         StaffSetup."Staff Price Group" := RetailSetup."Staff Price Group";
         StaffSetup."Staff SalesPrice Calc Codeunit" := RetailSetup."Staff SalesPrice Calc Codeunit";
         StaffSetup.Modify();
+    end;
+
+    local procedure UpgradePOSUnit()
+    var
+        POSUnit: Record "NPR POS Unit";
+        RetailSetup: Record "NPR Retail Setup";
+    begin
+        if not RetailSetup.Get() then
+            exit;
+
+        if (RetailSetup."Open Register Password" = '') and (RetailSetup."Password on unblock discount" = '') then
+            exit;
+
+        if not POSUnit.FindSet() then
+            exit;
+
+        repeat
+            POSUnit."Password on unblock discount" := RetailSetup."Password on unblock discount";
+            POSUnit."Open Register Password" := RetailSetup."Open Register Password";
+            POSUnit.Modify();
+        until POSUnit.Next() = 0;
     end;
 }

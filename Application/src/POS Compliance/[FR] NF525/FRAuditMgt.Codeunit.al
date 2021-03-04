@@ -29,7 +29,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
     local procedure IsEnabled(POSAuditProfileCode: Code[20]): Boolean
     var
-        NPRetailSetup: Record "NPR NP Retail Setup";
         POSAuditProfile: Record "NPR POS Audit Profile";
     begin
         if not Initialized then begin

@@ -1714,7 +1714,7 @@ codeunit 85008 "NPR E-Commerce Tests"
         LibraryECommerce: Codeunit "NPR Library - E-Commerce";
     begin
         if not Initialized then begin
-            InitializeSetupRecords();
+            CreateDefaultRetailSetup();
             PrepareDataForXml();
             SetSalesDocumentAsXml();
             SetPurchDocumentAsXml();
@@ -1942,13 +1942,6 @@ codeunit 85008 "NPR E-Commerce Tests"
         LibraryECommerce.CreateMagentoShipmentMapping(ExternalShipmentMethodCode);
     end;
 
-    local procedure InitializeSetupRecords()
-    var
-        LibraryECommerce: Codeunit "NPR Library - E-Commerce";
-    begin
-        LibraryECommerce.CreateRetailSetup();
-    end;
-
     local procedure LoadXmlAndRemoveElement(XPath: Text; ImportType: Record "NPR Nc Import Type"; var ImportEntry: Record "NPR NC Import Entry"; DocName: Text; Xml: TextBuilder)
     var
         Node: XmlNode;
@@ -2041,5 +2034,13 @@ codeunit 85008 "NPR E-Commerce Tests"
     begin
         MyNotifications.Disable(InstructionMgt.GetClosingUnpostedDocumentNotificationId());
         PurchaseInvoice.Close();
+    end;
+
+    local procedure CreateDefaultRetailSetup()
+    var
+        RetailItemSetup: Record "NPR Retail Item Setup";
+    begin
+        if not RetailItemSetup.Get() then
+            RetailItemSetup.Insert();
     end;
 }

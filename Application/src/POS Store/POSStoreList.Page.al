@@ -120,14 +120,6 @@ page 6150614 "NPR POS Store List"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Unit List action';
                 }
-                action("NP Retail Setup")
-                {
-                    Caption = 'NP Retail Setup';
-                    Image = Setup;
-                    RunObject = Page "NPR NP Retail Setup";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the NP Retail Setup action';
-                }
                 action("POS Posting Setup")
                 {
                     Caption = 'POS Posting Setup';

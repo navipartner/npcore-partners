@@ -14,15 +14,11 @@ codeunit 6151165 "NPR NpGp POS Session Mgt."
     var
         POSUnit: Record "NPR POS Unit";
         NcTask: Record "NPR Nc Task";
-        NPRetailSetup: Record "NPR NP Retail Setup";
         NpGpPOSSalesSetup: Record "NPR NpGp POS Sales Setup";
         POSEntry: Record "NPR POS Entry";
         NpGpPOSSalesInitMgt: Codeunit "NPR NpGp POS Sales Init Mgt.";
         TaskProcessorCode: Text;
     begin
-        if not NPRetailSetup.Get then
-            exit;
-
         if not POSUnit.Get(SalePOS."Register No.") then
             exit;
         if POSUnit."Global POS Sales Setup" = '' then
@@ -43,19 +39,16 @@ codeunit 6151165 "NPR NpGp POS Session Mgt."
     var
         POSUnit: Record "NPR POS Unit";
         NcTask: Record "NPR Nc Task";
-        NPRetailSetup: Record "NPR NP Retail Setup";
         NpGpPOSSalesSetup: Record "NPR NpGp POS Sales Setup";
         POSEntry: Record "NPR POS Entry";
         NpGpPOSSalesInitMgt: Codeunit "NPR NpGp POS Sales Init Mgt.";
         TaskProcessorCode: Text;
     begin
-        if not NPRetailSetup.Get then
-            exit;
-
         if not POSUnit.Get(SalePOS."Register No.") then
             exit;
         if POSUnit."Global POS Sales Setup" = '' then
             exit;
+            
         if not NpGpPOSSalesSetup.Get(POSUnit."Global POS Sales Setup") then
             exit;
         if not FindPosEntry(SalePOS, POSEntry) then

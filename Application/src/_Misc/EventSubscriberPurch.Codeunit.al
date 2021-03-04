@@ -1,8 +1,6 @@
 codeunit 6014444 "NPR Event Subscriber (Purch)"
 {
     var
-        RetailSetup: Record "NPR NP Retail Setup";
-        RetailSetupFetched: Boolean;
 
     [EventSubscriber(ObjectType::Table, 39, 'OnBeforeValidateEvent', 'Vendor Item No.', true, false)]
     local procedure OnBeforeValidateEventVendorItemNo(var Rec: Record "Purchase Line"; var xRec: Record "Purchase Line"; CurrFieldNo: Integer)
@@ -16,12 +14,10 @@ codeunit 6014444 "NPR Event Subscriber (Purch)"
         CreatedVariantCode: Code[10];
     begin
         if CurrFieldNo = Rec.FieldNo("Vendor Item No.") then begin
-            GetRetailSetup();
-            PurchHeader.Get(Rec."Document Type", Rec."Document No.");
-            Item.SetCurrentKey("Vendor No.", "Vendor Item No.");
-            if RetailSetup."Check Purchase Lines if vendor" then
-                Item.SetFilter("Vendor No.", PurchHeader."Buy-from Vendor No.");
             if Rec."Vendor Item No." <> '' then begin
+                PurchHeader.Get(Rec."Document Type", Rec."Document No.");
+                Item.SetCurrentKey("Vendor No.", "Vendor Item No.");
+                Item.SetFilter("Vendor No.", PurchHeader."Buy-from Vendor No.");
                 Item.SetFilter("Vendor Item No.", '%1', '@' + Rec."Vendor Item No.");
                 if Item.FindFirst() then begin
                     if Rec."No." <> Item."No." then begin
@@ -61,15 +57,5 @@ codeunit 6014444 "NPR Event Subscriber (Purch)"
         end;
     end;
 
-    local procedure GetRetailSetup(): Boolean
-    begin
-        if RetailSetupFetched then
-            exit(true);
-
-        if not RetailSetup.Get() then
-            exit(false);
-        RetailSetupFetched := true;
-        exit(true);
-    end;
 }
 

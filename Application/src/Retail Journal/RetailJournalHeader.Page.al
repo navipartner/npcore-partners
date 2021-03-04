@@ -20,12 +20,7 @@ page 6014490 "NPR Retail Journal Header"
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Code field';
-
-                        trigger OnAssistEdit()
-                        begin
-                            if AssistEdit(xRec) then
-                                CurrPage.Update;
-                        end;
+                       
                     }
                     field(Description; Description)
                     {

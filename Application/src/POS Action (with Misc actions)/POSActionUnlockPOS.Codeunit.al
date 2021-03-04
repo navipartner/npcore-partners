@@ -44,10 +44,10 @@ codeunit 6150836 "NPR POS Action: UnlockPOS"
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         POSSale: Codeunit "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
-        RetailSetup: Record "NPR NP Retail Setup";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         PasswordValid: Boolean;
         SalePOS: Record "NPR Sale POS";
+        POSUnit: Record "NPR POS Unit";
     begin
         if not Action.IsThisAction(ActionCode) then
             exit;
@@ -58,7 +58,7 @@ codeunit 6150836 "NPR POS Action: UnlockPOS"
         Type := JSON.GetStringOrFail('type', StrSubstNo(ReadingErr, ActionCode()));
 
         Clear(SalespersonPurchaser);
-        RetailSetup.Get();
+        POSSetup.GetPOSUnit(POSUnit);
 
         case Type of
             'SalespersonCode':
@@ -69,7 +69,7 @@ codeunit 6150836 "NPR POS Action: UnlockPOS"
                     PasswordValid := SalespersonPurchaser.FindFirst();
 
                     if (not PasswordValid) then
-                        PasswordValid := (Password = RetailSetup."Open Register Password");
+                        PasswordValid := (Password = POSUnit."Open Register Password");
 
                     if (DelChr(Password, '<=>', ' ') = '') then
                         PasswordValid := false;

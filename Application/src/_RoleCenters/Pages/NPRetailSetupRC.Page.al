@@ -608,13 +608,6 @@ page 6151245 "NPR Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Configuration Questionnaire action';
                 }
-                action("NP Retail Setup")
-                {
-                    Caption = 'NP Retail Setup';
-                    RunObject = Page "NPR NP Retail Setup";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the NP Retail Setup action';
-                }
             }
             group("Posting Setup")
             {
