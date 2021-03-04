@@ -32,7 +32,31 @@ page 6059812 "NPR Retail Activities"
                     Image = "Document";
                     ToolTip = 'Specifies the value of the Import Unprocessed field';
                 }
-
+            }
+            cuegroup(Control1)
+            {
+                Caption = 'Actions';
+                actions
+                {
+                    action("New Sales Order")
+                    {
+                        Caption = 'New Sales Order';
+                        RunObject = Page "Sales Order";
+                        RunPageMode = Create;
+                        ApplicationArea = All;
+                        Image = TileNew;
+                        ToolTip = 'Executes the New Sales Order action';
+                    }
+                    action("New Sales Quote")
+                    {
+                        Caption = 'New Sales Quote';
+                        RunObject = Page "Sales Quote";
+                        RunPageMode = Create;
+                        ApplicationArea = All;
+                        Image = TileNew;
+                        ToolTip = 'Executes the New Sales Quote action';
+                    }
+                }
             }
             cuegroup(Control6150622)
             {

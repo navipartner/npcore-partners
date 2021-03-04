@@ -24,6 +24,31 @@ page 6059983 "NPR Store Manager Activ."
                     ToolTip = 'Specifies the value of the Open Purchase Orders field';
                 }
             }
+            cuegroup(Control6014404)
+            {
+                Caption = 'Actions';
+                actions
+                {
+                    action("New Salesorder")
+                    {
+                        Caption = 'New Salesorder';
+                        RunObject = Page "Sales Order";
+                        RunPageMode = Create;
+                        ApplicationArea = All;
+                        Image = TileNew;
+                        ToolTip = 'Executes the New Salesorder action';
+                    }
+                    action("New Purchase Order")
+                    {
+                        Caption = 'New Purchase Order';
+                        RunObject = Page "Purchase Order";
+                        RunPageMode = Create;
+                        ApplicationArea = All;
+                        Image = TileNew;
+                        ToolTip = 'Executes the New Purchase Order action';
+                    }
+                }
+            }
             cuegroup("Posted Documents")
             {
                 field("Posted Sales Invoices"; Rec."Posted Sales Invoices")

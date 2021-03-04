@@ -11,7 +11,7 @@ page 6151265 "NPR POS Unit Rcpt.Text Profile"
         {
             group(General)
             {
-                Caption = 'Genearl';
+                Caption = 'General';
                 field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
