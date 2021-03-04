@@ -1,8 +1,5 @@
 table 6151558 "NPR NpXml Field Val. Buffer"
 {
-    // NC1.08/MH/20150310  CASE 206395 Object created
-    // NC2.00/MHA/20160525  CASE 240005 NaviConnect
-
     Caption = 'NpXml Field Value Buffer';
     DataClassification = CustomerContent;
 
@@ -30,10 +27,6 @@ table 6151558 "NPR NpXml Field Val. Buffer"
         key(Key1; "Entry No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

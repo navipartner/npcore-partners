@@ -80,14 +80,6 @@ codeunit 6151512 "NPR NpXml Batch Processing"
         exit(ParameterValue);
     end;
 
-    local procedure HasParameter(JobQueueEntry: Record "Job Queue Entry"; ParameterName: Text): Boolean
-    var
-        Position: Integer;
-    begin
-        Position := StrPos(LowerCase(JobQueueEntry."Parameter String"), LowerCase(ParameterName));
-        exit(Position > 0);
-    end;
-
     local procedure FindDelimiterPosition(ParameterString: Text) Position: Integer
     var
         NewPosition: Integer;
@@ -111,7 +103,6 @@ codeunit 6151512 "NPR NpXml Batch Processing"
     [EventSubscriber(ObjectType::Table, 472, 'OnAfterValidateEvent', 'Object ID to Run', true, true)]
     local procedure OnValidateJobQueueEntryObjectIDtoRun(var Rec: Record "Job Queue Entry"; var xRec: Record "Job Queue Entry"; CurrFieldNo: Integer)
     var
-        NcTaskProcessor: Record "NPR Nc Task Processor";
         ParameterString: Text;
     begin
         if Rec."Object Type to Run" <> Rec."Object Type to Run"::Codeunit then
@@ -128,7 +119,6 @@ codeunit 6151512 "NPR NpXml Batch Processing"
     local procedure OnValidateJobQueueEntryParameterString(var Rec: Record "Job Queue Entry"; var xRec: Record "Job Queue Entry"; CurrFieldNo: Integer)
     var
         NpXmlTemplate: Record "NPR NpXml Template";
-        ParameterString: Text;
         Description: Text;
     begin
         if Rec."Object Type to Run" <> Rec."Object Type to Run"::Codeunit then

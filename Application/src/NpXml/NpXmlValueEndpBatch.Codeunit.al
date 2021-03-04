@@ -1,10 +1,5 @@
 codeunit 6014676 "NPR NpXml Value Endp. Batch"
 {
-    // NPR5.23/BR/20160518      CASE 237658 Object created: To be Used as Custom Codeunit in Table Npxml Element
-    // NPR5.23.03/BR/20160621   CASE 242337 Code cleaned and restructured
-    // NPR5.23.03/MHA/20160726  CASE 242557 Magento reference updated according to NC2.00
-    // NPR5.31/BR/20170330      CASE 267459 Fix for errors with mutiple updates
-
     TableNo = "NPR NpXml Custom Val. Buffer";
 
     trigger OnRun()
@@ -25,10 +20,7 @@ codeunit 6014676 "NPR NpXml Value Endp. Batch"
     var
         RecRef: RecordRef;
     begin
-        //-NPR5.31 [267459]
         EndpointRequestBatch.LockTable;
-        //+NPR5.31 [267459]
-        //-NPR5.23.03
         Clear(RecRef);
         RecRef.Open(NpXmlCustomValueBuffer."Table No.");
         RecRef.SetPosition(NpXmlCustomValueBuffer."Record Position");
@@ -42,10 +34,7 @@ codeunit 6014676 "NPR NpXml Value Endp. Batch"
                 Commit;
             end;
         end;
-        //+NPR5.23.03
-        //-NPR5.31 [267459]
         Commit;
-        //+NPR5.31 [267459]
     end;
 }
 

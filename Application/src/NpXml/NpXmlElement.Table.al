@@ -1,28 +1,5 @@
 table 6151552 "NPR NpXml Element"
 {
-    // NC1.00/MH/20150113  CASE 199932 Refactored object from Web - XML
-    // NC1.01/MH/20150115  CASE 204467 Added Custom Codeunit ID for Customized Field Values
-    // NC1.04/MH/20150209  CASE 199932 Added 300 field Comment
-    // NC1.05/MH/20150219  CASE 206395 Added Options to field 5200 Field Type:
-    //                                  - ExclVat
-    //                                  - Firstname
-    //                                  - Lastname
-    //                                  - PrimaryKey
-    // NC1.07/MH/20150309  CASE 208131 Updated captions added Field 1010 Hidden
-    // NC1.08/MH/20150310  CASE 206395 Added function SetEnumList()
-    // NC1.08/MH/20150319  CASE 207529 Corrected Name of field from Customer to Custom
-    // NC1.16/TS/20150507  CASE 213379 Removed options on field 5200 Field Type - Functionality moved to Custom Value Codeunits for NpXml
-    // NC1.20/TTH/20151005 CASE 218023 Adding Preffix to the XML Tags and attributes
-    // NC1.21/TTH/20151020 CASE 224528 Adding versioning and possibility to lock the modified versions. Added field 20 Template Version number and 5255 Last Modified. New function XmlTemplateChanged.
-    // NC1.22/MHA/20151203 CASE 224528 Deleted function XmlTemplateChanged() and credted GetVersionNo()
-    // NC1.22/MHA/20160429 CASE 237658 NpXml extended with Namespaces
-    // NC2.00/MHA/20160525  CASE 240005 NaviConnect
-    // NC2.01/MHA /20161018 CASE 2425550 Added Generic Table fields for enabling Temporary Table Exports
-    // NC2.01/MHA /20161018 CASE 2425550 Added Xml Value fields for enabling Value generation by Subscription
-    // NC2.13/JDH /20180604 CASE 317971 Changed optioncaption to ENU
-    // NC2.16/BHR /20180824  CASE 322752 Replace record Object to Allobj
-    // NC2.17/JDH /20181112 CASE 334163 Added Caption to Object
-
     Caption = 'NpXml Element';
     DataClassification = CustomerContent;
 
@@ -75,7 +52,7 @@ table 6151552 "NPR NpXml Element"
         }
         field(110; "Field Name"; Text[50])
         {
-            CalcFormula = Lookup (Field.FieldName WHERE(TableNo = FIELD("Table No."),
+            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = FIELD("Table No."),
                                                         "No." = FIELD("Field No.")));
             Caption = 'Field Name';
             Editable = false;
@@ -94,11 +71,11 @@ table 6151552 "NPR NpXml Element"
 
             trigger OnValidate()
             var
-                XMLElement: Record "NPR NpXml Element";
+                NpXmlElement: Record "NPR NpXml Element";
                 XMLTemplate: Record "NPR NpXml Template";
             begin
-                if XMLElement.Get("Xml Template Code", "Parent Line No.") then
-                    "Parent Table No." := XMLElement."Table No."
+                if NpXmlElement.Get("Xml Template Code", "Parent Line No.") then
+                    "Parent Table No." := NpXmlElement."Table No."
                 else
                     if XMLTemplate.Get("Xml Template Code") then
                         "Parent Table No." := XMLTemplate."Table No.";
@@ -132,7 +109,6 @@ table 6151552 "NPR NpXml Element"
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NC2.01 [242550]
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
                 EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR NpXml Mgt.");
                 EventSubscription.SetRange("Published Function", 'OnSetupGenericChildTable');
@@ -141,14 +117,12 @@ table 6151552 "NPR NpXml Element"
 
                 "Generic Child Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
                 "Generic Child Function" := EventSubscription."Subscriber Function";
-                //-NC2.01 [242550]
             end;
 
             trigger OnValidate()
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NC2.01 [242550]
                 if "Generic Child Codeunit ID" = 0 then begin
                     "Generic Child Function" := '';
                     exit;
@@ -161,12 +135,11 @@ table 6151552 "NPR NpXml Element"
                 if "Generic Child Function" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Generic Child Function");
                 EventSubscription.FindFirst;
-                //-NC2.01 [242550]
             end;
         }
         field(605; "Generic Child Codeunit Name"; Text[50])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
                                                              "Object ID" = FIELD("Generic Child Codeunit ID")));
             Caption = 'Generic Child Codeunit Name';
             Description = 'NC2.01';
@@ -183,7 +156,6 @@ table 6151552 "NPR NpXml Element"
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NC2.01 [242550]
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
                 EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR NpXml Mgt.");
                 EventSubscription.SetRange("Published Function", 'OnSetupGenericChildTable');
@@ -192,14 +164,12 @@ table 6151552 "NPR NpXml Element"
 
                 "Generic Child Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
                 "Generic Child Function" := EventSubscription."Subscriber Function";
-                //-NC2.01 [242550]
             end;
 
             trigger OnValidate()
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NC2.01 [242550]
                 if "Generic Child Function" = '' then begin
                     "Generic Child Codeunit ID" := 0;
                     exit;
@@ -212,7 +182,6 @@ table 6151552 "NPR NpXml Element"
                 if "Generic Child Function" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Generic Child Function");
                 EventSubscription.FindFirst;
-                //-NC2.01 [242550]
             end;
         }
         field(620; "Xml Value Codeunit ID"; Integer)
@@ -226,7 +195,6 @@ table 6151552 "NPR NpXml Element"
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NC2.01 [255641]
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
                 EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR NpXml Value Mgt.");
                 EventSubscription.SetRange("Published Function", 'OnGetXmlValue');
@@ -235,14 +203,12 @@ table 6151552 "NPR NpXml Element"
 
                 "Xml Value Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
                 "Xml Value Function" := EventSubscription."Subscriber Function";
-                //-NC2.01 [255641]
             end;
 
             trigger OnValidate()
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NC2.01 [255641]
                 if "Xml Value Codeunit ID" = 0 then begin
                     "Xml Value Function" := '';
                     exit;
@@ -255,12 +221,11 @@ table 6151552 "NPR NpXml Element"
                 if "Xml Value Function" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Xml Value Function");
                 EventSubscription.FindFirst;
-                //-NC2.01 [255641]
             end;
         }
         field(625; "Xml Value Codeunit Name"; Text[50])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
                                                              "Object ID" = FIELD("Xml Value Codeunit ID")));
             Caption = 'Xml Value Codeunit Name';
             Description = 'NC2.01';
@@ -277,7 +242,6 @@ table 6151552 "NPR NpXml Element"
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NC2.01 [255641]
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
                 EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR NpXml Value Mgt.");
                 EventSubscription.SetRange("Published Function", 'OnGetXmlValue');
@@ -286,14 +250,12 @@ table 6151552 "NPR NpXml Element"
 
                 "Xml Value Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
                 "Xml Value Function" := EventSubscription."Subscriber Function";
-                //-NC2.01 [255641]
             end;
 
             trigger OnValidate()
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NC2.01 [255641]
                 if "Xml Value Function" = '' then begin
                     "Xml Value Codeunit ID" := 0;
                     exit;
@@ -306,7 +268,6 @@ table 6151552 "NPR NpXml Element"
                 if "Xml Value Function" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Xml Value Function");
                 EventSubscription.FindFirst;
-                //-NC2.01 [255641]
             end;
         }
         field(1000; Active; Boolean)
@@ -341,7 +302,7 @@ table 6151552 "NPR NpXml Element"
         }
         field(5120; "Table Name"; Text[50])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Table No.")));
             Caption = 'Table Name';
             Editable = false;
@@ -372,19 +333,13 @@ table 6151552 "NPR NpXml Element"
                 "Object": Record "Object";
                 AllObj: Record AllObj;
             begin
-                //-NC2.16 [322752]
-                //-NC1.16
-                //IF "Custom Codeunit ID" <> 0 THEN
-                //  Object.GET(Object.Type::Codeunit,'',"Custom Codeunit ID");
-                //+NC1.16
                 if "Custom Codeunit ID" <> 0 then
                     AllObj.Get(AllObj."Object Type"::Codeunit, "Custom Codeunit ID");
-                //+NC2.16 [322752]
             end;
         }
         field(5202; "Custom Codeunit Name"; Text[50])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
                                                              "Object ID" = FIELD("Custom Codeunit ID")));
             Caption = 'Custom Codeunit Name';
             Description = 'NC1.01,NC1.07,NC1.10';
@@ -447,7 +402,7 @@ table 6151552 "NPR NpXml Element"
         }
         field(100000; "Has Filter"; Boolean)
         {
-            CalcFormula = Exist ("NPR NpXml Filter" WHERE("Xml Template Code" = FIELD("Xml Template Code"),
+            CalcFormula = Exist("NPR NpXml Filter" WHERE("Xml Template Code" = FIELD("Xml Template Code"),
                                                       "Xml Element Line No." = FIELD("Line No.")));
             Caption = 'Has Filter';
             Editable = false;
@@ -455,7 +410,7 @@ table 6151552 "NPR NpXml Element"
         }
         field(100010; "Has Attribute"; Boolean)
         {
-            CalcFormula = Exist ("NPR NpXml Attribute" WHERE("Xml Template Code" = FIELD("Xml Template Code"),
+            CalcFormula = Exist("NPR NpXml Attribute" WHERE("Xml Template Code" = FIELD("Xml Template Code"),
                                                          "Xml Element Line No." = FIELD("Line No.")));
             Caption = 'Has Attribute';
             Editable = false;
@@ -470,69 +425,42 @@ table 6151552 "NPR NpXml Element"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     var
-        XMLAttribute: Record "NPR NpXml Attribute";
-        XMLElement: Record "NPR NpXml Element";
+        NpXmlAttribute: Record "NPR NpXml Attribute";
+        NpXmlElement: Record "NPR NpXml Element";
         XMLFilter: Record "NPR NpXml Filter";
     begin
         XMLFilter.SetRange("Xml Template Code", "Xml Template Code");
         XMLFilter.SetRange("Xml Element Line No.", "Line No.");
         XMLFilter.DeleteAll;
 
-        XMLAttribute.SetRange("Xml Template Code", "Xml Template Code");
-        XMLAttribute.SetRange("Xml Element Line No.", "Line No.");
-        XMLAttribute.DeleteAll;
-
-        //-NC1.21
-        //XMLElement.SETRANGE("Xml Template Code","Xml Template Code");
-        //XMLElement.SETFILTER("Line No.",'<>%1',"Line No.");
-        //IF XMLElement.FINDSET THEN
-        //  REPEAT
-        //
-        //  UNTIL XMLElement.NEXT = 0;
-        //-NC1.22
-        //XmlTemplateChanged();
-        //+NC1.22
-        //+NC1.21
+        NpXmlAttribute.SetRange("Xml Template Code", "Xml Template Code");
+        NpXmlAttribute.SetRange("Xml Element Line No.", "Line No.");
+        NpXmlAttribute.DeleteAll;
     end;
 
     trigger OnInsert()
-    var
-        XMLElement: Record "NPR NpXml Element";
     begin
         UpdateParentInfo();
-
-        //-NC1.08
         SetEnumList();
-        //+NC1.08
-
-        //-NC1.22
-        ////-NC1.21
-        //XmlTemplateChanged();
-        ////+NC1.21
         "Template Version No." := GetTemplateVersionNo();
-        //+NC1.22
     end;
 
     trigger OnModify()
     var
-        XMLAttribute: Record "NPR NpXml Attribute";
-        XMLElement: Record "NPR NpXml Element";
+        NpXmlAttribute: Record "NPR NpXml Attribute";
+        NpXmlElement: Record "NPR NpXml Element";
         XMLFilter: Record "NPR NpXml Filter";
     begin
         UpdateParentInfo();
-        XMLElement.SetRange("Xml Template Code", "Xml Template Code");
-        XMLElement.SetFilter("Line No.", '<>%1', "Line No.");
-        if XMLElement.FindSet then
+        NpXmlElement.SetRange("Xml Template Code", "Xml Template Code");
+        NpXmlElement.SetFilter("Line No.", '<>%1', "Line No.");
+        if NpXmlElement.FindSet then
             repeat
-                XMLElement.UpdateParentInfo();
-                XMLElement.Modify;
-            until XMLElement.Next = 0;
+                NpXmlElement.UpdateParentInfo();
+                NpXmlElement.Modify;
+            until NpXmlElement.Next = 0;
 
         if "Table No." <> xRec."Table No." then begin
             XMLFilter.SetRange("Xml Template Code", "Xml Template Code");
@@ -540,45 +468,36 @@ table 6151552 "NPR NpXml Element"
             XMLFilter.SetFilter("Table No.", '<>%1', 0);
             XMLFilter.ModifyAll("Table No.", "Table No.");
 
-            XMLAttribute.SetRange("Xml Template Code", "Xml Template Code");
-            XMLAttribute.SetRange("Xml Element Line No.", "Line No.");
-            XMLAttribute.SetRange("Table No.", xRec."Table No.");
-            XMLAttribute.ModifyAll("Table No.", "Table No.");
+            NpXmlAttribute.SetRange("Xml Template Code", "Xml Template Code");
+            NpXmlAttribute.SetRange("Xml Element Line No.", "Line No.");
+            NpXmlAttribute.SetRange("Table No.", xRec."Table No.");
+            NpXmlAttribute.ModifyAll("Table No.", "Table No.");
         end;
 
-        //-NC1.08
         SetEnumList();
-        //+NC1.08
 
-        //-NC1.21
-        //-NC1.22
-        //XmlTemplateChanged();
         "Template Version No." := GetTemplateVersionNo();
-        //+NC1.22
         "Last Modified at" := CreateDateTime(Today, Time);
-        //+NC1.21
     end;
 
     local procedure GetTemplateVersionNo(): Code[20]
     var
         NpXmlTemplate: Record "NPR NpXml Template";
     begin
-        //-NC1.22
         NpXmlTemplate.Get("Xml Template Code");
         exit(NpXmlTemplate."Template Version");
-        //+NC1.22
     end;
 
     procedure GetParentLineNo() ParentLineNo: Integer
     var
-        XMLElement: Record "NPR NpXml Element";
+        NpXmlElement: Record "NPR NpXml Element";
     begin
-        Clear(XMLElement);
-        XMLElement.SetRange("Xml Template Code", "Xml Template Code");
-        XMLElement.SetFilter("Line No.", '<%1', "Line No.");
-        XMLElement.SetFilter(Level, '<%1', Level);
-        if XMLElement.FindLast then
-            exit(XMLElement."Line No.");
+        Clear(NpXmlElement);
+        NpXmlElement.SetRange("Xml Template Code", "Xml Template Code");
+        NpXmlElement.SetFilter("Line No.", '<%1', "Line No.");
+        NpXmlElement.SetFilter(Level, '<%1', Level);
+        if NpXmlElement.FindLast then
+            exit(NpXmlElement."Line No.");
     end;
 
     procedure IsContainer(): Boolean
@@ -592,7 +511,6 @@ table 6151552 "NPR NpXml Element"
         "Field": Record "Field";
         NpXmlAttribute: Record "NPR NpXml Attribute";
     begin
-        //-NC1.08
         if "Field Type" <> "Field Type"::Enum then begin
             "Enum List (,)" := '';
             exit;
@@ -619,7 +537,6 @@ table 6151552 "NPR NpXml Element"
             Field.Type::Integer:
                 "Enum List (,)" := '0,1,2';
         end;
-        //+NC1.08
     end;
 
     procedure UpdateParentInfo()

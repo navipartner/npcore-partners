@@ -1,7 +1,5 @@
 table 6151562 "NPR NpXml Api Header"
 {
-    // NC2.06 /MHA /20170809  CASE 265779 Object created
-
     Caption = 'NpXml Api Header';
     DataClassification = CustomerContent;
 
@@ -35,10 +33,6 @@ table 6151562 "NPR NpXml Api Header"
         key(Key1; "Xml Template Code", Name)
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 
