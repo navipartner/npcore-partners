@@ -12,6 +12,11 @@ table 6150651 "NPR POS View Profile"
             Caption = 'Code';
             DataClassification = CustomerContent;
         }
+        field(2; Description; Text[50])
+        {
+            Caption = 'Description';
+            DataClassification = CustomerContent;
+        }
         field(10; "Client Formatting Culture ID"; Text[30])
         {
             Caption = 'Client Formatting Culture ID';

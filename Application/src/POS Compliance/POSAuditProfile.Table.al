@@ -11,6 +11,11 @@ table 6150650 "NPR POS Audit Profile"
             Caption = 'Code';
             DataClassification = CustomerContent;
         }
+        field(2; Description; Text[50])
+        {
+            Caption = 'Description';
+            DataClassification = CustomerContent;
+        }
         field(10; "Sale Fiscal No. Series"; Code[20])
         {
             Caption = 'Sale Fiscal No. Series';

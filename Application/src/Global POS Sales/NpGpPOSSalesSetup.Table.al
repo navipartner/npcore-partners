@@ -13,6 +13,11 @@ table 6151170 "NPR NpGp POS Sales Setup"
             DataClassification = CustomerContent;
             NotBlank = true;
         }
+        field(2; Description; Text[50])
+        {
+            Caption = 'Description';
+            DataClassification = CustomerContent;
+        }
         field(5; "Company Name"; Text[100])
         {
             Caption = 'Company Name';
