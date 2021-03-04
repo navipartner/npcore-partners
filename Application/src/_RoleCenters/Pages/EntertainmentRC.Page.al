@@ -295,6 +295,8 @@ page 6151249 "NPR Entertainment RC"
                     Image = Setup; 
                 }
             }
+        }
+        area(Creation){
             action("Import List")
             {
                 Caption = 'Import List';
