@@ -38,10 +38,6 @@ page 6151241 "NPR Retail POS- Sales Person R"
             {
                 ApplicationArea = All;
             }
-            part(Control6150615; "NPR Retail Top 10 Customers")
-            {
-                ApplicationArea = All;
-            }
             part(RetailTop10Vendors; "NPR Top 10 Vendors")
             {
                 ApplicationArea = All;
