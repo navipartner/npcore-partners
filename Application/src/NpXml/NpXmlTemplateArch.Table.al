@@ -1,10 +1,5 @@
 table 6151559 "NPR NpXml Template Arch."
 {
-    // NC1.21/TTH/20151020 CASE 224528 Adding versioning and possibility to lock the modified versions. New table for the archive.
-    // NC2.00/MHA/20160525  CASE 240005 NaviConnect
-    // NC2.01/MHA/20160905 CASE 242551 ValidateTableRelation and TestTableRelation disabled on Field 1 Xml Template Code
-    // NC2.17/JDH /20181112 CASE 334163 Added Caption to Object
-
     Caption = 'NpXml Template Archive';
     DataClassification = CustomerContent;
 
@@ -56,10 +51,6 @@ table 6151559 "NPR NpXml Template Arch."
         key(Key2; "Archived at")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

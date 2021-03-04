@@ -1,9 +1,5 @@
 page 6151557 "NPR NpXml Batch Filters"
 {
-    // NC1.00/MH/20150113  CASE 199932 Refactored object from Web - XML
-    // NC1.01/MH/20150201  CASE 199932 Renamed Page from "Template Filters" to "Batch Filters".
-    // NC2.00/MHA/20160525  CASE 240005 NaviConnect
-
     AutoSplitKey = true;
     Caption = 'Xml Batch Filters';
     DelayedInsert = true;
@@ -42,10 +38,6 @@ page 6151557 "NPR NpXml Batch Filters"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 
     trigger OnNewRecord(BelowxRec: Boolean)

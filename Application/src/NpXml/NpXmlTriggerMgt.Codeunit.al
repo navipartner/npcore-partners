@@ -1,36 +1,5 @@
 codeunit 6151553 "NPR NpXml Trigger Mgt."
 {
-    // NC1.13 /MHA /20150414  CASE 211360 Object Created - Restructured NpXml Codeunits. Independent functions moved to new codeunits
-    // NC1.14 /MHA /20150424  CASE 212415 Moved Clear of NpXml Mgt. in order to enable multiple template output
-    // NC1.17 /MHA /20150603  CASE 215533 Corrections of multi level triggers
-    // NC1.18 /MHA /20150707  CASE 218282 Renamed functions:
-    //                                     - SetRecRefXmlTemplateTriggerFilter ~ SetParentFilter
-    //                                     - RunNpXmlTemplate ~ RunTemplate
-    //                                     - RunNpXmlTemplateTrigger ~ RunTrigger
-    //                                     - RunNpXmlTemplateTriggers ~ RunTriggers
-    //                                     - GetXmlTemplate ~ TriggerToTemplate
-    // NC1.20 /MHA /20150821  CASE 2212229 Trigger filters changed to enable triggering if at least one trigger is true
-    // NC1.21 /MHA /20151117  CASE 227150 Removed Unused Variable to NpRetail in IsDuplicate()
-    // NC1.22 /MHA /20160415  CASE 231214 Added multi company Task Processing
-    // NC2.00 /MHA /20160525  CASE 240005 NaviConnect
-    // NC2.01 /MHA /20160914  CASE 242551 Changed InTemplateTrigger() to set filter on all fields before FINDFIRST for "Link Type"::Filter
-    // NC2.01 /MHA /20161018  CASE 242550 Added function OnSetupGenericParentTable() for enabling Temporary Table Exports
-    // NC2.03 /MHA /20170327  CASE 267094 COMMIT added after RunTemplate() to enable execution of multiple templates
-    // NC2.07 /MHA /20171027  CASE 294737 Added FILTERGROUP in InTemplateTrigger() to enable multiple filters on fields
-    // NC2.12 /MHA /20180418  CASE 308107 Deleted functions IsDuplicate(),IsDuplicateRecord() and added IsUniqueTask()
-    // NC2.14/MHA /20180629  CASE 320762 Deleted function GetRecRef()
-
-
-    trigger OnRun()
-    var
-        NpXmlTemplate: Record "NPR NpXml Template";
-        TempDataLogRecord: Record "NPR Data Log Record" temporary;
-        RecRef: RecordRef;
-        PrevRecRef: RecordRef;
-        DataLogEntryNo: Integer;
-    begin
-    end;
-
     var
         NpXmlMgt: Codeunit "NPR NpXml Mgt.";
         NpXmlValueMgt: Codeunit "NPR NpXml Value Mgt.";
@@ -45,9 +14,8 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
         NpXmlMgt.Initialize(NpXmlTemplate, RecRef2, NpXmlValueMgt.GetPrimaryKeyValue(RecRef2), true);
         ClearLastError;
         ProcessComplete := NpXmlMgt.Run() and ProcessComplete;
-        //-NC2.03 [267094]
+
         Commit;
-        //+NC2.03 [267094]
     end;
 
     local procedure RunTrigger(TaskProcessor: Record "NPR Nc Task Processor"; NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger"; PrevRecRef: RecordRef; RecRef: RecordRef; Insert: Boolean; Modify: Boolean; Delete: Boolean; var UniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary)
@@ -58,23 +26,13 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
         NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
         RecRef2: RecordRef;
     begin
-        //-NC2.01 [242550]
         if not TriggerToTemplate(TaskProcessor, Insert, Modify, Delete, NpXmlTemplateTrigger, NpXmlTemplate) then
             exit;
-        //+NC2.01 [242550]
         if not SetLinkFilter(NpXmlTemplateTrigger, PrevRecRef, RecRef, Delete, RecRef2) then
             exit;
 
-        //-NC2.01 [242550]
-        //IF NOT TriggerToTemplate(TaskProcessor,Insert,Modify,Delete,NpXmlTemplateTrigger,NpXmlTemplate) THEN
-        //  EXIT;
-        //+NC2.01 [242550]
-
         if NpXmlTemplateTrigger."Parent Line No." = 0 then begin
             repeat
-                //-NC2.12 [308107]
-                //IF NOT IsDuplicateRecord(NpXmlTemplateTrigger,RecRef2,DataLogEntryNo,TempDataLogRecord) THEN
-                //  RunTemplate(NpXmlTemplate,RecRef2);
                 NewUniqueTaskBuffer.Init;
                 NewUniqueTaskBuffer."Table No." := RecRef2.Number;
                 NewUniqueTaskBuffer."Task Processor Code" := TaskProcessor.Code;
@@ -83,7 +41,6 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
                 NewUniqueTaskBuffer."Processing Code" := NpXmlTemplateTrigger."Xml Template Code";
                 if NcTaskMgt.ReqisterUniqueTask(NewUniqueTaskBuffer, UniqueTaskBuffer) then
                     RunTemplate(NpXmlTemplate, RecRef2);
-            //+NC2.12 [308107]
             until RecRef2.Next = 0;
             exit;
         end;
@@ -93,10 +50,7 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
                 if TriggerToTemplate(TaskProcessor, false, false, false, NpXmlTemplateTrigger2, NpXmlTemplate) then begin
                     RecRef := RecRef2.Duplicate;
                     PrevRecRef := RecRef2.Duplicate;
-                    //-NC2.12 [308107]
-                    //RunTrigger(TaskProcessor,NpXmlTemplateTrigger2,PrevRecRef,RecRef,FALSE,FALSE,FALSE,DataLogEntryNo,TempDataLogRecord);
                     RunTrigger(TaskProcessor, NpXmlTemplateTrigger2, PrevRecRef, RecRef, false, false, false, UniqueTaskBuffer);
-                    //+NC2.12 [308107]
                 end;
             until RecRef2.Next = 0;
     end;
@@ -110,15 +64,8 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
         NpXmlTemplateTrigger.SetRange("Table No.", RecRef.Number);
         if NpXmlTemplateTrigger.FindSet then
             repeat
-                //-NC2.12 [308107]
-                //RunTrigger(TaskProcessor,NpXmlTemplateTrigger,PrevRecRef,RecRef,Insert,Modify,Delete,DataLogEntryNo,TempDataLogRecord);
                 RunTrigger(TaskProcessor, NpXmlTemplateTrigger, PrevRecRef, RecRef, Insert, Modify, Delete, UniqueTaskBuffer);
-            //+NC2.12 [308107]
             until NpXmlTemplateTrigger.Next = 0;
-    end;
-
-    procedure "--- Get"()
-    begin
     end;
 
     procedure TriggerToTemplate(TaskProcessor: Record "NPR Nc Task Processor"; Insert: Boolean; Modify: Boolean; Delete: Boolean; NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger"; var NpXmlTemplate: Record "NPR NpXml Template"): Boolean
@@ -137,10 +84,6 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
              (Delete and NpXmlTemplateTrigger."Delete Trigger"));
     end;
 
-    local procedure "--- Filter"()
-    begin
-    end;
-
     procedure InTemplateTrigger(NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger"; PrevRecRef: RecordRef; RecRef: RecordRef): Boolean
     var
         NpXmlTemplateTriggerLink: Record "NPR NpXml Templ.Trigger Link";
@@ -154,7 +97,6 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
         if NpXmlTemplateTrigger."Table No." <> RecRef.Number then
             exit(false);
 
-        //-NC2.01 [242551]
         Clear(NpXmlTemplateTriggerLink);
         NpXmlTemplateTriggerLink.SetRange("Xml Template Code", NpXmlTemplateTrigger."Xml Template Code");
         NpXmlTemplateTriggerLink.SetRange("Xml Template Trigger Line No.", NpXmlTemplateTrigger."Line No.");
@@ -213,14 +155,10 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
             RecRef2 := RecRef.Duplicate;
             RecRef2.SetRecFilter;
 
-            //-NC2.07 [294737]
             i := 40;
-            //+NC2.07 [294737]
             repeat
-                //-NC2.07 [294737]
                 i += 1;
                 RecRef2.FilterGroup(i);
-                //+NC2.07 [294737]
                 FieldRef := RecRef2.Field(NpXmlTemplateTriggerLink."Field No.");
                 FieldRef.SetFilter(NpXmlTemplateTriggerLink."Filter Value");
             until NpXmlTemplateTriggerLink.Next = 0;
@@ -228,7 +166,6 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
             if not RecRef2.FindFirst then
                 exit(false);
         end;
-        //+NC2.01 [242551]
 
         exit(true);
     end;
@@ -236,8 +173,6 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
     [IntegrationEvent(false, false)]
     local procedure OnSetupGenericParentTable(NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger"; ChildLinkRecRef: RecordRef; var ParentRecRef: RecordRef; var Handled: Boolean)
     begin
-        //-NC2.01 [242550]
-        //+NC2.01 [242550]
     end;
 
     procedure SetLinkFilter(NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger"; PrevRecRef: RecordRef; RecRef: RecordRef; Delete: Boolean; var RecRef2: RecordRef) HasLinkedRecords: Boolean
@@ -262,12 +197,6 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
         Handled: Boolean;
     begin
         Clear(RecRef2);
-        //-NC2.01 [242550]
-        //RecRef2.OPEN(NpXmlTemplateTrigger."Parent Table No.");
-        //IF (RecRef.NUMBER = NpXmlTemplateTrigger."Parent Table No.") THEN BEGIN
-        //  RecRef2 := RecRef.DUPLICATE;
-        //  RecRef2.SETRECFILTER;
-        //END;
         if NpXmlTemplateTrigger."Generic Parent Codeunit ID" <> 0 then
             OnSetupGenericParentTable(NpXmlTemplateTrigger, RecRef, RecRef2, Handled);
         if (not Handled) or (NpXmlTemplateTrigger."Generic Parent Codeunit ID" = 0) then begin
@@ -277,7 +206,6 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
         end;
         if RecRef.Number = NpXmlTemplateTrigger."Parent Table No." then
             RecRef2.SetRecFilter;
-        //+NC2.01 [242550]
         NpXmlTemplateTriggerLink.SetRange("Xml Template Code", NpXmlTemplateTrigger."Xml Template Code");
         NpXmlTemplateTriggerLink.SetRange("Xml Template Trigger Line No.", NpXmlTemplateTrigger."Line No.");
         NpXmlTemplateTriggerLink.SetFilter("Link Type", '%1|%2|%3|%4', NpXmlTemplateTriggerLink."Link Type"::TableLink,
@@ -330,10 +258,6 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
             until NpXmlTemplateTriggerLink.Next = 0;
     end;
 
-    procedure "--- Unique Task"()
-    begin
-    end;
-
     procedure IsUniqueTask(TaskProcessor: Record "NPR Nc Task Processor"; Insert: Boolean; Modify: Boolean; Delete: Boolean; PrevRecRef: RecordRef; RecRef: RecordRef; var UniqueTaskBuffer: Record "NPR Nc Unique Task Buffer" temporary) IsUnique: Boolean
     var
         Item: Record Item;
@@ -366,10 +290,6 @@ codeunit 6151553 "NPR NpXml Trigger Mgt."
         until NpXmlTemplateTrigger.Next = 0;
 
         exit(IsUnique);
-    end;
-
-    procedure "--- Output"()
-    begin
     end;
 
     procedure GetProcessComplete(): Boolean

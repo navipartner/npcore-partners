@@ -10,7 +10,6 @@ codeunit 6151552 "NPR NpXml Batch Mgt."
     var
         NpXmlMgt: Codeunit "NPR NpXml Mgt.";
         BatchStarted: Boolean;
-        Error001: Label 'Custom Value has not been set\The Custom Codeunit should invoke SetCustomValue in Codeunit 6151552 NpXml Batch Management';
 
     procedure CheckRunBatch(NPXmlTemplate: Record "NPR NpXml Template"): Boolean
     var
@@ -75,10 +74,6 @@ codeunit 6151552 "NPR NpXml Batch Mgt."
             until NpXmlTemplate.Next = 0;
     end;
 
-    local procedure "--- Filter"()
-    begin
-    end;
-
     local procedure SetRecRefXmlTemplateFilter(NpXmlTemplate: Record "NPR NpXml Template"; var RecRef: RecordRef)
     var
         NpXmlFilter: Record "NPR NpXml Filter";
@@ -120,10 +115,6 @@ codeunit 6151552 "NPR NpXml Batch Mgt."
                 FieldRef := RecRef.Field(NpXmlFilter."Parent Field No.");
                 FieldRef.SetFilter(NpXmlFilter."Filter Value");
             until NpXmlFilter.Next = 0;
-    end;
-
-    local procedure "--- Aux"()
-    begin
     end;
 
     local procedure CalcNextBatchDatetime(NPXmlTemplate: Record "NPR NpXml Template"): DateTime

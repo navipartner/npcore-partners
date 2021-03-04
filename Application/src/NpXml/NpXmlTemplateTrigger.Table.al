@@ -1,18 +1,5 @@
 table 6151555 "NPR NpXml Template Trigger"
 {
-    // NC1.01/MH/20150201  CASE 199932 Object Created - defines which table changes should trigger NpXml Templates (Transaction Task).
-    // NC1.05/MH/20150219  CASE 206395 Changed TestTableRelation and ValidateTableRelation for field 1 "Xml Template Code"
-    // NC1.07/MH/20150309  CASE 208131 Updated captions
-    // NC1.11/MH/20150330  CASE 210171 Added multi level triggers
-    // NC1.19/MH/20150707  CASE 218282 Deleted unused field 1000 "Xml Template Element Name"
-    // NC1.21/TTH/20151020 CASE 224528 Adding versioning and possibility to lock the modified versions. Added field 20 Template Version number and 1010 Last Modified. New function XmlTemplateChanged.
-    // NC1.22/MHA/20151203 CASE 224528 Function XmlTemplateChanged() deleted and GetVersionNo() created
-    // NC1.22/MHA/20151203 CASE 224528 Deleted function XmlTemplateChanged() and credted GetVersionNo()
-    // NC2.00/MHA/20160525  CASE 240005 NaviConnect
-    // NC2.01/MHA /20161018 CASE 2425550 Added Generic Table fields for enabling Temporary Table Exports
-    // NC2.17/JDH /20181112 CASE 334163 Added Caption to Object
-    // NC2.26/MHA /20200501  CASE 402488 Updated UpdateNaviConnectSetup() from Local to Global and changed Keep Log for from 1 minute to 30 days
-
     Caption = 'NpXml Template Trigger';
     DataClassification = CustomerContent;
 
@@ -67,7 +54,7 @@ table 6151555 "NPR NpXml Template Trigger"
         }
         field(120; "Xml Template Table Name"; Text[50])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Parent Table No.")));
             Caption = 'Xml Template Table Name';
             Editable = false;
@@ -81,7 +68,7 @@ table 6151555 "NPR NpXml Template Trigger"
         }
         field(220; "Table Name"; Text[50])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Table No.")));
             Caption = 'Table Name';
             Editable = false;
@@ -127,7 +114,6 @@ table 6151555 "NPR NpXml Template Trigger"
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NC2.01 [242550]
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
                 EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR NpXml Trigger Mgt.");
                 EventSubscription.SetRange("Published Function", 'OnSetupGenericParentTable');
@@ -136,14 +122,12 @@ table 6151555 "NPR NpXml Template Trigger"
 
                 "Generic Parent Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
                 "Generic Parent Function" := EventSubscription."Subscriber Function";
-                //-NC2.01 [242550]
             end;
 
             trigger OnValidate()
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NC2.01 [242550]
                 if "Generic Parent Codeunit ID" = 0 then begin
                     "Generic Parent Function" := '';
                     exit;
@@ -156,12 +140,11 @@ table 6151555 "NPR NpXml Template Trigger"
                 if "Generic Parent Function" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Generic Parent Function");
                 EventSubscription.FindFirst;
-                //-NC2.01 [242550]
             end;
         }
         field(605; "Generic Parent Codeunit Name"; Text[50])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
                                                              "Object ID" = FIELD("Generic Parent Codeunit ID")));
             Caption = 'Generic Parent Codeunit Name';
             Description = 'NC2.01';
@@ -178,7 +161,6 @@ table 6151555 "NPR NpXml Template Trigger"
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NC2.01 [242550]
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
                 EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR NpXml Trigger Mgt.");
                 EventSubscription.SetRange("Published Function", 'OnSetupGenericParentTable');
@@ -187,14 +169,12 @@ table 6151555 "NPR NpXml Template Trigger"
 
                 "Generic Parent Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
                 "Generic Parent Function" := EventSubscription."Subscriber Function";
-                //-NC2.01 [242550]
             end;
 
             trigger OnValidate()
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NC2.01 [242550]
                 if "Generic Parent Function" = '' then begin
                     "Generic Parent Codeunit ID" := 0;
                     exit;
@@ -207,7 +187,6 @@ table 6151555 "NPR NpXml Template Trigger"
                 if "Generic Parent Function" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Generic Parent Function");
                 EventSubscription.FindFirst;
-                //-NC2.01 [242550]
             end;
         }
         field(1010; "Last Modified at"; DateTime)
@@ -228,10 +207,6 @@ table 6151555 "NPR NpXml Template Trigger"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     var
         NpXmlTemplateTriggerLink: Record "NPR NpXml Templ.Trigger Link";
@@ -239,27 +214,15 @@ table 6151555 "NPR NpXml Template Trigger"
         NpXmlTemplateTriggerLink.SetRange("Xml Template Code", "Xml Template Code");
         NpXmlTemplateTriggerLink.SetRange("Xml Template Trigger Line No.", "Line No.");
         NpXmlTemplateTriggerLink.DeleteAll(true);
-        //-NC1.22
-        ////-NC1.21
-        //XmlTemplateChanged;
-        ////+NC1.21
-        //+NC1.22
     end;
 
     trigger OnInsert()
     begin
-        //-NC1.11
         Validate("Parent Line No.");
-        //+NC1.11
         TestField("Parent Table No.");
         TestField("Table No.");
         UpdateNaviConnectSetup();
-        //-NC1.22
-        ////-NC1.21
-        //XmlTemplateChanged;
-        ////+NC1.21
         "Template Version No." := GetTemplateVersionNo();
-        //+NC1.22
     end;
 
     trigger OnModify()
@@ -286,13 +249,8 @@ table 6151555 "NPR NpXml Template Trigger"
           then
             UpdateNaviConnectSetup();
 
-        //-NC1.21
-        //-NC1.22
-        //XmlTemplateChanged;
         "Template Version No." := GetTemplateVersionNo();
-        //+NC1.22
         "Last Modified at" := CreateDateTime(Today, Time);
-        //+NC1.21
     end;
 
     procedure GetParentLineNo() ParentLineNo: Integer
@@ -311,10 +269,8 @@ table 6151555 "NPR NpXml Template Trigger"
     var
         NpXmlTemplate: Record "NPR NpXml Template";
     begin
-        //-NC1.22
         NpXmlTemplate.Get("Xml Template Code");
         exit(NpXmlTemplate."Template Version");
-        //+NC1.22
     end;
 
     procedure UpdateNaviConnectSetup()
@@ -354,9 +310,7 @@ table 6151555 "NPR NpXml Template Trigger"
                     DataLogSetup."Log Modification" := DataLogSetup."Log Modification"::Changes;
                 if "Delete Trigger" then
                     DataLogSetup."Log Deletion" := DataLogSetup."Log Deletion"::Detailed;
-                //-NC2.26 [402488]
                 DataLogSetup."Keep Log for" := CreateDateTime(Today, 010000T) - CreateDateTime(CalcDate('<-30D>', Today), 010000T);
-                //+NC2.26 [402488]
                 DataLogSetup.Insert(true);
             end else begin
                 SetupChanged := false;
@@ -376,16 +330,11 @@ table 6151555 "NPR NpXml Template Trigger"
                     DataLogSetup.Modify(true);
             end;
 
-            //-NC1.22
-            //IF NOT DataLogSubscriber.GET(NpXmlTemplate."Task Processor Code","Table No.") THEN BEGIN
             if not DataLogSubscriber.Get(NpXmlTemplate."Task Processor Code", "Table No.", '') then begin
-                //+NC1.22
                 DataLogSubscriber.Init;
                 DataLogSubscriber.Code := NpXmlTemplate."Task Processor Code";
                 DataLogSubscriber."Table ID" := "Table No.";
-                //-NC1.22
                 DataLogSubscriber."Company Name" := '';
-                //+NC1.22
                 DataLogSubscriber.Insert(true);
             end;
         end;

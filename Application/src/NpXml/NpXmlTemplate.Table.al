@@ -1,33 +1,5 @@
 table 6151551 "NPR NpXml Template"
 {
-    // NC1.00 /MHA /20150113  CASE 199932 Refactored object from Web - XML
-    // NC1.01 /MHA /20150201  CASE 199932 Removed field 1010 "Transaction Trigger". Template Triggers are used instead
-    // NC1.05 /MHA /20150219  CASE 206395 Removed field 7 "Xml Element Name". Obsolete as NpXml Elements defines the Xml Schema
-    // NC1.07 /MHA /20150309  CASE 208131 Updated captions
-    // NC1.08 /MHA /20150311  CASE 206395 Added manual Renamed of related records and Renamed fields:
-    //                                 - Field 5100 "FTP File Transfer" to "FTP Transfer"
-    //                                 - Field 5200 "API File Transfer" to "API Transfer"
-    // NC1.09 /MHA /20150313  CASE 208758 Added Field 5219 "API Username Type" and function GetAPIUsername()
-    // NC1.11 /MHA /20150325  CASE 209616 Replaced ServerInstance Name with Database Name in automatic Username
-    // NC1.21 /TTH /20151020  CASE 224528 Adding versioning and possibility to lock the modified versions.
-    // NC1.21 /TTH /20151026  CASE 225078 Changed Template Renaming to inserting new records and deleting the old ones.
-    // NC1.22 /MHA /20151203  CASE 224528 Deleted function XmlTemplateChanged() and InitTemplateVersion. Created function InitVersion()
-    // NC1.22 /MHA /20151211  CASE 229473 Updated Automatic Username functionality
-    // NC1.22 /MHA /20160125  CASE 239371 Task Queue Worker Group replaced by NaviConnect Task Processor
-    // NC1.22 /MHA /20160429  CASE 237658 NpXml extended with Namespaces
-    // NC2.00 /MHA /20160525  CASE 240005 NaviConnect
-    // NC2.01 /MHA /20160905  CASE 242551 Length of field 6059906 Task Processor Code increased from 10 to 20 and added field 5254 API Reponse Success Path
-    // NC2.01 /MHA /20161212  CASE 260498 Added Api Request Header fields
-    // NC2.03 /MHA /20170316  CASE 268788 Field 5285 Renamed from "API SOAP Namespace" to "Root Namespace"
-    // NC2.03 /MHA /20170324  CASE 267094 Added fields: 4900 "Before Transfer Codeunit ID",4905 "Before Transfer Codeunit Name",4910 "Before Transfer Function"
-    // NC2.05 /MHA /20170615  CASE 265609 Added option to field 5270 "Api Type": REST (Json)
-    // NC2.06 /MHA /20170927  CASE 265779 Added Api Headers
-    // NC2.08 /THRO/20171124  CASE 297308 Added "JSON Root is Array", removed field 100 "Xml Schema Validation" and 110 "Xml Schema"
-    // NC2.08 /MHA /20171206  CASE 265541 Added field 5405 "Use JSON Numbers"
-    // NC2.11 /MHA /20180319  CASE 308403 Updated Hardcoded Dates with DMY2DATE to be Culture neutral in UpdateNaviConnectSetup()
-    // NC2.17/JDH /20181112 CASE 334163 Added Caption to fields 5310, 5315, 5320, 5400 and 5405
-    // NPR5.55/MHA /20200630  CASE #411410 Added field 5145 "FTP Filename (Fixed)"
-
     Caption = 'NpXml Template';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpXml Template List";
@@ -152,7 +124,6 @@ table 6151551 "NPR NpXml Template"
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //+NC2.03 [267094]
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
                 EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR NpXml Mgt.");
                 EventSubscription.SetRange("Published Function", 'OnBeforeTransferXml');
@@ -161,14 +132,12 @@ table 6151551 "NPR NpXml Template"
 
                 "Before Transfer Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
                 "Before Transfer Function" := EventSubscription."Subscriber Function";
-                //+NC2.03 [267094]
             end;
 
             trigger OnValidate()
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NC2.03 [267094]
                 if "Before Transfer Codeunit ID" = 0 then begin
                     "Before Transfer Function" := '';
                     exit;
@@ -181,12 +150,11 @@ table 6151551 "NPR NpXml Template"
                 if "Before Transfer Function" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Before Transfer Function");
                 EventSubscription.FindFirst;
-                //-267094 [267094]
             end;
         }
         field(4905; "Before Transfer Codeunit Name"; Text[50])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
                                                              "Object ID" = FIELD("Before Transfer Codeunit ID")));
             Caption = 'Before Transfer Codeunit Name';
             Description = 'NC2.03';
@@ -203,7 +171,6 @@ table 6151551 "NPR NpXml Template"
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NC2.03 [267094]
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
                 EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR NpXml Mgt.");
                 EventSubscription.SetRange("Published Function", 'OnBeforeTransferXml');
@@ -212,14 +179,12 @@ table 6151551 "NPR NpXml Template"
 
                 "Before Transfer Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
                 "Before Transfer Function" := EventSubscription."Subscriber Function";
-                //+NC2.03 [267094]
             end;
 
             trigger OnValidate()
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NC2.03 [267094]
                 if "Before Transfer Function" = '' then begin
                     "Before Transfer Codeunit ID" := 0;
                     exit;
@@ -232,7 +197,6 @@ table 6151551 "NPR NpXml Template"
                 if "Before Transfer Function" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Before Transfer Function");
                 EventSubscription.FindFirst;
-                //+NC2.03 [267094]
             end;
         }
         field(4990; "File Transfer"; Boolean)
@@ -326,9 +290,7 @@ table 6151551 "NPR NpXml Template"
 
             trigger OnValidate()
             begin
-                //-NC2.00
                 UpdateApiUsername();
-                //+NC2.00
             end;
         }
         field(5220; "API Username"; Text[250])
@@ -458,10 +420,6 @@ table 6151551 "NPR NpXml Template"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     var
         NpXmlApiHeader: Record "NPR NpXml Api Header";
@@ -474,23 +432,12 @@ table 6151551 "NPR NpXml Template"
         NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
         Text100: Label 'Template Deleted';
     begin
-        //-NC1.21
-        //-NC1.22
-        //IF NOT Archived THEN BEGIN
         if not VersionArchived() then begin
-            //+NC1.22
             if "Version Description" = '' then
                 "Version Description" := Text100;
             NpXmlTemplateMgt.Archive(Rec);
         end;
-        //+NC1.21
 
-        //-NC1.21
-        //NpXmlElement.SETRANGE("Xml Template Code",Code);
-        //NpXmlElement.DELETEALL(TRUE);
-        //
-        //NpXmlTemplateTrigger.SETRANGE("Xml Template Code",Code);
-        //NpXmlTemplateTrigger.DELETEALL(TRUE);
         NpXmlElement.SetRange("Xml Template Code", Code);
         NpXmlElement.DeleteAll;
 
@@ -505,37 +452,20 @@ table 6151551 "NPR NpXml Template"
 
         NpXmlTemplateTriggerLink.SetRange("Xml Template Code", Code);
         NpXmlTemplateTriggerLink.DeleteAll;
-        //+NC1.21
 
-        //-NC2.01
         NpXmlNamespace.SetRange("Xml Template Code", Code);
         NpXmlNamespace.DeleteAll;
-        //+NC2.01
 
-        //-NC2.06 [265779]
         NpXmlApiHeader.SetRange("Xml Template Code", Code);
         NpXmlApiHeader.DeleteAll;
-        //+NC2.06 [265779]
     end;
 
     trigger OnInsert()
     begin
-        //-NC2.00
-        //TESTFIELD("Xml Root Name");
-        //TESTFIELD("Table No.");
-        //+NC2.00
-
-        //-NC1.22
-        ////-NC1.21
-        //SetNextTemplateVersionNo(Rec);
-        ////+NC1.21
         if "Template Version" = '' then
             SetNextTemplateVersionNo(Rec);
-        //+NC1.22
 
-        //-NC2.00
         UpdateApiUsername();
-        //+NC2.00
         UpdateNaviConnectSetup();
     end;
 
@@ -546,11 +476,6 @@ table 6151551 "NPR NpXml Template"
         NpXmlTemplateArchive: Record "NPR NpXml Template Arch.";
         SaveTemplateDescription: Text;
     begin
-        //-NC2.00
-        //TESTFIELD("Xml Root Name");
-        //TESTFIELD("Table No.");
-        //+NC2.00
-
         if "Table No." <> xRec."Table No." then begin
             NpXmlTemplateTrigger.SetRange("Xml Template Code", Code);
             NpXmlTemplateTrigger.SetFilter("Parent Table No.", '<>%1', "Table No.");
@@ -565,13 +490,6 @@ table 6151551 "NPR NpXml Template"
            (xRec."Task Processor Code" <> "Task Processor Code")
           then
             UpdateNaviConnectSetup();
-
-        //-NC1.22
-        ////-NC1.21
-        //IF Archived THEN
-        //  XmlTemplateChanged();
-        ////+NC1.21
-        //+NC1.22
     end;
 
     trigger OnRename()
@@ -612,7 +530,6 @@ table 6151551 "NPR NpXml Template"
             until NpXmlTemplateTriggerLink.Next = 0;
         NpXmlTemplateTriggerLink.DeleteAll;
 
-        //-NC2.01
         NpXmlNamespace.SetRange("Xml Template Code", xRec.Code);
         if NpXmlNamespace.FindSet then
             repeat
@@ -621,9 +538,7 @@ table 6151551 "NPR NpXml Template"
                 NewNpXmlNamespace.Insert;
             until NpXmlNamespace.Next = 0;
         NpXmlNamespace.DeleteAll;
-        //+NC2.01
 
-        //-NC2.06 [265779]
         NpXmlApiHeader.SetRange("Xml Template Code", xRec.Code);
         if NpXmlApiHeader.FindSet then
             repeat
@@ -632,27 +547,18 @@ table 6151551 "NPR NpXml Template"
                 NewNpXmlApiHeader.Insert;
             until NpXmlApiHeader.Next = 0;
         NpXmlApiHeader.DeleteAll;
-        //+NC2.06 [265779]
     end;
 
     procedure GetApiUsername(): Text[250]
     var
         NpXmlMgt: Codeunit "NPR NpXml Mgt.";
     begin
-        //-NC1.09
         case "API Username Type" of
             "API Username Type"::Automatic:
-                begin
-                    //-NC1.22
-                    //ActiveSession.GET(SERVICEINSTANCEID,SESSIONID);
-                    //EXIT(LOWERCASE(ActiveSession."Database Name" + '_' + COMPANYNAME));
-                    exit(NpXmlMgt.GetAutomaticUsername());
-                    //+NC1.22
-                end;
+                exit(NpXmlMgt.GetAutomaticUsername());
             else
                 exit("API Username");
         end;
-        //+NC1.09
     end;
 
     procedure InitVersion()
@@ -660,7 +566,6 @@ table 6151551 "NPR NpXml Template"
         XMLTemplate: Record "NPR NpXml Template";
         NpXmlTemplateHistory: Record "NPR NpXml Template History";
     begin
-        //-NC1.22
         if not Archived then
             exit;
 
@@ -671,7 +576,6 @@ table 6151551 "NPR NpXml Template"
             "Version Description" := '';
         Archived := false;
         NpXmlTemplateHistory.InsertHistory(Code, "Template Version", NpXmlTemplateHistory."Event Type"::Modification, "Version Description");
-        //+NC1.22
     end;
 
     local procedure SetNextTemplateVersionNo(var NpXmlTemplate: Record "NPR NpXml Template")
@@ -683,7 +587,6 @@ table 6151551 "NPR NpXml Template"
         CurrentTemplateTimestamp: DateTime;
         NextTemplateVersionNo: Code[10];
     begin
-        //-NC1.21
         NpXmlSetup.Get;
 
         if NpXmlSetup."Template Version Prefix" = '' then
@@ -691,45 +594,20 @@ table 6151551 "NPR NpXml Template"
         if NpXmlSetup."Template Version No." <= 0 then
             NpXmlSetup."Template Version No." := 1;
 
-        //-NC1.22
-        //IF NpXmlTemplate."Template Version" <> '' THEN BEGIN
-        //  NextTemplateVersionNo := INCSTR(NpXmlTemplate."Template Version");
-        //  IF STRPOS(NextTemplateVersionNo,NpXmlSetup."Template Version Prefix" + FORMAT(NpXmlSetup."Template Version No.")) = 1 THEN BEGIN
-        //    NpXmlTemplate."Template Version" := NextTemplateVersionNo;
-        //    EXIT;
-        //  END;
-        //END;
-        //
-        //NpXmlTemplateArchive.SETRANGE(Code,NpXmlTemplate.Code);
-        //IF NpXmlTemplateArchive.FINDLAST THEN BEGIN
-        //  NextTemplateVersionNo := INCSTR(NpXmlTemplateArchive."Template Version No.");
-        //  IF STRPOS(NextTemplateVersionNo,NpXmlSetup."Template Version Prefix" + FORMAT(NpXmlSetup."Template Version No.")) = 1 THEN BEGIN
-        //    NpXmlTemplate."Template Version" := NextTemplateVersionNo;
-        //    EXIT;
-        //  END;
-        //END;
-        //
-        //NpXmlTemplate."Template Version" := NpXmlSetup."Template Version Prefix" + FORMAT(NpXmlSetup."Template Version No.") + '.00';
-        //
-        //InitTemplateVersion(NpXmlTemplate.Code,NpXmlTemplate."Template Version");
         NextTemplateVersionNo := NpXmlSetup."Template Version Prefix" + Format(NpXmlSetup."Template Version No.");
         NpXmlTemplate."Template Version" := NextTemplateVersionNo + '.00';
         NpXmlTemplateArchive.SetRange(Code, NpXmlTemplate.Code);
         NpXmlTemplateArchive.SetFilter("Template Version No.", '%1', NextTemplateVersionNo + '.??');
         if NpXmlTemplateArchive.FindLast then
             NpXmlTemplate."Template Version" := IncStr(NpXmlTemplateArchive."Template Version No.");
-        //+NC1.22
-        //+NC1.21
     end;
 
     local procedure UpdateApiUsername()
     begin
-        //-NC2.00
         if "API Username Type" <> "API Username Type"::Automatic then
             exit;
 
         "API Username" := GetApiUsername();
-        //+NC2.00
     end;
 
     procedure UpdateNaviConnectSetup()
@@ -743,10 +621,8 @@ table 6151551 "NPR NpXml Template"
     begin
         if not "Transaction Task" then
             exit;
-        //-NC2.00
         if "Disable Auto Task Setup" then
             exit;
-        //+NC2.00
 
         NpXmlTemplateTrigger.SetRange("Xml Template Code", Code);
         NpXmlTemplateTrigger.SetFilter("Table No.", '<>%1', 0);
@@ -774,10 +650,7 @@ table 6151551 "NPR NpXml Template"
                             DataLogSetup."Log Modification" := DataLogSetup."Log Modification"::Changes;
                         if NpXmlTemplateTrigger."Delete Trigger" then
                             DataLogSetup."Log Deletion" := DataLogSetup."Log Deletion"::Detailed;
-                        //-NC2.11 [308404]
-                        //DurationBuffer := CREATEDATETIME(310101D,000000T) - CREATEDATETIME(010101D,000000T);
                         DurationBuffer := CreateDateTime(DMY2Date(31, 1, 2001), 000000T) - CreateDateTime(DMY2Date(1, 1, 2001), 000000T);
-                        //+NC2.11 [308404]
                         DataLogSetup."Keep Log for" := DurationBuffer;
                         DataLogSetup.Insert(true);
                     end else begin
@@ -812,11 +685,9 @@ table 6151551 "NPR NpXml Template"
     var
         NpXmlTemplateArchive: Record "NPR NpXml Template Arch.";
     begin
-        //-NC1.22
         NpXmlTemplateArchive.SetRange(Code, Code);
         NpXmlTemplateArchive.SetRange("Template Version No.", "Template Version");
         exit(NpXmlTemplateArchive.FindFirst);
-        //+NC1.22
     end;
 }
 

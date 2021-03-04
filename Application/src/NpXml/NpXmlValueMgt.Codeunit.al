@@ -1,26 +1,5 @@
 codeunit 6151555 "NPR NpXml Value Mgt."
 {
-    // NC1.13/MHA /20150414  CASE 211360 Object Created - Restructured NpXml Codeunits. Independent functions moved to new codeunits
-    // NC1.16/TS  /20150507  CASE 213379 Moved hardcoded value functions to custom codeunits
-    // NC1.20/TTH /20151005  CASE 218023 Adding Preffix to the XML Tags and attributes
-    // NC2.00/MHA /20160525  CASE 240005 NaviConnect
-    // NC2.01/MHA /20161018  CASE 2425550 Added function OnGetXml() for enabling Value generation by Subscription
-    // NC2.08/MHA /20180105  CASE 301053 Removed redundant CASE 'boolean' in SetRecRefCalcFieldFilter()
-    // NC2.13/JDH /20180604 CASE 317971 Changed caption to ENU
-
-
-    trigger OnRun()
-    begin
-    end;
-
-    var
-        Error001: Label 'NpXml Template: %1\API Error:\%2';
-        Error002: Label 'Record in %1 within the filters does not exist';
-        Text001: Label 'Checking images:     @1@@@@@@@@@@@@@@@@@@\Estimated time left: #2##################';
-        Text002: Label 'Exporting %1 to XML\Exporting:           @2@@@@@@@@@@@@@@@@@@@\Estimated Time Left: #3###################\Record:       #4###########################';
-        Text100: Label 'Choose XML Document';
-        Text200: Label 'Finding first record in %1 within the filters: @2@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\Estimated Time Left:                           #3##############################\Record:  #4####################################################################';
-
     procedure GetXmlValue(RecRef: RecordRef; NpXmlElement: Record "NPR NpXml Element"; FieldNo: Integer) XmlValue: Text
     var
         TempBlob: Codeunit "Temp Blob";
@@ -33,13 +12,11 @@ codeunit 6151555 "NPR NpXml Value Mgt."
         TextBuffer: Text;
         Handled: Boolean;
     begin
-        //-NC2.01 [255641]
         if NpXmlElement."Xml Value Codeunit ID" > 0 then begin
             OnGetXmlValue(RecRef, NpXmlElement, FieldNo, XmlValue, Handled);
             if Handled then
                 exit(XmlValue);
         end;
-        //+NC2.01 [255641]
         if NpXmlElement."Custom Codeunit ID" > 0 then
             exit(GetCustomFieldValue(RecRef, NpXmlElement));
 
@@ -99,22 +76,14 @@ codeunit 6151555 "NPR NpXml Value Mgt."
         if NpXmlElement."Lower Case" then
             XmlValue := LowerCase(XmlValue);
 
-        //-NC1.20
         if (NpXmlElement.Prefix <> '') then
             XmlValue := NpXmlElement.Prefix + XmlValue;
-        //+NC1.20
 
         exit(XmlValue);
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnGetXmlValue(RecRef: RecordRef; NpXmlElement: Record "NPR NpXml Element"; FieldNo: Integer; var XmlValue: Text; var Handled: Boolean)
-    begin
-        //-NC2.01 [255641]
-        //+NC2.01 [255641]
-    end;
-
-    local procedure "--- Filter"()
     begin
     end;
 
@@ -139,14 +108,10 @@ codeunit 6151555 "NPR NpXml Value Mgt."
                     NpXmlFilter."Filter Type"::Constant:
                         begin
                             if NpXmlFilter."Filter Value" <> '' then begin
-                                //-NC1.11
                                 case LowerCase(Format(FieldRef2.Type)) of
                                     'boolean':
                                         FieldRef2.SetFilter('=%1', LowerCase(NpXmlFilter."Filter Value") in ['1', 'yes', 'ja', 'true']);
-                                    //-NC2.08 [301053]
-                                    //'integer','option','boolean' :
                                     'integer', 'option':
-                                        //+NC2.08 [301053]
                                         begin
                                             if Evaluate(BufferDecimal, NpXmlFilter."Filter Value") then
                                                 FieldRef2.SetFilter('=%1', BufferDecimal);
@@ -159,7 +124,6 @@ codeunit 6151555 "NPR NpXml Value Mgt."
                                     else
                                         FieldRef2.SetFilter('=%1', NpXmlFilter."Filter Value");
                                 end;
-                                //+NC1.11
                             end;
                         end;
                     NpXmlFilter."Filter Type"::Filter:
@@ -181,10 +145,6 @@ codeunit 6151555 "NPR NpXml Value Mgt."
                         RecRef2.SetRecFilter;
                 end;
         end;
-    end;
-
-    local procedure "--- Xml Value"()
-    begin
     end;
 
     procedure FillCustomValueBuffer(RecRef: RecordRef; NPXmlElement: Record "NPR NpXml Element"; var TempNpXmlCustomValueBuffer: Record "NPR NpXml Custom Val. Buffer" temporary)
@@ -282,22 +242,10 @@ codeunit 6151555 "NPR NpXml Value Mgt."
         SetRecRefCalcFieldFilter(NPXmlElement, RecRef, RecRef2);
         Value := '';
         case NPXmlElement."Field Type" of
-            //-NC1.16
-            //NPXmlElement."Field Type"::SKU: Value := GetSKU(RecRef);
-            //NPXmlElement."Field Type"::StockQty: Value := FORMAT(GetStockQty(RecRef2),0,9);
-            //NPXmlElement."Field Type"::StockStatus: Value := FORMAT(GetStockStatus(RecRef2),0,9);
-            //NPXmlElement."Field Type"::Base64: Value := GetBase64(RecRef,FieldNo);
-            //NPXmlElement."Field Type"::Enum: Value := GetEnum(RecRef,NPXmlElement,FieldNo);
-            //NPXmlElement."Field Type"::FIK: Value := GetFIK('71',RecRef);
-            //NPXmlElement."Field Type"::PrimaryKey: Value := GetPrimaryKeyValue(RecRef);
-            //NPXmlElement."Field Type"::ExclVat: Value := GetExclVat(RecRef2,FieldNo);
-            //NPXmlElement."Field Type"::Firstname: Value := GetFirstname(RecRef2,FieldNo);
-            //NPXmlElement."Field Type"::Lastname: Value := GetLastname(RecRef2,FieldNo);
             NPXmlElement."Field Type"::Enum:
                 Value := GetEnum(RecRef, NPXmlElement, FieldNo);
             NPXmlElement."Field Type"::PrimaryKey:
                 Value := GetPrimaryKeyValue(RecRef);
-        //+NC1.16
         end;
         RecRef2.Close;
         exit(Value);
