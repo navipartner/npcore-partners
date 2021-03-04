@@ -1,15 +1,5 @@
 page 6150615 "NPR POS Store Card"
 {
-    // NPR5.29/AP/20170126 CASE 261728 Recreated ENU-captions
-    // NPR5.30/AP/20170207 CASE 265509 Added new fields for Geolocation. Re-arranged layout to align more with std.
-    // NPR5.31/AP/20170419 CASE 272321 Added new fields for "Store Size", "Opening Date", "Store Group Code", "Store Category Code" and "Store Locality Code"
-    // NPR5.36/BR/20170810 CASE 277096 Added Navigate Actions
-    // NPR5.36/BR/20170914 CASE 289641 Added field VAT Customer No.
-    // NPR5.38/BR/20171214  CASE 299888 Changed ENU Caption from POS Ledger Register to POS Period Register
-    // NPR5.38/BR/20180125 CASE 302803 Added fields Posting Compression, POS Period Register No. Series
-    // NPR5.48/MMV /20180615 CASE 318028 Added field 28 for countries with location specific registration no.
-    // NPR5.53/ALPO/20191021 CASE 371956 Dimensions: POS Store & POS Unit integration
-    // NPR5.55/ALPO/20200730 CASE 414938 POS Store/POS Unit - Restaurant link (added "POS Restaurant Profile")
 
     UsageCategory = None;
     Caption = 'POS Store Card';
@@ -245,14 +235,6 @@ page 6150615 "NPR POS Store Card"
                 RunObject = Page "NPR POS Unit List";
                 ApplicationArea = All;
                 ToolTip = 'Executes the POS Unit List action';
-            }
-            action("NP Retail Setup")
-            {
-                Caption = 'NP Retail Setup';
-                Image = Setup;
-                RunObject = Page "NPR NP Retail Setup";
-                ApplicationArea = All;
-                ToolTip = 'Executes the NP Retail Setup action';
             }
             action("POS Posting Setup")
             {

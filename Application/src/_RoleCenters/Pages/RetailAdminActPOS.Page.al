@@ -40,15 +40,15 @@ page 6151248 "NPR Retail Admin Act - POS"
                     DrillDownPageID = "NPR Register List";
                     ToolTip = 'Specifies the value of the Cash Registers field';
                 }
-                field("POS Payment Bins"; Rec."POS Payment Bins")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the POS Payment Bins field';
-                }
                 field("POS Payment Methods"; Rec."POS Payment Methods")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Payment Methods field';
+                }
+                field("POS Payment Bins"; Rec."POS Payment Bins")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Payment Bins field';
                 }
             }
         }
