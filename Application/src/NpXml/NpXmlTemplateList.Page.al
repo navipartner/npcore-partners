@@ -193,7 +193,6 @@ page 6151552 "NPR NpXml Template List"
     }
 
     var
-        NpXmlMgt: Codeunit "NPR NpXml Mgt.";
         NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
         Text000: Label 'Delete %1 selected NpXml Templates?';
 }

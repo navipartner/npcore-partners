@@ -1,15 +1,5 @@
 table 6151554 "NPR NpXml Attribute"
 {
-    // NC1.00 /MHA /20150113  CASE 199932 Refactored object from Web - XML
-    // NC1.07 /MHA /20150309  CASE 206395 Added Field 140 Default Field Type
-    // NC1.21 /TTH /20151020  CASE 224528 Adding versioning and possibility to lock the modified versions. Added field 20 Template Version number and 5210 Last Modified. New function XmlTemplateChanged.
-    // NC1.22 /MHA /20151203  CASE 224528 Function XmlTemplateChanged() deleted and GetVersionNo() created
-    // NC1.22 /MHA /20151203  CASE 224528 Deleted function XmlTemplateChanged() and credted GetVersionNo()
-    // NC2.00 /MHA /20160525  CASE 240005 NaviConnect
-    // NC2.03 /MHA /20170404  CASE 267094 Added field 5105 Namespace
-    // NC2.17/JDH /20181112 CASE 334163 Added Caption to Object
-    // NC2.18/JDH /20181210 CASE 334163 Added Caption to Object (again)
-
     Caption = 'NpXml Attribute';
     DataClassification = CustomerContent;
 
@@ -72,7 +62,7 @@ table 6151554 "NPR NpXml Attribute"
         }
         field(130; "Attribute Field Name"; Text[50])
         {
-            CalcFormula = Lookup (Field.FieldName WHERE(TableNo = FIELD("Table No."),
+            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = FIELD("Table No."),
                                                         "No." = FIELD("Attribute Field No.")));
             Caption = 'Attribute Field Name';
             Editable = false;
@@ -123,53 +113,23 @@ table 6151554 "NPR NpXml Attribute"
         }
     }
 
-    fieldgroups
-    {
-    }
-
-    trigger OnDelete()
-    begin
-        //-NC1.22
-        ////-NC1.21
-        //XmlTemplateChanged;
-        ////+NC1.21
-        //+NC1.22
-    end;
-
     trigger OnInsert()
     begin
-        //-NC1.22
-        ////-NC1.21
-        //XmlTemplateChanged;
-        ////+NC1.21
         "Template Version No." := GetTemplateVersionNo();
-        //+NC1.22
     end;
 
     trigger OnModify()
-    var
-        XMLTemplate: Record "NPR NpXml Template";
-        NpXmlTemplateHistory: Record "NPR NpXml Template History";
-        RecRef: RecordRef;
-        xRecRef: RecordRef;
     begin
-        //-NC1.21
-        ////-NC1.22
-        //XmlTemplateChanged;
         "Template Version No." := GetTemplateVersionNo();
-        //+NC1.22
         "Last Modified at" := CreateDateTime(Today, Time);
-        //+NC1.21
     end;
 
     local procedure GetTemplateVersionNo(): Code[20]
     var
         NpXmlTemplate: Record "NPR NpXml Template";
     begin
-        //-NC1.22
         NpXmlTemplate.Get("Xml Template Code");
         exit(NpXmlTemplate."Template Version");
-        //+NC1.22
     end;
 }
 

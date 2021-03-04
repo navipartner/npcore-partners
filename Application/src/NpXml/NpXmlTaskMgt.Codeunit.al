@@ -1,18 +1,5 @@
 codeunit 6151550 "NPR NpXml Task Mgt."
 {
-    // NC1.01/MHA /20150201  CASE 199932 Object Created - Connects NpXml with NaviConnect
-    //                                 - NaviConnect References/Functions may be removed if [NC] is not installed.
-    // NC1.13/MHA /20150414  CASE 211360 Restructured NpXml Codeunits. Independent functions moved to new codeunits
-    // NC1.14/MHA /20150424  CASE 212415 Moved Clear of NpXml Mgt. in order to enable multiple template output
-    // NC1.20/MHA /20150821  CASE 221229 Trigger Code changed to clearify actions on different table triggers
-    // NC1.22/MHA /20160108  CASE 226040 Changed CommitOutput() to Append instead of Replace
-    // NC1.22/MHA /20160415  CASE 231214 Added multi company Task Processing
-    // NC2.00/MHA /20160525  CASE 240005 NaviConnect
-    // NC2.07/MHA /20171027  CASE 294737 PrevRecRef is now a Temporary Rec and can be filtered, thus function added: RecExists()
-    // NC2.12/MHA /20180418  CASE 308107 Adjusted Duplicate Check to use UniqueTaskBuffer
-    // NC2.14/MHA /20180629  CASE 320762 GetRecRef() moved from NpXmlTriggerMgt to NcTaskMgt
-    // NC2.22/MHA /20190626  CASE 355993 Delete should trigger even if record exists and cleared out green code
-
     TableNo = "NPR Nc Task";
 
     trigger OnRun()
@@ -50,10 +37,8 @@ codeunit 6151550 "NPR NpXml Task Mgt."
             Type::Delete:
                 begin
                     RecRef2 := PrevRecRef.Duplicate;
-                    //-NC2.22 [355993]
                     if NcTaskMgt.RecExists(RecRef2, "Company Name") then
                         RecRef2.Find;
-                    //+NC2.22 [355993]
 
                     NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef2, Rec, false, false, true, UniqueTaskBuffer);
                     ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
@@ -61,10 +46,8 @@ codeunit 6151550 "NPR NpXml Task Mgt."
             Type::Rename:
                 begin
                     RecRef2 := PrevRecRef.Duplicate;
-                    //-NC2.22 [355993]
                     if NcTaskMgt.RecExists(RecRef2, "Company Name") then
                         RecRef2.Find;
-                    //+NC2.22 [355993]
 
                     NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef2, Rec, false, false, true, UniqueTaskBuffer);
                     ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
@@ -83,32 +66,27 @@ codeunit 6151550 "NPR NpXml Task Mgt."
 
     var
         NpXmlTriggerMgt: Codeunit "NPR NpXml Trigger Mgt.";
-        NpXmlValueMgt: Codeunit "NPR NpXml Value Mgt.";
-
-    local procedure "--- Output"()
-    begin
-    end;
 
     local procedure CommitOutput(var Task: Record "NPR Nc Task")
     var
         OutputTempBlob: Codeunit "Temp Blob";
         TempBlob: Codeunit "Temp Blob";
-        InStream: InStream;
-        OutStream: OutStream;
+        InStr: InStream;
+        OutStr: OutStream;
         RecRef: RecordRef;
     begin
         Clear(TempBlob);
-        TempBlob.CreateOutStream(OutStream);
+        TempBlob.CreateOutStream(OutStr);
 
         Task.CalcFields("Data Output");
         if Task."Data Output".HasValue then begin
-            Task."Data Output".CreateInStream(InStream);
-            CopyStream(OutStream, InStream);
+            Task."Data Output".CreateInStream(InStr);
+            CopyStream(OutStr, InStr);
         end;
 
         if NpXmlTriggerMgt.GetOutput(OutputTempBlob) then begin
-            OutputTempBlob.CreateInStream(InStream);
-            CopyStream(OutStream, InStream);
+            OutputTempBlob.CreateInStream(InStr);
+            CopyStream(OutStr, InStr);
         end;
 
         RecRef.GetTable(Task);
@@ -135,10 +113,6 @@ codeunit 6151550 "NPR NpXml Task Mgt."
         Clear(ResponseTempBlob);
     end;
 
-    procedure "--- Setup"()
-    begin
-    end;
-
     procedure SetupNpXml()
     var
         NpXmlTemplate: Record "NPR NpXml Template";
@@ -148,10 +122,6 @@ codeunit 6151550 "NPR NpXml Task Mgt."
             repeat
                 NpXmlTemplate.UpdateNaviConnectSetup();
             until NpXmlTemplate.Next = 0;
-    end;
-
-    local procedure "--- Unique Task"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151501, 'IsUniqueTask', '', true, true)]

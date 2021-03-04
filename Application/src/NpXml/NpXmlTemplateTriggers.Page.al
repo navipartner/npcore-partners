@@ -1,12 +1,5 @@
 page 6151558 "NPR NpXml Template Triggers"
 {
-    // NC1.01/MH/20150201  CASE 199932 Object created
-    // NC1.11/MH/20150330  CASE 210171 Added multi level triggers and functions MoveDown() and MoveUp()
-    // NC1.13/MH/20150414  CASE 211360 Restructured NpXml Codeunits. Independent functions moved to new codeunits
-    // NC1.21/TS/20151014 CASE 225088 Added to Coloring based on (Parent Table No.<>Table No.) AND (Has no Trigger Links)
-    // NC2.00/MHA/20160525  CASE 240005 NaviConnect
-    // NC2.01/MHA /20161018 CASE 2425550 Added Generic Table fields for enabling Temporary Table Exports
-
     AutoSplitKey = true;
     Caption = 'Xml Template Triggers';
     DelayedInsert = true;
@@ -108,9 +101,7 @@ page 6151558 "NPR NpXml Template Triggers"
 
                 trigger OnAction()
                 begin
-                    //-NC1.11
                     MoveUp();
-                    //+NC1.11
                 end;
             }
             action("Move Down")
@@ -122,9 +113,7 @@ page 6151558 "NPR NpXml Template Triggers"
 
                 trigger OnAction()
                 begin
-                    //-NC1.11
                     MoveDown();
-                    //+NC1.11
                 end;
             }
             group("Multi Level Trigger")
@@ -160,20 +149,13 @@ page 6151558 "NPR NpXml Template Triggers"
 
     trigger OnAfterGetRecord()
     begin
-        //-NC2.00
         IndentTableName();
-        //+NC2.00
-        //-NC1.21
         SetHasNoLinks();
-        //+NC1.21
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        //-NC1.11
-        //"Xml Template Table No." := XmlTemplateTableNo;
         "Parent Line No." := GetParentLineNo();
-        //+NC1.11
     end;
 
     var
@@ -184,10 +166,8 @@ page 6151558 "NPR NpXml Template Triggers"
 
     local procedure IndentTableName()
     begin
-        //-NC2.00
         if Level > 0 then
             "Table Name" := PadStr('', Level * 3, ' ') + "Table Name";
-        //+NC2.00
     end;
 
     procedure MoveDown()
@@ -195,7 +175,6 @@ page 6151558 "NPR NpXml Template Triggers"
         NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger";
         TempNpXmlTemplateTrigger: Record "NPR NpXml Template Trigger" temporary;
     begin
-        //-NC1.11
         CurrPage.Update(true);
         CurrPage.SetSelectionFilter(NpXmlTemplateTrigger);
         if not NpXmlTemplateTrigger.FindSet then
@@ -218,13 +197,9 @@ page 6151558 "NPR NpXml Template Triggers"
             exit;
 
         repeat
-            //-NC1.13
-            //NpXmlMgt.SwapNpXmlTriggerLineNo(TempNpXmlTemplateTrigger,NpXmlTemplateTrigger);
             NpXmlTemplateMgt.SwapNpXmlTriggerLineNo(TempNpXmlTemplateTrigger, NpXmlTemplateTrigger);
-            //+NC1.13
             NpXmlTemplateTrigger.Get(TempNpXmlTemplateTrigger."Xml Template Code", TempNpXmlTemplateTrigger."Line No.");
         until TempNpXmlTemplateTrigger.Next(-1) = 0;
-        //+NC1.11
     end;
 
     procedure MoveUp()
@@ -233,7 +208,6 @@ page 6151558 "NPR NpXml Template Triggers"
         TempNpXmlTemplateTrigger: Record "NPR NpXml Template Trigger" temporary;
         LineNo: Integer;
     begin
-        //-NC1.11
         CurrPage.Update(true);
         CurrPage.SetSelectionFilter(NpXmlTemplateTrigger);
         if not NpXmlTemplateTrigger.FindLast then
@@ -257,23 +231,18 @@ page 6151558 "NPR NpXml Template Triggers"
             exit;
 
         repeat
-            //-NC1.13
-            //NpXmlMgt.SwapNpXmlTriggerLineNo(TempNpXmlTemplateTrigger,NpXmlTemplateTrigger);
             NpXmlTemplateMgt.SwapNpXmlTriggerLineNo(TempNpXmlTemplateTrigger, NpXmlTemplateTrigger);
-            //+NC1.13
             NpXmlTemplateTrigger.Get(TempNpXmlTemplateTrigger."Xml Template Code", TempNpXmlTemplateTrigger."Line No.");
         until TempNpXmlTemplateTrigger.Next = 0;
 
         FindFirst;
         Get("Xml Template Code", LineNo);
-        //+NC1.11
     end;
 
     local procedure UpdateLevel(Steps: Integer)
     var
         NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger";
     begin
-        //-NC1.11
         NpXmlTemplateTrigger.Reset;
         CurrPage.SetSelectionFilter(NpXmlTemplateTrigger);
         if NpXmlTemplateTrigger.FindSet then
@@ -293,18 +262,15 @@ page 6151558 "NPR NpXml Template Triggers"
             until NpXmlTemplateTrigger.Next = 0;
 
         CurrPage.Update(false);
-        //+NC1.11
     end;
 
     local procedure SetHasNoLinks()
     var
         NpXmlTemplateTriggerLinks: Record "NPR NpXml Templ.Trigger Link";
     begin
-        //-NC1.21
         NpXmlTemplateTriggerLinks.SetRange("Xml Template Code", "Xml Template Code");
         NpXmlTemplateTriggerLinks.SetRange("Xml Template Trigger Line No.", "Line No.");
         HasNoLinks := ("Parent Table No." <> "Table No.") and NpXmlTemplateTriggerLinks.IsEmpty;
-        //+NC1.21
     end;
 }
 

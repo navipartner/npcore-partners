@@ -1,8 +1,5 @@
 table 6151560 "NPR NpXml Template History"
 {
-    // NC1.21/TTH/20151020 CASE 224528 Adding versioning and possibility to lock the modified versions. New table for template history.
-    // NC2.00/MHA/20160525  CASE 240005 NaviConnect
-
     Caption = 'NpXml Template History';
     DataClassification = CustomerContent;
 
@@ -65,10 +62,6 @@ table 6151560 "NPR NpXml Template History"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     var
         Text000: Label 'Template Archived';
         Text001: Label 'Template Version %1 Restored';
@@ -88,7 +81,6 @@ table 6151560 "NPR NpXml Template History"
         EntryNo: Integer;
         FieldRef: FieldRef;
     begin
-        //-NC1.21
         TemplateHistory2.SetRange("Template Code", XmlTemplate);
         if TemplateHistory2.FindLast and (TemplateHistory2."Changed by" = UserId) and (TemplateHistory2."Event Type" = EventType) and (TemplateVersionNo = TemplateHistory2."Template Version No.") then
             exit;
@@ -110,7 +102,6 @@ table 6151560 "NPR NpXml Template History"
         TemplateHistory."Changed by" := UserId;
         TemplateHistory."Change at" := CreateDateTime(Today, Time);
         TemplateHistory.Insert;
-        //+NC1.21
     end;
 }
 

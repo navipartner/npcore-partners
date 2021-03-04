@@ -1,8 +1,5 @@
 page 6151565 "NPR NpXml Wsdl Input Dlg"
 {
-    // NC2.01/TR/2016092329  CASE 240432 Object created
-    // NC2.01/TR  /20170102  CASE 240432 Updated names of variables.
-
     Caption = 'WSDL Input Dialog';
     PageType = StandardDialog;
     UsageCategory = Administration;

@@ -1,22 +1,5 @@
 page 6151553 "NPR NpXml Elements"
 {
-    // NC1.00 /MHA /20150113  CASE 199932 Refactored object from Web - XML
-    // NC1.01 /MHA /20150115  CASE 204467 Added Custom Codeunit ID for Customized Field Values
-    // NC1.04 /MHA /20150209  CASE 199932 Added 300 field Comment
-    // NC1.07 /MHA /20150309  CASE 206395 Added Field 1010 Hidden
-    // NC1.08 /MHA /20150310  CASE 206395 Added CurrPage.Update on "Table No.".OnValidate in order to Update Parent Info and function PreviewXml()
-    // NC1.11 /MHA /20150330  CASE 210171 Added functions MoveDown() and MoveUp()
-    // NC1.13 /MHA /20150414  CASE 211360 Restructured NpXml Codeunits. Independent functions moved to new codeunits
-    // NC1.20 /TTH /20151005  CASE 218023 Adding Preffix to the XML Tags and attributes
-    // NC1.21 /TTH /20151104  CASE 224528 Added control <Template Version>
-    // NC1.21 /MHA /20151105  CASE 226655 Added Normalization if Line No. cannot be split during insert
-    // NC1.22 /MHA /20151203  CASE 224528 Changed Page to only be editable if NpXml Template is not Archived
-    // NC1.22 /MHA /20160429  CASE 237658 NpXml extended with Namespaces
-    // NC2.00 /MHA /20160525  CASE 240005 NaviConnect
-    // NC2.01 /MHA /20161018  CASE 2425550 Added Generic Table fields for enabling Temporary Table Exports
-    // NC2.01 /MHA /20161018  CASE 2425550 Added Xml Value fields for enabling Value generation by Subscription
-    // NC2.03 /MHA /20170404  CASE 267094 Added SetEnabledFilter() to Attribute SubPage
-
     AutoSplitKey = true;
     Caption = 'Xml Elements';
     DelayedInsert = true;
@@ -68,12 +51,8 @@ page 6151553 "NPR NpXml Elements"
 
                     trigger OnValidate()
                     begin
-                        //-NC1.08
                         CurrPage.Update(true);
-                        //+NC1.08
-                        //-NC2.00
                         InsertRelations();
-                        //+NC2.00
                     end;
                 }
                 field("Table Name"; "Table Name")
@@ -244,9 +223,7 @@ page 6151553 "NPR NpXml Elements"
 
                     trigger OnAction()
                     begin
-                        //-NC2.00
                         InsertNewElement(0);
-                        //+NC2.00
                     end;
                 }
                 action("New Child")
@@ -262,9 +239,7 @@ page 6151553 "NPR NpXml Elements"
 
                     trigger OnAction()
                     begin
-                        //-NC2.00
                         InsertNewElement(1);
-                        //+NC2.00
                     end;
                 }
                 action("New Parent")
@@ -280,9 +255,7 @@ page 6151553 "NPR NpXml Elements"
 
                     trigger OnAction()
                     begin
-                        //-NC2.00
                         InsertNewElement(2);
-                        //+NC2.00
                     end;
                 }
                 action("Delete")
@@ -301,13 +274,11 @@ page 6151553 "NPR NpXml Elements"
                     var
                         NpXmlElement: Record "NPR NpXml Element";
                     begin
-                        //-NC2.00
                         if not Confirm(Text000, true) then
                             exit;
 
                         CurrPage.SetSelectionFilter(NpXmlElement);
                         NpXmlElement.DeleteAll(true);
-                        //+NC2.00
                     end;
                 }
             }
@@ -324,10 +295,7 @@ page 6151553 "NPR NpXml Elements"
 
                     trigger OnAction()
                     begin
-                        //-NC1.13
-                        //XMLMgt.CopyXmlTemplate("Xml Template Code");
                         NpXmlTemplateMgt.CopyXmlTemplate("Xml Template Code");
-                        //+NC1.13
                         CurrPage.Update(false);
                     end;
                 }
@@ -344,9 +312,7 @@ page 6151553 "NPR NpXml Elements"
 
                     trigger OnAction()
                     begin
-                        //-NC1.08
                         PreviewXml();
-                        //+NC1.08
                     end;
                 }
                 action(Normalize)
@@ -360,13 +326,8 @@ page 6151553 "NPR NpXml Elements"
 
                     trigger OnAction()
                     begin
-                        //-NC1.21
-                        //-NC2.00
-                        //NpXmlTemplateMgt.NormalizeNpXmlElementLineNo("Xml Template Code");
                         NpXmlTemplateMgt.NormalizeNpXmlElementLineNo("Xml Template Code", Rec);
                         Find;
-                        //+NC2.00
-                        //+NC1.21
                     end;
                 }
             }
@@ -385,9 +346,7 @@ page 6151553 "NPR NpXml Elements"
 
                     trigger OnAction()
                     begin
-                        //-NC1.11
                         MoveUp();
-                        //+NC1.11
                     end;
                 }
                 action("Move Down")
@@ -403,9 +362,7 @@ page 6151553 "NPR NpXml Elements"
 
                     trigger OnAction()
                     begin
-                        //-NC1.11
                         MoveDown();
-                        //+NC1.11
                     end;
                 }
                 action("Decrement Level")
@@ -458,15 +415,7 @@ page 6151553 "NPR NpXml Elements"
 
     trigger OnOpenPage()
     begin
-        //-NC1.22
-        ////-NC1.22
-        //SetIsArchived();
-        ////+NC1.22
         SetEnabledFilters();
-        //+NC1.22
-        //-NC2.00
-        ToggleTreeView();
-        //+NC2.00
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -484,29 +433,11 @@ page 6151553 "NPR NpXml Elements"
         Text000: Label 'Do you want to delete the selected line or lines?';
         Text001: Label 'Add Table Link from table %1 %2?';
 
-    local procedure ToggleTreeView()
-    var
-        ActiveSession: Record "Active Session";
-        [RunOnClient]
-        SendKeys: DotNet NPRNetSendKeys;
-    begin
-        //-NC2.00
-        if not ActiveSession.Get(ServiceInstanceId, SessionId) then
-            exit;
-
-        if ActiveSession."Client Type" <> ActiveSession."Client Type"::"Windows Client" then
-            exit;
-
-        SendKeys.Send('^+Q');
-        //+NC2.00
-    end;
-
     local procedure InsertNewElement(ElementType: Option Sibling,Child,Parent)
     var
         NpXmlElement: Record "NPR NpXml Element";
         NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
     begin
-        //-NC2.00
         if ElementType = ElementType::Parent then
             NpXmlTemplateMgt.InitNpXmlElementAbove("Xml Template Code", "Line No.", NpXmlElement)
         else
@@ -527,10 +458,6 @@ page 6151553 "NPR NpXml Elements"
         NpXmlElement."Table No." := "Table No.";
         NpXmlElement."Element Name" := 'new_element_' + LowerCase(Format(ElementType));
         NpXmlElement.Insert(true);
-        Get(NpXmlElement."Xml Template Code", NpXmlElement."Line No.");
-
-        ToggleTreeView();
-        //+NC2.00
     end;
 
     local procedure InsertRelations()
@@ -547,7 +474,6 @@ page 6151553 "NPR NpXml Elements"
         LineNo: Integer;
         i: Integer;
     begin
-        //-NC2.00
         if not TableMetadata.Get("Table No.") then
             exit;
 
@@ -608,7 +534,6 @@ page 6151553 "NPR NpXml Elements"
             NpXmlFilter."Field No." := TempField."No.";
             NpXmlFilter.Insert(true);
         until TempField.Next = 0;
-        //+NC2.00
     end;
 
     procedure MoveDown()
@@ -616,7 +541,6 @@ page 6151553 "NPR NpXml Elements"
         NpXmlElement: Record "NPR NpXml Element";
         TempNpXmlElement: Record "NPR NpXml Element" temporary;
     begin
-        //-NC1.11
         CurrPage.Update(true);
         CurrPage.SetSelectionFilter(NpXmlElement);
         if not NpXmlElement.FindSet then
@@ -639,13 +563,9 @@ page 6151553 "NPR NpXml Elements"
             exit;
 
         repeat
-            //-NC1.13
-            //NpXmlMgt.SwapNpXmlElementLineNo(TempNpXmlElement,NpXmlElement);
             NpXmlTemplateMgt.SwapNpXmlElementLineNo(TempNpXmlElement, NpXmlElement);
-            //+NC1.13
             NpXmlElement.Get(TempNpXmlElement."Xml Template Code", TempNpXmlElement."Line No.");
         until TempNpXmlElement.Next(-1) = 0;
-        //+NC1.11
     end;
 
     procedure MoveUp()
@@ -654,7 +574,6 @@ page 6151553 "NPR NpXml Elements"
         TempNpXmlElement: Record "NPR NpXml Element" temporary;
         LineNo: Integer;
     begin
-        //-NC1.11
         CurrPage.Update(true);
         CurrPage.SetSelectionFilter(NpXmlElement);
         if not NpXmlElement.FindLast then
@@ -678,67 +597,49 @@ page 6151553 "NPR NpXml Elements"
             exit;
 
         repeat
-            //-NC1.13
-            //NpXmlMgt.SwapNpXmlElementLineNo(TempNpXmlElement,NpXmlElement);
             NpXmlTemplateMgt.SwapNpXmlElementLineNo(TempNpXmlElement, NpXmlElement);
-            //+NC1.13
             NpXmlElement.Get(TempNpXmlElement."Xml Template Code", TempNpXmlElement."Line No.");
         until TempNpXmlElement.Next = 0;
 
         FindFirst;
         Get("Xml Template Code", LineNo);
-        //+NC1.11
     end;
 
     local procedure PreviewXml()
     begin
-        //-NC1.08
         NpXmlMgt.PreviewXml("Xml Template Code");
-        //+NC1.08
     end;
 
     local procedure SetEnabledFilters()
     var
         NpXmlTemplate: Record "NPR NpXml Template";
     begin
-        //-NC1.22
         if NpXmlTemplate.Get(GetFilter("Xml Template Code")) then;
-        //-NC2.00
-        //IsArchived := NpXmlTemplate.Archived;
-        //+NC2.20
-        //+NC1.22
-        //-NC1.22
         NamespacesEnabled := NpXmlTemplate."Namespaces Enabled";
-        //+NC1.22
-        //-NC2.03 [267094]
         CurrPage.PagePartAttributes.PAGE.SetEnabledFilters(NpXmlTemplate);
-        //+NC2.03 [267094]
     end;
 
     local procedure UpdateLevel(Steps: Integer)
     var
-        XMLElement: Record "NPR NpXml Element";
+        NpXmlElement: Record "NPR NpXml Element";
     begin
-        XMLElement.Reset;
-        CurrPage.SetSelectionFilter(XMLElement);
-        if XMLElement.FindSet then
+        NpXmlElement.Reset;
+        CurrPage.SetSelectionFilter(NpXmlElement);
+        if NpXmlElement.FindSet then
             repeat
-                XMLElement.Level += Steps;
-                if XMLElement.Level < 0 then
-                    XMLElement.Level := 0;
-                XMLElement.Modify(true);
-            until XMLElement.Next = 0;
+                NpXmlElement.Level += Steps;
+                if NpXmlElement.Level < 0 then
+                    NpXmlElement.Level := 0;
+                NpXmlElement.Modify(true);
+            until NpXmlElement.Next = 0;
 
-        XMLElement.Reset;
-        XMLElement.SetRange("Xml Template Code", "Xml Template Code");
-        //-NC1.11
-        //XMLElement.SETFILTER("Line No.",'<>%1',"Line No.");
-        //+NC1.11
-        if XMLElement.FindSet then
+        NpXmlElement.Reset;
+        NpXmlElement.SetRange("Xml Template Code", "Xml Template Code");
+        if NpXmlElement.FindSet then
             repeat
-                XMLElement.UpdateParentInfo();
-                XMLElement.Modify;
-            until XMLElement.Next = 0;
+                NpXmlElement.UpdateParentInfo();
+                NpXmlElement.Modify;
+            until NpXmlElement.Next = 0;
 
         CurrPage.Update(false);
     end;
