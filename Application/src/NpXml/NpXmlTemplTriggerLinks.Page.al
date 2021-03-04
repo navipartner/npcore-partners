@@ -1,10 +1,5 @@
 page 6151560 "NPR NpXml Templ. Trigger Links"
 {
-    // NC1.01/MH/20150201  CASE 199932 Object created
-    // NC1.03/MH/20150205  CASE 199932 Added field 330 Previous Filter Value and Previous Options to field 300 Link Type
-    // NC1.08/MH/20150310  CASE 206395 Added function SetEnabled() for usability
-    // NC2.00/MHA/20160525  CASE 240005 NaviConnect
-
     AutoSplitKey = true;
     Caption = 'Xml Trigger Links';
     DelayedInsert = true;
@@ -26,9 +21,7 @@ page 6151560 "NPR NpXml Templ. Trigger Links"
 
                     trigger OnValidate()
                     begin
-                        //-NC1.08
                         SetEnabled();
-                        //+NC1.08
                     end;
                 }
                 field("Parent Field No."; "Parent Field No.")
@@ -85,22 +78,14 @@ page 6151560 "NPR NpXml Templ. Trigger Links"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnAfterGetCurrRecord()
     begin
-        //-NC1.08
         SetEnabled();
-        //+NC1.08
     end;
 
     trigger OnAfterGetRecord()
     begin
-        //-NC1.08
         SetEnabled();
-        //+NC1.08
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -120,13 +105,11 @@ page 6151560 "NPR NpXml Templ. Trigger Links"
 
     local procedure SetEnabled()
     begin
-        //-NC1.08
         XmlTemplateFilterValueEnabled := "Link Type" in ["Link Type"::ParentConstant, "Link Type"::ParentFilter];
         XmlTemplateFieldNoEnabled := XmlTemplateFilterValueEnabled or ("Link Type" in ["Link Type"::TableLink, "Link Type"::PreviousTableLink]);
         FieldNoEnabled := not XmlTemplateFilterValueEnabled;
         FilterValueEnabled := "Link Type" in ["Link Type"::Constant, "Link Type"::Filter];
         PreviousFilterValueEnabled := "Link Type" = "Link Type"::PreviousConstant;
-        //+NC1.08
     end;
 
     procedure SetTemplateTriggerView(NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger")

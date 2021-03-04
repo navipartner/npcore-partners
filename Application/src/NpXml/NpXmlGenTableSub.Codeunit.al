@@ -1,17 +1,5 @@
 codeunit 6151561 "NPR NpXml Gen. Table Sub."
 {
-    // NC2.01/MHA /20161018  CASE 2425550 Object created - contains functions for filling out Temporary Table during NpXml Export
-    // NC2.06/TS  /20170830  CASE 262530 Added Event Subscriber SetupVariantTranslation
-
-
-    trigger OnRun()
-    begin
-    end;
-
-    local procedure "--- NpXml Element Child Table"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6151551, 'OnSetupGenericChildTable', '', true, true)]
     local procedure SetupStockkeepingUnit(NpXmlElement: Record "NPR NpXml Element"; ParentRecRef: RecordRef; var ChildRecRef: RecordRef; var Handled: Boolean)
     var
@@ -80,7 +68,6 @@ codeunit 6151561 "NPR NpXml Gen. Table Sub."
         TempItemVariant: Record "Item Variant" temporary;
         MagentoStore: Record "NPR Magento Store";
     begin
-        //-NC2.06 [262530]
         if Handled then
             exit;
 
@@ -107,11 +94,6 @@ codeunit 6151561 "NPR NpXml Gen. Table Sub."
                 end;
         end;
         ChildRecRef.GetTable(TempItemVariant);
-        //+NC2.06 [262530]
-    end;
-
-    local procedure "--- NpXml Trigger Parent Table"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151553, 'OnSetupGenericParentTable', '', true, true)]
@@ -171,10 +153,6 @@ codeunit 6151561 "NPR NpXml Gen. Table Sub."
         end;
 
         ParentRecRef.GetTable(TempStockkeepingUnit);
-    end;
-
-    local procedure "--- Aux"()
-    begin
     end;
 
     local procedure IsElementSubscriber(NpXmlElement: Record "NPR NpXml Element"; GenericTableFunction: Text): Boolean

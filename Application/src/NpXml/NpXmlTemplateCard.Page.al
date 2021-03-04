@@ -566,7 +566,6 @@ page 6151551 "NPR NpXml Template Card"
     end;
 
     var
-        NpXmlMgt: Codeunit "NPR NpXml Mgt.";
         NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
         NpXmlTemplateTriggersVisible: Boolean;
         NpXmlBatchFiltersVisible: Boolean;

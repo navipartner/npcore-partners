@@ -1,8 +1,5 @@
 page 6151562 "NPR NpXml Templ. Arch. List"
 {
-    // NC1.21/TTH/20151020 CASE 224528 New Object
-    // NC2.00/MHA/20160525  CASE 240005 NaviConnect
-
     Caption = 'NpXml Template Archive';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -62,7 +59,6 @@ page 6151562 "NPR NpXml Templ. Arch. List"
                 var
                     NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
                 begin
-                    //-NC1.21
                     if not (Confirm(Text400)) then
                         exit;
 
@@ -72,7 +68,6 @@ page 6151562 "NPR NpXml Templ. Arch. List"
                     else
                         Message(StrSubstNo(Text100, "Template Version No."));
                     CurrPage.Close;
-                    //+NC1.21
                 end;
             }
             action("Export Template Version")
@@ -90,10 +85,8 @@ page 6151562 "NPR NpXml Templ. Arch. List"
                 var
                     NpXmlTemplateMgt: Codeunit "NPR NpXml Template Mgt.";
                 begin
-                    //-NC1.21
                     Clear(NpXmlTemplateMgt);
                     NpXmlTemplateMgt.ExportArchivedNpXmlTemplate(Rec);
-                    //+NC1.21
                 end;
             }
         }

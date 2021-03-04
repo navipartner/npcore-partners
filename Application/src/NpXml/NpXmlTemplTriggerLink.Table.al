@@ -1,17 +1,5 @@
 table 6151556 "NPR NpXml Templ.Trigger Link"
 {
-    // NC1.01/MH/20150201  CASE 199932 Object created - defines which table changes should trigger NpXml Templates (Transaction Task).
-    // NC1.03/MH/20150205  CASE 199932 Added field 330 Previous Filter Value and Previous Options to field 300 Link Type.
-    // NC1.06/MH/20150224  CASE 206395 Added Option, PreviousField, to field 300 Link Type.
-    // NC1.07/MH/20150309  CASE 208131 Updated captions
-    // NC1.08/MH/20150310  CASE 206395 Added Field Value Lookup
-    // NC1.11/MH/20150330  CASE 210171 Added multi level triggers
-    // NC1.13/MH/20150414  CASE 211360 Restructured NpXml Codeunits. Independent functions moved to new codeunits
-    // NC1.21/TTH/20151020 CASE 224528 Adding versioning and possibility to lock the modified versions. Added field 20 Template Version number and 340 Last Modified. New function XmlTemplateChanged.
-    // NC1.22/MHA/20151203 CASE 224528 Function XmlTemplateChanged() deleted and GetVersionNo() created
-    // NC1.22/MHA/20151203 CASE 224528 Deleted function XmlTemplateChanged() and credted GetVersionNo()
-    // NC2.00/MHA/20160525  CASE 240005 NaviConnect
-
     Caption = 'NpXml Template Trigger Link';
     DataClassification = CustomerContent;
 
@@ -76,7 +64,7 @@ table 6151556 "NPR NpXml Templ.Trigger Link"
         }
         field(120; "Parent Table Name"; Text[50])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Parent Table No.")));
             Caption = 'Parent Table Name';
             Description = 'NC1.11';
@@ -85,7 +73,7 @@ table 6151556 "NPR NpXml Templ.Trigger Link"
         }
         field(130; "Parent Field Name"; Text[50])
         {
-            CalcFormula = Lookup (Field.FieldName WHERE(TableNo = FIELD("Parent Table No."),
+            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = FIELD("Parent Table No."),
                                                         "No." = FIELD("Parent Field No.")));
             Caption = 'Parent Field Name';
             Description = 'NC1.11';
@@ -129,7 +117,7 @@ table 6151556 "NPR NpXml Templ.Trigger Link"
         }
         field(220; "Table Name"; Text[50])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Table No.")));
             Caption = 'Table Name';
             Editable = false;
@@ -137,7 +125,7 @@ table 6151556 "NPR NpXml Templ.Trigger Link"
         }
         field(230; "Field Name"; Text[50])
         {
-            CalcFormula = Lookup (Field.FieldName WHERE(TableNo = FIELD("Table No."),
+            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = FIELD("Table No."),
                                                         "No." = FIELD("Field No.")));
             Caption = 'Field Name';
             Editable = false;
@@ -165,12 +153,7 @@ table 6151556 "NPR NpXml Templ.Trigger Link"
 
             trigger OnLookup()
             begin
-                //-NC1.13
-                ////-NC1.08
-                //NpXmlMgt.LookupFieldValue("Parent Table No.","Parent Field No.","Parent Filter Value");
-                ////+NC1.08
                 NpXmlTemplateMgt.LookupFieldValue("Parent Table No.", "Parent Field No.", "Parent Filter Value");
-                //+NC1.13
             end;
         }
         field(320; "Filter Value"; Text[250])
@@ -181,12 +164,7 @@ table 6151556 "NPR NpXml Templ.Trigger Link"
 
             trigger OnLookup()
             begin
-                //-NC1.13
-                ////-NC1.08
-                //NpXmlMgt.LookupFieldValue("Table No.","Field No.","Filter Value");
-                ////+NC1.08
                 NpXmlTemplateMgt.LookupFieldValue("Table No.", "Field No.", "Filter Value");
-                //+NC1.13
             end;
         }
         field(330; "Previous Filter Value"; Text[250])
@@ -197,12 +175,7 @@ table 6151556 "NPR NpXml Templ.Trigger Link"
 
             trigger OnLookup()
             begin
-                //-NC1.13
-                ////-NC1.08
-                //NpXmlMgt.LookupFieldValue("Table No.","Field No.","Previous Filter Value");
-                ////+NC1.08
                 NpXmlTemplateMgt.LookupFieldValue("Table No.", "Field No.", "Previous Filter Value");
-                //+NC1.13
             end;
         }
         field(340; "Last Modified at"; DateTime)
@@ -220,43 +193,15 @@ table 6151556 "NPR NpXml Templ.Trigger Link"
         }
     }
 
-    fieldgroups
-    {
-    }
-
-    trigger OnDelete()
-    begin
-        //-NC1.22
-        ////-NC1.21
-        //XmlTemplateChanged;
-        ////+NC1.21
-        //+NC1.22
-    end;
-
     trigger OnInsert()
     begin
-        //-NC1.22
-        ////-NC1.21
-        //XmlTemplateChanged;
-        ////+NC1.21
         "Template Version No." := GetTemplateVersionNo();
-        //+NC1.22
     end;
 
     trigger OnModify()
-    var
-        XMLTemplate: Record "NPR NpXml Template";
-        NpXmlTemplateHistory: Record "NPR NpXml Template History";
-        RecRef: RecordRef;
-        xRecRef: RecordRef;
     begin
-        //-NC1.21
-        //-NC1.22
-        //XmlTemplateChanged;
         "Template Version No." := GetTemplateVersionNo();
-        //+NC1.22
         "Last Modified at" := CreateDateTime(Today, Time);
-        //+NC1.21
     end;
 
     var
@@ -266,10 +211,8 @@ table 6151556 "NPR NpXml Templ.Trigger Link"
     var
         NpXmlTemplate: Record "NPR NpXml Template";
     begin
-        //-NC1.22
         NpXmlTemplate.Get("Xml Template Code");
         exit(NpXmlTemplate."Template Version");
-        //+NC1.22
     end;
 }
 

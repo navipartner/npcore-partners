@@ -1,24 +1,13 @@
 codeunit 6151562 "NPR NpXml Xml Value Sub."
 {
-    // NC2.00/MHA /20161018 CASE 2425550 Object created - contains functions for returning Xml Value during NpXml Export
-    // NC2.01/MHA /20161110  CASE 242550 NaviConnect
-    // NC2.24/MHA /20191122  CASE 373950 Added function GetStockQty()
-
-
-    trigger OnRun()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6151555, 'OnGetXmlValue', '', true, true)]
     local procedure GetBase64(RecRef: RecordRef; NpXmlElement: Record "NPR NpXml Element"; FieldNo: Integer; var XmlValue: Text; var Handled: Boolean)
     var
         TempBlob: Codeunit "Temp Blob";
-        BinaryReader: DotNet NPRNetBinaryReader;
-        Convert: DotNet NPRNetConvert;
-        Encoding: DotNet NPRNetEncoding;
-        MemoryStream: DotNet NPRNetMemoryStream;
+        Base64Convert: Codeunit "Base64 Convert";
         FieldRef: FieldRef;
         InStr: InStream;
+        ByteText: Text;
     begin
         if Handled then
             exit;
@@ -30,7 +19,7 @@ codeunit 6151562 "NPR NpXml Xml Value Sub."
 
         FieldRef := RecRef.Field(FieldNo);
         if LowerCase(Format(FieldRef.Type)) <> 'blob' then begin
-            XmlValue := Convert.ToBase64String(Encoding.UTF8.GetBytes(Format(FieldRef.Value)));
+            XmlValue := Base64Convert.ToBase64((Format(FieldRef.Value)), TextEncoding::UTF8);
             exit;
         end;
 
@@ -38,12 +27,8 @@ codeunit 6151562 "NPR NpXml Xml Value Sub."
         Clear(TempBlob);
         TempBlob.FromFieldRef(FieldRef);
         TempBlob.CreateInStream(InStr);
-        MemoryStream := InStr;
-        BinaryReader := BinaryReader.BinaryReader(InStr);
-        XmlValue := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
-        MemoryStream.Flush;
-        MemoryStream.Close;
-        Clear(MemoryStream);
+        InStr.Read(ByteText);
+        XmlValue := Base64Convert.ToBase64(ByteText);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151555, 'OnGetXmlValue', '', true, true)]
@@ -54,7 +39,6 @@ codeunit 6151562 "NPR NpXml Xml Value Sub."
         StockkeepingUnit: Record "Stockkeeping Unit";
         Stock: Decimal;
     begin
-        //-NC2.24 [373950]
         if Handled then
             exit;
         if not IsSubscriber(NpXmlElement, 'GetStockQty') then
@@ -91,11 +75,6 @@ codeunit 6151562 "NPR NpXml Xml Value Sub."
         end;
 
         XmlValue := Format(Stock, 0, 9);
-        //+NC2.24 [373950]
-    end;
-
-    local procedure "--- Aux"()
-    begin
     end;
 
     local procedure IsSubscriber(NpXmlElement: Record "NPR NpXml Element"; XmlValueFunction: Text): Boolean

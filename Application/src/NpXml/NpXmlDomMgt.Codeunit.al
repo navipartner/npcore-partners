@@ -1,52 +1,12 @@
 codeunit 6151554 "NPR NpXml Dom Mgt."
 {
-    // NC1.13 /MHA /20150414  CASE 211360 Object Created - Restructured NpXml Codeunits. Independent functions moved to new codeunits
-    //                                    NC8.00: WebRequest Exception is catched using ASSERTERROR and GETLASTERROROBJECT
-    // NC1.16 /MHA /20150519  CASE 214257 Added Get-functions with Required parameter
-    // NC1.17 /MHA /20150527  CASE 214935 Added function LoadXml() for exception handling
-    // NC1.17 /MHA /20150616  CASE 215910 Added function IsLeafNode because values are treated as nodes
-    // NC1.22 /TS  /20150126  CASE 232405 Removed max length on Return value in function GetxmlText()
-    // NC1.22 /MHA /20160429  CASE 237658 Added function AddElementNamespace() and removed forced LOWERCASE
-    // NC2.00 /MHA /20160525  CASE 240005 NaviConnect
-    // NC2.01 /MHA /20160905  CASE 242551 Added functions TryLoadXml() and PrettyPrintXml()
-    // NC2.01 /MHA /20161219  CASE 256392 Replaced ASSERTERROR with Try Functions to prevent implicit roll back
-    // NC2.03 /MHA /20170404  CASE 267094 Added function AddAttributeNamespace()
-    // NC2.05 /MHA /20170615  CASE 265609 Added functions to enabled raw Text Web Request: SendWebRequestText(),TryGetWebResponseText()
-    // NC2.06/MHA /20170901   CASE 288285 Replace Nav OutStream with DotNet StreamWriter in TryGetWebResponseText() to correct Encoding
-    // NC2.13/JDH /20180604   CASE 317971 Changed caption to ENU
-    // NC2.19/MHA /20190116  CASE 342218 Added functions to be used to calculate Authorization Header from Extension
-    // NC2.19/MHA /20190311  CASE 345261 Removed implicit TryGetWebExceptionResponse() in SendWebRequest() and SendWebRequestText() and added Get functions
-    // NC2.21/MHA /20190530  CASE 344264 Added functions Xml Get functions for duration
-    // NC2.22/MHA /20190705  CASE 361164 Changed scope of GetWebExceptionInnerMessage() and TryGetWebExceptionResponse() from Global to Local
-    // NC2.25/MHA /20200205  CASE 389167 KeepAlive is disabled in SendWebRequest() and SendWebRequestText()
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
-        NpXmlTemplate2: Record "NPR NpXml Template";
-        OutputTempBlob: Codeunit "Temp Blob";
-        ResponseTempBlob: Codeunit "Temp Blob";
         Error003: Label 'Xml element %1 is missing in %2';
         Error004: Label 'Xml attribute %1 is missing in %2';
-        RecRef: RecordRef;
-        OutputOutStr: OutStream;
-        ResponseOutStr: OutStream;
-        Window: Dialog;
-        PrimaryKeyValue: Text;
-        BatchCount: Integer;
-        HideDialog: Boolean;
-        Initialized: Boolean;
-        OutputInitialized: Boolean;
         Text000: Label 'XmlElement %1 is missing';
         Text001: Label 'Value "%1" is not %2 in <%3>';
 
-    procedure "--- No Namespace"()
-    begin
-    end;
-
+    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
     procedure AddAttribute(var XmlNode: DotNet NPRNetXmlNode; Name: Text[260]; NodeValue: Text[260]) ExitStatus: Integer
     var
         NewAttributeXmlNode: DotNet NPRNetXmlNode;
@@ -64,6 +24,34 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         XmlNode.Attributes.SetNamedItem(NewAttributeXmlNode);
     end;
 
+    procedure AddAttribute(var Node: XmlNode; AttributeName: Text[260]; AttributeValue: Text[260])
+    begin
+        if (AttributeName in ['', 'xmlns']) OR (AttributeName.Contains(':')) then
+            exit;
+
+        if AttributeValue <> '' then
+            Node.AsXmlElement.SetAttribute(AttributeName, AttributeValue);
+    end;
+
+    procedure AddAttribute(var Element: XmlElement; AttributeName: Text[260]; AttributeValue: Text[260])
+    begin
+        if (AttributeName in ['', 'xmlns']) OR (AttributeName.Contains(':')) then
+            exit;
+
+        if AttributeValue <> '' then
+            Element.SetAttribute(AttributeName, AttributeValue);
+    end;
+
+    procedure AddNamespaceDeclaration(var Element: XmlElement; Prefix: Text[260]; Uri: Text[260])
+    begin
+        if (Prefix in ['', 'xmlns']) OR (Prefix.Contains(':')) then
+            exit;
+
+        if Uri <> '' then
+            Element.Add(XmlAttribute.CreateNamespaceDeclaration(Prefix, Uri));
+    end;
+
+    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
     procedure AddAttributeNamespace(var XmlNode: DotNet NPRNetXmlNode; Name: Text[260]; Namespace: Text; NodeValue: Text[260]) ExitStatus: Integer
     var
         NewAttributeXmlNode: DotNet NPRNetXmlNode;
@@ -80,6 +68,21 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         XmlNode.Attributes.SetNamedItem(NewAttributeXmlNode);
     end;
 
+    procedure AddAttributeNamespace(var Node: XmlNode; Prefix: Text[260]; AttributeName: Text[260]; NamespaceUri: Text; AttributeValue: Text[260])
+    begin
+        if (Prefix = '') OR (AttributeName = '') then
+            exit;
+
+        if (Prefix.Contains(':')) OR (AttributeName.Contains(':')) then
+            exit;
+
+        if AttributeValue <> '' then begin
+            Node.AsXmlElement.Add(XmlAttribute.CreateNamespaceDeclaration(Prefix, NamespaceUri));
+            Node.AsXmlElement.Add(XmlAttribute.Create(AttributeName, NamespaceUri, AttributeValue));
+        end;
+    end;
+
+    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
     procedure AddElement(var XmlElement: DotNet NPRNetXmlElement; ElementName: Text[250]; var CreatedXmlElement: DotNet NPRNetXmlElement)
     var
         NewChildXmlElement: DotNet NPRNetXmlElement;
@@ -90,6 +93,13 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         CreatedXmlElement := NewChildXmlElement;
     end;
 
+    procedure AddElement(var Element: XmlElement; ElementName: Text[250]; var CreatedXmlElement: XmlElement)
+    begin
+        CreatedXmlElement := XmlElement.Create(ElementName);
+        Element.Add(CreatedXmlElement);
+    end;
+
+    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
     procedure AddElementNamespace(var XmlElement: DotNet NPRNetXmlElement; ElementName: Text; Namespace: Text; var CreatedXmlElement: DotNet NPRNetXmlElement)
     var
         NewChildXmlElement: DotNet NPRNetXmlElement;
@@ -100,6 +110,21 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         NewChildXmlElement := XmlElement.OwnerDocument.CreateNode(XmlNodeType.Element, ElementName, Namespace);
         XmlElement.AppendChild(NewChildXmlElement);
         CreatedXmlElement := NewChildXmlElement;
+    end;
+
+    procedure AddElementNamespace(var Node: XmlNode; ElementName: Text; Namespace: Text; var CreatedXmNode: XmlNode)
+    var
+        Element: XmlElement;
+        CreatedXmlElement: XmlElement;
+    begin
+        Element := Node.AsXmlElement();
+
+        if Namespace = '' then
+            Namespace := Element.NamespaceUri;
+
+        CreatedXmlElement := XmlElement.Create(ElementName, Namespace);
+        Element.Add(CreatedXmlElement);
+        CreatedXmNode := CreatedXmlElement.AsXmlNode();
     end;
 
     [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
@@ -136,6 +161,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(not (NodeList.Count = 0));
     end;
 
+    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
     procedure InitDoc(var XmlDoc: DotNet "NPRNetXmlDocument"; var XmlDocNode: DotNet NPRNetXmlNode; NodeName: Text[1024])
     begin
         if not IsNull(XmlDoc) then
@@ -148,6 +174,17 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         XmlDocNode := XmlDoc.DocumentElement();
     end;
 
+    procedure InitDoc(var XmlDoc: XmlDocument; var XmlDocNode: XmlNode; NodeName: Text[1024])
+    var
+        Element: XmlElement;
+    begin
+        Clear(XmlDoc);
+        XmlDocument.ReadFrom('<?xml version="1.0" encoding="utf-8"?>' + '<' + NodeName + ' />', XmlDoc);
+        XmlDoc.GetRoot(Element);
+        XmlDocNode := Element.AsXmlNode();
+    end;
+
+    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
     procedure IsLeafNode(XmlNode: DotNet NPRNetXmlNode): Boolean
     var
         XmlNode2: DotNet NPRNetXmlNode;
@@ -161,6 +198,22 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
                 exit(false);
             XmlNode2 := XmlNode2.NextSibling;
         until IsNull(XmlNode2);
+
+        exit(true);
+    end;
+
+    procedure IsLeafNode(Node: XmlNode): Boolean
+    var
+        ChildNodesList: XmlNodeList;
+        ChildNode: XmlNode;
+    begin
+        if not Node.AsXmlElement.HasElements then
+            exit(true);
+
+        ChildNodesList := Node.AsXmlElement.GetChildElements();
+        foreach ChildNode in ChildNodesList do
+            if ChildNode.AsXmlElement.Name <> '#text' then
+                exit(false);
 
         exit(true);
     end;
@@ -214,6 +267,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(Element2.InnerText);
     end;
 
+    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
     procedure GetXmlTextNamespace(XmlElement: DotNet NPRNetXmlElement; NodePath: Text; XmlNsManager: DotNet NPRNetXmlNamespaceManager; MaxLength: Integer; Required: Boolean): Text
     var
         XmlElement2: DotNet NPRNetXmlElement;
@@ -235,6 +289,31 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
             exit(CopyStr(XmlElement2.InnerText, 1, MaxLength));
 
         exit(XmlElement2.InnerText);
+    end;
+
+    procedure GetXmlTextNamespace(Element: XmlElement; NodePath: Text; XmlNsManager: XmlNamespaceManager; MaxLength: Integer; Required: Boolean): Text
+    var
+        Element2: XmlElement;
+        Node: XmlNode;
+    begin
+        if Element.IsEmpty() then begin
+            if Required then
+                Error(Error003, NodePath, '');
+            exit('');
+        end;
+
+        Element.SelectSingleNode(NodePath, XmlNsManager, Node);
+        Element2 := Node.AsXmlElement();
+        if Element2.IsEmpty then begin
+            if Required then
+                Error(Error003, NodePath, Element.Name);
+            exit('');
+        end;
+
+        if MaxLength > 0 then
+            exit(CopyStr(Element2.InnerText, 1, MaxLength));
+
+        exit(Element2.InnerText);
     end;
 
     [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
@@ -266,39 +345,36 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
     end;
 
     [TryFunction]
+    [Obsolete('This function is not needed. Please use standard AL function: XmlDocument.Load();', '')]
     procedure TryLoadXml(XmlString: Text; var XmlDoc: DotNet "NPRNetXmlDocument")
     begin
         XmlDoc := XmlDoc.XmlDocument;
         XmlDoc.LoadXml(XmlString);
     end;
 
-    [TryFunction]
-    local procedure TryLoadXmlStream(var MemoryStream: DotNet NPRNetMemoryStream; var XmlDoc: DotNet "NPRNetXmlDocument")
-    begin
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.Load(MemoryStream);
-    end;
-
     procedure PrettyPrintXml(XmlString: Text) PrettyXml: Text
     var
-        StreamReader: DotNet NPRNetStreamReader;
-        XmlDoc: DotNet "NPRNetXmlDocument";
+        XmlDoc: XmlDocument;
         TempBlob: Codeunit "Temp Blob";
-        InStream: InStream;
-        OutStream: OutStream;
+        InStr: InStream;
+        OutStr: OutStream;
+        Buffer: Text;
     begin
-        if not TryLoadXml(XmlString, XmlDoc) then
+        if not XmlDocument.ReadFrom(XmlString, XmlDoc) then
             exit(XmlString);
 
-        TempBlob.CreateOutStream(OutStream, TEXTENCODING::UTF8);
-        XmlDoc.Save(OutStream);
+        TempBlob.CreateOutStream(OutStr, TEXTENCODING::UTF8);
+        XmlDoc.WriteTo(OutStr);
 
-        TempBlob.CreateInStream(InStream, TEXTENCODING::UTF8);
-        StreamReader := StreamReader.StreamReader(InStream);
-        PrettyXml := StreamReader.ReadToEnd;
+        TempBlob.CreateInStream(InStr, TEXTENCODING::UTF8);
+        while not InStr.EOS do begin
+            InStr.ReadText(Buffer);
+            PrettyXml += Buffer;
+        end;
     end;
 
     [TryFunction]
+    [Obsolete('Use standard procedure RemoveNamespaces from Codeunit "XML DOM Management". Entry parametar is Text and it returns cleared Text as output', '')]
     procedure RemoveNameSpaces(var XmlDoc: DotNet "NPRNetXmlDocument")
     var
         MemoryStream: DotNet NPRNetMemoryStream;
@@ -348,10 +424,6 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         XmlDoc.Load(MemoryStream2);
     end;
 
-    local procedure "--- Get"()
-    begin
-    end;
-
     [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
     procedure FindElement(XmlElement: DotNet NPRNetXmlElement; Path: Text; Required: Boolean; var XmlElement2: DotNet NPRNetXmlElement): Boolean
     begin
@@ -386,26 +458,6 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
             Error(Text000, Element.Name + '/' + Path);
 
         exit(not Element2.IsEmpty());
-    end;
-
-    procedure GetElementBigInt(XmlElement: DotNet NPRNetXmlElement; Path: Text; Required: Boolean) Value: BigInteger
-    var
-        XmlElement2: DotNet NPRNetXmlElement;
-    begin
-        XmlElement2 := XmlElement;
-        if Path <> '' then begin
-            if (not FindElement(XmlElement, Path, Required, XmlElement2)) then
-                exit(0);
-        end;
-
-        if not Evaluate(Value, XmlElement2.InnerText, 9) then begin
-            if not Required then
-                exit(0);
-
-            Error(Text001, XmlElement2.InnerText, GetDotNetType(Value), XmlElement.Name + '/' + Path);
-        end;
-
-        exit(Value);
     end;
 
     [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
@@ -572,28 +624,6 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(ReturnValue);
     end;
 
-    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
-
-    procedure GetElementDT(XmlElement: DotNet NPRNetXmlElement; Path: Text; Required: Boolean) Value: DateTime
-    var
-        XmlElement2: DotNet NPRNetXmlElement;
-    begin
-        XmlElement2 := XmlElement;
-        if Path <> '' then begin
-            if (not FindElement(XmlElement, Path, Required, XmlElement2)) then
-                exit(0DT);
-        end;
-
-        if not Evaluate(Value, XmlElement2.InnerText, 9) then begin
-            if not Required then
-                exit(0DT);
-
-            Error(Text001, XmlElement2.InnerText, GetDotNetType(Value), XmlElement.Name + '/' + Path);
-        end;
-
-        exit(Value);
-    end;
-
     procedure GetElementDT(Element: XmlElement; Path: Text; Required: Boolean) ReturnValue: DateTime
     var
         Element2: XmlElement;
@@ -612,26 +642,6 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         end;
 
         exit(ReturnValue);
-    end;
-
-    procedure GetElementGuid(XmlElement: DotNet NPRNetXmlElement; Path: Text; Required: Boolean) Value: Guid
-    var
-        XmlElement2: DotNet NPRNetXmlElement;
-    begin
-        XmlElement2 := XmlElement;
-        if Path <> '' then begin
-            if (not FindElement(XmlElement, Path, Required, XmlElement2)) then
-                exit;
-        end;
-
-        if not Evaluate(Value, XmlElement2.InnerText, 9) then begin
-            if not Required then
-                exit;
-
-            Error(Text001, XmlElement2.InnerText, GetDotNetType(Value), XmlElement.Name + '/' + Path);
-        end;
-
-        exit(Value);
     end;
 
     [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
@@ -710,48 +720,6 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(ReturnValue);
     end;
 
-    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
-    procedure GetElementTime(XmlElement: DotNet NPRNetXmlElement; Path: Text; Required: Boolean) Value: Time
-    var
-        XmlElement2: DotNet NPRNetXmlElement;
-    begin
-        XmlElement2 := XmlElement;
-        if Path <> '' then begin
-            if (not FindElement(XmlElement, Path, Required, XmlElement2)) then
-                exit(0T);
-        end;
-
-        if not Evaluate(Value, XmlElement2.InnerText, 9) then begin
-            if not Required then
-                exit(0T);
-
-            Error(Text001, XmlElement2.InnerText, GetDotNetType(Value), XmlElement.Name + '/' + Path);
-        end;
-
-        exit(Value);
-    end;
-
-    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
-    procedure GetElementDuration(XmlElement: DotNet NPRNetXmlElement; Path: Text; Required: Boolean) Value: Duration
-    var
-        XmlElement2: DotNet NPRNetXmlElement;
-    begin
-        XmlElement2 := XmlElement;
-        if Path <> '' then begin
-            if (not FindElement(XmlElement, Path, Required, XmlElement2)) then
-                exit(0);
-        end;
-
-        if not Evaluate(Value, XmlElement2.InnerText, 9) then begin
-            if not Required then
-                exit(0);
-
-            Error(Text001, XmlElement2.InnerText, GetDotNetType(Value), XmlElement.Name + '/' + Path);
-        end;
-
-        exit(Value);
-    end;
-
     procedure GetElementDuration(Element: XmlElement; Path: Text; Required: Boolean) ReturnValue: Duration
     var
         Element2: XmlElement;
@@ -770,34 +738,6 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         end;
 
         exit(ReturnValue);
-    end;
-
-    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
-    procedure GetAttributeBigInt(XmlElement: DotNet NPRNetXmlElement; Path: Text; Name: Text; Required: Boolean) Value: BigInteger
-    var
-        XmlElement2: DotNet NPRNetXmlElement;
-        TextValue: Text;
-        FullPath: Text;
-    begin
-        XmlElement2 := XmlElement;
-        if Path <> '' then begin
-            if (not FindElement(XmlElement, Path, Required, XmlElement2)) then
-                exit(0);
-        end;
-
-        TextValue := XmlElement2.GetAttribute(Name);
-        if not Evaluate(Value, TextValue, 9) then begin
-            if not Required then
-                exit(0);
-
-            FullPath := XmlElement.Name;
-            if Path <> '' then
-                FullPath += '/' + Path;
-            FullPath += '@' + Name;
-            Error(Text001, TextValue, GetDotNetType(Value), FullPath);
-        end;
-
-        exit(Value);
     end;
 
     procedure GetAttributeBigInt(Element: XmlElement; Path: Text; Name: Text; Required: Boolean) ReturnValue: BigInteger
@@ -827,33 +767,6 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         end;
 
         exit(ReturnValue);
-    end;
-
-    procedure GetAttributeBoolean(XmlElement: DotNet NPRNetXmlElement; Path: Text; Name: Text; Required: Boolean) Value: Boolean
-    var
-        XmlElement2: DotNet NPRNetXmlElement;
-        TextValue: Text;
-        FullPath: Text;
-    begin
-        XmlElement2 := XmlElement;
-        if Path <> '' then begin
-            if (not FindElement(XmlElement, Path, Required, XmlElement2)) then
-                exit(false);
-        end;
-
-        TextValue := XmlElement2.GetAttribute(Name);
-        if not Evaluate(Value, TextValue, 9) then begin
-            if not Required then
-                exit(false);
-
-            FullPath := XmlElement.Name;
-            if Path <> '' then
-                FullPath += '/' + Path;
-            FullPath += '@' + Name;
-            Error(Text001, TextValue, GetDotNetType(Value), FullPath);
-        end;
-
-        exit(Value);
     end;
 
     [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
@@ -897,142 +810,6 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         ReturnValue := UpperCase(CopyStr(TextValue, 1, MaxStrLen(ReturnValue)));
 
         exit(ReturnValue);
-    end;
-
-    procedure GetAttributeDate(XmlElement: DotNet NPRNetXmlElement; Path: Text; Name: Text; Required: Boolean) Value: Date
-    var
-        XmlElement2: DotNet NPRNetXmlElement;
-        TextValue: Text;
-        FullPath: Text;
-    begin
-        XmlElement2 := XmlElement;
-        if Path <> '' then begin
-            if (not FindElement(XmlElement, Path, Required, XmlElement2)) then
-                exit(0D);
-        end;
-
-        TextValue := XmlElement2.GetAttribute(Name);
-        if not Evaluate(Value, TextValue, 9) then begin
-            if not Required then
-                exit(0D);
-
-            FullPath := XmlElement.Name;
-            if Path <> '' then
-                FullPath += '/' + Path;
-            FullPath += '@' + Name;
-            Error(Text001, TextValue, GetDotNetType(Value), FullPath);
-        end;
-
-        exit(Value);
-    end;
-
-    procedure GetAttributeDec(XmlElement: DotNet NPRNetXmlElement; Path: Text; Name: Text; Required: Boolean) Value: Decimal
-    var
-        XmlElement2: DotNet NPRNetXmlElement;
-        TextValue: Text;
-        FullPath: Text;
-    begin
-        XmlElement2 := XmlElement;
-        if Path <> '' then begin
-            if (not FindElement(XmlElement, Path, Required, XmlElement2)) then
-                exit(0);
-        end;
-
-        TextValue := XmlElement2.GetAttribute(Name);
-        if not Evaluate(Value, TextValue, 9) then begin
-            if not Required then
-                exit(0);
-
-            FullPath := XmlElement.Name;
-            if Path <> '' then
-                FullPath += '/' + Path;
-            FullPath += '@' + Name;
-            Error(Text001, TextValue, GetDotNetType(Value), FullPath);
-        end;
-
-        exit(Value);
-    end;
-
-    procedure GetAttributeDT(XmlElement: DotNet NPRNetXmlElement; Path: Text; Name: Text; Required: Boolean) Value: DateTime
-    var
-        XmlElement2: DotNet NPRNetXmlElement;
-        TextValue: Text;
-        FullPath: Text;
-    begin
-        XmlElement2 := XmlElement;
-        if Path <> '' then begin
-            if (not FindElement(XmlElement, Path, Required, XmlElement2)) then
-                exit(0DT);
-        end;
-
-        TextValue := XmlElement2.GetAttribute(Name);
-        if not Evaluate(Value, TextValue, 9) then begin
-            if not Required then
-                exit(0DT);
-
-            FullPath := XmlElement.Name;
-            if Path <> '' then
-                FullPath += '/' + Path;
-            FullPath += '@' + Name;
-            Error(Text001, TextValue, GetDotNetType(Value), FullPath);
-        end;
-
-        exit(Value);
-    end;
-
-    procedure GetAttributeGuid(XmlElement: DotNet NPRNetXmlElement; Path: Text; Name: Text; Required: Boolean) Value: Guid
-    var
-        XmlElement2: DotNet NPRNetXmlElement;
-        TextValue: Text;
-        FullPath: Text;
-    begin
-        XmlElement2 := XmlElement;
-        if Path <> '' then begin
-            if (not FindElement(XmlElement, Path, Required, XmlElement2)) then
-                exit;
-        end;
-
-        TextValue := XmlElement2.GetAttribute(Name);
-        if not Evaluate(Value, TextValue, 9) then begin
-            if not Required then
-                exit;
-
-            FullPath := XmlElement.Name;
-            if Path <> '' then
-                FullPath += '/' + Path;
-            FullPath += '@' + Name;
-            Error(Text001, TextValue, GetDotNetType(Value), FullPath);
-        end;
-
-        exit(Value);
-    end;
-
-    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
-    procedure GetAttributeInt(XmlElement: DotNet NPRNetXmlElement; Path: Text; Name: Text; Required: Boolean) Value: Integer
-    var
-        XmlElement2: DotNet NPRNetXmlElement;
-        TextValue: Text;
-        FullPath: Text;
-    begin
-        XmlElement2 := XmlElement;
-        if Path <> '' then begin
-            if (not FindElement(XmlElement, Path, Required, XmlElement2)) then
-                exit(0);
-        end;
-
-        TextValue := XmlElement2.GetAttribute(Name);
-        if not Evaluate(Value, TextValue, 9) then begin
-            if not Required then
-                exit(0);
-
-            FullPath := XmlElement.Name;
-            if Path <> '' then
-                FullPath += '/' + Path;
-            FullPath += '@' + Name;
-            Error(Text001, TextValue, GetDotNetType(Value), FullPath);
-        end;
-
-        exit(Value);
     end;
 
     procedure GetAttributeInt(Element: XmlElement; Path: Text; Name: Text; Required: Boolean) ReturnValue: Integer
@@ -1101,97 +878,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(ReturnValue);
     end;
 
-    procedure GetAttributeTime(XmlElement: DotNet NPRNetXmlElement; Path: Text; Name: Text; Required: Boolean) Value: Time
-    var
-        XmlElement2: DotNet NPRNetXmlElement;
-        TextValue: Text;
-        FullPath: Text;
-    begin
-        XmlElement2 := XmlElement;
-        if Path <> '' then begin
-            if (not FindElement(XmlElement, Path, Required, XmlElement2)) then
-                exit(0T);
-        end;
-
-        TextValue := XmlElement2.GetAttribute(Name);
-        if not Evaluate(Value, TextValue, 9) then begin
-            if not Required then
-                exit(0T);
-
-            FullPath := XmlElement.Name;
-            if Path <> '' then
-                FullPath += '/' + Path;
-            FullPath += '@' + Name;
-            Error(Text001, TextValue, GetDotNetType(Value), FullPath);
-        end;
-
-        exit(Value);
-    end;
-
-    procedure GetAttributeDuration(XmlElement: DotNet NPRNetXmlElement; Path: Text; Name: Text; Required: Boolean) Value: Duration
-    var
-        XmlElement2: DotNet NPRNetXmlElement;
-        TextValue: Text;
-        FullPath: Text;
-    begin
-        XmlElement2 := XmlElement;
-        if Path <> '' then begin
-            if (not FindElement(XmlElement, Path, Required, XmlElement2)) then
-                exit(0);
-        end;
-
-        TextValue := XmlElement2.GetAttribute(Name);
-        if not Evaluate(Value, TextValue, 9) then begin
-            if not Required then
-                exit(0);
-
-            FullPath := XmlElement.Name;
-            if Path <> '' then
-                FullPath += '/' + Path;
-            FullPath += '@' + Name;
-            Error(Text001, TextValue, GetDotNetType(Value), FullPath);
-        end;
-
-        exit(Value);
-    end;
-
-    local procedure "--- Dotnet"()
-    begin
-    end;
-
-    procedure GetDotNetTime(Provider: Text): Text
-    var
-        DotNetDateTime: DotNet NPRNetDateTime;
-    begin
-        DotNetDateTime := DotNetDateTime.Now();
-        exit(DotNetDateTime.ToString(Provider));
-    end;
-
-    procedure ComputeSha256Hash("Key": Text; Value: Text; EncodingName: Text) Hash: Text
-    var
-        BitConverter: DotNet NPRNetBitConverter;
-        Encoding: DotNet NPRNetEncoding;
-        HmacSha256: DotNet NPRNetHMACSHA256;
-    begin
-        Encoding := Encoding.GetEncoding(EncodingName);
-        HmacSha256 := HmacSha256.HMACSHA256(Encoding.GetBytes(Key));
-        Hash := BitConverter.ToString(HmacSha256.ComputeHash(Encoding.GetBytes(Value)));
-        exit(Hash);
-    end;
-
-    procedure ToBase64String(Input: Text; EncodingName: Text): Text
-    var
-        Convert: DotNet NPRNetConvert;
-        Encoding: DotNet NPRNetEncoding;
-    begin
-        Encoding := Encoding.GetEncoding(EncodingName);
-        exit(Convert.ToBase64String(Encoding.GetBytes(Input)));
-    end;
-
-    procedure "--- WebRequest"()
-    begin
-    end;
-
+    [Obsolete('This function is not needed anymore. Now we are using native AL HttpResponseMessage from HttpClient.', '')]
     procedure GetWebExceptionMessage(var WebException: DotNet NPRNetWebException) ExceptionMessage: Text
     var
         HttpWebResponse: DotNet NPRNetHttpWebResponse;
@@ -1227,18 +914,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(LastErrorText);
     end;
 
-    local procedure GetWebExceptionInnerMessage(var WebException: DotNet NPRNetWebException) ExceptionMessage: Text
-    var
-        InnerWebException: DotNet NPRNetWebException;
-    begin
-        if TryGetInnerWebException(WebException, InnerWebException) then begin
-            ExceptionMessage := GetWebExceptionMessage(InnerWebException);
-            exit(ExceptionMessage);
-        end;
-
-        exit('');
-    end;
-
+    [Obsolete('This function is not needed anymore. Now we are using native AL HttpResponseMessage from HttpClient.', '')]
     procedure GetWebResponseText(var HttpWebResponse: DotNet NPRNetHttpWebResponse) ResponseText: Text
     var
         HttpWebException: DotNet NPRNetWebException;
@@ -1255,11 +931,10 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit('');
     end;
 
+    [Obsolete('This function is not needed anymore. Now we are using native AL HttpClient filetype to send WebRequest.', '')]
     procedure SendWebRequest(var XmlDoc: DotNet "NPRNetXmlDocument"; HttpWebRequest: DotNet NPRNetHttpWebRequest; var HttpWebResponse: DotNet NPRNetHttpWebResponse; var WebException: DotNet NPRNetWebException): Boolean
     begin
-        //-NC2.25 [389167]
         HttpWebRequest.KeepAlive(false);
-        //+NC2.25 [389167]
         if TryGetWebResponse(XmlDoc, HttpWebRequest, HttpWebResponse) then
             exit(true);
 
@@ -1267,11 +942,10 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(false);
     end;
 
+    [Obsolete('This function is not needed anymore. Now we are using native AL HttpClient filetype to send WebRequest.', '')]
     procedure SendWebRequestText(Request: Text; HttpWebRequest: DotNet NPRNetHttpWebRequest; var HttpWebResponse: DotNet NPRNetHttpWebResponse; var WebException: DotNet NPRNetWebException): Boolean
     begin
-        //-NC2.25 [389167]
         HttpWebRequest.KeepAlive(false);
-        //+NC2.25 [389167]
         if TryGetWebResponseText(Request, HttpWebRequest, HttpWebResponse) then
             exit(true);
 
@@ -1280,6 +954,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(false);
     end;
 
+    [Obsolete('We have agreed in "Remove .NET i AL" MS teams chat that we will skip calls for this function because it probably is not needed. And if at the end we find that it is still needed, we will lookup for alternatives.', '')]
     procedure SetTrustedCertificateValidation(var HttpWebRequest: DotNet NPRNetHttpWebRequest)
     var
         NpWebRequest: DotNet NPRNetNpWebRequest;
@@ -1289,18 +964,21 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
     end;
 
     [TryFunction]
+    [Obsolete('This function is not needed anymore. Now we are using native AL HttpResponseMessage from HttpClient.', '')]
     local procedure TryGetInnerWebException(var WebException: DotNet NPRNetWebException; var InnerWebException: DotNet NPRNetWebException)
     begin
         InnerWebException := WebException.InnerException;
     end;
 
     [TryFunction]
+    [Obsolete('This function is not needed anymore. Now we are using native AL HttpResponseMessage from HttpClient.', '')]
     local procedure TryGetWebExceptionResponse(var WebException: DotNet NPRNetWebException; var HttpWebResponse: DotNet NPRNetHttpWebResponse)
     begin
         HttpWebResponse := WebException.Response;
     end;
 
     [TryFunction]
+    [Obsolete('This function is not needed anymore. Now we are using native AL HttpResponseMessage from HttpClient.', '')]
     local procedure TryGetWebResponse(var XmlDoc: DotNet "NPRNetXmlDocument"; HttpWebRequest: DotNet NPRNetHttpWebRequest; var HttpWebResponse: DotNet NPRNetHttpWebResponse)
     var
         MemoryStream: DotNet NPRNetMemoryStream;
@@ -1315,6 +993,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
     end;
 
     [TryFunction]
+    [Obsolete('This function is not needed anymore. Now we are using native AL HttpResponseMessage from HttpClient.', '')]
     local procedure TryGetWebResponseText(var Request: Text; HttpWebRequest: DotNet NPRNetHttpWebRequest; var HttpWebResponse: DotNet NPRNetHttpWebResponse)
     var
         StreamWriter: DotNet NPRNetStreamWriter;
@@ -1329,6 +1008,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
     end;
 
     [TryFunction]
+    [Obsolete('This function is not needed anymore. Now we are using native AL HttpResponseMessage from HttpClient.', '')]
     local procedure TryReadResponseText(var HttpWebResponse: DotNet NPRNetHttpWebResponse; var ResponseText: Text)
     var
         Stream: DotNet NPRNetStream;
@@ -1342,7 +1022,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         Clear(Stream);
     end;
 
-    local procedure GetAttributeFromElement(Element: XmlElement; AttributeName: Text; var Attribute: XmlAttribute; Required: Boolean);
+    procedure GetAttributeFromElement(Element: XmlElement; AttributeName: Text; var Attribute: XmlAttribute; Required: Boolean);
     var
         AttributeCollection: XmlAttributeCollection;
     begin
