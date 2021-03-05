@@ -1,4 +1,4 @@
-page 6151245 "NPR Setup RC"
+page 6151245 "NPR Retail Setup RC"
 {
     Caption = 'NP Retail Setup';
     PageType = RoleCenter;
