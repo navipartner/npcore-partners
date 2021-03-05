@@ -42,7 +42,10 @@ jobs:
         serverInstanceName: $(serverInstanceName)
         alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Application
         analyzers: 'AppSourceCop,UICop'
-        azureADtenantID: ec3af438-38fc-4d9b-b8be-058101411d3a
+        keyVaultCert:
+          keyVaultCertPFXSecureFile: 'BusinessCentralKeyVaultReader.pfx'
+          certPassword: 498eH$??nhxUSSFS
+          azureADtenantID: ec3af438-38fc-4d9b-b8be-058101411d3a  
         dependancies:
         - package:
             source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
