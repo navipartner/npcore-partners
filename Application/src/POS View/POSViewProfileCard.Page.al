@@ -7,6 +7,16 @@ page 6150636 "NPR POS View Profile Card"
 
     layout
     {
+
+        area (factboxes)
+        {
+            part(POSViewPic; "NPR POS View Picture")
+            {
+                ApplicationArea = Basic, Suite; 
+                Editable =  true; 
+                SubPageLink = "Code" = FIELD("Code");
+            }
+        }
         area(content)
         {
             group(General)
@@ -16,17 +26,6 @@ page 6150636 "NPR POS View Profile Card"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
-                }
-                field(Description; Rec.Description)
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Description field';
-                }
-                field(Control6014403; Rec.Picture)
-                {
-                    ApplicationArea = All;
-                    ShowCaption = false;
-                    ToolTip = 'Specifies the value of the Picture field';
                 }
                 field("POS Theme Code"; Rec."POS Theme Code")
                 {
@@ -107,82 +106,6 @@ page 6150636 "NPR POS View Profile Card"
                     begin
                         Rec.DetectDecimalThousandsSeparator();
                         CurrPage.Update(true);
-                    end;
-                }
-            }
-            group(Picture)
-            {
-                Caption = 'Picture';
-                action(Import)
-                {
-                    Caption = 'Import';
-                    Image = Import;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Import action';
-
-                    trigger OnAction()
-                    var
-                        PicConfirmReplace: Label 'Replace the existing picture?';
-                        PictureExists: Boolean;
-                        FileMgt: Codeunit "File Management";
-                        Name: Text[250];
-                        TempBlob: Codeunit "Temp Blob";
-                        TextName: Text[200];
-                        RecRef: RecordRef;
-                    begin
-                        PictureExists := Rec.Picture.HasValue;
-
-                        Clear(TempBlob);
-                        Name := FileMgt.BLOBImport(TempBlob, TextName);
-
-                        RecRef.GetTable(Rec);
-                        TempBlob.ToRecordRef(RecRef, Rec.FieldNo(Picture));
-                        RecRef.SetTable(Rec);
-
-                        if Name = '' then
-                            exit;
-                        if PictureExists then
-                            if not Confirm(PicConfirmReplace, false) then
-                                exit;
-
-                        CurrPage.SaveRecord;
-                    end;
-                }
-                action(Export)
-                {
-                    Caption = 'Export';
-                    Image = Export;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Export action';
-
-                    trigger OnAction()
-                    var
-                        FileMgt: Codeunit "File Management";
-                        TempBlob: Codeunit "Temp Blob";
-                    begin
-                        if Rec.Picture.HasValue then begin
-                            Rec.CalcFields(Picture);
-                            TempBlob.FromRecord(Rec, Rec.FieldNo(Picture));
-                            FileMgt.BLOBExport(TempBlob, '*.bmp', true);
-                        end;
-                    end;
-                }
-                action("Delete")
-                {
-                    Caption = 'Delete';
-                    Image = Delete;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Delete action';
-
-                    trigger OnAction()
-                    var
-                        PicConfDelete: Label 'Delete the picture?';
-                    begin
-                        if Rec.Picture.HasValue then
-                            if Confirm(PicConfDelete, false) then begin
-                                Clear(Rec.Picture);
-                                CurrPage.SaveRecord;
-                            end;
                     end;
                 }
             }
