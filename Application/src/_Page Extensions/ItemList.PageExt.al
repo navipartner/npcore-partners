@@ -4,12 +4,6 @@ pageextension 6014433 "NPR Item List" extends "Item List"
     {
         addafter(Control1901314507)
         {
-            part("NPR NP Attributes FactBox"; "NPR NP Attributes FactBox")
-            {
-                SubPageLink = "No." = FIELD("No.");
-                ApplicationArea = All;
-            }
-
             part("NPR Discount FactBox"; "NPR Discount FactBox")
             {
                 Caption = 'Discounts';
