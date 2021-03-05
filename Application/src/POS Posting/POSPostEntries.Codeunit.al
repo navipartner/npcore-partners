@@ -1154,14 +1154,14 @@ codeunit 6150615 "NPR POS Post Entries"
 
     local procedure GetPOSPostingProfile(var POSEntry: Record "NPR POS Entry"; var POSPostingProfile: Record "NPR POS Posting Profile")
     var
-        POSUnit: Record "NPR POS Unit";
+        POSStore: Record "NPR POS Store";
         POSEntry2: Record "NPR POS Entry";
     begin
         POSEntry2.Copy(POSEntry);
         if POSEntry2."POS Unit No." = '' then
             if not POSEntry2.FindFirst() then
                 POSEntry2.Init();
-        POSUnit.GetPostingProfile(POSEntry2."POS Unit No.", POSPostingProfile);
+        POSStore.GetProfile(POSEntry2."POS Store Code", POSPostingProfile);
     end;
 
     local procedure MarkPOSEntries(OptStatus: Option Posted,Error; POSPostingLogEntryNo: Integer; var POSEntry: Record "NPR POS Entry"; var POSEntryWithError: Record "NPR POS Entry")
@@ -1201,14 +1201,14 @@ codeunit 6150615 "NPR POS Post Entries"
     local procedure MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer: Record "NPR POS Posting Buffer"; AmountIn: Decimal; AmountInLCY: Decimal; PostingType: Enum "General Posting Type"; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; BalancingAccountType: Enum "Gen. Journal Account Type"; BalancingAccountNo: Code[20]; VATAmountIn: Decimal; VATAmountInLCY: Decimal; var GenJournalLine: Record "Gen. Journal Line")
     var
         POSStore: Record "NPR POS Store";
-        NPRPOSUnit: Record "NPR POS Unit";
-        NPRPOSPostingProfile: Record "NPR POS Posting Profile";
+        POSPostingProfile: Record "NPR POS Posting Profile";
     begin
         if POSPostingBuffer."POS Store Code" = '' then
-            POSStore.Init
+            POSStore.Init()
         else
             POSStore.Get(POSPostingBuffer."POS Store Code");
-        NPRPOSUnit.GetPostingProfile(POSPostingBuffer."POS Unit No.", NPRPOSPostingProfile);
+        POSStore.GetProfile(POSPostingBuffer."POS Store Code", POSPostingProfile);
+
         MakeGenJournalLine(
           AccountType,
           AccountNo,
@@ -1239,8 +1239,8 @@ codeunit 6150615 "NPR POS Post Entries"
           POSPostingBuffer."Use Tax",
           VATAmountIn,
           VATAmountInLCY,
-          POSStore."VAT Customer No.",
-          NPRPOSPostingProfile."Source Code",
+          POSPostingProfile."VAT Customer No.",
+          POSPostingProfile."Source Code",
           GenJournalLine);
 
         OnAfterInsertPOSPostingBufferToGenJnl(POSPostingBuffer, GenJournalLine, false);
@@ -1249,11 +1249,12 @@ codeunit 6150615 "NPR POS Post Entries"
     local procedure MakeGenJournalFromPOSBalancingLine(POSBalancingLine: Record "NPR POS Balancing Line"; Amount: Decimal; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; PostingDescription: Text; var GenJournalLine: Record "Gen. Journal Line")
     var
         POSEntry: Record "NPR POS Entry";
-        NPRPOSUnit: Record "NPR POS Unit";
-        NPRPOSPostingProfile: Record "NPR POS Posting Profile";
+        POSStore: Record "NPR POS Store";
+        POSPostingProfile: Record "NPR POS Posting Profile";
     begin
         POSEntry.Get(POSBalancingLine."POS Entry No.");
-        NPRPOSUnit.GetPostingProfile(POSEntry."POS Unit No.", NPRPOSPostingProfile);
+        POSStore.GetProfile(POSEntry."POS Store Code", POSPostingProfile);
+
         MakeGenJournalLine(
           AccountType,
           AccountNo,
@@ -1285,7 +1286,7 @@ codeunit 6150615 "NPR POS Post Entries"
           0,
           0,
           '',
-          NPRPOSPostingProfile."Source Code",
+          POSPostingProfile."Source Code",
           GenJournalLine);
 
         OnAfterInsertPOSBalancingLineToGenJnl(POSBalancingLine, GenJournalLine, false);
@@ -1372,8 +1373,8 @@ codeunit 6150615 "NPR POS Post Entries"
         TempPOSTaxAmountLine: Record "NPR POS Tax Amount Line" temporary;
         Currency: Record Currency;
         GLSetup: Record "General Ledger Setup";
-        NPRPOSPostingProfile: Record "NPR POS Posting Profile";
-        NPRPOSUnit: Record "NPR POS Unit";
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        POSStore: Record "NPR POS Store";
         GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
         TaxLineCount: Integer;
         RemSalesTaxAmt: Decimal;
@@ -1428,9 +1429,9 @@ codeunit 6150615 "NPR POS Post Entries"
 
         TempPOSTaxAmountLine.Reset;
 
-        if POSEntry.FindFirst then
+        if POSEntry.FindFirst() then
             repeat
-                NPRPOSUnit.GetPostingProfile(POSEntry."POS Unit No.", NPRPOSPostingProfile);
+                POSStore.GetProfile(POSEntry."POS Store Code", POSPostingProfile);
                 TaxLineCount := 0;
                 RemSalesTaxAmt := 0;
                 RemSalesTaxSrcAmt := 0;
@@ -1478,7 +1479,7 @@ codeunit 6150615 "NPR POS Post Entries"
                             GenJnlLine."Shortcut Dimension 1 Code" := POSEntry."Shortcut Dimension 1 Code";
                             GenJnlLine."Shortcut Dimension 2 Code" := POSEntry."Shortcut Dimension 2 Code";
                             GenJnlLine."Dimension Set ID" := POSEntry."Dimension Set ID";
-                            GenJnlLine."Source Code" := NPRPOSPostingProfile."Source Code";
+                            GenJnlLine."Source Code" := POSPostingProfile."Source Code";
                             GenJnlLine."Bill-to/Pay-to No." := POSEntry."Customer No.";
                             GenJnlLine."Source Type" := GenJnlLine."Source Type"::Customer;
                             GenJnlLine."Source No." := POSEntry."Customer No.";
@@ -1540,14 +1541,14 @@ codeunit 6150615 "NPR POS Post Entries"
         TempGenJnlLine: Record "Gen. Journal Line" temporary;
         Currency: Record Currency;
         GLSetup: Record "General Ledger Setup";
-        NPRPOSPostingProfile: Record "NPR POS Posting Profile";
-        NPRPOSUnit: Record "NPR POS Unit";
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        POSStore: Record "NPR POS Store";
         GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
         TaxLineCount: Integer;
         RemSalesTaxAmt: Decimal;
         RemSalesTaxSrcAmt: Decimal;
     begin
-        NPRPOSUnit.GetPostingProfile(POSEntry."POS Unit No.", NPRPOSPostingProfile);
+        POSStore.GetProfile(POSEntry."POS Store Code", POSPostingProfile);
         GLSetup.Get;
         TaxLineCount := 0;
         RemSalesTaxAmt := 0;
@@ -1586,7 +1587,7 @@ codeunit 6150615 "NPR POS Post Entries"
                     TempGenJnlLine."Shortcut Dimension 1 Code" := POSEntry."Shortcut Dimension 1 Code";
                     TempGenJnlLine."Shortcut Dimension 2 Code" := POSEntry."Shortcut Dimension 2 Code";
                     TempGenJnlLine."Dimension Set ID" := POSEntry."Dimension Set ID";
-                    TempGenJnlLine."Source Code" := NPRPOSPostingProfile."Source Code";
+                    TempGenJnlLine."Source Code" := POSPostingProfile."Source Code";
                     TempGenJnlLine."Bill-to/Pay-to No." := POSEntry."Customer No.";
                     TempGenJnlLine."Source Type" := TempGenJnlLine."Source Type"::Customer;
                     TempGenJnlLine."Source No." := POSEntry."Customer No.";

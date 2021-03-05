@@ -65,6 +65,12 @@ page 6150616 "NPR POS Unit List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Type field';
                 }
+                field("POS Payment Bin"; Rec."Default POS Payment Bin")
+                {
+                    ApplicationArea = All;
+                    ShowMandatory = true;
+                    ToolTip = 'Specifies the value of the POS Payment Bin field';
+                }
             }
         }
     }

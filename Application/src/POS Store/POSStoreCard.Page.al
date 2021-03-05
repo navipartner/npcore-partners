@@ -103,35 +103,6 @@ page 6150615 "NPR POS Store Card"
                     ToolTip = 'Specifies the value of the Home Page field';
                 }
             }
-            group(Posting)
-            {
-                Caption = 'Posting';
-                field("VAT Customer No."; Rec."VAT Customer No.")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the VAT Customer No. field';
-                }
-                field("Posting Compression"; Rec."Posting Compression")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Posting Compression field';
-                }
-                field("Default POS Posting Setup"; Rec."Default POS Posting Setup")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Default POS Posting Setup field';
-                }
-                field("Tax Area Code"; Rec."Tax Area Code")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Tax Area Code field';
-                }
-                field("Tax Liable"; Rec."Tax Liable")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Tax Liable field';
-                }
-            }
             group(Profiles)
             {
                 Caption = 'Profiles';
@@ -139,6 +110,12 @@ page 6150615 "NPR POS Store Card"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Restaurant Profile field';
+                }
+                field("POS Posting Profile"; Rec."POS Posting Profile")
+                {
+                    ApplicationArea = All;
+                    ShowMandatory = true;
+                    ToolTip = 'Specifies the value of the POS Posting Profile field';
                 }
             }
             group(Reporting)

@@ -81,6 +81,7 @@ table 6014405 "NPR Sale POS"
                 POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
                 xSaleLinePOS: Record "NPR Sale Line POS";
                 POSSaleLine: Codeunit "NPR POS Sale Line";
+                FoundPostingProfile: Boolean;
             begin
                 GetPOSUnit();
                 "POS Store Code" := POSUnit."POS Store Code";
@@ -90,10 +91,10 @@ table 6014405 "NPR Sale POS"
                 "Customer Price Group" := POSPricingProfile."Customer Price Group";
                 "Customer Disc. Group" := POSPricingProfile."Customer Disc. Group";
 
-                POSUnit.GetProfile(POSPostingProfile);
+                FoundPostingProfile := POSStore.GetProfile(POSPostingProfile);
                 "Gen. Bus. Posting Group" := POSPostingProfile."Gen. Bus. Posting Group";
-                "Tax Area Code" := POSStore."Tax Area Code";
-                "Tax Liable" := POSStore."Tax Liable";
+                "Tax Area Code" := POSPostingProfile."Tax Area Code";
+                "Tax Liable" := POSPostingProfile."Tax Liable";
                 "VAT Bus. Posting Group" := POSPostingProfile."VAT Bus. Posting Group";
 
                 if ("Customer Type" = "Customer Type"::Cash) and ("Customer No." <> '') then begin
@@ -107,7 +108,7 @@ table 6014405 "NPR Sale POS"
                     Validate("Country Code", Contact."Country/Region Code");
                 end;
 
-                Modify;
+                Modify();
 
                 if ("Customer No." <> '') and ("Customer Type" = "Customer Type"::Ord) then begin
                     Cust.Get("Customer No.");
@@ -125,16 +126,23 @@ table 6014405 "NPR Sale POS"
                         if Cust."Customer Disc. Group" <> '' then
                             "Customer Disc. Group" := Cust."Customer Disc. Group";
 
-                        if POSStore."Default POS Posting Setup" = POSStore."Default POS Posting Setup"::Customer then begin
+                        if not FoundPostingProfile then begin
                             "Gen. Bus. Posting Group" := Cust."Gen. Bus. Posting Group";
                             "Tax Area Code" := Cust."Tax Area Code";
                             "Tax Liable" := Cust."Tax Liable";
                             "VAT Bus. Posting Group" := Cust."VAT Bus. Posting Group";
                         end else begin
-                            "Gen. Bus. Posting Group" := POSPostingProfile."Gen. Bus. Posting Group";
-                            "Tax Area Code" := POSStore."Tax Area Code";
-                            "Tax Liable" := POSStore."Tax Liable";
-                            "VAT Bus. Posting Group" := POSPostingProfile."VAT Bus. Posting Group";
+                            if POSPostingProfile."Default POS Posting Setup" = POSPostingProfile."Default POS Posting Setup"::Customer then begin
+                                "Gen. Bus. Posting Group" := Cust."Gen. Bus. Posting Group";
+                                "Tax Area Code" := Cust."Tax Area Code";
+                                "Tax Liable" := Cust."Tax Liable";
+                                "VAT Bus. Posting Group" := Cust."VAT Bus. Posting Group";
+                            end else begin
+                                "Gen. Bus. Posting Group" := POSPostingProfile."Gen. Bus. Posting Group";
+                                "Tax Area Code" := POSPostingProfile."Tax Area Code";
+                                "Tax Liable" := POSPostingProfile."Tax Liable";
+                                "VAT Bus. Posting Group" := POSPostingProfile."VAT Bus. Posting Group";
+                            end;
                         end;
                     end;
                 end;
@@ -772,13 +780,17 @@ table 6014405 "NPR Sale POS"
     procedure GetPOSSourceCode() SourceCode: Code[10]
     var
         POSUnit: Record "NPR Pos Unit";
+        POSStore: Record "NPR POS Store";
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin
         SourceCode := '';
 
-        if POSUnit.Get("Register No.") then
-            if POSPostingProfile.Get(POSUnit."POS Posting Profile") then
+        if POSUnit.Get("Register No.") then begin
+            POSStore.Get(POSUnit."POS Store Code");
+            if POSStore.GetProfile(POSPostingProfile) then begin
                 SourceCode := POSPostingProfile."Source Code";
+            end;
+        end;
     end;
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])

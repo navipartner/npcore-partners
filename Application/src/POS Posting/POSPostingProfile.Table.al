@@ -110,6 +110,9 @@ table 6150653 "NPR POS Posting Profile"
             Caption = 'POS Payment Bin';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Payment Bin";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Moved to POS Unit';
+            ObsoleteTag = 'POS Posting Profile -> POS Unit';
         }
         field(150; "Gen. Bus. Posting Group"; Code[20])
         {
@@ -132,6 +135,40 @@ table 6150653 "NPR POS Posting Profile"
             DataClassification = CustomerContent;
             TableRelation = "VAT Business Posting Group";
         }
+        field(152; "Tax Area Code"; Code[20])
+        {
+            Caption = 'Tax Area Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Tax Area";
+        }
+        field(153; "Tax Liable"; Boolean)
+        {
+            Caption = 'Tax Liable';
+            DataClassification = CustomerContent;
+        }        
+        field(154; "Default POS Posting Setup"; Option)
+        {
+            Caption = 'Default POS Posting Setup';
+            DataClassification = CustomerContent;
+            OptionCaption = 'Store,Customer';
+            OptionMembers = Store,Customer;
+        }        
+        field(155; "VAT Customer No."; Code[20])
+        {
+            Caption = 'VAT Customer No.';
+            DataClassification = CustomerContent;
+            Description = 'NPR5.36';
+            TableRelation = Customer;
+        }      
+        field(156; "Posting Compression"; Option)
+        {
+            Caption = 'Posting Compression';
+            DataClassification = CustomerContent;
+            Description = 'NPR5.38';
+            InitValue = "Per POS Entry";
+            OptionCaption = 'Uncompressed,Per POS Entry,Per POS Period';
+            OptionMembers = Uncompressed,"Per POS Entry","Per POS Period";
+        }          
         field(160; "POS Period Register No. Series"; Code[20])
         {
             Caption = 'POS Period Register No. Series';
