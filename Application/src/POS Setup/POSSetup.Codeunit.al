@@ -157,10 +157,8 @@ codeunit 6150708 "NPR POS Setup"
     end;
 
     local procedure FindPOSPostingProfile()
-    var
-        POSUnit: Record "NPR POS Unit";
     begin
-        POSUnit.GetPostingProfile(POSUnitRec."No.", POSPostingProfile);
+        POSStoreRec.GetProfile(POSPostingProfile);
     end;
 
     local procedure FindPOSRestaurantProfile()
@@ -171,7 +169,7 @@ codeunit 6150708 "NPR POS Setup"
             (POSStoreRec."POS Restaurant Profile" <> ''):
                 POSRestaurantProfile.Get(POSStoreRec."POS Restaurant Profile");
             else
-                Clear(POSPostingProfile);
+                Clear(POSRestaurantProfile);
         end;
     end;
 
@@ -188,13 +186,13 @@ codeunit 6150708 "NPR POS Setup"
     begin
         POSUnitRec := POSUnit;
         InitializeSetupPosUnit(POSUnitRec);
-        FindPOSPostingProfile;
     end;
 
     procedure SetPOSStore(POSStore: Record "NPR POS Store")
     begin
         POSStoreRec := POSStore;
         FindPOSRestaurantProfile();
+        FindPOSPostingProfile();
     end;
 
     #endregion "Set Record => functions"

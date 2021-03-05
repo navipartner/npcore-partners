@@ -72,7 +72,6 @@ codeunit 6150725 "NPR POS Action: Payment"
         POSAuditProfile: Record "NPR POS Audit Profile";
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR Sale POS";
-        POSPostingProfile: Record "NPR POS Posting Profile";
     begin
 
         if not Action.IsThisAction(ActionCode()) then
@@ -81,8 +80,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         POSSession.GetSetup(Setup);
         Setup.GetPOSUnit(POSUnit);
 
-        POSUnit.GetProfile(POSPostingProfile);
-        POSPostingProfile.TestField("POS Payment Bin");
+        PosUnit.TestField("Default POS Payment Bin");
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);

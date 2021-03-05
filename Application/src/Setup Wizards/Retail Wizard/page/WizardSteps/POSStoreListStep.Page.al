@@ -186,38 +186,6 @@ page 6014653 "NPR POS Store List Step"
                         end;
                     end;
                 }
-                field("Default POS Posting Setup"; "Default POS Posting Setup")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Default POS Posting Setup field';
-                }
-                field("Tax Area Code"; "Tax Area Code")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Tax Area Code field';
-
-                    trigger OnLookup(var Text: Text): Boolean
-                    var
-                        TaxArea: Record "Tax Area";
-                        TaxAreas: Page "Tax Area List";
-                    begin
-                        TaxAreas.LookupMode := true;
-
-                        if "Tax Area Code" <> '' then
-                            if TaxArea.Get("Tax Area Code") then
-                                TaxAreas.SetRecord(TaxArea);
-
-                        if TaxAreas.RunModal() = Action::LookupOK then begin
-                            TaxAreas.GetRecord(TaxArea);
-                            "Tax Area Code" := TaxArea.Code;
-                        end;
-                    end;
-                }
-                field("Tax Liable"; "Tax Liable")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Tax Liable field';
-                }
             }
         }
     }

@@ -86,9 +86,8 @@ codeunit 6150616 "NPR POS Post Item Entries"
 
     local procedure PostItemJnlLine(var POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Sales Line"): Integer
     var
-        POSUnit: Record "NPR POS Unit";
         POSStore: Record "NPR POS Store";
-        NPRPOSPostingProfile: Record "NPR POS Posting Profile";
+        POSPostingProfile: Record "NPR POS Posting Profile";
         ItemJnlLine: Record "Item Journal Line";
         MoveToLocation: Record Location;
         Item: Record Item;
@@ -103,94 +102,90 @@ codeunit 6150616 "NPR POS Post Item Entries"
 
         POSPeriodRegister.Get(POSEntry."POS Period Register No.");
 
-        POSUnit.GetPostingProfile(POSEntry."POS Unit No.", NPRPOSPostingProfile);
-        with POSSalesLine do begin
-            ItemJnlLine.Init;
-            ItemJnlLine."Posting Date" := POSEntry."Posting Date";
-            ItemJnlLine."Document Date" := POSEntry."Document Date";
-            ItemJnlLine."Document No." := POSPeriodRegister."Document No.";
-            if (ItemJnlLine."Document No." = '') then
-                ItemJnlLine."Document No." := POSEntry."Document No.";
-            ItemJnlLine."Source Posting Group" := POSEntry."Customer Posting Group";
-            ItemJnlLine."Salespers./Purch. Code" := POSEntry."Salesperson Code";
-            ItemJnlLine."Country/Region Code" := POSEntry."Country/Region Code";
-            if "Reason Code" <> '' then
-                ItemJnlLine."Reason Code" := "Reason Code"
-            else
-                ItemJnlLine."Reason Code" := POSEntry."Reason Code";
-            ItemJnlLine."Item No." := "No.";
-            ItemJnlLine.Description := CopyStr(Description, 1, MaxStrLen(ItemJnlLine.Description));
-            ItemJnlLine."Shortcut Dimension 1 Code" := "Shortcut Dimension 1 Code";
-            ItemJnlLine."Shortcut Dimension 2 Code" := "Shortcut Dimension 2 Code";
-            ItemJnlLine."Dimension Set ID" := "Dimension Set ID";
-            if "Location Code" = '' then begin
-                POSStore.Get(POSEntry."POS Store Code");
-                "Location Code" := POSStore."Location Code";
-            end;
-            ItemJnlLine."Location Code" := "Location Code";
-            ItemJnlLine."Bin Code" := "Bin Code";
-            ItemJnlLine."Variant Code" := "Variant Code";
-            ItemJnlLine."Inventory Posting Group" := "Posting Group";
-            ItemJnlLine."Gen. Bus. Posting Group" := "Gen. Bus. Posting Group";
-            ItemJnlLine."Gen. Prod. Posting Group" := "Gen. Prod. Posting Group";
-            ItemJnlLine."Applies-to Entry" := "Appl.-to Item Entry";
-            ItemJnlLine."Transaction Type" := POSEntry."Transaction Type";
-            ItemJnlLine."Transport Method" := POSEntry."Transport Method";
-            ItemJnlLine."Entry/Exit Point" := POSEntry."Exit Point";
-            ItemJnlLine.Area := POSEntry.Area;
-            ItemJnlLine."Transaction Specification" := POSEntry."Transaction Specification";
-            if "Withhold Item" then begin
-                ItemJnlLine."Entry Type" := ItemJnlLine."Entry Type"::Transfer;
-                MoveToLocation.Get("Move to Location");
-                ItemJnlLine."New Location Code" := MoveToLocation.Code;
-                if MoveToLocation."Bin Mandatory" and not MoveToLocation."Directed Put-away and Pick" then
-                    WMSManagement.GetDefaultBin(ItemJnlLine."Item No.", ItemJnlLine."Variant Code", ItemJnlLine."New Location Code", ItemJnlLine."New Bin Code");
-            end else
-                ItemJnlLine."Entry Type" := ItemJnlLine."Entry Type"::Sale;
-            ItemJnlLine."Unit of Measure Code" := "Unit of Measure Code";
-            ItemJnlLine."Qty. per Unit of Measure" := "Qty. per Unit of Measure";
-            ItemJnlLine."Item Reference No." := "Cross-Reference No.";
-            ItemJnlLine."Originally Ordered No." := "Originally Ordered No.";
-            ItemJnlLine."Originally Ordered Var. Code" := "Originally Ordered Var. Code";
-            ItemJnlLine."Out-of-Stock Substitution" := "Out-of-Stock Substitution";
-            ItemJnlLine."Item Category Code" := "Item Category Code";
-            ItemJnlLine.Nonstock := Nonstock;
-            ItemJnlLine."Purchasing Code" := "Product Group Code";
-            ItemJnlLine."Return Reason Code" := "Return Reason Code";
-            ItemJnlLine."Planned Delivery Date" := "Planned Delivery Date";
-            ItemJnlLine."Order Date" := POSEntry."Entry Date";
-            ItemJnlLine."NPR Document Time" := POSEntry."Ending Time";
-            ItemJnlLine."Serial No." := "Serial No.";
-            ItemJnlLine."Lot No." := "Lot No.";
-            ItemJnlLine."Document Line No." := "Line No.";
-            ItemJnlLine.Quantity := Quantity;
-            ItemJnlLine."Quantity (Base)" := "Quantity (Base)";
-            ItemJnlLine."Invoiced Quantity" := Quantity;
-            ItemJnlLine."Invoiced Qty. (Base)" := "Quantity (Base)";
-            ItemJnlLine."Unit Cost" := "Unit Cost (LCY)";
-            ItemJnlLine."Source Currency Code" := POSEntry."Currency Code";
-            ItemJnlLine."Unit Cost (ACY)" := "Unit Cost";
-            ItemJnlLine."Value Entry Type" := ItemJnlLine."Value Entry Type"::"Direct Cost";
-            ItemJnlLine.Amount := ("Amount Excl. VAT");
-            if POSEntry."Prices Including VAT" then
-                ItemJnlLine."Discount Amount" :=
-                  (("Line Discount Amount Incl. VAT") / (1 + "VAT %" / 100))
-            else
-                ItemJnlLine."Discount Amount" :=
-                  ("Line Discount Amount Incl. VAT");
-            ItemJnlLine."Source Type" := ItemJnlLine."Source Type"::Customer;
-            ItemJnlLine."Source No." := "Customer No.";
-            ItemJnlLine."Invoice-to Source No." := "Customer No.";
-            ItemJnlLine."Source Code" := NPRPOSPostingProfile."Source Code";
-            InsertTrackingLine(ItemJnlLine);
-            ItemJnlLine."Serial No." := '';
-            ItemJnlLine."Lot No." := '';
-            ItemJnlLine."NPR Discount Type" := "Discount Type";
-            ItemJnlLine."NPR Discount Code" := "Discount Code";
-            if Item.Get("No.") then begin
-                ItemJnlLine."NPR Item Group No." := Item."NPR Item Group";
-                ItemJnlLine."NPR Vendor No." := Item."Vendor No.";
-            end;
+        POSStore.GetProfile(POSEntry."POS Store Code", POSPostingProfile);
+        ItemJnlLine.Init;
+        ItemJnlLine."Posting Date" := POSEntry."Posting Date";
+        ItemJnlLine."Document Date" := POSEntry."Document Date";
+        ItemJnlLine."Document No." := POSPeriodRegister."Document No.";
+        if (ItemJnlLine."Document No." = '') then
+            ItemJnlLine."Document No." := POSEntry."Document No.";
+        ItemJnlLine."Source Posting Group" := POSEntry."Customer Posting Group";
+        ItemJnlLine."Salespers./Purch. Code" := POSEntry."Salesperson Code";
+        ItemJnlLine."Country/Region Code" := POSEntry."Country/Region Code";
+        if POSSalesLine."Reason Code" <> '' then
+            ItemJnlLine."Reason Code" := POSSalesLine."Reason Code"
+        else
+            ItemJnlLine."Reason Code" := POSEntry."Reason Code";
+        ItemJnlLine."Item No." := POSSalesLine."No.";
+        ItemJnlLine.Description := CopyStr(POSSalesLine.Description, 1, MaxStrLen(ItemJnlLine.Description));
+        ItemJnlLine."Shortcut Dimension 1 Code" := POSSalesLine."Shortcut Dimension 1 Code";
+        ItemJnlLine."Shortcut Dimension 2 Code" := POSSalesLine."Shortcut Dimension 2 Code";
+        ItemJnlLine."Dimension Set ID" := POSSalesLine."Dimension Set ID";
+        if POSSalesLine."Location Code" = '' then begin
+            POSSalesLine."Location Code" := POSStore."Location Code";
+        end;
+        ItemJnlLine."Location Code" := POSSalesLine."Location Code";
+        ItemJnlLine."Bin Code" := POSSalesLine."Bin Code";
+        ItemJnlLine."Variant Code" := POSSalesLine."Variant Code";
+        ItemJnlLine."Inventory Posting Group" := POSSalesLine."Posting Group";
+        ItemJnlLine."Gen. Bus. Posting Group" := POSSalesLine."Gen. Bus. Posting Group";
+        ItemJnlLine."Gen. Prod. Posting Group" := POSSalesLine."Gen. Prod. Posting Group";
+        ItemJnlLine."Applies-to Entry" := POSSalesLine."Appl.-to Item Entry";
+        ItemJnlLine."Transaction Type" := POSEntry."Transaction Type";
+        ItemJnlLine."Transport Method" := POSEntry."Transport Method";
+        ItemJnlLine."Entry/Exit Point" := POSEntry."Exit Point";
+        ItemJnlLine.Area := POSEntry.Area;
+        ItemJnlLine."Transaction Specification" := POSEntry."Transaction Specification";
+        if POSSalesLine."Withhold Item" then begin
+            ItemJnlLine."Entry Type" := ItemJnlLine."Entry Type"::Transfer;
+            MoveToLocation.Get(POSSalesLine."Move to Location");
+            ItemJnlLine."New Location Code" := MoveToLocation.Code;
+            if MoveToLocation."Bin Mandatory" and not MoveToLocation."Directed Put-away and Pick" then
+                WMSManagement.GetDefaultBin(ItemJnlLine."Item No.", ItemJnlLine."Variant Code", ItemJnlLine."New Location Code", ItemJnlLine."New Bin Code");
+        end else
+            ItemJnlLine."Entry Type" := ItemJnlLine."Entry Type"::Sale;
+        ItemJnlLine."Unit of Measure Code" := POSSalesLine."Unit of Measure Code";
+        ItemJnlLine."Qty. per Unit of Measure" := POSSalesLine."Qty. per Unit of Measure";
+        ItemJnlLine."Item Reference No." := POSSalesLine."Cross-Reference No.";
+        ItemJnlLine."Originally Ordered No." := POSSalesLine."Originally Ordered No.";
+        ItemJnlLine."Originally Ordered Var. Code" := POSSalesLine."Originally Ordered Var. Code";
+        ItemJnlLine."Out-of-Stock Substitution" := POSSalesLine."Out-of-Stock Substitution";
+        ItemJnlLine."Item Category Code" := POSSalesLine."Item Category Code";
+        ItemJnlLine.Nonstock := POSSalesLine.Nonstock;
+        ItemJnlLine."Purchasing Code" := POSSalesLine."Product Group Code";
+        ItemJnlLine."Return Reason Code" := POSSalesLine."Return Reason Code";
+        ItemJnlLine."Planned Delivery Date" := POSSalesLine."Planned Delivery Date";
+        ItemJnlLine."Order Date" := POSEntry."Entry Date";
+        ItemJnlLine."NPR Document Time" := POSEntry."Ending Time";
+        ItemJnlLine."Serial No." := POSSalesLine."Serial No.";
+        ItemJnlLine."Lot No." := POSSalesLine."Lot No.";
+        ItemJnlLine."Document Line No." := POSSalesLine."Line No.";
+        ItemJnlLine.Quantity := POSSalesLine.Quantity;
+        ItemJnlLine."Quantity (Base)" := POSSalesLine."Quantity (Base)";
+        ItemJnlLine."Invoiced Quantity" := POSSalesLine.Quantity;
+        ItemJnlLine."Invoiced Qty. (Base)" := POSSalesLine."Quantity (Base)";
+        ItemJnlLine."Unit Cost" := POSSalesLine."Unit Cost (LCY)";
+        ItemJnlLine."Source Currency Code" := POSEntry."Currency Code";
+        ItemJnlLine."Unit Cost (ACY)" := POSSalesLine."Unit Cost";
+        ItemJnlLine."Value Entry Type" := ItemJnlLine."Value Entry Type"::"Direct Cost";
+        ItemJnlLine.Amount := POSSalesLine."Amount Excl. VAT";
+        if POSEntry."Prices Including VAT" then
+            ItemJnlLine."Discount Amount" :=
+              (POSSalesLine."Line Discount Amount Incl. VAT" / (1 + POSSalesLine."VAT %" / 100))
+        else
+            ItemJnlLine."Discount Amount" := POSSalesLine."Line Discount Amount Incl. VAT";
+        ItemJnlLine."Source Type" := ItemJnlLine."Source Type"::Customer;
+        ItemJnlLine."Source No." := POSSalesLine."Customer No.";
+        ItemJnlLine."Invoice-to Source No." := POSSalesLine."Customer No.";
+        ItemJnlLine."Source Code" := POSPostingProfile."Source Code";
+        InsertTrackingLine(ItemJnlLine);
+        ItemJnlLine."Serial No." := '';
+        ItemJnlLine."Lot No." := '';
+        ItemJnlLine."NPR Discount Type" := POSSalesLine."Discount Type";
+        ItemJnlLine."NPR Discount Code" := POSSalesLine."Discount Code";
+        if Item.Get(POSSalesLine."No.") then begin
+            ItemJnlLine."NPR Item Group No." := Item."NPR Item Group";
+            ItemJnlLine."NPR Vendor No." := Item."Vendor No.";
         end;
 
         OnAfterCreateItemJournalLine(POSEntry, POSSalesLine, ItemJnlLine);

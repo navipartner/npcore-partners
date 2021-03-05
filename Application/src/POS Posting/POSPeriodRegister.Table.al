@@ -22,10 +22,12 @@ table 6150620 "NPR POS Period Register"
             trigger OnValidate()
             var
                 POSStore: Record "NPR POS Store";
+                POSPostingProfile: Record "NPR POS Posting Profile";
             begin
                 if "POS Store Code" <> '' then begin
                     POSStore.Get("POS Store Code");
-                    Validate("Posting Compression", POSStore."Posting Compression");
+                    POSStore.GetProfile(POSPostingProfile);
+                    Validate("Posting Compression", POSPostingProfile."Posting Compression");
                 end;
             end;
         }
@@ -139,6 +141,7 @@ table 6150620 "NPR POS Period Register"
     local procedure GenerateDocumentNo()
     var
         POSUnit: Record "NPR POS Unit";
+        POSStore: Record "NPR POS Store";
         POSPostingProfile: Record "NPR POS Posting Profile";
         NoSeriesMgt: Codeunit NoSeriesManagement;
     begin
@@ -146,9 +149,10 @@ table 6150620 "NPR POS Period Register"
             exit;
         TestField("POS Unit No.");
         POSUnit.Get("POS Unit No.");
-        POSUnit.GetProfile(POSPostingProfile);
+        POSStore.get(POSUnit."POS Store Code");
+        POSStore.GetProfile(POSPostingProfile);
         if POSPostingProfile."POS Period Register No. Series" <> '' then
-            NoSeriesMgt.InitSeries(POSPostingProfile."POS Period Register No. Series", xRec."No. Series", WorkDate, "Document No.", "No. Series");
+            NoSeriesMgt.InitSeries(POSPostingProfile."POS Period Register No. Series", xRec."No. Series", WorkDate(), "Document No.", "No. Series");
     end;
 
     local procedure UpdateTimeStamps()

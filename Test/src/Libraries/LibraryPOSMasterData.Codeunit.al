@@ -9,6 +9,7 @@ codeunit 85002 "NPR Library - POS Master Data"
         POSStore: Record "NPR POS Store";
         POSPaymentMethod: Record "NPR POS Payment Method";
         POSAuditProfile: Record "NPR POS Audit Profile";
+        POSPaymentBin: record "NPR POS Payment Bin";
         LibraryUtility: Codeunit "Library - Utility";
     begin
         POSUnit.Init();
@@ -18,21 +19,24 @@ codeunit 85002 "NPR Library - POS Master Data"
             LibraryUtility.GenerateRandomCode(POSUnit.FieldNo("No."), DATABASE::"NPR POS Unit"), 1,
             LibraryUtility.GetFieldLength(DATABASE::"NPR POS Unit", POSUnit.FieldNo("No."))));
         if POSStoreCode = '' then
-            CreatePOSStore(POSStore)
+            CreatePOSStore(POSStore, POSProfileCode)
         else
             POSStore.Get(POSStoreCode);
         POSUnit."POS Store Code" := POSStore.Code;
         POSUnit.Validate(Status, POSUnit.Status::CLOSED);
         CreatePOSAuditProfile(POSAuditProfile);
         POSUnit."POS Audit Profile" := POSAuditProfile.Code;
-        POSUnit."POS Posting Profile" := POSProfileCode;
         POSUnit.Insert(true);
+
+        CreatePOSBin(POSPaymentBin);
+        POSUnit."Default POS Payment Bin" := POSPaymentBin."No.";
+        POSUnit.Modify();
 
         CreatePeriodRegister(POSUnit);
         CreatePOSPaymentMethod(POSPaymentMethod, POSPaymentMethod."Processing Type"::CASH, '', false);
     end;
 
-    procedure CreatePOSStore(var POSStore: Record "NPR POS Store")
+    procedure CreatePOSStore(var POSStore: Record "NPR POS Store"; POSProfileCode: Code[20])
     var
         LibraryUtility: Codeunit "Library - Utility";
         Location: Record Location;
@@ -47,6 +51,7 @@ codeunit 85002 "NPR Library - POS Master Data"
 
         LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location);
         POSStore.Validate("Location Code", Location.Code);
+        POSStore."POS Posting Profile" := POSProfileCode;
 
         POSStore.Insert(true);
 
@@ -277,7 +282,7 @@ codeunit 85002 "NPR Library - POS Master Data"
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin
-        POSUnit.GetProfile(POSPostingProfile);
+        POSStore.GetProfile(POSPostingProfile);
         CreateVATPostingSetupForSaleItem(POSPostingProfile."VAT Bus. Posting Group", Item."VAT Prod. Posting Group");
         CreateGeneralPostingSetupForSaleItem(POSPostingProfile."Gen. Bus. Posting Group", Item."Gen. Prod. Posting Group", POSStore."Location Code", Item."Inventory Posting Group");
     end;
@@ -319,7 +324,6 @@ codeunit 85002 "NPR Library - POS Master Data"
     procedure CreateDefaultPostingSetup(var POSPostingProfile: Record "NPR POS Posting Profile")
     begin
         CreateDefaultPostingProfile(POSPostingProfile);
-
         CreateDefaultRetailSetup();
     end;
 
@@ -332,7 +336,6 @@ codeunit 85002 "NPR Library - POS Master Data"
         NoSeriesLine: Record "No. Series Line";
         GeneralPostingSetup: Record "General Posting Setup";
         VATPostingSetup: Record "VAT Posting Setup";
-        POSPaymentBin: record "NPR POS Payment Bin";
     begin
         POSPostingProfile.Init;
         POSPostingProfile.Code := LibraryUtility.GenerateRandomCode20(POSPostingProfile.FieldNo(Code), Database::"NPR POS Posting Profile");
@@ -355,9 +358,6 @@ codeunit 85002 "NPR Library - POS Master Data"
         POSPostingProfile.Validate("Gen. Bus. Posting Group", GeneralPostingSetup."Gen. Bus. Posting Group");
         LibraryERM.CreateVATPostingSetupWithAccounts(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT", 25);
         POSPostingProfile.Validate("VAT Bus. Posting Group", VATPostingSetup."VAT Bus. Posting Group");
-
-        CreatePOSBin(POSPaymentBin);
-        POSPostingProfile."POS Payment Bin" := POSPaymentBin."No.";
 
         POSPostingProfile.Modify;
     end;
@@ -408,7 +408,7 @@ codeunit 85002 "NPR Library - POS Master Data"
         if POSUnit.FindSet then
             repeat
                 if POSStore.Get(POSUnit."POS Store Code") then begin
-                    if POSPostingProfile.Get(POSUnit."POS Posting Profile") then begin
+                    if POSPostingProfile.Get(POSStore."POS Posting Profile") then begin
                         POSPostingSetup."POS Store Code" := POSStore.Code;
                         POSPostingSetup."Difference Account Type" := POSPostingSetup."Difference Account Type"::"G/L Account";
                         POSPostingSetup."Difference Acc. No." := POSPostingProfile."POS Posting Diff. Account";
@@ -442,7 +442,7 @@ codeunit 85002 "NPR Library - POS Master Data"
         LibraryRandom: Codeunit "Library - Random";
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin
-        POSUnit.GetProfile(POSPostingProfile);
+        POSStore.GetProfile(POSPostingProfile);
         NPRLibraryInventory.CreateItem(Item);
         Item.Validate("VAT Bus. Posting Gr. (Price)", POSPostingProfile."VAT Bus. Posting Group");
 

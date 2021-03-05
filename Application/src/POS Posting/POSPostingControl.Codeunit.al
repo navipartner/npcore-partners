@@ -11,12 +11,12 @@ codeunit 6150637 "NPR POS Posting Control"
     var
         POSEntry: Record "NPR POS Entry";
         POSPostingProfile: Record "NPR POS Posting Profile";
-        POSUnit: Record "NPR POS Unit";
+        POSStore: Record "NPR POS Store";
         ItemPost: Boolean;
         POSPost: Boolean;
         SessionNo: Integer;
     begin
-        POSUnit.GetPostingProfile(POSPeriodRegister."POS Unit No.", POSPostingProfile);
+        POSStore.GetProfile(POSPeriodRegister."POS Store Code", POSPostingProfile);
         case POSPostingProfile."Automatic Item Posting" of
             POSPostingProfile."Automatic Item Posting"::No,
           POSPostingProfile."Automatic Item Posting"::AfterSale:
@@ -60,12 +60,12 @@ codeunit 6150637 "NPR POS Posting Control"
     procedure AutomaticPostEntry(var POSEntry: Record "NPR POS Entry")
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
-        POSUnit: Record "NPR POS Unit";
+        POSStore: Record "NPR POS Store";
         ItemPost: Boolean;
         POSPost: Boolean;
         SessionNo: Integer;
     begin
-        POSUnit.GetPostingProfile(POSEntry."POS Unit No.", POSPostingProfile);
+        POSStore.GetProfile(POSEntry."POS Store Code", POSPostingProfile);
         ItemPost := (POSPostingProfile."Automatic Item Posting" = POSPostingProfile."Automatic Item Posting"::AfterSale);
         POSPost := (POSPostingProfile."Automatic POS Posting" = POSPostingProfile."Automatic POS Posting"::AfterSale);
         if POSPostingProfile."Automatic Posting Method" = POSPostingProfile."Automatic Posting Method"::Direct then begin
@@ -182,25 +182,22 @@ codeunit 6150637 "NPR POS Posting Control"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150614, 'OnAfterInsertPOSEntry', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSEntry', '', false, false)]
     local procedure CheckDimOnAfterInsertPOSEntry(var SalePOS: Record "NPR Sale POS"; var POSEntry: Record "NPR POS Entry")
     begin
-        with POSEntry do
-            CheckGlobalDimAndDimSetConsistency(RecordId, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID", 1);
+        CheckGlobalDimAndDimSetConsistency(POSEntry.RecordId(), POSEntry."Shortcut Dimension 1 Code", POSEntry."Shortcut Dimension 2 Code", POSEntry."Dimension Set ID", 1);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150614, 'OnAfterInsertPOSPaymentLine', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSPaymentLine', '', false, false)]
     local procedure CheckDimOnAfterInsertPOSPmtLine(SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS"; POSEntry: Record "NPR POS Entry"; POSPaymentLine: Record "NPR POS Payment Line")
     begin
-        with POSPaymentLine do
-            CheckGlobalDimAndDimSetConsistency(RecordId, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID", 1);
+        CheckGlobalDimAndDimSetConsistency(POSPaymentLine.RecordId(), POSPaymentLine."Shortcut Dimension 1 Code", POSPaymentLine."Shortcut Dimension 2 Code", POSPaymentLine."Dimension Set ID", 1);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150614, 'OnAfterInsertPOSSalesLine', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSSalesLine', '', false, false)]
     local procedure CheckDimOnAfterInsertPOSSalesLine(SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS"; POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Sales Line")
     begin
-        with POSSalesLine do
-            CheckGlobalDimAndDimSetConsistency(RecordId, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID", 1);
+        CheckGlobalDimAndDimSetConsistency(POSSalesLine.RecordId(), POSSalesLine."Shortcut Dimension 1 Code", POSSalesLine."Shortcut Dimension 2 Code", POSSalesLine."Dimension Set ID", 1);
     end;
 
     local procedure GetGLSetup()
@@ -215,7 +212,7 @@ codeunit 6150637 "NPR POS Posting Control"
     var
         RecordLink: Record "Record Link";
     begin
-        RecordLink.Init;
+        RecordLink.Init();
         RecordLink."Link ID" := 0;
         RecordLink."Record ID" := RecID;
         RecordLink.Type := RecordLink.Type::Note;
@@ -227,7 +224,7 @@ codeunit 6150637 "NPR POS Posting Control"
         RecordLink.Notify := SentToUserID <> '';
         SetNoteURL(RecordLink, RecID);
         SetNoteText(RecordLink, HeaderTxt, MessageTxt);
-        RecordLink.Insert;
+        RecordLink.Insert();
     end;
 
     local procedure SetNoteURL(var RecordLink: Record "Record Link"; RecID: RecordID)

@@ -2838,6 +2838,7 @@ codeunit 85004 "NPR EFT Tests"
     procedure InitializeData()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
+        ItemRef: Record "Item Reference";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryEFT: Codeunit "NPR Library - EFT";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -2852,7 +2853,7 @@ codeunit 85004 "NPR EFT Tests"
         if not _Initialized then begin
             NPRLibraryPOSMasterData.CreatePOSSetup(_POSSetup);
             NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
-            NPRLibraryPOSMasterData.CreatePOSStore(_POSStore);
+            NPRLibraryPOSMasterData.CreatePOSStore(_POSStore, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreatePOSUnit(_POSUnit, _POSStore.Code, POSPostingProfile.Code);
             NPRLibraryEFT.CreateEFTPaymentTypePOS(_POSPaymentMethod, _POSUnit, _POSStore);
             NPRLibraryEFT.CreateMockEFTSetup(_EFTSetup, _POSUnit."No.", _POSPaymentMethod.Code);
@@ -2863,7 +2864,14 @@ codeunit 85004 "NPR EFT Tests"
         EFTTransactionRequest.SetRange("Register No.", _POSUnit."No.");
         EFTTransactionRequest.SetRange("Integration Type", EFTTestMockIntegration.IntegrationType());
         EFTTransactionRequest.DeleteAll;
-        Commit;
+
+        //Delete all item reference from template data, so all tests are independent instead of triggering lookup prompts for previous errors when not intended.
+        ItemRef.SetCurrentKey("Reference No.");
+        ItemRef.SetFilter("Reference No.", '<>%1', '');
+        if not ItemRef.IsEmpty() then
+            ItemRef.DeleteAll();
+
+        Commit();
     end;
 
     procedure SetSessionActionStateBeforePayment()

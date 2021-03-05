@@ -22,6 +22,11 @@ page 6150639 "NPR POS Post. Profile Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
+                field("Default POS Posting Setup"; Rec."Default POS Posting Setup")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Default POS Posting Setup field';
+                }                
                 field("Automatic Item Posting"; Rec."Automatic Item Posting")
                 {
                     ApplicationArea = All;
@@ -52,17 +57,31 @@ page 6150639 "NPR POS Post. Profile Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the VAT Bus. Posting Group field';
                 }
+                field("Tax Area Code"; Rec."Tax Area Code")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Tax Area Code field';
+                }
+                field("Tax Liable"; Rec."Tax Liable")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Tax Liable field';
+                }                
                 field("POS Period Register No. Series"; Rec."POS Period Register No. Series")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Period Register No. Series field';
                 }
-                field("POS Payment Bin"; Rec."POS Payment Bin")
+                field("VAT Customer No."; Rec."VAT Customer No.")
                 {
                     ApplicationArea = All;
-                    ShowMandatory = true;
-                    ToolTip = 'Specifies the value of the POS Payment Bin field';
+                    ToolTip = 'Specifies the value of the VAT Customer No. field';
                 }
+                field("Posting Compression"; Rec."Posting Compression")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Posting Compression field';
+                }                
                 group("Posting Difference")
                 {
                     Caption = 'Posting Difference';

@@ -30,9 +30,6 @@ table 6150615 "NPR POS Unit"
             Caption = 'Default POS Payment Bin';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Payment Bin";
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Moved to POS Unit Posting Profile';
-            ObsoleteTag = 'POS Unit -> POS Posting Profile';
         }
         field(20; Status; Option)
         {
@@ -172,6 +169,10 @@ table 6150615 "NPR POS Unit"
             Description = 'NPR5.52';
             TableRelation = "NPR POS Posting Profile";
             NotBlank = true;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Moved to POS Store';
+            ObsoleteTag = 'POS Unit -> POS Store';
+
         }
         field(540; "POS Unit Receipt Text Profile"; Code[20])
         {
@@ -278,15 +279,6 @@ table 6150615 "NPR POS Unit"
         Modify;
     end;
 
-    procedure GetPostingProfile(POSUnitNo: Code[10]; var POSPostingProfile: Record "NPR POS Posting Profile")
-    var
-        POSUnit: Record "NPR POS Unit";
-    begin
-        POSUnit.Get(POSUnitNo);
-        POSUnit.TestField("POS Posting Profile");
-        POSPostingProfile.Get(POSUnit."POS Posting Profile");
-    end;
-
     procedure GetProfile(var POSPricingProfile: Record "NPR POS Pricing Profile"): Boolean
     begin
         Clear(POSPricingProfile);
@@ -301,14 +293,6 @@ table 6150615 "NPR POS Unit"
         if "MPOS Profile" = '' then
             exit;
         exit(MPOSProfile.Get("MPOS Profile"));
-    end;
-
-    procedure GetProfile(var POSPostingProfile: Record "NPR POS Posting Profile"): Boolean
-    begin
-        Clear(POSPostingProfile);
-        if "POS Posting Profile" = '' then
-            exit;
-        exit(POSPostingProfile.Get("POS Posting Profile"));
     end;
 
     procedure GetProfile(var POSViewProfile: Record "NPR POS View Profile"): Boolean

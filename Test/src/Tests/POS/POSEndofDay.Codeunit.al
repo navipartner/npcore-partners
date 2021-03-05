@@ -843,6 +843,7 @@ codeunit 85020 "NPR POS End of Day"
         POSPostingProfile: Record "NPR POS Posting Profile";
         POSEndOfDayProfile: Record "NPR POS End of Day Profile";
         POSPaymentBin: Record "NPR POS Payment Bin";
+        ItemRef: Record "Item Reference";
         NPRLibraryEFT: Codeunit "NPR Library - EFT";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
     begin
@@ -867,7 +868,7 @@ codeunit 85020 "NPR POS End of Day"
 
             NPRLibraryPOSMasterData.CreatePOSSetup(_POSSetup);
             NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
-            NPRLibraryPOSMasterData.CreatePOSStore(_POSStore);
+            NPRLibraryPOSMasterData.CreatePOSStore(_POSStore, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreatePOSUnit(_POSUnit, _POSStore.Code, POSPostingProfile.Code);
 
             POSEndOfDayProfile.Code := 'EOD-TEST';
@@ -879,6 +880,12 @@ codeunit 85020 "NPR POS End of Day"
             _Initialized := true;
 
         end;
+
+        //Delete all item reference from template data, so all tests are independent instead of triggering lookup prompts for previous errors when not intended.
+        ItemRef.SetCurrentKey("Reference No.");
+        ItemRef.SetFilter("Reference No.", '<>%1', '');
+        if not ItemRef.IsEmpty() then
+            ItemRef.DeleteAll();
 
         Commit;
     end;

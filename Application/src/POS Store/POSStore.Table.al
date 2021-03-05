@@ -121,6 +121,9 @@ table 6150614 "NPR POS Store"
             InitValue = "Per POS Entry";
             OptionCaption = 'Uncompressed,Per POS Entry,Per POS Period';
             OptionMembers = Uncompressed,"Per POS Entry","Per POS Period";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Moved to POS Posting Profile';
+            ObsoleteTag = 'POS Store -> POS Posting Profile';
         }
         field(25; "Location Code"; Code[10])
         {
@@ -189,11 +192,17 @@ table 6150614 "NPR POS Store"
             Caption = 'Tax Area Code';
             DataClassification = CustomerContent;
             TableRelation = "Tax Area";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Moved to POS Posting Profile';
+            ObsoleteTag = 'POS Store -> POS Posting Profile';
         }
         field(52; "Tax Liable"; Boolean)
         {
             Caption = 'Tax Liable';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Moved to POS Posting Profile';
+            ObsoleteTag = 'POS Store -> POS Posting Profile';
         }
         field(53; "VAT Bus. Posting Group"; Code[20])
         {
@@ -210,6 +219,9 @@ table 6150614 "NPR POS Store"
             DataClassification = CustomerContent;
             OptionCaption = 'Store,Customer';
             OptionMembers = Store,Customer;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Moved to POS Posting Profile';
+            ObsoleteTag = 'POS Store -> POS Posting Profile';
         }
         field(60; "Item Posting"; Option)
         {
@@ -225,8 +237,8 @@ table 6150614 "NPR POS Store"
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
             ObsoleteState = Removed;
-            ObsoleteReason = 'Moved to dedicated POS Unit Profile';
-            ObsoleteTag = 'NPR POS Store -> NPR POS Unit -> NPR POS Posting Profile';
+            ObsoleteReason = 'Moved to dedicated POS Posting Profile';
+            ObsoleteTag = 'NPR POS Store -> NPR POS Posting Profile';
         }
         field(70; "POS Entry Doc. No. Series"; Code[20])
         {
@@ -241,6 +253,13 @@ table 6150614 "NPR POS Store"
             DataClassification = CustomerContent;
             Description = 'NPR5.55';
             TableRelation = "NPR POS NPRE Rest. Profile";
+        }
+        field(580; "POS Posting Profile"; Code[20])
+        {
+            Caption = 'POS Posting Profile';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Posting Profile";
+            NotBlank = true;
         }
         field(800; "Geolocation Latitude"; Decimal)
         {
@@ -299,6 +318,9 @@ table 6150614 "NPR POS Store"
             DataClassification = CustomerContent;
             Description = 'NPR5.36';
             TableRelation = Customer;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Moved to POS Posting Profile';
+            ObsoleteTag = 'POS Store -> POS Posting Profile';
         }
     }
 
@@ -349,6 +371,21 @@ table 6150614 "NPR POS Store"
         end;
 
         OnAfterValidateShortcutDimCode(Rec, xRec, FieldNumber, ShortcutDimCode);
+    end;
+
+    procedure GetProfile(POSStoreNo: Code[10]; var POSPostingProfile: Record "NPR POS Posting Profile")
+    begin
+        Get(POSStoreNo);
+        TestField("POS Posting Profile");
+        POSPostingProfile.Get("POS Posting Profile");
+    end;
+
+    procedure GetProfile(var POSPostingProfile: Record "NPR POS Posting Profile"): Boolean
+    begin
+        Clear(POSPostingProfile);
+        if "POS Posting Profile" = '' then
+            exit;
+        exit(POSPostingProfile.Get("POS Posting Profile"));
     end;
 
     [IntegrationEvent(false, false)]

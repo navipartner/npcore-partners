@@ -253,29 +253,6 @@ page 6014683 "NPR POS Unit List Step"
                         end;
                     end;
                 }
-                field("POS Posting Profile"; "POS Posting Profile")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the POS Posting Profile field';
-
-                    trigger OnLookup(var Text: Text): Boolean
-                    var
-                        TempAllPOSPostingProfileList: Page "NPR POS Posting Prof. Select";
-                    begin
-                        TempAllPOSPostingProfileList.LookupMode := true;
-                        TempAllPOSPostingProfileList.Editable := false;
-                        TempAllPOSPostingProfileList.SetRec(TempAllPOSPostingProfile);
-
-                        if "POS Posting Profile" <> '' then
-                            if TempAllPOSPostingProfile.Get("POS Posting Profile") then
-                                TempAllPOSPostingProfileList.SetRecord(TempAllPOSPostingProfile);
-
-                        if TempAllPOSPostingProfileList.RunModal() = Action::LookupOK then begin
-                            TempAllPOSPostingProfileList.GetRecord(TempAllPOSPostingProfile);
-                            "POS Posting Profile" := TempAllPOSPostingProfile.Code;
-                        end;
-                    end;
-                }
                 field("Ean Box Sales Setup"; "Ean Box Sales Setup")
                 {
                     ApplicationArea = All;
