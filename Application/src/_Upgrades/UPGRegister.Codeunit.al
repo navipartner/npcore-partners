@@ -70,11 +70,18 @@ codeunit 6150925 "NPR UPG Register"
                 end;
                 POSPostingProfile."POS Posting Diff. Account" := Register."Difference Account";
                 POSPostingProfile."Posting Diff. Account (Neg.)" := Register."Difference Account - Neg.";
-                POSPostingProfile."POS Payment Bin" := POSUnit."Default POS Payment Bin";
                 if POSStore.Get(POSUnit."POS Store Code") then begin
                     POSPostingProfile."Gen. Bus. Posting Group" := POSStore."Gen. Bus. Posting Group";
                     POSPostingProfile."VAT Bus. Posting Group" := POSStore."VAT Bus. Posting Group";
                     POSPostingProfile."POS Period Register No. Series" := POSStore."POS Period Register No. Series";
+                    POSPostingProfile."Tax Area Code" := POSStore."Tax Area Code";
+                    POSPostingProfile."Tax Liable" := POSStore."Tax Liable";
+                    POSPostingProfile."Default POS Posting Setup" := POSStore."Default POS Posting Setup";
+                    POSPostingProfile."VAT Customer No." := POSStore."VAT Customer No.";
+                    POSPostingProfile."Posting Compression" := POSStore."Posting Compression";
+
+                    POSStore."POS Posting Profile" := POSPostingProfile.Code;
+                    POSStore.Modify();
                 end;
                 POSPostingProfile.Modify();
             end;

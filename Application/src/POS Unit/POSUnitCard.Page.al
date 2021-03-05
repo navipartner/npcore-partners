@@ -43,6 +43,12 @@ page 6150617 "NPR POS Unit Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Type field';
                 }
+                field("POS Payment Bin"; Rec."Default POS Payment Bin")
+                {
+                    ApplicationArea = All;
+                    ShowMandatory = true;
+                    ToolTip = 'Specifies the value of the POS Payment Bin field';
+                }
                 field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
@@ -94,12 +100,6 @@ page 6150617 "NPR POS Unit Card"
                     ApplicationArea = All;
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the POS End of Day Profile field';
-                }
-                field("POS Posting Profile"; Rec."POS Posting Profile")
-                {
-                    ApplicationArea = All;
-                    ShowMandatory = true;
-                    ToolTip = 'Specifies the value of the POS Posting Profile field';
                 }
                 field("POS Unit Receipt Text Profile"; Rec."POS Unit Receipt Text Profile")
                 {

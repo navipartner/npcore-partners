@@ -1,14 +1,11 @@
 codeunit 6150627 "NPR POS Workshift Checkpoint"
 {
     var
-        t030: Label 'Balancing';
-        t031: Label 'Sales occur on this register after this balancing. Cancel and save countings.';
         MissingBin: Label 'No payment bin relation found for POS Unit %1.';
 
         POS_UNIT_SLAVE_STATUS: Label 'This POS manages other units for End-of-Day. The other units need to be in status closed, which is done with "Close Workshift" action. POS unit %1 has status %2.';
         EndOfDayUIOption: Option SUMMARY,BALANCING,"NONE";
         EodWorkshiftMode: Option XREPORT,ZREPORT,CLOSEWORKSHIFT;
-        EntrySourceMethodOption: Option NA,AUDITROLL,BINENTRY;
         POSTING_ERROR: Label 'While posting end-of-day, the following error occured:\\%1';
 
     procedure EndWorkshift(Mode: Option; UnitNo: Code[10]; DimensionSetId: Integer) PosEntryNo: Integer
@@ -61,17 +58,15 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         UnittoBinRelation: Record "NPR POS Unit to Bin Relation";
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         POSUnit: Record "NPR POS Unit";
-        POSPostingProfile: Record "NPR POS Posting Profile";
         EntrySourceMethod: Option;
     begin
 
         POSWorkshiftCheckpoint.Get(CheckPointEntryNo);
 
         POSUnit.Get(POSWorkshiftCheckpoint."POS Unit No.");
-        POSUnit.GetProfile(POSPostingProfile);
 
-        if (POSPostingProfile."POS Payment Bin" <> '') then
-            PaymentBinCheckpoint.CreatePosEntryBinCheckpoint(POSUnit."No.", POSPostingProfile."POS Payment Bin", CheckPointEntryNo);
+        if (POSUnit."Default POS Payment Bin" <> '') then
+            PaymentBinCheckpoint.CreatePosEntryBinCheckpoint(POSUnit."No.", POSUnit."Default POS Payment Bin", CheckPointEntryNo);
 
         UnittoBinRelation.SetFilter("POS Unit No.", '=%1', POSWorkshiftCheckpoint."POS Unit No.");
         if (UnittoBinRelation.FindSet()) then begin
@@ -80,7 +75,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
 
             until (UnittoBinRelation.Next() = 0);
         end else begin
-            if (POSPostingProfile."POS Payment Bin" = '') then
+            if POSUnit."Default POS Payment Bin" = '' then
                 Error(MissingBin, POSWorkshiftCheckpoint."POS Unit No.");
 
         end;

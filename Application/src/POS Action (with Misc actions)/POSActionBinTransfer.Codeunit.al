@@ -203,14 +203,11 @@ codeunit 6150851 "NPR POS Action: Bin Transfer"
     var
         POSSetup: Codeunit "NPR POS Setup";
         POSUnit: Record "NPR POS Unit";
-        POSPostingProfile: Record "NPR POS Posting Profile";
     begin
-
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
-        POSUnit.GetProfile(POSPostingProfile);
-        POSPostingProfile.TestField("POS Payment Bin");
-        exit(POSPostingProfile."POS Payment Bin");
+        POSUnit.TestField("Default POS Payment Bin");
+        exit(POSUnit."Default POS Payment Bin");
     end;
 
     local procedure GetUnitNo(POSSession: Codeunit "NPR POS Session"): Code[10]

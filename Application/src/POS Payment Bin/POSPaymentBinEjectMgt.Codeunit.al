@@ -129,7 +129,6 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
     var
         POSPaymentBin: Record "NPR POS Payment Bin";
         POSUnit: Record "NPR POS Unit";
-        POSPostingProfile: Record "NPR POS Posting Profile";
         OpenDrawer: Boolean;
     begin
         OpenDrawer := Force;
@@ -140,8 +139,7 @@ codeunit 6150641 "NPR POS Payment Bin Eject Mgt."
                 exit;
         end;
 
-        POSUnit.GetProfile(POSPostingProfile);
-        if ((not POSUnit.Get(SalePOS."Register No.")) or (not POSPaymentBin.Get(POSPostingProfile."POS Payment Bin"))) then
+        if ((not POSUnit.Get(SalePOS."Register No.")) or (not POSPaymentBin.Get(POSUnit."Default POS Payment Bin"))) then
             POSPaymentBin."Eject Method" := 'PRINTER';
 
         EjectDrawer(POSPaymentBin, SalePOS);

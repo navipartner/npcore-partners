@@ -1,8 +1,6 @@
 codeunit 6150628 "NPR POS Payment Bin Checkpoint"
 {
-
     var
-        t001: Label 'Opening receipt is missing!';
         UNCONFIRMED_CP: Label 'Not Counted.';
         ACCOUNT_DIFFERENCE: Label 'WARNING!\\As a result of the close workshift, there needs to be a transfer of %1 to the amount of %5 from bin %2 to bin %3. These bins are configured with different G/L Accounts, and the posting needs to be handled.\\You can either:\\A) configure the bins to use the same account\\B) perform a BIN TRANSFER prior to close workshift on unit %4\\C) manually post the difference in a journal.\\If you continue, you will have to manually post the difference in a journal. Do you want to continue?';
 
@@ -186,7 +184,6 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
         FromPOSUnit: Record "NPR POS Unit";
         ToPOSPostingSetup: Record "NPR POS Posting Setup";
         FromPOSPostingSetup: Record "NPR POS Posting Setup";
-        POSPostingProfile: Record "NPR POS Posting Profile";
         POSPostEntries: Codeunit "NPR POS Post Entries";
         TargetPaymentbin: Code[10];
     begin
@@ -213,8 +210,7 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
 
                         TargetPaymentbin := FromPOSPostingSetup."Close to POS Bin No.";
                         if (TargetPaymentbin = '') then begin
-                            ToPOSUnit.GetProfile(POSPostingProfile);
-                            TargetPaymentbin := POSPostingProfile."POS Payment Bin";
+                            TargetPaymentbin := ToPOSUnit."Default POS Payment Bin";
                         end;
 
                         POSPostEntries.GetPostingSetup(ToPOSUnit."POS Store Code", POSBinEntry."Payment Method Code", TargetPaymentbin, ToPOSPostingSetup);

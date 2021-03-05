@@ -45,21 +45,6 @@ page 6059781 "NPR POS Stores Select"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
-                field("Default POS Posting Setup"; Rec."Default POS Posting Setup")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Default POS Posting Setup field';
-                }
-                field("Tax Area Code"; Rec."Tax Area Code")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Tax Area Code field';
-                }
-                field("Tax Liable"; Rec."Tax Liable")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Tax Liable field';
-                }
             }
         }
     }
