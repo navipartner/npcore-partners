@@ -920,8 +920,14 @@ page 6014519 "NPR Sales Order Pick Subform"
                     ToolTip = 'Executes the Select Item Substitution action';
 
                     trigger OnAction()
+                    var
+                        ItemSubstitutionMgt: Codeunit "Item Subst.";
                     begin
-                        ShowItemSub();
+                        Clear(SalesHeader);
+                        Rec.TestStatusOpen();
+                        ItemSubstitutionMgt.ItemSubstGet(Rec);
+                        if TransferExtendedText.SalesCheckIfAnyExtText(Rec, false) then
+                            TransferExtendedText.InsertSalesExtText(Rec);
                     end;
                 }
                 action(Dimensions)

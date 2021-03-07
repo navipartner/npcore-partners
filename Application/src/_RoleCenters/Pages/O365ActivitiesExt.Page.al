@@ -32,7 +32,7 @@ page 6151333 "NPR O365 Activities Ext"
             {
                 CuegroupLayout = wide;
                 ShowCaption = false;
-                field("Sales This Month Last Year"; "NPR Sales CM Last Year")
+                field("Sales This Month Last Year"; Rec."NPR Sales CM Last Year")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the sum of sales in the current month of last year.';
@@ -110,8 +110,6 @@ page 6151333 "NPR O365 Activities Ext"
             NewRecord := true;
         end;
 
-        Rec.SETFILTER("User ID Filter", USERID);
-
         ShowAwaitingIncomingDoc := OCRServiceMgt.OcrServiceIsEnable;
         ShowIntercompanyActivities := false;
         ShowDocumentsPendingDocExchService := false;
@@ -124,7 +122,6 @@ page 6151333 "NPR O365 Activities Ext"
         ConfPersonalizationMgt.RaiseOnOpenRoleCenterEvent;
 
         CODEUNIT.Run(CODEUNIT::"NPR Activities Mgt.");
-
     end;
 
     trigger OnInit()
