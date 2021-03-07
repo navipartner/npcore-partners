@@ -92,7 +92,7 @@ table 6150615 "NPR POS Unit"
         }
         field(200; "Ean Box Sales Setup"; Code[20])
         {
-            Caption = 'POS Input Profile';
+            Caption = 'POS Input Box Profile';
             DataClassification = CustomerContent;
             Description = 'NPR5.45';
             TableRelation = "NPR Ean Box Setup" WHERE("POS View" = CONST(Sale));

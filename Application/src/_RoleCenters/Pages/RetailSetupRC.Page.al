@@ -105,6 +105,13 @@ page 6151245 "NPR Retail Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Scenarios action';
                 }
+                action("POS Scenarios Sets")
+                {
+                    Caption = 'POS Scenarios Sets';
+                    RunObject = Page "NPR POS Scenarios Sets";
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the POS Scenarios Sets action';
+                }
                 action("POS Store List")
                 {
                     Caption = 'POS Store List';
@@ -135,13 +142,6 @@ page 6151245 "NPR Retail Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Themes action';
                 }
-                action("POS Scenarios Sets")
-                {
-                    Caption = 'POS Scenarios Sets';
-                    RunObject = Page "NPR POS Scenarios Sets";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the POS Scenarios Sets action';
-                }
                 action("POS Input Box Events")
                 {
                     Caption = 'POS Input Box Events';
@@ -165,10 +165,10 @@ page 6151245 "NPR Retail Setup RC"
                 Image = CostAccounting;
                 action("POS Payment Method List")
                 {
-                    Caption = 'POS Payment Method List';
+                    Caption = 'POS Payment Methods';
                     RunObject = Page "NPR POS Payment Method List";
                     ApplicationArea = All;
-                    ToolTip = 'Executes the POS Payment Method List action';
+                    ToolTip = 'Executes the POS Payment Methods action';
                 }
                 action("POS Payment Bins")
                 {
@@ -202,10 +202,10 @@ page 6151245 "NPR Retail Setup RC"
                 }
                 action("EFT BIN Group List")
                 {
-                    Caption = 'EFT BIN Group List';
+                    Caption = 'EFT BIN Groups';
                     RunObject = Page "NPR EFT BIN Group List";
                     ApplicationArea = All;
-                    ToolTip = 'Executes the EFT BIN Group List action';
+                    ToolTip = 'Executes the EFT BIN Groups action';
                 }
                 action("Pepper Terminal Types")
                 {
@@ -471,13 +471,6 @@ page 6151245 "NPR Retail Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Retail Replenisment Setup action';
                 }
-                action("Global POS Sales Setups")
-                {
-                    Caption = 'Global POS Sales Setups';
-                    RunObject = Page "NPR NpGp Global POSSalesSetups";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Global POS Sales Setups action';
-                }
             }
 
 
@@ -580,13 +573,6 @@ page 6151245 "NPR Retail Setup RC"
             group(Configuration)
             {
                 Caption = 'Configuration';
-                action("No. Series")
-                {
-                    Caption = 'No. Series';
-                    RunObject = Page "No. Series";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the No. Series action';
-                }
                 action("Configuration Templates")
                 {
                     Caption = 'Configuration Templates';
@@ -608,6 +594,13 @@ page 6151245 "NPR Retail Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Configuration Questionnaire action';
                 }
+                action("No. Series")
+                {
+                    Caption = 'No. Series';
+                    RunObject = Page "No. Series";
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the No. Series action';
+                }
             }
             group("Posting Setup")
             {
@@ -619,13 +612,6 @@ page 6151245 "NPR Retail Setup RC"
                     RunObject = page "General Posting Setup";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Gen. Posting Setup action';
-                }
-                action("POS Posting Setup")
-                {
-                    Caption = 'POS Posting Setup';
-                    RunObject = Page "NPR POS Posting Setup";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the POS Posting Setup action';
                 }
                 action("VAT Posting Setup")
                 {
@@ -647,6 +633,13 @@ page 6151245 "NPR Retail Setup RC"
                     RunObject = page "Dimension List";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Dimensions List action';
+                }
+                action("POS Posting Setup")
+                {
+                    Caption = 'POS Posting Setup';
+                    RunObject = Page "NPR POS Posting Setup";
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the POS Posting Setup action';
                 }
 
             }
