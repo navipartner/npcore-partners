@@ -120,11 +120,11 @@ page 6150701 "NPR POS Menus"
             }
             action(DeployPackageFromAzureBlob)
             {
-                Caption = 'Deploy Package From Azure';
+                Caption = 'Download Template Data';
                 Image = ImportDatabase;
                 ApplicationArea = All;
                 RunObject = page "NPR POS Menu Deploy from Azure";
-                ToolTip = 'Executes the Deploy Package From Azure action';
+                ToolTip = 'Downloads template data.';
             }
         }
     }

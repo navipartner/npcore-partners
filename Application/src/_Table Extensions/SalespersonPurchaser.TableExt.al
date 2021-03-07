@@ -108,7 +108,7 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         }
         field(6014416; "NPR Locked-to Register No."; Code[10])
         {
-            Caption = 'Locked-to Register No.';
+            Caption = 'Locked-to POS Unit No.';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }

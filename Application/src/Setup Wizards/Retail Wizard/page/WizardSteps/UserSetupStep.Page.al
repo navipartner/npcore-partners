@@ -37,7 +37,7 @@ page 6014690 "NPR User Setup Step"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the last date on which the user is allowed to post to the company.';
                 }
-                field("Register Time"; "Register Time")
+                field("POS Unit Time"; "Register Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies whether to register the user''s time usage defined as the time spent from when the user logs in to when the user logs out. Unexpected interruptions, such as idle session timeout, terminal server idle session timeout, or a client crash are not recorded.';
@@ -111,10 +111,10 @@ page 6014690 "NPR User Setup Step"
                     ApplicationArea = All;
                     ToolTip = 'Specifies if a user is a time sheet administrator. A time sheet administrator can access any time sheet and then edit, change, or delete it.';
                 }
-                field("Backoffice Register No."; "NPR Backoffice Register No.")
+                field("Backoffice POS Unit No."; "NPR Backoffice Register No.")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the NPR Backoffice Register No. field';
+                    ToolTip = 'Specifies the value of the NPR Backoffice POS Unit No. field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -135,12 +135,12 @@ page 6014690 "NPR User Setup Step"
                         POSUnitsList.SetPOSUnitMode(false);
                     end;
                 }
-                field("Allow Register Switch"; "NPR Allow Register Switch")
+                field("Allow POS Unit Switch"; "NPR Allow Register Switch")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the NPR Allow Register Switch field';
+                    ToolTip = 'Specifies the value of the NPR Allow POS Unit Switch field';
                 }
-                field("Register Switch Filter"; "NPR Register Switch Filter")
+                field("POS Unit Switch Filter"; "NPR Register Switch Filter")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR POS Unit Switch Filter field';

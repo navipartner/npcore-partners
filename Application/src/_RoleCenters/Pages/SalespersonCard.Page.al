@@ -76,10 +76,10 @@ page 6014428 "NPR Salesperson Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Reverse Sales Ticket field';
                 }
-                field("Locked-to Register No."; Rec."NPR Locked-to Register No.")
+                field("Locked-to POS Unit No."; Rec."NPR Locked-to Register No.")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the NPR Locked-to Register No. field';
+                    ToolTip = 'Specifies the value of the NPR Locked-to POS Unit No. field';
                 }
             }
             group(Retail)
