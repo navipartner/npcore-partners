@@ -141,14 +141,14 @@ page 6014639 "NPR RP Template List"
             }
             action(DeployPackage)
             {
-                Caption = 'Deploy Package';
+                Caption = 'Download Template data';
                 Image = ImportDatabase;
                 Promoted = true;
 				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
-                ToolTip = 'Executes the Deploy Package action';
+                ToolTip = 'Downloads Template data.';
 
                 trigger OnAction()
                 var
