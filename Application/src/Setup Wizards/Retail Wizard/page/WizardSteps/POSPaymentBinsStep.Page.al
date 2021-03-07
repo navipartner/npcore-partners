@@ -180,7 +180,7 @@ page 6014684 "NPR POS Payment Bins Step"
             Rec.Modify();
 
             if i = 1 then
-                LastNoUsed := HelperFunctions.FormatCode(LastNoUsed)
+                HelperFunctions.FormatCode(LastNoUsed, true)
             else
                 LastNoUsed := IncStr(LastNoUsed);
         end;
@@ -193,7 +193,7 @@ page 6014684 "NPR POS Payment Bins Step"
         CalculatedNo := WantedStartingNo;
 
         if POSPaymentBin.Get(WantedStartingNo) then begin
-            WantedStartingNo := HelperFunctions.FormatCode(WantedStartingNo);
+            HelperFunctions.FormatCode(WantedStartingNo, true);
             CalculatedNo := CheckIfNoAvailableInPOSPaymentBin(POSPaymentBin, WantedStartingNo);
         end;
     end;

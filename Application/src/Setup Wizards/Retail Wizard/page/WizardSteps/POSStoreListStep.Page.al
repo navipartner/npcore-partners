@@ -213,7 +213,7 @@ page 6014653 "NPR POS Store List Step"
             Rec.Insert();
 
             if i = 1 then
-                LastNoUsed := HelperFunctions.FormatCode(LastNoUsed)
+                HelperFunctions.FormatCode(LastNoUsed, true)
             else
                 LastNoUsed := IncStr(LastNoUsed);
         end;
@@ -226,7 +226,7 @@ page 6014653 "NPR POS Store List Step"
         CalculatedNo := WantedStartingNo;
 
         if POSStore.Get(WantedStartingNo) then begin
-            WantedStartingNo := HelperFunctions.FormatCode(WantedStartingNo);
+            HelperFunctions.FormatCode(WantedStartingNo, true);
             CalculatedNo := CheckIfNoAvailableInPOSStore(POSStore, WantedStartingNo);
         end;
     end;

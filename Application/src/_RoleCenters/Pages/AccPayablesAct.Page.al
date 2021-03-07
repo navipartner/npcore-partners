@@ -121,7 +121,6 @@ page 6151254 "NPR Acc. Payables Act"
         end;
 
         Rec.SetFilter("Due Date Filter", '<=%1', WorkDate);
-        Rec.SetFilter("User ID Filter", UserId);
     end;
 
     var
