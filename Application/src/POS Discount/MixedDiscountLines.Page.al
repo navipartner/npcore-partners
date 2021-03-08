@@ -89,8 +89,15 @@ page 6014451 "NPR Mixed Discount Lines"
                 {
                     ApplicationArea = All;
                     Caption = 'Mix Discount Price';
-                    Visible = (DiscountType <> DiscountType::"Multiple Discount Levels");
                     ToolTip = 'Specifies the value of the Mix Discount Price field';
+
+                    trigger OnValidate()
+                    var
+                        CantChangePriceErr: Label 'You can''t change Mix Discount Price.';
+                    begin
+                        if DiscountType = DiscountType::"Multiple Discount Levels" then
+                            Error(CantChangePriceErr);
+                    end;
                 }
             }
             repeater(MixLines)
