@@ -326,6 +326,7 @@ page 6014450 "NPR Mixed Discount"
         {
             part(MinimumDiscountFactBox; "NPR Mix Discount FactBox")
             {
+                SubPageLink = Code = field(Code);
                 ApplicationArea = All;
                 Caption = 'Discount Amount';
             }
