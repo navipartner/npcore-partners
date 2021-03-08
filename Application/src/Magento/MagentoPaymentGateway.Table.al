@@ -127,6 +127,12 @@ table 6151413 "NPR Magento Payment Gateway"
         }
     }
 
+    {
+        key(Key1; "Code")
+        {
+        }
+    }
+
     [NonDebuggable]
     procedure SetApiPassword(NewPassword: Text)
     begin
