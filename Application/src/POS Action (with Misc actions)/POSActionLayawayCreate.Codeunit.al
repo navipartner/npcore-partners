@@ -189,7 +189,6 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
         RetailSalesDocMgt.SetSendPostedPdf2Nav(false);
         RetailSalesDocMgt.SetRetailPrint(true);
         RetailSalesDocMgt.SetOpenSalesDocAfterExport(false);
-        RetailSalesDocMgt.SetWriteInAuditRoll(true);
         RetailSalesDocMgt.ProcessPOSSale(SalePOS);
         RetailSalesDocMgt.GetCreatedSalesHeader(SalesHeaderOut);
     end;

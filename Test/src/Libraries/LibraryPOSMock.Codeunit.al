@@ -31,6 +31,20 @@ codeunit 85003 "NPR Library - POS Mock"
         POSSession.GetSale(POSSale);
     end;
 
+    procedure InitializePOSSessionAndStartSale(var POSSession: Codeunit "NPR POS Session"; POSUnit: Record "NPR POS Unit"; Salesperson: Record "Salesperson/Purchaser"; var POSSale: Codeunit "NPR POS Sale")
+    var
+        POSFrontEnd: Codeunit "NPR POS Front End Management";
+        POSSetup: Codeunit "NPR POS Setup";
+        POSUnitIdentity: Codeunit "NPR POS Unit Identity";
+        POSUnitIdentityRec: Record "NPR POS Unit Identity";
+    begin
+        InitializePOSSession(POSSession, POSUnit);
+        POSSession.GetSetup(POSSetup);
+        POSSetup.SetSalesperson(Salesperson);
+        POSSession.StartTransaction();
+        POSSession.GetSale(POSSale);
+    end;
+
     procedure CreateItemLineWithDiscount(POSSession: Codeunit "NPR POS Session"; ItemNo: Text; Quantity: Decimal; DiscountPct: Decimal)
     var
         SaleLinePOS: Record "NPR Sale Line POS";

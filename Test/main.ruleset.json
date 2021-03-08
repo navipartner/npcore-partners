@@ -151,7 +151,31 @@
             "id": "AW0007",
             "action":"Warning",
             "justification": "The Web client does not support displaying Repeater controls that contain FlowFilter fields!"
+        },
+        {
+            "id": "AS0051",
+            "action": "Hidden",
+            "justification": "Does not matter on a test app"
+        },
+        {
+            "id": "AS0084",
+            "action": "Hidden",
+            "justification": "Does not matter on a test app"
+        },
+        {
+            "id": "AS0015",
+            "action": "Hidden",
+            "justification": "Does not matter on a test app"
+        },
+        {
+            "id": "AS0052",
+            "action": "Hidden",
+            "justification": "Does not matter on a test app"
+        },
+        {
+            "id": "AS0054",
+            "action": "Hidden",
+            "justification": "Does not matter on a test app"
         }
-
     ]
 }

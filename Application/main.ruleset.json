@@ -84,7 +84,7 @@
         },
         {
             "id": "AA0219",
-            "action":"Error",
+            "action":"Hidden",
             "justification": "The Tooltip property of Fields must start with 'Specifies'."
         },
         {

@@ -548,7 +548,6 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         RetailSalesDocMgt.SetTransferPaymentMethod(true);
         RetailSalesDocMgt.SetTransferTaxSetup(true);
         RetailSalesDocMgt.SetOpenSalesDocAfterExport(false);
-        RetailSalesDocMgt.SetWriteInAuditRoll(true);
         RetailSalesDocMgt.SetCustomerCreditCheck(JSON.GetBooleanParameter('Check Customer Credit'));
 
         POSSaleLine.CalculateBalance(AmountExclVAT, VATAmount, AmountInclVAT);
