@@ -17,11 +17,11 @@ codeunit 6150712 "NPR POS Data Driver: Sale Line"
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo(Type), false);
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo(Description), true);
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Description 2"), false);
-        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Variant Code"), true);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Variant Code"), false);
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo(Quantity), true);
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Unit of Measure Code"), false);
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Unit Price"), true);
-        if Setup.ShowDiscountFieldsInSaleView(SaleLine."Register No.") then begin
+        if Setup.ShowDiscountFieldsInSaleView() then begin
             DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Discount %"), true);
             DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Discount Amount"), true);
         end;

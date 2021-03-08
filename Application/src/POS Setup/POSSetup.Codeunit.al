@@ -104,17 +104,11 @@ codeunit 6150708 "NPR POS Setup"
         exit(SalespersonRec.Code);
     end;
 
-    procedure ShowDiscountFieldsInSaleView(POSUnitNo: Code[10]): Boolean
+    procedure ShowDiscountFieldsInSaleView(): Boolean
     var
-        POSUnit: Record "NPR POS Unit";
         POSVieWProfile: Record "NPR POS View Profile";
     begin
-        if not POSUnit.Get(POSUnitNo) then
-            Clear(POSUnit);
-
-        if not POSVieWProfile.Get(POSUnit."POS View Profile") then
-            Clear(POSVieWProfile);
-
+        GetPOSViewProfile(POSVieWProfile);
         exit(POSVieWProfile."POS - Show discount fields");
     end;
 
@@ -216,11 +210,8 @@ codeunit 6150708 "NPR POS Setup"
 
     procedure GetPOSViewProfile(var POSViewProfile: Record "NPR POS View Profile"): Boolean
     begin
-        if (POSUnitRec."POS View Profile" = '') then
-            exit(false);
-
-        POSViewProfile.Get(POSUnitRec."POS View Profile");
-        exit(true);
+        POSUnitRec.TestField("No.");
+        exit(POSUnitRec.GetProfile(POSViewProfile));
     end;
 
     procedure GetPOSStore(var POSStoreOut: Record "NPR POS Store")
@@ -242,8 +233,7 @@ codeunit 6150708 "NPR POS Setup"
     var
         POSViewProfile: Record "NPR POS View Profile";
     begin
-        POSUnitRec.TestField("No.");
-        POSUnitRec.GetProfile(POSViewProfile);
+        GetPOSViewProfile(POSViewProfile);
 
         case POSViewProfile."Lock Timeout" of
             POSViewProfile."Lock Timeout"::"30S":
