@@ -56,7 +56,6 @@ report 6060043 "NPR Export Excel Item Worksh."
                                 MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Direct Unit Cost"), Format("Direct Unit Cost"), false, false, '', ExcelBuf."Cell Type"::Number);
                             MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Purchase Price Currency Code"), Format("Purchase Price Currency Code"), false, false, '', ExcelBuf."Cell Type"::Text);
                             MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Vendor No."), Format("Vendor No."), false, false, '', ExcelBuf."Cell Type"::Text);
-                            MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Item Group"), Format("Item Group"), false, false, '', ExcelBuf."Cell Type"::Text);
                             MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Variety Group"), Format("Variety Group"), false, false, '', ExcelBuf."Cell Type"::Text);
                             MapCell(RowNo, DATABASE::"NPR Item Worksh. Variant Line", ItemWorksheetVariantLine.FieldNo("Variety 1 Value"), Format(ItemWorksheetVariantLine."Variety 1 Value"), false, false, '', ExcelBuf."Cell Type"::Text);
                             MapCell(RowNo, DATABASE::"NPR Item Worksh. Variant Line", ItemWorksheetVariantLine.FieldNo("Variety 2 Value"), Format(ItemWorksheetVariantLine."Variety 2 Value"), false, false, '', ExcelBuf."Cell Type"::Text);
@@ -99,7 +98,6 @@ report 6060043 "NPR Export Excel Item Worksh."
                                 EnterCell(RowNo, 0, Format("Direct Unit Cost"), false, false, '', ExcelBuf."Cell Type"::Number);
                             EnterCell(RowNo, 0, Format("Purchase Price Currency Code"), false, false, '', ExcelBuf."Cell Type"::Text);
                             EnterCell(RowNo, 0, Format("Vendor No."), false, false, '', ExcelBuf."Cell Type"::Text);
-                            EnterCell(RowNo, 0, Format("Item Group"), false, false, '', ExcelBuf."Cell Type"::Text);
                             EnterCell(RowNo, 0, Format("Variety Group"), false, false, '', ExcelBuf."Cell Type"::Text);
                             EnterCell(RowNo, 0, ItemWorksheetVariantLine."Variety 1 Value", false, false, '', ExcelBuf."Cell Type"::Text);
                             EnterCell(RowNo, 0, ItemWorksheetVariantLine."Variety 2 Value", false, false, '', ExcelBuf."Cell Type"::Text);
@@ -146,7 +144,6 @@ report 6060043 "NPR Export Excel Item Worksh."
                         MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Direct Unit Cost"), Format("Direct Unit Cost"), false, false, '', ExcelBuf."Cell Type"::Number);
                         MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Purchase Price Currency Code"), Format("Purchase Price Currency Code"), false, false, '', ExcelBuf."Cell Type"::Text);
                         MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Vendor No."), Format("Vendor No."), false, false, '', ExcelBuf."Cell Type"::Text);
-                        MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Item Group"), Format("Item Group"), false, false, '', ExcelBuf."Cell Type"::Text);
                         MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Variety Group"), Format("Variety Group"), false, false, '', ExcelBuf."Cell Type"::Text);
                         MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Variety 1"), Format("Variety 1"), false, false, '', ExcelBuf."Cell Type"::Text);
                         MapCell(RowNo, DATABASE::"NPR Item Worksheet Line", FieldNo("Variety 2"), Format("Variety 2"), false, false, '', ExcelBuf."Cell Type"::Text);
@@ -174,7 +171,6 @@ report 6060043 "NPR Export Excel Item Worksh."
                         EnterCell(RowNo, 0, Format("Direct Unit Cost"), false, false, '', ExcelBuf."Cell Type"::Number);
                         EnterCell(RowNo, 0, Format("Purchase Price Currency Code"), false, false, '', ExcelBuf."Cell Type"::Text);
                         EnterCell(RowNo, 0, Format("Vendor No."), false, false, '', ExcelBuf."Cell Type"::Text);
-                        EnterCell(RowNo, 0, Format("Item Group"), false, false, '', ExcelBuf."Cell Type"::Text);
                         EnterCell(RowNo, 0, Format("Variety Group"), false, false, '', ExcelBuf."Cell Type"::Text);
                         EnterCell(RowNo, 0, Format("Variety 1"), false, false, '', ExcelBuf."Cell Type"::Text);
                         EnterCell(RowNo, 0, Format("Variety 2"), false, false, '', ExcelBuf."Cell Type"::Text);
@@ -265,7 +261,6 @@ report 6060043 "NPR Export Excel Item Worksh."
                     EnterCell(HeaderRowNo, 0, FieldCaption("Direct Unit Cost"), false, true, '', ExcelBuf."Cell Type"::Text);
                     EnterCell(HeaderRowNo, 0, FieldCaption("Purchase Price Currency Code"), false, true, '', ExcelBuf."Cell Type"::Text);
                     EnterCell(HeaderRowNo, 0, FieldCaption("Vendor No."), false, true, '', ExcelBuf."Cell Type"::Text);
-                    EnterCell(HeaderRowNo, 0, FieldCaption("Item Group"), false, true, '', ExcelBuf."Cell Type"::Text);
                     EnterCell(HeaderRowNo, 0, FieldCaption("Variety Group"), false, true, '', ExcelBuf."Cell Type"::Text);
                     EnterCell(HeaderRowNo, 0, FieldCaption("Variety 1"), false, true, '', ExcelBuf."Cell Type"::Text);
                     EnterCell(HeaderRowNo, 0, FieldCaption("Variety 2"), false, true, '', ExcelBuf."Cell Type"::Text);

@@ -6,7 +6,8 @@ tableextension 6014427 "NPR Item" extends Item
         {
             Caption = 'Item Group';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Item Group";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Using Item Category Code instead.';
         }
         field(6014401; "NPR Group sale"; Boolean)
         {

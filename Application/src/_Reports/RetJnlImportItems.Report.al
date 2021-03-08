@@ -8,7 +8,7 @@ report 6014424 "NPR Ret. Jnl. - Import Items"
     {
         dataitem(Item; Item)
         {
-            RequestFilterFields = "No.", "Vendor No.", "NPR Item Group", "NPR Group sale", "Last Date Modified", Description, "Search Description";
+            RequestFilterFields = "No.", "Vendor No.", "Item Category Code", "NPR Group sale", "Last Date Modified", Description, "Search Description";
 
             trigger OnAfterGetRecord()
             begin

@@ -1,15 +1,8 @@
 codeunit 6014476 "NPR Retail Price Log Mgt."
 {
-    // NPR5.40/MHA /20180316  CASE 304031 Object created
-
-
     trigger OnRun()
     begin
         UpdatePriceLog();
-    end;
-
-    local procedure "--- Price Log Setup"()
-    begin
     end;
 
     procedure EnablePriceLog(RetailPriceLogSetup: Record "NPR Retail Price Log Setup")
@@ -540,7 +533,7 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
         FilterPageBuilder.AddRecord(FilterName, Item);
         FilterPageBuilder.ADdField(FilterName, Item."No.");
         FilterPageBuilder.ADdField(FilterName, Item."Last Date Modified");
-        FilterPageBuilder.ADdField(FilterName, Item."NPR Item Group");
+        FilterPageBuilder.ADdField(FilterName, Item."Item Category Code");
         FilterPageBuilder.ADdField(FilterName, Item."Item Disc. Group");
         FilterPageBuilder.ADdField(FilterName, Item.Description);
         FilterPageBuilder.ADdField(FilterName, Item.Inventory);

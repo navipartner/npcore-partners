@@ -133,16 +133,16 @@ table 6014414 "NPR Period Discount Line"
 
             trigger OnValidate()
             var
-                ItemGroup: Record "NPR Item Group";
+                ItemCategory: Record "Item Category";
                 POSTaxCalculation: Codeunit "NPR POS Tax Calculation";
                 Handled: Boolean;
                 UnitCost: Decimal;
             begin
 
                 if Item.Get("Item No.") then begin
-                    ItemGroup.Get(Item."NPR Item Group");
+                    ItemCategory.Get(Item."Item Category Code");
                     if Item."Price Includes VAT" then begin
-                        if VATPostingSetup.Get(ItemGroup."VAT Bus. Posting Group", ItemGroup."VAT Prod. Posting Group") then begin
+                        if VATPostingSetup.Get(ItemCategory."NPR VAT Bus. Posting Group", ItemCategory."NPR VAT Prod. Posting Group") then begin
                             POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup, Handled);
                             VATPct := VATPostingSetup."VAT %";
                         end;
@@ -265,28 +265,32 @@ table 6014414 "NPR Period Discount Line"
         }
         field(200; "Quantity Sold"; Decimal)
         {
-            CalcFormula = - Sum("Item Ledger Entry".Quantity WHERE("Item No." = FIELD("Item No."),
-                                                                   "NPR Discount Type" = CONST(Period),
-                                                                   "NPR Discount Code" = FIELD(Code),
-                                                                   "Entry Type" = CONST(Sale),
-                                                                   "Posting Date" = FIELD("Date Filter"),
-                                                                   "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                   "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                   "Location Code" = FIELD("Location Filter")));
+            CalcFormula = - Sum("NPR Aux. Item Ledger Entry".Quantity
+                                WHERE(
+                                    "Item No." = FIELD("Item No."),
+                                    "Discount Type" = CONST(Period),
+                                    "Discount Code" = FIELD(Code),
+                                    "Entry Type" = CONST(Sale),
+                                    "Posting Date" = FIELD("Date Filter"),
+                                    "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
+                                    "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
+                                    "Location Code" = FIELD("Location Filter")));
             Caption = 'Sold Quantity';
             Editable = false;
             FieldClass = FlowField;
         }
         field(201; Turnover; Decimal)
         {
-            CalcFormula = Sum("Value Entry"."Sales Amount (Actual)" WHERE("Item No." = FIELD("Item No."),
-                                                                           "NPR Discount Type" = CONST(Period),
-                                                                           "NPR Discount Code" = FIELD(Code),
-                                                                           "Item Ledger Entry Type" = CONST(Sale),
-                                                                           "Posting Date" = FIELD("Date Filter"),
-                                                                           "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                           "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                           "Location Code" = FIELD("Location Filter")));
+            CalcFormula = Sum("NPR Aux. Value Entry"."Sales Amount (Actual)"
+                            WHERE(
+                                "Item No." = FIELD("Item No."),
+                                "Discount Type" = CONST(Period),
+                                "Discount Code" = FIELD(Code),
+                                "Item Ledger Entry Type" = CONST(Sale),
+                                "Posting Date" = FIELD("Date Filter"),
+                                "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
+                                "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
+                                "Location Code" = FIELD("Location Filter")));
             Caption = 'Turnover';
             Editable = false;
             FieldClass = FlowField;
@@ -305,16 +309,16 @@ table 6014414 "NPR Period Discount Line"
             trigger OnValidate()
             var
                 GLSetup: Record "General Ledger Setup";
-                ItemGroup: Record "NPR Item Group";
+                ItemCategory: Record "Item Category";
                 POSTaxCalculation: Codeunit "NPR POS Tax Calculation";
                 Handled: Boolean;
                 UnitCost: Decimal;
             begin
                 if ("Campaign Profit" < 100) and Item.Get("Item No.") then begin
                     GLSetup.Get();
-                    ItemGroup.Get(Item."NPR Item Group");
+                    ItemCategory.Get(Item."Item Category Code");
                     if Item."Price Includes VAT" then begin
-                        if VATPostingSetup.Get(ItemGroup."VAT Bus. Posting Group", ItemGroup."VAT Prod. Posting Group") then begin
+                        if VATPostingSetup.Get(ItemCategory."NPR VAT Bus. Posting Group", ItemCategory."NPR VAT Prod. Posting Group") then begin
                             POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup, Handled);
                             VATPct := VATPostingSetup."VAT %";
                         end;

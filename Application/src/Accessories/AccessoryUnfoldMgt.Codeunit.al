@@ -1,9 +1,5 @@
 codeunit 6014506 "NPR Accessory Unfold Mgt."
 {
-    // 288039/MHA /20180214  CASE 288039 Object created - unfold Accessory Items
-    // NPR5.40/NPKNAV/20180330  CASE 288039 Transport NPR5.40 - 30 March 2018
-
-
     trigger OnRun()
     begin
     end;
@@ -240,11 +236,11 @@ codeunit 6014506 "NPR Accessory Unfold Mgt."
 
     local procedure Worksheet2ItemJnlLine(var AccessoryUnfoldWorksheet: Record "NPR Accessory Unfold Worksheet"; var LineNo: Integer; var TempItemJnlLine: Record "Item Journal Line" temporary)
     var
-        ItemLedgEntry: Record "Item Ledger Entry";
+        AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry";
         ValueEntry: Record "Value Entry";
     begin
-        ItemLedgEntry.Get(AccessoryUnfoldWorksheet."Item Ledger Entry No.");
-        ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgEntry."Entry No.");
+        AuxItemLedgerEntry.Get(AccessoryUnfoldWorksheet."Item Ledger Entry No.");
+        ValueEntry.SetRange("Item Ledger Entry No.", AuxItemLedgerEntry."Entry No.");
         ValueEntry.FindFirst;
 
         LineNo += 10000;
@@ -255,21 +251,21 @@ codeunit 6014506 "NPR Accessory Unfold Mgt."
             TempItemJnlLine.Validate("Item No.", AccessoryUnfoldWorksheet."Item No.")
         else
             TempItemJnlLine.Validate("Item No.", AccessoryUnfoldWorksheet."Accessory Item No.");
-        TempItemJnlLine.Validate("Posting Date", ItemLedgEntry."Posting Date");
-        TempItemJnlLine."Document No." := ItemLedgEntry."Document No.";
-        TempItemJnlLine."NPR Register Number" := ItemLedgEntry."NPR Register Number";
-        TempItemJnlLine."NPR Document Time" := ItemLedgEntry."NPR Document Time";
-        TempItemJnlLine.Validate("Entry Type", ItemLedgEntry."Entry Type");
-        TempItemJnlLine.Validate("Source Type", ItemLedgEntry."Source Type");
-        TempItemJnlLine.Validate("Source No.", ItemLedgEntry."Source No.");
+        TempItemJnlLine.Validate("Posting Date", AuxItemLedgerEntry."Posting Date");
+        TempItemJnlLine."Document No." := AuxItemLedgerEntry."Document No.";
+        TempItemJnlLine."NPR Register Number" := AuxItemLedgerEntry."POS Unit No.";
+        TempItemJnlLine."NPR Document Time" := AuxItemLedgerEntry."Document Time";
+        TempItemJnlLine.Validate("Entry Type", AuxItemLedgerEntry."Entry Type");
+        TempItemJnlLine.Validate("Source Type", AuxItemLedgerEntry."Source Type");
+        TempItemJnlLine.Validate("Source No.", AuxItemLedgerEntry."Source No.");
         TempItemJnlLine.Validate("Source Code", ValueEntry."Source Code");
         TempItemJnlLine.Validate("Gen. Bus. Posting Group", ValueEntry."Gen. Bus. Posting Group");
         TempItemJnlLine.Validate("Gen. Prod. Posting Group", ValueEntry."Gen. Prod. Posting Group");
         TempItemJnlLine.Validate(Quantity, AccessoryUnfoldWorksheet.Quantity);
-        TempItemJnlLine.Validate("Location Code", ItemLedgEntry."Location Code");
-        TempItemJnlLine.Validate("Shortcut Dimension 1 Code", ItemLedgEntry."Global Dimension 1 Code");
-        TempItemJnlLine.Validate("Shortcut Dimension 2 Code", ItemLedgEntry."Global Dimension 2 Code");
-        TempItemJnlLine.Validate("Salespers./Purch. Code", ItemLedgEntry."NPR Salesperson Code");
+        TempItemJnlLine.Validate("Location Code", AuxItemLedgerEntry."Location Code");
+        TempItemJnlLine.Validate("Shortcut Dimension 1 Code", AuxItemLedgerEntry."Global Dimension 1 Code");
+        TempItemJnlLine.Validate("Shortcut Dimension 2 Code", AuxItemLedgerEntry."Global Dimension 2 Code");
+        TempItemJnlLine.Validate("Salespers./Purch. Code", AuxItemLedgerEntry."Salespers./Purch. Code");
         TempItemJnlLine.Validate("Unit Amount", AccessoryUnfoldWorksheet."Unit Price");
         TempItemJnlLine.Insert;
     end;

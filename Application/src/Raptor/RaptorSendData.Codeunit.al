@@ -1,8 +1,5 @@
 codeunit 6151494 "NPR Raptor Send Data"
 {
-    // NPR5.53/ALPO/20191128 CASE 379012 Raptor tracking integration: send info about sold products to Raptor
-    // NPR5.55/ALPO/20200422 CASE 400925 Exclude webshop sales from data sent to Raptor
-
     TableNo = "Job Queue Entry";
 
     trigger OnRun()
@@ -79,6 +76,7 @@ codeunit 6151494 "NPR Raptor Send Data"
 
     local procedure ItemLedgerIsEligibleForSending(ItemLedger: Record "Item Ledger Entry"): Boolean
     var
+        AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry";
         Eligible: Boolean;
         Handled: Boolean;
     begin
@@ -101,7 +99,8 @@ codeunit 6151494 "NPR Raptor Send Data"
             if SalespersonTmp.IsEmpty then
                 CreateTmpSalespersonList(SalespersonTmp);
             SalespersonTmp.SetFilter(Code, RaptorSetup."Webshop Salesperson Filter");
-            SalespersonTmp.Code := ItemLedger."NPR Salesperson Code";
+            AuxItemLedgerEntry.Get(ItemLedger."Entry No.");
+            SalespersonTmp.Code := AuxItemLedgerEntry."Salespers./Purch. Code";
             Eligible := not SalespersonTmp.Find;
         end;
 
@@ -136,6 +135,7 @@ codeunit 6151494 "NPR Raptor Send Data"
     local procedure GenerateParameters(var Parameters: Record "Name/Value Buffer"; ItemLedger: Record "Item Ledger Entry"; SessionGUID: Guid)
     var
         POSUnit: Record "NPR POS Unit";
+        AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry";
         Item: Record Item;
         RaptorMgt: Codeunit "NPR Raptor Management";
     begin
@@ -164,7 +164,8 @@ codeunit 6151494 "NPR Raptor Send Data"
         modules/subscribers. Those are not sent to Raptor.
         */
 
-        if not POSUnit.Get(ItemLedger."NPR Register Number") then
+        AuxItemLedgerEntry.Get(ItemLedger."Entry No.");
+        if not POSUnit.Get(AuxItemLedgerEntry."POS Unit No.") then
             POSUnit.Init();
 
         if not Item.Get(ItemLedger."Item No.") then

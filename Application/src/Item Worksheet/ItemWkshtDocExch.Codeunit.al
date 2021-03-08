@@ -2,7 +2,7 @@ codeunit 6060056 "NPR Item Wksht. Doc. Exch."
 {
     procedure InsertItemWorksheetLine(ItemWorksheet: Record "NPR Item Worksheet"; var ItemWorksheetLine: Record "NPR Item Worksheet Line"; VendorNo: Code[20]; VendorItemNo: Text; VendorItemDescription: Text; ItemGroupText: Text; DirectUnitCost: Decimal)
     var
-        ItemGroup: Record "NPR Item Group";
+        ItemCategory: Record "Item Category";
         LastItemWorksheetLine: Record "NPR Item Worksheet Line";
         ItemWorksheetLineNo: Integer;
     begin
@@ -24,9 +24,9 @@ codeunit 6060056 "NPR Item Wksht. Doc. Exch."
         ItemWorksheetLine.Validate("Vendor No.", VendorNo);
         ItemWorksheetLine.SetUpNewLine(LastItemWorksheetLine);
         ItemWorksheetLine.Action := ItemWorksheetLine.Action::CreateNew;
-        if (ItemGroupText <> '') and (StrLen(ItemGroupText) <= MaxStrLen(ItemGroup."No.")) then
-            if ItemGroup.Get(ItemGroupText) then
-                ItemWorksheetLine.Validate("Item Group", ItemGroupText);
+        if (ItemGroupText <> '') and (StrLen(ItemGroupText) <= MaxStrLen(ItemCategory.Code)) then
+            if ItemCategory.Get(ItemGroupText) then
+                ItemWorksheetLine.Validate("Item Category Code", ItemGroupText);
         ItemWorksheetLine.Validate("Vendor Item No.", CopyStr(VendorItemNo, 1, MaxStrLen(ItemWorksheetLine."Vendor Item No.")));
         ItemWorksheetLine.Validate(Description, CopyStr(VendorItemDescription, 1, MaxStrLen(ItemWorksheetLine.Description)));
         ItemWorksheetLine.Validate("Direct Unit Cost", DirectUnitCost);
@@ -164,7 +164,7 @@ codeunit 6060056 "NPR Item Wksht. Doc. Exch."
                             case ErrorMessage2."Field Number" of
                                 ItemWorksheetLine.FieldNo("Vendor Item No."):
                                     VendorItemNo := ErrorMessage2.Description;
-                                ItemWorksheetLine.FieldNo("Item Group"):
+                                ItemWorksheetLine.FieldNo("Item Category Code"):
                                     ItemGroupText := ErrorMessage2.Description;
                                 ItemWorksheetLine.FieldNo(Description):
                                     VendorItemDescription := ErrorMessage2.Description;

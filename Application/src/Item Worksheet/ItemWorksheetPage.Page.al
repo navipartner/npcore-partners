@@ -111,12 +111,6 @@ page 6060042 "NPR Item Worksheet Page"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Existing Item No. field.';
                 }
-                field("Item Group"; Rec."Item Group")
-                {
-                    ApplicationArea = All;
-                    Editable = FieldsEditable;
-                    ToolTip = 'Specifies the value of the Item Group field.';
-                }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = All;

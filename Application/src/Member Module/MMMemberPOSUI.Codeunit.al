@@ -24,7 +24,7 @@ codeunit 6060135 "NPR MM Member POS UI"
     local procedure ConfigureLookupTemplate(var Template: DotNet NPRNetTemplate; LookupRec: RecordRef)
     var
         Vendor: Record Vendor;
-        ItemGroup: Record "NPR Item Group";
+        ItemCategory: Record "Item Category";
         SaleLinePOS: Record "NPR Sale Line POS";
         Row: DotNet NPRNetRow;
         Info: DotNet NPRNetInfo;
@@ -41,7 +41,7 @@ codeunit 6060135 "NPR MM Member POS UI"
 
                     Row := Row.Row();
                     Row.AddInfo('no', LookupRec.Field(1).Caption, 1, TextAlign.Left, 16, 'calc(25% - 2px)', NumberFormat.None, true);
-                    Info := Row.AddInfo('category', ItemGroup.TableCaption, 6014400, TextAlign.Left, 16, 'calc(25% - 3px)', NumberFormat.None, false);
+                    Info := Row.AddInfo('category', ItemCategory.TableCaption, 5702, TextAlign.Left, 16, 'calc(25% - 3px)', NumberFormat.None, false);
                     Info.RelatedTableFieldNo := 2;
                     Info := Row.AddInfo('vendor', Vendor.TableCaption, 31, TextAlign.Left, 16, 'calc(25% - 3px)', NumberFormat.None, false);
                     Info.RelatedTableFieldNo := 2;

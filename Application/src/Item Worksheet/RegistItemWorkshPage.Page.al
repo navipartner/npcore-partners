@@ -89,12 +89,6 @@ page 6060047 "NPR Regist. Item Worksh. Page"
                     Editable = false;
                     ToolTip = 'Specifies the value of the Existing Item No. field';
                 }
-                field("Item Group"; Rec."Item Group")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Item Group field';
-                }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = All;

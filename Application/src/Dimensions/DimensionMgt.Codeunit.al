@@ -1,15 +1,5 @@
 codeunit 6014401 "NPR Dimension Mgt."
 {
-    // NPR5.30/MHA /20170201  CASE 264918 Np Photo Module removed
-    // NPR5.36/TJ  /20170920  CASE 286283 Renamed variables/function into english and into proper naming terminology
-    //                                    Removed unused variables
-    // NPR5.55/TJ  /20200420  CASE 400524 Multi-Piece type should be mapped to Quantity Discount Header
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         TempDimBuf1: Record "Dimension Buffer" temporary;
         TempDimBuf2: Record "Dimension Buffer" temporary;
@@ -129,7 +119,6 @@ codeunit 6014401 "NPR Dimension Mgt."
                                         if DefaultDimPriority1.Get(SourceCode, DefaultDim."Table ID") then begin
                                             if DefaultDimPriority2.Get(SourceCode, TempDimBuf2."Table ID") then begin
                                                 if DefaultDimPriority1.Priority < DefaultDimPriority2.Priority then begin
-                                                    // npk/ohm - 231006
                                                     TempDimBuf3.Init;
                                                     TempDimBuf3 := TempDimBuf2;
                                                     TempDimBuf3."Table ID" := DefaultDim."Table ID";
@@ -141,12 +130,8 @@ codeunit 6014401 "NPR Dimension Mgt."
                                                     TempDimBuf2 := TempDimBuf3;
                                                     TempDimBuf2.Insert;
                                                     TempDimBuf3.Delete;
-                                                    //TempDimBuf2.RENAME(DefaultDim."Table ID",0,TempDimBuf2."Dimension Code");
-                                                    //TempDimBuf2."Dimension Value Code" := DefaultDim."Dimension Value Code";
-                                                    //TempDimBuf2.MODIFY;
                                                 end;
                                             end else begin
-                                                // npk/ohm - 231006
                                                 TempDimBuf3.Init;
                                                 TempDimBuf3 := TempDimBuf2;
                                                 TempDimBuf3."Table ID" := DefaultDim."Table ID";
@@ -158,9 +143,6 @@ codeunit 6014401 "NPR Dimension Mgt."
                                                 TempDimBuf2 := TempDimBuf3;
                                                 TempDimBuf2.Insert;
                                                 TempDimBuf3.Delete;
-                                                //TempDimBuf2.RENAME(DefaultDim."Table ID",0,TempDimBuf2."Dimension Code");
-                                                //TempDimBuf2."Dimension Value Code" := DefaultDim."Dimension Value Code";
-                                                //TempDimBuf2.MODIFY;
                                             end;
                                         end;
                                 end;
@@ -186,7 +168,7 @@ codeunit 6014401 "NPR Dimension Mgt."
             Type::Item:
                 exit(DATABASE::Item);
             Type::"Item Group":
-                exit(DATABASE::"NPR Item Group");
+                exit(DATABASE::"Item Category");
             Type::Repair:
                 Error('AL Error: Repair are not used in Core.');
             Type::Payment:
@@ -213,18 +195,11 @@ codeunit 6014401 "NPR Dimension Mgt."
             Type::Mix:
                 exit(DATABASE::"NPR Mixed Discount");
             Type::"Multi-Piece":
-                //-NPR5.55 [400524]
-                //EXIT(DATABASE::"Quantity Discount Line");
                 exit(DATABASE::"NPR Quantity Discount Header");
-            //+NPR5.55 [400524]
             Type::"Sales Card":
                 exit(0);
             Type::BOM:
                 exit(0);
-            //-NPR5.30 [264918]
-            //Type::Fotoarbejde :
-            //  EXIT(0);
-            //+NPR5.30 [264918]
             Type::Rounding:
                 exit(0);
             Type::Combination:
@@ -352,31 +327,6 @@ codeunit 6014401 "NPR Dimension Mgt."
                 TempDimBuf2."Dimension Value Code" := '';
                 TempDimBuf2.Modify;
             end;
-    end;
-
-    procedure OpenFormDefaultDimensions(TableID: Integer; No: Code[20])
-    begin
-        //OpenFormDefaultDimensions
-        /*
-        DefaultDimension.SETRANGE("Table ID",TableID);
-        DefaultDimension.SETRANGE("No.",No);
-        DefaultDimensionsFrm.SETTABLEVIEW(DefaultDimension);
-        DefaultDimensionsFrm.RUN;*/
-
-    end;
-
-    procedure SetNPRDimFilterSaleLinePOS(var NPRLineDimension: Record "NPR Line Dimension"; var SaleLinePOS: Record "NPR Sale Line POS")
-    begin
-        //SetNPRDimFilterEkspLine
-        NPRLineDimension.SetRange("Table ID", DATABASE::"NPR Sale Line POS");
-        NPRLineDimension.SetRange("Register No.", SaleLinePOS."Register No.");
-        NPRLineDimension.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-
-        NPRLineDimension.SetRange(Date, SaleLinePOS.Date);  //ohm - 13/3/06
-        //NPRDimension.SETRANGE(Date);
-        NPRLineDimension.SetRange("Sale Type", SaleLinePOS."Sale Type");
-        NPRLineDimension.SetRange("Line No.", SaleLinePOS."Line No.");
-        //NPRDimension.SETRANGE("No.",'');
     end;
 }
 

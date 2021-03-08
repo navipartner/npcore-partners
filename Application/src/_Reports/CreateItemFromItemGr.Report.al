@@ -1,25 +1,27 @@
 report 6014610 "NPR Create Item From ItemGr."
 {
-    Caption = 'Create Item(s) From Item Group';
+    Caption = 'Create Item(s) From Item Category';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     dataset
     {
-        dataitem("Item Group"; "NPR Item Group")
+        dataitem("Item Category"; "Item Category")
         {
-            DataItemTableView = SORTING("No.") WHERE("Main Item Group" = FILTER(false));
-            RequestFilterFields = "No.";
+            DataItemTableView = SORTING(Code) WHERE("NPR Main Category" = FILTER(false));
+            RequestFilterFields = Code;
 
             trigger OnAfterGetRecord()
+            var
+                ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
             begin
-                if not Item.Get("No.") then begin
+                if not Item.Get(Code) then begin
                     Item.Reset();
                     Item.Init();
-                    Item."No." := "No.";
+                    Item."No." := Code;
                     Item.Insert(true);
-                    Item."NPR Item Group" := "No.";
-                    "Item Group".SetupItemFromGroup(Item, "Item Group");
+                    Item."Item Category Code" := Code;
+                    ItemCategoryMgt.SetupItemFromCategory(Item, "Item Category");
                     Item."Costing Method" := Item."Costing Method"::FIFO;
                     Item.Validate("NPR Group sale", true);
                     Item.Validate("Price Includes VAT", true);

@@ -8,10 +8,10 @@ report 6014439 "NPR Item Sales Postings"
     UseSystemPrinter = true;
     dataset
     {
-        dataitem("Item Ledger Entry"; "Item Ledger Entry")
+        dataitem(AuxItemLedgerEntry; "NPR Aux. Item Ledger Entry")
         {
             DataItemTableView = SORTING("Item No.", "Entry Type", "Posting Date") ORDER(Ascending) WHERE("Entry Type" = FILTER(Sale));
-            RequestFilterFields = "Item No.", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code", "NPR Salesperson Code", "NPR Item Group No.", Quantity, Description;
+            RequestFilterFields = "Item No.", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code", "Salespers./Purch. Code", "Item Category Code", Quantity;
             column(ItemFilters; StrSubstNo('%1: %2', TableCaption, ItemFilter))
             {
             }
@@ -21,10 +21,10 @@ report 6014439 "NPR Item Sales Postings"
             column(COMPANYNAME; CompanyName)
             {
             }
-            column(ItemNo_ItemLedgerEntry; "Item Ledger Entry"."Item No.")
+            column(ItemNo_ItemLedgerEntry; AuxItemLedgerEntry."Item No.")
             {
             }
-            column(EntryNo_ItemLedgerEntry; "Item Ledger Entry"."Entry No.")
+            column(EntryNo_ItemLedgerEntry; AuxItemLedgerEntry."Entry No.")
             {
             }
             column(No_Item; Item."No.")
@@ -54,7 +54,7 @@ report 6014439 "NPR Item Sales Postings"
             column(Inventory_Item; Item.Inventory)
             {
             }
-            column(Quantity_ItemLedgerEntry; "Item Ledger Entry".Quantity)
+            column(Quantity_ItemLedgerEntry; AuxItemLedgerEntry.Quantity)
             {
             }
             column(ShowVendorItemNo; ShowVendorItemNo)
@@ -66,7 +66,7 @@ report 6014439 "NPR Item Sales Postings"
             column(Sales_Unit_Price; Item."Unit Price" * ItemSalesQty)
             {
             }
-            column(Report_Filters; "Item Ledger Entry".GetFilters)
+            column(Report_Filters; AuxItemLedgerEntry.GetFilters)
             {
             }
             column(ShowVendorNo_; ShowVendorNo)
@@ -98,8 +98,8 @@ report 6014439 "NPR Item Sales Postings"
                 ValueEntry.SetFilter("Global Dimension 2 Code", GetFilter("Global Dimension 2 Code"));
                 ValueEntry.SetFilter("Location Code", GetFilter("Location Code"));
                 ValueEntry.SetFilter("Posting Date", GetFilter("Posting Date"));
-                ValueEntry.SetFilter("Salespers./Purch. Code", GetFilter("NPR Salesperson Code"));
-                ValueEntry.SetRange("Item No.", "Item Ledger Entry"."Item No.");
+                ValueEntry.SetFilter("Salespers./Purch. Code", GetFilter("Salespers./Purch. Code"));
+                ValueEntry.SetRange("Item No.", AuxItemLedgerEntry."Item No.");
                 ValueEntry.CalcSums("Invoiced Quantity", "Sales Amount (Actual)", "Cost Amount (Actual)");
                 ItemSalesQty := -ValueEntry."Invoiced Quantity";
                 ItemSalesAmount := ValueEntry."Sales Amount (Actual)";
@@ -115,7 +115,7 @@ report 6014439 "NPR Item Sales Postings"
                 SetFilter("Item No.", Reportfilter);
                 VendorItemNo := '';
                 if ShowVendorItemNo then
-                    if Item1.Get("Item Ledger Entry"."Item No.") then
+                    if Item1.Get(AuxItemLedgerEntry."Item No.") then
                         VendorItemNo := Item1."Vendor Item No.";
             end;
         }
@@ -171,7 +171,7 @@ report 6014439 "NPR Item Sales Postings"
 
     trigger OnPreReport()
     begin
-        Reportfilter := "Item Ledger Entry".GetFilter("Item No.");
+        Reportfilter := AuxItemLedgerEntry.GetFilter("Item No.");
     end;
 
     var
@@ -182,11 +182,9 @@ report 6014439 "NPR Item Sales Postings"
         ItemProfitPct: Decimal;
         Item: Record Item;
         Reportfilter: Text[1024];
-        "//-NPR5.33": Integer;
         ShowVendorItemNo: Boolean;
         Item1: Record Item;
         VendorItemNo: Text;
-        "//+NPR5.33": Integer;
         ItemSalesQty: Decimal;
         ItemSalesAmount: Decimal;
         ValueEntry: Record "Value Entry";

@@ -67,12 +67,12 @@ codeunit 6014416 "NPR Mixed Discount Management"
             repeat
                 FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::Item, TempSaleLinePOS."No.", TempSaleLinePOS."Variant Code", tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
                 FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group", TempSaleLinePOS."Item Disc. Group", '', tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
-                FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Group", TempSaleLinePOS."Item Group", '', tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
+                FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Group", TempSaleLinePOS."Item Category Code", '', tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
             until TempSaleLinePOS.Next = 0;
         end else begin
             FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::Item, Rec."No.", Rec."Variant Code", tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
             FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group", Rec."Item Disc. Group", '', tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
-            FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Group", Rec."Item Group", '', tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
+            FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Item Group", Rec."Item Category Code", '', tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups);
         end;
 
         TempSaleLinePOS.FindSet;
@@ -172,7 +172,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
         if tmpImpactedItems.Get(TempSaleLinePOS."No.", '') then
             exit(true);
 
-        if tmpImpactedItemGroups.Get(TempSaleLinePOS."Item Group") then
+        if tmpImpactedItemGroups.Get(TempSaleLinePOS."Item Category Code") then
             exit(true);
 
         exit(tmpImpactedItemDiscGroups.Get(TempSaleLinePOS."Item Disc. Group"));
@@ -809,7 +809,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
     begin
         TempSaleLinePOS.SetRange("No.");
         TempSaleLinePOS.SetRange("Variant Code");
-        TempSaleLinePOS.SetRange("Item Group");
+        TempSaleLinePOS.SetRange("Item Category Code");
         TempSaleLinePOS.SetRange("Item Disc. Group");
         case TempMixedDiscountLine."Disc. Grouping Type" of
             TempMixedDiscountLine."Disc. Grouping Type"::Item:
@@ -819,7 +819,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
                         TempSaleLinePOS.SetFilter("Variant Code", TempMixedDiscountLine."Variant Code");
                 end;
             TempMixedDiscountLine."Disc. Grouping Type"::"Item Group":
-                TempSaleLinePOS.SetRange("Item Group", TempMixedDiscountLine."No.");
+                TempSaleLinePOS.SetRange("Item Category Code", TempMixedDiscountLine."No.");
             TempMixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group":
                 TempSaleLinePOS.SetRange("Item Disc. Group", TempMixedDiscountLine."No.");
             else
@@ -975,7 +975,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
         if TempMixedDiscountLine.Get(TempMixedDiscount.Code, TempMixedDiscountLine."Disc. Grouping Type"::Item, TempSaleLinePOS."No.", '') and (HighestPriority > TempMixedDiscountLine.Priority) then
             HighestPriority := TempMixedDiscountLine.Priority;
 
-        if TempMixedDiscountLine.Get(TempMixedDiscount.Code, TempMixedDiscountLine."Disc. Grouping Type"::"Item Group", TempSaleLinePOS."Item Group", '') and (HighestPriority > TempMixedDiscountLine.Priority) then
+        if TempMixedDiscountLine.Get(TempMixedDiscount.Code, TempMixedDiscountLine."Disc. Grouping Type"::"Item Group", TempSaleLinePOS."Item Category Code", '') and (HighestPriority > TempMixedDiscountLine.Priority) then
             HighestPriority := TempMixedDiscountLine.Priority;
 
         if TempMixedDiscountLine.Get(TempMixedDiscount.Code, TempMixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group", TempSaleLinePOS."Item Disc. Group", '') and (HighestPriority > TempMixedDiscountLine.Priority) then
@@ -1166,7 +1166,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
                             TempSaleLinePOS2.SetRange("Variant Code", MixedDiscountLine."Variant Code");
                     end;
                 MixedDiscountLine."Disc. Grouping Type"::"Item Group":
-                    TempSaleLinePOS2.SetRange("Item Group", MixedDiscountLine."No.");
+                    TempSaleLinePOS2.SetRange("Item Category Code", MixedDiscountLine."No.");
                 MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group":
                     TempSaleLinePOS2.SetRange("Item Disc. Group", MixedDiscountLine."No.")
             end;
@@ -1472,7 +1472,7 @@ codeunit 6014416 "NPR Mixed Discount Management"
 
         if not IsActive then begin
             MixedDiscountLine.SetRange("Disc. Grouping Type", MixedDiscountLine."Disc. Grouping Type"::"Item Group");
-            MixedDiscountLine.SetRange("No.", Rec."Item Group");
+            MixedDiscountLine.SetRange("No.", Rec."Item Category Code");
             IsActive := not MixedDiscountLine.IsEmpty;
         end;
 

@@ -7,37 +7,37 @@ report 6014431 "NPR S.Person Trx by Item Gr."
     ApplicationArea = All;
     dataset
     {
-        dataitem("Item Group"; "NPR Item Group")
+        dataitem("Item Category"; "Item Category")
         {
-            CalcFields = "Consumption (Amount)", "Sales (Qty.)", "Sales (LCY)";
-            RequestFilterFields = "No.", "Search Description", "Date Filter";
+            CalcFields = "NPR Consumption (Amount)", "NPR Sales (Qty.)", "NPR Sales (LCY)";
+            RequestFilterFields = "Code", "Description", "NPR Date Filter";
             column(COMPANYNAME; CompanyName)
             {
             }
             column(CompanyInfoPicture; CompanyInformation.Picture)
             {
             }
-            column(DateFilter; GetFilter("Date Filter"))
+            column(DateFilter; GetFilter("NPR Date Filter"))
             {
             }
             column(SortSalesPerson; SortSalesPerson)
             {
             }
-            column(No; "No.")
+            column(No; "Code")
             {
             }
             column(Description; Description)
             {
             }
-            column(SalesQty; "Sales (Qty.)")
+            column(SalesQty; "NPR Sales (Qty.)")
             {
                 AutoFormatType = 1;
             }
-            column(SaleLCY; "Sales (LCY)")
+            column(SaleLCY; "NPR Sales (LCY)")
             {
                 AutoFormatType = 1;
             }
-            column(db; "Sales (LCY)" - "Consumption (Amount)")
+            column(db; "NPR Sales (LCY)" - "NPR Consumption (Amount)")
             {
                 AutoFormatType = 1;
             }
@@ -55,7 +55,7 @@ report 6014431 "NPR S.Person Trx by Item Gr."
             dataitem("Salesperson/Purchaser"; "Salesperson/Purchaser")
             {
                 CalcFields = "NPR Sales (Qty.)", "NPR Sales (LCY)", "NPR COGS (LCY)";
-                DataItemLink = "NPR Item Group Filter" = FIELD("No."), "Date Filter" = FIELD("Date Filter");
+                DataItemLink = "NPR Item Category Filter" = FIELD("Code"), "Date Filter" = FIELD("NPR Date Filter");
                 column(SalesPersonCode; Code)
                 {
                 }
@@ -114,8 +114,8 @@ report 6014431 "NPR S.Person Trx by Item Gr."
                     end;
 
                     Clear(PercentItemGroupSale);
-                    if "Item Group"."Sales (LCY)" <> 0 then
-                        PercentItemGroupSale := '(' + Format(("NPR Sales (LCY)" / "Item Group"."Sales (LCY)" * 100), -4) + '%)';
+                    if "Item Category"."NPR Sales (LCY)" <> 0 then
+                        PercentItemGroupSale := '(' + Format(("NPR Sales (LCY)" / "Item Category"."NPR Sales (LCY)" * 100), -4) + '%)';
                 end;
 
                 trigger OnPreDataItem()
@@ -172,8 +172,8 @@ report 6014431 "NPR S.Person Trx by Item Gr."
                         Dg := (("Salesperson/Purchaser"."NPR Sales (LCY)" - "Salesperson/Purchaser"."NPR COGS (LCY)") / "Salesperson/Purchaser"."NPR Sales (LCY)") * 100;
 
                     Clear(PercentItemGroupSale);
-                    if "Item Group"."Sales (LCY)" <> 0 then
-                        PercentItemGroupSale := '(' + Format(("Salesperson/Purchaser"."NPR Sales (LCY)" / "Item Group"."Sales (LCY)" * 100), -4) + '%)';
+                    if "Item Category"."NPR Sales (LCY)" <> 0 then
+                        PercentItemGroupSale := '(' + Format(("Salesperson/Purchaser"."NPR Sales (LCY)" / "Item Category"."NPR Sales (LCY)" * 100), -4) + '%)';
                 end;
 
                 trigger OnPreDataItem()
@@ -186,27 +186,27 @@ report 6014431 "NPR S.Person Trx by Item Gr."
             trigger OnAfterGetRecord()
             begin
                 if not ShowItemsGrpWithoutSale then begin
-                    if "Sales (Qty.)" = 0 then
+                    if "NPR Sales (Qty.)" = 0 then
                         CurrReport.Skip();
                 end;
 
                 Clear(Dg);
-                if "Sales (LCY)" <> 0 then
-                    Dg := (("Sales (LCY)" - "Consumption (Amount)") / "Sales (LCY)") * 100;
+                if "NPR Sales (LCY)" <> 0 then
+                    Dg := (("NPR Sales (LCY)" - "NPR Consumption (Amount)") / "NPR Sales (LCY)") * 100;
 
                 Clear(PercentTotalSale);
                 if TotalSale <> 0 then
-                    PercentTotalSale := ("Sales (LCY)" / TotalSale) * 100;
+                    PercentTotalSale := ("NPR Sales (LCY)" / TotalSale) * 100;
             end;
 
             trigger OnPreDataItem()
             begin
-                CopyFilter("Date Filter", ValueEntry."Posting Date");
-                ValueEntry.SetCurrentKey("Item No.", "Posting Date", "Item Ledger Entry Type", "Entry Type", "Variance Type", "Item Charge No.", "Location Code", "Variant Code");
-                ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
-                ValueEntry.SetFilter(ValueEntry."NPR Item Group No.", '<>%1', '');
-                ValueEntry.CalcSums("Sales Amount (Actual)");
-                TotalSale := ValueEntry."Sales Amount (Actual)";
+                CopyFilter("NPR Date Filter", AuxValueEntry."Posting Date");
+                AuxValueEntry.SetCurrentKey("Item No.", "Posting Date", "Item Ledger Entry Type", "Entry Type", "Variance Type", "Item Charge No.", "Location Code", "Variant Code");
+                AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
+                AuxValueEntry.SetFilter(AuxValueEntry."Item Category Code", '<>%1', '');
+                AuxValueEntry.CalcSums("Sales Amount (Actual)");
+                TotalSale := AuxValueEntry."Sales Amount (Actual)";
             end;
         }
     }
@@ -277,7 +277,7 @@ report 6014431 "NPR S.Person Trx by Item Gr."
 
     var
         CompanyInformation: Record "Company Information";
-        ValueEntry: Record "Value Entry";
+        AuxValueEntry: Record "NPR Aux. Value Entry";
         TempVendorAmount: Record "Vendor Amount" temporary;
         ShowItemsGrpWithoutSale: Boolean;
         [InDataSet]

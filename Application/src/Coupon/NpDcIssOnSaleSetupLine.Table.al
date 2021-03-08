@@ -30,7 +30,7 @@ table 6151602 "NPR NpDc Iss.OnSale Setup Line"
             NotBlank = true;
             TableRelation = IF (Type = CONST(Item)) Item
             ELSE
-            IF (Type = CONST("Item Group")) "NPR Item Group"
+            IF (Type = CONST("Item Group")) "Item Category"
             ELSE
             IF (Type = CONST("Item Disc. Group")) "Item Discount Group";
 
@@ -38,7 +38,7 @@ table 6151602 "NPR NpDc Iss.OnSale Setup Line"
             var
                 Item: Record Item;
                 ItemDiscountGroup: Record "Item Discount Group";
-                ItemGroup: Record "NPR Item Group";
+                ItemCategory: Record "Item Category";
             begin
                 case Type of
                     Type::Item:
@@ -50,8 +50,8 @@ table 6151602 "NPR NpDc Iss.OnSale Setup Line"
                         end;
                     Type::"Item Group":
                         begin
-                            ItemGroup.Get("No.");
-                            Description := ItemGroup.Description;
+                            ItemCategory.Get("No.");
+                            Description := ItemCategory.Description;
                             "Unit Price" := 0;
                             "Profit %" := 0;
                         end;

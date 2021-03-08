@@ -41,7 +41,6 @@ table 6151392 "NPR CS Stock-Takes Data"
         {
             Caption = 'Item Group Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Item Group";
         }
         field(16; Created; DateTime)
         {

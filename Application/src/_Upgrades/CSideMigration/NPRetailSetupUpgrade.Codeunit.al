@@ -44,7 +44,7 @@ codeunit 6014422 "NPR NP Retail Setup Upgrade"
     local procedure UpgradeFiedsToDedicatedSetups()
     var
         UpgradeTag: Codeunit "Upgrade Tag";
-        UpgradeTagLbl: Label 'NPRetailSetup_MoveFieldsToDedicatedSetups-20210217', Locked = true;
+        UpgradeTagLbl: Label 'NPRetailSetup_MoveFieldsToDedicatedSetups-20210303', Locked = true;
     begin
         if UpgradeTag.HasUpgradeTag(UpgradeTagLbl) then
             exit;
@@ -53,9 +53,6 @@ codeunit 6014422 "NPR NP Retail Setup Upgrade"
         UpgradeDiscountPriority();
         UpgradePOSViewProfile();
         UpgradeExchangeLabelSetup();
-        UpgradeRetailItemSetup();
-        UpgradeStaffSetup();
-        UpgradePOSUnit();
         UpgradeTag.SetUpgradeTag(UpgradeTagLbl);
     end;
 
@@ -107,7 +104,6 @@ codeunit 6014422 "NPR NP Retail Setup Upgrade"
         DiscountPriority.Modify();
     end;
 
-
     local procedure UpgradePOSViewProfile()
     var
         RetailSetup: Record "NPR Retail Setup";
@@ -146,75 +142,5 @@ codeunit 6014422 "NPR NP Retail Setup Upgrade"
         ExchangeLabelSetup."Exchange Label Exchange Period" := RetailSetup."Exchange Label Exchange Period";
         ExchangeLabelSetup."Exchange Label Default Date" := RetailSetup."Exchange label default date";
         ExchangeLabelSetup.Modify();
-    end;
-
-    local procedure UpgradeRetailItemSetup()
-    var
-        RetailSetup: Record "NPR Retail Setup";
-        RetailItemSetup: Record "NPR Retail Item Setup";
-    begin
-        if not RetailSetup.Get() then
-            exit;
-
-        if not RetailItemSetup.Get() then begin
-            RetailItemSetup.Init();
-            RetailItemSetup.Insert();
-        end;
-
-        RetailItemSetup."Item Group on Creation" := RetailSetup."Item Group on Creation";
-        RetailItemSetup."Item Description at 1 star" := RetailSetup."Item Description at 1 star";
-        RetailItemSetup."EAN No. at 1 star" := RetailSetup."EAN No. at 1 star";
-        RetailItemSetup."Transfer SeO Item Entry" := RetailSetup."Transfer SeO Item Entry";
-        RetailItemSetup."EAN-No. at Item Create" := RetailSetup."EAN-No. at Item Create";
-        RetailItemSetup."Autocreate EAN-Number" := RetailSetup."Autocreate EAN-Number";
-        RetailItemSetup."Itemgroup Pre No. Serie" := RetailSetup."Itemgroup Pre No. Serie";
-        RetailItemSetup."Itemgroup No. Serie StartNo." := RetailSetup."Itemgroup No. Serie StartNo.";
-        RetailItemSetup."Itemgroup No. Serie EndNo." := RetailSetup."Itemgroup No. Serie EndNo.";
-        RetailItemSetup."Itemgroup No. Serie Warning" := RetailSetup."Itemgroup No. Serie Warning";
-        RetailItemSetup."Reason for Return Mandatory" := RetailSetup."Reason for Return Mandatory";
-        RetailItemSetup."Description Control" := RetailSetup."Description control";
-        RetailItemSetup."Not use Dim filter SerialNo" := RetailSetup."Not use Dim filter SerialNo";
-        RetailItemSetup.Modify();
-    end;
-
-    local procedure UpgradeStaffSetup()
-    var
-        RetailSetup: Record "NPR Retail Setup";
-        StaffSetup: Record "NPR Staff Setup";
-    begin
-        if not RetailSetup.Get() then
-            exit;
-
-        if not StaffSetup.Get() then begin
-            StaffSetup.Init();
-            StaffSetup.Insert();
-        end;
-
-        StaffSetup."Internal Unit Price" := RetailSetup."Internal Unit Price";
-        StaffSetup."Staff Disc. Group" := RetailSetup."Staff Disc. Group";
-        StaffSetup."Staff Price Group" := RetailSetup."Staff Price Group";
-        StaffSetup."Staff SalesPrice Calc Codeunit" := RetailSetup."Staff SalesPrice Calc Codeunit";
-        StaffSetup.Modify();
-    end;
-
-    local procedure UpgradePOSUnit()
-    var
-        POSUnit: Record "NPR POS Unit";
-        RetailSetup: Record "NPR Retail Setup";
-    begin
-        if not RetailSetup.Get() then
-            exit;
-
-        if (RetailSetup."Open Register Password" = '') and (RetailSetup."Password on unblock discount" = '') then
-            exit;
-
-        if not POSUnit.FindSet() then
-            exit;
-
-        repeat
-            POSUnit."Password on unblock discount" := RetailSetup."Password on unblock discount";
-            POSUnit."Open Register Password" := RetailSetup."Open Register Password";
-            POSUnit.Modify();
-        until POSUnit.Next() = 0;
     end;
 }

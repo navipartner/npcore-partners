@@ -39,7 +39,7 @@ table 6014422 "NPR Retail Journal Line"
                     "Vendor Item No." := Item."Vendor Item No.";
                     "Last Direct Cost" := Item."Last Direct Cost";
                     "Unit Price" := Item."Unit Price";
-                    "Item group" := Item."NPR Item Group";
+                    "Item group" := Item."Item Category Code";
                     "Cannot edit unit price" := Item."NPR Cannot edit unit price";
                     "New Item No." := "Item No.";
                     if Item."Sales Unit of Measure" <> '' then
@@ -181,9 +181,9 @@ table 6014422 "NPR Retail Journal Line"
             Caption = 'Description 2';
             DataClassification = CustomerContent;
         }
-        field(19; "Item group"; Code[10])
+        field(19; "Item group"; Code[20])
         {
-            Caption = 'Item group';
+            Caption = 'Item Category';
             NotBlank = true;
             DataClassification = CustomerContent;
         }
@@ -639,7 +639,7 @@ table 6014422 "NPR Retail Journal Line"
             if "Item No." <> '' then begin
                 tItem.Init;
                 tItem."No." := "Item No.";
-                tItem.Validate("NPR Item Group", "Item group");
+                tItem.Validate("Item Category Code", "Item group");
                 tItem."Unit Cost" := "Last Direct Cost";
                 tItem.Validate("Unit Price", "Discount Price Incl. Vat");
                 "Profit % (new)" := tItem."Profit %";

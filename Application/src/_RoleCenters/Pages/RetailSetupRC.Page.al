@@ -382,6 +382,13 @@ page 6151245 "NPR Retail Setup RC"
                     ToolTip = 'Executes the SMS Template List action';
 
                 }
+                action("Exchange Label Setup")
+                {
+                    Caption = 'Exchange Label Setup';
+                    RunObject = Page "NPR Exchange Label Setup";
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the Exchange Label Setup action';
+                }
             }
             group(Miscellaneous)
             {
@@ -491,13 +498,6 @@ page 6151245 "NPR Retail Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the RIS Retail Inventory Sets action';
                 }
-                action("Item Category Mapping")
-                {
-                    Caption = 'Item Category Mapping';
-                    RunObject = Page "NPR Item Category Mapping";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Item Category Mapping action';
-                }
                 action("Store Groups")
                 {
                     Caption = 'Store Groups';
@@ -519,12 +519,12 @@ page 6151245 "NPR Retail Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Variety Setup action';
                 }
-                action("Item Groups")
+                action("Item Categories")
                 {
-                    Caption = 'Item Groups';
-                    RunObject = page "NPR Item Group List";
+                    Caption = 'Item Categories';
+                    RunObject = Page "Item Categories";
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Item Groups action';
+                    ToolTip = 'Executes the Item Categories action';
                 }
                 action(Locations)
                 {

@@ -100,10 +100,10 @@ report 6014419 "NPR Vendor Sales Stat"
             column(DateFilter; StrSubstNo(Text002, StartDate, EndDate))
             {
             }
-            dataitem(ItemLedgerEntryPurchase; "Item Ledger Entry")
+            dataitem(AuxItemLedgerEntryPurchase; "NPR Aux. Item Ledger Entry")
             {
                 CalcFields = "Cost Amount (Actual)";
-                DataItemLink = "NPR Vendor No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Code"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Code"), "Posting Date" = FIELD("Date Filter");
+                DataItemLink = "Vendor No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Code"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Code"), "Posting Date" = FIELD("Date Filter");
                 DataItemTableView = SORTING("Entry No.") WHERE("Entry Type" = CONST(Purchase));
 
                 trigger OnAfterGetRecord()
@@ -118,10 +118,10 @@ report 6014419 "NPR Vendor Sales Stat"
                     PurchaseLCY := 0;
                 end;
             }
-            dataitem(ItemLedgerEntrySale; "Item Ledger Entry")
+            dataitem(AuxItemLedgerEntrySale; "NPR Aux. Item Ledger Entry")
             {
                 CalcFields = "Sales Amount (Actual)";
-                DataItemLink = "NPR Vendor No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Code"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Code"), "Posting Date" = FIELD("Date Filter");
+                DataItemLink = "Vendor No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Code"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Code"), "Posting Date" = FIELD("Date Filter");
                 DataItemTableView = SORTING("Entry No.") WHERE("Entry Type" = CONST(Sale));
 
                 trigger OnAfterGetRecord()

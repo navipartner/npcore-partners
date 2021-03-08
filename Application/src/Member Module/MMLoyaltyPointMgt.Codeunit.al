@@ -37,7 +37,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
         end;
 
-        CreatePointEntryFromValueEntry(ValueEntry, LoyaltyPostingSourceEnum::VALUE_ENTRY);
+        CreatePointEntryFromValueEntry(ValueEntry, LoyaltyPostingSourceEnum::VALUE_ENTRY, ItemJournalLine."NPR Register Number");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, CodeUnit::"NPR MM Membership Events", 'OnAfterInsertMembershipEntry', '', true, true)]
@@ -223,14 +223,11 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         ValueEntry."Item Ledger Entry Type" := ValueEntry."Item Ledger Entry Type"::Sale;
         ValueEntry."Document No." := DocumentNo;
         ValueEntry."Valued Quantity" := Quantity;
-
-        ValueEntry."NPR Register No." := PosUnitNo;
-
         ValueEntry."Sales Amount (Actual)" := Amount;
         ValueEntry."Discount Amount" := DiscountAmount;
         ValueEntry."Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
 
-        CreatePointEntryFromValueEntry(ValueEntry, DataSource);
+        CreatePointEntryFromValueEntry(ValueEntry, DataSource, POSUnitNo);
     end;
 
     procedure SimulatePointEntryForTestFramework(PostingDate: Date; PosUnitNo: Code[10]; ItemNo: Code[20]; Quantity: Decimal; CustomerNo: Code[20]; DocumentNo: Code[20]; Amount: Decimal; DiscountAmount: Decimal; DataSource: Option)
@@ -252,16 +249,14 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         ValueEntry."Item Ledger Entry Type" := ValueEntry."Item Ledger Entry Type"::Sale;
         ValueEntry."Document No." := DocumentNo;
         ValueEntry."Valued Quantity" := Quantity;
-        ValueEntry."NPR Register No." := PosUnitNo;
         ValueEntry."Sales Amount (Actual)" := Amount;
         ValueEntry."Discount Amount" := DiscountAmount;
         ValueEntry."Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
 
-        CreatePointEntryFromValueEntry(ValueEntry, DataSource);
-
+        CreatePointEntryFromValueEntry(ValueEntry, DataSource, PosUnitNo);
     end;
 
-    local procedure CreatePointEntryFromValueEntry(ValueEntry: Record "Value Entry"; LoyaltyPostingSource: Option): Boolean
+    local procedure CreatePointEntryFromValueEntry(ValueEntry: Record "Value Entry"; LoyaltyPostingSource: Option; POSUnitNo: Code[10]): Boolean
     var
         Membership: Record "NPR MM Membership";
         MembershipPointsEntry: Record "NPR MM Members. Points Entry";
@@ -344,7 +339,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         MembershipPointsEntry."Item No." := ValueEntry."Item No.";
         MembershipPointsEntry."Variant Code" := ValueEntry."Variant Code";
 
-        if (POSUnit.Get(ValueEntry."NPR Register No.")) then begin
+        if (POSUnit.Get(POSUnitNo)) then begin
             MembershipPointsEntry."POS Unit Code" := POSUnit."No.";
             MembershipPointsEntry."POS Store Code" := POSUnit."POS Store Code";
         end;
@@ -731,7 +726,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         LoyaltyItemPointSetup.SetFilter(Blocked, '=%1', false);
         LoyaltyItemPointSetup.SetFilter(Type, '=%1', LoyaltyItemPointSetup.Type::"Item Group");
 
-        LoyaltyItemPointSetup.SetFilter("No.", '=%1', Item."NPR Item Group");
+        LoyaltyItemPointSetup.SetFilter("No.", '=%1', Item."Item Category Code");
         LoyaltyItemPointSetup.SetFilter("Valid From Date", '=%1|<=%2', 0D, ReferenceDate);
         LoyaltyItemPointSetup.SetFilter("Valid Until Date", '=%1|>=%2', 0D, ReferenceDate);
         if (LoyaltyItemPointSetup.FindFirst()) then begin

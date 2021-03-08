@@ -105,8 +105,8 @@ report 6014428 "NPR Shelf Labels"
                 end;
 
                 Clear(TMPItemGroup);
-                if ItemGroup.Get(TMPRetail_Journal_Line_Col1."Item group") then
-                    TMPItemGroup := ItemGroup.Description;
+                if ItemCategory.Get(TMPRetail_Journal_Line_Col1."Item group") then
+                    TMPItemGroup := ItemCategory.Description;
 
                 TMPBeforeUnitPrice := TMPRetail_Journal_Line_Col1."Discount Price Incl. Vat";
                 TMPUnitPriceCard := Item."Unit Price";
@@ -180,7 +180,7 @@ report 6014428 "NPR Shelf Labels"
         Item: Record Item;
         ItemVariant: Record "Item Variant";
         BlobBuffer: Record "NPR BLOB buffer" temporary;
-        ItemGroup: Record "NPR Item Group";
+        ItemCategory: Record "Item Category";
         BarcodeLib: Codeunit "NPR Barcode Image Library";
         StringLibrary: Codeunit "NPR String Library";
         TempBlobCol1: Codeunit "Temp Blob";

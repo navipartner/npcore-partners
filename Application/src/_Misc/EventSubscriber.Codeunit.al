@@ -77,15 +77,8 @@ codeunit 6014404 "NPR Event Subscriber"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnBeforeInsertTransferEntry', '', true, false)]
     local procedure ItemJnlPostLineOnBeforeInsertTransferEntry(var NewItemLedgerEntry: Record "Item Ledger Entry"; var OldItemLedgerEntry: Record "Item Ledger Entry"; var ItemJournalLine: Record "Item Journal Line")
     var
-        RetailItemSetup: Record "NPR Retail Item Setup";
     begin
-        RetailItemSetup.Get();
-        NewItemLedgerEntry."NPR Vendor No." := OldItemLedgerEntry."NPR Vendor No.";
-        NewItemLedgerEntry."NPR Item Group No." := OldItemLedgerEntry."NPR Item Group No.";
-        NewItemLedgerEntry."NPR Register Number" := OldItemLedgerEntry."NPR Register Number";
-        NewItemLedgerEntry."NPR Salesperson Code" := OldItemLedgerEntry."NPR Salesperson Code";
-        if RetailItemSetup."Transfer SeO Item Entry" then
-            NewItemLedgerEntry."Item Reference No." := OldItemLedgerEntry."Item Reference No.";
+        NewItemLedgerEntry."Item Reference No." := OldItemLedgerEntry."Item Reference No.";
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnBeforePostItemJnlLine', '', false, false)]
@@ -100,42 +93,8 @@ codeunit 6014404 "NPR Event Subscriber"
 
         if ItemJournalLine."NPR Vendor No." = '' then
             ItemJournalLine."NPR Vendor No." := Item."Vendor No.";
-        if ItemJournalLine."NPR Item Group No." = '' then
-            ItemJournalLine."NPR Item Group No." := Item."NPR Item Group";
         if ItemJournalLine."NPR Document Time" = 0T then
             ItemJournalLine."NPR Document Time" := Time;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnAfterInitItemLedgEntry', '', true, false)]
-    local procedure ItemJnlPostLineOnAfterInitItemLedgEntry(var NewItemLedgEntry: Record "Item Ledger Entry"; ItemJournalLine: Record "Item Journal Line"; var ItemLedgEntryNo: Integer)
-    var
-        Item: Record Item;
-    begin
-        NewItemLedgEntry."NPR Vendor No." := ItemJournalLine."NPR Vendor No.";
-        NewItemLedgEntry."NPR Item Group No." := ItemJournalLine."NPR Item Group No.";
-        NewItemLedgEntry."NPR Discount Type" := ItemJournalLine."NPR Discount Type";
-        NewItemLedgEntry."NPR Discount Code" := ItemJournalLine."NPR Discount Code";
-        NewItemLedgEntry."NPR Register Number" := ItemJournalLine."NPR Register Number";
-        NewItemLedgEntry."NPR Group Sale" := ItemJournalLine."NPR Group Sale";
-        NewItemLedgEntry."NPR Salesperson Code" := ItemJournalLine."Salespers./Purch. Code";
-        NewItemLedgEntry."NPR Document Time" := ItemJournalLine."NPR Document Time";
-        NewItemLedgEntry."NPR Document Date and Time" := CreateDateTime(ItemJournalLine."Posting Date", NewItemLedgEntry."NPR Document Time");
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnBeforeInsertValueEntry', '', false, false)]
-    local procedure ItemJnlPostLineOnBeforeInsertValueEntry(var ValueEntry: Record "Value Entry"; ItemJournalLine: Record "Item Journal Line")
-    var
-        Item: Record Item;
-    begin
-        ValueEntry."NPR Item Group No." := ItemJournalLine."NPR Item Group No.";
-        ValueEntry."NPR Vendor No." := ItemJournalLine."NPR Vendor No.";
-        ValueEntry."NPR Discount Type" := ItemJournalLine."NPR Discount Type";
-        ValueEntry."NPR Discount Code" := ItemJournalLine."NPR Discount Code";
-        ValueEntry."NPR Register No." := ItemJournalLine."NPR Register Number";
-        ValueEntry."NPR Group Sale" := ItemJournalLine."NPR Group Sale";
-        ValueEntry."NPR Salesperson Code" := ItemJournalLine."Salespers./Purch. Code";
-        ValueEntry."NPR Document Date and Time" := CreateDateTime(ItemJournalLine."Posting Date", ItemJournalLine."NPR Document Time");
-        ValueEntry."NPR Item Category Code" := ItemJournalLine."Item Category Code";
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostSalesDoc', '', true, false)]

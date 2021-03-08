@@ -34,15 +34,15 @@ report 6014533 "NPR Inventory - flow"
             {
                 CalcFields = "Sales (Qty.)", "Purchases (Qty.)", "Purchases (LCY)", "Sales (LCY)", "Positive Adjmt. (Qty.)", "Negative Adjmt. (Qty.)", "COGS (LCY)";
                 DataItemLink = "Vendor No." = FIELD("No.");
-                DataItemTableView = SORTING("NPR Group sale", "NPR Item Group", "Vendor No.") ORDER(Ascending);
-                RequestFilterFields = "No.", "Statistics Group", "NPR Item Group", "Location Filter";
+                DataItemTableView = SORTING("NPR Group sale", "Item Category Code", "Vendor No.") ORDER(Ascending);
+                RequestFilterFields = "No.", "Statistics Group", "Item Category Code", "Location Filter";
                 column(No_Item; Item."No.")
                 {
                 }
                 column(Description_Item; Item.Description)
                 {
                 }
-                column(ItemGroup_Item; Item."NPR Item Group")
+                column(ItemGroup_Item; "Item Category Code")
                 {
                 }
                 column(StockInventoryStart_Item; StockInventoryStart)
@@ -84,14 +84,14 @@ report 6014533 "NPR Inventory - flow"
                 column(ShowItemSection_Item; ShowItemSection)
                 {
                 }
-                dataitem("Item Group"; "NPR Item Group")
+                dataitem("Item Category"; "Item Category")
                 {
-                    DataItemLink = "No." = FIELD("NPR Item Group"), "Vendor Filter" = FIELD("Vendor No.");
-                    DataItemTableView = SORTING("No.");
-                    column(No_ItemGroup; "Item Group"."No.")
+                    DataItemLink = "Code" = FIELD("Item Category Code"), "NPR Vendor Filter" = FIELD("Vendor No.");
+                    DataItemTableView = SORTING("Code");
+                    column(No_ItemGroup; "Item Category"."Code")
                     {
                     }
-                    column(Description_ItemGroup; "Item Group".Description)
+                    column(Description_ItemGroup; "Item Category".Description)
                     {
                     }
                     column(StockInventoryStart2; StockInventoryStart2)
@@ -107,7 +107,7 @@ report 6014533 "NPR Inventory - flow"
                         ItemL3: Record Item;
                         Done: Boolean;
                     begin
-                        Item2.SetRange("NPR Item Group", "Item Group"."No.");
+                        Item2.SetRange("Item Category Code", "Item Category"."Code");
                         Item2.SetRange("Vendor No.", Item."Vendor No.");
                         if Item.GetFilter("Statistics Group") <> '' then
                             Item2.SetRange("Statistics Group", Item."Statistics Group");
@@ -118,7 +118,7 @@ report 6014533 "NPR Inventory - flow"
 
                         Done := false;
                         ItemL3.SetRange("Vendor No.", Item."Vendor No.");
-                        ItemL3.SetRange("NPR Item Group", "Item Group"."No.");
+                        ItemL3.SetRange("Item Category Code", "Item Category"."Code");
                         if Item.GetFilter("Statistics Group") <> '' then
                             ItemL3.SetRange("Statistics Group", Item."Statistics Group");
                         if ItemL3.FindFirst() then
@@ -128,7 +128,7 @@ report 6014533 "NPR Inventory - flow"
                                         NewGroup := true;
                                         Done := true;
                                     end;
-                                    if ItemL3."NPR Item Group" <> "Item Group"."No." then begin
+                                    if ItemL3."Item Category Code" <> "Item Category"."Code" then begin
                                         NewGroup := true;
                                         Done := true;
                                     end;
@@ -254,7 +254,7 @@ report 6014533 "NPR Inventory - flow"
                     end;
 
                     UpdateGroupSales := true;
-                    if ItemGroupPrevious = Item."NPR Item Group" then begin
+                    if ItemGroupPrevious = Item."Item Category Code" then begin
                         if SkipNoSales then
                             if "Sales (LCY)" = 0 then
                                 UpdateGroupSales := false;
@@ -290,7 +290,7 @@ report 6014533 "NPR Inventory - flow"
                         GroupControl := 0;
                     end;
 
-                    ItemGroupPrevious := Item."NPR Item Group";
+                    ItemGroupPrevious := Item."Item Category Code";
 
                     ShowItem := false;
                     ShowItemSection := (not OnlyTotal and not SkipWithoutPortfolio and not SkipNoSales);

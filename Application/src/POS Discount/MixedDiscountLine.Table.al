@@ -18,7 +18,7 @@ table 6014412 "NPR Mixed Discount Line"
             NotBlank = true;
             TableRelation = IF ("Disc. Grouping Type" = CONST(Item)) Item
             ELSE
-            IF ("Disc. Grouping Type" = CONST("Item Group")) "NPR Item Group"
+            IF ("Disc. Grouping Type" = CONST("Item Group")) "Item Category"
             ELSE
             IF ("Disc. Grouping Type" = CONST("Item Disc. Group")) "Item Discount Group"
             ELSE
@@ -30,7 +30,7 @@ table 6014412 "NPR Mixed Discount Line"
                 Item: Record Item;
                 ItemVariant: Record "Item Variant";
                 ItemDiscountGroup: Record "Item Discount Group";
-                ItemGroup: Record "NPR Item Group";
+                ItemCategory: Record "Item Category";
                 MixedDiscount: Record "NPR Mixed Discount";
             begin
                 case "Disc. Grouping Type" of
@@ -49,8 +49,8 @@ table 6014412 "NPR Mixed Discount Line"
                         end;
                     "Disc. Grouping Type"::"Item Group":
                         begin
-                            ItemGroup.Get("No.");
-                            Description := ItemGroup.Description;
+                            ItemCategory.Get("No.");
+                            Description := ItemCategory.Description;
                         end;
                     "Disc. Grouping Type"::"Item Disc. Group":
                         begin
@@ -162,6 +162,7 @@ table 6014412 "NPR Mixed Discount Line"
         {
             Caption = 'Item Group';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
         }
         field(210; "Cross-Reference No."; Code[50])
         {

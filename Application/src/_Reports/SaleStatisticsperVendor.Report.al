@@ -88,7 +88,7 @@ report 6014416 "NPR Sale Statistics per Vendor"
                 CalcFields = "Sales (Qty.)", "COGS (LCY)", "Sales (LCY)", "Purchases (LCY)";
                 DataItemLink = "Vendor No." = FIELD("No.");
                 PrintOnlyIfDetail = false;
-                RequestFilterFields = "NPR Item Group", "Location Filter", "Date Filter";
+                RequestFilterFields = "Item Category Code", "Location Filter", "Date Filter";
                 column(No_Item; Item."No.")
                 {
                 }

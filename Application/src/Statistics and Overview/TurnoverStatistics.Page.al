@@ -179,24 +179,24 @@ page 6014411 "NPR Turnover Statistics"
 
     procedure CalculateYear(DateFilter: Code[50]; DepartmentFilter: Code[50])
     var
-        ValueEntry: Record "Value Entry";
+        AuxValueEntry: Record "NPR Aux. Value Entry";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         SalesAmountActual: Decimal;
         CostAmountActual: Decimal;
     begin
-        ValueEntry.SetCurrentKey("Salespers./Purch. Code", "NPR Item Group No.", "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code");
+        AuxValueEntry.SetCurrentKey("Salespers./Purch. Code", "Item Category Code", "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code");
 
         SalesAmountActual := 0;
         CostAmountActual := 0;
         if SalespersonPurchaser.Find('-') then
             repeat
-                ValueEntry.SetRange("Salespers./Purch. Code", SalespersonPurchaser.Code);
-                ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
-                ValueEntry.SetFilter("Posting Date", DateFilter);
-                ValueEntry.SetFilter("Global Dimension 1 Code", DepartmentFilter);
-                ValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
-                SalesAmountActual += ValueEntry."Sales Amount (Actual)";
-                CostAmountActual += -ValueEntry."Cost Amount (Actual)";
+                AuxValueEntry.SetRange("Salespers./Purch. Code", SalespersonPurchaser.Code);
+                AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
+                AuxValueEntry.SetFilter("Posting Date", DateFilter);
+                AuxValueEntry.SetFilter("Global Dimension 1 Code", DepartmentFilter);
+                AuxValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
+                SalesAmountActual += AuxValueEntry."Sales Amount (Actual)";
+                CostAmountActual += -AuxValueEntry."Cost Amount (Actual)";
             until SalespersonPurchaser.Next = 0;
         Netto := SalesAmountActual;
         CostOfGoodsSold := CostAmountActual;
@@ -209,25 +209,25 @@ page 6014411 "NPR Turnover Statistics"
 
     procedure CalculateLastYear(DateFilter: Code[50]; DepartmentFilter: Code[50])
     var
-        ValueEntry: Record "Value Entry";
+        AuxValueEntry: Record "NPR Aux. Value Entry";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         SalesAmountActual: Decimal;
         CostAmountActual: Decimal;
     begin
         TurnoverIndex := 0;
         DBIndex := 0;
-        ValueEntry.SetCurrentKey("Salespers./Purch. Code", "NPR Item Group No.", "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code");
+        AuxValueEntry.SetCurrentKey("Salespers./Purch. Code", "Item Category Code", "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code");
         SalesAmountActual := 0;
         CostAmountActual := 0;
         if SalespersonPurchaser.Find('-') then
             repeat
-                ValueEntry.SetRange("Salespers./Purch. Code", SalespersonPurchaser.Code);
-                ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
-                ValueEntry.SetFilter("Posting Date", DateFilter);
-                ValueEntry.SetFilter("Global Dimension 1 Code", DepartmentFilter);
-                ValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
-                SalesAmountActual += ValueEntry."Sales Amount (Actual)";
-                CostAmountActual += -ValueEntry."Cost Amount (Actual)";
+                AuxValueEntry.SetRange("Salespers./Purch. Code", SalespersonPurchaser.Code);
+                AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
+                AuxValueEntry.SetFilter("Posting Date", DateFilter);
+                AuxValueEntry.SetFilter("Global Dimension 1 Code", DepartmentFilter);
+                AuxValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
+                SalesAmountActual += AuxValueEntry."Sales Amount (Actual)";
+                CostAmountActual += -AuxValueEntry."Cost Amount (Actual)";
             until SalespersonPurchaser.Next = 0;
         NettoLast := SalesAmountActual;
         CostOfGoodsSoldLast := CostAmountActual;

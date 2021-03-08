@@ -1,11 +1,5 @@
 table 6014612 "NPR Retail Campaign Items"
 {
-    // NPR5.38.01/JKL/20180206 CASE table created
-    // NPR5.41/JKL /20180419 CASE 299278  added campaign profit calc + vendor item no from item + units pr. parcel + unit purchase price
-    // NPR5.42/JKL /20180523 CASE 299272  changed calc for profit + current purchprice
-    // NPR5.51/MHA /20190722 CASE 358985 Added hook OnGetVATPostingSetup() and removed redundant VAT calculation
-    // NPR5.55/ALST/20200508 CASE 397967 calculating quantity sold
-
     Caption = 'Period Discount Items';
     DataClassification = CustomerContent;
 
@@ -404,7 +398,6 @@ table 6014612 "NPR Retail Campaign Items"
 
     var
         Text1060003: Label 'The special offer price exceeds the normal retail price!';
-        ItemGroup: Record "NPR Item Group";
         Text1060005: Label 'This items includes multi unit prices, which will be controlled by period discounts';
         VATPostingSetup: Record "VAT Posting Setup";
         DG: Decimal;
@@ -594,7 +587,6 @@ table 6014612 "NPR Retail Campaign Items"
     local procedure CalcProfit()
     var
         Item: Record Item;
-        ItemGroup: Record "NPR Item Group";
         VATPostingSetup: Record "VAT Posting Setup";
         POSTaxCalculation: Codeunit "NPR POS Tax Calculation";
         Handled: Boolean;
@@ -653,30 +645,25 @@ table 6014612 "NPR Retail Campaign Items"
 
     local procedure GetQuantitySold() QuantitySold: Decimal
     var
-        ItemLedgerEntry: Record "Item Ledger Entry";
+        AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry";
     begin
-        //-NPR5.55 [397967]
-        ItemLedgerEntry.SetRange("Item No.", "Item No.");
-        ItemLedgerEntry.SetFilter("Document Date", '%1..%2', "Starting Date", "Ending Date");
-        ItemLedgerEntry.SetFilter(Quantity, '<0');
+        AuxItemLedgerEntry.SetRange("Item No.", "Item No.");
+        AuxItemLedgerEntry.SetFilter("Document Date", '%1..%2', "Starting Date", "Ending Date");
+        AuxItemLedgerEntry.SetFilter(Quantity, '<0');
         case "Disc. Type" of
             "Disc. Type"::Periodic:
-                ItemLedgerEntry.SetRange("NPR Discount Type", ItemLedgerEntry."NPR Discount Type"::Period);
+                AuxItemLedgerEntry.SetRange("Discount Type", AuxItemLedgerEntry."Discount Type"::Period);
             "Disc. Type"::Mix:
-                ItemLedgerEntry.SetRange("NPR Discount Type", ItemLedgerEntry."NPR Discount Type"::Mixed);
+                AuxItemLedgerEntry.SetRange("Discount Type", AuxItemLedgerEntry."Discount Type"::Mixed);
             else
                 exit;
         end;
-        ItemLedgerEntry.SetRange("NPR Discount Code", "Disc. Code");
-        ItemLedgerEntry.SetRange("Variant Code", "Variant Code");
+        AuxItemLedgerEntry.SetRange("Discount Code", "Disc. Code");
+        AuxItemLedgerEntry.SetRange("Variant Code", "Variant Code");
 
-        if not ItemLedgerEntry.FindSet then
-            exit;
+        AuxItemLedgerEntry.CalcSums(Quantity);
 
-        repeat
-            QuantitySold -= ItemLedgerEntry.Quantity;
-        until ItemLedgerEntry.Next = 0;
-        //+NPR5.55 [397967]
+        QuantitySold := -AuxItemLedgerEntry.Quantity;
     end;
 }
 

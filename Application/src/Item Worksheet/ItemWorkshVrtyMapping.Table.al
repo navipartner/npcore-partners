@@ -89,7 +89,7 @@ table 6060057 "NPR Item Worksh. Vrty Mapping"
                 case "Item Wksh. Maping Field" of
                     6014400:
                         begin
-                            RecRef.Open(6014410);
+                            RecRef.Open(Database::"Item Category");
                             Variant := RecRef;
                             if PAGE.RunModal(0, Variant) = ACTION::LookupOK then
                                 RecRef := Variant;

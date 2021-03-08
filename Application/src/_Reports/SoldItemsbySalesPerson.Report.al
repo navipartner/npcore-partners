@@ -36,17 +36,17 @@ report 6014412 "NPR Sold Items by Sales Person"
             column(ProfitPct_Item; ProfitPct)
             {
             }
-            dataitem("Item Ledger Entry"; "Item Ledger Entry")
+            dataitem(AuxItemLedgerEntry; "NPR Aux. Item Ledger Entry")
             {
                 DataItemLink = "Item No." = FIELD("No."), "Variant Code" = FIELD("Variant Filter"), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"), "Posting Date" = FIELD("Date Filter"), "Location Code" = FIELD("Location Filter");
-                DataItemTableView = SORTING("Item No.", "Entry Type") WHERE("Invoiced Quantity" = FILTER(<> 0), "Entry Type" = CONST(Sale), "NPR Salesperson Code" = FILTER(<> ''));
-                column(ItemNo_ItemLedgerEntry; "Item Ledger Entry"."Item No.")
+                DataItemTableView = SORTING("Item No.", "Entry Type") WHERE("Invoiced Quantity" = FILTER(<> 0), "Entry Type" = CONST(Sale), "Salespers./Purch. Code" = FILTER(<> ''));
+                column(ItemNo_ItemLedgerEntry; "Item No.")
                 {
                 }
-                column(SalespersonCode_ItemLedgerEntry; "Item Ledger Entry"."NPR Salesperson Code")
+                column(SalespersonCode_ItemLedgerEntry; "Salespers./Purch. Code")
                 {
                 }
-                column(InvoicedQuantity_ItemLedgerEntry; "Item Ledger Entry"."Invoiced Quantity")
+                column(InvoicedQuantity_ItemLedgerEntry; "Invoiced Quantity")
                 {
                 }
                 column(SalespersonName_ItemLedgerEntry; SalespersonName)
@@ -56,7 +56,7 @@ report 6014412 "NPR Sold Items by Sales Person"
                 trigger OnAfterGetRecord()
                 begin
                     SalespersonName := '';
-                    if SalespersonPurchaser.Get("NPR Salesperson Code") then
+                    if SalespersonPurchaser.Get("Salespers./Purch. Code") then
                         SalespersonName := SalespersonPurchaser.Name;
                 end;
             }

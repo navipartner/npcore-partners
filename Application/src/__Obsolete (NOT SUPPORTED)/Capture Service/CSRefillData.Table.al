@@ -60,7 +60,6 @@ table 6151388 "NPR CS Refill Data"
         {
             Caption = 'Item Group Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Item Group";
         }
         field(17; "Combined key"; Code[30])
         {

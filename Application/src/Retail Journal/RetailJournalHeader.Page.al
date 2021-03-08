@@ -115,23 +115,21 @@ page 6014490 "NPR Retail Journal Header"
                             end;
                         }
                     }
-                    group("Item Group")
+                    group("Item Category")
                     {
-                        Caption = 'Item Group';
-                        field(ItemGroupFilter; ItemGroupFilter)
+                        Caption = 'Item Category';
+                        field(ItemCategoryFilter; ItemCategoryFilter)
                         {
                             ApplicationArea = All;
-                            Caption = 'Item Group';
+                            Caption = 'Item Category';
                             ShowCaption = false;
-                            TableRelation = "NPR Item Group";
-                            ToolTip = 'Specifies the value of the Item Group field';
+                            TableRelation = "Item Category";
+                            ToolTip = 'Specifies the value of the Item Category field';
 
                             trigger OnValidate()
                             begin
-                                //-NPR5.53 [374290]
-                                ItemGroupFilter := UpperCase(ItemGroupFilter);
+                                ItemCategoryFilter := UpperCase(ItemCategoryFilter);
                                 SetLineFilters();
-                                //+NPR5.53 [374290]
                             end;
                         }
                     }
@@ -718,7 +716,7 @@ page 6014490 "NPR Retail Journal Header"
         Text001: Label 'Discount Code and Type updated successfully';
         RetailJournalCode: Codeunit "NPR Retail Journal Code";
         VendorFilter: Text;
-        ItemGroupFilter: Text;
+        ItemCategoryFilter: Text;
         ShowUnknown: Option All,"Only existing items","Only unknown items";
         ShowNew: Option All,"Only existing items","Only new items";
         ShowInventory: Option All,"In stock","Not in stock";
@@ -780,7 +778,7 @@ page 6014490 "NPR Retail Journal Header"
     local procedure SetLineFilters()
     begin
         //-NPR5.53 [374290]
-        CurrPage.SubLine.PAGE.SetLineFilters(VendorFilter, ItemGroupFilter, ShowUnknown, ShowNew, ShowInventory);
+        CurrPage.SubLine.PAGE.SetLineFilters(VendorFilter, ItemCategoryFilter, ShowUnknown, ShowNew, ShowInventory);
         //+NPR5.53 [374290]
     end;
 }

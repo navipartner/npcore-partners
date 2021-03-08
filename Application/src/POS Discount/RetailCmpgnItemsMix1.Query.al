@@ -1,8 +1,5 @@
 query 6014614 "NPR Retail Cmpgn. Items Mix 1"
 {
-    // MAG2.26/MHA /20200507  CASE 401235 Object created - returns Items used on Mixed Discount Line (Item Group) related to Retail Campaign
-
-
     elements
     {
         dataitem(Retail_Campaign_Line; "NPR Retail Campaign Line")
@@ -21,7 +18,7 @@ query 6014614 "NPR Retail Cmpgn. Items Mix 1"
                 DataItemTableFilter = "Disc. Grouping Type" = CONST("Item Group"), "No." = FILTER(<> '');
                 dataitem(Item; Item)
                 {
-                    DataItemLink = "NPR Item Group" = Mixed_Discount_Line."No.";
+                    DataItemLink = "Item Category Code" = Mixed_Discount_Line."No.";
                     SqlJoinType = InnerJoin;
                     column(Item_No; "No.")
                     {

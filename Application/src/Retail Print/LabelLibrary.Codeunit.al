@@ -564,7 +564,7 @@ codeunit 6014413 "NPR Label Library"
                             RetailJnlLine."Sales Unit of measure" := SalesUnit;
                             RetailJnlLine."Purch. Unit of measure" := PurchaseUnit;
                             RetailJnlLine."Serial No." := ItemLedgerEntry."Serial No.";
-                            RetailJnlLine."Item group" := Item."NPR Item Group";
+                            RetailJnlLine."Item group" := Item."Item Category Code";
                             RetailJnlLine.Validate("Variant Code", "Variant Code");
                             RetailJnlLine.Insert(true);
                         until ItemLedgerEntry.Next = 0;
@@ -584,7 +584,7 @@ codeunit 6014413 "NPR Label Library"
                     RetailJnlLine."Last Direct Cost" := "Unit Cost";
                     RetailJnlLine."Sales Unit of measure" := SalesUnit;
                     RetailJnlLine."Purch. Unit of measure" := PurchaseUnit;
-                    RetailJnlLine."Item group" := Item."NPR Item Group";
+                    RetailJnlLine."Item group" := Item."Item Category Code";
                     RetailJnlLine.Validate("Variant Code", "Variant Code");
                     RetailJnlLine.Insert(true);
                 end;

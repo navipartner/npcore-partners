@@ -256,7 +256,7 @@ page 6151597 "NPR NpDc Coupon List Items"
 
         FilterPageBuilder.AddFieldNo(TableMetadata.Name, Item.FieldNo("No."));
         FilterPageBuilder.AddFieldNo(TableMetadata.Name, Item.FieldNo("Vendor No."));
-        FilterPageBuilder.AddFieldNo(TableMetadata.Name, Item.FieldNo("NPR Item Group"));
+        FilterPageBuilder.AddFieldNo(TableMetadata.Name, Item.FieldNo("Item Category Code"));
         FilterPageBuilder.AddFieldNo(TableMetadata.Name, Item.FieldNo("Item Disc. Group"));
         FilterPageBuilder.AddFieldNo(TableMetadata.Name, Item.FieldNo("Search Description"));
         FilterPageBuilder.PageCaption := Text000;

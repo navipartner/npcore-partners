@@ -362,7 +362,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
     local procedure IssueOnSaleAchieved(SalePOS: Record "NPR Sale POS"; CouponType: Record "NPR NpDc Coupon Type") NewCouponQty: Integer
     var
         NpDcIssueOnSaleSetup: Record "NPR NpDc Iss.OnSale Setup";
-        NpDcItemBuffer: Record "NPR NpDc Item Buffer" temporary;
+        NpDcItemBuffer: Record "NPR NpDc Item Buffer 2" temporary;
         SalesAmount: Decimal;
         ItemQty: Decimal;
     begin
@@ -390,7 +390,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         exit(NewCouponQty);
     end;
 
-    local procedure GetLotQty(NpDcIssueOnSaleSetup: Record "NPR NpDc Iss.OnSale Setup"; var NpDcItemBuffer: Record "NPR NpDc Item Buffer" temporary) LotQty: Decimal
+    local procedure GetLotQty(NpDcIssueOnSaleSetup: Record "NPR NpDc Iss.OnSale Setup"; var NpDcItemBuffer: Record "NPR NpDc Item Buffer 2" temporary) LotQty: Decimal
     var
         NpDcIssueOnSaleSetupLine: Record "NPR NpDc Iss.OnSale Setup Line";
         LotLineQty: Decimal;
@@ -407,7 +407,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
                 NpDcIssueOnSaleSetupLine.Type::Item:
                     NpDcItemBuffer.SetRange("Item No.", NpDcIssueOnSaleSetupLine."No.");
                 NpDcIssueOnSaleSetupLine.Type::"Item Group":
-                    NpDcItemBuffer.SetRange("Item Group", NpDcIssueOnSaleSetupLine."No.");
+                    NpDcItemBuffer.SetRange("Item Category Code", NpDcIssueOnSaleSetupLine."No.");
                 NpDcIssueOnSaleSetupLine.Type::"Item Disc. Group":
                     NpDcItemBuffer.SetRange("Item Disc. Group", NpDcIssueOnSaleSetupLine."No.");
             end;
@@ -426,7 +426,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         exit(LotQty);
     end;
 
-    local procedure SalePOS2DiscBuffer(SalePOS: Record "NPR Sale POS"; CouponType: Record "NPR NpDc Coupon Type"; var NpDcItemBuffer: Record "NPR NpDc Item Buffer" temporary): Decimal
+    local procedure SalePOS2DiscBuffer(SalePOS: Record "NPR Sale POS"; CouponType: Record "NPR NpDc Coupon Type"; var NpDcItemBuffer: Record "NPR NpDc Item Buffer 2" temporary): Decimal
     var
         SaleLinePOS: Record "NPR Sale Line POS";
         NpDcIssueOnSaleSetupLine: Record "NPR NpDc Iss.OnSale Setup Line";
@@ -455,7 +455,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
                 NpDcIssueOnSaleSetupLine.Type::Item:
                     SaleLinePOS.SetRange("No.", NpDcIssueOnSaleSetupLine."No.");
                 NpDcIssueOnSaleSetupLine.Type::"Item Group":
-                    SaleLinePOS.SetRange("Item Group", NpDcIssueOnSaleSetupLine."No.");
+                    SaleLinePOS.SetRange("Item Category Code", NpDcIssueOnSaleSetupLine."No.");
                 NpDcIssueOnSaleSetupLine.Type::"Item Disc. Group":
                     SaleLinePOS.SetRange("Item Disc. Group", NpDcIssueOnSaleSetupLine."No.");
             end;
@@ -463,14 +463,14 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         until NpDcIssueOnSaleSetupLine.Next = 0;
     end;
 
-    local procedure SaleLinePOS2DiscBuffer(var SaleLinePOS: Record "NPR Sale Line POS"; var NpDcItemBuffer: Record "NPR NpDc Item Buffer" temporary): Decimal
+    local procedure SaleLinePOS2DiscBuffer(var SaleLinePOS: Record "NPR Sale Line POS"; var NpDcItemBuffer: Record "NPR NpDc Item Buffer 2" temporary): Decimal
     begin
         if not SaleLinePOS.FindSet then
             exit;
 
         repeat
             if NpDcItemBuffer.Get(
-                SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Item Group", SaleLinePOS."Item Disc. Group", SaleLinePOS."Unit Price", 0, '')
+                SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Item Category Code", SaleLinePOS."Item Disc. Group", SaleLinePOS."Unit Price", 0, '')
             then begin
                 NpDcItemBuffer.Quantity += SaleLinePOS.Quantity;
                 NpDcItemBuffer."Line Amount" += SaleLinePOS."Amount Including VAT";
@@ -479,7 +479,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
                 NpDcItemBuffer.Init;
                 NpDcItemBuffer."Item No." := SaleLinePOS."No.";
                 NpDcItemBuffer."Variant Code" := SaleLinePOS."Variant Code";
-                NpDcItemBuffer."Item Group" := SaleLinePOS."Item Group";
+                NpDcItemBuffer."Item Category Code" := SaleLinePOS."Item Category Code";
                 NpDcItemBuffer."Item Disc. Group" := SaleLinePOS."Item Disc. Group";
                 NpDcItemBuffer."Unit Price" := SaleLinePOS."Unit Price";
                 NpDcItemBuffer."Discount Type" := 0;

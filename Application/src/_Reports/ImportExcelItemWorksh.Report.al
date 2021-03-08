@@ -225,9 +225,6 @@ report 6060042 "NPR Import Excel Item Worksh."
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Item No."), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 ItemWorksheetLine.Validate("Item No.", CopyStr(AppendPrefix(ExcelBuf2."Cell Value as Text", ItemWorksheetLine), 1, FieldLength));
-                        if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Item Group"), MappedColumnNo, FieldLength) then
-                            if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
-                                ItemWorksheetLine.Validate("Item Group", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Vendor No."), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 ItemWorksheetLine.Validate("Vendor No.", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
@@ -300,8 +297,6 @@ report 6060042 "NPR Import Excel Item Worksh."
                             ItemWorksheetLine.Validate("Item No.", ExcelBuf2."Cell Value as Text");
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 5) then
                             ItemWorksheetLine.Validate("Vendor Item No.", ExcelBuf2."Cell Value as Text");
-                        if ExcelBuf2.Get(ExcelBuf."Row No.", 12) then
-                            ItemWorksheetLine.Validate("Item Group", ExcelBuf2."Cell Value as Text");
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 11) then
                             ItemWorksheetLine.Validate("Vendor No.", ExcelBuf2."Cell Value as Text");
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 2) then

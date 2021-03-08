@@ -198,7 +198,7 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
             NpDcCouponListItem.Type::"Item Disc. Group":
                 SaleLinePOS.SetRange("Item Disc. Group", NpDcCouponListItem."No.");
             NpDcCouponListItem.Type::"Item Group":
-                SaleLinePOS.SetRange("Item Group", NpDcCouponListItem."No.");
+                SaleLinePOS.SetRange("Item Category Code", NpDcCouponListItem."No.");
         end;
         SaleLinePOS.CalcSums(Quantity);
         exit(SaleLinePOS.Quantity);
@@ -222,7 +222,7 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
             NpDcCouponListItem.Type::"Item Disc. Group":
                 SaleLinePOS.SetRange("Item Disc. Group", NpDcCouponListItem."No.");
             NpDcCouponListItem.Type::"Item Group":
-                SaleLinePOS.SetRange("Item Group", NpDcCouponListItem."No.");
+                SaleLinePOS.SetRange("Item Category Code", NpDcCouponListItem."No.");
         end;
         SaleLinePOS.CalcSums(Quantity);
         exit(SaleLinePOS.Quantity div NpDcCouponListItem."Validation Quantity");

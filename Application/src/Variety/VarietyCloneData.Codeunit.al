@@ -743,7 +743,6 @@ codeunit 6059972 "NPR Variety Clone Data"
 
     procedure ShowEAN13BarcodeNoSetup()
     var
-        RetailItemSetup: Record "NPR Retail Item Setup";
         VarietySetup: Record "NPR Variety Setup";
         NoSeriesMgt: Codeunit NoSeriesManagement;
         ItemRef1: Record "Item Reference";
@@ -751,7 +750,6 @@ codeunit 6059972 "NPR Variety Clone Data"
         Filler: array[3] of Text;
         NextNo: array[3] of Text;
     begin
-        RetailItemSetup.Get;
         VarietySetup.Get;
         if VarietySetup."EAN-Internal" <> 0 then begin
             ItemRef1.SetCurrentKey("Reference Type", "Reference No.");
@@ -779,25 +777,9 @@ codeunit 6059972 "NPR Variety Clone Data"
                 '   ' + VarietySetup.FieldCaption("External EAN No. Series") + ' : ' + VarietySetup."External EAN No. Series" + '\' +
                 '   ' + VarietySetup.FieldCaption("EAN-External") + ' : ' + Format(VarietySetup."EAN-External") + '\' +
                 '   ' + Format(VarietySetup."EAN-External") + '-' + Filler[2] + '-' + NextNo[2] + '-x\' +
-                '    Last Item reference found: ' + ItemRef2."Reference No." + '\' +
-                'Retail Setup Enabled Fields:\' +
-                '   ' + RetailItemSetup.FieldCaption("Autocreate EAN-Number") + ' : ' + Format(RetailItemSetup."Autocreate EAN-Number") + '\' +
-                '   ' + RetailItemSetup.FieldCaption("EAN No. at 1 star") + ' : ' + Format(RetailItemSetup."EAN No. at 1 star") + '\' +
-                '   ' + RetailItemSetup.FieldCaption("EAN-No. at Item Create") + ' : ' + Format(RetailItemSetup."EAN-No. at Item Create") + '\'
+                '    Last Item reference found: ' + ItemRef2."Reference No." + '\'
         );
         //+VRT1.11
-    end;
-
-    procedure DisableOldBarcodeSetup()
-    var
-        RetailItemSetup: Record "NPR Retail Item Setup";
-    begin
-        RetailItemSetup.Get;
-        RetailItemSetup."Autocreate EAN-Number" := false;
-        RetailItemSetup."EAN No. at 1 star" := false;
-        RetailItemSetup."EAN-No. at Item Create" := false;
-
-        RetailItemSetup.Modify;
     end;
 
     procedure AssignBarcodes(Item: Record Item)

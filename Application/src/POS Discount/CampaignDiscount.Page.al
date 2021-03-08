@@ -162,27 +162,6 @@ page 6014453 "NPR Campaign Discount"
 
     actions
     {
-        area(navigation)
-        {
-            action(Dimensions)
-            {
-                Caption = 'Dimensions';
-                Image = Dimensions;
-                RunObject = Page "Default Dimensions";
-                RunPageLink = "Table ID" = CONST(6014413),
-                              "No." = FIELD(Code);
-                ShortCutKey = 'Shift+Ctrl+D';
-                ApplicationArea = All;
-                ToolTip = 'Executes the Dimensions action';
-
-                trigger OnAction()
-                var
-                    NPRDimMgt: Codeunit "NPR Dimension Mgt.";
-                begin
-                    NPRDimMgt.OpenFormDefaultDimensions(DATABASE::"NPR Period Discount", Code);
-                end;
-            }
-        }
         area(processing)
         {
             group("Lin&e")
@@ -276,24 +255,24 @@ page 6014453 "NPR Campaign Discount"
                             end;
                         end;
                     }
-                    action("Transfer from Item Group")
+                    action("Transfer from Item Category")
                     {
-                        Caption = 'Transfer from Item Group';
+                        Caption = 'Transfer from Item Category';
                         Image = TransferToLines;
                         ApplicationArea = All;
-                        ToolTip = 'Executes the Transfer from Item Group action';
+                        ToolTip = 'Executes the Transfer from Item Category action';
 
                         trigger OnAction()
                         var
-                            ItemGroup: Record "NPR Item Group";
-                            ItemGroupTree: Page "NPR Item Group Tree";
+                            ItemCategory: Record "Item Category";
+                            ItemCategories: Page "Item Categories";
                         begin
-                            Clear(ItemGroupTree);
-                            ItemGroupTree.LookupMode := true;
-                            if (ItemGroupTree.RunModal = ACTION::LookupOK) then begin
+                            Clear(ItemCategories);
+                            ItemCategories.LookupMode := true;
+                            if (ItemCategories.RunModal = ACTION::LookupOK) then begin
                                 Item.Reset;
-                                ItemGroupTree.GetRecord(ItemGroup);
-                                Item.SetRange("NPR Item Group", ItemGroup."No.");
+                                ItemCategories.GetRecord(ItemCategory);
+                                Item.SetRange("Item Category Code", ItemCategory.Code);
                                 Item.SetFilter("Unit Price", '<>0');
                                 TransferToPeriod();
                             end;

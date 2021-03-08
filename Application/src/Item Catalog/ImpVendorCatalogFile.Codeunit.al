@@ -1,12 +1,5 @@
 codeunit 6060061 "NPR Imp. Vendor Catalog File"
 {
-    // NPR5.39/BR  /20171207 CASE 295322 Process Vendor File
-    // NPR5.42/RA/20180523  CASE 295322 Process Vendor File
-    // NPR5.45/RA  /20180802  CASE 295322 Added Item Material that will be used to find Item group
-    // NPR5.45/RA  /20180827  CASE 325023 Added density
-    // NPR5.48/RA  /20181128  CASE 337498 Functionality of field "Item Category Code" changed coding modified to support this
-
-
     trigger OnRun()
     var
         FileManagement: Codeunit "File Management";
@@ -268,7 +261,6 @@ codeunit 6060061 "NPR Imp. Vendor Catalog File"
     local procedure UpdateItem(var FieldArray: array[200] of Text; var Item: Record Item)
     var
         NPRAttribute: Record "NPR Attribute";
-        ItemCategoryMapping: Record "NPR Item Category Mapping";
         CatalogNonstockManagement: Codeunit "NPR Catalog Nonstock Mgt.";
     begin
         with Item do begin
@@ -278,14 +270,7 @@ codeunit 6060061 "NPR Imp. Vendor Catalog File"
                 repeat
                     CatalogNonstockManagement.UpdateItemAttribute(0, "No.", NPRAttribute.Code, FieldArray[NPRAttribute."Import File Column No."]);
                 until NPRAttribute.Next = 0;
-            //-NPR5.45
-            if "NPR Item Group" = '' then
-                //-NPR5.45
-                //IF ItemCategoryMapping.GET(FieldArray[38], FieldArray[44]) THEN
-                if ItemCategoryMapping.Get(FieldArray[38], FieldArray[44], FieldArray[45]) then
-                    //+NPR5.45
-                    Validate("NPR Item Group", ItemCategoryMapping."Item Group");
-            //+NPR5.45
+
             Modify;
         end;
     end;

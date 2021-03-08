@@ -7,7 +7,6 @@ codeunit 85010 "NPR Library - E-Commerce"
         PostSalesOrderDescLbl: Label 'Post Sales Order';
         DeleteSalesOrderDescLbl: Label 'Delete Sales Order';
 
-
     procedure CreateEcStore(StoreCode: Code[20])
     var
         EcStore: Record "NPR NpEc Store";

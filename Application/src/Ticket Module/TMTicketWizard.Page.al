@@ -1,7 +1,5 @@
 page 6151133 "NPR TM Ticket Wizard"
 {
-    // TM90.1.46/TSA /20200320 CASE 397084 Initial Version
-
     Caption = 'Ticket Setup Wizard';
     DataCaptionExpression = Description;
     DataCaptionFields = Description;
@@ -62,14 +60,14 @@ page 6151133 "NPR TM Ticket Wizard"
                             TmpAdmissionDescription := TmpDescription;
                     end;
                 }
-                field(ItemGroup; TmpItemGroup)
+                field(ItemGroup; TmpItemCategory)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Item Group';
                     Editable = NOT (ItemNumberValid);
                     ShowMandatory = true;
-                    TableRelation = "NPR Item Group";
-                    ToolTip = 'Specifies the value of the Item Group field';
+                    TableRelation = "Item Category";
+                    ToolTip = 'Specifies the value of the Item Category field';
                 }
                 field(UnitPrice; TmpUnitPrice)
                 {
@@ -215,8 +213,8 @@ page 6151133 "NPR TM Ticket Wizard"
     begin
 
         if (CloseAction = ACTION::LookupOK) then begin
-            if (TmpItemGroup = '') then
-                Error(MUST_NOT_BE_BLANK, Item.FieldCaption("NPR Item Group"));
+            if (TmpItemCategory = '') then
+                Error(MUST_NOT_BE_BLANK, Item.FieldCaption("Item Category Code"));
 
             if (TmpDescription = '') then
                 Error(MUST_NOT_BE_BLANK, Item.FieldCaption(Description));
@@ -242,7 +240,7 @@ page 6151133 "NPR TM Ticket Wizard"
         TmpTicketBomTemplate: Code[10];
         TicketTypeCodeValid: Boolean;
         AdmissionCodeValid: Boolean;
-        TmpItemGroup: Code[10];
+        TmpItemCategory: Code[20];
         TmpItemNo: Code[20];
         TmpUnitPrice: Decimal;
         ItemNumberValid: Boolean;
@@ -303,7 +301,7 @@ page 6151133 "NPR TM Ticket Wizard"
         ItemNumberValid := Item.Get(TmpItemNo);
         if (ItemNumberValid) then begin
             TmpDescription := Item.Description;
-            TmpItemGroup := Item."NPR Item Group";
+            TmpItemCategory := Item."Item Category Code";
             TmpUnitPrice := Item."Unit Price";
 
             TmpTicketTypeCode := Item."NPR Ticket Type";
@@ -311,12 +309,12 @@ page 6151133 "NPR TM Ticket Wizard"
         end;
     end;
 
-    procedure GetItemInformation(var ItemNumberOut: Code[20]; var DescriptionOut: Text[30]; var ItemGroupOut: Code[10]; var UnitPriceOut: Decimal; var TicketBomTemplateOut: Code[10])
+    procedure GetItemInformation(var ItemNumberOut: Code[20]; var DescriptionOut: Text[30]; var ItemCategoryOut: Code[20]; var UnitPriceOut: Decimal; var TicketBomTemplateOut: Code[10])
     begin
 
         ItemNumberOut := TmpItemNo;
         DescriptionOut := TmpDescription;
-        ItemGroupOut := TmpItemGroup;
+        ItemCategoryOut := TmpItemCategory;
         UnitPriceOut := TmpUnitPrice;
         TicketBomTemplateOut := TmpTicketBomTemplate;
     end;

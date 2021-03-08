@@ -26,7 +26,7 @@ report 6014405 "NPR Salesperson/Item Group Top"
             column(SalesPersonFilters; "Salesperson/Purchaser".GetFilters)
             {
             }
-            column(ItemGroupFilters; "Item Group".GetFilters)
+            column(ItemGroupFilters; "Item Category".GetFilters)
             {
             }
             column(sorteringstext; SortingText)
@@ -92,15 +92,15 @@ report 6014405 "NPR Salesperson/Item Group Top"
             column(ShowQty; ShowQty)
             {
             }
-            dataitem("Item Group"; "NPR Item Group")
+            dataitem("Item Category"; "Item Category")
             {
-                CalcFields = "Sales (LCY)", "Consumption (Amount)";
-                DataItemLink = "Salesperson Filter" = FIELD(Code), "Date Filter" = FIELD("Date Filter");
-                DataItemTableView = SORTING("No.");
-                column(No_ItemGroup; "Item Group"."No.")
+                CalcFields = "NPR Sales (LCY)", "NPR Consumption (Amount)";
+                DataItemLink = "NPR Salesperson/Purch. Filter" = FIELD(Code), "NPR Date Filter" = FIELD("Date Filter");
+                DataItemTableView = SORTING("Code");
+                column(No_ItemGroup; "Item Category"."Code")
                 {
                 }
-                column(Description_ItemGroup; "Item Group".Description)
+                column(Description_ItemGroup; "Item Category".Description)
                 {
                 }
                 column(SaleLCY_ItemGroup; SalesLCYGP)
@@ -123,17 +123,18 @@ report 6014405 "NPR Salesperson/Item Group Top"
 
                     SalesLCYGP := 0;
                     CogsLCYGP := 0;
-                    ValueEntryGP.Reset();
-                    ValueEntryGP.SetRange("Item Ledger Entry Type", ValueEntryGP."Item Ledger Entry Type"::Sale);
-                    ValueEntryGP.SetRange("Salespers./Purch. Code", "Salesperson/Purchaser".Code);
-                    ValueEntryGP.SetRange("NPR Item Group No.", "Item Group"."No.");
-                    ValueEntryGP.SetFilter("Posting Date", SPDateFilter);
-                    ValueEntryGP.SetFilter("Global Dimension 1 Code", SPGlobalDim1Filter);
-                    if ValueEntryGP.FindSet() then
-                        repeat
-                            SalesLCYGP += ValueEntryGP."Sales Amount (Actual)";
-                            CogsLCYGP += -ValueEntryGP."Cost Amount (Actual)";
-                        until ValueEntryGP.Next() = 0;
+
+                    AuxValueEntry.Reset();
+                    AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
+                    AuxValueEntry.SetRange("Salespers./Purch. Code", "Salesperson/Purchaser".Code);
+                    AuxValueEntry.SetRange("Item Category Code", "Item Category".Code);
+                    AuxValueEntry.SetFilter("Posting Date", SPDateFilter);
+                    AuxValueEntry.SetFilter("Global Dimension 1 Code", SPGlobalDim1Filter);
+                    AuxValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
+
+                    SalesLCYGP := AuxValueEntry."Sales Amount (Actual)";
+                    CogsLCYGP := -AuxValueEntry."Cost Amount (Actual)";
+
                     if SalesLCYGP = 0 then
                         CurrReport.Skip();
 
@@ -146,7 +147,7 @@ report 6014405 "NPR Salesperson/Item Group Top"
                         ItemAmount.Init();
                         ItemAmount.Amount := -SalesLCYGP;
                         ItemAmount."Amount 2" := CogsLCYGP;
-                        ItemAmount."Item No." := "No.";
+                        ItemAmount."Item No." := "Code";
                         ItemAmount.Insert();
 
                         if (i = 0) or (i < ShowQty) then
@@ -160,7 +161,7 @@ report 6014405 "NPR Salesperson/Item Group Top"
 
                 trigger OnPreDataItem()
                 begin
-                    "Item Group".SetFilter("No.", SPItemGroupFilter);
+                    "Item Category".SetFilter("Code", SPItemGroupFilter);
                 end;
             }
             dataitem("Integer"; "Integer")
@@ -169,10 +170,10 @@ report 6014405 "NPR Salesperson/Item Group Top"
                 column(Number_Integer; Integer.Number)
                 {
                 }
-                column(No1_ItemGroup; "Item Group"."No.")
+                column(No1_ItemGroup; "Item Category"."Code")
                 {
                 }
-                column(Description1_ItemGroup; "Item Group".Description)
+                column(Description1_ItemGroup; "Item Category".Description)
                 {
                 }
                 column(SaleLCY1_ItemGroup; SalesLCYGPINT)
@@ -200,21 +201,20 @@ report 6014405 "NPR Salesperson/Item Group Top"
                         if ItemAmount.Next = 0 then
                             CurrReport.Break();
 
-                    "Item Group".Get(ItemAmount."Item No.");
+                    "Item Category".Get(ItemAmount."Item No.");
                     SalesLCYGPINT := 0;
                     CogsLCYGPINT := 0;
-                    ValueEntryGP.Reset;
-                    ValueEntryGP.SetRange("Item Ledger Entry Type", ValueEntryGP."Item Ledger Entry Type"::Sale);
-                    ValueEntryGP.SetRange("Salespers./Purch. Code", "Salesperson/Purchaser".Code);
-                    ValueEntryGP.SetRange("NPR Item Group No.", ItemAmount."Item No.");
-                    ValueEntryGP.SetFilter("Posting Date", SPDateFilter);
-                    ValueEntryGP.SetFilter("Global Dimension 1 Code", SPGlobalDim1Filter);
-                    if ValueEntryGP.FindSet() then
-                        repeat
-                            SalesLCYGPINT += ValueEntryGP."Sales Amount (Actual)";
-                            CogsLCYGPINT += -ValueEntryGP."Cost Amount (Actual)";
-                        until ValueEntryGP.Next() = 0;
 
+                    AuxValueEntry.Reset();
+                    AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
+                    AuxValueEntry.SetRange("Salespers./Purch. Code", "Salesperson/Purchaser".Code);
+                    AuxValueEntry.SetRange("Item Category Code", ItemAmount."Item No.");
+                    AuxValueEntry.SetFilter("Posting Date", SPDateFilter);
+                    AuxValueEntry.SetFilter("Global Dimension 1 Code", SPGlobalDim1Filter);
+                    AuxValueEntry.CalcSums("Sales Amount (Actual)", "Cost Amount (Actual)");
+
+                    SalesLCYGP := AuxValueEntry."Sales Amount (Actual)";
+                    CogsLCYGP := -AuxValueEntry."Cost Amount (Actual)";
 
                     Clear(dg);
                     Clear(SalesPct);
@@ -230,17 +230,17 @@ report 6014405 "NPR Salesperson/Item Group Top"
             begin
                 SalesLCY := 0;
                 CogsLCY := 0;
-                ValueEntry.Reset;
-                ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
-                ValueEntry.SetRange("Salespers./Purch. Code", "Salesperson/Purchaser".Code);
-                CopyFilter("Date Filter", ValueEntry."Posting Date");
-                CopyFilter("NPR Item Group Filter", ValueEntry."NPR Item Group No.");
-                CopyFilter("NPR Global Dimension 1 Filter", ValueEntry."Global Dimension 1 Code");
-                if ValueEntry.FindSet() then
-                    repeat
-                        SalesLCY += ValueEntry."Sales Amount (Actual)";
-                        CogsLCY += -ValueEntry."Cost Amount (Actual)"
-                    until ValueEntry.Next() = 0;
+
+                AuxValueEntry.Reset;
+                AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
+                AuxValueEntry.SetRange("Salespers./Purch. Code", "Salesperson/Purchaser".Code);
+                CopyFilter("Date Filter", AuxValueEntry."Posting Date");
+                CopyFilter("NPR Item Category Filter", AuxValueEntry."Item Category Code");
+                CopyFilter("NPR Global Dimension 1 Filter", AuxValueEntry."Global Dimension 1 Code");
+                AuxValueEntry.CalcFields("Sales Amount (Actual)", "Cost Amount (Actual)");
+
+                SalesLCY := AuxValueEntry."Sales Amount (Actual)";
+                CogsLCY := -AuxValueEntry."Cost Amount (Actual)";
 
                 ItemAmount.DeleteAll();
 
@@ -270,7 +270,7 @@ report 6014405 "NPR Salesperson/Item Group Top"
                     SortingText := '';
                 SPDateFilter := "Salesperson/Purchaser".GetFilter("Date Filter");
                 SPGlobalDim1Filter := "Salesperson/Purchaser".GetFilter("Global Dimension 1 Code");
-                SPItemGroupFilter := "Salesperson/Purchaser".GetFilter("NPR Item Group Filter");
+                SPItemGroupFilter := "Salesperson/Purchaser".GetFilter("NPR Item Category Filter");
             end;
         }
     }
@@ -349,8 +349,7 @@ report 6014405 "NPR Salesperson/Item Group Top"
     var
         CompanyInformation: Record "Company Information";
         ItemAmount: Record "Item Amount" temporary;
-        ValueEntry: Record "Value Entry";
-        ValueEntryGP: Record "Value Entry";
+        AuxValueEntry: Record "NPR Aux. Value Entry";
         ShowMainTotal: Boolean;
         [InDataSet]
         ShowMainTotalVisible: Boolean;

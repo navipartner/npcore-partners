@@ -153,8 +153,6 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         GetItem(ItemWkshLine."Item No.");
         with Item do begin
             Validate("Vendor Item No.", ItemWkshLine."Vendor Item No.");
-            if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Item Group")) then
-                Validate("NPR Item Group", ItemWkshLine."Item Group");
             if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Vendor No.")) then
                 Validate("Vendor No.", ItemWkshLine."Vendor No.");
             Validate(Description, ItemWkshLine.Description);
@@ -605,7 +603,6 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         RegisteredWorksheetLine."Manufacturer Code" := ItemWkshLine."Manufacturer Code";
         RegisteredWorksheetLine."Item Category Code" := ItemWkshLine."Item Category Code";
         RegisteredWorksheetLine."Product Group Code" := ItemWkshLine."Product Group Code";
-        RegisteredWorksheetLine."Item Group" := ItemWkshLine."Item Group";
         RegisteredWorksheetLine."Variant Code" := ItemWkshLine."Variant Code";
         RegisteredWorksheetLine."Sales Price Currency Code" := ItemWkshLine."Sales Price Currency Code";
         RegisteredWorksheetLine."Purchase Price Currency Code" := ItemWkshLine."Purchase Price Currency Code";

@@ -57,11 +57,12 @@ report 6014404 "NPR Return Reason Code Stat."
             column(ExistItemLedgEntry; ExistItemLedgEntry)
             {
             }
-            dataitem("Item Ledger Entry"; "Item Ledger Entry")
+            dataitem(AuxItemLedgerEntry; "NPR Aux. Item Ledger Entry")
             {
                 DataItemLink = "Return Reason Code" = FIELD(Code);
                 DataItemTableView = SORTING("Entry No.");
-                RequestFilterFields = "Posting Date", "NPR Register Number";
+                RequestFilterFields = "Posting Date", "POS Unit No.";
+
                 column(EntryNo_ItemLedgerEntry; "Entry No.")
                 {
                 }
@@ -81,7 +82,7 @@ report 6014404 "NPR Return Reason Code Stat."
                 column(CustomerNo; CustomerNo)
                 {
                 }
-                column(ExternalDocumentNo_ItemLedgerEntry; "External Document No.")
+                column(ExternalDocumentNo_ItemLedgerEntry; GlobItemLedgerentry."External Document No.")
                 {
                     IncludeCaption = true;
                 }
@@ -89,18 +90,18 @@ report 6014404 "NPR Return Reason Code Stat."
                 {
                     IncludeCaption = true;
                 }
-                column(DocumentNo_ItemLedgerEntry; "Document No.")
+                column(DocumentNo_ItemLedgerEntry; GlobItemLedgerentry."Document No.")
                 {
                 }
-                column(RegisterNumber_ItemLedgerEntry; "NPR Register Number")
-                {
-                    IncludeCaption = true;
-                }
-                column(SalespersonCode_ItemLedgerEntry; "NPR Salesperson Code")
+                column(RegisterNumber_ItemLedgerEntry; "POS Unit No.")
                 {
                     IncludeCaption = true;
                 }
-                column(UnitofMeasureCode_ItemLedgerEntry; "Unit of Measure Code")
+                column(SalespersonCode_ItemLedgerEntry; "Salespers./Purch. Code")
+                {
+                    IncludeCaption = true;
+                }
+                column(UnitofMeasureCode_ItemLedgerEntry; GlobItemLedgerentry."Unit of Measure Code")
                 {
                 }
                 column(Quantity_ItemLedgerEntry; Quantity)
@@ -110,14 +111,14 @@ report 6014404 "NPR Return Reason Code Stat."
                 column(CostAmount; CostAmount)
                 {
                 }
-                column(SalesAmountActual_ItemLedgerEntry; "Sales Amount (Actual)")
+                column(SalesAmountActual_ItemLedgerEntry; GlobItemLedgerentry."Sales Amount (Actual)")
                 {
                 }
 
                 trigger OnAfterGetRecord()
                 begin
-
-                    CalcFields("Sales Amount (Actual)", "Cost Amount (Expected)", "Cost Amount (Actual)");
+                    GlobItemLedgerentry.get("Entry No.");
+                    GlobItemLedgerentry.CalcFields("Sales Amount (Actual)", "Cost Amount (Expected)", "Cost Amount (Actual)");
 
                     if Item.Get("Item No.") then
                         ItemDescription := Item.Description;
@@ -131,7 +132,7 @@ report 6014404 "NPR Return Reason Code Stat."
                     if "Source Type" = "Source Type"::Customer then
                         CustomerNo := "Source No.";
 
-                    CostAmount := "Cost Amount (Expected)" + "Cost Amount (Actual)";
+                    CostAmount := GlobItemLedgerentry."Cost Amount (Expected)" + GlobItemLedgerentry."Cost Amount (Actual)";
                 end;
             }
 
@@ -153,12 +154,13 @@ report 6014404 "NPR Return Reason Code Stat."
         if "Return Reason".GetFilters <> '' then
             ReturnReasonFilters := "Return Reason".TableCaption + ' ' + "Return Reason".GetFilters;
 
-        if "Item Ledger Entry".GetFilters <> '' then
-            ItemLedgerEntryFilters := "Item Ledger Entry".TableCaption + ' ' + "Item Ledger Entry".GetFilters;
+        if AuxItemLedgerEntry.GetFilters <> '' then
+            ItemLedgerEntryFilters := AuxItemLedgerEntry.TableCaption + ' ' + AuxItemLedgerEntry.GetFilters;
     end;
 
     var
         Item: Record Item;
+        GlobItemLedgerentry: Record "Item Ledger Entry";
         ExistItemLedgEntry: Boolean;
         CostAmount: Decimal;
         BaseUOMCaption: Label 'Base UOM';

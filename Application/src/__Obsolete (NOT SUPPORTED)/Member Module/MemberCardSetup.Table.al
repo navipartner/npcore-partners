@@ -22,10 +22,6 @@ table 6059772 "NPR Member Card Setup"
         field(3; "No."; Code[20])
         {
             Caption = 'Code';
-            TableRelation = IF (Type = CONST(Item)) Item."No."
-            ELSE
-            IF (Type = CONST("Item Group")) "NPR Item Group"."No.";
-            ValidateTableRelation = false;
             DataClassification = CustomerContent;
         }
         field(5; "Units Per Point"; Decimal)

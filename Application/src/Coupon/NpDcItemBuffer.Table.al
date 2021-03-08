@@ -2,6 +2,8 @@ table 6151604 "NPR NpDc Item Buffer"
 {
     Caption = 'Discount Item Buffer';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Item Group is obsolete, new table with Item Category Code as part of primary key is created.';
 
     fields
     {

@@ -401,24 +401,24 @@ page 6014450 "NPR Mixed Discount"
                             end;
                         end;
                     }
-                    action("Transfer Item Group")
+                    action("Transfer Item Category")
                     {
-                        Caption = 'Transfer Item Group';
+                        Caption = 'Transfer Item Category';
                         Image = TransferToLines;
                         ApplicationArea = All;
-                        ToolTip = 'Executes the Transfer Item Group action';
+                        ToolTip = 'Executes the Transfer Item Category action';
 
                         trigger OnAction()
                         var
-                            Varegruppe: Record "NPR Item Group";
-                            Varegrp: Page "NPR Item Group Tree";
+                            ItemCategory: Record "Item Category";
+                            ItemCategories: Page "Item Categories";
                         begin
-                            Clear(Varegrp);
-                            Varegrp.LookupMode := true;
-                            if (Varegrp.RunModal = ACTION::LookupOK) then begin
+                            Clear(ItemCategories);
+                            ItemCategories.LookupMode := true;
+                            if (ItemCategories.RunModal = ACTION::LookupOK) then begin
                                 Item.Reset;
-                                Varegrp.GetRecord(Varegruppe);
-                                Item.SetRange("NPR Item Group", Varegruppe."No.");
+                                ItemCategories.GetRecord(ItemCategory);
+                                Item.SetRange("Item Category Code", ItemCategory.Code);
                                 TransferToMix();
                             end;
                         end;

@@ -56,43 +56,10 @@ table 6059982 "NPR Item Repair"
             Editable = false;
             FieldClass = FlowField;
         }
-        field(30; "No. Of tests"; Integer)
-        {
-            CalcFormula = Count ("NPR Item Repair Tests" WHERE("Item No." = FIELD("Item No."),
-                                                           "Variant Code" = FIELD("Variant Code")));
-            Caption = 'No. Of tests';
-            Editable = false;
-            FieldClass = FlowField;
-        }
-        field(31; "No.Of Errors"; Integer)
-        {
-            CalcFormula = Count ("NPR Item Repair Tests" WHERE("Item No." = FIELD("Item No."),
-                                                           "Variant Code" = FIELD("Variant Code"),
-                                                           Success = CONST(false)));
-            Caption = 'No.Of Errors';
-            Editable = false;
-            FieldClass = FlowField;
-        }
         field(32; "Errors Exists"; Boolean)
         {
             Caption = 'Errors Exists';
             DataClassification = CustomerContent;
-        }
-        field(35; "No. Of Variant Actions"; Integer)
-        {
-            CalcFormula = Count ("NPR Item Repair Action" WHERE("Item No." = FIELD("Item No."),
-                                                            "Variant Code" = FIELD("Variant Code")));
-            Caption = 'No. Of Variant Actions';
-            Editable = false;
-            FieldClass = FlowField;
-        }
-        field(36; "No. Of Item Actions"; Integer)
-        {
-            CalcFormula = Count ("NPR Item Repair Action" WHERE("Item No." = FIELD("Item No."),
-                                                            "Variant Code" = CONST('')));
-            Caption = 'No. Of Item Actions';
-            Editable = false;
-            FieldClass = FlowField;
         }
         field(37; "First Action"; Text[30])
         {
@@ -118,52 +85,6 @@ table 6059982 "NPR Item Repair"
         {
             Caption = 'Variety 4 Used';
             DataClassification = CustomerContent;
-        }
-        field(50; "Variant Action"; Option)
-        {
-            CalcFormula = Lookup ("NPR Item Repair Action"."Variant Action" WHERE("Item No." = FIELD("Item No."),
-                                                                              "Variant Code" = FIELD("Variant Code")));
-            Caption = 'Variant Action';
-            Editable = false;
-            FieldClass = FlowField;
-            OptionCaption = 'None,Block Variant,Delete Variant,Update From Item';
-            OptionMembers = "None",BlockVariant,DeleteVariant,UpdateFromItem;
-        }
-        field(51; "Variety 1 Action"; Option)
-        {
-            CalcFormula = Lookup ("NPR Item Repair Action"."Variety 1 Action" WHERE("Item No." = FIELD("Item No.")));
-            Caption = 'Variety 1 Action';
-            Editable = false;
-            FieldClass = FlowField;
-            OptionCaption = 'None,Use Variant Setup,Use Item Setup,Select Manual';
-            OptionMembers = "None",UseVariantSetup,UseItemSetup,SelectManual;
-        }
-        field(52; "Variety 2 Action"; Option)
-        {
-            CalcFormula = Lookup ("NPR Item Repair Action"."Variety 2 Action" WHERE("Item No." = FIELD("Item No.")));
-            Caption = 'Variety 2 Action';
-            Editable = false;
-            FieldClass = FlowField;
-            OptionCaption = 'None,Use Variant Setup,Use Item Setup,Select Manual';
-            OptionMembers = "None",UseVariantSetup,UseItemSetup,SelectManual;
-        }
-        field(53; "Variety 3 Action"; Option)
-        {
-            CalcFormula = Lookup ("NPR Item Repair Action"."Variety 3 Action" WHERE("Item No." = FIELD("Item No.")));
-            Caption = 'Variety 3 Action';
-            Editable = false;
-            FieldClass = FlowField;
-            OptionCaption = 'None,Use Variant Setup,Use Item Setup,Select Manual';
-            OptionMembers = "None",UseVariantSetup,UseItemSetup,SelectManual;
-        }
-        field(54; "Variety 4 Action"; Option)
-        {
-            CalcFormula = Lookup ("NPR Item Repair Action"."Variety 4 Action" WHERE("Item No." = FIELD("Item No.")));
-            Caption = 'Variety 4 Action';
-            Editable = false;
-            FieldClass = FlowField;
-            OptionCaption = 'None,Use Variant Setup,Use Item Setup,Select Manual';
-            OptionMembers = "None",UseVariantSetup,UseItemSetup,SelectManual;
         }
         field(6059970; "Variety 1 (Item)"; Code[10])
         {

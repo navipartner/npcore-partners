@@ -50,9 +50,7 @@ table 6014419 "NPR Archive Sale Line POS"
             Caption = 'No.';
             TableRelation = IF (Type = CONST("G/L Entry")) "G/L Account"."No."
             ELSE
-            IF (Type = CONST("Item Group")) "NPR Item Group"."No."
-            ELSE
-            IF (Type = CONST(Repair)) "NPR Customer Repair"."No."
+            IF (Type = CONST("Item Group")) "Item Category".Code
             ELSE
             IF (Type = CONST(Payment)) "NPR POS Payment Method".Code WHERE("Block POS Payment" = const(false))
             ELSE
@@ -788,8 +786,9 @@ table 6014419 "NPR Archive Sale Line POS"
         field(6011; "Item Group"; Code[10])
         {
             Caption = 'Item Group';
-            TableRelation = "NPR Item Group";
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Using Item Category Code instead.';
         }
         field(6012; "MR Anvendt antal"; Decimal)
         {
@@ -1049,6 +1048,7 @@ table 6014419 "NPR Archive Sale Line POS"
         {
             MaintainSIFTIndex = false;
             SumIndexFields = "Amount Including VAT", Amount, Quantity;
+            ObsoleteState = Removed;
         }
         key(Key4; "Register No.", "Sales Ticket No.", "Line No.")
         {
@@ -1083,6 +1083,12 @@ table 6014419 "NPR Archive Sale Line POS"
             MaintainSIFTIndex = false;
             MaintainSQLIndex = false;
             SumIndexFields = "Amount Including VAT";
+        }
+
+        key(Key10; "Register No.", "Sales Ticket No.", "Sale Type", Type, "No.", "Item Category Code", Quantity)
+        {
+            MaintainSIFTIndex = false;
+            SumIndexFields = "Amount Including VAT", Amount, Quantity;
         }
     }
 

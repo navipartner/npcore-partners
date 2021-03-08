@@ -281,7 +281,7 @@ codeunit 6151596 "NPR NpDc Module Apply ItemList"
             NpDcCouponListItem.Type::"Item Group":
                 begin
                     SaleLinePOS.SetFilter("No.", '<>%1', '');
-                    SaleLinePOS.SetRange("Item Group", NpDcCouponListItem."No.");
+                    SaleLinePOS.SetRange("Item Category Code", NpDcCouponListItem."No.");
                 end;
             NpDcCouponListItem.Type::"Item Disc. Group":
                 begin

@@ -7,10 +7,10 @@ DefaultLayout = RDLC;
     ApplicationArea = All;
     dataset
     {
-        dataitem("Item Group"; "NPR Item Group")
+        dataitem("Item Category"; "Item Category")
         {
-            DataItemTableView = SORTING("No.");
-            RequestFilterFields = "No.", "Main Item Group";
+            DataItemTableView = SORTING("Code");
+            RequestFilterFields = "Code", "NPR Main Category";
             column(PageNoCaptionLbl; PageNoCaptionLbl)
             {
             }
@@ -20,29 +20,29 @@ DefaultLayout = RDLC;
             column(COMPANYNAME; CompanyName)
             {
             }
-            column(Item_Group_No_; "Item Group"."No.")
+            column(Item_Group_No_; "Item Category"."Code")
             {
             }
-            column(Item_Group_Description_; "Item Group".Description)
+            column(Item_Group_Description_; "Item Category".Description)
             {
                 IncludeCaption = true;
             }
-            column(Item_Group_Belongs_in_Main_Item_Group_; "Item Group"."Belongs In Main Item Group")
+            column(Item_Group_Belongs_in_Main_Item_Group_; "Item Category"."NPR Main Category Code")
             {
             }
-            column(Item_Group_VAT_Prod_Posting_Group_; "Item Group"."VAT Prod. Posting Group")
+            column(Item_Group_VAT_Prod_Posting_Group_; "Item Category"."NPR VAT Prod. Posting Group")
             {
             }
-            column(Item_Group_VAT_Bus_Posting_Group_; "Item Group"."VAT Bus. Posting Group")
+            column(Item_Group_VAT_Bus_Posting_Group_; "Item Category"."NPR VAT Bus. Posting Group")
             {
             }
-            column(Item_Group_Gen_Bus_Posting_Group_; "Item Group"."Gen. Bus. Posting Group")
+            column(Item_Group_Gen_Bus_Posting_Group_; "Item Category"."NPR Gen. Bus. Posting Group")
             {
             }
-            column(Item_Group_Gen_Prod_Posting_Group_; "Item Group"."Gen. Prod. Posting Group")
+            column(Item_Group_Gen_Prod_Posting_Group_; "Item Category"."NPR Gen. Prod. Posting Group")
             {
             }
-            column(Item_Group_Inventory_Posting_Group_; "Item Group"."Inventory Posting Group")
+            column(Item_Group_Inventory_Posting_Group_; "Item Category"."NPR Inventory Posting Group")
             {
             }
             column(ItemGroupCaption; ItemGroupCaptionLbl)

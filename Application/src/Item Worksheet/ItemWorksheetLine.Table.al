@@ -96,7 +96,6 @@ table 6060042 "NPR Item Worksheet Line"
                 "Costing Method" := Item."Costing Method";
                 if "No. Series" = '' then
                     "No. Series" := Item."No. Series";
-                "Item Group" := Item."NPR Item Group";
                 "Sales Price" := Item."Unit Price";
                 "Direct Unit Cost" := Item."Last Direct Cost";
                 "Tax Group Code" := Item."Tax Group Code";
@@ -1277,6 +1276,38 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             TableRelation = "Item Category";
             ValidateTableRelation = false;
+
+            trigger OnValidate()
+            var
+                ItemCategory: Record "Item Category";
+                TempItem: Record Item temporary;
+                ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
+            begin
+                ItemWorksheetManagement.CheckItemGroupSetup("Item Category Code");
+
+                if not ItemCategory.Get("Item Category Code") then
+                    ItemCategory.Init();
+
+                "VAT Prod. Posting Group" := ItemCategory."NPR VAT Prod. Posting Group";
+                "VAT Bus. Posting Gr. (Price)" := ItemCategory."NPR VAT Bus. Posting Group";
+                "Gen. Prod. Posting Group" := ItemCategory."NPR Gen. Prod. Posting Group";
+                "Inventory Posting Group" := ItemCategory."NPR Inventory Posting Group";
+                "Global Dimension 1 Code" := ItemCategory."NPR Global Dimension 1 Code";
+                "Global Dimension 2 Code" := ItemCategory."NPR Global Dimension 2 Code";
+                if Description = '' then
+                    Description := ItemCategory.Description;
+
+
+                ItemCategoryMgt.ApplyTemplateToTempItem(TempItem, ItemCategory);
+
+                "Base Unit of Measure" := TempItem."Base Unit of Measure";
+                "Sales Unit of Measure" := TempItem."Sales Unit of Measure";
+                "Tax Group Code" := TempItem."Tax Group Code";
+                "Purch. Unit of Measure" := TempItem."Purch. Unit of Measure";
+                "Costing Method" := TempItem."Costing Method";
+                "No. Series" := TempItem."No. Series";
+                Validate("Variety Group", TempItem."NPR Variety Group");
+            end;
         }
         field(5704; "Product Group Code"; Code[10])
         {
@@ -1433,38 +1464,9 @@ table 6060042 "NPR Item Worksheet Line"
         {
             Caption = 'Item Group';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Item Group" WHERE(Blocked = CONST(false));
-            ValidateTableRelation = false;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Using Item Category instead';
 
-            trigger OnValidate()
-            var
-                ItemGroup: Record "NPR Item Group";
-            begin
-                ItemWorksheetManagement.CheckItemGroupSetup("Item Group");
-
-                if not ItemGroup.Get("Item Group") then
-                    ItemGroup.Init();
-                "VAT Prod. Posting Group" := ItemGroup."VAT Prod. Posting Group";
-                "VAT Bus. Posting Gr. (Price)" := ItemGroup."VAT Bus. Posting Group";
-                "Gen. Prod. Posting Group" := ItemGroup."Gen. Prod. Posting Group";
-                "Inventory Posting Group" := ItemGroup."Inventory Posting Group";
-                "Base Unit of Measure" := ItemGroup."Base Unit of Measure";
-                "Sales Unit of Measure" := ItemGroup."Sales Unit of Measure";
-                "Tax Group Code" := ItemGroup."Tax Group Code";
-
-                "Purch. Unit of Measure" := ItemGroup."Purch. Unit of Measure";
-                if Description = '' then
-                    Description := ItemGroup.Description;
-                "Costing Method" := ItemGroup."Costing Method";
-
-                if ItemGroup."No. Series" <> '' then
-                    "No. Series" := ItemGroup."No. Series";
-
-                "Global Dimension 1 Code" := ItemGroup."Global Dimension 1 Code";
-                "Global Dimension 2 Code" := ItemGroup."Global Dimension 2 Code";
-
-                Validate("Variety Group", ItemGroup."Variety Group");
-            end;
         }
         field(6014401; "Group sale"; Option)
         {
@@ -1817,10 +1819,10 @@ table 6060042 "NPR Item Worksheet Line"
     begin
         SetUseVariant();
 
-        if "Item Group" = '' then begin
+        if "Item Category Code" = '' then begin
             GetWorksheet();
             if ItemWorksheet."Item Group" <> '' then
-                Validate("Item Group", ItemWorksheet."Item Group");
+                Validate("Item Category Code", ItemWorksheet."Item Group");
         end;
     end;
 
