@@ -21,6 +21,7 @@
 		],
 		"al.enableCodeAnalysis": true,
 		"al.enableCodeActions": true,
+		"al.backgroundCodeAnalysis": false, //if your machine is powerful enough for this, just enable it in user config. Most dev laptops are not.
 		"al.ruleSetPath": "main.ruleset.json",
 		"al.useLegacyRuntime": false,
 		"al.assemblyProbingPaths": [
