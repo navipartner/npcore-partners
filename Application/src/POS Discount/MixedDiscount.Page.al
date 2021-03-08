@@ -2,8 +2,7 @@ page 6014450 "NPR Mixed Discount"
 {
     Caption = 'Mix Discount';
     PageType = Card;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "NPR Mixed Discount";
 
     layout
@@ -505,14 +504,16 @@ page 6014450 "NPR Mixed Discount"
                     Caption = 'Copy Mixed Discount';
                     Image = CopyDocument;
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Copy Mixed Discount action';
+                    Enabled = Rec.Code <> '';
+                    ToolTip = 'Executes the Copy Mixed Discount action. To copy Mixed Discount lines, Mixed Discount must be created.';
 
                     trigger OnAction()
                     var
                         MixedDiscount1: Record "NPR Mixed Discount";
                         MixedDiscountLine1: Record "NPR Mixed Discount Line";
                     begin
-                        if PAGE.RunModal(PAGE::"NPR Mixed Discount List", MixedDiscount1) <> ACTION::LookupOK then exit;
+                        if PAGE.RunModal(PAGE::"NPR Mixed Discount List", MixedDiscount1) <> ACTION::LookupOK then
+                            exit;
                         MixedDiscountLine1.SetRange(Code, Rec.Code);
                         MixedDiscountLine1.DeleteAll();
 
