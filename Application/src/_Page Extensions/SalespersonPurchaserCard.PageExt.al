@@ -21,11 +21,6 @@ pageextension 6014455 "NPR Salesperson/Purchaser Card" extends "Salesperson/Purc
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Supervisor POS field';
                 }
-                field("NPR Reverse Sales Ticket"; "NPR Reverse Sales Ticket")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the NPR Reverse Sales Ticket field';
-                }
                 field("NPR Locked-to Register No."; "NPR Locked-to Register No.")
                 {
                     ApplicationArea = All;

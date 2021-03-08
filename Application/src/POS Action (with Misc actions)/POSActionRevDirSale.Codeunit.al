@@ -57,20 +57,12 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale"
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         Setup: Codeunit "NPR POS Setup";
-        SalespersonPurchaser: Record "Salesperson/Purchaser";
         Context: Codeunit "NPR POS JSON Management";
     begin
         if not Action.IsThisAction(ActionCode) then
             exit;
 
-        // TODO: Remove this verification and start the permission & security workflow instead
         POSSession.GetSetup(Setup);
-        SalespersonPurchaser.Get(Setup.Salesperson);
-
-        case SalespersonPurchaser."NPR Reverse Sales Ticket" of
-            SalespersonPurchaser."NPR Reverse Sales Ticket"::No:
-                Error(NotAllowed, SalespersonPurchaser.Name);
-        end;
 
         Context.SetContext('PromptForReason', true);
 
