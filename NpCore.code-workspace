@@ -19,6 +19,8 @@
 			"${UICop}",
 			"${CodeCop}"
 		],
+		"al.enableCodeAnalysis": true,
+		"al.enableCodeActions": true,
 		"al.ruleSetPath": "main.ruleset.json",
 		"al.useLegacyRuntime": false,
 		"al.assemblyProbingPaths": [

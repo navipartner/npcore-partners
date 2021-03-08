@@ -453,5 +453,15 @@ codeunit 85002 "NPR Library - POS Master Data"
 
         CreatePostingSetupForSaleItem(Item, POSUnit, POSStore);
     end;
+
+    procedure CreateSalespersonForPOSUsage(var Salesperson: Record "Salesperson/Purchaser")
+    var
+        LibrarySales: Codeunit "Library - Sales";
+    begin
+        LibrarySales.CreateSalesperson(Salesperson);
+        Salesperson."NPR Register Password" := '1';
+        Salesperson.Modify();
+    end;
+
 }
 
