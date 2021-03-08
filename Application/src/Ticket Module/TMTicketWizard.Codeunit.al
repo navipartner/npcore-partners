@@ -1,8 +1,5 @@
 ﻿codeunit 6151133 "NPR TM Ticket Wizard"
 {
-    // TM90.1.46/TSA /20200320 CASE 397084 Initial Version
-
-
     trigger OnRun()
     var
         ItemNumberCreated: Code[20];
@@ -30,7 +27,7 @@
         PageAction: Action;
         ItemNo: Code[20];
         ItemDescription: Text[50];
-        ItemGroup: Code[10];
+        ItemCategory: Code[20];
         UnitPrice: Decimal;
         TypeCode: Code[10];
         TypeDescription: Text[30];
@@ -52,12 +49,12 @@
             exit(false);
 
         TicketWizardPage.GetTicketTypeInformation(TypeCode, TypeDescription, TypeTemplate);
-        TicketWizardPage.GetItemInformation(ItemNo, ItemDescription, ItemGroup, UnitPrice, BomTemplate);
+        TicketWizardPage.GetItemInformation(ItemNo, ItemDescription, ItemCategory, UnitPrice, BomTemplate);
         TicketWizardPage.GetAdmissionInformation(AdmissionCode, AdmissionDescription, AdmissionTemplate);
         TicketWizardPage.GetScheduleInformation(ScheduleStartDate, ScheduleUntilDate, TmpSchedules);
 
         CreateTicketType(TypeCode, TypeDescription, TypeTemplate);
-        CreateItem(ItemNo, ItemDescription, ItemGroup, UnitPrice, TypeCode);
+        CreateItem(ItemNo, ItemDescription, ItemCategory, UnitPrice, TypeCode);
         CreateAdmission(AdmissionCode, AdmissionDescription, AdmissionTemplate);
         CreateSchedules(AdmissionCode, ScheduleStartDate, ScheduleUntilDate, TmpSchedules);
         CreateTicketBom(ItemNo, AdmissionCode, BomTemplate);
@@ -386,7 +383,7 @@
         exit(ConfigTemplateHeader.Code);
     end;
 
-    local procedure CreateItem(var ItemNo: Code[20]; ItemDescription: Text[50]; ItemGroup: Code[10]; UnitPrice: Decimal; TicketType: Code[10])
+    local procedure CreateItem(var ItemNo: Code[20]; ItemDescription: Text[50]; ItemCategory: Code[20]; UnitPrice: Decimal; TicketType: Code[10])
     var
         TicketSetup: Record "NPR TM Ticket Setup";
         Item: Record Item;
@@ -403,12 +400,12 @@
         Item.Insert(true);
 
         Item.Validate(Description, ItemDescription);
-        Item.Validate("NPR Item Group", ItemGroup);
+        Item.Validate("Item Category Code", ItemCategory);
         Item.Validate("Unit Price", UnitPrice);
         Item.Validate("NPR Ticket Type", TicketType);
 
         Item.TestField(Description);
-        Item.TestField("NPR Item Group");
+        Item.TestField("Item Category Code");
         Item.TestField("NPR Ticket Type");
 
         Item.Modify(true);

@@ -180,20 +180,6 @@ page 6059970 "NPR Variety Setup"
                         VRTCloneData.ShowEAN13BarcodeNoSetup();
                     end;
                 }
-                action("Disable Original Setup")
-                {
-                    Caption = 'Disable Original Setup';
-                    Image = InactivityDescription;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Disable Original Setup action';
-
-                    trigger OnAction()
-                    var
-                        VRTCloneData: Codeunit "NPR Variety Clone Data";
-                    begin
-                        VRTCloneData.DisableOldBarcodeSetup();
-                    end;
-                }
                 action("Item Reference")
                 {
                     Caption = 'Item Reference';

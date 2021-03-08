@@ -26,7 +26,6 @@ table 6151365 "NPR CS Refill Section Data"
         {
             Caption = 'Item Group Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Item Group";
         }
         field(12; Refilled; Boolean)
         {

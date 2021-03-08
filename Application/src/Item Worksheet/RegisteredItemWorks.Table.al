@@ -84,11 +84,11 @@ table 6060045 "NPR Registered Item Works."
             DataClassification = CustomerContent;
             TableRelation = User."User Name";
         }
-        field(6014400; "Item Group"; Code[10])
+        field(6014400; "Item Group"; Code[20])
         {
-            Caption = 'Item Group';
+            Caption = 'Item Category';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Item Group" WHERE(Blocked = CONST(false));
+            TableRelation = "Item Category" WHERE("NPR Blocked" = CONST(false));
         }
     }
 

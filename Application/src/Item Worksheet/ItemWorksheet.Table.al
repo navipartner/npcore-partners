@@ -118,15 +118,13 @@ table 6060041 "NPR Item Worksheet"
             Caption = 'Excel Import from Line No.';
             DataClassification = CustomerContent;
         }
-        field(6014400; "Item Group"; Code[10])
+        field(6014400; "Item Group"; Code[20])
         {
-            Caption = 'Item Group';
+            Caption = 'Item Category';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Item Group" WHERE(Blocked = CONST(false));
+            TableRelation = "Item Category" WHERE("NPR Blocked" = CONST(false));
 
             trigger OnValidate()
-            var
-                ItemGroup: Record "NPR Item Group";
             begin
                 ItemWorksheetManagement.CheckItemGroupSetup("Item Group");
             end;

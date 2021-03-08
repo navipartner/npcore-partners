@@ -1,12 +1,5 @@
 codeunit 6151050 "NPR Item Hierarchy Mgmt."
 {
-    // NPR5.38.01/JKL /20180126  CASE 289017 Object created - Replenishment Module
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         TextUpdateRetailCampHieracy: Label 'Do you want to update the Item Hierachy %1 with the items from retail Campaign %2';
         TextCancelledByUser: Label 'Cancelled by user!';
@@ -244,7 +237,7 @@ codeunit 6151050 "NPR Item Hierarchy Mgmt."
                                             begin
 
                                                 // add all frtom group..
-                                                Item.SetRange("NPR Item Group", MixedDiscountLine."No.");
+                                                Item.SetRange("Item Category Code", MixedDiscountLine."No.");
                                                 Item.SetRange(Blocked, false);
                                                 if Item.FindSet then begin
                                                     repeat

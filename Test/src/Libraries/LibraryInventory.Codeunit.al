@@ -1,9 +1,5 @@
 codeunit 85001 "NPR Library - Inventory"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         InventorySetup: Record "Inventory Setup";
         LibraryUtility: Codeunit "Library - Utility";
@@ -11,17 +7,19 @@ codeunit 85001 "NPR Library - Inventory"
         LibraryERM: Codeunit "Library - ERM";
         VATPostingSetup: Record "VAT Posting Setup";
 
-    procedure CreateItemGroup(var ItemGroup: Record "NPR Item Group"): Code[10]
+    procedure CreateItemCategory(var ItemCategory: Record "Item Category"): Code[20]
     var
         NoSeriesManagement: Codeunit NoSeriesManagement;
+        ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
         GeneralPostingSetup: Record "General Posting Setup";
         InventoryPostingGroup: Record "Inventory Posting Group";
         VATPostingSetup: Record "VAT Posting Setup";
+        TempItem: Record Item temporary;
     begin
-        Clear(ItemGroup);
+        Clear(ItemCategory);
 
-        ItemGroup."No." := NoSeriesManagement.GetNextNo(LibraryUtility.GetGlobalNoSeriesCode, Today, true);
-        ItemGroup.Insert(true);
+        ItemCategory.Code := NoSeriesManagement.GetNextNo(LibraryUtility.GetGlobalNoSeriesCode, Today, true);
+        ItemCategory.Insert(true);
 
         VATPostingSetup.SetFilter("VAT Bus. Posting Group", '<>%1', '');
         LibraryERM.FindVATPostingSetupInvt(VATPostingSetup);
@@ -30,25 +28,27 @@ codeunit 85001 "NPR Library - Inventory"
         if not InventoryPostingGroup.FindFirst then
             LibraryInventory.CreateInventoryPostingGroup(InventoryPostingGroup);
 
-        ItemGroup.Validate("VAT Prod. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
-        ItemGroup.Validate("VAT Bus. Posting Group", VATPostingSetup."VAT Bus. Posting Group");
+        ItemCategory.Validate("NPR VAT Prod. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
+        ItemCategory.Validate("NPR VAT Bus. Posting Group", VATPostingSetup."VAT Bus. Posting Group");
 
-        ItemGroup."Gen. Prod. Posting Group" := GeneralPostingSetup."Gen. Prod. Posting Group";
-        ItemGroup."Gen. Bus. Posting Group" := GeneralPostingSetup."Gen. Bus. Posting Group";
+        ItemCategory."NPR Gen. Prod. Posting Group" := GeneralPostingSetup."Gen. Prod. Posting Group";
+        ItemCategory."NPR Gen. Bus. Posting Group" := GeneralPostingSetup."Gen. Bus. Posting Group";
 
-        ItemGroup."Inventory Posting Group" := InventoryPostingGroup.Code;
+        ItemCategory."NPR Inventory Posting Group" := InventoryPostingGroup.Code;
 
-        ItemGroup.Modify(true);
+        ItemCategory."NPR Item Template Code" := ItemCategoryMgt.CreateItemTemplate(ItemCategory, TempItem);
 
-        exit(ItemGroup."No.");
+        ItemCategory.Modify(true);
+
+        exit(ItemCategory.Code);
     end;
 
-    procedure CreateItemGroupNo(): Code[10]
+    procedure CreateItemCategoryCode(): Code[20]
     var
-        ItemGroup: Record "NPR Item Group";
+        ItemCategory: Record "Item Category";
     begin
-        CreateItemGroup(ItemGroup);
-        exit(ItemGroup."No.");
+        CreateItemCategory(ItemCategory);
+        exit(ItemCategory.Code);
     end;
 
     procedure CreateItem(var Item: Record Item): Code[20]
@@ -62,7 +62,7 @@ codeunit 85001 "NPR Library - Inventory"
         ItemNoSeriesSetup(InventorySetup);
         Clear(Item);
 
-        Item."NPR Item Group" := CreateItemGroupNo();
+        Item."Item Category Code" := CreateItemCategoryCode();
         Item.Insert(true);
 
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", '', 1);

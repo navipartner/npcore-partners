@@ -523,7 +523,7 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         AccessorySparePart.SetFilter("Add Extra Line Automatically", '=%1', true);
         if (AccessorySparePart.IsEmpty()) then begin
             // Item Group Accessory
-            AccessorySparePart.SetFilter(Code, '=%1', Item."NPR Item Group");
+            AccessorySparePart.SetFilter(Code, '=%1', Item."Item Category Code");
             if (not AccessorySparePart.IsEmpty()) then
                 AddAccessoryForItem(Item, true, POSSaleLine);
         end else
@@ -551,7 +551,7 @@ codeunit 6151289 "NPR SS Action: Insert Item"
             AccessorySaleLinePOS."Main Item No." := Item."No.";
             AccessorySaleLinePOS."Item group accessory" := GroupAccessory;
             if (GroupAccessory) then
-                AccessorySaleLinePOS."Accessories Item Group No." := Item."NPR Item Group";
+                AccessorySaleLinePOS."Accessories Item Group No." := Item."Item Category Code";
 
             AccessorySaleLinePOS.Validate("No.", AccessorySparePart."Item No.");
 
@@ -581,7 +581,7 @@ codeunit 6151289 "NPR SS Action: Insert Item"
 
             AccessorySaleLinePOS."Item group accessory" := GroupAccessory;
             if (GroupAccessory) then
-                AccessorySaleLinePOS."Accessories Item Group No." := Item."NPR Item Group";
+                AccessorySaleLinePOS."Accessories Item Group No." := Item."Item Category Code";
 
             AccessorySaleLinePOS.Accessory := true;
             AccessorySaleLinePOS."Main Item No." := Item."No.";

@@ -8,47 +8,47 @@ report 6014449 "NPR Vendor trx by Item group"
     UseSystemPrinter = true;
     dataset
     {
-        dataitem(vg; "NPR Item Group")
+        dataitem(ItemCategory; "Item Category")
         {
-            CalcFields = "Consumption (Amount)";
-            RequestFilterFields = "No.", "Date Filter", "Global Dimension 1 Filter", "Vendor Filter";
+            CalcFields = "NPR Consumption (Amount)";
+            RequestFilterFields = "Code", "NPR Date Filter", "NPR Global Dimension 1 Filter", "NPR Vendor Filter";
             column(COMPANYNAME; CompanyName)
             {
             }
-            column(DateFilters; GetFilter("Date Filter"))
+            column(DateFilters; GetFilter("NPR Date Filter"))
             {
             }
-            column(No_Filter; GetFilter("No."))
+            column(No_Filter; GetFilter("Code"))
             {
             }
-            column(GlobalDimension1_Filter; GetFilter("Global Dimension 1 Filter"))
+            column(GlobalDimension1_Filter; GetFilter("NPR Global Dimension 1 Filter"))
             {
             }
-            column(Vendor_Filter; GetFilter("Vendor Filter"))
+            column(Vendor_Filter; GetFilter("NPR Vendor Filter"))
             {
             }
-            column(No_vg; vg."No.")
+            column(No_vg; ItemCategory."Code")
             {
             }
-            column(Description_vg; vg.Description)
+            column(Description_vg; ItemCategory.Description)
             {
             }
-            column(PurchaseLCY_vg; vg."Purchases (LCY)")
+            column(PurchaseLCY_vg; ItemCategory."NPR Purchases (LCY)")
             {
             }
-            column(PurchaseQuantity_vg; vg."Purchases (Qty.)")
+            column(PurchaseQuantity_vg; ItemCategory."NPR Purchases (Qty.)")
             {
             }
-            column(SaleLCY_vg; vg."Sales (LCY)")
+            column(SaleLCY_vg; ItemCategory."NPR Sales (LCY)")
             {
             }
-            column(SalesQty_vg; vg."Sales (Qty.)")
+            column(SalesQty_vg; ItemCategory."NPR Sales (Qty.)")
             {
             }
             column(pctvaresalgfjor_vg; pctvaresalgfjor)
             {
             }
-            column(DB_vg; "Sales (LCY)" - "Consumption (Amount)")
+            column(DB_vg; "NPR Sales (LCY)" - "NPR Consumption (Amount)")
             {
             }
             column(dgItemGrp_vg; dgItemGrp)
@@ -69,7 +69,7 @@ report 6014449 "NPR Vendor trx by Item group"
             dataitem(Vendor; Vendor)
             {
                 CalcFields = "NPR Sales (LCY)", "NPR COGS (LCY)";
-                DataItemLink = "NPR Item Group Filter" = FIELD("No."), "Date Filter" = FIELD("Date Filter"), "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"), "No." = FIELD("Vendor Filter");
+                DataItemLink = "NPR Item Category Filter" = FIELD("Code"), "Date Filter" = FIELD("NPR Date Filter"), "Global Dimension 1 Filter" = FIELD("NPR Global Dimension 1 Filter"), "No." = FIELD("NPR Vendor Filter");
                 DataItemTableView = SORTING("No.");
                 PrintOnlyIfDetail = false;
                 column(No_Vendor; Vendor."No.")
@@ -78,16 +78,16 @@ report 6014449 "NPR Vendor trx by Item group"
                 column(Name_Vendor; Vendor.Name)
                 {
                 }
-                column(PurchaseLCY_vgvendor; vgvendor."Purchases (LCY)")
+                column(PurchaseLCY_vgvendor; vgvendor."NPR Purchases (LCY)")
                 {
                 }
-                column(PurchaseQty_vgvendor; vgvendor."Purchases (Qty.)")
+                column(PurchaseQty_vgvendor; vgvendor."NPR Purchases (Qty.)")
                 {
                 }
-                column(SaleLCY_vgvendor; vgvendor."Sales (LCY)")
+                column(SaleLCY_vgvendor; vgvendor."NPR Sales (LCY)")
                 {
                 }
-                column(SaleQty_vgvendor; vgvendor."Sales (Qty.)")
+                column(SaleQty_vgvendor; vgvendor."NPR Sales (Qty.)")
                 {
                 }
                 column(DB_vgvendor; "NPR Sales (LCY)" - "NPR COGS (LCY)")
@@ -99,28 +99,28 @@ report 6014449 "NPR Vendor trx by Item group"
 
                 trigger OnAfterGetRecord()
                 begin
-                    if (vg.GetFilter("Vendor Filter") = '') and ("NPR Sales (LCY)" = 0) then CurrReport.Skip;
+                    if (ItemCategory.GetFilter("NPR Vendor Filter") = '') and ("NPR Sales (LCY)" = 0) then CurrReport.Skip;
 
                     Clear(dg);
                     if "NPR Sales (LCY)" <> 0 then
                         dg := (("NPR Sales (LCY)" - "NPR COGS (LCY)") / "NPR Sales (LCY)") * 100;
 
-                    vareposter.SetRange("NPR Vendor No.", "No.");
-                    vareposter.CalcSums(Quantity);
-                    negatedQuantity := vareposter.Quantity * -1;
-                    vgvendor.SetFilter("Vendor Filter", "No.");
-                    vgvendor.CalcFields("Purchases (LCY)", "Purchases (Qty.)", "Sales (LCY)", "Sales (Qty.)");
+                    AuxItemLedgerEntry.SetRange("Vendor No.", "No.");
+                    AuxItemLedgerEntry.CalcSums(Quantity);
+                    negatedQuantity := AuxItemLedgerEntry.Quantity * -1;
+                    vgvendor.SetFilter("NPR Vendor Filter", "No.");
+                    vgvendor.CalcFields("NPR Purchases (LCY)", "NPR Purchases (Qty.)", "NPR Sales (LCY)", "NPR Sales (Qty.)");
                 end;
 
                 trigger OnPreDataItem()
                 begin
-                    vareposter.SetCurrentKey("Entry Type", "Posting Date", "NPR Item Group No.", "NPR Vendor No.");
-                    vareposter.SetRange("Entry Type", vareposter."Entry Type"::Sale);
-                    vareposter.SetRange("NPR Item Group No.", vg."No.");
-                    vg.CopyFilter("Date Filter", vareposter."Posting Date");
+                    AuxItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Item Category Code", "Vendor No.");
+                    AuxItemLedgerEntry.SetRange("Entry Type", AuxItemLedgerEntry."Entry Type"::Sale);
+                    AuxItemLedgerEntry.SetRange("Item Category Code", ItemCategory."Code");
+                    ItemCategory.CopyFilter("NPR Date Filter", AuxItemLedgerEntry."Posting Date");
 
-                    vgvendor.CopyFilters(vg);
-                    vgvendor.SetRange("No.", vg."No.");
+                    vgvendor.CopyFilters(ItemCategory);
+                    vgvendor.SetRange("Code", ItemCategory."Code");
                     if vgvendor.Find('-') then;
                 end;
             }
@@ -128,37 +128,37 @@ report 6014449 "NPR Vendor trx by Item group"
             trigger OnAfterGetRecord()
             begin
                 //Varesalg sidste år
-                CalcFields("Purchases (LCY)");
+                CalcFields("NPR Purchases (LCY)");
 
-                if vg.GetFilter("Date Filter") <> '' then begin
-                    varegruppefjor.SetRange("No.", "No.");
+                if ItemCategory.GetFilter("NPR Date Filter") <> '' then begin
+                    varegruppefjor.SetRange("Code", "Code");
                     varegruppefjor.Find('-');
-                    varegruppefjor.CalcFields("Sales (LCY)", "Purchases (LCY)");
-                    varesalgfjor := varegruppefjor."Sales (LCY)";
-                    varekobfjor := varegruppefjor."Purchases (LCY)";
+                    varegruppefjor.CalcFields("NPR Sales (LCY)", "NPR Purchases (LCY)");
+                    varesalgfjor := varegruppefjor."NPR Sales (LCY)";
+                    varekobfjor := varegruppefjor."NPR Purchases (LCY)";
 
                     Clear(pctvaresalgfjor);
                     if varesalgfjor <> 0 then
-                        pctvaresalgfjor := ("Sales (LCY)" / varesalgfjor) * 100;
+                        pctvaresalgfjor := ("NPR Sales (LCY)" / varesalgfjor) * 100;
                 end;
 
                 if not visudensalg then begin
-                    if not ("Sales (Qty.)" <> 0) then CurrReport.Skip;
+                    if not ("NPR Sales (Qty.)" <> 0) then CurrReport.Skip;
                 end;
 
                 Clear(dgItemGrp);
-                if "Sales (LCY)" <> 0 then
-                    dgItemGrp := (("Sales (LCY)" - "Consumption (Amount)") / "Sales (LCY)") * 100;
+                if "NPR Sales (LCY)" <> 0 then
+                    dgItemGrp := (("NPR Sales (LCY)" - "NPR Consumption (Amount)") / "NPR Sales (LCY)") * 100;
 
                 Clear(pcttot);
                 if totalsalg <> 0 then
-                    pcttot := ("Sales (LCY)" / totalsalg) * 100;
+                    pcttot := ("NPR Sales (LCY)" / totalsalg) * 100;
 
-                TotalPurchaseLCY += "Purchases (LCY)";
-                TotalPurchaseQty += "Purchases (Qty.)";
-                TotalSaleLCY += "Sales (LCY)";
-                TotalSaleQty += "Sales (Qty.)";
-                TotalConsumptionAmt += "Consumption (Amount)";
+                TotalPurchaseLCY += "NPR Purchases (LCY)";
+                TotalPurchaseQty += "NPR Purchases (Qty.)";
+                TotalSaleLCY += "NPR Sales (LCY)";
+                TotalSaleQty += "NPR Sales (Qty.)";
+                TotalConsumptionAmt += "NPR Consumption (Amount)";
                 TotalProfitLCY := (TotalSaleLCY - TotalConsumptionAmt);
                 Totaldg := ((TotalSaleLCY - TotalConsumptionAmt) / TotalSaleLCY) * 100;
             end;
@@ -166,21 +166,21 @@ report 6014449 "NPR Vendor trx by Item group"
             trigger OnPreDataItem()
             begin
                 //Totalsalg
-                CopyFilter("Date Filter", valueentry."Posting Date");
+                CopyFilter("NPR Date Filter", AuxValueEntry."Posting Date");
 
-                CopyFilter("Vendor Filter", valueentry."NPR Vendor No.");
-                valueentry.SetCurrentKey("Item No.", "Posting Date", "Item Ledger Entry Type", "Entry Type", "Variance Type", "Item Charge No.", "Location Code", "Variant Code");
-                CopyFilter("Date Filter", valueentry."Posting Date");
-                valueentry.SetRange("Item Ledger Entry Type", valueentry."Item Ledger Entry Type"::Sale);
-                valueentry.CalcSums("Sales Amount (Actual)");
-                totalsalg := valueentry."Sales Amount (Actual)";
+                CopyFilter("NPR Vendor Filter", AuxValueEntry."Vendor No.");
+                AuxValueEntry.SetCurrentKey("Item No.", "Posting Date", "Item Ledger Entry Type", "Entry Type", "Variance Type", "Item Charge No.", "Location Code", "Variant Code");
+                CopyFilter("NPR Date Filter", AuxValueEntry."Posting Date");
+                AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
+                AuxValueEntry.CalcSums("Sales Amount (Actual)");
+                totalsalg := AuxValueEntry."Sales Amount (Actual)";
 
                 //Salg sidste år - filtre
-                if vg.GetFilter("Date Filter") <> '' then begin
-                    varegruppefjor.CopyFilters(vg);
-                    startdato := CalcDate('<-1Y>', vg.GetRangeMin("Date Filter"));
-                    slutdato := CalcDate('<-1Y>', vg.GetRangeMax("Date Filter"));
-                    varegruppefjor.SetRange("Date Filter", startdato, slutdato);
+                if ItemCategory.GetFilter("NPR Date Filter") <> '' then begin
+                    varegruppefjor.CopyFilters(ItemCategory);
+                    startdato := CalcDate('<-1Y>', ItemCategory.GetRangeMin("NPR Date Filter"));
+                    slutdato := CalcDate('<-1Y>', ItemCategory.GetRangeMax("NPR Date Filter"));
+                    varegruppefjor.SetRange("NPR Date Filter", startdato, slutdato);
                 end;
             end;
         }
@@ -265,10 +265,10 @@ report 6014449 "NPR Vendor trx by Item group"
 
     var
         firmaoplysninger: Record "Company Information";
-        vareposter: Record "Item Ledger Entry";
-        varegruppefjor: Record "NPR Item Group";
-        vgvendor: Record "NPR Item Group";
-        valueentry: Record "Value Entry";
+        AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry";
+        varegruppefjor: Record "Item Category";
+        vgvendor: Record "Item Category";
+        AuxValueEntry: Record "NPR Aux. Value Entry";
         visudensalg: Boolean;
         slutdato: Date;
         startdato: Date;

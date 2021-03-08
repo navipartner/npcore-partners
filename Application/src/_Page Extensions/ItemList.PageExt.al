@@ -28,19 +28,6 @@ pageextension 6014433 "NPR Item List" extends "Item List"
 
         addafter("Price/Profit Calculation")
         {
-            field("NPR Item Group"; Rec."NPR Item Group")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the NPR Item Group field';
-            }
-
-            field("NPR NPR_ItemGroupDesc"; ItemGroupDesc)
-            {
-                Caption = 'Item Group Description';
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the Item Group Description field';
-            }
-
             field("NPR Ticket Type"; Rec."NPR Ticket Type")
             {
                 ApplicationArea = All;
@@ -432,7 +419,6 @@ pageextension 6014433 "NPR Item List" extends "Item List"
     end;
 
     var
-        ItemGroupDesc: Text[50];
         ItemAvlByLocation: Decimal;
         ItemFilter: Record Item;
         MagentoEnabled: Boolean;

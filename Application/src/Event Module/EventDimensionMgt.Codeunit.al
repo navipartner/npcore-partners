@@ -1,16 +1,9 @@
 codeunit 6014411 "NPR Event Dimension Mgt"
 {
-    // NPR5.55/TJ  /20200407 Reintroducing funcionality for BC130+. Code restored from NAV2017 and slightly refactored
-
-
-    trigger OnRun()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 408, 'OnAfterSetupObjectNoList', '', true, false)]
     local procedure DimensionMgtOnLoadDimensions(var TempAllObjWithCaption: Record AllObjWithCaption temporary)
     begin
-        InsertObject(TempAllObjWithCaption, DATABASE::"NPR Item Group");
+        InsertObject(TempAllObjWithCaption, DATABASE::"Item Category");
         InsertObject(TempAllObjWithCaption, DATABASE::"NPR Mixed Discount");
         InsertObject(TempAllObjWithCaption, DATABASE::"NPR Period Discount");
         InsertObject(TempAllObjWithCaption, DATABASE::"NPR Quantity Discount Header");

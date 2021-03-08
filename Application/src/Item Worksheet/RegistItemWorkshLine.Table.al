@@ -974,8 +974,8 @@ table 6060046 "NPR Regist. Item Worksh Line"
         {
             Caption = 'Item Group';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Item Group" WHERE(Blocked = CONST(false));
-            ValidateTableRelation = false;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Using Item Category Code instead.';
         }
         field(6014401; "Group sale"; Option)
         {

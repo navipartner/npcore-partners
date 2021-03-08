@@ -68,14 +68,14 @@ report 6014430 "NPR Item Sales Stats/Provider"
             column(ShowItemGroup_Vendor; ShowItemGroup)
             {
             }
-            dataitem(Varegruppe; "NPR Item Group")
+            dataitem(Varegruppe; "Item Category")
             {
-                DataItemTableView = SORTING("No.");
+                DataItemTableView = SORTING(Code);
                 PrintOnlyIfDetail = true;
                 column(ItemGroupDesc; ItemGroupDesc)
                 {
                 }
-                column(ItemGroupNo; Varegruppe."No.")
+                column(ItemGroupNo; Varegruppe.Code)
                 {
                 }
                 column(ItemGroupFooterDesc; ItemGroupFooterDesc)
@@ -84,8 +84,8 @@ report 6014430 "NPR Item Sales Stats/Provider"
                 dataitem(Item; Item)
                 {
                     CalcFields = "Sales (Qty.)", "Sales (LCY)", "Scheduled Receipt (Qty.)", "Qty. on Purch. Order", "COGS (LCY)", "Purchases (Qty.)";
-                    DataItemLink = "NPR Item Group" = FIELD("No.");
-                    DataItemTableView = SORTING("NPR Group sale", "NPR Item Group", "Vendor No.") ORDER(Ascending);
+                    DataItemLink = "Item Category Code" = FIELD(Code);
+                    DataItemTableView = SORTING("NPR Group sale", "Item Category Code", "Vendor No.") ORDER(Ascending);
                     RequestFilterFields = "Global Dimension 1 Filter", "Date Filter";
                     column(ItemDesc; Item.Description)
                     {
@@ -96,7 +96,7 @@ report 6014430 "NPR Item Sales Stats/Provider"
                     column(ItemNo; Item."No.")
                     {
                     }
-                    column(ItemItemGroup; Item."NPR Item Group")
+                    column(ItemItemGroup; Item."Item Category Code")
                     {
                     }
                     column(ItemPurchasesQty; Item."Purchases (Qty.)")
@@ -154,7 +154,7 @@ report 6014430 "NPR Item Sales Stats/Provider"
 
                     trigger OnAfterGetRecord()
                     begin
-                        ItemFooterDesc := Text10600005 + Varegruppe."No." + ' ' + Varegruppe.Description;
+                        ItemFooterDesc := Text10600005 + Varegruppe.Code + ' ' + Varegruppe.Description;
                         if ShowItemWithSales and ("Sales (Qty.)" = 0) then
                             CurrReport.Skip();
 
@@ -220,13 +220,13 @@ report 6014430 "NPR Item Sales Stats/Provider"
 
                 trigger OnAfterGetRecord()
                 begin
-                    ItemGroupDesc := Text10600004 + "No." + ' ' + Description;
+                    ItemGroupDesc := Text10600004 + Code + ' ' + Description;
                     ItemGroupFooterDesc := Text10600006 + Vendor.Name;
                 end;
 
                 trigger OnPreDataItem()
                 begin
-                    FilterDesc := Text10600001 + GetFilter("No.") + Text10600007 + Item.GetFilter("Global Dimension 1 Filter");
+                    FilterDesc := Text10600001 + GetFilter(Code) + Text10600007 + Item.GetFilter("Global Dimension 1 Filter");
                     InventoryValueDesc := StrSubstNo(Text10600008, ValueDate, ValueMethod);
                 end;
             }

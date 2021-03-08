@@ -1,13 +1,5 @@
 page 6014588 "NPR Item Statistics Subpage"
 {
-    // NPR4.12/BHR /29062015 CASE 2171113 display Cost Amount
-    // NPR4.21/TS  /20160225 CASE 226010 HideEmty always set as True so as not to display Emty Lines
-    // NPR5.31/BR  /20172021 CASE 272890 made non-editable
-    // NPR5.51/RA  /20190628 CASE 338480 Added Function GetGlobals
-    // NPR5.51/YAHA/20190822 CASE 365732 Flow Item Category Filter From Advanced Sales Statistics to Item Statistics
-    // NPR5.53/YAHA/20200107 CASE 384124 Adding vendor no - to be used in filters
-    // NPR5.55/BHR /20200724 CASE 361515 Comment Key not used in AL
-
     Caption = 'Item Statistics Subform';
     Editable = false;
     PageType = List;
@@ -65,14 +57,14 @@ page 6014588 "NPR Item Statistics Subpage"
 
                     trigger OnDrillDown()
                     var
-                        ValueEntry: Record "Value Entry";
-                        ValueEntryForm: Page "Value Entries";
+                        AuxValueEntry: Record "NPR Aux. Value Entry";
+                        AuxValueEntries: Page "NPR Aux. Value Entries";
                     begin
 
-                        SetValueEntryFilter(ValueEntry);
-                        ValueEntryForm.SetTableView(ValueEntry);
-                        ValueEntryForm.Editable(false);
-                        ValueEntryForm.RunModal;
+                        SetValueEntryFilter(AuxValueEntry);
+                        AuxValueEntries.SetTableView(AuxValueEntry);
+                        AuxValueEntries.Editable(false);
+                        AuxValueEntries.RunModal;
                     end;
                 }
                 field("LastYear Sale Amount"; "LastYear Sale Amount")
@@ -165,7 +157,7 @@ page 6014588 "NPR Item Statistics Subpage"
         "LastYear Profit %": Decimal;
         Dim1Filter: Code[20];
         Dim2Filter: Code[20];
-        ItemGroupFilter: Code[20];
+        // ItemGroupFilter: Code[20];
         HideEmpty: Boolean;
         Periodestart: Date;
         Periodeslut: Date;
@@ -177,53 +169,47 @@ page 6014588 "NPR Item Statistics Subpage"
         "Last Year CostAmt": Decimal;
         ItemCatCodeFilter: Code[20];
 
-    procedure SetFilter(GlobalDim1: Code[20]; GlobalDim2: Code[20]; DatoStart: Date; DatoEnd: Date; ItemGroup: Code[20]; LastYearCalc: Text[50]; ItemCatCode: Code[20])
+    procedure SetFilter(GlobalDim1: Code[20]; GlobalDim2: Code[20]; DatoStart: Date; DatoEnd: Date; LastYearCalc: Text[50]; ItemCatCode: Code[20])
     begin
         //SetFilter()
-        //-NPR5.51 [365732]
         if (Dim1Filter <> GlobalDim1) or (Dim2Filter <> GlobalDim2) or (Periodestart <> DatoStart) or
-        //   ( Periodeslut <> DatoEnd ) OR ( ItemGroupFilter <> ItemGroup ) THEN
-             (Periodeslut <> DatoEnd) or (ItemGroupFilter <> ItemGroup) or (ItemCatCodeFilter <> ItemCatCode) then
-            //-NPR5.51 [365732]
+             (Periodeslut <> DatoEnd) or (ItemCatCodeFilter <> ItemCatCode) then
             ReleaseLock;
         Dim1Filter := GlobalDim1;
         Dim2Filter := GlobalDim2;
         Periodestart := DatoStart;
         Periodeslut := DatoEnd;
         CalcLastYear := LastYearCalc;
-        //-NPR5.51 [365732]
         ItemCatCodeFilter := ItemCatCode;
-        //+NPR5.51 [365732]
 
-        if (ItemGroup = '') and (ItemGroupFilter <> '') and HideEmpty then begin
-            ItemGroupFilter := ItemGroup;
+        if (ItemCatCode = '') and (ItemCatCodeFilter <> '') and HideEmpty then begin
+            ItemCatCodeFilter := ItemCatCode;
             HideEmpty := false;
             ChangeEmptyFilter;
         end else begin
-            ItemGroupFilter := ItemGroup;
+            ItemCatCodeFilter := ItemCatCode;
         end;
 
-        //CurrForm.UPDATE;
         CurrPage.Update;
     end;
 
     procedure Calc()
     var
-        ValueEntry: Record "Value Entry";
+        AuxValueEntry: Record "NPR Aux. Value Entry";
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
         //Calc()
-        SetValueEntryFilter(ValueEntry);
-        ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
+        SetValueEntryFilter(AuxValueEntry);
+        AuxValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
 
         SetItemLedgerEntryFilter(ItemLedgerEntry);
         ItemLedgerEntry.CalcSums(Quantity);
 
         "Sale Quantity" := ItemLedgerEntry.Quantity;
-        "Sale Amount" := ValueEntry."Sales Amount (Actual)";
-        "Profit Amount" := ValueEntry."Sales Amount (Actual)" + ValueEntry."Cost Amount (Actual)";
+        "Sale Amount" := AuxValueEntry."Sales Amount (Actual)";
+        "Profit Amount" := AuxValueEntry."Sales Amount (Actual)" + AuxValueEntry."Cost Amount (Actual)";
         //-NPR4.12
-        CostAmt := ValueEntry."Cost Amount (Actual)";
+        CostAmt := AuxValueEntry."Cost Amount (Actual)";
         //+NPR4.12
 
         if "Sale Amount" <> 0 then
@@ -234,17 +220,17 @@ page 6014588 "NPR Item Statistics Subpage"
         // Calc last year
         LastYear := true;
 
-        SetValueEntryFilter(ValueEntry);
-        ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
+        SetValueEntryFilter(AuxValueEntry);
+        AuxValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
 
         SetItemLedgerEntryFilter(ItemLedgerEntry);
         ItemLedgerEntry.CalcSums(Quantity);
 
         "LastYear Sale Quantity" := ItemLedgerEntry.Quantity;
-        "LastYear Sale Amount" := ValueEntry."Sales Amount (Actual)";
-        "LastYear Profit Amount" := ValueEntry."Sales Amount (Actual)" + ValueEntry."Cost Amount (Actual)";
+        "LastYear Sale Amount" := AuxValueEntry."Sales Amount (Actual)";
+        "LastYear Profit Amount" := AuxValueEntry."Sales Amount (Actual)" + AuxValueEntry."Cost Amount (Actual)";
         //-NPR4.12
-        "Last Year CostAmt" := ValueEntry."Cost Amount (Actual)";
+        "Last Year CostAmt" := AuxValueEntry."Cost Amount (Actual)";
         //+NPR4.12
 
         if "LastYear Sale Amount" <> 0 then
@@ -266,18 +252,10 @@ page 6014588 "NPR Item Statistics Subpage"
         else
             ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', CalcDate(CalcLastYear, Periodestart), CalcDate(CalcLastYear, Periodeslut));
 
-
-        //-NPR5.51 [365732]
         if ItemCatCodeFilter <> '' then
             ItemLedgerEntry.SetRange("Item Category Code", ItemCatCodeFilter)
         else
             ItemLedgerEntry.SetRange("Item Category Code");
-        //+NPR5.51 [365732]
-
-        if ItemGroupFilter <> '' then
-            ItemLedgerEntry.SetRange("NPR Item Group No.", ItemGroupFilter)
-        else
-            ItemLedgerEntry.SetRange("NPR Item Group No.");
 
         if Dim1Filter <> '' then
             ItemLedgerEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
@@ -290,33 +268,30 @@ page 6014588 "NPR Item Statistics Subpage"
             ItemLedgerEntry.SetRange("Global Dimension 2 Code");
     end;
 
-    procedure SetValueEntryFilter(var ValueEntry: Record "Value Entry")
+    procedure SetValueEntryFilter(var AuxValueEntry: Record "NPR Aux. Value Entry")
     begin
         //SetValueEntryFilter
-        //-NPR5.55 [361515]
-        //ValueEntry.SETCURRENTKEY( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
-        //+NPR5.55 [361515]
-        ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
-        ValueEntry.SetRange("Item No.", "No.");
+        AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
+        AuxValueEntry.SetRange("Item No.", "No.");
         if not LastYear then
-            ValueEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
+            AuxValueEntry.SetFilter("Posting Date", '%1..%2', Periodestart, Periodeslut)
         else
-            ValueEntry.SetFilter("Posting Date", '%1..%2', CalcDate(CalcLastYear, Periodestart), CalcDate(CalcLastYear, Periodeslut));
+            AuxValueEntry.SetFilter("Posting Date", '%1..%2', CalcDate(CalcLastYear, Periodestart), CalcDate(CalcLastYear, Periodeslut));
 
-        if ItemGroupFilter <> '' then
-            ValueEntry.SetRange("NPR Item Group No.", ItemGroupFilter)
+        if ItemCatCodeFilter <> '' then
+            AuxValueEntry.SetRange("Item Category Code", ItemCatCodeFilter)
         else
-            ValueEntry.SetRange("NPR Item Group No.");
+            AuxValueEntry.SetRange("Item Category Code");
 
         if Dim1Filter <> '' then
-            ValueEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
+            AuxValueEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
         else
-            ValueEntry.SetRange("Global Dimension 1 Code");
+            AuxValueEntry.SetRange("Global Dimension 1 Code");
 
         if Dim2Filter <> '' then
-            ValueEntry.SetRange("Global Dimension 2 Code", Dim2Filter)
+            AuxValueEntry.SetRange("Global Dimension 2 Code", Dim2Filter)
         else
-            ValueEntry.SetRange("Global Dimension 2 Code");
+            AuxValueEntry.SetRange("Global Dimension 2 Code");
     end;
 
     procedure ChangeEmptyFilter(): Boolean
@@ -372,7 +347,7 @@ page 6014588 "NPR Item Statistics Subpage"
         Dim2Filter := '';
         Periodestart := Today;
         Periodeslut := Today;
-        ItemGroupFilter := '';
+        ItemCatCodeFilter := '';
         HideEmpty := true;
     end;
 

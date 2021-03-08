@@ -183,10 +183,8 @@ codeunit 6150616 "NPR POS Post Item Entries"
         ItemJnlLine."Lot No." := '';
         ItemJnlLine."NPR Discount Type" := POSSalesLine."Discount Type";
         ItemJnlLine."NPR Discount Code" := POSSalesLine."Discount Code";
-        if Item.Get(POSSalesLine."No.") then begin
-            ItemJnlLine."NPR Item Group No." := Item."NPR Item Group";
+        if Item.Get(POSSalesLine."No.") then
             ItemJnlLine."NPR Vendor No." := Item."Vendor No.";
-        end;
 
         OnAfterCreateItemJournalLine(POSEntry, POSSalesLine, ItemJnlLine);
 

@@ -969,7 +969,7 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
                 VendorItemDescription := GetEntryValue(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo(Description), HeaderRecordNo, RecordNo);
                 ItemWkshtDocExchange.InsertItemWorksheetLine(ItemWorksheet, ItemWorksheetLine, VendorNo, VendorItemNo, VendorItemDescription, ItemGroupText, DirectUnitCost);
                 LogErrorMessage(EntryNo, ItemWorksheetLine, ItemWorksheetLine.FieldNo("Vendor Item No."), VendorItemNo);
-                LogErrorMessage(EntryNo, ItemWorksheetLine, ItemWorksheetLine.FieldNo("Item Group"), ItemGroupText);
+                LogErrorMessage(EntryNo, ItemWorksheetLine, ItemWorksheetLine.FieldNo("Item Category Code"), ItemGroupText);
                 LogErrorMessage(EntryNo, ItemWorksheetLine, ItemWorksheetLine.FieldNo("Direct Unit Cost"), Format(DirectUnitCost, 0, 9));
                 LogErrorMessage(EntryNo, ItemWorksheetLine, ItemWorksheetLine.FieldNo(Description), VendorItemDescription);
                 LogErrorMessage(EntryNo, ItemWorksheetLine, ItemWorksheetLine.FieldNo("Vendor No."), VendorNo);

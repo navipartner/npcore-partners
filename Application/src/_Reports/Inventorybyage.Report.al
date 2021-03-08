@@ -7,10 +7,10 @@ report 6014400 "NPR Inventory by age"
     ApplicationArea = All;
     dataset
     {
-        dataitem(ItemGroupHeader; "NPR Item Group")
+        dataitem(ItemCategoryHeader; "Item Category")
         {
-            DataItemTableView = SORTING("Sorting-Key");
-            RequestFilterFields = "No.";
+            DataItemTableView = SORTING("Presentation Order");
+            RequestFilterFields = "Code";
             column(PageNoCaptionLbl; PageNoCaptionLbl)
             {
             }
@@ -47,7 +47,7 @@ report 6014400 "NPR Inventory by age"
             column(Total_Caption; Total_Caption_Lbl)
             {
             }
-            column(No_ItemGroupHeader; "No.")
+            column(No_ItemGroupHeader; "Code")
             {
             }
             column(Description_ItemGroupHeader; Description)
@@ -56,7 +56,7 @@ report 6014400 "NPR Inventory by age"
             column(ShowItem; ShowItem)
             {
             }
-            column(Main_Item_Group_ItemGroupHeader; "Main Item Group")
+            column(Main_Item_Group_ItemGroupHeader; "NPR Main Category Code")
             {
             }
             column(PeriodLength; PeriodLength)
@@ -68,7 +68,7 @@ report 6014400 "NPR Inventory by age"
             column(RequestPageFilters; RequestPageFilters)
             {
             }
-            column(ItemGrpNoLvl0; StrSubstNo(TotalText, "No."))
+            column(ItemGrpNoLvl0; StrSubstNo(TotalText, "Code"))
             {
             }
             column(ItemFound1; ItemFound[1])
@@ -91,8 +91,8 @@ report 6014400 "NPR Inventory by age"
             }
             dataitem(Item; Item)
             {
-                DataItemLink = "NPR Item Group" = FIELD("No.");
-                DataItemTableView = SORTING("NPR Group sale", "NPR Item Group", "Vendor No.");
+                DataItemLink = "Item Category Code" = FIELD("Code");
+                DataItemTableView = SORTING("NPR Group sale", "Item Category Code", "Vendor No.");
                 column(No_Item; "No.")
                 {
                 }
@@ -158,8 +158,8 @@ report 6014400 "NPR Inventory by age"
 
                 trigger OnPreDataItem()
                 begin
-                    ItemGroupHeader.CopyFilter("Date Filter", "Date Filter");
-                    ItemGroupHeader.CopyFilter("Global Dimension 1 Filter", "Global Dimension 1 Filter");
+                    ItemCategoryHeader.CopyFilter("NPR Date Filter", "Date Filter");
+                    ItemCategoryHeader.CopyFilter("NPR Global Dimension 1 Filter", "Global Dimension 1 Filter");
 
                     n := 1;
                     Clear(ItemSection);
@@ -167,17 +167,17 @@ report 6014400 "NPR Inventory by age"
                     Clear(ExistNonZeroItemRecords);
                 end;
             }
-            dataitem(ItemGroupSub1; "NPR Item Group")
+            dataitem(ItemCategorySub1; "Item Category")
             {
-                DataItemLink = "Parent Item Group No." = FIELD("No.");
-                DataItemTableView = SORTING("No.");
-                column(No_ItemGroupSub1; "No.")
+                DataItemLink = "Parent Category" = FIELD("Code");
+                DataItemTableView = SORTING("Code");
+                column(No_ItemGroupSub1; "Code")
                 {
                 }
                 column(Description_ItemGroupSub1; Description)
                 {
                 }
-                column(ItemGrpNoLvl1; StrSubstNo(TotalText, "No."))
+                column(ItemGrpNoLvl1; StrSubstNo(TotalText, "Code"))
                 {
                 }
                 column(ItemFound2; ItemFound[2])
@@ -188,8 +188,8 @@ report 6014400 "NPR Inventory by age"
                 }
                 dataitem(Item1; Item)
                 {
-                    DataItemLink = "NPR Item Group" = FIELD("No.");
-                    DataItemTableView = SORTING("NPR Group sale", "NPR Item Group", "Vendor No.");
+                    DataItemLink = "Item Category Code" = FIELD("Code");
+                    DataItemTableView = SORTING("NPR Group sale", "Item Category Code", "Vendor No.");
                     column(No_Item1; "No.")
                     {
                     }
@@ -255,8 +255,8 @@ report 6014400 "NPR Inventory by age"
 
                     trigger OnPreDataItem()
                     begin
-                        ItemGroupHeader.CopyFilter("Date Filter", "Date Filter");
-                        ItemGroupHeader.CopyFilter("Global Dimension 1 Filter", "Global Dimension 1 Filter");
+                        ItemCategoryHeader.CopyFilter("NPR Date Filter", "Date Filter");
+                        ItemCategoryHeader.CopyFilter("NPR Global Dimension 1 Filter", "Global Dimension 1 Filter");
 
                         n := 2;
                         Clear(ItemSection);
@@ -264,17 +264,17 @@ report 6014400 "NPR Inventory by age"
                         Clear(ExistNonZeroItemRecords);
                     end;
                 }
-                dataitem(ItemGroupSub2; "NPR Item Group")
+                dataitem(ItemCategorySub2; "Item Category")
                 {
-                    DataItemLink = "Parent Item Group No." = FIELD("No.");
-                    DataItemTableView = SORTING("Sorting-Key");
-                    column(No_ItemGroupSub2; "No.")
+                    DataItemLink = "Parent Category" = FIELD("Code");
+                    DataItemTableView = SORTING("Presentation Order");
+                    column(No_ItemGroupSub2; "Code")
                     {
                     }
                     column(Description_ItemGroupSub2; Description)
                     {
                     }
-                    column(ItemGrpNoLvl2; StrSubstNo(TotalText, "No."))
+                    column(ItemGrpNoLvl2; StrSubstNo(TotalText, "Code"))
                     {
                     }
                     column(ItemFound3; ItemFound[3])
@@ -286,8 +286,8 @@ report 6014400 "NPR Inventory by age"
                     dataitem(Item2; Item)
                     {
                         CalcFields = Inventory;
-                        DataItemLink = "NPR Item Group" = FIELD("No.");
-                        DataItemTableView = SORTING("NPR Group sale", "NPR Item Group", "Vendor No.");
+                        DataItemLink = "Item Category Code" = FIELD("Code");
+                        DataItemTableView = SORTING("NPR Group sale", "Item Category Code", "Vendor No.");
                         column(No_Item2; "No.")
                         {
                         }
@@ -353,8 +353,8 @@ report 6014400 "NPR Inventory by age"
 
                         trigger OnPreDataItem()
                         begin
-                            ItemGroupHeader.CopyFilter("Date Filter", "Date Filter");
-                            ItemGroupHeader.CopyFilter("Global Dimension 1 Filter", "Global Dimension 1 Filter");
+                            ItemCategoryHeader.CopyFilter("NPR Date Filter", "Date Filter");
+                            ItemCategoryHeader.CopyFilter("NPR Global Dimension 1 Filter", "Global Dimension 1 Filter");
 
                             n := 3;
                             Clear(ItemSection);
@@ -362,17 +362,17 @@ report 6014400 "NPR Inventory by age"
                             Clear(ExistNonZeroItemRecords);
                         end;
                     }
-                    dataitem(ItemGroupSub3; "NPR Item Group")
+                    dataitem(ItemCategorySub3; "Item Category")
                     {
-                        DataItemLink = "Parent Item Group No." = FIELD("No.");
-                        DataItemTableView = SORTING("Parent Item Group No.");
-                        column(No_ItemGroupSub3; "No.")
+                        DataItemLink = "Parent Category" = FIELD("Code");
+                        DataItemTableView = SORTING("Parent Category");
+                        column(No_ItemGroupSub3; "Code")
                         {
                         }
                         column(Description_ItemGroupSub3; Description)
                         {
                         }
-                        column(ItemGrpNoLvl3; StrSubstNo(TotalText, "No."))
+                        column(ItemGrpNoLvl3; StrSubstNo(TotalText, "Code"))
                         {
                         }
                         column(ItemFound4; ItemFound[4])
@@ -384,8 +384,8 @@ report 6014400 "NPR Inventory by age"
                         dataitem(Item3; Item)
                         {
                             CalcFields = Inventory;
-                            DataItemLink = "NPR Item Group" = FIELD("No.");
-                            DataItemTableView = SORTING("NPR Group sale", "NPR Item Group", "Vendor No.");
+                            DataItemLink = "Item Category Code" = FIELD("Code");
+                            DataItemTableView = SORTING("NPR Group sale", "Item Category Code", "Vendor No.");
                             column(No_Item3; "No.")
                             {
                             }
@@ -451,8 +451,8 @@ report 6014400 "NPR Inventory by age"
 
                             trigger OnPreDataItem()
                             begin
-                                ItemGroupHeader.CopyFilter("Date Filter", "Date Filter");
-                                ItemGroupHeader.CopyFilter("Global Dimension 1 Filter", "Global Dimension 1 Filter");
+                                ItemCategoryHeader.CopyFilter("NPR Date Filter", "Date Filter");
+                                ItemCategoryHeader.CopyFilter("NPR Global Dimension 1 Filter", "Global Dimension 1 Filter");
 
                                 n := 4;
                                 Clear(ItemSection);
@@ -461,17 +461,17 @@ report 6014400 "NPR Inventory by age"
                                 Clear(ExistNonZeroItemRecords);
                             end;
                         }
-                        dataitem(ItemGroupSub4; "NPR Item Group")
+                        dataitem(ItemCategorySub4; "Item Category")
                         {
-                            DataItemLink = "Parent Item Group No." = FIELD("No.");
-                            DataItemTableView = SORTING("Parent Item Group No.");
-                            column(No_ItemGroupSub4; "No.")
+                            DataItemLink = "Parent Category" = FIELD("Code");
+                            DataItemTableView = SORTING("Parent Category");
+                            column(No_ItemGroupSub4; "Code")
                             {
                             }
                             column(Description_ItemGroupSub4; Description)
                             {
                             }
-                            column(ItemGrpNoLvl4; StrSubstNo(TotalText, "No."))
+                            column(ItemGrpNoLvl4; StrSubstNo(TotalText, "Code"))
                             {
                             }
                             column(ItemFound5; ItemFound[5])
@@ -483,8 +483,8 @@ report 6014400 "NPR Inventory by age"
                             dataitem(Item4; Item)
                             {
                                 CalcFields = Inventory;
-                                DataItemLink = "NPR Item Group" = FIELD("No.");
-                                DataItemTableView = SORTING("NPR Group sale", "NPR Item Group", "Vendor No.");
+                                DataItemLink = "Item Category Code" = FIELD("Code");
+                                DataItemTableView = SORTING("NPR Group sale", "Item Category Code", "Vendor No.");
                                 column(No_Item4; "No.")
                                 {
                                 }
@@ -550,8 +550,8 @@ report 6014400 "NPR Inventory by age"
 
                                 trigger OnPreDataItem()
                                 begin
-                                    ItemGroupHeader.CopyFilter("Date Filter", "Date Filter");
-                                    ItemGroupHeader.CopyFilter("Global Dimension 1 Filter", "Global Dimension 1 Filter");
+                                    ItemCategoryHeader.CopyFilter("NPR Date Filter", "Date Filter");
+                                    ItemCategoryHeader.CopyFilter("NPR Global Dimension 1 Filter", "Global Dimension 1 Filter");
 
                                     n := 5;
                                     Clear(ItemSection);
@@ -569,8 +569,8 @@ report 6014400 "NPR Inventory by age"
                                 Clear(ItemFound);
                                 Clear(ExistItemGrpSub);
 
-                                if "No." <> '' then begin
-                                    CheckItem.SetRange("NPR Item Group", "No.");
+                                if "Code" <> '' then begin
+                                    CheckItem.SetRange("Item Category Code", "Code");
                                     if CheckItem.FindFirst() then
                                         ItemFound[5] := true
                                     else
@@ -581,9 +581,9 @@ report 6014400 "NPR Inventory by age"
 
                             trigger OnPreDataItem()
                             begin
-                                ItemGroupHeader.CopyFilter("Date Filter", "Date Filter");
-                                ItemGroupHeader.CopyFilter("Global Dimension 1 Filter", "Global Dimension 1 Filter");
-                                ItemGroupHeader.CopyFilter("Global Dimension 2 Filter", "Global Dimension 2 Filter");
+                                ItemCategoryHeader.CopyFilter("NPR Date Filter", "NPR Date Filter");
+                                ItemCategoryHeader.CopyFilter("NPR Global Dimension 1 Filter", "NPR Global Dimension 1 Filter");
+                                ItemCategoryHeader.CopyFilter("NPR Global Dimension 2 Filter", "NPR Global Dimension 2 Filter");
                             end;
                         }
 
@@ -596,8 +596,8 @@ report 6014400 "NPR Inventory by age"
                             Clear(ExistItemGrpSub);
                             CheckItem.Reset();
 
-                            if "No." <> '' then begin
-                                CheckItem.SetRange("NPR Item Group", "No.");
+                            if "Code" <> '' then begin
+                                CheckItem.SetRange("Item Category Code", "Code");
                                 if CheckItem.FindFirst() then
                                     ItemFound[4] := true
                                 else
@@ -608,9 +608,9 @@ report 6014400 "NPR Inventory by age"
 
                         trigger OnPreDataItem()
                         begin
-                            ItemGroupHeader.CopyFilter("Date Filter", "Date Filter");
-                            ItemGroupHeader.CopyFilter("Global Dimension 1 Filter", "Global Dimension 1 Filter");
-                            ItemGroupHeader.CopyFilter("Global Dimension 2 Filter", "Global Dimension 2 Filter");
+                            ItemCategoryHeader.CopyFilter("NPR Date Filter", "NPR Date Filter");
+                            ItemCategoryHeader.CopyFilter("NPR Global Dimension 1 Filter", "NPR Global Dimension 1 Filter");
+                            ItemCategoryHeader.CopyFilter("NPR Global Dimension 2 Filter", "NPR Global Dimension 2 Filter");
                         end;
                     }
 
@@ -623,8 +623,8 @@ report 6014400 "NPR Inventory by age"
                         Clear(ExistItemGrpSub);
                         CheckItem.Reset();
 
-                        if "No." <> '' then begin
-                            CheckItem.SetRange("NPR Item Group", "No.");
+                        if "Code" <> '' then begin
+                            CheckItem.SetRange("Item Category Code", "Code");
                             if CheckItem.FindFirst() then
                                 ItemFound[3] := true
                             else
@@ -635,9 +635,9 @@ report 6014400 "NPR Inventory by age"
 
                     trigger OnPreDataItem()
                     begin
-                        ItemGroupHeader.CopyFilter("Date Filter", "Date Filter");
-                        ItemGroupHeader.CopyFilter("Global Dimension 1 Filter", "Global Dimension 1 Filter");
-                        ItemGroupHeader.CopyFilter("Global Dimension 2 Filter", "Global Dimension 2 Filter");
+                        ItemCategoryHeader.CopyFilter("NPR Date Filter", "NPR Date Filter");
+                        ItemCategoryHeader.CopyFilter("NPR Global Dimension 1 Filter", "NPR Global Dimension 1 Filter");
+                        ItemCategoryHeader.CopyFilter("NPR Global Dimension 2 Filter", "NPR Global Dimension 2 Filter");
                     end;
                 }
 
@@ -650,8 +650,8 @@ report 6014400 "NPR Inventory by age"
                     Clear(ExistItemGrpSub);
                     CheckItem.Reset();
 
-                    if "No." <> '' then begin
-                        CheckItem.SetRange("NPR Item Group", "No.");
+                    if "Code" <> '' then begin
+                        CheckItem.SetRange("Item Category Code", "Code");
                         if CheckItem.FindFirst() then
                             ItemFound[2] := true
                         else
@@ -662,9 +662,9 @@ report 6014400 "NPR Inventory by age"
 
                 trigger OnPreDataItem()
                 begin
-                    ItemGroupHeader.CopyFilter("Date Filter", "Date Filter");
-                    ItemGroupHeader.CopyFilter("Global Dimension 1 Filter", "Global Dimension 1 Filter");
-                    ItemGroupHeader.CopyFilter("Global Dimension 2 Filter", "Global Dimension 2 Filter");
+                    ItemCategoryHeader.CopyFilter("NPR Date Filter", "NPR Date Filter");
+                    ItemCategoryHeader.CopyFilter("NPR Global Dimension 1 Filter", "NPR Global Dimension 1 Filter");
+                    ItemCategoryHeader.CopyFilter("NPR Global Dimension 2 Filter", "NPR Global Dimension 2 Filter");
                 end;
             }
 
@@ -675,8 +675,8 @@ report 6014400 "NPR Inventory by age"
                 Clear(ExistItemGrpSub);
                 CheckItem.Reset();
 
-                if "No." <> '' then begin
-                    CheckItem.SetRange("NPR Item Group", "No.");
+                if "Code" <> '' then begin
+                    CheckItem.SetRange("Item Category Code", "Code");
                     if CheckItem.FindFirst() then
                         ItemFound[1] := true
                     else
@@ -771,11 +771,11 @@ report 6014400 "NPR Inventory by age"
         if ShowItem then
             RequestPageFilters += TxtShowItem;
 
-        if ItemGroupHeader.GetFilters <> '' then
+        if ItemCategoryHeader.GetFilters <> '' then
             if RequestPageFilters <> '' then
-                RequestPageFilters += ', ' + ItemGroupHeader.GetFilters
+                RequestPageFilters += ', ' + ItemCategoryHeader.GetFilters
             else
-                RequestPageFilters += ItemGroupHeader.GetFilters;
+                RequestPageFilters += ItemCategoryHeader.GetFilters;
 
         Chr := 10;
         for i := 1 to 5 do begin

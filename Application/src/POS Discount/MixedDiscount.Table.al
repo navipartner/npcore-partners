@@ -190,8 +190,10 @@ table 6014411 "NPR Mixed Discount"
         }
         field(200; "Quantity sold"; Decimal)
         {
-            CalcFormula = - Sum("Item Ledger Entry".Quantity WHERE("NPR Discount Type" = CONST(Mixed),
-                                                                   "NPR Discount Code" = FIELD(Code)));
+            CalcFormula = - Sum("NPR Aux. Item Ledger Entry".Quantity
+                                WHERE(
+                                    "Discount Type" = CONST(Mixed),
+                                    "Discount Code" = FIELD(Code)));
             Caption = 'Sold Qty';
             DecimalPlaces = 0 : 5;
             Description = 'NPR5.31';
@@ -200,8 +202,10 @@ table 6014411 "NPR Mixed Discount"
         }
         field(201; Turnover; Decimal)
         {
-            CalcFormula = Sum("Value Entry"."Sales Amount (Actual)" WHERE("NPR Discount Type" = CONST(Mixed),
-                                                                           "NPR Discount Code" = FIELD(Code)));
+            CalcFormula = Sum("NPR Aux. Value Entry"."Sales Amount (Actual)"
+                            WHERE(
+                                "Discount Type" = CONST(Mixed),
+                                "Discount Code" = FIELD(Code)));
             Caption = 'Turnover';
             Editable = false;
             FieldClass = FlowField;

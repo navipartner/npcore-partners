@@ -192,9 +192,6 @@ codeunit 6060049 "NPR Item Wksht. WebService Mgr"
                 Element, 'VendorItemNo',
                 MaxStrLen(ItemWorksheetLine."Vendor Item No."), true));
 
-        TempText := GetXmlText(Element, 'ItemGroup', MaxStrLen(ItemWorksheetLine."Item Group"), false);
-        if TempText <> '' then
-            ItemWorksheetLine.Validate("Item Group", TempText);
         ItemWorksheetLine.Validate("Vendor No.",
             GetXmlText(
                 Element, 'VendorNo',

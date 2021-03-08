@@ -1,12 +1,10 @@
 page 6059947 "NPR Sales Price Maint. Groups"
 {
-    // NPR5.33/NPKNAV/20170630  CASE 272906 Transport NPR5.33 - 30 June 2017
-
     Caption = 'Sales Price Maintenance Groups';
     PageType = List;
     UsageCategory = Administration;
     ApplicationArea = All;
-    SourceTable = "NPR Sales Price Maint. Groups";
+    SourceTable = "NPR Sales Price Maint. Groups2";
 
     layout
     {
@@ -14,10 +12,10 @@ page 6059947 "NPR Sales Price Maint. Groups"
         {
             repeater(Group)
             {
-                field("Item Group"; "Item Group")
+                field("Item Category Code"; "Item Category Code")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Item Group field';
+                    ToolTip = 'Specifies the value of the Item Category Code field';
                 }
                 field(Description; Description)
                 {

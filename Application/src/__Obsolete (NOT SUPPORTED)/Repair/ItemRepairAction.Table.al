@@ -35,21 +35,6 @@ table 6059981 "NPR Item Repair Action"
             Editable = false;
             FieldClass = FlowField;
         }
-        field(30; "No. Of tests"; Integer)
-        {
-            CalcFormula = Count ("NPR Item Repair Tests" WHERE("Item No." = FIELD("Item No.")));
-            Caption = 'No. Of tests';
-            Editable = false;
-            FieldClass = FlowField;
-        }
-        field(31; "No.Of Errors"; Integer)
-        {
-            CalcFormula = Count ("NPR Item Repair Tests" WHERE("Item No." = FIELD("Item No."),
-                                                           Success = CONST(false)));
-            Caption = 'No.Of Errors';
-            Editable = false;
-            FieldClass = FlowField;
-        }
         field(50; "Variant Action"; Option)
         {
             Caption = 'Variant Action';
