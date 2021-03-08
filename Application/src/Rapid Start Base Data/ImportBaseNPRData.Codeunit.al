@@ -1,7 +1,18 @@
 codeunit 6014602 "NPR Import Base NPR Data"
 {
     trigger OnRun()
+    var
+        AllObj: Record AllObj;
+        Attempts: Integer;
     begin
+        //We've had problems that invoking this codeunit on a container programmatically right after publishing npretail give errors on missing npretail tables. 
+        //This shouldn't be possible NST behaviour, so we try to workaround what appears to be a race condition in MS end by delaying up to 100 seconds:        
+
+        while (not AllObj.Get(AllObj."Object Type"::Table, 6014404) and (Attempts < 10)) do begin
+            Attempts += 1;
+            Sleep(1000 * 10);
+        end;
+
         ImportRapidPackageFromFeed('MINIMAL-NPR.rapidstart');
     end;
 
