@@ -7,10 +7,8 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         Ask: Boolean;
         Invoice: Boolean;
         Print: Boolean;
-        Post: Boolean;
         Receive: Boolean;
         Ship: Boolean;
-        WriteInAuditRoll: Boolean;
         Text000003: Label 'You cannot debit item groups!';
         Text000007: Label 'Error. You can not post customer payments from the register using the sales module!';
         Text000008: Label '%1 %2 was created';
@@ -100,11 +98,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         DocumentType := DocumentType::Quote;
     end;
 
-    procedure SetWriteInAuditRoll(WriteInAuditRollIn: Boolean)
-    begin
-        WriteInAuditRoll := WriteInAuditRollIn;
-    end;
-
     procedure SetShowCreationMessage()
     begin
         ShowCreationMessage := true;
@@ -192,6 +185,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         Success: Boolean;
         POSSalesDocumentOutputMgt: Codeunit "NPR POS Sales Doc. Output Mgt.";
         POSEntry: Record "NPR POS Entry";
+        Post: Boolean;
     begin
         CreateSalesHeader(SalePOS, SalesHeader);
 
@@ -221,12 +215,14 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         end;
 
         CreatedSalesHeader := SalesHeader;
+        Post := SalesHeader.Invoice or SalesHeader.Receive or SalesHeader.Ship;
 
-        if Post then
+        if Post then begin
             if Ask then
                 Posted := SalesPostYesNo.Run(SalesHeader)
             else
                 Posted := SalesPost.Run(SalesHeader);
+        end;
 
         if Post and (not Posted) then
             Message(POSTING_ERROR, SalesHeader."Document Type", SalesHeader."No.", GetLastErrorText);
@@ -276,7 +272,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 
         InvokeOnFinishCreditSaleWorkflow(SalePOS);
 
-        OnAfterDebitSalePostEvent(SalePOS, SalesHeader, Posted, WriteInAuditRoll);
+        OnAfterDebitSalePostEvent(SalePOS, SalesHeader, Posted);
 
         Commit;
     end;
@@ -726,9 +722,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         ReportSelectionRetail: Record "NPR Report Selection Retail";
         POSEntryManagement: Codeunit "NPR POS Entry Management";
     begin
-        if not WriteInAuditRoll then
-            exit;
-
         if not RetailPrint then
             exit;
 
@@ -1209,7 +1202,7 @@ then
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnAfterDebitSalePostEvent(SalePOS: Record "NPR Sale POS"; SalesHeader: Record "Sales Header"; Posted: Boolean; WriteInAuditRoll: Boolean)
+    local procedure OnAfterDebitSalePostEvent(SalePOS: Record "NPR Sale POS"; SalesHeader: Record "Sales Header"; Posted: Boolean)
     begin
     end;
 }

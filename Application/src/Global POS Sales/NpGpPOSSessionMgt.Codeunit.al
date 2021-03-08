@@ -35,7 +35,7 @@ codeunit 6151165 "NPR NpGp POS Session Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014407, 'OnAfterDebitSalePostEvent', '', true, true)]
-    local procedure OnAfterDebitSalePostEvent(var Sender: Codeunit "NPR Sales Doc. Exp. Mgt."; SalePOS: Record "NPR Sale POS"; SalesHeader: Record "Sales Header"; Posted: Boolean; WriteInAuditRoll: Boolean)
+    local procedure OnAfterDebitSalePostEvent(var Sender: Codeunit "NPR Sales Doc. Exp. Mgt."; SalePOS: Record "NPR Sale POS"; SalesHeader: Record "Sales Header"; Posted: Boolean)
     var
         POSUnit: Record "NPR POS Unit";
         NcTask: Record "NPR Nc Task";
@@ -48,7 +48,7 @@ codeunit 6151165 "NPR NpGp POS Session Mgt."
             exit;
         if POSUnit."Global POS Sales Setup" = '' then
             exit;
-            
+
         if not NpGpPOSSalesSetup.Get(POSUnit."Global POS Sales Setup") then
             exit;
         if not FindPosEntry(SalePOS, POSEntry) then

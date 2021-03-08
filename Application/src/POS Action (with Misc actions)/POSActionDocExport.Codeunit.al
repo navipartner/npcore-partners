@@ -430,7 +430,6 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         RetailSalesDocMgt.SetTransferTaxSetup(JSON.GetBooleanParameterOrFail('SetTransferTaxSetup', ActionCode()));
         RetailSalesDocMgt.SetOpenSalesDocAfterExport(JSON.GetBooleanParameterOrFail('OpenDocumentAfterExport', ActionCode()));
         RetailSalesDocMgt.SetSendDocument(JSON.GetBooleanParameterOrFail('SetSend', ActionCode()));
-        RetailSalesDocMgt.SetWriteInAuditRoll(true);
         RetailSalesDocMgt.SetSendICOrderConf(JSON.GetBooleanParameter('SendICOrderConfirmation'));
         RetailSalesDocMgt.SetCustomerCreditCheck(JSON.GetBooleanParameter('CheckCustomerCredit'));
 
