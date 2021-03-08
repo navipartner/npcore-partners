@@ -123,6 +123,7 @@ table 6151413 "NPR Magento Payment Gateway"
                     exit;
 
                 Validate("Cancel Codeunit Id", EventSubscription."Subscriber Codeunit ID");
+            end;
         }
     }
 
