@@ -83,11 +83,6 @@
             "justification": "Use a text constant for passing user messages and errors without concatenations."
         },
         {
-            "id": "AA0219",
-            "action":"Hidden",
-            "justification": "The Tooltip property of Fields must start with 'Specifies'."
-        },
-        {
             "id": "AA0220",
             "action":"Error",
             "justification": "The value of the Tooltip property of Fields must be filled."
