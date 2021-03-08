@@ -33,9 +33,7 @@ table 6151003 "NPR POS Quote Line"
             DataClassification = CustomerContent;
             TableRelation = IF (Type = CONST("G/L Entry")) "G/L Account"."No."
             ELSE
-            IF (Type = CONST("Item Group")) "NPR Item Group"."No."
-            ELSE
-            IF (Type = CONST(Repair)) "NPR Customer Repair"."No."
+            IF (Type = CONST("Item Group")) "Item Category".Code
             ELSE
             IF (Type = CONST(Payment)) "NPR POS Payment Method".Code WHERE( "Block POS Payment"= const(false))
             ELSE

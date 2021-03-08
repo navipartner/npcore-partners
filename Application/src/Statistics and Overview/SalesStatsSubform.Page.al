@@ -1,11 +1,5 @@
 page 6014594 "NPR Sales Stats Subform"
 {
-    // NPR5.52/ZESO/20191010  Object created
-    // NPR5.53/ZESO/20191205  CASE 371446 New Function GetGlobals
-    // NPR5.53/ZESO/20191210  CASE 371446 Populate Description
-    // NPR5.53/ZESO/20191211  CASE 371446 New Function SetTempRec
-    // NPR5.55/BHR /20200724 CASE 361515 Comment Key not used in AL
-
     Caption = 'Sales Statistics Subform';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -38,11 +32,11 @@ page 6014594 "NPR Sales Stats Subform"
 
                     trigger OnDrillDown()
                     var
-                        ItemLedgerEntry: Record "Item Ledger Entry";
-                        ItemLedgerEntryForm: Page "Item Ledger Entries";
+                        AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry";
+                        ItemLedgerEntryForm: Page "NPR Aux. Item Ledger Entries";
                     begin
-                        SetItemLedgerEntryFilter(ItemLedgerEntry, "No.");
-                        ItemLedgerEntryForm.SetTableView(ItemLedgerEntry);
+                        SetItemLedgerEntryFilter(AuxItemLedgerEntry, "No.");
+                        ItemLedgerEntryForm.SetTableView(AuxItemLedgerEntry);
                         ItemLedgerEntryForm.Editable(false);
                         ItemLedgerEntryForm.RunModal;
                     end;
@@ -54,13 +48,13 @@ page 6014594 "NPR Sales Stats Subform"
 
                     trigger OnDrillDown()
                     var
-                        ValueEntry: Record "Value Entry";
-                        ValueEntryForm: Page "Value Entries";
+                        AuxValueEntry: Record "NPR Aux. Value Entry";
+                        AuxValueEntries: Page "NPR Aux. Value Entries";
                     begin
-                        SetValueEntryFilter(ValueEntry, "No.");
-                        ValueEntryForm.SetTableView(ValueEntry);
-                        ValueEntryForm.Editable(false);
-                        ValueEntryForm.RunModal;
+                        SetValueEntryFilter(AuxValueEntry, "No.");
+                        AuxValueEntries.SetTableView(AuxValueEntry);
+                        AuxValueEntries.Editable(false);
+                        AuxValueEntries.RunModal;
                     end;
                 }
             }
@@ -100,25 +94,21 @@ page 6014594 "NPR Sales Stats Subform"
         Dim2Filter: Text;
         ItemNoFilter: Text;
         ItemCategoryCodeFilter: Text;
-        Statistics: Option ,Item,"Item Group","Item Category";
+        Statistics: Option ,Item,"Item Category";
 
-    procedure PopulateTemp(StartDate: Date; EndDate: Date; StartTime: Time; EndTime: Time; VarStatisticsBy: Option ,Item,"Item Group","Item Category"; VarItemFilter: Text; VarItemCatFilter: Text; VarItemGroupFilter: Text; VarDim1Filter: Text; VarDim2Filter: Text)
+    procedure PopulateTemp(StartDate: Date; EndDate: Date; StartTime: Time; EndTime: Time; VarStatisticsBy: Option ,Item,"Item Category"; VarItemFilter: Text; VarItemCatFilter: Text; VarDim1Filter: Text; VarDim2Filter: Text)
     var
         ItemQtyQuery: Query "NPR Sales Stat - Item Qty";
-        ItemGroupQtyQuery: Query "NPR Sales Stat. - Item Gr Qty";
         ItemCatQtyQuery: Query "NPR Sales Stat. -Item Cat Qty";
         ItemAmtQuery: Query "NPR Sales Stats - Item Sales";
-        ItemGroupAmtQuery: Query "NPR Sales Stats: Item Grp.";
         ItemCatAmtQuery: Query "NPR Sales Stats: Item Cat.";
         Item: Record Item;
         ItemCategory: Record "Item Category";
-        ItemGroup: Record "NPR Item Group";
     begin
         TempRec.DeleteAll;
         StartDateTime := CreateDateTime(StartDate, StartTime);
         EndDateTime := CreateDateTime(EndDate, EndTime);
         ItemNoFilter := VarItemFilter;
-        ItemGroupFilter := VarItemGroupFilter;
         ItemCategoryCodeFilter := VarItemCatFilter;
         Dim1Filter := VarDim1Filter;
         Dim2Filter := VarDim2Filter;
@@ -137,10 +127,8 @@ page 6014594 "NPR Sales Stats Subform"
                     while ItemQtyQuery.Read do begin
                         TempRec.Init;
                         TempRec."No." := ItemQtyQuery.Item_No;
-                        //-NPR5.53 [371446]
                         if Item.Get(ItemQtyQuery.Item_No) then
                             TempRec.Description := Item.Description;
-                        //+NPR5.53 [371446]
                         TempRec."Sales (Qty)" := -ItemQtyQuery.Sum_Quantity;
                         TempRec.Insert;
                     end;
@@ -159,47 +147,6 @@ page 6014594 "NPR Sales Stats Subform"
                             TempRec.Modify;
                         end;
                     end;
-
-
-
-
-                end;
-
-            VarStatisticsBy::"Item Group":
-                begin
-                    ItemGroupQtyQuery.SetRange(ItemGroupQtyQuery.Filter_Entry_Type, ItemGroupQtyQuery.Filter_Entry_Type::Sale);
-                    ItemGroupQtyQuery.SetFilter(ItemGroupQtyQuery.Filter_DateTime, '%1..%2', StartDateTime, EndDateTime);
-                    ItemGroupQtyQuery.SetFilter(ItemGroupQtyQuery.Filter_Item_No, ItemNoFilter);
-                    ItemGroupQtyQuery.SetFilter(ItemGroupQtyQuery.Filter_Item_Group_No, ItemGroupFilter);
-                    ItemGroupQtyQuery.SetFilter(ItemGroupQtyQuery.Filter_Item_Category_Code, ItemCategoryCodeFilter);
-                    ItemGroupQtyQuery.SetFilter(ItemGroupQtyQuery.Filter_Dim_1_Code, Dim1Filter);
-                    ItemGroupQtyQuery.SetFilter(ItemGroupQtyQuery.Filter_Dim_2_Code, Dim2Filter);
-                    ItemGroupQtyQuery.Open;
-                    while ItemGroupQtyQuery.Read do begin
-                        TempRec.Init;
-                        TempRec."No." := ItemGroupQtyQuery.Item_Group_No;
-                        //-NPR5.53 [371446]
-                        if ItemGroup.Get(ItemGroupQtyQuery.Item_Group_No) then
-                            TempRec.Description := ItemGroup.Description;
-                        //+NPR5.53 [371446]
-                        TempRec."Sales (Qty)" := -ItemGroupQtyQuery.Sum_Quantity;
-                        TempRec.Insert;
-                    end;
-
-                    ItemGroupAmtQuery.SetRange(ItemGroupAmtQuery.Filter_Entry_Type, ItemGroupAmtQuery.Filter_Entry_Type::Sale);
-                    ItemGroupAmtQuery.SetFilter(ItemGroupAmtQuery.Filter_DateTime, '%1..%2', StartDateTime, EndDateTime);
-                    ItemGroupAmtQuery.SetFilter(ItemGroupAmtQuery.Filter_Item_No, ItemNoFilter);
-                    ItemGroupAmtQuery.SetFilter(ItemGroupAmtQuery.Filter_Item_Group_No, ItemGroupFilter);
-                    ItemGroupAmtQuery.SetFilter(ItemGroupAmtQuery.Filter_Item_Category_Code, ItemCategoryCodeFilter);
-                    ItemGroupAmtQuery.SetFilter(ItemGroupAmtQuery.Filter_Dim_1_Code, Dim1Filter);
-                    ItemGroupAmtQuery.SetFilter(ItemGroupAmtQuery.Filter_Dim_2_Code, Dim2Filter);
-                    ItemGroupAmtQuery.Open;
-                    while ItemGroupAmtQuery.Read do begin
-                        if TempRec.Get(ItemGroupAmtQuery.Item_Group_No) then begin
-                            TempRec."Sales (LCY)" := ItemGroupAmtQuery.Sum_Sales_Amount_Actual;
-                            TempRec.Modify;
-                        end;
-                    end;
                 end;
 
             VarStatisticsBy::"Item Category":
@@ -207,7 +154,6 @@ page 6014594 "NPR Sales Stats Subform"
                     ItemCatQtyQuery.SetRange(ItemCatQtyQuery.Filter_Entry_Type, ItemCatQtyQuery.Filter_Entry_Type::Sale);
                     ItemCatQtyQuery.SetFilter(ItemCatQtyQuery.Filter_DateTime, '%1..%2', StartDateTime, EndDateTime);
                     ItemCatQtyQuery.SetFilter(ItemCatQtyQuery.Filter_Item_No, ItemNoFilter);
-                    ItemCatQtyQuery.SetFilter(ItemCatQtyQuery.Filter_Item_Group_No, ItemGroupFilter);
                     ItemCatQtyQuery.SetFilter(ItemCatQtyQuery.Filter_Item_Category_Code, ItemCategoryCodeFilter);
                     ItemCatQtyQuery.SetFilter(ItemCatQtyQuery.Filter_Dim_1_Code, Dim1Filter);
                     ItemCatQtyQuery.SetFilter(ItemCatQtyQuery.Filter_Dim_2_Code, Dim2Filter);
@@ -215,10 +161,8 @@ page 6014594 "NPR Sales Stats Subform"
                     while ItemCatQtyQuery.Read do begin
                         TempRec.Init;
                         TempRec."No." := ItemCatQtyQuery.Item_Category_Code;
-                        //-NPR5.53 [371446]
                         if ItemCategory.Get(ItemCatQtyQuery.Item_Category_Code) then
                             TempRec.Description := ItemCategory.Description;
-                        //+NPR5.53 [371446]
                         TempRec."Sales (Qty)" := -ItemCatQtyQuery.Sum_Quantity;
                         TempRec.Insert;
                     end;
@@ -226,7 +170,6 @@ page 6014594 "NPR Sales Stats Subform"
                     ItemCatAmtQuery.SetRange(ItemCatAmtQuery.Filter_Entry_Type, ItemCatAmtQuery.Filter_Entry_Type::Sale);
                     ItemCatAmtQuery.SetFilter(ItemCatAmtQuery.Filter_DateTime, '%1..%2', StartDateTime, EndDateTime);
                     ItemCatAmtQuery.SetFilter(ItemCatAmtQuery.Filter_Item_No, ItemNoFilter);
-                    ItemCatAmtQuery.SetFilter(ItemCatAmtQuery.Filter_Item_Group_No, ItemGroupFilter);
                     ItemCatAmtQuery.SetFilter(ItemCatAmtQuery.Filter_Item_Category_Code, ItemCategoryCodeFilter);
                     ItemCatAmtQuery.SetFilter(ItemCatAmtQuery.Filter_Dim_1_Code, Dim1Filter);
                     ItemCatAmtQuery.SetFilter(ItemCatAmtQuery.Filter_Dim_2_Code, Dim2Filter);
@@ -242,95 +185,55 @@ page 6014594 "NPR Sales Stats Subform"
         CurrPage.Update;
     end;
 
-    procedure SetItemLedgerEntryFilter(var ItemLedgerEntry: Record "Item Ledger Entry"; varNo: Code[20])
+    procedure SetItemLedgerEntryFilter(var AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry"; varNo: Code[20])
     begin
         //SetItemLedgerEntryFilter
-        ItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code");
-        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
-        ItemLedgerEntry.SetFilter("NPR Document Date and Time", '%1..%2', StartDateTime, EndDateTime);
+        AuxItemLedgerEntry.SetCurrentKey("Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code");
+        AuxItemLedgerEntry.SetRange("Entry Type", AuxItemLedgerEntry."Entry Type"::Sale);
+        AuxItemLedgerEntry.SetFilter("Document Date and Time", '%1..%2', StartDateTime, EndDateTime);
         case Statistics of
             Statistics::Item:
-                ItemLedgerEntry.SetRange("Item No.", varNo);
+                AuxItemLedgerEntry.SetRange("Item No.", varNo);
             Statistics::"Item Category":
-                ItemLedgerEntry.SetRange("Item Category Code", varNo);
-            Statistics::"Item Group":
-                ItemLedgerEntry.SetRange("NPR Item Group No.", varNo);
+                AuxItemLedgerEntry.SetRange("Item Category Code", varNo);
         end;
 
-        //IF ItemGroupFilter <> '' THEN
-        //ItemLedgerEntry.SETRANGE( "Item Group No.", ItemGroupFilter )
-        //ELSE
-        //ItemLedgerEntry.SETRANGE( "Item Group No.",varNo);
-
         if Dim1Filter <> '' then
-            ItemLedgerEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
+            AuxItemLedgerEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
         else
-            ItemLedgerEntry.SetRange("Global Dimension 1 Code");
+            AuxItemLedgerEntry.SetRange("Global Dimension 1 Code");
 
         if Dim2Filter <> '' then
-            ItemLedgerEntry.SetRange("Global Dimension 2 Code", Dim2Filter)
+            AuxItemLedgerEntry.SetRange("Global Dimension 2 Code", Dim2Filter)
         else
-            ItemLedgerEntry.SetRange("Global Dimension 2 Code");
-
-        //IF ItemNoFilter <> ''  THEN
-        //ItemLedgerEntry.SETFILTER("Item No.",ItemNoFilter)
-        //ELSE
-        //ItemLedgerEntry.SETRANGE("Item No.",varNo);
-
-        //IF ItemCategoryCodeFilter <> ''  THEN
-        //ItemLedgerEntry.SETFILTER("Item Category Code",ItemCategoryCodeFilter)
-        //ELSE
-        //ItemLedgerEntry.SETRANGE("Item Category Code",varNo);
+            AuxItemLedgerEntry.SetRange("Global Dimension 2 Code");
     end;
 
-    procedure SetValueEntryFilter(var ValueEntry: Record "Value Entry"; varNo: Code[20])
+    procedure SetValueEntryFilter(var AuxValueEntry: Record "NPR Aux. Value Entry"; varNo: Code[20])
     begin
         //SetValueEntryFilter
-        //-NPR5.55 [361515]
-        //ValueEntry.SETCURRENTKEY( "Item Ledger Entry Type", "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code" );
-        //+NPR5.55 [361515]
-        ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
-        ValueEntry.SetFilter("NPR Document Date and Time", '%1..%2', StartDateTime, EndDateTime);
+        AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
+        AuxValueEntry.SetFilter("Document Date and Time", '%1..%2', StartDateTime, EndDateTime);
         case Statistics of
             Statistics::Item:
-                ValueEntry.SetRange("Item No.", varNo);
+                AuxValueEntry.SetRange("Item No.", varNo);
             Statistics::"Item Category":
-                ValueEntry.SetRange("NPR Item Category Code", varNo);
-            Statistics::"Item Group":
-                ValueEntry.SetRange("NPR Item Group No.", varNo);
+                AuxValueEntry.SetRange("Item Category Code", varNo);
         end;
 
-        //IF ItemGroupFilter <> '' THEN
-        //ValueEntry.SETRANGE( "Item Group No.", ItemGroupFilter )
-        //ELSE
-        //ValueEntry.SETRANGE( "Item Group No.",varNo);
-
         if Dim1Filter <> '' then
-            ValueEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
+            AuxValueEntry.SetRange("Global Dimension 1 Code", Dim1Filter)
         else
-            ValueEntry.SetRange("Global Dimension 1 Code");
+            AuxValueEntry.SetRange("Global Dimension 1 Code");
 
         if Dim2Filter <> '' then
-            ValueEntry.SetRange("Global Dimension 2 Code", Dim2Filter)
+            AuxValueEntry.SetRange("Global Dimension 2 Code", Dim2Filter)
         else
-            ValueEntry.SetRange("Global Dimension 2 Code");
-
-
-        //IF ItemCategoryCodeFilter <> ''  THEN
-        //ValueEntry.SETFILTER("Item Category Code",ItemCategoryCodeFilter)
-        //ELSE
-        //ValueEntry.SETRANGE("Item Category Code",varNo);
-
-
-        //IF ItemNoFilter <> ''  THEN
-        //ValueEntry.SETFILTER("Item No.",ItemNoFilter)
-        //ELSE
-        //ValueEntry.SETRANGE("Item No.",varNo);
+            AuxValueEntry.SetRange("Global Dimension 2 Code");
     end;
 
     procedure GetGlobals(var InStartDate: Date; var InEndDate: Date; var InStartTime: Time; var InEndTime: Time; var InVarStatisticsBy: Option; var InVarItemFilter: Text; var InVarItemCatFilter: Text; var InVarItemGroupFilter: Text; var InVarDim1Filter: Text; var InVarDim2Filter: Text)
     begin
-        //-NPR5.53 [371446]
         InStartDate := DT2Date(StartDateTime);
         InEndDate := DT2Date(EndDateTime);
         InStartTime := DT2Time(StartDateTime);
@@ -341,14 +244,11 @@ page 6014594 "NPR Sales Stats Subform"
         InVarItemGroupFilter := ItemGroupFilter;
         InVarDim1Filter := Dim1Filter;
         InVarDim2Filter := Dim2Filter;
-        //+NPR5.53 [371446]
     end;
 
     procedure SetTempRec(var NewTempRec: Record "NPR Sales Stats Time Period")
     begin
-        //-NPR5.53 [371446]
         TempRec.Copy(NewTempRec, true);
-        //+NPR5.53 [371446]
     end;
 }
 

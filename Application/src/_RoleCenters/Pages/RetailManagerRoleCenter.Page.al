@@ -692,12 +692,12 @@ page 6151241 "NPR Manager"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Retail Item List action';
                 }
-                action("Item Group Tree")
+                action("Item Categories")
                 {
-                    Caption = 'Item Group Tree';
-                    RunObject = Page "NPR Item Group Tree";
+                    Caption = 'Item Categories';
+                    RunObject = Page "Item Categories";
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Item Group Tree action';
+                    ToolTip = 'Executes the Item Categories action';
                 }
                 action("Stockkeeping Unit List")
                 {

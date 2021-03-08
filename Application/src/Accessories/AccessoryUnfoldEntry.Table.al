@@ -1,7 +1,5 @@
 table 6014508 "NPR Accessory Unfold Entry"
 {
-    // NPR5.40/MHA /20180214  CASE 288039 Object created - unfold Accessory Items
-
     Caption = 'Accessory Unfold Entry';
     DataClassification = CustomerContent;
 
@@ -112,21 +110,21 @@ table 6014508 "NPR Accessory Unfold Entry"
         }
         field(65; "Cash Register No."; Code[20])
         {
-            CalcFormula = Lookup("Item Ledger Entry"."NPR Register Number" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
+            CalcFormula = Lookup("NPR Aux. Item Ledger Entry"."POS Unit No." WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
             Caption = 'POS Unit No.';
             Editable = false;
             FieldClass = FlowField;
         }
         field(70; "Salesperson Code"; Code[20])
         {
-            CalcFormula = Lookup("Item Ledger Entry"."NPR Salesperson Code" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
+            CalcFormula = Lookup("NPR Aux. Item Ledger Entry"."Salespers./Purch. Code" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
             Caption = 'Salesperson Code';
             Editable = false;
             FieldClass = FlowField;
         }
         field(75; "Document Time"; Time)
         {
-            CalcFormula = Lookup("Item Ledger Entry"."NPR Document Time" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
+            CalcFormula = Lookup("NPR Aux. Item Ledger Entry"."Document Time" WHERE("Entry No." = FIELD("Item Ledger Entry No.")));
             Caption = 'Document Time';
             Editable = false;
             FieldClass = FlowField;

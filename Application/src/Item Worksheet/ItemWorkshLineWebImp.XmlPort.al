@@ -94,10 +94,6 @@ xmlport 6060041 "NPR Item Worksh. Line Web Imp."
                     {
                         MinOccurs = Zero;
                     }
-                    fieldelement(ItemGroup; "Item Worksheet Line"."Item Group")
-                    {
-                        MinOccurs = Zero;
-                    }
                     fieldelement(VarietyGroup; "Item Worksheet Line"."Variety Group")
                     {
                         MinOccurs = Zero;

@@ -35,7 +35,6 @@ table 6151395 "NPR CS Whse. Receipt Data"
         {
             Caption = 'Item Group Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Item Group";
         }
      
         field(16; Created; DateTime)

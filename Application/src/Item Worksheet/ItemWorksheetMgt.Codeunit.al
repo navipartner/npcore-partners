@@ -178,19 +178,18 @@ codeunit 6060040 "NPR Item Worksheet Mgt."
             exit;
     end;
 
-    procedure CheckItemGroupSetup(ItemGroupCode: Code[10])
+    procedure CheckItemGroupSetup(ItemGroupCode: Code[20])
     var
-        ItemGroup: Record "NPR Item Group";
+        ItemCategory: Record "Item Category";
     begin
-        if not ItemGroup.Get(ItemGroupCode) then
+        if not ItemCategory.Get(ItemGroupCode) then
             exit;
-        ItemGroup.TestField("VAT Bus. Posting Group");
-        ItemGroup.TestField("Gen. Prod. Posting Group");
-        ItemGroup.TestField("VAT Prod. Posting Group");
-        ItemGroup.TestField("Inventory Posting Group");
-        ItemGroup.TestField(Blocked, false);
-        ItemGroup.TestField("Main Item Group", false);
-        ItemGroup.Get(ItemGroupCode);
+        ItemCategory.TestField("NPR VAT Bus. Posting Group");
+        ItemCategory.TestField("NPR Gen. Prod. Posting Group");
+        ItemCategory.TestField("NPR VAT Prod. Posting Group");
+        ItemCategory.TestField("NPR Inventory Posting Group");
+        ItemCategory.TestField("NPR Blocked", false);
+        ItemCategory.TestField("NPR Main Category", false);
     end;
 
     procedure CombineLines(ItemWorksheet: Record "NPR Item Worksheet")
@@ -597,7 +596,7 @@ codeunit 6060040 "NPR Item Worksheet Mgt."
           Item.FieldNo("Indirect Cost %"),
           Item.FieldNo("No. Series"),
           Item.FieldNo(Reserve),
-          Item.FieldNo("NPR Item Group")] then
+          Item.FieldNo("Item Category Code")] then
             exit(true)
         else
             exit(false);
@@ -612,7 +611,7 @@ codeunit 6060040 "NPR Item Worksheet Mgt."
         case TableNumber of
             DATABASE::Item:
                 if FieldNumber in [
-                  Item.FieldNo("NPR Item Group")] then
+                  Item.FieldNo("Item Category Code")] then
                     exit(true)
                 else
                     exit(false);

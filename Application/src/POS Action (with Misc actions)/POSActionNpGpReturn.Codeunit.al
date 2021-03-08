@@ -61,14 +61,12 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        RetailItemSetup: Record "NPR Retail Item Setup";
         Context: Codeunit "NPR POS JSON Management";
     begin
         if not Action.IsThisAction(ActionCode) then
             exit;
 
-        RetailItemSetup.Get();
-        Context.SetContext('PromptForReason', RetailItemSetup."Reason for Return Mandatory");
+        Context.SetContext('PromptForReason', true);
 
         FrontEnd.SetActionContext(ActionCode, Context);
 
@@ -357,7 +355,6 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
     var
         SalePOS: Record "NPR Sale POS";
         SaleLinePOS: Record "NPR Sale Line POS";
-        RetailItemSetup: Record "NPR Retail Item Setup";
         RetailCrossReference: Record "NPR Retail Cross Reference";
         Item: Record Item;
         JSON: Codeunit "NPR POS JSON Management";
@@ -383,11 +380,8 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
 
         POSSession.GetSaleLine(POSSaleLine);
 
-        RetailItemSetup.Get();
-        if (RetailItemSetup."Reason for Return Mandatory") then begin
-            JSON.SetScopeRoot();
-            ReturnReasonCode := JSON.GetStringOrFail('ReturnReasonCode', StrSubstNo(ReadingErr, ActionCode()));
-        end;
+        JSON.SetScopeRoot();
+        ReturnReasonCode := JSON.GetStringOrFail('ReturnReasonCode', StrSubstNo(ReadingErr, ActionCode()));
 
         UpdateLineNos(SalePOS, TempNpGpPOSSalesLine);
 

@@ -75,7 +75,7 @@ report 6014612 "NPR Inventory per Variant/date"
         {
             CalcFields = "Net Change", "NPR Has Variants";
             DataItemTableView = SORTING("No.");
-            RequestFilterFields = "No.", "Vendor No.", "NPR Item Group", "NPR Group sale", "Location Filter", "Date Filter";
+            RequestFilterFields = "No.", "Vendor No.", "Item Category Code", "NPR Group sale", "Location Filter", "Date Filter";
             column(ShowLocation; ShowLocation)
             {
             }

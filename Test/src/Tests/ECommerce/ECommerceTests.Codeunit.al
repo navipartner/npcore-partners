@@ -1714,7 +1714,6 @@ codeunit 85008 "NPR E-Commerce Tests"
         LibraryECommerce: Codeunit "NPR Library - E-Commerce";
     begin
         if not Initialized then begin
-            CreateDefaultRetailSetup();
             PrepareDataForXml();
             SetSalesDocumentAsXml();
             SetPurchDocumentAsXml();
@@ -1726,7 +1725,6 @@ codeunit 85008 "NPR E-Commerce Tests"
 
     local procedure PrepareDataForXml()
     var
-        RetailItemSetup: Record "NPR Retail Item Setup";
         LibraryECommerce: Codeunit "NPR Library - E-Commerce";
     begin
         LibraryECommerce.GetSalesOrderNo(SalesOrderNo);
@@ -1740,10 +1738,6 @@ codeunit 85008 "NPR E-Commerce Tests"
         LibraryECommerce.GetMagentoPaymentCode(MagentoPaymentCode2);
         LibraryECommerce.GetMagentoPaymentTransactionId(TransactionId2);
         LibraryECommerce.GetMagentoShipmentMethodCode(ExternalShipmentMethodCode);
-        if RetailItemSetup.get() and RetailItemSetup."Item Group on Creation" then begin
-            RetailItemSetup."Item Group on Creation" := false;
-            RetailItemSetup.Modify();
-        end;
         LibraryECommerce.CreateItem(ItemNo);
         LibraryECommerce.CreateItem(ItemNo2);
         LibraryECommerce.GetItemQuantitiesAndPrices(Qty, Qty2, UnitPrice, UnitPrice2);
@@ -2034,13 +2028,5 @@ codeunit 85008 "NPR E-Commerce Tests"
     begin
         MyNotifications.Disable(InstructionMgt.GetClosingUnpostedDocumentNotificationId());
         PurchaseInvoice.Close();
-    end;
-
-    local procedure CreateDefaultRetailSetup()
-    var
-        RetailItemSetup: Record "NPR Retail Item Setup";
-    begin
-        if not RetailItemSetup.Get() then
-            RetailItemSetup.Insert();
     end;
 }

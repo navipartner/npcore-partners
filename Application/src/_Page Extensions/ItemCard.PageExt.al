@@ -19,12 +19,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 ToolTip = 'Specifies the value of the NPR Item Status field';
             }
 
-            field("NPR Item Group"; Rec."NPR Item Group")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the value of the NPR Item Group field';
-            }
-
             field("NPR Item Brand"; Rec."NPR Item Brand")
             {
                 ApplicationArea = All;

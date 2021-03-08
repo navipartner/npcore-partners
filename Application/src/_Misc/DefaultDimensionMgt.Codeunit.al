@@ -3,8 +3,8 @@ codeunit 6014400 "NPR Default Dimension Mgt."
     procedure UpdateGlobalDimCode(GlobalDimCodeNo: Integer; "Table ID": Integer; "No.": Code[20]; NewDimValue: Code[20])
     begin
         case "Table ID" of
-            DATABASE::"NPR Item Group":
-                UpdateItemGroupGlobalDimCode(GlobalDimCodeNo, "No.", NewDimValue);
+            DATABASE::"Item Category":
+                UpdateItemCategoryGlobalDimCode(GlobalDimCodeNo, "No.", NewDimValue);
             DATABASE::"NPR Mixed Discount":
                 UpdateMixedDiscountGlobalDimCode(GlobalDimCodeNo, "No.", NewDimValue);
             DATABASE::"NPR Period Discount":
@@ -20,19 +20,19 @@ codeunit 6014400 "NPR Default Dimension Mgt."
         end;
     end;
 
-    
-    procedure UpdateItemGroupGlobalDimCode(GlobalDimCodeNo: Integer; ItemGroupNo: Code[20]; NewDimValue: Code[20])
+
+    procedure UpdateItemCategoryGlobalDimCode(GlobalDimCodeNo: Integer; ItemCategoryCode: Code[20]; NewDimValue: Code[20])
     var
-        ItemGroup: Record "NPR Item Group";
+        ItemCategory: Record "Item Category";
     begin
-        if ItemGroup.Get(ItemGroupNo) then begin
+        if ItemCategory.Get(ItemCategoryCode) then begin
             case GlobalDimCodeNo of
                 1:
-                    ItemGroup."Global Dimension 1 Code" := NewDimValue;
+                    ItemCategory."NPR Global Dimension 1 Code" := NewDimValue;
                 2:
-                    ItemGroup."Global Dimension 2 Code" := NewDimValue;
+                    ItemCategory."NPR Global Dimension 2 Code" := NewDimValue;
             end;
-            ItemGroup.Modify(true);
+            ItemCategory.Modify(true);
         end;
     end;
 

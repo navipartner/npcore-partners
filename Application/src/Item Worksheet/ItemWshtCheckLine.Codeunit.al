@@ -62,7 +62,7 @@ codeunit 6060045 "NPR Item Wsht.-Check Line"
                     ;
                 Action::CreateNew:
                     begin
-                        if "Item Group" = '' then begin
+                        if "Item Category Code" = '' then begin
                             ProcessError(ItemWkshtLine, StrSubstNo(Text112, "Line No."), StopOnError);
                         end else begin
                             if not NoSeries.Get("No. Series") then begin

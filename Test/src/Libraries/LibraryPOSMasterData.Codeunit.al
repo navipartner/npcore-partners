@@ -1,9 +1,5 @@
 codeunit 85002 "NPR Library - POS Master Data"
 {
-    trigger OnRun()
-    begin
-    end;
-
     procedure CreatePOSUnit(var POSUnit: Record "NPR POS Unit"; POSStoreCode: Code[10]; POSProfileCode: Code[20])
     var
         POSStore: Record "NPR POS Store";
@@ -324,7 +320,6 @@ codeunit 85002 "NPR Library - POS Master Data"
     procedure CreateDefaultPostingSetup(var POSPostingProfile: Record "NPR POS Posting Profile")
     begin
         CreateDefaultPostingProfile(POSPostingProfile);
-        CreateDefaultRetailSetup();
     end;
 
 
@@ -360,15 +355,6 @@ codeunit 85002 "NPR Library - POS Master Data"
         POSPostingProfile.Validate("VAT Bus. Posting Group", VATPostingSetup."VAT Bus. Posting Group");
 
         POSPostingProfile.Modify;
-    end;
-
-    local procedure CreateDefaultRetailSetup()
-    var
-        RetailItemSetup: Record "NPR Retail Item Setup";
-    begin
-
-        if not RetailItemSetup.Get() then
-            RetailItemSetup.Insert();
     end;
 
     local procedure CreatePOSPostingSetup(var POSPaymentMethod: Record "NPR POS Payment Method")

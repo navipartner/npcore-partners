@@ -13,40 +13,42 @@ report 6014420 "NPR Item Group Top"
             column(Picture_CompanyInformation; CompanyInformation.Picture)
             {
             }
-            dataitem("Item Group"; "NPR Item Group")
+            dataitem("Item Category"; "Item Category")
             {
-                RequestFilterFields = "No.", "Belongs In Main Item Group", "Date Filter", "Salesperson Filter", "Vendor Filter", "Global Dimension 1 Filter";
+                RequestFilterFields = "Code", "NPR Main Category Code", "NPR Date Filter", "NPR Salesperson/Purch. Filter", "NPR Vendor Filter", "NPR Global Dimension 1 Filter";
 
                 trigger OnAfterGetRecord()
                 begin
                     IleSalesQty := 0;
                     IleSalesLCY := 0;
                     IleCostAmtActual := 0;
-                    ItemLedgerEntry.Reset();
-                    ItemLedgerEntry.SetRange("NPR Item Group No.", "No.");
-                    ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
-                    ItemLedgerEntry.SetFilter("NPR Vendor No.", "Item Group".GetFilter("Vendor Filter"));
-                    ItemLedgerEntry.SetFilter("Posting Date", "Item Group".GetFilter("Date Filter"));
-                    ItemLedgerEntry.SetFilter("Global Dimension 1 Code", "Item Group".GetFilter("Global Dimension 1 Filter"));
-                    ItemLedgerEntry.SetFilter("Global Dimension 2 Code", "Item Group".GetFilter("Global Dimension 2 Filter"));
-                    if ItemLedgerEntry.FindSet() then
-                        repeat
-                            IleSalesQty += -ItemLedgerEntry.Quantity;
-                        until ItemLedgerEntry.Next() = 0;
 
-                    ValueEntry.Reset();
-                    ValueEntry.SetRange("NPR Item Group No.", "No.");
-                    ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
-                    ValueEntry.SetFilter("NPR Vendor No.", "Item Group".GetFilter("Vendor Filter"));
-                    ValueEntry.SetFilter("Posting Date", "Item Group".GetFilter("Date Filter"));
-                    ValueEntry.SetFilter("Global Dimension 1 Code", "Item Group".GetFilter("Global Dimension 1 Filter"));
-                    ValueEntry.SetFilter("Global Dimension 2 Code", "Item Group".GetFilter("Global Dimension 2 Filter"));
-                    ValueEntry.SetFilter("Salespers./Purch. Code", "Item Group".GetFilter("Salesperson Filter"));
-                    if ValueEntry.FindSet() then
-                        repeat
-                            IleSalesLCY += ValueEntry."Sales Amount (Actual)";
-                            IleCostAmtActual += -ValueEntry."Cost Amount (Actual)";
-                        until ValueEntry.Next() = 0;
+                    AuxItemLedgerEntry.Reset();
+                    AuxItemLedgerEntry.SetRange("Item Category Code", "Code");
+                    AuxItemLedgerEntry.SetRange("Entry Type", AuxItemLedgerEntry."Entry Type"::Sale);
+                    AuxItemLedgerEntry.SetFilter("Vendor No.", "Item Category".GetFilter("NPR Vendor Filter"));
+                    AuxItemLedgerEntry.SetFilter("Posting Date", "Item Category".GetFilter("NPR Date Filter"));
+                    AuxItemLedgerEntry.SetFilter("Global Dimension 1 Code", "Item Category".GetFilter("NPR Global Dimension 1 Filter"));
+                    AuxItemLedgerEntry.SetFilter("Global Dimension 2 Code", "Item Category".GetFilter("NPR Global Dimension 2 Filter"));
+
+                    AuxItemLedgerEntry.CalcFields(Quantity);
+
+                    IleSalesQty := -AuxItemLedgerEntry.Quantity;
+
+                    AuxValueEntry.Reset();
+                    AuxValueEntry.SetRange("Item Category Code", "Code");
+                    AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
+                    AuxValueEntry.SetFilter("Vendor No.", "Item Category".GetFilter("NPR Vendor Filter"));
+                    AuxValueEntry.SetFilter("Posting Date", "Item Category".GetFilter("NPR Date Filter"));
+                    AuxValueEntry.SetFilter("Global Dimension 1 Code", "Item Category".GetFilter("NPR Global Dimension 1 Filter"));
+                    AuxValueEntry.SetFilter("Global Dimension 2 Code", "Item Category".GetFilter("NPR Global Dimension 2 Filter"));
+                    AuxValueEntry.SetFilter("Salespers./Purch. Code", "Item Category".GetFilter("NPR Salesperson/Purch. Filter"));
+
+                    AuxValueEntry.CalcFields("Sales Amount (Actual)", "Cost Amount (Actual)");
+
+                    IleSalesLCY := AuxValueEntry."Sales Amount (Actual)";
+                    IleCostAmtActual := -AuxValueEntry."Cost Amount (Actual)";
+
                     db := IleSalesLCY - IleCostAmtActual;
 
                     if IleSalesLCY <> 0 then
@@ -54,7 +56,7 @@ report 6014420 "NPR Item Group Top"
                     else
                         dg := 0;
                     TempNPRBufferSort.Init();
-                    TempNPRBufferSort.Template := "No.";
+                    TempNPRBufferSort.Template := "Code";
                     TempNPRBufferSort."Line No." := 0;
                     case SortType of
                         SortType::ant:
@@ -85,10 +87,10 @@ report 6014420 "NPR Item Group Top"
 
                     if Sorting = Sorting::st then
                         TempNPRBufferSort.Ascending(false);
-                    "Item Group".SetFilter("Item Group"."Global Dimension 1 Filter", "Dimension Value".Code);
-                    "Item Group".CopyFilter("Date Filter", Item."Date Filter");
+                    "Item Category".SetFilter("Item Category"."NPR Global Dimension 1 Filter", "Dimension Value".Code);
+                    "Item Category".CopyFilter("NPR Date Filter", Item."Date Filter");
                     Item.SetFilter("Global Dimension 1 Filter", "Dimension Value".Code);
-                    Item.SetRange("NPR Item Group", '');
+                    Item.SetRange("Item Category Code", '');
                     if Item.Find('-') then
                         repeat
                             Item.CalcFields("Sales (Qty.)", "Sales (LCY)");
@@ -109,10 +111,10 @@ report 6014420 "NPR Item Group Top"
                 column(Name_DimensionValue; "Dimension Value".Name)
                 {
                 }
-                column(No_ItemGroup; "Item Group"."No.")
+                column(No_ItemGroup; "Item Category"."Code")
                 {
                 }
-                column(Description_ItemGroup; "Item Group".Description)
+                column(Description_ItemGroup; "Item Category".Description)
                 {
                 }
                 column(SalesQty_ItemGroup; IleSalesQty)
@@ -161,37 +163,37 @@ report 6014420 "NPR Item Group Top"
 
                     i += 1;
 
-                    "Item Group".SetFilter("Item Group"."Global Dimension 1 Filter", "Dimension Value".Code);
-                    if "Item Group".Get(TempNPRBufferSort.Template) then begin
+                    "Item Category".SetFilter("Item Category"."NPR Global Dimension 1 Filter", "Dimension Value".Code);
+                    if "Item Category".Get(TempNPRBufferSort.Template) then begin
                         IleSalesQty := 0;
                         IleSalesLCY := 0;
                         IleCostAmtActual := 0;
 
-                        ItemLedgerEntry.Reset();
-                        ItemLedgerEntry.SetRange("NPR Item Group No.", "Item Group"."No.");
-                        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
-                        ItemLedgerEntry.SetFilter("NPR Vendor No.", "Item Group".GetFilter("Vendor Filter"));
-                        ItemLedgerEntry.SetFilter("Posting Date", "Item Group".GetFilter("Date Filter"));
-                        ItemLedgerEntry.SetFilter("Global Dimension 1 Code", "Item Group".GetFilter("Global Dimension 1 Filter"));
-                        ItemLedgerEntry.SetFilter("Global Dimension 2 Code", "Item Group".GetFilter("Global Dimension 2 Filter"));
-                        if ItemLedgerEntry.FindSet() then
-                            repeat
-                                IleSalesQty += -ItemLedgerEntry.Quantity;
-                            until ItemLedgerEntry.Next() = 0;
+                        AuxItemLedgerEntry.Reset();
+                        AuxItemLedgerEntry.SetRange("Item Category Code", "Item Category"."Code");
+                        AuxItemLedgerEntry.SetRange("Entry Type", AuxItemLedgerEntry."Entry Type"::Sale);
+                        AuxItemLedgerEntry.SetFilter("Vendor No.", "Item Category".GetFilter("NPR Vendor Filter"));
+                        AuxItemLedgerEntry.SetFilter("Posting Date", "Item Category".GetFilter("NPR Date Filter"));
+                        AuxItemLedgerEntry.SetFilter("Global Dimension 1 Code", "Item Category".GetFilter("NPR Global Dimension 1 Filter"));
+                        AuxItemLedgerEntry.SetFilter("Global Dimension 2 Code", "Item Category".GetFilter("NPR Global Dimension 2 Filter"));
 
-                        ValueEntry.Reset();
-                        ValueEntry.SetRange("NPR Item Group No.", "Item Group"."No.");
-                        ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
-                        ValueEntry.SetFilter("NPR Vendor No.", "Item Group".GetFilter("Vendor Filter"));
-                        ValueEntry.SetFilter("Posting Date", "Item Group".GetFilter("Date Filter"));
-                        ValueEntry.SetFilter("Global Dimension 1 Code", "Item Group".GetFilter("Global Dimension 1 Filter"));
-                        ValueEntry.SetFilter("Global Dimension 2 Code", "Item Group".GetFilter("Global Dimension 2 Filter"));
-                        ValueEntry.SetFilter("Salespers./Purch. Code", "Item Group".GetFilter("Salesperson Filter"));
-                        if ValueEntry.FindSet() then
-                            repeat
-                                IleSalesLCY += ValueEntry."Sales Amount (Actual)";
-                                IleCostAmtActual += -ValueEntry."Cost Amount (Actual)";
-                            until ValueEntry.Next() = 0;
+                        AuxItemLedgerEntry.CalcFields(Quantity);
+
+                        IleSalesQty += -AuxItemLedgerEntry.Quantity;
+
+                        AuxValueEntry.Reset();
+                        AuxValueEntry.SetRange("Item Category Code", "Item Category"."Code");
+                        AuxValueEntry.SetRange("Item Ledger Entry Type", AuxValueEntry."Item Ledger Entry Type"::Sale);
+                        AuxValueEntry.SetFilter("Vendor No.", "Item Category".GetFilter("NPR Vendor Filter"));
+                        AuxValueEntry.SetFilter("Posting Date", "Item Category".GetFilter("NPR Date Filter"));
+                        AuxValueEntry.SetFilter("Global Dimension 1 Code", "Item Category".GetFilter("NPR Global Dimension 1 Filter"));
+                        AuxValueEntry.SetFilter("Global Dimension 2 Code", "Item Category".GetFilter("NPR Global Dimension 2 Filter"));
+                        AuxValueEntry.SetFilter("Salespers./Purch. Code", "Item Category".GetFilter("NPR Salesperson/Purch. Filter"));
+
+                        AuxValueEntry.CalcFields("Sales Amount (Actual)", "Cost Amount (Actual)");
+
+                        IleSalesLCY := AuxValueEntry."Sales Amount (Actual)";
+                        IleCostAmtActual := -AuxValueEntry."Cost Amount (Actual)";
                     end;
 
                     db := IleSalesLCY - IleCostAmtActual;
@@ -295,15 +297,15 @@ report 6014420 "NPR Item Group Top"
         Clear(TotalSale);
         Clear(TotalProfit);
 
-        Dim1Filter := "Item Group".GetFilter("Global Dimension 1 Filter");
+        Dim1Filter := "Item Category".GetFilter("NPR Global Dimension 1 Filter");
     end;
 
     var
         CompanyInformation: Record "Company Information";
         Item: Record Item;
-        ItemLedgerEntry: Record "Item Ledger Entry";
+        AuxItemLedgerEntry: Record "NPR Aux. Item Ledger Entry";
         TempNPRBufferSort: Record "NPR TEMP Buffer" temporary;
-        ValueEntry: Record "Value Entry";
+        AuxValueEntry: Record "NPR Aux. Value Entry";
         PreviousDimValueCode: Code[20];
         db: Decimal;
         dg: Decimal;
@@ -315,15 +317,9 @@ report 6014420 "NPR Item Group Top"
         TotalProfit: Decimal;
         TotalQty: Decimal;
         TotalSale: Decimal;
-        window: Dialog;
         CountDimValue: Integer;
         i: Integer;
         ShowQty: Integer;
-        Text10600000: Label 'ant';
-        Text10600004: Label 'db';
-        Text10600002: Label 'Itemgroups Sorted by #1##########';
-        Text10600003: Label 'sal';
-        Text10600001: Label 'st';
         SortType: Option ant,sal,db,dg;
         Sorting: Option st,mi;
         FiltersDimValue: Text;

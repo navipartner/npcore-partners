@@ -33,7 +33,6 @@ table 6151386 "NPR CS Rfid Data"
         {
             Caption = 'Item Group Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Item Group";
         }
         field(17; "Combined key"; Code[30])
         {

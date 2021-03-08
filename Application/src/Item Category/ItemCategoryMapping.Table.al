@@ -1,13 +1,9 @@
 table 6060062 "NPR Item Category Mapping"
 {
-    // NPR5.39/BR  /20180215  CASE 295322 Object Created
-    // NPR5.45/RA  /20180827  CASE 295322 Added field 30 40 and added them to primary key
-    // NPR5.48/TJ  /20181115  CASE 330832 Increased Length of field Item Category Code from 10 to 20
-
     Caption = 'Item Category Mapping';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR Item Category Mapping";
-    LookupPageID = "NPR Item Category Mapping";
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Item Group is obsolete.';
 
     fields
     {
@@ -23,7 +19,8 @@ table 6060062 "NPR Item Category Mapping"
             Caption = 'Item Group';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = "NPR Item Group";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Using Item Category instead.';
         }
         field(30; "Item Material"; Code[20])
         {

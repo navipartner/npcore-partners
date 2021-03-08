@@ -59,7 +59,7 @@ codeunit 6014593 "NPR Change Log Auto Enabler"
         TestTable(DATABASE::"NPR POS Payment Bin");
         TestTable(DATABASE::"NPR RP Template Header");
         TestTable(DATABASE::"NPR EFT BIN Group");
-        TestTable(DATABASE::"NPR Item Group");
+        TestTable(DATABASE::"Item Category");
         TestTable(DATABASE::"NPR POS Payment Method");
     end;
 

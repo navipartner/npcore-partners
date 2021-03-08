@@ -33,7 +33,7 @@ table 6060142 "NPR MM Loy. Item Point Setup"
         {
             Caption = 'No.';
             DataClassification = CustomerContent;
-            TableRelation = IF (Type = CONST("Item Group")) "NPR Item Group"
+            TableRelation = IF (Type = CONST("Item Group")) "Item Category"
             ELSE
             IF (Type = CONST(Item)) Item
             ELSE
@@ -42,7 +42,7 @@ table 6060142 "NPR MM Loy. Item Point Setup"
             trigger OnValidate()
             var
                 Item: Record Item;
-                ItemGroup: Record "NPR Item Group";
+                ItemCategory: Record "Item Category";
                 Vendor: Record Vendor;
             begin
                 case Type of
@@ -50,8 +50,8 @@ table 6060142 "NPR MM Loy. Item Point Setup"
                         if (Item.Get("No.")) then
                             Description := Item.Description;
                     Type::"Item Group":
-                        if (ItemGroup.Get("No.")) then
-                            Description := ItemGroup.Description;
+                        if (ItemCategory.Get("No.")) then
+                            Description := ItemCategory.Description;
                     Type::Vendor:
                         if (Vendor.Get("No.")) then
                             Description := Vendor.Name;

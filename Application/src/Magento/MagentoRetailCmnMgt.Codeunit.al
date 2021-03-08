@@ -573,7 +573,7 @@ codeunit 6151426 "NPR Magento Retail Cmn. Mgt."
                 end;
             MixedDiscountLine."Disc. Grouping Type"::"Item Group":
                 begin
-                    Item.SetRange("NPR Item Group", MixedDiscountLine."No.");
+                    Item.SetRange("Item Category Code", MixedDiscountLine."No.");
                 end;
             MixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group":
                 begin

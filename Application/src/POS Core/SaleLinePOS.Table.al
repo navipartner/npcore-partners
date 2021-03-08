@@ -48,9 +48,7 @@ table 6014406 "NPR Sale Line POS"
             DataClassification = CustomerContent;
             TableRelation = IF (Type = CONST("G/L Entry")) "G/L Account"."No."
             ELSE
-            IF (Type = CONST("Item Group")) "NPR Item Group"."No."
-            ELSE
-            IF (Type = CONST(Repair)) "NPR Customer Repair"."No."
+            IF (Type = CONST("Item Group")) "Item Category".Code
             ELSE
             IF (Type = CONST(Payment)) "NPR POS Payment Method".Code WHERE("Block POS Payment" = const(false))
             ELSE
@@ -86,7 +84,7 @@ table 6014406 "NPR Sale Line POS"
                         end;
                     Type::"Item Group":
                         begin
-                            InitFromItemGroup();
+                            InitFromItemCategory();
                             UpdateVATSetup();
                         end;
                     Type::Payment:
@@ -1262,16 +1260,8 @@ table 6014406 "NPR Sale Line POS"
         {
             Caption = 'Item Group';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Item Group";
-
-            trigger OnValidate()
-            begin
-                CreateDim(
-                  NPRDimMgt.TypeToTableNPR(Type), "No.",
-                  NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
-                  DATABASE::"NPR NPRE Seating", "NPRE Seating Code",
-                  0, '');
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Item Category Used instead.';
         }
         field(6012; "MR Anvendt antal"; Decimal)
         {
@@ -1411,6 +1401,15 @@ table 6014406 "NPR Sale Line POS"
             Caption = 'Item Category Code';
             DataClassification = CustomerContent;
             Description = 'NPR5.00 [250375]';
+
+            trigger OnValidate()
+            begin
+                CreateDim(
+                  NPRDimMgt.TypeToTableNPR(Type), "No.",
+                  NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
+                  DATABASE::"NPR NPRE Seating", "NPRE Seating Code",
+                  0, '');
+            end;
         }
         field(6051; "Product Group Code"; Code[10])
         {
@@ -1545,10 +1544,12 @@ table 6014406 "NPR Sale Line POS"
             MaintainSIFTIndex = false;
             MaintainSQLIndex = false;
         }
+
         key(Key3; "Register No.", "Sales Ticket No.", "Sale Type", Type, "No.", "Item Group", Quantity)
         {
             MaintainSIFTIndex = false;
             SumIndexFields = "Amount Including VAT", Amount, Quantity;
+            ObsoleteState = Removed;
         }
         key(Key4; "Register No.", "Sales Ticket No.", "Line No.")
         {
@@ -1583,6 +1584,11 @@ table 6014406 "NPR Sale Line POS"
             MaintainSIFTIndex = false;
             MaintainSQLIndex = false;
             SumIndexFields = "Amount Including VAT";
+        }
+        key(Key10; "Register No.", "Sales Ticket No.", "Sale Type", Type, "No.", "Item Category Code", Quantity)
+        {
+            MaintainSIFTIndex = false;
+            SumIndexFields = "Amount Including VAT", Amount, Quantity;
         }
     }
 
@@ -2242,7 +2248,6 @@ table 6014406 "NPR Sale Line POS"
         "Item Category Code" := Item."Item Category Code";
         "Tax Group Code" := Item."Tax Group Code";
         "Posting Group" := Item."Inventory Posting Group";
-        "Item Group" := Item."NPR Item Group";
         "Item Disc. Group" := Item."Item Disc. Group";
         "Vendor No." := Item."Vendor No.";
         "Custom Disc Blocked" := Item."NPR Custom Discount Blocked";
@@ -2254,21 +2259,21 @@ table 6014406 "NPR Sale Line POS"
         DescriptionControl.GetDescriptionPOS(Rec, xRec, Item);
     end;
 
-    local procedure InitFromItemGroup()
+    local procedure InitFromItemCategory()
     var
-        ItemGroup: Record "NPR Item Group";
+        ItemCategory: Record "Item Category";
     begin
         if "No." = '' then
             exit;
 
-        ItemGroup.Get("No.");
+        ItemCategory.Get("No.");
         GetItem;
         Item.TestField("NPR Group sale");
         "Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
         "VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
         "Tax Group Code" := Item."Tax Group Code";
         "Item Disc. Group" := Item."Item Disc. Group";
-        Description := CopyStr(ItemGroup.Description, 1, MaxStrLen(Description));
+        Description := CopyStr(ItemCategory.Description, 1, MaxStrLen(Description));
     end;
 
     local procedure InitFromPaymentTypePOS()
@@ -2466,9 +2471,7 @@ table 6014406 "NPR Sale Line POS"
     var
         TempItemLedgerEntry: Record "Item Ledger Entry" temporary;
         ItemLedgerEntry: Record "Item Ledger Entry";
-        RetailItemSetup: Record "NPR Retail Item Setup";
     begin
-        RetailItemSetup.Get();
         TestField("Sale Type", "Sale Type"::Sale);
         TestField(Type, Type::Item);
 
@@ -2482,8 +2485,7 @@ table 6014406 "NPR Sale Line POS"
         ItemLedgerEntry.SetRange("Location Code", "Location Code");
         if "Variant Code" <> '' then
             ItemLedgerEntry.SetRange("Variant Code", "Variant Code");
-        if not RetailItemSetup."Not use Dim filter SerialNo" then
-            ItemLedgerEntry.SetRange("Global Dimension 1 Code", "Shortcut Dimension 1 Code");
+        ItemLedgerEntry.SetRange("Global Dimension 1 Code", "Shortcut Dimension 1 Code");
         if ItemLedgerEntry.Find('-') then
             repeat
                 ItemLedgerEntry.SetRange("Serial No.", ItemLedgerEntry."Serial No.");

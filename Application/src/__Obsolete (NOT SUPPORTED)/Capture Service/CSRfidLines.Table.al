@@ -60,7 +60,6 @@ table 6151369 "NPR CS Rfid Lines"
         {
             Caption = 'Item Group Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Item Group";
         }
         field(19; "Transferred To"; Option)
         {

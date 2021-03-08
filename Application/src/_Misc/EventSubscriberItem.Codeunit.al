@@ -20,9 +20,7 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
     [EventSubscriber(ObjectType::Table, 27, 'OnBeforeInsertEvent', '', true, false)]
     local procedure OnBeforeInsertEventLicenseCheck(var Rec: Record Item; RunTrigger: Boolean)
     var
-        RetailItemSetup: Record "NPR Retail Item Setup";
         InvtSetup: Record "Inventory Setup";
-        ItemGroup: Record "NPR Item Group";
         NoSeriesMgt: Codeunit NoSeriesManagement;
         TempItem: Record Item temporary;
     begin
@@ -30,45 +28,9 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
             exit;
 
         GetSalesSetup;
-        RetailItemSetup.Get();
-
-        if RetailItemSetup."Item Group on Creation" and (Rec."No." = '') and (Rec."NPR Item Group" = '') then begin
-            if PAGE.RunModal(PAGE::"NPR Item Group Tree", ItemGroup) = ACTION::LookupOK then begin
-                Rec."NPR Item Group" := ItemGroup."No.";
-                if ItemGroup."No. Series" <> '' then begin
-                    Rec."No. Series" := ItemGroup."No. Series";
-                    InvtSetup.Get;
-                    InvtSetup.TestField("Item Nos.");
-                    NoSeriesMgt.InitSeries(InvtSetup."Item Nos.", Rec."No. Series", 0D, Rec."No.", Rec."No. Series");
-                end;
-
-                if ItemGroup."Config. Template Header" <> '' then
-                    if ApplyTemplateToTempItem(Rec, TempItem, ItemGroup."Config. Template Header") then
-                        Rec."Price Includes VAT" := TempItem."Price Includes VAT";
-            end;
-        end;
 
         if Rec."Price Includes VAT" and (SalesSetup."VAT Bus. Posting Gr. (Price)" <> '') then
             Rec."VAT Bus. Posting Gr. (Price)" := SalesSetup."VAT Bus. Posting Gr. (Price)";
-    end;
-
-    local procedure ApplyTemplateToTempItem(var Item: Record Item; var TempItem: Record Item temporary; ConfigTemplHeaderCode: Code[10]): Boolean
-    var
-        ConfigTemplateHeader: Record "Config. Template Header";
-        RecRef: RecordRef;
-        ConfigTemplateMgt: Codeunit "Config. Template Management";
-    begin
-        if not TempItem.IsTemporary then
-            exit(false);
-
-        ConfigTemplateHeader.Get(ConfigTemplHeaderCode);
-        TempItem := Item;
-        TempItem.Insert;
-        RecRef.GetTable(TempItem);
-        ConfigTemplateMgt.ApplyTemplateLinesWithoutValidation(ConfigTemplateHeader, RecRef);
-        RecRef.SetTable(TempItem);
-
-        exit(true);
     end;
 
     [EventSubscriber(ObjectType::Table, 27, 'OnAfterInsertEvent', '', true, false)]
@@ -80,8 +42,8 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
             exit;
 
         Rec."NPR Primary Key Length" := StrLen(Rec."No.");
-        if Rec."NPR Item Group" <> '' then
-            Rec.Validate("NPR Item Group");
+        if Rec."Item Category Code" <> '' then
+            Rec.Validate("Item Category Code");
         Rec.Modify;
     end;
 
@@ -152,27 +114,14 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
         CheckGroupSale(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 27, 'OnAfterValidateEvent', 'Unit Cost', true, false)]
-    local procedure OnAfterValidateEventUnitCost(var Rec: Record Item; var xRec: Record Item; CurrFieldNo: Integer)
-    var
-    begin
-        UnitCostValidation(Rec);
-    end;
-
-    [EventSubscriber(ObjectType::Table, 27, 'OnAfterValidateEvent', 'Last Direct Cost', true, false)]
-    local procedure OnAfterValidateEventLastDirectCost(var Rec: Record Item; var xRec: Record Item; CurrFieldNo: Integer)
-    var
-    begin
-        UnitCostValidation(Rec);
-    end;
-
-    [EventSubscriber(ObjectType::Table, 27, 'OnAfterValidateEvent', 'NPR Item Group', true, false)]
+    [EventSubscriber(ObjectType::Table, 27, 'OnAfterValidateEvent', 'Item Category Code', true, false)]
     local procedure OnAfterValidateEventItemGroupLicenseCheck(var Rec: Record Item; var xRec: Record Item; CurrFieldNo: Integer)
     var
-        ItemGroup: Record "NPR Item Group";
+        ItemCategory: Record "Item Category";
+        ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
     begin
-        if ItemGroup.Get(Rec."NPR Item Group") then
-            ItemGroup.SetupItemFromGroup(Rec, ItemGroup);
+        if ItemCategory.Get(Rec."Item Category Code") then
+            ItemCategoryMgt.SetupItemFromCategory(Rec, ItemCategory);
     end;
 
     [EventSubscriber(ObjectType::Table, 27, 'OnAfterValidateEvent', 'NPR Group sale', true, false)]
@@ -216,15 +165,6 @@ codeunit 6014441 "NPR Event Subscriber (Item)"
         if Item."NPR Group sale" then
             if Item."Costing Method" = Item."Costing Method"::Standard then
                 Error(ErrStd, Item."No.");
-    end;
-
-    local procedure UnitCostValidation(var Item: Record Item)
-    var
-        StaffSetup: Record "NPR Staff Setup";
-    begin
-        StaffSetup.Get();
-        if StaffSetup."Staff SalesPrice Calc Codeunit" > 0 then
-            Codeunit.Run(StaffSetup."Staff SalesPrice Calc Codeunit", Item);
     end;
 
     local procedure UpdateVendorItemRef(var Item: Record Item; xItem: Record Item)
