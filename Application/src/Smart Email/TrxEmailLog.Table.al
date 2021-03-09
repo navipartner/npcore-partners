@@ -1,8 +1,5 @@
 table 6059825 "NPR Trx Email Log"
 {
-    // NPR5.38/THRO/20171018 CASE 286713 Object created
-    // NPR5.55/THRO/20200511 CASE 343266 Added Provider + "Status Message"
-
     Caption = 'Transactional Email Log';
     DataClassification = CustomerContent;
 
@@ -17,9 +14,9 @@ table 6059825 "NPR Trx Email Log"
         field(3; Provider; Option)
         {
             Caption = 'Provider';
+            DataClassification = CustomerContent;
             OptionCaption = 'Campaign Monitor,Mailchimp';
             OptionMembers = "Campaign Monitor",Mailchimp;
-            DataClassification = CustomerContent;
         }
         field(10; "Message ID"; Guid)
         {
@@ -75,8 +72,5 @@ table 6059825 "NPR Trx Email Log"
         }
     }
 
-    fieldgroups
-    {
-    }
 }
 

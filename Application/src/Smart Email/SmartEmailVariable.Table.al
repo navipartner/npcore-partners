@@ -1,8 +1,5 @@
 table 6059823 "NPR Smart Email Variable"
 {
-    // NPR5.38/THRO/20171018 CASE 286713 Object created
-    // NPR5.55/THRO/20200511 CASE 343266 Added field "Variable Type" - used in Mandrill integration
-
     Caption = 'Smart Email Variable';
     DataClassification = CustomerContent;
 
@@ -11,8 +8,8 @@ table 6059823 "NPR Smart Email Variable"
         field(1; "Transactional Email Code"; Code[20])
         {
             Caption = 'Transactional Email Code';
-            TableRelation = "NPR Smart Email";
             DataClassification = CustomerContent;
+            TableRelation = "NPR Smart Email";
         }
         field(2; "Line No."; Integer)
         {
@@ -27,9 +24,9 @@ table 6059823 "NPR Smart Email Variable"
         field(20; "Variable Type"; Option)
         {
             Caption = 'Variable Type';
+            DataClassification = CustomerContent;
             OptionCaption = ' ,Mailchimp,Handlebars';
             OptionMembers = " ",Mailchimp,Handlebars;
-            DataClassification = CustomerContent;
         }
         field(50; "Merge Table ID"; Integer)
         {
@@ -39,8 +36,8 @@ table 6059823 "NPR Smart Email Variable"
         field(60; "Field No."; Integer)
         {
             Caption = 'Field No.';
-            TableRelation = Field."No." WHERE(TableNo = FIELD("Merge Table ID"));
             DataClassification = CustomerContent;
+            TableRelation = Field."No." WHERE(TableNo = FIELD("Merge Table ID"));
 
             trigger OnValidate()
             begin
@@ -50,7 +47,7 @@ table 6059823 "NPR Smart Email Variable"
         }
         field(62; "Field Name"; Text[80])
         {
-            CalcFormula = Lookup (Field."Field Caption" WHERE(TableNo = FIELD("Merge Table ID"),
+            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Merge Table ID"),
                                                               "No." = FIELD("Field No.")));
             Caption = 'Field Name';
             Editable = false;
@@ -76,8 +73,5 @@ table 6059823 "NPR Smart Email Variable"
         }
     }
 
-    fieldgroups
-    {
-    }
 }
 
