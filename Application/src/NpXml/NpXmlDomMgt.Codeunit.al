@@ -452,7 +452,13 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
             Error(Text000, Element.Name + '/' + Path);
         end;
 
-        Element.SelectSingleNode(Path, Node);
+        if not Element.SelectSingleNode(Path, Node) then begin
+            if not Required then
+                exit(false);
+
+            Error(Text000, Element.Name + '/' + Path);
+        end;
+
         Element2 := Node.AsXmlElement();
         if Element2.IsEmpty() and Required then
             Error(Text000, Element.Name + '/' + Path);
