@@ -42,6 +42,8 @@ tableextension 6014427 "NPR Item" extends Item
         {
             Caption = 'Can''t edit unit price';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
         }
         field(6014428; "NPR Primary Key Length"; Integer)
         {
@@ -64,6 +66,8 @@ tableextension 6014427 "NPR Item" extends Item
         {
             Caption = 'Second-hand number';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
         }
         field(6014502; "NPR Condition"; Option)
         {
@@ -79,6 +83,8 @@ tableextension 6014427 "NPR Item" extends Item
         {
             Caption = 'Second-hand';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
         }
         field(6014504; "NPR Guarantee Index"; Option)
         {
@@ -141,11 +147,15 @@ tableextension 6014427 "NPR Item" extends Item
         {
             Caption = 'Sale Blocked';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
         }
         field(6014640; "NPR Purchase Blocked"; Boolean)
         {
             Caption = 'Purchase Blocked';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
         }
         field(6014641; "NPR Custom Discount Blocked"; Boolean)
         {
