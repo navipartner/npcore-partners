@@ -574,12 +574,11 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
             RecRef.SetTable(SalesHeader);
         end;
 
-        if XmlElement.SelectNodes('payments', XNodeList) then begin
+        if XmlElement.SelectNodes('payments/payment_method', XNodeList) then begin
             foreach XNode in XNodeList do begin
                 XmlElement2 := XNode.AsXmlElement();
                 if (LowerCase(NpXmlDomMgt.GetXmlAttributeText(XmlElement2, 'type', true)) = 'payment_gateway')
-                and (SalesHeader."Payment Method Code" = '')
-                and (LowerCase(XmlElement2.Name) = 'payment_method') then begin
+                and (SalesHeader."Payment Method Code" = '') then begin
                     PaymentMapping.SetRange("External Payment Method Code",
                       CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement2, 'code', true), 1, MaxStrLen(PaymentMapping."External Payment Method Code")));
                     PaymentMapping.SetRange("External Payment Type",
