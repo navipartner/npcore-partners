@@ -1,12 +1,5 @@
 codeunit 6059820 "NPR Transactional Email Mgt."
 {
-    // NPR5.55/THRO/20200511 CASE 343266 Object created
-
-
-    trigger OnRun()
-    begin
-    end;
-
     procedure CheckConnection(TransactionalEmailSetup: Record "NPR Trx Email Setup")
     var
         CampaignMonitorMgt: Codeunit "NPR CampaignMonitor Mgt.";
@@ -92,19 +85,25 @@ codeunit 6059820 "NPR Transactional Email Mgt."
         MandrillTransEmailMgt: Codeunit "NPR Mandrill Trans. Email Mgt";
     begin
         TransactionalEmailSetup.SetRange(Default, true);
-        if not TransactionalEmailSetup.FindFirst then begin
+        if not TransactionalEmailSetup.FindFirst() then begin
             TransactionalEmailSetup.SetRange(Default);
-            TransactionalEmailSetup.FindFirst;
+            TransactionalEmailSetup.FindFirst();
         end;
         case TransactionalEmailSetup.Provider of
             TransactionalEmailSetup.Provider::"Campaign Monitor":
                 begin
                     if (FromName <> '') and (FromName <> FromEmail) then
                         FromEmail := StrSubstNo('%1 %2', FromName, FromEmail);
-                    CampaignMonitorMgt.SendClasicMail(Recipient, Cc, Bcc, Subject, BodyHtml, BodyText, FromEmail, ReplyTo, TrackOpen, TrackClick, Group, AddRecipientsToListID, Attachment, Silent);
+                    CampaignMonitorMgt.SendClasicMail(
+                        Recipient, Cc, Bcc, Subject, BodyHtml, BodyText, 
+                        FromEmail, ReplyTo, TrackOpen, TrackClick, Group, 
+                        AddRecipientsToListID, Attachment, Silent);
                 end;
             TransactionalEmailSetup.Provider::Mailchimp:
-                MandrillTransEmailMgt.SendClassicMail(Recipient, Cc, Bcc, Subject, BodyHtml, BodyText, FromEmail, FromName, ReplyTo, TrackOpen, TrackClick, Group, AddRecipientsToListID, Attachment, Silent);
+                MandrillTransEmailMgt.SendClassicMail(
+                    Recipient, Cc, Bcc, Subject, BodyHtml, BodyText, 
+                    FromEmail, FromName, ReplyTo, TrackOpen, TrackClick, Group, 
+                    AddRecipientsToListID, Attachment, Silent);
         end;
     end;
 

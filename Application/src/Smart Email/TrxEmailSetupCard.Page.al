@@ -1,39 +1,36 @@
 page 6059826 "NPR Trx Email Setup Card"
 {
-    // NPR5.55/THRO/20200511 CASE 343266 Object created
-
-    UsageCategory = None;
     Caption = 'Transaction Email Setup Card';
     PageType = Card;
     SourceTable = "NPR Trx Email Setup";
-
+    UsageCategory = None;
     layout
     {
         area(content)
         {
             group(General)
             {
-                field(Provider; Provider)
+                field(Provider; Rec.Provider)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Provider field';
                 }
-                field(Default; Default)
+                field(Default; Rec.Default)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Default field';
                 }
-                field("Client ID"; "Client ID")
+                field("Client ID"; Rec."Client ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Client ID field';
                 }
-                field("API Key"; "API Key")
+                field("API Key"; Rec."API Key")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the API Key field';
                 }
-                field("API URL"; "API URL")
+                field("API URL"; Rec."API URL")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the API URL field';
@@ -48,12 +45,12 @@ page 6059826 "NPR Trx Email Setup Card"
         {
             action(CheckConnection)
             {
+                ApplicationArea = All;
                 Caption = 'Test Connection';
                 Image = Link;
                 Promoted = true;
 				PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
                 ToolTip = 'Executes the Test Connection action';
 
                 trigger OnAction()

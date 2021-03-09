@@ -1,8 +1,5 @@
 page 6059821 "NPR Smart Email List"
 {
-    // NPR5.38/THRO/20171018 CASE 286713 Object created
-    // NPR5.55/THRO/20200511 CASE 343266 Added Provider
-
     Caption = 'Smart Email List';
     CardPageID = "NPR Smart Email Card";
     Editable = false;
@@ -10,40 +7,39 @@ page 6059821 "NPR Smart Email List"
     SourceTable = "NPR Smart Email";
     UsageCategory = Lists;
     ApplicationArea = All;
-
     layout
     {
         area(content)
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Provider; Provider)
+                field(Provider; Rec.Provider)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Provider field';
                 }
-                field("Merge Table ID"; "Merge Table ID")
+                field("Merge Table ID"; Rec."Merge Table ID")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Merge Table ID field';
                 }
-                field("Table Caption"; "Table Caption")
+                field("Table Caption"; Rec."Table Caption")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table Caption field';
                 }
-                field("Smart Email Name"; "Smart Email Name")
+                field("Smart Email Name"; Rec."Smart Email Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Smart Email Name field';
@@ -52,8 +48,5 @@ page 6059821 "NPR Smart Email List"
         }
     }
 
-    actions
-    {
-    }
 }
 

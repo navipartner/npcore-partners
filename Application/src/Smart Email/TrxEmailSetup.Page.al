@@ -1,8 +1,5 @@
 page 6059820 "NPR Trx Email Setup"
 {
-    // NPR5.38/THRO/20171018 CASE 286713 Object created
-    // NPR5.55/THRO/20200511 CASE 343266 Changed to List
-
     Caption = 'Transactional Email Setup';
     CardPageID = "NPR Trx Email Setup Card";
     Editable = false;
@@ -10,34 +7,33 @@ page 6059820 "NPR Trx Email Setup"
     SourceTable = "NPR Trx Email Setup";
     UsageCategory = Administration;
     ApplicationArea = All;
-
     layout
     {
         area(content)
         {
             repeater(Group)
             {
-                field(Provider; Provider)
+                field(Provider; Rec.Provider)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Provider field';
                 }
-                field(Default; Default)
+                field(Default; Rec.Default)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Default field';
                 }
-                field("Client ID"; "Client ID")
+                field("Client ID"; Rec."Client ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Client ID field';
                 }
-                field("API Key"; "API Key")
+                field("API Key"; Rec."API Key")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the API Key field';
                 }
-                field("<API Key>"; "API URL")
+                field("<API Key>"; Rec."API URL")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the API URL field';
@@ -52,12 +48,12 @@ page 6059820 "NPR Trx Email Setup"
         {
             action(CheckConnection)
             {
+                ApplicationArea = All;
                 Caption = 'Test Connection';
                 Image = Link;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
                 ToolTip = 'Executes the Test Connection action';
 
                 trigger OnAction()

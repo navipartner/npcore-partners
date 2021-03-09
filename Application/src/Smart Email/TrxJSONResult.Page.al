@@ -1,6 +1,5 @@
 page 6059829 "NPR Trx JSON Result"
 {
-    UsageCategory = None;
     Caption = 'Transactional JSON Result';
     DeleteAllowed = false;
     Editable = false;
@@ -10,6 +9,7 @@ page 6059829 "NPR Trx JSON Result"
     ShowFilter = false;
     SourceTable = "NPR Trx JSON Result";
     SourceTableTemporary = true;
+    UsageCategory = None;
 
     layout
     {
@@ -54,7 +54,7 @@ page 6059829 "NPR Trx JSON Result"
     var
         TransactionalEmailMgt: Codeunit "NPR Transactional Email Mgt.";
     begin
-        if Rec.IsEmpty then
+        if Rec.IsEmpty() then
             TransactionalEmailMgt.GetSmartEmailList(Rec);
     end;
 
@@ -63,11 +63,11 @@ page 6059829 "NPR Trx JSON Result"
 
     procedure LoadRecords(var ResultsToShow: Record "NPR Trx JSON Result"; UseCaption: Text)
     begin
-        if ResultsToShow.FindSet then
+        if ResultsToShow.FindSet() then
             repeat
                 Rec := ResultsToShow;
-                Rec.Insert;
-            until ResultsToShow.Next = 0;
+                Rec.Insert();
+            until ResultsToShow.Next() = 0;
         NewCaption := UseCaption;
     end;
 }

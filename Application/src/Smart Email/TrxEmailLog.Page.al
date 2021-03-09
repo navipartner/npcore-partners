@@ -1,8 +1,5 @@
 page 6059825 "NPR Trx Email Log"
 {
-    // NPR5.38/THRO/20171018 CASE 286713 Object created
-    // NPR5.55/THRO/20200511 CASE 343266 Added Provider and "Status Message"
-
     Caption = 'Transactional Email Log';
     DeleteAllowed = false;
     Editable = false;
@@ -19,57 +16,57 @@ page 6059825 "NPR Trx Email Log"
         {
             repeater(Group)
             {
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
-                field(Provider; Provider)
+                field(Provider; Rec.Provider)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Provider field';
                 }
-                field("Message ID"; "Message ID")
+                field("Message ID"; Rec."Message ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Message ID field';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field("Status Message"; "Status Message")
+                field("Status Message"; Rec."Status Message")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status Message field';
                 }
-                field(Recipient; Recipient)
+                field(Recipient; Rec.Recipient)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Recipient field';
                 }
-                field(Subject; Subject)
+                field(Subject; Rec.Subject)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Subject field';
                 }
-                field("Smart Email ID"; "Smart Email ID")
+                field("Smart Email ID"; Rec."Smart Email ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Smart Email ID field';
                 }
-                field("Sent At"; "Sent At")
+                field("Sent At"; Rec."Sent At")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sent At field';
                 }
-                field("Total Opens"; "Total Opens")
+                field("Total Opens"; Rec."Total Opens")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Total Opens field';
                 }
-                field("Total Clicks"; "Total Clicks")
+                field("Total Clicks"; Rec."Total Clicks")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Total Clicks field';
@@ -98,12 +95,10 @@ page 6059825 "NPR Trx Email Log"
                     TransactionalEmailMgt: Codeunit "NPR Transactional Email Mgt.";
                 begin
                     CurrPage.SetSelectionFilter(LogEntry);
-                    if LogEntry.FindSet then
+                    if LogEntry.FindSet() then
                         repeat
-                            //-NPR5.55 [343266]
                             TransactionalEmailMgt.GetMessageDetails(LogEntry);
-                        //-NPR5.55 [343266]
-                        until LogEntry.Next = 0;
+                        until LogEntry.Next() = 0;
                 end;
             }
         }

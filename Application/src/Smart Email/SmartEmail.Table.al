@@ -1,9 +1,5 @@
 table 6059822 "NPR Smart Email"
 {
-    // NPR5.38/THRO/20171018 CASE 286713 Object created
-    // NPR5.44/THRO/20180723 CASE 310042 Added field 200 "NpXml Template Code"
-    // NPR5.55/THRO/20200511 CASE 343266 Added Provider option Mailchimp + field "Merge Language (Mailchimp)"
-
     Caption = 'Smart Email';
     DrillDownPageID = "NPR Smart Email List";
     LookupPageID = "NPR Smart Email List";
@@ -25,10 +21,8 @@ table 6059822 "NPR Smart Email"
 
             trigger OnValidate()
             begin
-                //-NPR5.55 [343266]
                 if Provider <> xRec.Provider then
                     Validate("Smart Email ID", '');
-                //+NPR5.55 [343266]
             end;
         }
         field(10; Description; Text[30])
@@ -60,7 +54,7 @@ table 6059822 "NPR Smart Email"
         }
         field(60; "Table Caption"; Text[80])
         {
-            CalcFormula = Lookup ("Table Metadata".Caption WHERE(ID = FIELD("Merge Table ID")));
+            CalcFormula = Lookup("Table Metadata".Caption WHERE(ID = FIELD("Merge Table ID")));
             Caption = 'Table Caption';
             Editable = false;
             FieldClass = FlowField;
@@ -69,8 +63,6 @@ table 6059822 "NPR Smart Email"
         {
             Caption = 'Smart Email ID';
             TableRelation = "NPR Trx JSON Result".ID WHERE(Provider = FIELD(Provider));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
             DataClassification = CustomerContent;
 
@@ -79,9 +71,7 @@ table 6059822 "NPR Smart Email"
                 TransactionalEmailMgt: Codeunit "NPR Transactional Email Mgt.";
             begin
                 if "Smart Email ID" <> '' then
-                    //-NPR5.55 [343266]
                     TransactionalEmailMgt.GetSmartEmailDetails(Rec);
-                //+NPR5.55 [343266]
             end;
         }
         field(110; "Smart Email Name"; Text[50])
