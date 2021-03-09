@@ -403,25 +403,6 @@ table 6014612 "NPR Retail Campaign Items"
         DG: Decimal;
         VATPct: Decimal;
 
-    procedure ShowComment()
-    var
-        RetailComment: Record "NPR Retail Comment";
-    begin
-        /*
-        RetailComment.SETRANGE("Table ID",6014414);
-        IF Code <> '' THEN
-          IF "Item No." <> '' THEN BEGIN
-            RetailComment.SETRANGE("No.",Code);
-            RetailComment.SETRANGE("No. 2","Item No.");
-            {FORMREF
-            NPRBemærkningslinjeFrm.SETTABLEVIEW(NPRBemærkningslinjeRec);
-            NPRBemærkningslinjeFrm.RUNMODAL;
-            }
-          END;
-        */
-
-    end;
-
     procedure CreateDiscountItems(RetailCampaignHeader: Record "NPR Retail Campaign Header")
     var
         Item: Record Item;
@@ -460,7 +441,6 @@ table 6014612 "NPR Retail Campaign Items"
                                     Status := PeriodDiscount.Status;
                                     "Discount %" := PeriodDiscountLine."Discount %";
                                     "Discount Amount" := PeriodDiscountLine."Discount Amount";
-                                    //Profit := PeriodDiscountLine.Profit;
                                     "Campaign Unit Cost" := PeriodDiscountLine."Campaign Unit Cost";
                                     "Unit Cost" := PeriodDiscountLine."Unit Cost Purchase";
                                     "Vendor No." := PeriodDiscountLine."Vendor No.";
@@ -468,15 +448,13 @@ table 6014612 "NPR Retail Campaign Items"
                                     "Variant Code" := PeriodDiscountLine."Variant Code";
                                     "Starting Time" := PeriodDiscountLine."Starting Time";
                                     "Ending Time" := PeriodDiscountLine."Ending Time";
-                                    //-NPR5.41 [299278]
                                     if Item.Get("Item No.") then begin
                                         "Unit Cost" := Item."Unit Cost";
                                         "Vendor Item No." := Item."Vendor Item No.";
                                         "Vendor No." := Item."Vendor No.";
                                         "Units per Parcel" := Item."Units per Parcel";
-                                        //-NPR5.42 [299272]
 
-                                        if ((not Item."NPR Purchase Blocked") and (not Item.Blocked)) then begin
+                                        if not Item.Blocked then begin
                                             Clear(RequisitionLine);
                                             RequisitionLine.Init;
                                             RequisitionLine.Validate(Type, RequisitionLine.Type::Item);
@@ -488,11 +466,9 @@ table 6014612 "NPR Retail Campaign Items"
                                             "Unit Purchase Price" := RequisitionLine."Direct Unit Cost";
                                         end;
 
-                                        //+NPR5.42 [299272]
                                         if "Unit Purchase Price" = 0 then
                                             "Unit Purchase Price" := Item."Last Direct Cost";
                                     end;
-                                    //+NPR5.41 [299278]
 
                                     "Page no. in advert" := PeriodDiscountLine."Page no. in advert";
                                     "Priority 2" := PeriodDiscountLine.Priority;
@@ -505,9 +481,7 @@ table 6014612 "NPR Retail Campaign Items"
                                     if RetailComment.FindFirst then
                                         "Comment 2" := CopyStr(RetailComment.Comment, 1, 50);
                                     CalcProfit;
-                                    //-NPR5.55 [397967]
                                     "Quantity Sold" := GetQuantitySold;
-                                    //+NPR5.55 [397967]
                                     if Insert then;
                                 until PeriodDiscountLine.Next = 0;
                             end;
@@ -536,14 +510,12 @@ table 6014612 "NPR Retail Campaign Items"
                                     "Ending Time" := 0T;
                                     "Unit Price" := MixedDiscountLine."Unit price";
                                     "Unit Cost" := MixedDiscountLine."Unit cost";
-                                    //-NPR5.41 [299278]
                                     if Item.Get("Item No.") then begin
                                         "Unit Cost" := Item."Unit Cost";
                                         "Vendor Item No." := Item."Vendor Item No.";
                                         "Vendor No." := Item."Vendor No.";
                                         "Units per Parcel" := Item."Units per Parcel";
-                                        //-NPR5.42 [299272]
-                                        if ((not Item."NPR Purchase Blocked") and (not Item.Blocked)) then begin
+                                        if not Item.Blocked then begin
                                             Clear(RequisitionLine);
                                             RequisitionLine.Init;
                                             RequisitionLine.Validate(Type, RequisitionLine.Type::Item);
@@ -554,16 +526,12 @@ table 6014612 "NPR Retail Campaign Items"
                                             PurchPriceCalcMgt.FindReqLinePrice(RequisitionLine, 0);
                                             "Unit Purchase Price" := RequisitionLine."Direct Unit Cost";
                                         end;
-                                        //+NPR5.42 [299272]
                                         if "Unit Purchase Price" = 0 then
                                             "Unit Purchase Price" := Item."Last Direct Cost";
                                     end;
-                                    //+NPR5.41 [299278]
 
-                                    //  "Item Group" := Item."Item Group";
                                     "Page no. in advert" := 0;
                                     "Priority 2" := '';
-                                    //"Pagenumber in paper" := MixedDiscountLine."Pagenumber in paper";
                                     Photo := false;
                                     "Mix Discount Type" := MixedDiscount."Discount Type".AsInteger() + 1;
                                     "Total Discount %" := MixedDiscount."Total Discount %";
@@ -572,9 +540,7 @@ table 6014612 "NPR Retail Campaign Items"
                                     "Item Discount Qty." := MixedDiscount."Item Discount Qty.";
                                     "Item Discount %" := MixedDiscount."Item Discount %";
                                     "Mix Type" := MixedDiscount."Mix Type" + 1;
-                                    //-NPR5.55 [397967]
                                     "Quantity Sold" := GetQuantitySold;
-                                    //+NPR5.55 [397967]
                                     if Insert then;
                                 until MixedDiscountLine.Next = 0;
                             end;
@@ -592,18 +558,13 @@ table 6014612 "NPR Retail Campaign Items"
         Handled: Boolean;
         VATPct: Decimal;
     begin
-        //-NPR5.41 [299278]
-
-        //-NPR5.42 [299272]
-
         if Item.Get("Item No.") then begin
             VATPct := 0;
-            //-NPR5.51 [358985]
             if VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then begin
                 POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup, Handled);
                 VATPct := VATPostingSetup."VAT %";
             end;
-            //+NPR5.51 [358985]
+
             if ((VATPct > 0) and (Item."Price Includes VAT")) then begin
                 if (("Campaign Unit Price" > 0) and ("Campaign Unit Cost" > 0)) then begin
                     Profit := Round(((("Campaign Unit Price" / (1 + VATPct / 100)) / "Campaign Unit Cost") * 100) - 100, 0.001);
@@ -638,9 +599,6 @@ table 6014612 "NPR Retail Campaign Items"
                         end;
             end;
         end;
-        //+NPR5.42 [299272]
-
-        //+NPR5.41 [299278]
     end;
 
     local procedure GetQuantitySold() QuantitySold: Decimal

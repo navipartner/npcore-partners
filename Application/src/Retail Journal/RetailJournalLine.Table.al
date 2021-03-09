@@ -40,7 +40,6 @@ table 6014422 "NPR Retail Journal Line"
                     "Last Direct Cost" := Item."Last Direct Cost";
                     "Unit Price" := Item."Unit Price";
                     "Item group" := Item."Item Category Code";
-                    "Cannot edit unit price" := Item."NPR Cannot edit unit price";
                     "New Item No." := "Item No.";
                     if Item."Sales Unit of Measure" <> '' then
                         "Sales Unit of measure" := Item."Sales Unit of Measure";
