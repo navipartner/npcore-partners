@@ -1,8 +1,5 @@
 table 6059820 "NPR Trx Email Setup"
 {
-    // NPR5.38/THRO/20171018 CASE 286713 Object created
-    // NPR5.55/THRO/20200511 CASE 343266 Added Provider and Default
-
     Caption = 'Transactional Email Setup';
     DataClassification = CustomerContent;
 
@@ -16,9 +13,9 @@ table 6059820 "NPR Trx Email Setup"
         field(3; Provider; Option)
         {
             Caption = 'Provider';
+            DataClassification = CustomerContent;
             OptionCaption = 'Campaign Monitor,Mailchimp';
             OptionMembers = "Campaign Monitor",Mailchimp;
-            DataClassification = CustomerContent;
         }
         field(10; "Client ID"; Text[100])
         {
@@ -37,9 +34,7 @@ table 6059820 "NPR Trx Email Setup"
 
             trigger OnValidate()
             begin
-                //-#346526 [346526]
                 "API URL" := DelChr("API URL", '>', '/');
-                //+#346526 [346526]
             end;
         }
         field(50; Default; Boolean)
@@ -51,13 +46,11 @@ table 6059820 "NPR Trx Email Setup"
             var
                 TransactionalEmailSetup: Record "NPR Trx Email Setup";
             begin
-                //-NPR5.55 [343266]
                 if (xRec.Default = true) and (Default = false) then
                     Error(CannotRemoveDefaultSetupErr);
 
                 TransactionalEmailSetup.SetRange(Default, true);
                 TransactionalEmailSetup.ModifyAll(Default, false, false);
-                //+NPR5.55 [343266]
             end;
         }
     }
@@ -69,19 +62,14 @@ table 6059820 "NPR Trx Email Setup"
         }
     }
 
-    fieldgroups
-    {
-    }
 
     trigger OnInsert()
     var
         TransactionalEmailSetup: Record "NPR Trx Email Setup";
     begin
-        //-NPR5.55 [343266]
         TransactionalEmailSetup.SetRange(Default, true);
-        if not TransactionalEmailSetup.FindFirst then
+        if not TransactionalEmailSetup.FindFirst() then
             Default := true;
-        //+NPR5.55 [343266]
     end;
 
     var
