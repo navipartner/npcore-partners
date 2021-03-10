@@ -696,7 +696,7 @@ codeunit 6060150 "NPR Event Management"
                     MsgToDisplay := MsgToDisplay + ' ' + StrSubstNo(Text003, Format(AvailCap), "Unit of Measure Code");
                 if BufferMode then
                     exit(MsgToDisplay);
-                if OverCapacitateResourceSetupValue = JobsSetup."NPR Over Capacitate Resource"::Disallow then
+                if OverCapacitateResourceSetupValue = JobsSetup."NPR Over Capacitate Resource"::Disallow.AsInteger() then
                     Error(MsgToDisplay);
                 MsgToDisplay := MsgToDisplay + ' ' + Text004 + ' ' + ContinueMsg;
                 if not Confirm(MsgToDisplay) then
@@ -740,7 +740,7 @@ codeunit 6060150 "NPR Event Management"
             MsgToDisplay := StrSubstNo(TimeFrameProblemMsg, Format(Rec."NPR Starting Time"), Format(Rec."NPR Ending Time"), Rec."No.", MsgToDisplay);
             if BufferMode then
                 exit(MsgToDisplay);
-            if OverCapacitateResourceSetupValue = JobsSetup."NPR Over Capacitate Resource"::Disallow then
+            if OverCapacitateResourceSetupValue = JobsSetup."NPR Over Capacitate Resource"::Disallow.AsInteger() then
                 Error(MsgToDisplay);
             MsgToDisplay := MsgToDisplay + '\' + ContinueMsg;
             if not Confirm(MsgToDisplay) then
@@ -1085,7 +1085,7 @@ codeunit 6060150 "NPR Event Management"
         Resource.Get(JobPlanningLine."No.");
         SetupValue := Resource."NPR Over Capacitate Resource";
         if SetupValue = 0 then
-            SetupValue := JobsSetup."NPR Over Capacitate Resource";
+            SetupValue := JobsSetup."NPR Over Capacitate Resource".AsInteger();
         exit(SetupValue);
     end;
 
@@ -1134,7 +1134,7 @@ codeunit 6060150 "NPR Event Management"
     begin
         JobsSetup.Get();
         OverCapacitateResourceSetupValue := GetOverCapacitateResourceSetup(Rec);
-        exit(OverCapacitateResourceSetupValue in [JobsSetup."NPR Over Capacitate Resource"::" ", JobsSetup."NPR Over Capacitate Resource"::Allow]);
+        exit(OverCapacitateResourceSetupValue in [JobsSetup."NPR Over Capacitate Resource"::" ".AsInteger(), JobsSetup."NPR Over Capacitate Resource"::Allow.AsInteger()]);
     end;
 
     local procedure FindJobUnitPriceInclVAT(var JobPlanningLine: Record "Job Planning Line"; CalledByFieldNo: Integer)
