@@ -197,7 +197,7 @@ table 6150616 "NPR POS Payment Method"
         }
         field(320; "Auto End Sale"; Boolean)
         {
-            Caption = 'Auto end sale';
+            Caption = 'Auto End Sale';
             DataClassification = CustomerContent;
             InitValue = true;
         }

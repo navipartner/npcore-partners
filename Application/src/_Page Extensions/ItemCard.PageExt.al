@@ -689,11 +689,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 Caption = 'Discounts';
                 SubPageLink = "No." = FIELD("No.");
             }
-            part(NPRAttributes; "NPR NP Attributes FactBox")
-            {
-                ApplicationArea = All;
-                SubPageLink = "No." = FIELD("No.");
-            }
         }
     }
     actions

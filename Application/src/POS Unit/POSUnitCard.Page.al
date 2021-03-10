@@ -69,7 +69,7 @@ page 6150617 "NPR POS Unit Card"
                 field("Open Register Password"; Rec."Open Register Password")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Open Cash Register Password field.';
+                    ToolTip = 'Specifies the value of the Open POS Unit Password field.';
                     ExtendedDatatype = Masked;
                 }
                 field("Password on unblock discount"; Rec."Password on unblock discount")
@@ -101,16 +101,16 @@ page 6150617 "NPR POS Unit Card"
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the POS End of Day Profile field';
                 }
-                field("POS Unit Receipt Text Profile"; Rec."POS Unit Receipt Text Profile")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the POS Unit Receipt Text Profile field';
-                }
                 field("Ean Box Sales Setup"; Rec."Ean Box Sales Setup")
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Ean Box Sales Setup field';
+                }
+                field("POS Unit Receipt Text Profile"; Rec."POS Unit Receipt Text Profile")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Unit Receipt Text Profile field';
                 }
                 field("POS Sales Workflow Set"; Rec."POS Sales Workflow Set")
                 {

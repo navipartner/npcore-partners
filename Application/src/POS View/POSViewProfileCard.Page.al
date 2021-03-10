@@ -37,6 +37,11 @@ page 6150636 "NPR POS View Profile Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Line Order on Screen field';
                 }
+                field("POS - Show discount fields"; "POS - Show discount fields")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Show Discount field';
+                }
                 field("Initial Sales View"; Rec."Initial Sales View")
                 {
                     ApplicationArea = All;
@@ -46,11 +51,6 @@ page 6150636 "NPR POS View Profile Card"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the After End-of-Sale View field';
-                }
-                field("POS - Show discount fields"; "POS - Show discount fields")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Show Discount field';
                 }
                 field("Lock Timeout"; "Lock Timeout")
                 {

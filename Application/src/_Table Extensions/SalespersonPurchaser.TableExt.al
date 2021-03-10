@@ -4,7 +4,7 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
     {
         field(6014400; "NPR Register Password"; Code[20])
         {
-            Caption = 'Register Password';
+            Caption = 'POS Unit Password';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
         }
