@@ -141,12 +141,12 @@ codeunit 6060165 "NPR Event Plan.Line Group. Mgt"
             EventPlanLineBuffer."Status Text" := CopyStr(ReturnMsg, 1, MaxStrLen(EventPlanLineBuffer."Status Text"));
             EventMgt.AllowOverCapacitateResource(JobPlanningLine, OverCapacitateSetup);
             case OverCapacitateSetup of
-                JobsSetup."NPR Over Capacitate Resource"::Disallow:
+                JobsSetup."NPR Over Capacitate Resource"::Disallow.AsInteger():
                     begin
                         EventPlanLineBuffer."Status Type" := EventPlanLineBuffer."Status Type"::Error;
                         EventPlanLineBuffer."Action Type" := EventPlanLineBuffer."Action Type"::Skip;
                     end;
-                JobsSetup."NPR Over Capacitate Resource"::Warn:
+                JobsSetup."NPR Over Capacitate Resource"::Warn.AsInteger():
                     begin
                         EventPlanLineBuffer."Status Type" := EventPlanLineBuffer."Status Type"::Warning;
                         EventPlanLineBuffer."Action Type" := EventPlanLineBuffer."Action Type"::" ";
