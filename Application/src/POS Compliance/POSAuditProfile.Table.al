@@ -95,7 +95,7 @@ table 6150650 "NPR POS Audit Profile"
         }
         field(80; "Print Receipt On Sale Cancel"; Boolean)
         {
-            Caption = 'Print Receipt On Sale Cancel';
+            Caption = 'Print Receipt on Sale Cancel';
             DataClassification = CustomerContent;
         }
         field(90; "Allow Printing Receipt Copy"; Option)

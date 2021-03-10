@@ -229,7 +229,7 @@ table 6150615 "NPR POS Unit"
         }
         field(5058; "Open Register Password"; Code[20])
         {
-            Caption = 'Open Cash Register Password';
+            Caption = 'Open POS Unit Password';
             DataClassification = CustomerContent;
         }
         field(6211; "Password on unblock discount"; Text[4])
