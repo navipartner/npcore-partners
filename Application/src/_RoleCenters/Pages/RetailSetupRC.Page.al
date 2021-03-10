@@ -81,14 +81,6 @@ page 6151245 "NPR Retail Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Actions action';
                 }
-                action("POS Default View")
-                {
-                    Caption = 'POS Default View';
-                    Image = View;
-                    RunObject = Page "NPR POS Default Views";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the POS Default View action';
-                }
                 action("POS View List")
                 {
                     Caption = 'POS View List';
@@ -96,6 +88,14 @@ page 6151245 "NPR Retail Setup RC"
                     RunObject = Page "NPR POS View List";
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS View List action';
+                }
+                action("POS Default View")
+                {
+                    Caption = 'POS Default View';
+                    Image = View;
+                    RunObject = Page "NPR POS Default Views";
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the POS Default View action';
                 }
                 action("POS Scenarios")
                 {
@@ -421,13 +421,6 @@ page 6151245 "NPR Retail Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Keyboard Binding Setup action';
                 }
-                action("NPR Attributes")
-                {
-                    Caption = 'NPR Attributes';
-                    RunObject = Page "NPR Attributes";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the NPR Attributes action';
-                }
                 action("POS Web Fonts")
                 {
                     Caption = 'POS Web Fonts';
@@ -505,19 +498,19 @@ page 6151245 "NPR Retail Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Store Groups action';
                 }
-                action("Variety Fields Setup")
-                {
-                    Caption = 'Variety Fields Setup';
-                    RunObject = Page "NPR Variety Fields Setup";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Variety Fields Setup action';
-                }
                 action("Variety Setup")
                 {
                     Caption = 'Variety Setup';
                     RunObject = page "NPR Variety";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Variety Setup action';
+                }
+                action("Variety Fields Setup")
+                {
+                    Caption = 'Variety Fields Setup';
+                    RunObject = Page "NPR Variety Fields Setup";
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the Variety Fields Setup action';
                 }
                 action("Item Categories")
                 {

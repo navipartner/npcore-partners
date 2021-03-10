@@ -65,7 +65,7 @@ page 6150626 "NPR POS Audit Profile"
                 field("Print Receipt On Sale Cancel"; Rec."Print Receipt On Sale Cancel")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Print Receipt On Sale Cancel field';
+                    ToolTip = 'Specifies the value of the Print Receipt on Sale Cancel field';
                 }
                 field("Allow Printing Receipt Copy"; Rec."Allow Printing Receipt Copy")
                 {

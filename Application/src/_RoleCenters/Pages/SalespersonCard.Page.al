@@ -69,7 +69,7 @@ page 6014428 "NPR Salesperson Card"
                 {
                     ApplicationArea = All;
                     ExtendedDatatype = Masked;
-                    ToolTip = 'Specifies the value of the NPR Register Password field';
+                    ToolTip = 'Specifies the value of the NPR POS Unit Password field';
                 }
                 field("Locked-to Register No."; Rec."NPR Locked-to Register No.")
                 {
