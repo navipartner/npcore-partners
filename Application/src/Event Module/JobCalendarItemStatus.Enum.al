@@ -7,4 +7,5 @@ enum 6014449 "NPR Job Calendar Item Status"
     value(2; Error) { Caption = 'Error'; }
     value(3; Removed) { Caption = 'Removed'; }
     value(4; Sent) { Caption = 'Sent'; }
+    value(5; Received) { Caption = 'Received'; }
 }
