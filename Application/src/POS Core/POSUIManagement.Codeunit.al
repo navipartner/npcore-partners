@@ -175,7 +175,7 @@ codeunit 6150702 "NPR POS UI Management"
     var
         POSTheme: Record "NPR POS Theme";
         ThemeDep: Record "NPR POS Theme Dependency";
-        WebClientDep: Record "NPR Web Client Dependency";        
+        WebClientDep: Record "NPR Web Client Dependency";
         POSViewProfile: Record "NPR POS View Profile";
         ThemeLine: JsonObject;
         Theme: JsonArray;
@@ -324,7 +324,7 @@ codeunit 6150702 "NPR POS UI Management"
         CaptionFunctionButtonText: Label 'Function';
         CaptionMainMenuButtonText: Label 'Main Menu';
         CaptionLabelReturnAmount: Label 'Balance';
-        CaptionLabelRegisterNo: Label 'Register';
+        CaptionLabelRegisterNo: Label 'POS Unit';
         CaptionLabelSalesPersonCode: Label 'Salesperson Code';
         CaptionLabelClear: Label 'Erase';
         CaptionLabelPaymentAmount: Label 'Total';

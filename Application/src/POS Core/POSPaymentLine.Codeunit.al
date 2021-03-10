@@ -9,7 +9,7 @@ codeunit 6150707 "NPR POS Payment Line"
         RegisterNo: Code[20];
         SalesTicketNo: Code[20];
         NotFound: Label '%1 %2 not found.';
-        PaymentTypeNotFound: Label '%1 %2 for register %3 was not found.';
+        PaymentTypeNotFound: Label '%1 %2 for POS unit %3 was not found.';
         DeleteNotAllowed: Label 'Payments approved by a 3-party must be cancelled, not deleted.';
         Initialized: Boolean;
         ErrVATCalcNotSupportInPOS: Label '%1 %2 not supported in POS';
