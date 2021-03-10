@@ -265,17 +265,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the NPR Item AddOn No. field';
                     }
-                    field("NPR Guarantee Index"; Rec."NPR Guarantee Index")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the NPR Guarantee Index field';
-                    }
-                    field("NPR Insurrance category"; Rec."NPR Insurrance category")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the NPR Insurrance category field';
-                    }
-
                     field("NPR NPRE Item Routing Profile"; Rec."NPR NPRE Item Routing Profile")
                     {
                         ApplicationArea = All;

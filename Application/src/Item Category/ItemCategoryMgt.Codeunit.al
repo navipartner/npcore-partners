@@ -195,10 +195,8 @@
         Item.Validate(Item."Inventory Posting Group", ItemCategory."NPR Inventory Posting Group");
 
         Item.Validate(Item."Item Disc. Group", TempItem."Item Disc. Group");
-        Item.Validate(Item."NPR Guarantee Index", TempItem."NPR Guarantee Index");
         Item.Validate(Item."NPR Guarantee voucher", TempItem."NPR Guarantee voucher");
         Item."Costing Method" := TempItem."Costing Method";
-        Item."NPR Insurrance category" := TempItem."NPR Insurrance category";
 
         DefaultDimension2.SetRange("Table ID", DATABASE::Item);
         DefaultDimension2.SetRange("No.", Item."No.");
@@ -278,7 +276,7 @@
     var
         ConfigTemplateHeader: Record "Config. Template Header";
         ConfigTemplateMgt: Codeunit "Config. Template Management";
-        TemplateFields: Array[15] of FieldRef;
+        TemplateFields: Array[13] of FieldRef;
         ConfigTemplateCode: Code[10];
     begin
         if ItemCategory.IsTemporary() then
@@ -290,19 +288,17 @@
 
         SetFieldRef(TemplateFields[1], TempItem, TempItem.FieldNo(Type));
         SetFieldRef(TemplateFields[2], TempItem, TempItem.FieldNo("Item Disc. Group"));
-        SetFieldRef(TemplateFields[3], TempItem, TempItem.FieldNo("NPR Guarantee Index"));
-        SetFieldRef(TemplateFields[4], TempItem, TempItem.FieldNo("No. Series"));
-        SetFieldRef(TemplateFields[5], TempItem, TempItem.FieldNo("Costing Method"));
-        SetFieldRef(TemplateFields[6], TempItem, TempItem.FieldNo("Base Unit of Measure")); // Base unit of Measure must be first
-        SetFieldRef(TemplateFields[7], TempItem, TempItem.FieldNo("Sales Unit of Measure"));
-        SetFieldRef(TemplateFields[8], TempItem, TempItem.FieldNo("Purch. Unit of Measure"));
-        SetFieldRef(TemplateFields[9], TempItem, TempItem.FieldNo("NPR Insurrance category"));
-        SetFieldRef(TemplateFields[10], TempItem, TempItem.FieldNo("NPR Guarantee voucher"));
-        SetFieldRef(TemplateFields[11], TempItem, TempItem.FieldNo("Tax Group Code"));
-        SetFieldRef(TemplateFields[12], TempItem, TempItem.FieldNo("Tariff No."));
-        SetFieldRef(TemplateFields[13], TempItem, TempItem.FieldNo("Reordering Policy"));
-        SetFieldRef(TemplateFields[14], TempItem, TempItem.FieldNo("NPR Variety Group"));
-        SetFieldRef(TemplateFields[15], TempItem, TempItem.FieldNo("Item Category Code"));
+        SetFieldRef(TemplateFields[3], TempItem, TempItem.FieldNo("No. Series"));
+        SetFieldRef(TemplateFields[4], TempItem, TempItem.FieldNo("Costing Method"));
+        SetFieldRef(TemplateFields[5], TempItem, TempItem.FieldNo("Base Unit of Measure")); // Base unit of Measure must be first
+        SetFieldRef(TemplateFields[6], TempItem, TempItem.FieldNo("Sales Unit of Measure"));
+        SetFieldRef(TemplateFields[7], TempItem, TempItem.FieldNo("Purch. Unit of Measure"));
+        SetFieldRef(TemplateFields[8], TempItem, TempItem.FieldNo("NPR Guarantee voucher"));
+        SetFieldRef(TemplateFields[9], TempItem, TempItem.FieldNo("Tax Group Code"));
+        SetFieldRef(TemplateFields[10], TempItem, TempItem.FieldNo("Tariff No."));
+        SetFieldRef(TemplateFields[11], TempItem, TempItem.FieldNo("Reordering Policy"));
+        SetFieldRef(TemplateFields[12], TempItem, TempItem.FieldNo("NPR Variety Group"));
+        SetFieldRef(TemplateFields[13], TempItem, TempItem.FieldNo("Item Category Code"));
 
         ConfigTemplateMgt.CreateConfigTemplateAndLines(
             ConfigTemplateCode, ItemCategory.Description, Database::Item, TemplateFields);
