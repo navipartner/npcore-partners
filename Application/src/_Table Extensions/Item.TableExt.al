@@ -92,6 +92,8 @@ tableextension 6014427 "NPR Item" extends Item
             DataClassification = CustomerContent;
             OptionCaption = ' ,Move to Warranty';
             OptionMembers = " ","Flyt til garanti kar.";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
         }
         field(6014506; "NPR Has Accessories"; Boolean)
         {
@@ -104,6 +106,8 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Insurance Section';
             DataClassification = CustomerContent;
             TableRelation = "NPR Insurance Category";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
         }
         field(6014509; "NPR Item Brand"; Code[10])
         {
