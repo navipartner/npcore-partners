@@ -884,6 +884,7 @@ codeunit 6014450 "NPR E-mail Management"
         EmailLog."Recipient E-mail" := CopyStr(List2Text(MailAddresses), 1, MaxStrLen(EmailLog."Recipient E-mail"));
         EmailLog."From E-mail" := CopyStr(SmtpMail.GetFrom(), 1, MaxStrLen(EmailLog."From E-mail"));
         EmailLog."E-mail subject" := CopyStr(SmtpMail.GetSubject(), 1, MaxStrLen(EmailLog."E-mail subject"));
+        EmailLog.Filename := CopyStr(AttachmentBuffer.Description, 1, MaxStrLen(EmailLog.Filename));
     end;
 
     local procedure AddEmailLogEntry(EmailLog: Record "NPR E-mail Log"; RecRef: RecordRef; EmailLogPrepared: Boolean)
