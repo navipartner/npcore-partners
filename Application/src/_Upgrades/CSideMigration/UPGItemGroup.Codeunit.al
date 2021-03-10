@@ -55,13 +55,11 @@ codeunit 6014468 "NPR UPG Item Group"
             Clear(TempItem);
             TempItem.Type := ItemGroup.Type;
             TempItem."Item Disc. Group" := ItemGroup."Item Discount Group";
-            TempItem."NPR Guarantee Index" := ItemGroup."Warranty File";
             TempItem."No. Series" := ItemGroup."No. Series";
             TempItem."Costing Method" := ItemGroup."Costing Method";
             TempItem."Base Unit of Measure" := ItemGroup."Base Unit of Measure";
             TempItem."Sales Unit of Measure" := ItemGroup."Sales Unit of Measure";
             TempItem."Purch. Unit of Measure" := ItemGroup."Purch. Unit of Measure";
-            TempItem."NPR Insurrance category" := ItemGroup."Insurance Category";
             TempItem."NPR Guarantee voucher" := ItemGroup.Warranty;
             TempItem."Tax Group Code" := ItemGroup."Tax Group Code";
             TempItem."Tariff No." := ItemGroup."Tarif No.";
