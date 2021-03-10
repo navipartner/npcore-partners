@@ -3,7 +3,7 @@ codeunit 6150854 "NPR POS Action - CK Mgt."
     var
         ActionDescription: Label 'This is a built-in action for CashKeeper Payments';
         Setup: Codeunit "NPR POS Setup";
-        CashkeeperNotFound: Label 'CashKeeper Setup for register %3 was not found.';
+        CashkeeperNotFound: Label 'CashKeeper Setup for POS unit %3 was not found.';
 
     local procedure ActionCode(): Text
     begin
