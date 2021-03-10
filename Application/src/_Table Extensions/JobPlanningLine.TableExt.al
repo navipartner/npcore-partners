@@ -1,15 +1,5 @@
 tableextension 6014401 "NPR Job Planning Line" extends "Job Planning Line"
 {
-    // NPR5.29/TJ/20161013 CASE 248723 New fields 6060150..6060160
-    // NPR5.31/TJ/20170315 CASE 269162 Added new option "Ready to be Invoiced" to field "Event Status"
-    //                                 Removed value from property InitValue on field "Event Status" (was Order)
-    // NPR5.38/TJ/20170104 CASE 261965 Added new fields 6060163..6060166 and 6151575
-    // NPR5.38/NPKNAV/20180126  CASE 291965 Transport NPR5.38 - 26 January 2018
-    // NPR5.43/TJ/20170817 CASE 262079 Added field "Ticket Collect Status"
-    // NPR5.48/JDH /20181109 CASE 334163 Added option caption to Ticket Collect Status
-    // NPR5.48/TJ  /20190201 CASE 335824 Removed Field "Ticket No."
-    // NPR5.49/TJ  /20190218 CASE 345047 New field Att. to Line No.
-    // NPR5.55/TJ  /20200326 CASE 397741 New fields "Group Source Line No.", "Group Line" and "Skip Cap./Avail. Check"
     fields
     {
         field(6060150; "NPR Starting Time"; Time)
@@ -24,13 +14,11 @@ tableextension 6014401 "NPR Job Planning Line" extends "Job Planning Line"
             Description = 'NPR5.29';
             DataClassification = CustomerContent;
         }
-        field(6060152; "NPR Event Status"; Option)
+        field(6060152; "NPR Event Status"; Enum "NPR Event Status")
         {
             Caption = 'Event Status';
             Description = 'NPR5.29';
             Editable = false;
-            OptionCaption = 'Planning,Quote,Order,Completed,,,,,,Postponed,Cancelled,Ready to be Invoiced';
-            OptionMembers = Planning,Quote,"Order",Completed,,,,,,Postponed,Cancelled,"Ready to be Invoiced";
             DataClassification = CustomerContent;
         }
         field(6060153; "NPR Resource E-Mail"; Text[80])
@@ -46,28 +34,22 @@ tableextension 6014401 "NPR Job Planning Line" extends "Job Planning Line"
             Description = 'NPR5.29';
             DataClassification = CustomerContent;
         }
-        field(6060155; "NPR Calendar Item Status"; Option)
+        field(6060155; "NPR Calendar Item Status"; Enum "NPR Job Calendar Item Status")
         {
             Caption = 'Calendar Item Status';
             Description = 'NPR5.29';
-            OptionCaption = ' ,Send,Error,Removed,Sent,Received';
-            OptionMembers = " ",Send,Error,Removed,Sent,Received;
             DataClassification = CustomerContent;
         }
-        field(6060156; "NPR Mail Item Status"; Option)
+        field(6060156; "NPR Mail Item Status"; Enum "NPR Job Mail Item Status")
         {
             Caption = 'Mail Item Status';
             Description = 'NPR5.29';
-            OptionCaption = ' ,Sent,Error';
-            OptionMembers = " ",Sent,Error;
             DataClassification = CustomerContent;
         }
-        field(6060157; "NPR Meeting Request Response"; Option)
+        field(6060157; "NPR Meeting Request Response"; Enum "NPR Meeting Request Response")
         {
             Caption = 'Meeting Request Response';
             Description = 'NPR5.29';
-            OptionCaption = ' ,Unknown,Organizer,Tentative,Accepted,Declined,No Response';
-            OptionMembers = " ",Unknown,Organizer,Tentative,Accepted,Declined,"No Response";
             DataClassification = CustomerContent;
         }
         field(6060158; "NPR Ticket Token"; Text[100])
@@ -76,12 +58,10 @@ tableextension 6014401 "NPR Job Planning Line" extends "Job Planning Line"
             Description = 'NPR5.29';
             DataClassification = CustomerContent;
         }
-        field(6060159; "NPR Ticket Status"; Option)
+        field(6060159; "NPR Ticket Status"; Enum "NPR Ticket Status")
         {
             Caption = 'Ticket Status';
             Description = 'NPR5.29';
-            OptionCaption = ' ,Registered,Issued,Revoked,Confirmed';
-            OptionMembers = " ",Registered,Issued,Revoked,Confirmed;
             DataClassification = CustomerContent;
         }
         field(6060160; "NPR Att. to Line No."; Integer)
@@ -90,12 +70,10 @@ tableextension 6014401 "NPR Job Planning Line" extends "Job Planning Line"
             Description = 'NPR5.49';
             DataClassification = CustomerContent;
         }
-        field(6060162; "NPR Ticket Collect Status"; Option)
+        field(6060162; "NPR Ticket Collect Status"; Enum "NPR Ticket Collect Status")
         {
             Caption = 'Ticket Collect Status';
             Description = 'NPR5.43';
-            OptionCaption = ' ,Not Collected,Collected,Error';
-            OptionMembers = " ","Not Collected",Collected,Error;
             DataClassification = CustomerContent;
         }
         field(6060163; "NPR Est. Unit Price Incl. VAT"; Decimal)
@@ -156,4 +134,3 @@ tableextension 6014401 "NPR Job Planning Line" extends "Job Planning Line"
         }
     }
 }
-

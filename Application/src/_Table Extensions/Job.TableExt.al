@@ -36,6 +36,7 @@ tableextension 6014422 "NPR Job" extends Job
             Caption = 'Calendar Item Status';
             DataClassification = CustomerContent;
             Description = 'NPR5.29';
+            ValuesAllowed = " ", Send, Error, Removed, Sent;
         }
         field(6060156; "NPR Mail Item Status"; Enum "NPR Job Mail Item Status")
         {
