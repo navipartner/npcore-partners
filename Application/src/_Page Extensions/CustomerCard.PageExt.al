@@ -287,6 +287,12 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     Image = SendConfirmation;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Send SMS action';
+                    trigger OnAction()
+                    var
+                        SMSMgt: Codeunit "NPR SMS Management";
+                    begin
+                        SMSMgt.EditAndSendSMS(Rec);
+                    end;
                 }
             }
         }

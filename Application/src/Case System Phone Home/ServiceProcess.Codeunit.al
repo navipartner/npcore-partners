@@ -7,18 +7,18 @@ codeunit 6014483 "NPR Service Process"
     var
         AmountUsed: Decimal;
     begin
-        if StrLen(Value) > 0 then begin
-            if Evaluate(AmountUsed, Value) then;
+        if StrLen(Rec.Value) > 0 then begin
+            if Evaluate(AmountUsed, Rec.Value) then;
             AmountUsed := AmountUsed / 100;
-            if not ProcessServiceAmount(Choice, AmountUsed) then
-                Chosen := false;
+            if not ProcessServiceAmount(Rec.Choice, AmountUsed) then
+                Rec.Chosen := false;
         end else
-            if not ProcessService(Choice) then
-                Chosen := false;
+            if not ProcessService(Rec.Choice) then
+                Rec.Chosen := false;
     end;
 
     var
-        IComm: Record "NPR I-Comm";
+        SMSSetup: Record "NPR SMS Setup";
         ServiceLibraryNamespaceUri: Label 'urn:microsoft-dynamics-schemas/codeunit/ServiceLibrary', Locked = true;
 
     local procedure IsUserSubscribed(SubscriptionUserId: Text[50]; CustomerNo: Code[20]; ServiceId: Code[20]) Result: Boolean
@@ -81,9 +81,9 @@ codeunit 6014483 "NPR Service Process"
         CustomerNo: Code[20];
         SubscriptionUserId: Text[50];
     begin
-        if IComm.Get then begin
+        if SMSSetup.Get() then begin
             SubscriptionUserId := ''; //Unknown in webclient
-            CustomerNo := IComm."Customer No.";
+            CustomerNo := SMSSetup."Customer No.";
             UserSubscribed := IsUserSubscribed(SubscriptionUserId, CustomerNo, serviceid);
             if not UserSubscribed then begin
                 CustomerSubscribed := IsCustomerSubscribed(CustomerNo, serviceid);
@@ -112,9 +112,9 @@ codeunit 6014483 "NPR Service Process"
         QtyUsed: Decimal;
         LogDescription: Text[50];
     begin
-        if IComm.Get then begin
+        if SMSSetup.Get then begin
             SubscriptionUserId := ''; //Unknown in webclient
-            CustomerNo := IComm."Customer No.";
+            CustomerNo := SMSSetup."Customer No.";
             UserSubscribed := IsUserSubscribed(SubscriptionUserId, CustomerNo, ServiceId);
             QtyUsed := -1;
             LogDescription := SubscriptionUserId;

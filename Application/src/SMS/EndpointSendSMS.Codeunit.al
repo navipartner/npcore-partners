@@ -1,0 +1,38 @@
+codeunit 6014420 "NPR Endpoint Send SMS" implements "NPR Send SMS"
+{
+    procedure SendSMS(PhoneNo: Text; SenderNo: Text; Message: Text)
+    var
+        NcEndpoint: Record "NPR Nc Endpoint";
+        NcTaskOutput: Record "NPR Nc Task Output" temporary;
+        SMSSetup: Record "NPR SMS Setup";
+        NcEndpointMgt: Codeunit "NPR Nc Endpoint Mgt.";
+        BSlash: Label '\', Locked = true;
+        SendFailedErr: Label 'Upload to Endpoint %1 failed.';
+        OStream: OutStream;
+        CRLF: Text;
+        FileContent: Text;
+        FileName: Text;
+        Response: Text;
+    begin
+        SMSSetup.Get();
+        SMSSetup.TestField("SMS Endpoint");
+        NcEndpoint.Get(SMSSetup."SMS Endpoint");
+        NcEndpoint.TestField(Enabled);
+        CRLF[1] := 13;
+        CRLF[2] := 10;
+        if FileContent = '' then begin
+            FileContent := 'from: ' + SMSSetup."Local E-Mail Address" + CRLF;
+            FileContent += 'to: ' + PhoneNo + SMSSetup."SMS-Address Postfix" + CRLF;
+            FileContent += 'subject: ' + Message;
+        end;
+        if FileName = '' then
+            FileName := SMSSetup."Local SMTP Pickup Library" + BSlash + PhoneNo + '.txt';
+        NcTaskOutput.Data.CreateOutStream(OStream, TEXTENCODING::Windows);
+        OStream.WriteText(FileContent);
+        NcTaskOutput.Insert(false);
+        NcTaskOutput.Name := FileName;
+        if not NcEndpointMgt.RunEndpoint(NcTaskOutput, NcEndpoint, Response) then
+            Error(SendFailedErr, NcEndpoint.Code);
+    end;
+
+}
