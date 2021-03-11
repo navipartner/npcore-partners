@@ -41,7 +41,7 @@ table 6060057 "NPR Item Worksh. Vrty Mapping"
             Caption = 'Vendor Variey Value';
             DataClassification = CustomerContent;
         }
-        field(13; "Variety Value"; Code[20])
+        field(13; "Variety Value"; Code[50])
         {
             Caption = 'Variety Value';
             DataClassification = CustomerContent;

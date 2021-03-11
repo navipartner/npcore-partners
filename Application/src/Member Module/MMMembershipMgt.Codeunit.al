@@ -4902,7 +4902,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     end;
 
-    procedure GetMemberFromExtMemberNo(ExternalMemberNo: Code[20]) MemberEntryNo: Integer
+    procedure GetMemberFromExtMemberNo(ExternalMemberNo: Code[50]) MemberEntryNo: Integer
     var
         Member: Record "NPR MM Member";
     begin

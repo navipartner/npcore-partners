@@ -375,7 +375,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
 
     end;
 
-    local procedure DoWorkflowFunction(FunctionId: Integer; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; AdmissionCode: Code[20]; ExternalTicketNumber: Code[20]; TicketReference: Text; WithTicketPrint: Boolean)
+    local procedure DoWorkflowFunction(FunctionId: Integer; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; AdmissionCode: Code[20]; ExternalTicketNumber: Code[50]; TicketReference: Text; WithTicketPrint: Boolean)
     begin
 
         case FunctionId of
@@ -701,7 +701,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
             TicketRequestManager.DeleteReservationRequest(Token, true);
         end;
 
-        ExternalMemberNo := SaleLinePOS."Serial No.";
+        //ExternalMemberNo := SaleLinePOS."Serial No.";
         Token := TicketRequestManager.POS_CreateReservationRequest(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS.Quantity, ExternalMemberNo);
         Commit;
 
@@ -1297,7 +1297,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         exit(LookupOK);
     end;
 
-    local procedure AquireTicketParticipant(Token: Text[100]; ExternalMemberNo: Code[20]; ForceDialog: Boolean): Boolean
+    local procedure AquireTicketParticipant(Token: Text[100]; ExternalMemberNo: Code[50]; ForceDialog: Boolean): Boolean
     var
         TicketNotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
         MemberManagement: Codeunit "NPR MM Membership Mgt.";

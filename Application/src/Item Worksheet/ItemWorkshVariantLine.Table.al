@@ -362,7 +362,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
 
             trigger OnLookup()
             var
-                VarValue: Code[20];
+                VarValue: Code[50];
             begin
                 CalcFields("Variety 3", "Variety 3 Table");
                 VarValue := "Variety 3 Value";
@@ -407,7 +407,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
 
             trigger OnLookup()
             var
-                VarValue: Code[20];
+                VarValue: Code[50];
             begin
                 CalcFields("Variety 4", "Variety 4 Table");
                 VarValue := "Variety 4 Value";
@@ -595,7 +595,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
         //TO BE IMPLEMENTED
     end;
 
-    local procedure ValidateVarietyValue(VrtNo: Integer; VrtType: Code[10]; VrtTable: Code[20]; VrtValue: Code[20]; OldVrtValue: Code[20])
+    local procedure ValidateVarietyValue(VrtNo: Integer; VrtType: Code[10]; VrtTable: Code[40]; VrtValue: Code[50]; OldVrtValue: Code[50])
     var
         ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
         ItemWorksheetVarValue: Record "NPR Item Worksh. Variety Value";
@@ -842,7 +842,7 @@ table 6060043 "NPR Item Worksh. Variant Line"
         ItemWorksheetVariantLine2.SetRange("Variety 1 Value", "Variety 1 Value");
     end;
 
-    local procedure CreateVarietyMapping(VrtType: Code[10]; VrtTable: Code[20]; WorksheetTemplate: Code[10]; WorksheetName: Code[10]; VendorNo: Code[20]; OldVrtValue: Code[20]; NewValue: Code[20])
+    local procedure CreateVarietyMapping(VrtType: Code[10]; VrtTable: Code[40]; WorksheetTemplate: Code[10]; WorksheetName: Code[10]; VendorNo: Code[20]; OldVrtValue: Code[50]; NewValue: Code[50])
     var
         ItemWorksheetVarietyMapping: Record "NPR Item Worksh. Vrty Mapping";
         ItemWorksheetVarietyMapping2: Record "NPR Item Worksh. Vrty Mapping";

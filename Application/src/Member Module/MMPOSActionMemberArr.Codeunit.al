@@ -150,7 +150,7 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
         MemberTicketManager: Codeunit "NPR MM Member Ticket Manager";
         POSActionMemberManagement: Codeunit "NPR MM POS Action: MemberMgmt.";
         MembershipEvents: Codeunit "NPR MM Membership Events";
-        ExternalItemNo: Code[20];
+        ExternalItemNo: Code[50];
         Parameter: Code[20];
         LogEntryNo: Integer;
         ResponseCode: Integer;

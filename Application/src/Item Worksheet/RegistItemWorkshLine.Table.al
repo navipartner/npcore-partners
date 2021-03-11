@@ -40,7 +40,7 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'Vendor Item No.';
             DataClassification = CustomerContent;
         }
-        field(8; "Internal Bar Code"; Code[20])
+        field(8; "Internal Bar Code"; Code[50])
         {
             Caption = 'Internal Bar Code';
             DataClassification = CustomerContent;

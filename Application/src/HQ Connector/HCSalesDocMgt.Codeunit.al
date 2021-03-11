@@ -331,7 +331,7 @@ codeunit 6150906 "NPR HC Sales Doc. Mgt."
         Evaluate(TempSalesLine."Inv. Disc. Amount to Invoice", NpXmlDomMgt.GetXmlText(Element, 'invdiscamounttoinvoice', 0, false), 9);
         TempSalesLine."VAT Identifier" := NpXmlDomMgt.GetXmlText(Element, 'vatidentifier', 0, false);
         Evaluate(TempSalesLine."IC Partner Ref. Type", NpXmlDomMgt.GetXmlText(Element, 'icpartnerreftype', 0, false), 9);
-        TempSalesLine."IC Partner Reference" := NpXmlDomMgt.GetXmlText(Element, 'icpartnerreference', 0, false);
+        TempSalesLine."IC Item Reference No." := NpXmlDomMgt.GetXmlText(Element, 'icpartnerreference', 0, false);
         Evaluate(TempSalesLine."Prepayment %", NpXmlDomMgt.GetXmlText(Element, 'prepaymentpercent', 0, false), 9);
         Evaluate(TempSalesLine."Prepmt. Line Amount", NpXmlDomMgt.GetXmlText(Element, 'prepmtlineamount', 0, false), 9);
         Evaluate(TempSalesLine."Prepmt. Amt. Inv.", NpXmlDomMgt.GetXmlText(Element, 'prepmtamtinv', 0, false), 9);

@@ -86,7 +86,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     Visible = false;
                     ToolTip = 'Specifies the value of the IC Partner Ref. Type field';
                 }
-                field("IC Partner Reference"; Rec."IC Partner Reference")
+                field("IC Item Reference No."; Rec."IC Item Reference No.")
                 {
                     ApplicationArea = All;
                     Visible = false;

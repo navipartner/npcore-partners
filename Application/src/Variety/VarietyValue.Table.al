@@ -27,7 +27,7 @@ table 6059973 "NPR Variety Value"
             NotBlank = true;
             TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD(Type));
         }
-        field(3; Value; Code[20])
+        field(3; Value; Code[50])
         {
             Caption = 'Value';
             DataClassification = CustomerContent;

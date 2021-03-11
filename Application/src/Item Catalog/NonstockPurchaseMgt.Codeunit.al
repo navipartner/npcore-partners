@@ -15,7 +15,7 @@ codeunit 6060064 "NPR Nonstock Purchase Mgt."
         ProgWindow: Dialog;
 
 
-    procedure ShowNonstock(var PurchaseLine: Record "Purchase Line"; ItemRef: Code[20])
+    procedure ShowNonstock(var PurchaseLine: Record "Purchase Line"; ItemRef: Code[50])
     var
         NonstockItem: Record "Nonstock Item";
         Execute: Boolean;

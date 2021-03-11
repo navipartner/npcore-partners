@@ -22,7 +22,7 @@ table 6014542 "NPR RFID Print Buffer"
             Caption = 'Variant Code';
             DataClassification = CustomerContent;
         }
-        field(4; "Serial No."; Code[20])
+        field(4; "Serial No."; Code[50])
         {
             Caption = 'Serial No.';
             DataClassification = CustomerContent;

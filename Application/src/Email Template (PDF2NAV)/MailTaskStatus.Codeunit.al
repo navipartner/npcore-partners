@@ -287,7 +287,7 @@ codeunit 6059905 "NPR Mail Task Status"
         SMTPMail.CreateMessage(ToName, '', Recipients, '', '', true);
     end;
 
-    procedure CreateMessage(SendAsMailType: Option Auto,JMail,SMTPMail; SenderName: Text[100]; SenderAddress: Text[50]; Recipients: Text[1024]; Subject: Text[200]; Body: Text[1024])
+    procedure CreateMessage(SendAsMailType: Option Auto,JMail,SMTPMail; SenderName: Text[100]; SenderAddress: Text; Recipients: Text[1024]; Subject: Text[200]; Body: Text[1024])
     var
         SMTPMailSetup: Record "SMTP Mail Setup";
         Separators: List of [Text];

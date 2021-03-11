@@ -40,7 +40,7 @@ table 6060044 "NPR Item Worksh. Variety Value"
             DataClassification = CustomerContent;
             NotBlank = true;
         }
-        field(6; Value; Code[20])
+        field(6; Value; Code[50])
         {
             Caption = 'Value';
             DataClassification = CustomerContent;
