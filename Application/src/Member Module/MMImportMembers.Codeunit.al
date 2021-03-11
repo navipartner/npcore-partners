@@ -1,15 +1,12 @@
 codeunit 6060132 "NPR MM Import Members"
 {
 
-    // #xxx/TSA /20180316 CASE xxx Added iComm setup warning
-
     trigger OnRun()
     var
         FileManagement: Codeunit "File Management";
         SuggestFileName: Text[1024];
         FileName: Text[1024];
         Serverfilename: Text;
-        Member: Record "NPR MM Member";
     begin
 
         if GuiAllowed then begin
@@ -38,7 +35,6 @@ codeunit 6060132 "NPR MM Import Members"
         GLineCount: Integer;
         REQUIRED: Integer;
         OPTIONAL: Integer;
-        "--Convert": Integer;
         AsciiStr: Text[250];
         AnsiStr: Text[250];
         InternalVars: Boolean;
@@ -74,7 +70,7 @@ codeunit 6060132 "NPR MM Import Members"
         INVALID_LENGTH: Label 'The length of %1 exceeds the max length of %2 for %3 on line %4.';
         VALUE_REQUIRED: Label 'A value is required for field %1 on line %2.';
         INVALID_DATE: Label 'The date %1 specified for field %2 on line %3 does not conform to the expected date format %4.';
-        UNSUCCESSFULL_IMPORT: Label 'Some of the import lines did not result in successfull member creation. Do you want to view the list?';
+        UNSUCCESSFUL_IMPORT: Label 'Some of the import lines did not result in successful member creation. Do you want to view the list?';
         IMPORT_MESSAGE_DIALOG: Label 'Importing :\#1#######################################################';
         PROCESS_INFO: Label 'Processing: (%1) %2 %3';
         SUCCESS_MSG: Label '%1 members imported successfully.';
@@ -105,7 +101,7 @@ codeunit 6060132 "NPR MM Import Members"
         // xxx
         if IComm.Get() then
             if IComm."Use Auto. Cust. Lookup" then
-                if not Confirm('Warning: %1 is setup and may interfer with customer creation when importing members. Has the %1 been configured correctly?', false, IComm.TableCaption()) then
+                if not Confirm('Warning: %1 is setup and may interfere with customer creation when importing members. Has the %1 been configured correctly?', false, IComm.TableCaption()) then
                     Error('');
 
         REQUIRED := 1;
@@ -163,7 +159,7 @@ codeunit 6060132 "NPR MM Import Members"
         MemberInfoCapture.SetFilter("Entry No.", '%1..', LowEntryNo);
         if (MemberInfoCapture.Count() > 0) then begin
             if (GuiAllowed) then begin
-                if (Confirm(UNSUCCESSFULL_IMPORT, true)) then begin
+                if (Confirm(UNSUCCESSFUL_IMPORT, true)) then begin
                     MemberInfoCapturePage.SetTableView(MemberInfoCapture);
                     MemberInfoCapturePage.SetShowImportAction();
                     MemberInfoCapturePage.Run();
@@ -265,8 +261,6 @@ codeunit 6060132 "NPR MM Import Members"
         end;
 
         // -- Membership
-
-        //GMemberInfo."External Membership No." := validateTextField (GMemberInfo."External Membership No.", MAXSTRLEN (GMemberInfo."External Membership No."), OPTIONAL, GMemberInfo.FIELDCAPTION ("External Membership No."));
         GMemberInfo."External Membership No." := validateTextField(FldExternalMembershipNo, MaxStrLen(GMemberInfo."External Membership No."), OPTIONAL, GMemberInfo.FieldCaption("External Membership No."));
 
         // fldRole
@@ -379,7 +373,6 @@ codeunit 6060132 "NPR MM Import Members"
         if ((MembershipEntryNo <> 0) and (GMemberInfo."Initial Loyalty Point Count" > 0)) then
             LoyaltyPointManagement.ManualAddSalePoints(MembershipEntryNo, 'Import', GMemberInfo."Initial Loyalty Point Count", 0, 'Import');
 
-        //MemberEntryNo := MemberManagement.AddMemberAndCard (MembershipEntryNo, MemberInfoCapture, FALSE);
         MemberManagement.AddMemberAndCard(MembershipEntryNo, MemberInfoCapture, false, MemberEntryNo, ResponseMessage);
 
         if (not (Member.Get(MemberEntryNo))) then
@@ -498,7 +491,7 @@ codeunit 6060132 "NPR MM Import Members"
         NextByte: Text[1];
     begin
 
-        //  This function splits the textline into 2 parts at first occurence of separator
+        //  This function splits the text line into 2 parts at first occurence of separator
         //  Quotecharacter enables separator to occur inside datablock
 
         //  example:
@@ -849,37 +842,13 @@ codeunit 6060132 "NPR MM Import Members"
     var
         RecordLink: Record "Record Link";
         OutStr: OutStream;
-        BinaryWriter: DotNet NPRNetBinaryWriter;
-        Encoding: DotNet NPRNetEncoding;
     begin
-
         RecordLink.Get(Member.AddLink('', 'Notes'));
-
         RecordLink.Type := RecordLink.Type::Note;
-        RecordLink.Note.CreateOutStream(OutStr);
-
-        Encoding := Encoding.UTF8;
-        BinaryWriter := BinaryWriter.BinaryWriter(OutStr, Encoding);
-        BinaryWriter.Write(CommentText);
-
+        RecordLink.Note.CreateOutStream(OutStr, TextEncoding::UTF8);
+        OutStr.WriteText(CommentText);
         RecordLink.Modify();
     end;
 
-    local procedure TextToNote(CommentText: Text) NoteText: Text
-    var
-        TextLength: Integer;
-        Char1: Char;
-        Char2: Char;
-    begin
-        TextLength := StrLen(CommentText);
-        if (TextLength <= 255) then begin
-            Char1 := TextLength;
-            NoteText := Format(Char1) + CommentText;
-        end else begin
-            Char1 := 128 + (TextLength - 256) mod 128;
-            Char2 := 2 + (TextLength - 256) div 128;
-            NoteText := Format(Char1) + Format(Char2) + CommentText;
-        end;
-    end;
 }
 

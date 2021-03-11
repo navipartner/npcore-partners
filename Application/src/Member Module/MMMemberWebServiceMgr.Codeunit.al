@@ -5,7 +5,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
 
     trigger OnRun()
     var
-        XmlDoc: DotNet "NPRNetXmlDocument";
+        XmlDoc: XmlDocument;
         FunctionName: Text[100];
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
@@ -18,47 +18,48 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             MemberInfoCapture.FindLast();
         end;
 
-        if (LoadXmlDoc(XmlDoc)) then begin
-            FunctionName := GetWebserviceFunction("Import Type");
+        if (Rec.LoadXmlDoc(XmlDoc)) then begin
+            FunctionName := GetWebServiceFunction(Rec."Import Type");
             case FunctionName of
                 'CreateMembership':
-                    ImportCreateMemberships(XmlDoc, "Document ID");
+                    ImportCreateMemberships(XmlDoc, Rec."Document ID");
+
                 'ConfirmMembershipPayment':
-                    ImportConfirmMemberships(XmlDoc, "Document ID");
+                    ImportConfirmMemberships(XmlDoc, Rec."Document ID");
                 'AddMembershipMember':
-                    ImportAddMembershipMembers(XmlDoc, "Document ID");
+                    ImportAddMembershipMembers(XmlDoc, Rec."Document ID");
                 'AddAnonymousMember':
-                    ImportAddAnonymousMembers(XmlDoc, "Document ID");
+                    ImportAddAnonymousMembers(XmlDoc, Rec."Document ID");
                 'GetMembership':
-                    ImportGetMemberships(XmlDoc, "Document ID");
+                    ImportGetMemberships(XmlDoc, Rec."Document ID");
 
                 'GetMembershipTicketList':
-                    ImportGetMembershipTicketList(XmlDoc, "Document ID");
+                    ImportGetMembershipTicketList(XmlDoc, Rec."Document ID");
                 'GetMembershipMembers':
-                    ImportGetMembershipMembers(XmlDoc, "Document ID");
+                    ImportGetMembershipMembers(XmlDoc, Rec."Document ID");
                 'UpdateMember':
-                    ImportUpdateMembers(XmlDoc, "Document ID");
+                    ImportUpdateMembers(XmlDoc, Rec."Document ID");
                 'BlockMembership':
-                    ImportBlockMemberships(XmlDoc, "Document ID");
+                    ImportBlockMemberships(XmlDoc, Rec."Document ID");
                 'BlockMember':
-                    ImportBlockMembers(XmlDoc, "Document ID");
+                    ImportBlockMembers(XmlDoc, Rec."Document ID");
 
                 'ChangeMembership':
-                    ImportChangeMemberships(XmlDoc, "Document ID");
+                    ImportChangeMemberships(XmlDoc, Rec."Document ID");
                 'GetMembershipChangeItemsList':
-                    ImportGetChangeMembershipList(XmlDoc, "Document ID");
+                    ImportGetChangeMembershipList(XmlDoc, Rec."Document ID");
                 'RegretMembership':
-                    ImportRegretMemberships(XmlDoc, "Document ID");
+                    ImportRegretMemberships(XmlDoc, Rec."Document ID");
 
                 'GetMembershipAutoRenewProduct':
-                    ImportGetChangeMembershipList(XmlDoc, "Document ID"); // Same impl as for GetMembershipChangeItemsList
+                    ImportGetChangeMembershipList(XmlDoc, Rec."Document ID"); // Same impl as for GetMembershipChangeItemsList
                 'ConfirmAutoRenewPayment':
-                    ImportGetChangeMembershipList(XmlDoc, "Document ID"); // Same impl as for GetMembershipChangeItemsList
+                    ImportGetChangeMembershipList(XmlDoc, Rec."Document ID"); // Same impl as for GetMembershipChangeItemsList
 
                 'SetGDPRApproval':
-                    ImportGdprApproval(XmlDoc, "Document ID");
+                    ImportGdprApproval(XmlDoc, Rec."Document ID");
                 'GetMembershipRoles':
-                    ImportGetMembershipMembers(XmlDoc, "Document ID"); // Same as GetMembershipMembers
+                    ImportGetMembershipMembers(XmlDoc, Rec."Document ID"); // Same as GetMembershipMembers
 
                 'CreateWalletMemberPass':
                     CreateWallet(XmlDoc, "Document ID");
@@ -66,7 +67,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
                 'GetSetAutoRenewOption':
                     ; // Do nothing, handled by xmlport
                 'GetSetMemberComOption':
-                    ; // Do nothing, handled by xmlport
+                    ; // Do nothing, handled by xmlport */
 
                 else
                     Error(MISSING_CASE, "Import Type", FunctionName);
@@ -88,34 +89,27 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         TEXT6060000: Label 'The %1 %2 is already in use.';
         NOT_LAST_TIMEFRAME: Label 'Document ID %1 does not specify the last non-blocked timeframe for membership.';
 
-    local procedure ImportCreateMemberships(XmlDoc: DotNet "NPRNetXmlDocument"; DocumentID: Text[100])
+    local procedure ImportCreateMemberships(XmlDoc: XmlDocument; DocumentID: Text[100])
     var
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
+        Request: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
         i: Integer;
     begin
 
-        if (IsNull(XmlDoc)) then
-            exit;
-        XmlElement := XmlDoc.DocumentElement;
-        if (IsNull(XmlElement)) then
+        if (not XmlDoc.GetRoot(Request)) then
             exit;
 
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'createmembership', XmlNodeList)) then
+        if (not NpXmlDomMgt.FindNodes(Request.AsXmlNode(), 'createmembership/request', NodeList)) then
             exit;
 
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'request', XmlNodeList)) then
-            exit;
-
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-            ImportCreateMembership(XmlElement, DocumentID);
-        end;
+        foreach Node in NodeList do
+            ImportCreateMembership(Node.AsXmlElement(), DocumentID);
 
         Commit();
     end;
 
-    local procedure ImportCreateMembership(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportCreateMembership(CreateMembershipRequest: XmlElement; DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
@@ -127,14 +121,11 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         MembershipSetup: Record "NPR MM Membership Setup";
     begin
 
-        if (IsNull(XmlElement)) then
-            exit(false);
-
         MemberInfoCapture.Init();
         MemberInfoCapture."Import Entry Document ID" := DocumentID;
-        InsertCreateMembership(XmlElement, MemberInfoCapture);
+        InsertCreateMembership(CreateMembershipRequest, MemberInfoCapture);
 
-        TransferAttributes(XmlElement, MemberInfoCapture);
+        TransferAttributes(CreateMembershipRequest, MemberInfoCapture);
 
         MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MemberInfoCapture."Item No.");
         MembershipSalesSetup.TestField(Blocked, false);
@@ -177,35 +168,27 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         exit(true);
     end;
 
-    local procedure ImportConfirmMemberships(XmlDoc: DotNet "NPRNetXmlDocument"; DocumentID: Text[100])
+    local procedure ImportConfirmMemberships(XmlDoc: XmlDocument; DocumentID: Text[100])
     var
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        i: Integer;
+        Request: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
     begin
 
-        if (IsNull(XmlDoc)) then
-            exit;
-        XmlElement := XmlDoc.DocumentElement;
-        if (IsNull(XmlElement)) then
+        if (not XmlDoc.GetRoot(Request)) then
             exit;
 
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'confirmmembership', XmlNodeList)) then
+        if (not NpXmlDomMgt.FindNodes(Request.AsXmlNode(), 'confirmmembership/request', NodeList)) then
             exit;
 
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'request', XmlNodeList)) then
-            exit;
-
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-            ImportConfirmMembership(XmlElement, DocumentID);
-        end;
+        foreach Node in NodeList do
+            ImportConfirmMembership(Node.AsXmlElement(), DocumentID);
 
         Commit();
 
     end;
 
-    local procedure ImportConfirmMembership(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportConfirmMembership(Request: XmlElement; DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipEntry: Record "NPR MM Membership Entry";
@@ -215,21 +198,18 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         TargetDocumentId: Text[100];
     begin
 
-        if (IsNull(XmlElement)) then
-            exit(false);
-
         MemberInfoCapture.Init();
         MemberInfoCapture."Import Entry Document ID" := DocumentID;
         MemberInfoCapture.Insert();
 
-        TargetDocumentId := NpXmlDomMgt.GetXmlText(XmlElement, 'documentid', MaxStrLen(MemberInfoCapture."Import Entry Document ID"), true);
+        TargetDocumentId := NpXmlDomMgt.GetXmlText(Request, 'documentid', MaxStrLen(MemberInfoCapture."Import Entry Document ID"), true);
         MembershipEntry.SetFilter("Import Entry Document ID", '=%1', TargetDocumentId);
         MembershipEntry.SetFilter(Blocked, '=%1', false);
         MembershipEntry.FindFirst();
 
-        MemberInfoCapture."Document No." := NpXmlDomMgt.GetXmlText(XmlElement, 'externaldocumentnumber', MaxStrLen(MemberInfoCapture."Document No."), false);
-        Evaluate(MemberInfoCapture.Amount, NpXmlDomMgt.GetXmlText(XmlElement, 'amount', 10, false));
-        Evaluate(MemberInfoCapture."Amount Incl VAT", NpXmlDomMgt.GetXmlText(XmlElement, 'amountinclvat', 10, false));
+        MemberInfoCapture."Document No." := NpXmlDomMgt.GetXmlText(Request, 'externaldocumentnumber', MaxStrLen(MemberInfoCapture."Document No."), false);
+        Evaluate(MemberInfoCapture.Amount, NpXmlDomMgt.GetXmlText(Request, 'amount', 10, false));
+        Evaluate(MemberInfoCapture."Amount Incl VAT", NpXmlDomMgt.GetXmlText(Request, 'amountinclvat', 10, false));
 
         MemberInfoCapture."Membership Entry No." := MembershipEntry."Membership Entry No.";
         MemberInfoCapture.Modify();
@@ -254,34 +234,26 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
 
     end;
 
-    local procedure ImportAddMembershipMembers(XmlDoc: DotNet "NPRNetXmlDocument"; DocumentID: Text[100])
+    local procedure ImportAddMembershipMembers(XmlDoc: XmlDocument; DocumentID: Text[100])
     var
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        i: Integer;
+        Request: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
     begin
 
-        if (IsNull(XmlDoc)) then
-            exit;
-        XmlElement := XmlDoc.DocumentElement;
-        if (IsNull(XmlElement)) then
+        if (not XmlDoc.GetRoot(Request)) then
             exit;
 
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'addmember', XmlNodeList)) then
+        if (not NpXmlDomMgt.FindNodes(Request.AsXmlNode(), 'addmember/request', NodeList)) then
             exit;
 
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'request', XmlNodeList)) then
-            exit;
-
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-            ImportAddMembershipMember(XmlElement, DocumentID);
-        end;
+        foreach Node in NodeList do
+            ImportAddMembershipMember(Node.AsXmlElement(), DocumentID);
 
         Commit();
     end;
 
-    local procedure ImportAddMembershipMember(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportAddMembershipMember(Request: XmlElement; DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
@@ -294,12 +266,9 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         Member: Record "NPR MM Member";
     begin
 
-        if (IsNull(XmlElement)) then
-            exit(false);
-
         MemberInfoCapture.Init();
         MemberInfoCapture."Import Entry Document ID" := DocumentID;
-        GetXmlMembershipMemberInfo(XmlElement, MemberInfoCapture);
+        GetXmlMembershipMemberInfo(Request, MemberInfoCapture);
 
         MemberInfoCapture.TestField("External Membership No.");
 
@@ -310,7 +279,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         if (MembershipEntryNo = 0) then
             Error(INVALID_MEMBERSHIP_NO, MemberInfoCapture."External Membership No.");
 
-        TransferAttributes(XmlElement, MemberInfoCapture);
+        TransferAttributes(Request, MemberInfoCapture);
 
         if (not (MembershipManagement.AddMemberAndCard(MembershipEntryNo, MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage))) then
             Error(ResponseMessage);
@@ -335,46 +304,34 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         exit(true);
     end;
 
-    local procedure ImportAddAnonymousMembers(XmlDoc: DotNet "NPRNetXmlDocument"; DocumentID: Text[100])
+    local procedure ImportAddAnonymousMembers(XmlDoc: XmlDocument; DocumentID: Text[100])
     var
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        i: Integer;
+        Request: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
     begin
 
-        if (IsNull(XmlDoc)) then
-            exit;
-        XmlElement := XmlDoc.DocumentElement;
-        if (IsNull(XmlElement)) then
+        XmlDoc.GetRoot(Request);
+
+        if (not NpXmlDomMgt.FindNodes(Request.AsXmlNode(), 'addmember/request', NodeList)) then
             exit;
 
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'addmember', XmlNodeList)) then
-            exit;
-
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'request', XmlNodeList)) then
-            exit;
-
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-            ImportAddAnonymousMember(XmlElement, DocumentID);
-        end;
+        foreach Node in NodeList do
+            ImportAddAnonymousMember(Node.AsXmlElement(), DocumentID);
 
         Commit();
     end;
 
-    local procedure ImportAddAnonymousMember(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportAddAnonymousMember(Request: XmlElement; DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MembershipEntryNo: Integer;
     begin
 
-        if (IsNull(XmlElement)) then
-            exit(false);
-
         MemberInfoCapture.Init();
         MemberInfoCapture."Import Entry Document ID" := DocumentID;
-        GetAnonymousMemberArgs(XmlElement, MemberInfoCapture);
+        GetAnonymousMemberArgs(Request, MemberInfoCapture);
 
         MemberInfoCapture.TestField("External Membership No.");
 
@@ -390,88 +347,62 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         exit(true);
     end;
 
-    local procedure ImportGetMemberships(XmlDoc: DotNet "NPRNetXmlDocument"; DocumentID: Text[100])
+    local procedure ImportGetMemberships(XmlDoc: XmlDocument; DocumentID: Text[100])
     var
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        i: Integer;
+        Request: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
     begin
 
-        if (IsNull(XmlDoc)) then
-            exit;
-        XmlElement := XmlDoc.DocumentElement;
-        if (IsNull(XmlElement)) then
+        XmlDoc.GetRoot(Request);
+
+        if (not NpXmlDomMgt.FindNodes(Request.AsXmlNode(), 'getmembership/request', NodeList)) then
             exit;
 
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'getmembership', XmlNodeList)) then
-            exit;
-
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'request', XmlNodeList)) then
-            exit;
-
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-            ImportGetMemberQuery(XmlElement, DocumentID);
-        end;
+        foreach Node in NodeList do
+            ImportGetMemberQuery(Node.AsXmlElement(), DocumentID);
 
         Commit();
     end;
 
-    local procedure ImportGetMembershipTicketList(XmlDoc: DotNet "NPRNetXmlDocument"; DocumentID: Text[100])
+    local procedure ImportGetMembershipTicketList(XmlDoc: XmlDocument; DocumentID: Text[100])
     var
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        i: Integer;
+        Request: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
     begin
 
-        if (IsNull(XmlDoc)) then
-            exit;
-        XmlElement := XmlDoc.DocumentElement;
-        if (IsNull(XmlElement)) then
+        XmlDoc.GetRoot(Request);
+
+        if (not NpXmlDomMgt.FindNodes(Request.AsXmlNode(), 'getmembershiptickets/request', NodeList)) then
             exit;
 
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'getmembershiptickets', XmlNodeList)) then
-            exit;
-
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'request', XmlNodeList)) then
-            exit;
-
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-            ImportGetMemberQuery(XmlElement, DocumentID);
-        end;
+        foreach Node in NodeList do
+            ImportGetMemberQuery(Node.AsXmlElement(), DocumentID);
 
         Commit();
     end;
 
-    local procedure ImportGetMembershipMembers(XmlDoc: DotNet "NPRNetXmlDocument"; DocumentID: Text[100])
+    local procedure ImportGetMembershipMembers(XmlDoc: XmlDocument; DocumentID: Text[100])
     var
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        i: Integer;
+        Request: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
     begin
 
-        if (IsNull(XmlDoc)) then
-            exit;
-        XmlElement := XmlDoc.DocumentElement;
-        if (IsNull(XmlElement)) then
+        XmlDoc.GetRoot(Request);
+
+        if (not NpXmlDomMgt.FindNodes(Request.AsXmlNode(), 'getmembers/request', NodeList)) then
             exit;
 
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'getmembers', XmlNodeList)) then
-            exit;
-
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'request', XmlNodeList)) then
-            exit;
-
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-            ImportGetMemberQuery(XmlElement, DocumentID);
-        end;
+        foreach Node in NodeList do
+            ImportGetMemberQuery(Node.AsXmlElement(), DocumentID);
 
         Commit();
+
     end;
 
-    local procedure ImportGetMemberQuery(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportGetMemberQuery(Request: XmlElement; DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
@@ -483,12 +414,9 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         IsValid: Boolean;
     begin
 
-        if (IsNull(XmlElement)) then
-            exit(false);
-
         MemberInfoCapture.Init();
         MemberInfoCapture."Import Entry Document ID" := DocumentID;
-        InsertGetMemberQuery(XmlElement, MemberInfoCapture);
+        InsertGetMemberQuery(Request, MemberInfoCapture);
 
         MembershipEntryNo := MembershipManagement.FindMembershipUsing('EXT-MEMBERSHIP-NO', MemberInfoCapture."External Membership No.", '');
 
@@ -539,46 +467,34 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         exit(true);
     end;
 
-    local procedure ImportUpdateMembers(XmlDoc: DotNet "NPRNetXmlDocument"; DocumentID: Text[100])
+    local procedure ImportUpdateMembers(XmlDoc: XmlDocument; DocumentID: Text[100])
     var
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        i: Integer;
+        Request: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
     begin
 
-        if (IsNull(XmlDoc)) then
-            exit;
-        XmlElement := XmlDoc.DocumentElement;
-        if (IsNull(XmlElement)) then
+        XmlDoc.GetRoot(Request);
+
+        if (not NpXmlDomMgt.FindNodes(Request.AsXmlNode(), 'updatemember/request', NodeList)) then
             exit;
 
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'updatemember', XmlNodeList)) then
-            exit;
-
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'request', XmlNodeList)) then
-            exit;
-
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-            ImportUpdateMember(XmlElement, DocumentID);
-        end;
+        foreach Node in NodeList do
+            ImportUpdateMember(Node.AsXmlElement(), DocumentID);
 
         Commit();
     end;
 
-    local procedure ImportUpdateMember(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportUpdateMember(Request: XmlElement; DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         Member: Record "NPR MM Member";
     begin
 
-        if (IsNull(XmlElement)) then
-            exit(false);
-
         MemberInfoCapture.Init();
         MemberInfoCapture."Import Entry Document ID" := DocumentID;
-        GetXmlMembershipMemberInfo(XmlElement, MemberInfoCapture);
+        GetXmlMembershipMemberInfo(Request, MemberInfoCapture);
 
         MemberInfoCapture.TestField("External Member No");
         MemberInfoCapture."Member Entry No" := MembershipManagement.GetMemberFromExtMemberNo(MemberInfoCapture."External Member No");
@@ -589,7 +505,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         if (MemberInfoCapture."Membership Entry No." = 0) then
             Error(INVALID_MEMBERSHIP_NO, MemberInfoCapture."External Member No");
 
-        TransferAttributes(XmlElement, MemberInfoCapture);
+        TransferAttributes(Request, MemberInfoCapture);
 
         MembershipManagement.UpdateMember(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture);
         MemberInfoCapture.Modify();
@@ -601,46 +517,34 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         exit(true);
     end;
 
-    local procedure ImportBlockMemberships(XmlDoc: DotNet "NPRNetXmlDocument"; DocumentID: Text[100])
+    local procedure ImportBlockMemberships(XmlDoc: XmlDocument; DocumentID: Text[100])
     var
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        i: Integer;
+        Request: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
     begin
 
-        if (IsNull(XmlDoc)) then
-            exit;
-        XmlElement := XmlDoc.DocumentElement;
-        if (IsNull(XmlElement)) then
+        XmlDoc.GetRoot(Request);
+
+        if (not NpXmlDomMgt.FindNodes(Request.AsXmlNode(), 'blockmembers/request', NodeList)) then
             exit;
 
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'blockmember', XmlNodeList)) then
-            exit;
-
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'request', XmlNodeList)) then
-            exit;
-
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-            ImportBlockMembership(XmlElement, DocumentID);
-        end;
+        foreach Node in NodeList do
+            ImportBlockMembership(Node.AsXmlElement(), DocumentID);
 
         Commit();
     end;
 
-    local procedure ImportBlockMembership(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportBlockMembership(Request: XmlElement; DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         Membership: Record "NPR MM Membership";
     begin
 
-        if (IsNull(XmlElement)) then
-            exit(false);
-
         MemberInfoCapture.Init();
         MemberInfoCapture."Import Entry Document ID" := DocumentID;
-        InsertGetMemberQuery(XmlElement, MemberInfoCapture);
+        InsertGetMemberQuery(Request, MemberInfoCapture);
 
         if (MemberInfoCapture."External Membership No." <> '') then begin
             MemberInfoCapture."Membership Entry No." := MembershipManagement.GetMembershipFromExtMembershipNo(MemberInfoCapture."External Membership No.");
@@ -668,35 +572,26 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         exit(true);
     end;
 
-    local procedure ImportBlockMembers(XmlDoc: DotNet "NPRNetXmlDocument"; DocumentID: Text[100])
+    local procedure ImportBlockMembers(XmlDoc: XmlDocument; DocumentID: Text[100])
     var
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        i: Integer;
+        Request: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
     begin
 
-        if (IsNull(XmlDoc)) then
-            exit;
-        XmlElement := XmlDoc.DocumentElement;
-        if (IsNull(XmlElement)) then
+        XmlDoc.GetRoot(Request);
+
+        if (not NpXmlDomMgt.FindNodes(Request.AsXmlNode(), 'blockmember/request', NodeList)) then
             exit;
 
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'blockmember', XmlNodeList)) then
-            exit;
-
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'request', XmlNodeList)) then
-            exit;
-
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-            ImportBlockMember(XmlElement, DocumentID);
-        end;
+        foreach Node in NodeList do
+            ImportBlockMember(Node.AsXmlElement(), DocumentID);
 
         Commit();
 
     end;
 
-    local procedure ImportBlockMember(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportBlockMember(Request: XmlElement; DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
@@ -705,12 +600,9 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         Member: Record "NPR MM Member";
     begin
 
-        if (IsNull(XmlElement)) then
-            exit(false);
-
         MemberInfoCapture.Init();
         MemberInfoCapture."Import Entry Document ID" := DocumentID;
-        InsertGetMemberQuery(XmlElement, MemberInfoCapture);
+        InsertGetMemberQuery(Request, MemberInfoCapture);
 
         if (MemberInfoCapture."External Member No" <> '') then begin
             MemberInfoCapture."Member Entry No" := MembershipManagement.GetMemberFromExtMemberNo(MemberInfoCapture."External Member No");
@@ -752,34 +644,25 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
 
     end;
 
-    local procedure ImportChangeMemberships(XmlDoc: DotNet "NPRNetXmlDocument"; DocumentID: Text[100])
+    local procedure ImportChangeMemberships(XmlDoc: XmlDocument; DocumentID: Text[100])
     var
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        i: Integer;
+        Request: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
     begin
 
-        if (IsNull(XmlDoc)) then
-            exit;
-        XmlElement := XmlDoc.DocumentElement;
-        if (IsNull(XmlElement)) then
+        XmlDoc.GetRoot(Request);
+
+        if (not NpXmlDomMgt.FindNodes(Request.AsXmlNode(), 'changemembership/request', NodeList)) then
             exit;
 
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'changemember', XmlNodeList)) then
-            exit;
-
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'request', XmlNodeList)) then
-            exit;
-
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-            ImportChangeMembership(XmlElement, DocumentID);
-        end;
+        foreach Node in NodeList do
+            ImportChangeMembership(Node.AsXmlElement(), DocumentID);
 
         Commit();
     end;
 
-    local procedure ImportChangeMembership(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportChangeMembership(Request: XmlElement; DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
@@ -790,12 +673,9 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         NotFoundReasonText: Text;
     begin
 
-        if (IsNull(XmlElement)) then
-            exit(false);
-
         MemberInfoCapture.Init();
         MemberInfoCapture."Import Entry Document ID" := DocumentID;
-        InsertGetMemberQuery(XmlElement, MemberInfoCapture);
+        InsertGetMemberQuery(Request, MemberInfoCapture);
 
         if (MemberInfoCapture."External Member No" <> '') then begin
             MemberInfoCapture."Membership Entry No." := MembershipManagement.GetMembershipFromExtMemberNo(MemberInfoCapture."External Member No");
@@ -815,7 +695,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
                 Error(INVALID_MEMBERSHIP_NO, MemberInfoCapture."External Membership No.");
         end;
 
-        AppendChangeMembership(XmlElement, MemberInfoCapture);
+        AppendChangeMembership(Request, MemberInfoCapture);
 
         if (MemberInfoCapture."Membership Entry No." = 0) then
             Error(NOT_FOUND);
@@ -862,42 +742,34 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         exit(true);
     end;
 
-    local procedure ImportGetChangeMembershipList(XmlDoc: DotNet "NPRNetXmlDocument"; DocumentID: Text[100])
+    local procedure ImportGetChangeMembershipList(XmlDoc: XmlDocument; DocumentID: Text[100])
     var
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
+        Request: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
         i: Integer;
     begin
 
-        if (IsNull(XmlDoc)) then
-            exit;
-        XmlElement := XmlDoc.DocumentElement;
-        if (IsNull(XmlElement)) then
+        XmlDoc.GetRoot(Request);
+
+        if (not NpXmlDomMgt.FindNodes(Request.AsXmlNode(), 'getchangemembershiplist/request', NodeList)) then
             exit;
 
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'request', XmlNodeList)) then
-            exit;
-
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-            ImportGetChangeMembershipItems(XmlElement, DocumentID);
-        end;
+        foreach Node in NodeList do
+            ImportGetChangeMembershipItems(Node.AsXmlElement(), DocumentID);
 
         Commit();
     end;
 
-    local procedure ImportGetChangeMembershipItems(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportGetChangeMembershipItems(Request: XmlElement; DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
     begin
 
-        if (IsNull(XmlElement)) then
-            exit(false);
-
         MemberInfoCapture.Init();
         MemberInfoCapture."Import Entry Document ID" := DocumentID;
-        InsertGetMemberQuery(XmlElement, MemberInfoCapture);
+        InsertGetMemberQuery(Request, MemberInfoCapture);
 
         if (MemberInfoCapture."External Membership No." <> '') then begin
             MemberInfoCapture."Membership Entry No." := MembershipManagement.GetMembershipFromExtMembershipNo(MemberInfoCapture."External Membership No.");
@@ -918,34 +790,25 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         exit(true);
     end;
 
-    local procedure ImportRegretMemberships(XmlDoc: DotNet "NPRNetXmlDocument"; DocumentID: Text[100])
+    local procedure ImportRegretMemberships(XmlDoc: XmlDocument; DocumentID: Text[100])
     var
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        i: Integer;
+        Request: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
     begin
 
-        if (IsNull(XmlDoc)) then
-            exit;
-        XmlElement := XmlDoc.DocumentElement;
-        if (IsNull(XmlElement)) then
+        XmlDoc.GetRoot(Request);
+
+        if (not NpXmlDomMgt.FindNodes(Request.AsXmlNode(), 'regretmembershiptimeframe/request', NodeList)) then
             exit;
 
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'regretmembershiptimeframe', XmlNodeList)) then
-            exit;
-
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'request', XmlNodeList)) then
-            exit;
-
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-            ImportRegretMembership(XmlElement, DocumentID);
-        end;
+        foreach Node in NodeList do
+            ImportRegretMembership(Node.AsXmlElement(), DocumentID);
 
         Commit();
     end;
 
-    local procedure ImportRegretMembership(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportRegretMembership(Request: XmlElement; DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipEntry: Record "NPR MM Membership Entry";
@@ -953,14 +816,11 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
     begin
 
-        if (IsNull(XmlElement)) then
-            exit(false);
-
         MemberInfoCapture.Init();
         MemberInfoCapture."Import Entry Document ID" := DocumentID;
         MemberInfoCapture.Insert();
 
-        TargetDocumentId := NpXmlDomMgt.GetXmlText(XmlElement, 'documentid', MaxStrLen(MemberInfoCapture."Import Entry Document ID"), true);
+        TargetDocumentId := NpXmlDomMgt.GetXmlText(Request, 'documentid', MaxStrLen(MemberInfoCapture."Import Entry Document ID"), true);
         MembershipEntry.SetFilter("Import Entry Document ID", '=%1', TargetDocumentId);
         MembershipEntry.SetFilter(Blocked, '=%1', false);
         MembershipEntry.FindFirst();
@@ -982,35 +842,26 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         exit(true);
     end;
 
-    local procedure ImportGdprApproval(XmlDoc: DotNet "NPRNetXmlDocument"; DocumentID: Text[100])
+    local procedure ImportGdprApproval(XmlDoc: XmlDocument; DocumentID: Text[100])
     var
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        i: Integer;
+        Request: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
     begin
 
-        if (IsNull(XmlDoc)) then
-            exit;
-        XmlElement := XmlDoc.DocumentElement;
-        if (IsNull(XmlElement)) then
+        XmlDoc.GetRoot(Request);
+
+        if (not NpXmlDomMgt.FindNodes(Request.AsXmlNode(), 'getsegdprtapproval/request', NodeList)) then
             exit;
 
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'addmember', XmlNodeList)) then
-            exit;
-
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'request', XmlNodeList)) then
-            exit;
-
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-            ImportGdprApprovalRequest(XmlElement, DocumentID);
-        end;
+        foreach Node in NodeList do
+            ImportGdprApprovalRequest(Node.AsXmlElement(), DocumentID);
 
         Commit();
 
     end;
 
-    local procedure ImportGdprApprovalRequest(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportGdprApprovalRequest(Request: XmlElement; DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
@@ -1020,12 +871,9 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         DataSubjectId: Text[40];
     begin
 
-        if (IsNull(XmlElement)) then
-            exit(false);
-
         MemberInfoCapture.Init();
         MemberInfoCapture."Import Entry Document ID" := DocumentID;
-        GetGdprArgs(XmlElement, MemberInfoCapture, DataSubjectId);
+        GetGdprArgs(Request, MemberInfoCapture, DataSubjectId);
 
         if (DataSubjectId = '') then begin
             MemberInfoCapture.TestField("External Card No.");
@@ -1058,36 +906,27 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
 
     end;
 
-    local procedure CreateWallet(XmlDoc: DotNet "NPRNetXmlDocument"; DocumentID: Text[100])
+    local procedure CreateWallet(XmlDoc: XmlDocument; DocumentID: Text[100])
     var
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        i: Integer;
+        Request: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
     begin
 
-        if (IsNull(XmlDoc)) then
+        XmlDoc.GetRoot(Request);
+
+        if (not NpXmlDomMgt.FindNodes(Request.AsXmlNode(), 'createwalletpass/request', NodeList)) then
             exit;
 
-        XmlElement := XmlDoc.DocumentElement;
-        if (IsNull(XmlElement)) then
-            exit;
+        foreach Node in NodeList do
+            ProcessCreateWalletRequest(Node.AsXmlElement(), DocumentID);
 
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'createwalletpass', XmlNodeList)) then
-            exit;
-
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'request', XmlNodeList)) then
-            exit;
-
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-            ProcessCreateWalletRequest(XmlElement, DocumentID);
-        end;
 
         Commit();
 
     end;
 
-    local procedure ProcessCreateWalletRequest(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
+    local procedure ProcessCreateWalletRequest(Request: XmlElement; DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipEntry: Record "NPR MM Membership Entry";
@@ -1101,12 +940,9 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         NotificationEntryNo: Integer;
     begin
 
-        if (IsNull(XmlElement)) then
-            exit(false);
-
         MemberInfoCapture.Init();
         MemberInfoCapture."Import Entry Document ID" := DocumentID;
-        CreateSynchronous := GetCreateWalletRequest(XmlElement, MemberInfoCapture);
+        CreateSynchronous := GetCreateWalletRequest(Request, MemberInfoCapture);
 
         MemberInfoCapture."Membership Entry No." := MembershipManagement.GetMembershipFromExtCardNo(MemberInfoCapture."External Card No.", Today, ResponseMessage);
         if (MemberInfoCapture."Membership Entry No." = 0) then
@@ -1142,22 +978,22 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
     begin
     end;
 
-    local procedure InsertCreateMembership(XmlElement: DotNet NPRNetXmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture")
+    local procedure InsertCreateMembership(CreateMembershipRequest: XmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture")
     begin
 
         MemberInfoCapture."Entry No." := 0;
-        MemberInfoCapture."Item No." := NpXmlDomMgt.GetXmlText(XmlElement, 'membershipsalesitem', MaxStrLen(MemberInfoCapture."Item No."), true);
+        MemberInfoCapture."Item No." := NpXmlDomMgt.GetXmlText(CreateMembershipRequest, 'membershipsalesitem', MaxStrLen(MemberInfoCapture."Item No."), true);
 
-        Evaluate(MemberInfoCapture."Document Date", NpXmlDomMgt.GetXmlText(XmlElement, 'activationdate', 0, false), 9);
+        Evaluate(MemberInfoCapture."Document Date", NpXmlDomMgt.GetXmlText(CreateMembershipRequest, 'activationdate', 0, false), 9);
         MemberInfoCapture.Insert();
 
-        MemberInfoCapture."Company Name" := NpXmlDomMgt.GetXmlText(XmlElement, 'companyname', MaxStrLen(MemberInfoCapture."Company Name"), false);
+        MemberInfoCapture."Company Name" := NpXmlDomMgt.GetXmlText(CreateMembershipRequest, 'companyname', MaxStrLen(MemberInfoCapture."Company Name"), false);
 
-        MemberInfoCapture."Customer No." := NpXmlDomMgt.GetXmlText(XmlElement, 'preassigned_customer_number', MaxStrLen(MemberInfoCapture."Customer No."), false);
+        MemberInfoCapture."Customer No." := NpXmlDomMgt.GetXmlText(CreateMembershipRequest, 'preassigned_customer_number', MaxStrLen(MemberInfoCapture."Customer No."), false);
 
     end;
 
-    local procedure GetXmlMembershipMemberInfo(XmlElement: DotNet NPRNetXmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture")
+    local procedure GetXmlMembershipMemberInfo(MemberRequest: XmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture")
     var
         GenderText: Text[30];
         CrmText: Text[30];
@@ -1170,25 +1006,25 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
     begin
 
         MemberInfoCapture."Entry No." := 0;
-        MemberInfoCapture."External Membership No." := NpXmlDomMgt.GetXmlText(XmlElement, 'membershipnumber', MaxStrLen(MemberInfoCapture."External Membership No."), false);
-        MemberInfoCapture."External Member No" := NpXmlDomMgt.GetXmlText(XmlElement, 'membernumber', MaxStrLen(MemberInfoCapture."External Member No"), false);
+        MemberInfoCapture."External Membership No." := NpXmlDomMgt.GetXmlText(MemberRequest, 'membershipnumber', MaxStrLen(MemberInfoCapture."External Membership No."), false);
+        MemberInfoCapture."External Member No" := NpXmlDomMgt.GetXmlText(MemberRequest, 'membernumber', MaxStrLen(MemberInfoCapture."External Member No"), false);
 
-        MemberInfoCapture."First Name" := NpXmlDomMgt.GetXmlText(XmlElement, 'firstname', MaxStrLen(MemberInfoCapture."First Name"), true);
-        MemberInfoCapture."E-Mail Address" := LowerCase(NpXmlDomMgt.GetXmlText(XmlElement, 'email', MaxStrLen(MemberInfoCapture."E-Mail Address"), true));
+        MemberInfoCapture."First Name" := NpXmlDomMgt.GetXmlText(MemberRequest, 'firstname', MaxStrLen(MemberInfoCapture."First Name"), true);
+        MemberInfoCapture."E-Mail Address" := LowerCase(NpXmlDomMgt.GetXmlText(MemberRequest, 'email', MaxStrLen(MemberInfoCapture."E-Mail Address"), true));
 
-        MemberInfoCapture."Guardian External Member No." := NpXmlDomMgt.GetXmlText(XmlElement, 'guardian/membernumber', MaxStrLen(MemberInfoCapture."Guardian External Member No."), false);
+        MemberInfoCapture."Guardian External Member No." := NpXmlDomMgt.GetXmlText(MemberRequest, 'guardian/membernumber', MaxStrLen(MemberInfoCapture."Guardian External Member No."), false);
         if (MemberInfoCapture."Guardian External Member No." <> '') then
             if (MemberInfoCapture."E-Mail Address" = '') then
-                MemberInfoCapture."E-Mail Address" := LowerCase(NpXmlDomMgt.GetXmlText(XmlElement, 'guardian/email', MaxStrLen(MemberInfoCapture."E-Mail Address"), true));
+                MemberInfoCapture."E-Mail Address" := LowerCase(NpXmlDomMgt.GetXmlText(MemberRequest, 'guardian/email', MaxStrLen(MemberInfoCapture."E-Mail Address"), true));
 
-        MemberInfoCapture."Middle Name" := NpXmlDomMgt.GetXmlText(XmlElement, 'middlename', MaxStrLen(MemberInfoCapture."Middle Name"), false);
-        MemberInfoCapture."Last Name" := NpXmlDomMgt.GetXmlText(XmlElement, 'lastname', MaxStrLen(MemberInfoCapture."Last Name"), true);
-        MemberInfoCapture.Address := NpXmlDomMgt.GetXmlText(XmlElement, 'address', MaxStrLen(MemberInfoCapture.Address), false);
+        MemberInfoCapture."Middle Name" := NpXmlDomMgt.GetXmlText(MemberRequest, 'middlename', MaxStrLen(MemberInfoCapture."Middle Name"), false);
+        MemberInfoCapture."Last Name" := NpXmlDomMgt.GetXmlText(MemberRequest, 'lastname', MaxStrLen(MemberInfoCapture."Last Name"), true);
+        MemberInfoCapture.Address := NpXmlDomMgt.GetXmlText(MemberRequest, 'address', MaxStrLen(MemberInfoCapture.Address), false);
 
-        MemberInfoCapture."Post Code Code" := NpXmlDomMgt.GetXmlText(XmlElement, 'postcode', MaxStrLen(MemberInfoCapture."Post Code Code"), false);
-        MemberInfoCapture.City := NpXmlDomMgt.GetXmlText(XmlElement, 'city', MaxStrLen(MemberInfoCapture.City), false);
-        MemberInfoCapture.Country := NpXmlDomMgt.GetXmlText(XmlElement, 'country', MaxStrLen(MemberInfoCapture.Country), false);
-        MemberInfoCapture."Phone No." := NpXmlDomMgt.GetXmlText(XmlElement, 'phoneno', MaxStrLen(MemberInfoCapture."Phone No."), false);
+        MemberInfoCapture."Post Code Code" := NpXmlDomMgt.GetXmlText(MemberRequest, 'postcode', MaxStrLen(MemberInfoCapture."Post Code Code"), false);
+        MemberInfoCapture.City := NpXmlDomMgt.GetXmlText(MemberRequest, 'city', MaxStrLen(MemberInfoCapture.City), false);
+        MemberInfoCapture.Country := NpXmlDomMgt.GetXmlText(MemberRequest, 'country', MaxStrLen(MemberInfoCapture.Country), false);
+        MemberInfoCapture."Phone No." := NpXmlDomMgt.GetXmlText(MemberRequest, 'phoneno', MaxStrLen(MemberInfoCapture."Phone No."), false);
 
         if (MemberInfoCapture."E-Mail Address" = '') and (MemberInfoCapture."Phone No." <> '') then
             MemberInfoCapture."Notification Method" := MemberInfoCapture."Notification Method"::SMS;
@@ -1199,7 +1035,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         if (MemberInfoCapture."E-Mail Address" <> '') and (MemberInfoCapture."Phone No." <> '') then
             MemberInfoCapture."Notification Method" := MemberInfoCapture."Notification Method"::EMAIL;
 
-        NotificationMethodText := NpXmlDomMgt.GetXmlText(XmlElement, 'notificationmethod', MaxStrLen(NotificationMethodText), false);
+        NotificationMethodText := NpXmlDomMgt.GetXmlText(MemberRequest, 'notificationmethod', MaxStrLen(NotificationMethodText), false);
         case UpperCase(NotificationMethodText) of
             'NO_THANKYOU', '0':
                 MemberInfoCapture."Notification Method" := MemberInfoCapture."Notification Method"::NO_THANKYOU;
@@ -1213,9 +1049,9 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
                 ; // Do nothing
         end;
 
-        Evaluate(MemberInfoCapture.Birthday, NpXmlDomMgt.GetXmlText(XmlElement, 'birthday', 0, false), 9);
+        Evaluate(MemberInfoCapture.Birthday, NpXmlDomMgt.GetXmlText(MemberRequest, 'birthday', 0, false), 9);
 
-        GenderText := NpXmlDomMgt.GetXmlText(XmlElement, 'gender', MaxStrLen(GenderText), false);
+        GenderText := NpXmlDomMgt.GetXmlText(MemberRequest, 'gender', MaxStrLen(GenderText), false);
         case UpperCase(GenderText) of
             'MALE', '1', Format(MemberInfoCapture.Gender::MALE, 0, 9):
                 MemberInfoCapture.Gender := MemberInfoCapture.Gender::MALE;
@@ -1227,7 +1063,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
                 MemberInfoCapture.Gender := MemberInfoCapture.Gender::NOT_SPECIFIED;
         end;
 
-        CrmText := NpXmlDomMgt.GetXmlText(XmlElement, 'newsletter', MaxStrLen(CrmText), false);
+        CrmText := NpXmlDomMgt.GetXmlText(MemberRequest, 'newsletter', MaxStrLen(CrmText), false);
         case UpperCase(CrmText) of
             'YES', '1', Format(MemberInfoCapture."News Letter"::YES, 0, 9):
                 MemberInfoCapture."News Letter" := MemberInfoCapture."News Letter"::YES;
@@ -1237,10 +1073,10 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
                 MemberInfoCapture."News Letter" := MemberInfoCapture."News Letter"::NOT_SPECIFIED;
         end;
 
-        MemberInfoCapture."User Logon ID" := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement, 'username', MaxStrLen(MemberInfoCapture."User Logon ID"), false));
-        MemberInfoCapture."Password SHA1" := NpXmlDomMgt.GetXmlText(XmlElement, 'password', MaxStrLen(MemberInfoCapture."Password SHA1"), false);
+        MemberInfoCapture."User Logon ID" := UpperCase(NpXmlDomMgt.GetXmlText(MemberRequest, 'username', MaxStrLen(MemberInfoCapture."User Logon ID"), false));
+        MemberInfoCapture."Password SHA1" := NpXmlDomMgt.GetXmlText(MemberRequest, 'password', MaxStrLen(MemberInfoCapture."Password SHA1"), false);
 
-        GdprText := NpXmlDomMgt.GetXmlText(XmlElement, 'gdpr_approval', MaxStrLen(GdprText), false);
+        GdprText := NpXmlDomMgt.GetXmlText(MemberRequest, 'gdpr_approval', MaxStrLen(GdprText), false);
         case UpperCase(GdprText) of
             'PENDING', '1', UpperCase(Format(MemberInfoCapture."GDPR Approval"::PENDING, 0, 9)):
                 MemberInfoCapture."GDPR Approval" := MemberInfoCapture."GDPR Approval"::PENDING;
@@ -1252,20 +1088,20 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
                 MemberInfoCapture."GDPR Approval" := MemberInfoCapture."GDPR Approval"::NA;
         end;
 
-        MemberInfoCapture."External Card No." := NpXmlDomMgt.GetXmlText(XmlElement, 'membercard/cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
+        MemberInfoCapture."External Card No." := NpXmlDomMgt.GetXmlText(MemberRequest, 'membercard/cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
         if (MemberInfoCapture."External Card No." <> '') then begin
 
             if (StrLen(MemberInfoCapture."External Card No.") >= 4) then
                 MemberInfoCapture."External Card No. Last 4" := CopyStr(MemberInfoCapture."External Card No.", StrLen(MemberInfoCapture."External Card No.") - 3);
 
-            BooleanTextField := NpXmlDomMgt.GetXmlText(XmlElement, 'membercard/is_permanent', MaxStrLen(BooleanTextField), true);
+            BooleanTextField := NpXmlDomMgt.GetXmlText(MemberRequest, 'membercard/is_permanent', MaxStrLen(BooleanTextField), true);
             if (BooleanTextField = '') then
                 BooleanTextField := Format(false, 0, 9);
 
             Evaluate(isPermanent, BooleanTextField, 9);
             MemberInfoCapture."Temporary Member Card" := not isPermanent;
 
-            DateTextField := NpXmlDomMgt.GetXmlText(XmlElement, 'membercard/valid_until', MaxStrLen(DateTextField), true);
+            DateTextField := NpXmlDomMgt.GetXmlText(MemberRequest, 'membercard/valid_until', MaxStrLen(DateTextField), true);
             if (DateTextField = '') then
                 DateTextField := Format(CalcDate('<+10D>', Today), 0, 9); // Default valid for 10 days
             Evaluate(MemberInfoCapture."Valid Until", DateTextField, 9);
@@ -1274,75 +1110,26 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
 
         MemberInfoCapture."Member Card Type" := MemberInfoCapture."Member Card Type"::NONE;
 
-        MemberInfoCapture."Customer No." := NpXmlDomMgt.GetXmlText(XmlElement, 'preassigned_customer_number', MaxStrLen(MemberInfoCapture."Customer No."), false);
-        MemberInfoCapture."Contact No." := NpXmlDomMgt.GetXmlText(XmlElement, 'preassigned_contact_number', MaxStrLen(MemberInfoCapture."Contact No."), false);
+        MemberInfoCapture."Customer No." := NpXmlDomMgt.GetXmlText(MemberRequest, 'preassigned_customer_number', MaxStrLen(MemberInfoCapture."Customer No."), false);
+        MemberInfoCapture."Contact No." := NpXmlDomMgt.GetXmlText(MemberRequest, 'preassigned_contact_number', MaxStrLen(MemberInfoCapture."Contact No."), false);
 
         MemberInfoCapture.Insert();
     end;
 
-    local procedure GetMemberCardNumberAttributes(var MemberInfoCapture: Record "NPR MM Member Info Capture"; XmlElement: DotNet NPRNetXmlElement)
-    var
-        BooleanTextField: Text;
-        DateTextField: Text;
-        XmlElement2: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        i: Integer;
-        isPermanent: Boolean;
-    begin
-
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'membercardnumber', XmlNodeList)) then
-            exit;
-
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement2 := XmlNodeList.ItemOf(i);
-
-            BooleanTextField := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement2, 'is_permanent', false), 1, MaxStrLen(BooleanTextField));
-            if (BooleanTextField = '') then
-                BooleanTextField := Format(false, 0, 9);
-
-            Evaluate(isPermanent, BooleanTextField, 9);
-            MemberInfoCapture."Temporary Member Card" := not isPermanent;
-
-            DateTextField := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement2, 'valid_until', false), 1, MaxStrLen(DateTextField));
-            if (DateTextField = '') then
-                DateTextField := Format(CalcDate('<CM>', CalcDate('<CM+1M-10D>', Today)), 0, 9); // End of next month
-            Evaluate(MemberInfoCapture."Valid Until", DateTextField, 9);
-        end;
-
-    end;
-
-    local procedure GetMemberEmailAttributes(var MemberInfoCapture: Record "NPR MM Member Info Capture"; XmlElement: DotNet NPRNetXmlElement)
-    var
-        XmlElement2: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        emailAddress: Text;
-    begin
-
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'email', XmlNodeList)) then
-            exit;
-
-        XmlElement2 := XmlNodeList.ItemOf(0);
-        MemberInfoCapture."Guardian External Member No." := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement2, 'guardian_external_member_no', false), 1, MaxStrLen(MemberInfoCapture."Guardian External Member No."));
-
-        emailAddress := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement2, 'email', false), 1, MaxStrLen(MemberInfoCapture."E-Mail Address"));
-        if (emailAddress <> '') then
-            MemberInfoCapture."E-Mail Address" := emailAddress;
-    end;
-
-    local procedure InsertGetMemberQuery(XmlElement: DotNet NPRNetXmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture")
+    local procedure InsertGetMemberQuery(Request: XmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture")
     var
         CustomerNo: Code[20];
         Membership: Record "NPR MM Membership";
     begin
 
         MemberInfoCapture."Entry No." := 0;
-        MemberInfoCapture."External Member No" := NpXmlDomMgt.GetXmlText(XmlElement, 'membernumber', MaxStrLen(MemberInfoCapture."External Member No"), false);
-        MemberInfoCapture."External Card No." := NpXmlDomMgt.GetXmlText(XmlElement, 'cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
-        MemberInfoCapture."External Membership No." := NpXmlDomMgt.GetXmlText(XmlElement, 'membershipnumber', MaxStrLen(MemberInfoCapture."External Membership No."), false);
-        MemberInfoCapture."User Logon ID" := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement, 'username', MaxStrLen(MemberInfoCapture."User Logon ID"), false));
-        MemberInfoCapture."Password SHA1" := NpXmlDomMgt.GetXmlText(XmlElement, 'password', MaxStrLen(MemberInfoCapture."Password SHA1"), false);
+        MemberInfoCapture."External Member No" := NpXmlDomMgt.GetXmlText(Request, 'membernumber', MaxStrLen(MemberInfoCapture."External Member No"), false);
+        MemberInfoCapture."External Card No." := NpXmlDomMgt.GetXmlText(Request, 'cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
+        MemberInfoCapture."External Membership No." := NpXmlDomMgt.GetXmlText(Request, 'membershipnumber', MaxStrLen(MemberInfoCapture."External Membership No."), false);
+        MemberInfoCapture."User Logon ID" := UpperCase(NpXmlDomMgt.GetXmlText(Request, 'username', MaxStrLen(MemberInfoCapture."User Logon ID"), false));
+        MemberInfoCapture."Password SHA1" := NpXmlDomMgt.GetXmlText(Request, 'password', MaxStrLen(MemberInfoCapture."Password SHA1"), false);
 
-        CustomerNo := NpXmlDomMgt.GetXmlText(XmlElement, 'customernumber', 20, false);
+        CustomerNo := NpXmlDomMgt.GetXmlText(Request, 'customernumber', 20, false);
         if (CustomerNo <> '') then begin
             Membership.SetFilter("Customer No.", '=%1', CustomerNo);
             Membership.SetFilter(Blocked, '=%1', false);
@@ -1355,31 +1142,31 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
 
         end;
 
-        MemberInfoCapture."Document No." := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement, 'externaldocumentnumber', MaxStrLen(MemberInfoCapture."Document No."), false));
+        MemberInfoCapture."Document No." := UpperCase(NpXmlDomMgt.GetXmlText(Request, 'externaldocumentnumber', MaxStrLen(MemberInfoCapture."Document No."), false));
 
         MemberInfoCapture.Insert();
     end;
 
-    local procedure GetCreateWalletRequest(XmlElement: DotNet NPRNetXmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture") Synchronous: Boolean
+    local procedure GetCreateWalletRequest(Request: XmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture") Synchronous: Boolean
     var
         DeliveryMethod: Text[100];
         BoolText: Text;
     begin
 
         MemberInfoCapture."Entry No." := 0;
-        MemberInfoCapture."External Card No." := NpXmlDomMgt.GetXmlText(XmlElement, 'cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
+        MemberInfoCapture."External Card No." := NpXmlDomMgt.GetXmlText(Request, 'cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
         MemberInfoCapture.Insert();
 
     end;
 
-    local procedure AppendChangeMembership(XmlElement: DotNet NPRNetXmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture")
+    local procedure AppendChangeMembership(Request: XmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture")
     var
         ChangeType: Text[100];
     begin
 
-        MemberInfoCapture."Item No." := NpXmlDomMgt.GetXmlText(XmlElement, 'membershipchangeitem', MaxStrLen(MemberInfoCapture."Item No."), true);
+        MemberInfoCapture."Item No." := NpXmlDomMgt.GetXmlText(Request, 'membershipchangeitem', MaxStrLen(MemberInfoCapture."Item No."), true);
 
-        ChangeType := NpXmlDomMgt.GetXmlText(XmlElement, 'changetype', MaxStrLen(ChangeType), true);
+        ChangeType := NpXmlDomMgt.GetXmlText(Request, 'changetype', MaxStrLen(ChangeType), true);
         case UpperCase(ChangeType) of
             'CANCEL', '1', Format(MemberInfoCapture."Information Context"::REGRET, 0, 9):
                 MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::REGRET;
@@ -1396,7 +1183,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         end;
     end;
 
-    local procedure GetWebserviceFunction(ImportTypeCode: Code[20]) FunctionName: Text[100]
+    local procedure GetWebServiceFunction(ImportTypeCode: Code[20]) FunctionName: Text[100]
     var
         ImportType: Record "NPR Nc Import Type";
     begin
@@ -1408,27 +1195,27 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         exit(ImportType."Webservice Function");
     end;
 
-    local procedure GetAnonymousMemberArgs(XmlElement: DotNet NPRNetXmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture")
+    local procedure GetAnonymousMemberArgs(Request: XmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture")
     begin
 
         MemberInfoCapture."Entry No." := 0;
-        MemberInfoCapture."External Membership No." := NpXmlDomMgt.GetXmlText(XmlElement, 'membershipnumber', MaxStrLen(MemberInfoCapture."External Membership No."), false);
-        Evaluate(MemberInfoCapture.Quantity, NpXmlDomMgt.GetXmlText(XmlElement, 'addmembercount', 0, false), 9);
+        MemberInfoCapture."External Membership No." := NpXmlDomMgt.GetXmlText(Request, 'membershipnumber', MaxStrLen(MemberInfoCapture."External Membership No."), false);
+        Evaluate(MemberInfoCapture.Quantity, NpXmlDomMgt.GetXmlText(Request, 'addmembercount', 0, false), 9);
 
         MemberInfoCapture.Insert();
 
     end;
 
-    local procedure GetGdprArgs(XmlElement: DotNet NPRNetXmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture"; var DataSubjectId: Text[40])
+    local procedure GetGdprArgs(Request: XmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture"; var DataSubjectId: Text[40])
     var
         GdprText: Text;
     begin
 
         MemberInfoCapture."Entry No." := 0;
-        MemberInfoCapture."External Card No." := NpXmlDomMgt.GetXmlText(XmlElement, 'cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
-        DataSubjectId := NpXmlDomMgt.GetXmlText(XmlElement, 'datasubjectid', MaxStrLen(DataSubjectId), false);
+        MemberInfoCapture."External Card No." := NpXmlDomMgt.GetXmlText(Request, 'cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
+        DataSubjectId := NpXmlDomMgt.GetXmlText(Request, 'datasubjectid', MaxStrLen(DataSubjectId), false);
 
-        GdprText := NpXmlDomMgt.GetXmlText(XmlElement, 'gdpr_approval', MaxStrLen(GdprText), false);
+        GdprText := NpXmlDomMgt.GetXmlText(Request, 'gdpr_approval', MaxStrLen(GdprText), false);
         case UpperCase(GdprText) of
             'PENDING', '1', UpperCase(Format(MemberInfoCapture."GDPR Approval"::PENDING, 0, 9)):
                 MemberInfoCapture."GDPR Approval" := MemberInfoCapture."GDPR Approval"::PENDING;
@@ -1444,27 +1231,22 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
 
     end;
 
-    local procedure TransferAttributes(var XmlElementIn: DotNet NPRNetXmlElement; MemberInfoCapture: Record "NPR MM Member Info Capture")
+    local procedure TransferAttributes(RequestAttributes: XmlElement; MemberInfoCapture: Record "NPR MM Member Info Capture")
     var
         AttributeCode: Code[20];
         AttributeValue: Text[250];
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
         i: Integer;
     begin
 
-        if (not NpXmlDomMgt.FindNodes(XmlElementIn, 'request/attributes/attribute', XmlNodeList)) then
+        if (not NpXmlDomMgt.FindNodes(RequestAttributes.AsXmlNode(), 'request/attributes/attribute', NodeList)) then
             exit;
 
-        if (XmlNodeList.Count = 0) then
-            exit;
-
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-
-            AttributeCode := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'code', true), 1, MaxStrLen(AttributeCode));
+        foreach Node in NodeList do begin
+            AttributeCode := CopyStr(NpXmlDomMgt.GetXmlAttributeText(Node.AsXmlElement(), 'code', true), 1, MaxStrLen(AttributeCode));
             AttributeValue := '';
-            AttributeValue := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'value', false), 1, MaxStrLen(AttributeValue));
+            AttributeValue := CopyStr(NpXmlDomMgt.GetXmlAttributeText(Node.AsXmlElement(), 'value', false), 1, MaxStrLen(AttributeValue));
 
             ApplyAttributesToMemberInfoCapture(MemberInfoCapture."Entry No.", AttributeCode, AttributeValue);
         end;

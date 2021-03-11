@@ -5,6 +5,7 @@ xmlport 6060140 "NPR MM Confirm AutoRenew Pay."
     Caption = 'Confirm AutoRenew Payment';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
+    Encoding = UTF8;
 
     schema
     {

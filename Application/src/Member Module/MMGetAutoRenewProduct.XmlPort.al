@@ -4,7 +4,7 @@ xmlport 6060139 "NPR MM Get AutoRenew Product"
     Caption = 'Get AutoRenew Product';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-
+    Encoding = UTF8;
     schema
     {
         textelement(membershipautorenew)

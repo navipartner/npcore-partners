@@ -475,7 +475,8 @@ codeunit 6060093 "NPR MM Admission Service WS"
                     TenantMedia.CalcFields(Content);
                 if TenantMedia.Content.HasValue then begin
                     TenantMedia.Content.CreateInStream(InStrDefault);
-                    GetImageContentAndExtension(InStrDefault, PictureBase64Default, PictureExtensionDefault);
+                    GetImageContentAndExtension(InStrDefault, TenantMedia."Mime Type", PictureBase64Error, PictureExtensionDefault);
+
                     Clear(InStrDefault);
                 end;
 
@@ -484,7 +485,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
                     TenantMedia.CalcFields(Content);
                 if TenantMedia.Content.HasValue then begin
                     TenantMedia.Content.CreateInStream(InStrError);
-                    GetImageContentAndExtension(InStrError, PictureBase64Error, PictureExtensionError);
+                    GetImageContentAndExtension(InStrError, TenantMedia."Mime Type", PictureBase64Error, PictureExtensionError);
                     Clear(InStrError);
                 end;
             end;
@@ -496,7 +497,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
             TenantMedia.CalcFields(Content);
         if TenantMedia.Content.HasValue and (PictureBase64Default = '') then begin
             TenantMedia.Content.CreateInStream(InStrDefault);
-            GetImageContentAndExtension(InStrDefault, PictureBase64Default, PictureExtensionDefault);
+            GetImageContentAndExtension(InStrDefault, TenantMedia."Mime Type", PictureBase64Default, PictureExtensionDefault);
             Clear(InStrDefault);
         end;
 
@@ -505,7 +506,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
             TenantMedia.CalcFields(Content);
         if TenantMedia.Content.HasValue and (PictureBase64Error = '') then begin
             TenantMedia.Content.CreateInStream(InStrError);
-            GetImageContentAndExtension(InStrError, PictureBase64Error, PictureExtensionError);
+            GetImageContentAndExtension(InStrError, TenantMedia."Mime Type", PictureBase64Error, PictureExtensionError);
             Clear(InStrError);
         end;
 
@@ -568,56 +569,15 @@ codeunit 6060093 "NPR MM Admission Service WS"
         end;
     end;
 
-    local procedure GetImageContentAndExtension(InS: InStream; var Base64: Text; var Extension: Text[10])
+    local procedure GetImageContentAndExtension(InS: InStream; MimeType: Text[100]; var Base64: Text; var Extension: Text[10])
     var
-        Convert: DotNet NPRNetConvert;
-        Bytes: DotNet NPRNetArray;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Image: DotNet NPRNetImage;
-        ImageFormat: DotNet NPRNetImageFormat;
-        Converter: DotNet NPRNetImageConverter;
+        Base64Convert: Codeunit "Base64 Convert";
     begin
-        MemoryStream := MemoryStream.MemoryStream();
-        CopyStream(MemoryStream, InS);
+        Base64 := Base64Convert.ToBase64(InS);
 
-        Bytes := MemoryStream.ToArray();
-
-        Converter := Converter.ImageConverter;
-        Image := Converter.ConvertFrom(Bytes);
-
-        if (ImageFormat.Jpeg.Equals(Image.RawFormat)) then
-            Extension := 'jpeg'
-        else
-            if (ImageFormat.Png.Equals(Image.RawFormat)) then
-                Extension := 'png'
-            else
-                if (ImageFormat.Gif.Equals(Image.RawFormat)) then
-                    Extension := 'gif'
-                else
-                    if (ImageFormat.Bmp.Equals(Image.RawFormat)) then
-                        Extension := 'bmp'
-                    else
-                        if (ImageFormat.Tiff.Equals(Image.RawFormat)) then
-                            Extension := 'tiff'
-                        else
-                            if (ImageFormat.Emf.Equals(Image.RawFormat)) then
-                                Extension := 'emf'
-                            else
-                                if (ImageFormat.Icon.Equals(Image.RawFormat)) then
-                                    Extension := 'icon'
-                                else
-                                    if (ImageFormat.Exif.Equals(Image.RawFormat)) then
-                                        Extension := 'exif'
-                                    else
-                                        if (ImageFormat.Wmf.Equals(Image.RawFormat)) then
-                                            Extension := 'wmf';
-
-        Base64 := Convert.ToBase64String(Bytes);
-
-        MemoryStream.Dispose;
-        Clear(MemoryStream);
-        Clear(Bytes);
-        Clear(InS);
+        Extension := 'unknown';
+        if (MimeType.StartsWith('image/')) then
+            Extension := MimeType.Substring(StrLen('image/'));
     end;
 
     procedure GuestValidationV2(Barcode: Text[50]; ScannerStationId: Code[10]; var No: Code[20]; var Token: Code[50]; var ErrorNumber: Code[10]; var ErrorDescription: Text; var LightColor: Text[30]): Boolean

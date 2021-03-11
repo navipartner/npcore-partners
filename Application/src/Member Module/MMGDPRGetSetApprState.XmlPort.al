@@ -4,7 +4,7 @@ xmlport 6151121 "NPR MM GDPR GetSet Appr. State"
     Caption = 'GDPR Get Set Approval State';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-
+    Encoding = UTF8;
     schema
     {
         textelement(members)

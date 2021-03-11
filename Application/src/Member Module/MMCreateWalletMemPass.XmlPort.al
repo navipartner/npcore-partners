@@ -4,6 +4,7 @@ xmlport 6060143 "NPR MM Create Wallet Mem. Pass"
     Caption = 'Create Wallet Member Pass';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
+    Encoding = UTF8;
 
     schema
     {

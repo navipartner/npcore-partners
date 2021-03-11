@@ -49,12 +49,12 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup";
         LoyaltyEndpointClient: Record "NPR MM NPR Remote Endp. Setup";
         EFTInterface: Codeunit "NPR EFT Interface";
-        LoyaltyPointsWSClient: Codeunit "NPR MM Loy. Point WS (Client)";
+        ForeignMembership: Codeunit "NPR MM NPR Membership";
         SoapAction: Text;
         ResponseMessage: Text;
         XmlRequest: Text;
-        XmlRequestDoc: DotNet "NPRNetXmlDocument";
-        XmlResponseDoc: DotNet "NPRNetXmlDocument";
+        XmlRequestDoc: XmlDocument;
+        XmlResponseDoc: XmlDocument;
         Success: Boolean;
     begin
 
@@ -63,9 +63,8 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         LoyaltyEndpointClient.TestField(Type, LoyaltyEndpointClient.Type::LoyaltyServices);
 
         if (TransformToSoapAction(EFTTransactionRequest, SoapAction, XmlRequest, ResponseMessage)) then begin
-            XmlRequestDoc := XmlRequestDoc.XmlDocument;
-            XmlRequestDoc.LoadXml(XmlRequest);
-            Success := LoyaltyPointsWSClient.WebServiceApi(LoyaltyEndpointClient, SoapAction, ResponseMessage, XmlRequestDoc, XmlResponseDoc);
+            XmlDocument.ReadFrom(XmlRequest, XmlRequestDoc);
+            Success := ForeignMembership.WebServiceApi(LoyaltyEndpointClient, SoapAction, ResponseMessage, XmlRequestDoc, XmlResponseDoc);
             HandleWebServiceResult(EFTTransactionRequest, Success, ResponseMessage, XmlRequestDoc, XmlResponseDoc);
 
         end else begin
@@ -118,7 +117,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         exit(TransformOk);
     end;
 
-    local procedure HandleWebServiceResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; ServiceSuccess: Boolean; ResponseMessage: Text; var XmlRequestDoc: DotNet "NPRNetXmlDocument"; var XmlResponseDoc: DotNet "NPRNetXmlDocument")
+    local procedure HandleWebServiceResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; ServiceSuccess: Boolean; ResponseMessage: Text; var XmlRequestDoc: XmlDocument; var XmlResponseDoc: XmlDocument)
     var
         OStream: OutStream;
     begin
@@ -126,13 +125,13 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         if (not ServiceSuccess) then begin
             EFTTransactionRequest.Successful := false;
             EFTTransactionRequest."Result Code" := -198;
-            EFTTransactionRequest."Result Description" := 'Webservice fault.';
+            EFTTransactionRequest."Result Description" := 'WebService fault.';
 
             EFTTransactionRequest."Receipt 1".CreateOutStream(OStream);
-            OStream.Write(XmlResponseDoc.InnerXml());
+            XmlResponseDoc.WriteTo(OStream);
             EFTTransactionRequest.Modify();
             EFTTransactionRequest."Receipt 2".CreateOutStream(OStream);
-            OStream.Write(XmlRequestDoc.InnerXml());
+            XmlResponseDoc.WriteTo(OStream);
 
             EFTTransactionRequest.Modify();
             exit;
@@ -324,12 +323,12 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
     begin
     end;
 
-    local procedure HandleReservePointsResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var XmlResponseDoc: DotNet "NPRNetXmlDocument")
+    local procedure HandleReservePointsResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var XmlResponseDoc: XmlDocument)
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlPoints: DotNet NPRNetXmlElement;
-        XmlResponseMessage: DotNet NPRNetXmlElement;
+        Element: XmlElement;
+        PointsNode: XmlNode;
+        ResponseMessageNode: XmlNode;
         OStream: OutStream;
         ResponseCode: Code[20];
         ResponseMessage: Text;
@@ -339,28 +338,31 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         NewBalance: Text;
         ElementPath: Text;
         ReceiptText: Text;
+        XmlAsText: Text;
+        XmlDomMgt: Codeunit "XML DOM Management";
     begin
 
-        NpXmlDomMgt.RemoveNameSpaces(XmlResponseDoc);
-        XmlElement := XmlResponseDoc.DocumentElement;
-        if (IsNull(XmlElement)) then begin
-            Error(StrSubstNo(INVALID_XML, NpXmlDomMgt.PrettyPrintXml(XmlResponseDoc.InnerXml())));
-            exit;
-        end;
+
+        XmlResponseDoc.WriteTo(XmlAsText);
+        XmlDomMgt.RemoveNameSpaces(XmlAsText);
+        XmlDocument.ReadFrom(XmlAsText, XmlResponseDoc);
+
+        if (not XmlResponseDoc.GetRoot(Element)) then
+            Error(StrSubstNo(INVALID_XML, NpXmlDomMgt.PrettyPrintXml(XmlAsText)));
 
         // Status
         ElementPath := '//Body/ReservePoints_Result/reservePoints/Response/';
-        ResponseCode := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'Status/ResponseCode', 10, true);
-        ResponseMessage := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'Status/ResponseMessage', 1000, true);
+        ResponseCode := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'Status/ResponseCode', 10, true);
+        ResponseMessage := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'Status/ResponseMessage', 1000, true);
 
-        NpXmlDomMgt.FindNode(XmlElement, '//Body/ReservePoints_Result/reservePoints/Response/Status/ResponseMessage', XmlResponseMessage);
-        MessageCode := NpXmlDomMgt.GetXmlAttributeText(XmlResponseMessage, 'MessageCode', false);
+        NpXmlDomMgt.FindNode(Element.AsXmlNode(), '//Body/ReservePoints_Result/reservePoints/Response/Status/ResponseMessage', ResponseMessageNode);
+        MessageCode := NpXmlDomMgt.GetXmlAttributeText(ResponseMessageNode, 'MessageCode', false);
 
         // Message payload
-        NpXmlDomMgt.FindNode(XmlElement, '//Body/ReservePoints_Result/reservePoints/Response/Points', XmlPoints);
-        ReferenceNumber := NpXmlDomMgt.GetXmlAttributeText(XmlPoints, 'ReferenceNumber', false);
-        AuthorizationCode := NpXmlDomMgt.GetXmlAttributeText(XmlPoints, 'AuthorizationNumber', false);
-        NewBalance := NpXmlDomMgt.GetXmlAttributeText(XmlPoints, 'NewPointBalance', false);
+        NpXmlDomMgt.FindNode(Element.AsXmlNode(), '//Body/ReservePoints_Result/reservePoints/Response/Points', PointsNode);
+        ReferenceNumber := NpXmlDomMgt.GetXmlAttributeText(PointsNode, 'ReferenceNumber', false);
+        AuthorizationCode := NpXmlDomMgt.GetXmlAttributeText(PointsNode, 'AuthorizationNumber', false);
+        NewBalance := NpXmlDomMgt.GetXmlAttributeText(PointsNode, 'NewPointBalance', false);
 
         EFTTransactionRequest.Successful := (ResponseCode = 'OK');
         FinalizeTransactionRequest(EFTTransactionRequest, MessageCode, ResponseMessage, AuthorizationCode, ReferenceNumber);
@@ -381,12 +383,13 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         EFTTransactionRequest.Modify();
     end;
 
-    local procedure HandleRegisterSalesResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var XmlResponseDoc: DotNet "NPRNetXmlDocument")
+    local procedure HandleRegisterSalesResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var XmlResponseDoc: XmlDocument)
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlPoints: DotNet NPRNetXmlElement;
-        XmlResponseMessage: DotNet NPRNetXmlElement;
+        XmlDomMgt: Codeunit "XML DOM Management";
+        Element: XmlElement;
+        PointsNode: XmlNode;
+        ResponseMessageNode: XmlNode;
         ResponseCode: Code[20];
         ResponseMessage: Text;
         MessageCode: Text;
@@ -399,40 +402,41 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         PointsSpent: Integer;
         ReceiptText: Text;
         OStream: OutStream;
+        XmlAsText: Text;
     begin
 
-        NpXmlDomMgt.RemoveNameSpaces(XmlResponseDoc);
-        XmlElement := XmlResponseDoc.DocumentElement;
-        if (IsNull(XmlElement)) then begin
-            Error(StrSubstNo(INVALID_XML, NpXmlDomMgt.PrettyPrintXml(XmlResponseDoc.InnerXml())));
-            exit;
-        end;
+        XmlResponseDoc.WriteTo(XmlAsText);
+        XmlDomMgt.RemoveNameSpaces(XmlAsText);
+        XmlDocument.ReadFrom(XmlAsText, XmlResponseDoc);
+
+        if (not XmlResponseDoc.GetRoot(Element)) then
+            Error(StrSubstNo(INVALID_XML, NpXmlDomMgt.PrettyPrintXml(XmlAsText)));
 
         // Status
         ElementPath := '//Body/RegisterSale_Result/registerSale/Response/';
-        ResponseCode := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'Status/ResponseCode', 10, true);
-        ResponseMessage := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'Status/ResponseMessage', 1000, true);
+        ResponseCode := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'Status/ResponseCode', 10, true);
+        ResponseMessage := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'Status/ResponseMessage', 1000, true);
 
-        NpXmlDomMgt.FindNode(XmlElement, '//Body/RegisterSale_Result/registerSale/Response/Status/ResponseMessage', XmlResponseMessage);
-        MessageCode := NpXmlDomMgt.GetXmlAttributeText(XmlResponseMessage, 'MessageCode', false);
+        NpXmlDomMgt.FindNode(Element.AsXmlNode(), '//Body/RegisterSale_Result/registerSale/Response/Status/ResponseMessage', ResponseMessageNode);
+        MessageCode := NpXmlDomMgt.GetXmlAttributeText(ResponseMessageNode, 'MessageCode', false);
 
         // Message payload
-        NpXmlDomMgt.FindNode(XmlElement, '//Body/RegisterSale_Result/registerSale/Response/Points', XmlPoints);
-        ReferenceNumber := NpXmlDomMgt.GetXmlAttributeText(XmlPoints, 'ReferenceNumber', false);
-        AuthorizationCode := NpXmlDomMgt.GetXmlAttributeText(XmlPoints, 'AuthorizationNumber', false);
+        NpXmlDomMgt.FindNode(Element.AsXmlNode(), '//Body/RegisterSale_Result/registerSale/Response/Points', PointsNode);
+        ReferenceNumber := NpXmlDomMgt.GetXmlAttributeText(PointsNode, 'ReferenceNumber', false);
+        AuthorizationCode := NpXmlDomMgt.GetXmlAttributeText(PointsNode, 'AuthorizationNumber', false);
 
         EFTTransactionRequest.Successful := (ResponseCode = 'OK');
         FinalizeTransactionRequest(EFTTransactionRequest, MessageCode, ResponseMessage, AuthorizationCode, ReferenceNumber);
         EFTTransactionRequest.Modify();
         Commit();
 
-        if (not EvaluateToInteger(PointsEarned, NpXmlDomMgt.GetXmlAttributeText(XmlPoints, 'PointsEarned', false))) then
+        if (not EvaluateToInteger(PointsEarned, NpXmlDomMgt.GetXmlAttributeText(PointsNode, 'PointsEarned', false))) then
             PointsEarned := 0;
 
-        if (not EvaluateToInteger(PointsSpent, NpXmlDomMgt.GetXmlAttributeText(XmlPoints, 'PointsSpent', false))) then
+        if (not EvaluateToInteger(PointsSpent, NpXmlDomMgt.GetXmlAttributeText(PointsNode, 'PointsSpent', false))) then
             PointsSpent := 0;
 
-        if (not EvaluateToInteger(NewBalance, NpXmlDomMgt.GetXmlAttributeText(XmlPoints, 'NewPointBalance', false))) then
+        if (not EvaluateToInteger(NewBalance, NpXmlDomMgt.GetXmlAttributeText(PointsNode, 'NewPointBalance', false))) then
             NewBalance := 0;
 
         ReceiptText := CreateRegisterPointsSlip(EFTTransactionRequest, 0, PointsEarned, PointsSpent, NewBalance);

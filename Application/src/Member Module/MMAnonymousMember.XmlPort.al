@@ -4,7 +4,7 @@ xmlport 6060136 "NPR MM Anonymous Member"
     Caption = 'Add Member';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-
+    Encoding = UTF8;
     schema
     {
         textelement(members)

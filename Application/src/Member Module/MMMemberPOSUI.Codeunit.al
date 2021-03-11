@@ -13,13 +13,19 @@ codeunit 6060135 "NPR MM Member POS UI"
     var
         Template: DotNet NPRNetTemplate;
     begin
-        ConfigureLookupTemplate(Template, LookupRecRef);
+        // ConfigureLookupTemplate(Template, LookupRecRef);
         // TODO: CTRLUPGRADE - Transcendence doesn't support template based lookups yet, this must be refactored to use standard NAV lookup
-        Error('CTRLUPGRADE');
+        // Error('CTRLUPGRADE');
+        Error('The action you attempting does no support the older version of displaying the selection list. There should be a new workflow 2 action to be used instead.');
         /*
         Position := Marshaller.Lookup(LookupCaption, Template, LookupRecRef, false, false, 0);
         */
     end;
+
+    /*
+    
+    ==> K E P T   F O R  R E F E R E N C E   U N T I L   L O Y A L T Y  A C T I O N   H A S   B E E N   C O N V E R T E D   T O   W O R K F L O W   2 <==
+
 
     local procedure ConfigureLookupTemplate(var Template: DotNet NPRNetTemplate; LookupRec: RecordRef)
     var
@@ -108,7 +114,7 @@ codeunit 6060135 "NPR MM Member POS UI"
 
         end;
     end;
-
+    */
     procedure MemberSearchWithFacialRecognition(var MemberEntryNo: Integer) MemberFound: Boolean
     var
         MCSWebcamAPI: Codeunit "NPR MCS Webcam API";

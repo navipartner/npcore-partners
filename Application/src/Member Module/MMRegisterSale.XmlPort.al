@@ -4,7 +4,7 @@ xmlport 6151162 "NPR MM Register Sale"
     Caption = 'Register Sale';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-
+    Encoding = UTF8;
     schema
     {
         textelement(RegisterSale)

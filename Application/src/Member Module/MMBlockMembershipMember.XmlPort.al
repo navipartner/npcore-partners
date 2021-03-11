@@ -1,9 +1,9 @@
 xmlport 6151187 "NPR MM Block Membership Member"
 {
-
     Caption = 'Block Membership';
+    FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-
+    Encoding = UTF8;
     schema
     {
         textelement(members)

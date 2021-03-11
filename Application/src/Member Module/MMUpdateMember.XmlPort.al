@@ -4,7 +4,7 @@ xmlport 6060131 "NPR MM Update Member"
     Caption = 'Update Member';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-
+    Encoding = UTF8;
     schema
     {
         textelement(members)

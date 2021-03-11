@@ -4,7 +4,7 @@ xmlport 6060133 "NPR MM Get Members. TicketList"
     Caption = 'Get Membership Ticket List';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-
+    Encoding = UTF8;
     schema
     {
         textelement(membershiptickets)
