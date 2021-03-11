@@ -4,7 +4,7 @@ xmlport 6060149 "NPR MM Get Loyalty Rcpt. List"
     Caption = 'Get Loyalty Receipt List';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-
+    Encoding = UTF8;
     schema
     {
         textelement(loyalty)

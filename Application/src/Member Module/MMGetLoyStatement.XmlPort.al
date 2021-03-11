@@ -4,7 +4,7 @@ xmlport 6060145 "NPR MM Get Loy. Statement"
     Caption = 'Get Loyalty Statement';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-
+    Encoding = UTF8;
     schema
     {
         textelement(loyalty)

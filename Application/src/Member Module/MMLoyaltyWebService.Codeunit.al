@@ -166,7 +166,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         if (LanguageId <> 0) then
             GlobalLanguage(LanguageId);
 
-        PdfDoc := GetBase64(Filename);
+        PdfDoc := FileToBase64(Filename);
         if (Erase(Filename)) then;
 
         exit(PdfDoc);
@@ -730,31 +730,18 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         exit('');
     end;
 
-    local procedure GetBase64(Filename: Text) Value: Text
+    local procedure FileToBase64(Filename: Text) B64String: Text
     var
-        TempBlob: Codeunit "Temp Blob";
-        BinaryReader: DotNet NPRNetBinaryReader;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Convert: DotNet NPRNetConvert;
-        FieldRef: FieldRef;
         InStr: InStream;
-        f: File;
+        FileHandle: File;
+        Base64Convert: Codeunit "Base64 Convert";
     begin
-
-        Value := '';
-
-        f.Open(Filename);
-        f.CreateInStream(InStr);
-        MemoryStream := InStr;
-        BinaryReader := BinaryReader.BinaryReader(InStr);
-
-        Value := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
-
-        MemoryStream.Dispose;
-        Clear(MemoryStream);
-        f.Close;
-        exit(Value);
-
+        B64String := '';
+        FileHandle.Open(Filename);
+        FileHandle.CreateInStream(InStr);
+        B64String := Base64Convert.ToBase64(InStr);
+        FileHandle.Close;
+        exit(B64String);
     end;
 }
 

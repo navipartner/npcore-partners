@@ -4,7 +4,7 @@ xmlport 6151163 "NPR MM Reserve Points"
     Caption = 'Reserve Points';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-
+    Encoding = UTF8;
     schema
     {
         textelement(ReservePoints)

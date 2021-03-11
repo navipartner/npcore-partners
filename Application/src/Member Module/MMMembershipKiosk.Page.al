@@ -43,8 +43,7 @@ page 6060078 "NPR MM Membership Kiosk"
 
     trigger OnInit()
     begin
-
-        MemberInfoJObject := MemberInfoJObject.JObject();
+        Clear(MemberInfoJObject);
     end;
 
     var
@@ -52,15 +51,15 @@ page 6060078 "NPR MM Membership Kiosk"
         MembershipKiosk: Codeunit "NPR MM Membership Kiosk";
         PageId: Option WELCOME,SCANTICKET,MEMBERINFO,TAKEPICTURE,PREVIEW,PRINT,SHOWERROR;
         StateMachinePageId: Integer;
-        MemberInfoJObject: DotNet JObject;
+        MemberInfoJObject: JsonObject;
         INVALID_DATE: Label 'The date %1 specified for field %2 does not conform to the expected date format %3.';
         DATE_MASK_ERROR: Label 'Date format mask %1 is not supported.';
         VALUE_REQUIRED: Label 'A value is required for field %1.';
 
     procedure GotoPage(CurrentPageId: Integer; DestinationPageId: Integer; EventContents: Text): Integer
     var
-        JToken: DotNet JToken;
-        JObject: DotNet JObject;
+        JToken: JsonToken;
+        JObject: JsonObject;
         ScanCode: Text;
         TicketWebService: Codeunit "NPR TM Ticket WebService";
         Status: Integer;
@@ -72,7 +71,7 @@ page 6060078 "NPR MM Membership Kiosk"
 
         //MESSAGE ('from: %1, to: %2, params %3', FromPageId, ToPage, EventContents);
         if (EventContents <> '') then
-            JObject := JObject.Parse(EventContents);
+            JObject.ReadFrom(EventContents);
 
         if (DestinationPageId <> PageId::WELCOME) then begin
             case CurrentPageId of
@@ -124,7 +123,7 @@ page 6060078 "NPR MM Membership Kiosk"
 
         case DestinationPageId of
             PageId::WELCOME:
-                MemberInfoJObject := MemberInfoJObject.JObject();
+                Clear(MemberInfoJObject);
         end;
 
         BridgeMgt.RegisterAdHocModule('MembershipSelfService', MembershipKiosk.GetHtml(DestinationPageId, MemberInfoJObject), MembershipKiosk.GetCss(DestinationPageId), MembershipKiosk.GetScript(DestinationPageId));
@@ -198,22 +197,16 @@ page 6060078 "NPR MM Membership Kiosk"
     begin
     end;
 
-    local procedure GetJToken(JObject: DotNet JObject; "Key": Text; var JToken: DotNet JToken) KeyFound: Boolean
+    local procedure GetJToken(JObject: JsonObject; JsonKey: Text; var JToken: JsonToken) KeyFound: Boolean
     begin
-
-        KeyFound := true;
-        JToken := JObject.GetValue(Key);
-        if (IsNull(JToken)) then begin
-            JToken.Parse(StrSubstNo('{%1: ""}', Key));
-            KeyFound := false;
-        end;
-
-        exit(KeyFound);
+        KeyFound := JObject.Get(JsonKey, JToken);
+        if (not KeyFound) then
+            JToken.ReadFrom(StrSubstNo('{%1: ""}', JsonKey));
     end;
 
-    local procedure CopyKeyValue(SourceJObject: DotNet JObject; SourceKey: Text; TargetJObject: DotNet JObject; TargetKey: Text) KeyFound: Boolean
+    local procedure CopyKeyValue(SourceJObject: JsonObject; SourceKey: Text; TargetJObject: JsonObject; TargetKey: Text) KeyFound: Boolean
     var
-        SourceJToken: DotNet JToken;
+        SourceJToken: JsonToken;
     begin
 
         KeyFound := (GetStringValue(SourceJObject, SourceKey) <> '');
@@ -225,24 +218,23 @@ page 6060078 "NPR MM Membership Kiosk"
         exit(KeyFound);
     end;
 
-    local procedure GetStringValue(JObject: DotNet JObject; "Key": Text): Text
+    local procedure GetStringValue(JObject: JsonObject; JsonKey: Text) KeyValue: Text
     var
-        JToken: DotNet JToken;
+        JToken: JsonToken;
     begin
 
-        JToken := JObject.GetValue(Key);
-        if (IsNull(JToken)) then
+        if (not JObject.Get(JsonKey, JToken)) then
             exit('');
 
-        exit(JToken.ToString());
+        JToken.WriteTo(KeyValue);
     end;
 
-    local procedure GetDateValue(JObject: DotNet JObject; "Key": Text; DateMask: Code[20]; IsOptional: Boolean) ReturnDate: Date
+    local procedure GetDateValue(JObject: JsonObject; JsonKey: Text; DateMask: Code[20]; IsOptional: Boolean) ReturnDate: Date
     var
         ErrorMessage: Text;
     begin
 
-        if (not (TextToDate(GetStringValue(JObject, Key), DateMask, IsOptional, Key, ReturnDate, ErrorMessage))) then
+        if (not (TextToDate(GetStringValue(JObject, JsonKey), DateMask, IsOptional, JsonKey, ReturnDate, ErrorMessage))) then
             Error(ErrorMessage);
     end;
 
@@ -282,19 +274,16 @@ page 6060078 "NPR MM Membership Kiosk"
         exit(IsValid);
     end;
 
-    local procedure PutStringValue(var JObject: DotNet JObject; "Key": Text; Value: Text)
+    local procedure PutStringValue(var JObject: JsonObject; JsonKey: Text; KeyValue: Text)
     var
-        JToken: DotNet JToken;
+        JToken: JsonToken;
     begin
-
-        JToken := JToken.Parse(StrSubstNo('{%1: "%2"}', Key, Value));
-        JObject.Remove(Key);
-        JObject.Add(Key, JToken.Item(Key));
+        JToken.ReadFrom(StrSubstNo('{%1: "%2"}', JsonKey, KeyValue));
+        JObject.Remove(JsonKey);
+        JObject.Add(JsonKey, JToken);
     end;
 
-    local procedure ShowErrorMessage(var JObject: DotNet JObject; ErrorMessage: Text): Integer
-    var
-        "Key": Text;
+    local procedure ShowErrorMessage(var JObject: JsonObject; ErrorMessage: Text): Integer
     begin
 
         PutStringValue(JObject, 'ErrorMessage', ErrorMessage);
@@ -305,7 +294,7 @@ page 6060078 "NPR MM Membership Kiosk"
     begin
     end;
 
-    local procedure CreateMembership(JObject: DotNet JObject)
+    local procedure CreateMembership(JObject: JsonObject)
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";

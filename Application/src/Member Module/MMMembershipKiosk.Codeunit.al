@@ -30,7 +30,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         end;
     end;
 
-    procedure GetHtml(PageId: Integer; var Parameters: DotNet JObject) Html: Text
+    procedure GetHtml(PageId: Integer; var Parameters: JsonObject) Html: Text
     begin
 
         case PageId of
@@ -79,16 +79,15 @@ codeunit 6060126 "NPR MM Membership Kiosk"
     begin
     end;
 
-    local procedure GetStringValue(JObject: DotNet JObject; "Key": Text): Text
+    local procedure GetStringValue(JObject: JsonObject; JsonKey: Text) KeyValue: Text
     var
-        JToken: DotNet JToken;
+        JToken: JsonToken;
     begin
 
-        JToken := JObject.GetValue(Key);
-        if (IsNull(JToken)) then
+        if (not JObject.Get(JsonKey, JToken)) then
             exit('');
 
-        exit(JToken.ToString());
+        JToken.WriteTo(KeyValue);
     end;
 
     local procedure "Kiosk Pages"()
@@ -129,7 +128,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '}';
     end;
 
-    local procedure WelcomePage(var Parameters: DotNet JObject) Html: Text
+    local procedure WelcomePage(var Parameters: JsonObject) Html: Text
     begin
         Html :=
         '<!doctype html>' +
@@ -171,7 +170,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         ContainerCss(Css);
     end;
 
-    local procedure ScanTicketBarcodePage(var Parameters: DotNet JObject) Html: Text
+    local procedure ScanTicketBarcodePage(var Parameters: JsonObject) Html: Text
     begin
 
         Html :=
@@ -230,7 +229,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         ContainerCss(Css);
     end;
 
-    local procedure MemberInfoCapturePage(var Parameters: DotNet JObject) Html: Text
+    local procedure MemberInfoCapturePage(var Parameters: JsonObject) Html: Text
     begin
         Html :=
 
@@ -307,7 +306,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         ContainerCss(Css);
     end;
 
-    local procedure TakePhotoPage(var Parameters: DotNet JObject) Html: Text
+    local procedure TakePhotoPage(var Parameters: JsonObject) Html: Text
     begin
         Html :=
         '<!doctype html>' +
@@ -366,7 +365,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         ContainerCss(Css);
     end;
 
-    local procedure PreviewCardPage(var Parameters: DotNet JObject) Html: Text
+    local procedure PreviewCardPage(var Parameters: JsonObject) Html: Text
     begin
 
         //MESSAGE ('Params: %1', Parameters.ToString ());
@@ -440,7 +439,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '}';
     end;
 
-    local procedure PrintPage(var Parameters: DotNet JObject) Html: Text
+    local procedure PrintPage(var Parameters: JsonObject) Html: Text
     begin
 
         Html :=
@@ -490,7 +489,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         LoaderCss(Css);
     end;
 
-    local procedure ShowErrorPage(var Parameters: DotNet JObject) Html: Text
+    local procedure ShowErrorPage(var Parameters: JsonObject) Html: Text
     begin
 
         Html :=

@@ -4,7 +4,7 @@ xmlport 6060142 "NPR MM Member Identifier"
     Caption = 'MM Member Identifier';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-
+    Encoding = UTF8;
     schema
     {
         textelement(MemberIdentifier)

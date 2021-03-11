@@ -1,11 +1,9 @@
 xmlport 6060137 "NPR MM Confirm Members. Pay."
 {
-    // 
-
     Caption = 'Confirm Membership Payment';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-
+    Encoding = UTF8;
     schema
     {
         textelement(memberships)

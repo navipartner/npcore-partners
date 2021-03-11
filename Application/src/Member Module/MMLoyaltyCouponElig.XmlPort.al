@@ -4,7 +4,7 @@ xmlport 6060147 "NPR MM Loyalty Coupon Elig."
     Caption = 'Loyalty Coupon Eligibility';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-
+    Encoding = UTF8;
     schema
     {
         textelement(loyalty)
