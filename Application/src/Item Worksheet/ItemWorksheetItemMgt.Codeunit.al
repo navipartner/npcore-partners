@@ -8,7 +8,7 @@ codeunit 6060041 "NPR Item Worksheet Item Mgt."
         ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
         ItemNo: Code[20];
         VendorNo: Code[20];
-        CodeVar: Code[30];
+        CodeVar: Code[10];
     begin
         if ItemWorksheetLine."Existing Item No." <> '' then
             exit;

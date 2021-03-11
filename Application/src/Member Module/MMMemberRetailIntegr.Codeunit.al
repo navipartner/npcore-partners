@@ -211,7 +211,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         exit(true);
     end;
 
-    procedure POS_GetExternalTicketItemFromMembership(ExternalMemberCardNo: Text[100]) TicketItemBarcode: Code[20]
+    procedure POS_GetExternalTicketItemFromMembership(ExternalMemberCardNo: Text[100]) TicketItemBarcode: Code[50]
     var
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";

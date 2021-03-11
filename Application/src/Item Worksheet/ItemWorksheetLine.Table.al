@@ -207,7 +207,7 @@ table 6060042 "NPR Item Worksheet Line"
                     Validate(Action);
             end;
         }
-        field(8; "Internal Bar Code"; Code[20])
+        field(8; "Internal Bar Code"; Code[50])
         {
             Caption = 'Internal Bar Code';
             DataClassification = CustomerContent;
@@ -702,7 +702,7 @@ table 6060042 "NPR Item Worksheet Line"
                             Error(VarietyAddedErr, "Variety 1", "Variety 1 Table (New)");
             end;
         }
-        field(203; "Variety 1 Table (New)"; Code[20])
+        field(203; "Variety 1 Table (New)"; Code[40])
         {
             Caption = 'Variety 1 Table (New)';
             DataClassification = CustomerContent;
@@ -755,7 +755,7 @@ table 6060042 "NPR Item Worksheet Line"
                             Error(VarietyAddedErr, "Variety 2", "Variety 2 Table (New)");
             end;
         }
-        field(213; "Variety 2 Table (New)"; Code[20])
+        field(213; "Variety 2 Table (New)"; Code[40])
         {
             Caption = 'Variety 2 Table (New)';
             DataClassification = CustomerContent;
@@ -808,7 +808,7 @@ table 6060042 "NPR Item Worksheet Line"
                             Error(VarietyAddedErr, "Variety 3", "Variety 3 Table (New)");
             end;
         }
-        field(223; "Variety 3 Table (New)"; Code[20])
+        field(223; "Variety 3 Table (New)"; Code[40])
         {
             Caption = 'Variety 3 Table (New)';
             DataClassification = CustomerContent;
@@ -861,7 +861,7 @@ table 6060042 "NPR Item Worksheet Line"
                             Error(VarietyAddedErr, "Variety 4", "Variety 4 Table (New)");
             end;
         }
-        field(233; "Variety 4 Table (New)"; Code[20])
+        field(233; "Variety 4 Table (New)"; Code[40])
         {
             Caption = 'Variety 4 Table (New)';
             DataClassification = CustomerContent;
@@ -1939,7 +1939,7 @@ table 6060042 "NPR Item Worksheet Line"
         end;
     end;
 
-    local procedure GetVariety1Table(): Code[20]
+    local procedure GetVariety1Table(): Code[40]
     begin
         if not "Create Copy of Variety 1 Table" then
             exit("Variety 1 Table (Base)");
@@ -1961,7 +1961,7 @@ table 6060042 "NPR Item Worksheet Line"
         exit('');
     end;
 
-    local procedure GetVariety2Table(): Code[20]
+    local procedure GetVariety2Table(): Code[40]
     begin
         if not VRTGroup."Create Copy of Variety 2 Table" then
             exit("Variety 2 Table (Base)");
@@ -1983,7 +1983,7 @@ table 6060042 "NPR Item Worksheet Line"
         exit('');
     end;
 
-    local procedure GetVariety3Table(): Code[20]
+    local procedure GetVariety3Table(): Code[40]
     begin
         if not VRTGroup."Create Copy of Variety 3 Table" then
             exit("Variety 3 Table (Base)");
@@ -2005,7 +2005,7 @@ table 6060042 "NPR Item Worksheet Line"
         exit('');
     end;
 
-    local procedure GetVariety4Table(): Code[20]
+    local procedure GetVariety4Table(): Code[40]
     begin
         if not VRTGroup."Create Copy of Variety 4 Table" then
             exit("Variety 4 Table (Base)");

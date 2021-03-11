@@ -67,11 +67,11 @@ codeunit 6014486 "NPR IC - Map ICR Barcodes"
                     exit;
         end;
 
-        if (ICOutboxSalesLine."IC Partner Reference" <> '') and (ICOutboxSalesLine."IC Partner Reference" <> SalesLine."No.") then
+        if (ICOutboxSalesLine."IC Item Reference No." <> '') and (ICOutboxSalesLine."IC Item Reference No." <> SalesLine."IC Item Reference No.") then
             exit;
 
-        ICOutboxSalesLine."IC Partner Reference" := GetICR(SalesLine."No.", SalesLine."Variant Code");
-        if ICOutboxSalesLine."IC Partner Reference" <> '' then
+        ICOutboxSalesLine."IC Item Reference No." := GetICR(SalesLine."No.", SalesLine."Variant Code");
+        if ICOutboxSalesLine."IC Item Reference No." <> '' then
             ICOutboxSalesLine.Modify;
     end;
 
@@ -97,15 +97,15 @@ codeunit 6014486 "NPR IC - Map ICR Barcodes"
                     exit;
         end;
 
-        if (ICOutboxPurchaseLine."IC Partner Reference" <> '') and (ICOutboxPurchaseLine."IC Partner Reference" <> PurchaseLine."No.") then
+        if (ICOutboxPurchaseLine."IC Item Reference No." <> '') and (ICOutboxPurchaseLine."IC Item Reference No." <> PurchaseLine."IC Item Reference No.") then
             exit;
 
-        ICOutboxPurchaseLine."IC Partner Reference" := GetICR(PurchaseLine."No.", PurchaseLine."Variant Code");
-        if ICOutboxPurchaseLine."IC Partner Reference" <> '' then
+        ICOutboxPurchaseLine."IC Item Reference No." := GetICR(PurchaseLine."No.", PurchaseLine."Variant Code");
+        if ICOutboxPurchaseLine."IC Item Reference No." <> '' then
             ICOutboxPurchaseLine.Modify;
     end;
 
-    local procedure GetICR(ItemNo: Code[20]; VariantCode: Code[10]): Code[20]
+    local procedure GetICR(ItemNo: Code[20]; VariantCode: Code[10]): Code[50]
     var
         ItemReference: Record "Item Reference";
     begin

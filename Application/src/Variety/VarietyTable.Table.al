@@ -58,7 +58,7 @@ table 6059972 "NPR Variety Table"
             Caption = 'Is Copy';
             DataClassification = CustomerContent;
         }
-        field(31; "Copy from"; Code[20])
+        field(31; "Copy from"; Code[40])
         {
             Caption = 'Copy from';
             DataClassification = CustomerContent;

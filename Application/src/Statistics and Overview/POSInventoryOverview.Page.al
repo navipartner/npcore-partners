@@ -176,10 +176,10 @@ page 6060059 "NPR POS Inventory Overview"
         Item: Record Item;
         ItemCode: Code[20];
         VariantCode: Code[10];
-        Variety1ValueCode: Code[20];
-        Variety2ValueCode: Code[20];
-        Variety3ValueCode: Code[20];
-        Variety4ValueCode: Code[20];
+        Variety1ValueCode: Code[50];
+        Variety2ValueCode: Code[50];
+        Variety3ValueCode: Code[50];
+        Variety4ValueCode: Code[50];
         VariantVisible: Boolean;
         Variety1ValueVisible: Boolean;
         Variety2ValueVisible: Boolean;

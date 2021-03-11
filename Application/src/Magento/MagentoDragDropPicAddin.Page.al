@@ -96,7 +96,7 @@ page 6151451 "NPR Magento DragDropPic. Addin"
         IsIconPicture: Boolean;
         VarietyTypeCode: Code[10];
         VarietyTableCode: Code[40];
-        VarietyValueCode: Code[20];
+        VarietyValueCode: Code[50];
 
     local procedure ConfirmOverwrite(): Boolean
     var
@@ -337,7 +337,7 @@ page 6151451 "NPR Magento DragDropPic. Addin"
         PictureLinkVariantValueCode := NewVariantValueCode;
     end;
 
-    procedure SetVarietyFilters(NewVarietyTypeCode: Code[10]; NewVarietyTableCode: Code[40]; NewVarietyValueCode: Code[20])
+    procedure SetVarietyFilters(NewVarietyTypeCode: Code[10]; NewVarietyTableCode: Code[40]; NewVarietyValueCode: Code[50])
     begin
         VarietyTypeCode := NewVarietyTypeCode;
         VarietyTableCode := NewVarietyTableCode;
