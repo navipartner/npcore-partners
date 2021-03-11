@@ -965,6 +965,12 @@ page 6150652 "NPR POS Entry List"
                     Image = SendConfirmation;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Send SMS action';
+                    trigger OnAction()
+                    var
+                        SMSMgt: Codeunit "NPR SMS Management";
+                    begin
+                        SMSMgt.EditAndSendSMS(Rec);
+                    end;
                 }
             }
             group(PDF2NAV)
