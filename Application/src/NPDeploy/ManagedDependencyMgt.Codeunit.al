@@ -574,5 +574,28 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
         if JArray.ReadFrom(JSON) then
             exit(JArray.AsToken());
     end;
+
+    procedure DownloadFileFromAzureBlobToUserDevice(URL: Text; DialogTitle: Text; ToFolder: Text; ToFilter: Text; var ToFile: Text; var ErrorReasonPhrase: Text): Boolean
+    var
+        Client: HttpClient;
+        ResponseMessage: HttpResponseMessage;
+        InStr: InStream;
+        FileDownloaded: Boolean;
+    begin
+        Client.Get(URL, ResponseMessage);
+
+        if ResponseMessage.IsSuccessStatusCode then begin
+            ResponseMessage.Content.ReadAs(InStr);
+            FileDownloaded := DownloadFromStream(InStr, DialogTitle, ToFolder, ToFilter, ToFile);
+            if not FileDownloaded then
+                //Bypass warning message for EXE files: The file that you are trying to access cannot be downloaded. The destination file has an extension that may be blocked. Contact your system administrator
+                exit(true)
+            else
+                exit(true);
+        end;
+
+        ErrorReasonPhrase := ResponseMessage.ReasonPhrase;
+        exit(false);
+    end;
 }
 
