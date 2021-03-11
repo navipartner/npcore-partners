@@ -349,7 +349,7 @@ page 6151245 "NPR Retail Setup RC"
                 {
                     Caption = 'Report Selection - Retail';
                     RunObject = Page "NPR Retail Report Select. List";
-                    ApplicationArea = All; 
+                    ApplicationArea = All;
                     ToolTip = 'Runs the page for selecting retail reports';
                 }
                 action("Object Output Selection")
@@ -647,6 +647,20 @@ page 6151245 "NPR Retail Setup RC"
                 ApplicationArea = All;
                 Caption = 'Open POS';
                 RunObject = Codeunit "NPR Open POS Page";
+            }
+            action(DownloadMajorTom)
+            {
+                ApplicationArea = All;
+                Caption = 'Download Major Tom';
+                ToolTip = 'Download Major Tom installation (setup.exe) file from Azure Blob Storage.';
+                RunObject = Page "NPR Retail Download Major Tom";
+            }
+            action(DownloadHWConnector)
+            {
+                ApplicationArea = All;
+                Caption = 'Download HW Connector';
+                ToolTip = 'Download Hardware Connector installation (setup.exe) file from Azure Blob Storage.';
+                RunObject = Page "NPR Retail Downl. HW Connector";
             }
         }
     }
