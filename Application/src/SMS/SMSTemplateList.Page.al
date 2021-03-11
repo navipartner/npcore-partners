@@ -14,22 +14,22 @@ page 6059940 "NPR SMS Template List"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Table No."; "Table No.")
+                field("Table No."; Rec."Table No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table No. field';
                 }
-                field("Table Caption"; "Table Caption")
+                field("Table Caption"; Rec."Table Caption")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table Caption field';
@@ -40,7 +40,7 @@ page 6059940 "NPR SMS Template List"
                     Caption = 'Filters on Table';
                     ToolTip = 'Specifies the value of the Filters on Table field';
                 }
-                field("Report ID"; "Report ID")
+                field("Report ID"; Rec."Report ID")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -48,10 +48,6 @@ page 6059940 "NPR SMS Template List"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

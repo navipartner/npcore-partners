@@ -57,6 +57,17 @@ table 6059940 "NPR SMS Template Header"
                 end;
             end;
         }
+        field(51; "Recipient Type"; Enum "NPR SMS Recipient Type")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Recipient Type';
+        }
+        field(52; "Recipient Group"; Code[10])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Recipient Group';
+            TableRelation = "NPR SMS Recipient Group";
+        }
         field(100; "Table Filters"; BLOB)
         {
             Caption = 'Table Filters';
@@ -75,10 +86,6 @@ table 6059940 "NPR SMS Template Header"
         key(Key1; "Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnDelete()

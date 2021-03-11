@@ -30,8 +30,5 @@ table 6059941 "NPR SMS Template Line"
         }
     }
 
-    fieldgroups
-    {
-    }
 }
 

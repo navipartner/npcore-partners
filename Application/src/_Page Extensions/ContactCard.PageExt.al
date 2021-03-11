@@ -72,6 +72,12 @@ pageextension 6014452 "NPR Contact Card" extends "Contact Card"
                     Image = SendConfirmation;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Send SMS action';
+                    trigger OnAction()
+                    var
+                        SMSMgt: Codeunit "NPR SMS Management";
+                    begin
+                        SMSMgt.EditAndSendSMS(Rec);
+                    end;
                 }
             }
             group("NPR ResetPassword")

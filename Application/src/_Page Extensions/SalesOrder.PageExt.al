@@ -220,6 +220,12 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                     Image = SendConfirmation;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Send SMS action';
+                    trigger OnAction()
+                    var
+                        SMSMgt: Codeunit "NPR SMS Management";
+                    begin
+                        SMSMgt.EditAndSendSMS(Rec);
+                    end;
                 }
             }
             group("NPR Variants")

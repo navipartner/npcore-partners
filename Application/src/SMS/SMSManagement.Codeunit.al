@@ -1,82 +1,62 @@
 codeunit 6059940 "NPR SMS Management"
 {
     var
-        DataTypeManagement: Codeunit "Data Type Management";
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
-        NaviDocsHandlingProfileTxt: Label 'Send SMS';
-        SMSFilterCaption: Label 'Filters for %1 table';
+        UserNotified: Boolean;
         NoRecordSelectedTxt: Label 'No record was selected. Send SMS based on blank record?';
         NoTemplateTxt: Label 'There is no %1 that match the %2 record.';
-        SMSSentTxt: Label 'Message sent.';
-        Error001: Label 'SMS Message and Phone No must be suplied.';
-        Error002: Label 'You are not allowed to use the %1 service.';
-        Error003: Label 'Multiple receipients aren''t allowed.';
-        Error004: Label 'SMS wasn''t sent. The service returned:\%1';
-        Error005: Label 'Can''t find %1 for %2 %3.';
-        Error006: Label 'Send SMS returned: %1';
-        NaviDocsNotEnabledTxt: Label 'NaviDocs isn''t enabled.';
-        SetupNaviDocsTxt: Label 'Do you want to set it up now?';
-        MessageChangeTxt: Label 'You have changed the Sender or Message body. NaviDocs can only send based on the info in Template. Do you want to send direct now?';
-        SMSAddedToNaviDocsTxt: Label 'Message added to NaviDocs Queue.';
         NoRecordsText: Label 'No records within the combination of filteres entred and filters on Template.';
         BatchSendStatusText: Label '%1 records withing the filter:  %2';
         CaptionText: Label 'Filters - %1', Comment = '%1 = Table Name';
         NaviDocsProgressDialogText: Label 'Adding Messages to NaviDocs: @1@@@@@@@@@@@@@@@@@@@@@@@';
         SendingProgressDialogText: Label 'Sending Messages: @1@@@@@@@@@@@@@@@@@@@@@@@';
-        AFSetupMissingTxt: Label 'Azure Functions Messages Service isn''t set up. Go to setup page?';
+        PermissionErr: Label 'You do not have right permissions to set up Job Queue.';
 
-    procedure SendSMS(PhoneNo: Text; Sender: Text; SMSMessage: Text)
-    var
-        IComm: Record "NPR I-Comm";
-        ServiceCalc: Codeunit "NPR Service Calculation";
-        SMSHandled: Boolean;
-        ForeignPhone: Boolean;
-        ServiceCode: Code[20];
-        Result: Text;
-        ErrorHandled: Boolean;
-        ResponseString: Text;
+    #region SMS functions
+    procedure SendSMS(PhoneNo: Text; SenderNo: Text; Message: Text)
     begin
-        OnSendSMS(SMSHandled, PhoneNo, Sender, SMSMessage);
-        if SMSHandled then
-            exit;
+        InsertMessageLog(PhoneNo, SenderNo, Message, 0DT);
+        if not UserNotified then
+            QueuedNotification();
+        UserNotified := true;
+    end;
 
-        IComm.Get;
-        IComm.TestField("SMS Provider");
-        if IComm."SMS Provider" <> IComm."SMS Provider"::NaviPartner then
-            exit;
+    procedure SendSMS(PhoneNo: Text; SenderNo: Text; Message: Text; DelayUntil: DateTime)
+    begin
+        InsertMessageLog(PhoneNo, SenderNo, Message, DelayUntil);
+    end;
 
-        PhoneNo := DelChr(PhoneNo, '<=>', ' ');
-        if (PhoneNo = '') or (SMSMessage = '') then
-            Error(Error001);
+    procedure SendQueuedSMS(MessageLog: Record "NPR SMS Log")
+    var
+        Status: Enum "NPR SMS Log Status";
+        MessageText: Text;
+    begin
+        MessageLog.GetMessage(MessageText);
+        if not TrySendSMS(MessageLog."Reciepient No.", MessageLog."Sender No.", MessageText) then
+            UpdateMessageLog(MessageLog, Status::Error, GetLastErrorText)
+        else
+            UpdateMessageLog(MessageLog, Status::Sent, '');
+    end;
 
-        if StrPos(PhoneNo, ',') <> 0 then
-            Error(Error003);
+    [TryFunction]
+    local procedure TrySendSMS(PhoneNo: Text; SenderNo: Text; Message: Text)
+    var
+        SMSSetup: Record "NPR SMS Setup";
+        ISendSMS: Interface "NPR Send SMS";
+    begin
+        SMSSetup.Get();
+        ISendSMS := SMSSetup."SMS Provider";
+        ISendSMS.SendSMS(PhoneNo, SenderNo, Message);
+    end;
 
-        ForeignPhone := (CopyStr(PhoneNo, 1, 1) = '+') and (CopyStr(PhoneNo, 1, 3) <> '+45');
-        if ForeignPhone then
-            ServiceCode := 'SMSUDLAND'
-        else begin
-            ServiceCode := 'ECLUBSMS';
-            if CopyStr(PhoneNo, 1, 3) <> '+45' then
-                PhoneNo := '+45' + PhoneNo;
+    procedure QueueMessages(PhoneNo: List of [Text]; SenderNo: Text; Message: Text; DelayUntil: DateTime)
+    var
+        i: Integer;
+        SendTo: Text;
+    begin
+        for i := 1 to PhoneNo.Count do begin
+            PhoneNo.Get(i, SendTo);
+            SendSMS(SendTo, SenderNo, Message, DelayUntil);
         end;
-
-        if Sender = '' then begin
-            IComm.TestField("E-Club Sender");
-            Sender := IComm."E-Club Sender";
-        end;
-
-        if ServiceCalc.useService(ServiceCode) then begin
-            if CallRestWebServiceNew(AzureKeyVaultMgt.GetSecret('SMSMgtHTTPRequestUrl'), Sender, PhoneNo, SMSMessage, ResponseString) then begin
-                OnSMSSendSuccess(PhoneNo, Sender, SMSMessage, Result);
-            end else begin
-                ErrorHandled := false;
-                OnSMSSendError(ErrorHandled, PhoneNo, Sender, SMSMessage, GetLastErrorText);
-                if not ErrorHandled then
-                    Error(StrSubstNo(Error004, GetLastErrorText));
-            end;
-        end else
-            Error(StrSubstNo(Error002, ServiceCode));
     end;
 
     procedure SendTestSMS(var Template: Record "NPR SMS Template Header")
@@ -89,12 +69,15 @@ codeunit 6059940 "NPR SMS Management"
         SendingOption: Option Direct,NaviDocs;
         DelayUntil: DateTime;
         Changed: Boolean;
+        SendToList: List of [Text];
+        SMSRecipientType: enum "NPR SMS Recipient Type";
+        SMSGroupcode: Code[10];
     begin
         DialogPage.SetRecord(Template);
         if DialogPage.RunModal <> ACTION::OK then
             exit;
 
-        DialogPage.GetData(SendTo, RecRef, SMSBodyText, Sender, SendingOption, DelayUntil);
+        DialogPage.GetData(SMSRecipientType, SMSGroupcode, SendTo, RecRef, SMSBodyText, Sender, DelayUntil);
 
         if Sender = '' then
             Sender := Template."Alt. Sender";
@@ -107,23 +90,11 @@ codeunit 6059940 "NPR SMS Management"
 
         if SMSBodyText = '' then
             SMSBodyText := MakeMessage(Template, RecRef);
-        if SendingOption = SendingOption::NaviDocs then begin
-            if Sender <> Template."Alt. Sender" then
-                if Sender <> GetDefaultSender then
-                    Changed := true;
-            if not Changed then
-                if SMSBodyText <> MakeMessage(Template, RecRef) then
-                    Changed := true;
-            if not Changed then begin
-                AddSMStoNaviDocsExt(RecRef, SendTo, Template.Code, DelayUntil);
-                Message(SMSAddedToNaviDocsTxt);
-                exit;
-            end else
-                if not Confirm(MessageChangeTxt) then
-                    exit;
-        end;
-        SendSMS(SendTo, Sender, SMSBodyText);
-        Message(SMSSentTxt);
+
+        PopulateSendList(SendToList, Template."Recipient Type"::Field, Template."Recipient Group", SendTo);
+
+        QueueMessages(SendToList, Sender, SMSBodyText, DelayUntil);
+        QueuedNotification();
     end;
 
     procedure SendBatchSMS(SMSTemplateHeader: Record "NPR SMS Template Header")
@@ -131,14 +102,20 @@ codeunit 6059940 "NPR SMS Management"
         SMSSendMessage: Page "NPR SMS Send Message";
         RecRef: RecordRef;
         SendTo: Text;
+        SendToList: List of [Text];
         Filters: Text;
         Window: Dialog;
         Counter: Integer;
         Total: Integer;
+        Sender: Text;
         SendOption: Option Direct,NaviDocs;
         DelayUntil: DateTime;
+        MessageText: Text;
         DummyTxt: Text;
         DummyRecRef: RecordRef;
+        i: Integer;
+        SMSRecipientType: enum "NPR SMS Recipient Type";
+        SMSGroupcode: Code[10];
     begin
         if not RunDynamicRequestPage(SMSTemplateHeader, Filters, '') then
             exit;
@@ -153,29 +130,82 @@ codeunit 6059940 "NPR SMS Management"
             exit;
         end;
 
-        SMSSendMessage.SetData('', DummyRecRef, SMSTemplateHeader."Alt. Sender", 2, StrSubstNo(BatchSendStatusText, SMSTemplateHeader."Table Caption", Total));
+        Sender := SMSTemplateHeader."Alt. Sender";
+        if Sender = '' then
+            Sender := GetDefaultSender;
+
+        SendTo := MergeDataFields(SMSTemplateHeader.Recipient, RecRef, 0);
+        SMSSendMessage.SetData(SMSTemplateHeader."Recipient Type", SMSTemplateHeader."Recipient Group", '', DummyRecRef, Sender, 2, StrSubstNo(BatchSendStatusText, SMSTemplateHeader."Table Caption", Total), false);
+
         SMSSendMessage.SetRecord(SMSTemplateHeader);
         if SMSSendMessage.RunModal <> ACTION::OK then
             exit;
 
-        SMSSendMessage.GetData(DummyTxt, DummyRecRef, DummyTxt, DummyTxt, SendOption, DelayUntil);
+        SMSSendMessage.GetData(SMSRecipientType, SMSGroupcode, DummyTxt, DummyRecRef, MessageText, DummyTxt, DelayUntil);
+
         Counter := 0;
         if SendOption = SendOption::NaviDocs then
             Window.Open(NaviDocsProgressDialogText)
         else
             Window.Open(SendingProgressDialogText);
+
+
         if RecRef.FindSet then
             repeat
                 Counter += 1;
                 Window.Update(1, Round((Counter / Total) * 10000, 1));
-                SendTo := MergeDataFields(SMSTemplateHeader.Recipient, RecRef, 0);
-
-                if SendOption = SendOption::NaviDocs then
-                    AddSMStoNaviDocsExt(RecRef, SendTo, SMSTemplateHeader.Code, DelayUntil)
-                else
-                    SendSMS(SendTo, SMSTemplateHeader."Alt. Sender", MakeMessage(SMSTemplateHeader, RecRef));
+                PopulateSendList(SendToList, SMSTemplateHeader."Recipient Type", SMSTemplateHeader."Recipient Group", MergeDataFields(SMSTemplateHeader.Recipient, RecRef, 0));
+                QueueMessages(SendToList, Sender, MergeDataFields(MessageText, RecRef, 0), DelayUntil);
             until RecRef.Next = 0;
         Window.Close;
+        QueuedNotification();
+    end;
+
+    procedure EditAndSendSMS(RecordToSendVariant: Variant)
+    var
+        RecRef: RecordRef;
+        SMSTemplateHeader: Record "NPR SMS Template Header";
+        DialogPage: Page "NPR SMS Send Message";
+        SendTo: Text;
+        Sender: Text;
+        SMSBodyText: Text;
+        SendingOption: Option Direct,NaviDocs;
+        DelayUntil: DateTime;
+        SMSRecipientType: enum "NPR SMS Recipient Type";
+        DataTypeManagement: Codeunit "Data Type Management";
+        SMSGroupcode: Code[10];
+        SMSPhoneList: List of [Text];
+        i: Integer;
+    begin
+        if not DataTypeManagement.GetRecordRef(RecordToSendVariant, RecRef) then
+            exit;
+        if SelectTemplate(RecRef, SMSTemplateHeader) then begin
+            Sender := SMSTemplateHeader."Alt. Sender";
+            if Sender = '' then
+                Sender := GetDefaultSender;
+            SendTo := MergeDataFields(SMSTemplateHeader.Recipient, RecRef, 0);
+
+            DialogPage.SetData(SMSTemplateHeader."Recipient Type", SMSTemplateHeader."Recipient Group", SendTo, RecRef, Sender, 1, '', true);
+
+            DialogPage.SetRecord(SMSTemplateHeader);
+            if DialogPage.RunModal <> ACTION::OK then
+                exit;
+            DialogPage.GetData(SMSRecipientType, SMSGroupcode, SendTo, RecRef, SMSBodyText, Sender, DelayUntil);
+
+            if SMSTemplateHeader."Table No." <> 0 then
+                if IsRecRefEmpty(RecRef) then
+                    if not Confirm(NoRecordSelectedTxt) then
+                        exit;
+
+            if SMSBodyText = '' then
+                SMSBodyText := MakeMessage(SMSTemplateHeader, RecRef);
+
+            PopulateSendList(SMSPhoneList, SMSRecipientType, SMSGroupcode, SendTo);
+
+            QueueMessages(SMSPhoneList, Sender, SMSBodyText, DelayUntil);
+            QueuedNotification();
+        end else
+            Message(NoTemplateTxt, SMSTemplateHeader.TableCaption, RecRef.Caption);
     end;
 
     local procedure RunDynamicRequestPage(SMSTemplateHeader: Record "NPR SMS Template Header"; var ReturnFilters: Text; Filters: Text): Boolean
@@ -255,98 +285,141 @@ codeunit 6059940 "NPR SMS Management"
         exit(true);
     end;
 
-    procedure EditAndSendSMS(RecordToSendVariant: Variant)
+    local procedure PopulateSendList(var SMSPhoneList: List of [Text]; SMSRecipientType: enum "NPR SMS Recipient Type"; SMSGroupcode: Code[10]; SendTo: Text)
     var
-        RecRef: RecordRef;
-        SMSTemplateHeader: Record "NPR SMS Template Header";
-        DialogPage: Page "NPR SMS Send Message";
-        SendTo: Text;
-        Sender: Text;
-        SMSBodyText: Text;
-        SendingOption: Option Direct,NaviDocs;
-        DelayUntil: DateTime;
-        Changed: Boolean;
+        SMSGroupLine: Record "NPR SMS Rcpt. Group Line";
     begin
-        if not DataTypeManagement.GetRecordRef(RecordToSendVariant, RecRef) then
+        Clear(SMSPhoneList);
+        if SMSRecipientType = SMSRecipientType::Field then
+            SMSPhoneList.Add(SendTo)
+        else begin
+            SMSGroupLine.SetRange("Group Code", SMSGroupcode);
+            if SMSGroupLine.FindSet() then
+                repeat
+                    SMSPhoneList.Add(SMSGroupLine."Mobile Phone No.");
+                until SMSGroupLine.Next() = 0;
+        end;
+    end;
+    #endregion
+    #region Message Log
+    procedure InsertMessageLog(PhoneNo: Text; SenderNo: Text; Message: Text; SendDT: DateTime)
+    var
+        MessageLog: Record "NPR SMS Log";
+    begin
+        MessageLog.Init();
+        MessageLog."Sender No." := SenderNo;
+        MessageLog."Reciepient No." := PhoneNo;
+        MessageLog.SetMessage(Message);
+        if SendDT <> 0DT then
+            MessageLog."Send on Date Time" := SendDT
+        else
+            MessageLog."Send on Date Time" := CurrentDateTime;
+        MessageLog.Insert();
+    end;
+
+    procedure DiscardOldMessages(MessageLog: Record "NPR SMS Log") IsDiscarder: Boolean
+    var
+        SMSSetup: Record "NPR SMS Setup";
+    begin
+        SMSSetup.Get();
+        if SMSSetup."Discard Msg. Older Than [Hrs]" = 0 then
+            exit(false);
+        if CurrentDateTime > (MessageLog."Send on Date Time" + SMSSetup."Discard Msg. Older Than [Hrs]" * 60 * 60 * 1000) then begin
+            MessageLog.Status := MessageLog.Status::"Timeout Discard";
+            exit(true);
+        end;
+    end;
+
+    procedure UpdateMessageLog(MessageLog: Record "NPR SMS Log"; Status: Enum "NPR SMS Log Status"; ErrorMessage: Text)
+    var
+        SMSSetup: Record "NPR SMS Setup";
+    begin
+        MessageLog."Send Attempts" += 1;
+        MessageLog."Last Send Attempt" := CurrentDateTime;
+        case Status of
+            Status::Error:
+                begin
+                    if MessageLog."Send Attempts" >= SMSSetup."Auto Send Attempts" then
+                        MessageLog.Status := Status;
+
+                    MessageLog.SetError(ErrorMessage);
+                end;
+            Status::Sent:
+                begin
+                    MessageLog.SetError('');
+                    MessageLog."Date Time Sent" := CurrentDateTime;
+                    MessageLog.Status := Status;
+                end;
+        end;
+        MessageLog.Modify();
+    end;
+
+    #endregion
+    #region Notification
+    local procedure SetupNotification()
+    var
+        SMSSentNotification: Notification;
+        NoSetupMsg: Label 'SMS setup is not initialized. Messages will not be sent.';
+        NoCategoryMsg: Label 'There is no job category in SMS Setup. Messages will not be sent.';
+        OpenSMSSetupMsg: Label 'Open SMS Setup';
+        SMSSetup: Record "NPR SMS Setup";
+    begin
+        if not SMSSetup.Get() then begin
+            SMSSentNotification.Message := NoSetupMsg;
+            SMSSentNotification.Scope := NotificationScope::LocalScope;
+            SMSSentNotification.AddAction(OpenSMSSetupMsg, Codeunit::"NPR SMS Management", 'OpenMessageSetup');
+            SMSSentNotification.Send();
             exit;
-        if SelectTemplate(RecRef, SMSTemplateHeader) then begin
-            Sender := SMSTemplateHeader."Alt. Sender";
-            if Sender = '' then
-                Sender := GetDefaultSender;
-            SendTo := MergeDataFields(SMSTemplateHeader.Recipient, RecRef, 0);
-
-            DialogPage.SetData(SendTo, RecRef, Sender, 1, '');
-
-            DialogPage.SetRecord(SMSTemplateHeader);
-            if DialogPage.RunModal <> ACTION::OK then
-                exit;
-            DialogPage.GetData(SendTo, RecRef, SMSBodyText, Sender, SendingOption, DelayUntil);
-
-            if SMSTemplateHeader."Table No." <> 0 then
-                if IsRecRefEmpty(RecRef) then
-                    if not Confirm(NoRecordSelectedTxt) then
-                        exit;
-            if SMSBodyText = '' then
-                SMSBodyText := MakeMessage(SMSTemplateHeader, RecRef);
-            if SendingOption = SendingOption::NaviDocs then begin
-                if Sender <> SMSTemplateHeader."Alt. Sender" then
-                    if Sender <> GetDefaultSender then
-                        Changed := true;
-                if not Changed then
-                    if SMSBodyText <> MakeMessage(SMSTemplateHeader, RecRef) then
-                        Changed := true;
-                if not Changed then begin
-                    AddSMStoNaviDocsExt(RecRef, SendTo, SMSTemplateHeader.Code, DelayUntil);
-                    Message(SMSAddedToNaviDocsTxt);
-                    exit;
-                end else
-                    if not Confirm(MessageChangeTxt) then
-                        exit;
-            end;
-            SendSMS(SendTo, Sender, SMSBodyText);
-            Message(SMSSentTxt);
-        end else
-            Message(NoTemplateTxt, SMSTemplateHeader.TableCaption, RecRef.Caption);
-    end;
-
-    local procedure MakeSMSBody(PhoneNo: Text; Sender: Text; SMSMessage: Text): Text
-    var
-        XmlDoc: XmlDocument;
-        Root: XmlElement;
-        Xml: Text;
-    begin
-        XmlDocument.ReadFrom('<?xml version="1.0" encoding="utf-8"?><message />', XmlDoc);
-        XmlDoc.GetRoot(Root);
-        Root.Add(XmlElement.Create('recipients', '', PhoneNo));
-        Root.Add(XmlElement.Create('sender', '', Sender));
-        Root.Add(XmlElement.Create('message', '', SMSMessage));
-        XmlDoc.WriteTo(Xml);
-        exit(Xml);
-    end;
-
-    [TryFunction]
-    local procedure CallRestWebService(BaseURL: Text; Method: Text; RestMethod: Text;
-        var Content: HttpContent; var ResponseMessage: HttpResponseMessage)
-    var
-        WebClient: HttpClient;
-        ResponseText: Text;
-    begin
-        case RestMethod of
-            'GET':
-                WebClient.Get(BaseURL, ResponseMessage);
-            'POST':
-                WebClient.Post(BaseURL, Content, ResponseMessage);
-            'PUT':
-                WebClient.Put(BaseURL, Content, ResponseMessage);
-            'DELETE':
-                WebClient.Delete(BaseURL, ResponseMessage);
         end;
-        if not ResponseMessage.IsSuccessStatusCode then begin
-            ResponseMessage.Content.ReadAs(ResponseText);
-            Error(ResponseText);
+        if SMSSetup."Job Queue Category Code" = '' then begin
+            SMSSentNotification.Message := NoCategoryMsg;
+            SMSSentNotification.Scope := NotificationScope::LocalScope;
+            SMSSentNotification.AddAction(OpenSMSSetupMsg, Codeunit::"NPR SMS Management", 'OpenMessageSetup');
+            SMSSentNotification.Send();
+            exit;
         end;
     end;
 
+    procedure QueuedNotification()
+    var
+        SMSSentNotification: Notification;
+        QuedMsg: Label 'SMS message/s queued for sending.';
+    begin
+        SetupNotification();
+        SMSSentNotification.Message := QuedMsg;
+        SMSSentNotification.Scope := NotificationScope::LocalScope;
+        SMSSentNotification.Send();
+    end;
+
+    local procedure ErrorNotification()
+    var
+        SMSSentNotification: Notification;
+        MessageErr: Label 'There are errors in Message log.';
+        OpenErrorsMsg: Label 'Open Message Log';
+    begin
+        SMSSentNotification.Message := MessageErr;
+        SMSSentNotification.Scope := NotificationScope::LocalScope;
+        SMSSentNotification.AddAction(OpenErrorsMsg, Codeunit::"NPR SMS Management", 'OpenErrorMessages');
+        SMSSentNotification.Send();
+    end;
+
+    procedure OpenErrorMessages(SMSSentNotification: Notification)
+    var
+        MessageLog: Record "NPR SMS Log";
+    begin
+        MessageLog.SetRange(SystemCreatedBy, UserSecurityId());
+        MessageLog.SetRange(Status, MessageLog.Status::Error);
+
+        Page.Run(0, MessageLog);
+    end;
+
+    procedure OpenMessageSetup(SMSSentNotification: Notification)
+    var
+        SMSSetup: Record "NPR SMS Setup";
+    begin
+        Page.Run(0, SMSSetup);
+    end;
+    #endregion
     #region Template handling
     procedure FindTemplate(RecordVariant: Variant; var Template: Record "NPR SMS Template Header"): Boolean
     var
@@ -357,6 +430,7 @@ codeunit 6059940 "NPR SMS Management"
         TemplateFound: Boolean;
         MoreRecords: Boolean;
         CanEvaluateFilters: Boolean;
+        DataTypeManagement: Codeunit "Data Type Management";
     begin
         OnBeforeFindTemplate(IsHandled, RecordVariant, Template);
         if IsHandled then
@@ -397,6 +471,7 @@ codeunit 6059940 "NPR SMS Management"
         IsHandled: Boolean;
         TemplateFound: Boolean;
         CanEvaluateFilters: Boolean;
+        DataTypeManagement: Codeunit "Data Type Management";
     begin
         OnBeforeFindTemplate(IsHandled, RecordVariant, Template);
         if IsHandled then
@@ -441,6 +516,7 @@ codeunit 6059940 "NPR SMS Management"
     local procedure EvaluateConditionOnTable(SourceRecordVariant: Variant; TableId: Integer; TempBlob: Codeunit "Temp Blob"): Boolean
     var
         RequestPageParametersHelper: Codeunit "Request Page Parameters Helper";
+        DataTypeManagement: Codeunit "Data Type Management";
         TableRecRef: RecordRef;
         SourceRecRef: RecordRef;
         KeyRef: KeyRef;
@@ -468,54 +544,61 @@ codeunit 6059940 "NPR SMS Management"
     var
         RecRef: RecordRef;
         TemplateLine: Record "NPR SMS Template Line";
+        DataTypeManagement: Codeunit "Data Type Management";
         MergeRecord: Boolean;
         CRLF: Text[2];
-        NewLine: Text;
+        Char13: Char;
+        Char10: Char;
     begin
         SMSMessage := '';
-        NewLine := '\n';
+        Char13 := 13;
+        Char10 := 10;
         if DataTypeManagement.GetRecordRef(RecordVariant, RecRef) then
             MergeRecord := not IsRecRefEmpty(RecRef);
 
         TemplateLine.SetRange("Template Code", Template.Code);
         if TemplateLine.FindSet then
             repeat
+                if SMSMessage <> '' then
+                    SMSMessage += Format(Char13) + Format(Char10);
                 if MergeRecord then
                     SMSMessage += MergeDataFields(TemplateLine."SMS Text", RecRef, Template."Report ID")
                 else
                     SMSMessage += TemplateLine."SMS Text";
-                SMSMessage += NewLine;
+
             until TemplateLine.Next = 0;
         exit(SMSMessage);
     end;
 
     local procedure MergeDataFields(TextLine: Text; var RecRef: RecordRef; ReportID: Integer): Text
     var
-        RegEx: DotNet NPRNetRegex;
-        Match: DotNet NPRNetMatch;
+        DotNetRegEx: Codeunit DotNet_Regex;
+        DotNetMatch: Codeunit DotNet_Match;
         FieldPos: Integer;
         ResultText: Text;
     begin
         ResultText := '';
         repeat
-            Match := RegEx.Match(TextLine, '{\d+}');
-            if Match.Success then begin
-                ResultText += CopyStr(TextLine, 1, Match.Index);
-                ResultText += ConvertToValue(Match.Value, RecRef);
-                TextLine := CopyStr(TextLine, Match.Index + Match.Length + 1);
+            DotNetRegEx.Regex('{\d+}');
+            DotNetRegEx.Match(TextLine, DotNetMatch);
+            if DotNetMatch.Success() then begin
+                ResultText += CopyStr(TextLine, 1, DotNetMatch.Index());
+                ResultText += ConvertToValue(DotNetMatch.Value(), RecRef);
+                TextLine := CopyStr(TextLine, DotNetMatch.Index() + DotNetMatch.Length() + 1);
             end;
-        until not Match.Success;
+        until not DotNetMatch.Success();
 
         ResultText += TextLine;
         TextLine := ResultText;
         ResultText := '';
         repeat
-            Match := RegEx.Match(TextLine, StrSubstNo(AFReportLinkTag, '.*?'));
-            if Match.Success then begin
-                ResultText += CopyStr(TextLine, 1, Match.Index);
-                TextLine := CopyStr(TextLine, Match.Index + Match.Length + 1);
+            DotNetRegEx.Regex(StrSubstNo(AFReportLinkTag, '.*?'));
+            DotNetRegEx.Match(TextLine, DotNetMatch);
+            if DotNetMatch.Success() then begin
+                ResultText += CopyStr(TextLine, 1, DotNetMatch.Index());
+                TextLine := CopyStr(TextLine, DotNetMatch.Index() + DotNetMatch.Length() + 1);
             end;
-        until not Match.Success;
+        until not DotNetMatch.Success();
 
         ResultText += TextLine;
         exit(ResultText);
@@ -559,47 +642,14 @@ codeunit 6059940 "NPR SMS Management"
 
     local procedure GetDefaultSender(): Text
     var
-        IComm: Record "NPR I-Comm";
+        SMSSetup: Record "NPR SMS Setup";
     begin
-        IComm.Get;
-        IComm.TestField("E-Club Sender");
-        exit(IComm."E-Club Sender");
-    end;
-
-    local procedure GetDefaultSenderTo(i: Integer): Text
-    var
-        IComm: Record "NPR I-Comm";
-    begin
-        IComm.Get;
-        case i of
-            1: //Default
-                begin
-                    IComm.TestField("Reg. Turnover Mobile No.");
-                    exit(IComm."Reg. Turnover Mobile No.");
-                end;
-            2:
-                exit(IComm."Register Turnover Mobile 2"); //Option 2
-            3:
-                exit(IComm."Register Turnover Mobile 3"); //Option 3
-        end;
+        SMSSetup.Get();
+        SMSSetup.TestField("Default Sender No.");
+        exit(SMSSetup."Default Sender No.");
     end;
     #endregion
-
     #region Publishers
-    [IntegrationEvent(false, false)]
-    local procedure OnSendSMS(var Handled: Boolean; PhoneNo: Text; Sender: Text; SMSMessage: Text)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnSMSSendSuccess(Recepient: Text; Sender: Text; SMSMessage: Text; Result: Text)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnSMSSendError(var ThrowError: Boolean; Recepient: Text; Sender: Text; SMSMessage: Text; ErrorMessage: Text)
-    begin
-    end;
 
     [IntegrationEvent(false, FALSE)]
     local procedure OnBeforeFindTemplate(var IsHandled: Boolean; RecordVariant: Variant; var Template: Record "NPR SMS Template Header")
@@ -611,39 +661,31 @@ codeunit 6059940 "NPR SMS Management"
     begin
     end;
     #endregion Publishers
-
     #region Subscribers
-    [EventSubscriber(ObjectType::Page, 21, 'OnAfterActionEvent', 'NPR SendSMS', true, true)]
-    local procedure Page21OnAfterActionEventSendSMS(var Rec: Record Customer)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Role Center Notification Mgt.", 'OnBeforeShowNotifications', '', true, true)]
+    local procedure OnBeforeShowNotification()
+    var
+        SMSSetup: Record "NPR SMS Setup";
+        MessageLog: Record "NPR SMS Log";
     begin
-        EditAndSendSMS(Rec);
+        if not SMSSetup.ReadPermission then
+            exit;
+        if not SMSSetup.Get() then
+            exit;
+        MessageLog.SetRange(SystemCreatedBy, UserSecurityId());
+        MessageLog.SetRange(Status, MessageLog.Status::Error);
+        MessageLog.SetRange("User Notified", false);
+        if MessageLog.IsEmpty then
+            exit;
+
+        MessageLog.ModifyAll("User Notified", true);
+
+        Commit();
+
+        ErrorNotification();
     end;
 
-    [EventSubscriber(ObjectType::Page, 41, 'OnAfterActionEvent', 'NPR SendSMS', true, true)]
-    local procedure Page41OnAfterActionEventSendSMS(var Rec: Record "Sales Header")
-    begin
-        EditAndSendSMS(Rec);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 42, 'OnAfterActionEvent', 'NPR SendSMS', true, true)]
-    local procedure Page42OnAfterActionEventSendSMS(var Rec: Record "Sales Header")
-    begin
-        EditAndSendSMS(Rec);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 5050, 'OnAfterActionEvent', 'NPR SendSMS', true, true)]
-    local procedure Page5050OnAfterActionEventSendSMS(var Rec: Record Contact)
-    begin
-        EditAndSendSMS(Rec);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 6150652, 'OnAfterActionEvent', 'SendSMS', true, true)]
-    local procedure Page6150652OnAfterActionEventSendSMS(var Rec: Record "NPR POS Entry")
-    begin
-        EditAndSendSMS(Rec);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6150627, 'OnAfterEndWorkshift', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workshift Checkpoint", 'OnAfterEndWorkshift', '', true, true)]
     local procedure CodeUnit6150627OnAfterEndWorkshift(Mode: Option; UnitNo: Code[20]; Successful: Boolean; PosEntryNo: Integer)
     var
         RecRef: RecordRef;
@@ -656,132 +698,107 @@ codeunit 6059940 "NPR SMS Management"
         SendTo: Text;
         SMSManagement: Codeunit "NPR SMS Management";
         i: Integer;
+        SendToList: list of [Text];
     begin
-        if Successful then begin
-            if POSUnit.Get(UnitNo) then
-                if POSEndOfdayProfile.Get(POSUnit."POS End of Day Profile") then begin
-                    if (not SMSTemplateHeader.Get(POSEndOfdayProfile."SMS Profile")) then
-                        exit;
+        if not Successful then
+            exit;
 
-                    POSWorkshifCheckpoint.Reset;
-                    POSWorkshifCheckpoint.SetRange("POS Entry No.", PosEntryNo);
-                    if POSWorkshifCheckpoint.FindFirst then
-                        RecRef.GetTable(POSWorkshifCheckpoint);
-                    SMSBodyText := SMSManagement.MakeMessage(SMSTemplateHeader, RecRef);
+        if not POSUnit.Get(UnitNo) then
+            exit;
 
-                    Sender := SMSTemplateHeader."Alt. Sender";
-                    if Sender = '' then
-                        Sender := GetDefaultSender;
+        if not POSEndOfdayProfile.Get(POSUnit."POS End of Day Profile") then
+            exit;
 
-                    for i := 1 to 3 do begin
-                        SendTo := GetDefaultSenderTo(i);
-                        if SendTo <> '' then
-                            SendSMS(SendTo, Sender, SMSBodyText);
-                    end;
-                end;
-        end;
+        if (not SMSTemplateHeader.Get(POSEndOfdayProfile."SMS Profile")) then
+            exit;
+
+        POSWorkshifCheckpoint.Reset;
+        POSWorkshifCheckpoint.SetRange("POS Entry No.", PosEntryNo);
+        if POSWorkshifCheckpoint.FindFirst then
+            RecRef.GetTable(POSWorkshifCheckpoint);
+
+        SMSBodyText := SMSManagement.MakeMessage(SMSTemplateHeader, RecRef);
+
+        Sender := SMSTemplateHeader."Alt. Sender";
+        if Sender = '' then
+            Sender := GetDefaultSender;
+
+        SendTo := MergeDataFields(SMSTemplateHeader.Recipient, RecRef, 0);
+
+        PopulateSendList(SendToList, SMSTemplateHeader."Recipient Type", SMSTemplateHeader."Recipient Group", SendTo);
+        QueueMessages(SendToList, Sender, SMSBodyText, CurrentDateTime + 1000 * 60); //Delay 1 minute
     end;
     #endregion Subscribers
-
-    #region NaviDocs functions
-    procedure IsNaviDocsAvailable(AskUserToMakeSetup: Boolean)
+    #region Job functions
+    procedure CreateMessageJob(JobCategory: Code[10])
     var
-        NaviDocsSetup: Record "NPR NaviDocs Setup";
-        SetupOK: Boolean;
+        JobQueueEntry: Record "Job Queue Entry";
     begin
-        SetupOK := (NaviDocsSetup.Get and NaviDocsSetup."Enable NaviDocs");
-        if (not SetupOK) and AskUserToMakeSetup then
-            if Confirm(StrSubstNo('%1 %2', NaviDocsNotEnabledTxt, SetupNaviDocsTxt)) then
-                PAGE.RunModal(6059767, NaviDocsSetup);
-        SetupOK := (NaviDocsSetup.Get and NaviDocsSetup."Enable NaviDocs");
-        if not SetupOK then
-            Error(NaviDocsNotEnabledTxt);
-        AddNaviDocsHandlingProfile;
+        if not (JobQueueEntry.ReadPermission and JobQueueEntry.WritePermission) then
+            Error(PermissionErr);
+
+        if JobCategory = '' then
+            JobCategory := GetJobQueueCategoryCode();
+
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR Send SMS Job Handler");
+        JobQueueEntry.SetRange("Job Queue Category Code", JobCategory);
+        if not JobQueueEntry.FindFirst() then begin
+            Clear(JobQueueEntry);
+            JobQueueEntry.Init();
+            JobQueueEntry.Status := JobQueueEntry.Status::"On Hold";
+            JobQueueEntry."Earliest Start Date/Time" := CurrentDateTime;
+            JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
+            JobQueueEntry."Object ID to Run" := Codeunit::"NPR Send SMS Job Handler";
+            JobQueueEntry."Job Queue Category Code" := JobCategory;
+            JobQueueEntry."Run in User Session" := false;
+            JobQueueEntry."Recurring Job" := true;
+            JobQueueEntry."Run on Mondays" := true;
+            JobQueueEntry."Run on Tuesdays" := true;
+            JobQueueEntry."Run on Wednesdays" := true;
+            JobQueueEntry."Run on Thursdays" := true;
+            JobQueueEntry."Run on Fridays" := true;
+            JobQueueEntry."Run on Saturdays" := true;
+            JobQueueEntry."Run on Sundays" := true;
+            JobQueueEntry."Maximum No. of Attempts to Run" := 10000;
+            JobQueueEntry."No. of Minutes between Runs" := 1;
+            JobQueueEntry.Insert(true);
+            CODEUNIT.Run(CODEUNIT::"Job Queue - Enqueue", JobQueueEntry);
+        end;
+        if not (JobQueueEntry.Status In [JobQueueEntry.Status::Ready, JobQueueEntry.Status::"In Process"]) then begin
+            JobQueueEntry.SetStatus(JobQueueEntry.Status::Ready);
+            JobQueueEntry.Modify();
+        end;
+
     end;
 
-    procedure AddSMStoNaviDocs(RecordVariant: Variant; PhoneNo: Text)
+    procedure DeleteMessageJob(JobCategory: Code[10])
     var
-        NaviDocsManagement: Codeunit "NPR NaviDocs Management";
-        RecRef: RecordRef;
+        JobQueueEntry: Record "Job Queue Entry";
     begin
-        DataTypeManagement.GetRecordRef(RecordVariant, RecRef);
-        NaviDocsManagement.AddDocumentEntryWithHandlingProfile(RecRef, NaviDocsHandlingProfileCode, 0, PhoneNo, 0DT);
+        if not (JobQueueEntry.ReadPermission and JobQueueEntry.WritePermission) then
+            Error(PermissionErr);
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR Send SMS Job Handler");
+        JobQueueEntry.Setfilter("Job Queue Category Code", '%1', JobCategory);
+        JobQueueEntry.DeleteAll(true);
     end;
 
-    procedure AddSMStoNaviDocsExt(RecordVariant: Variant; PhoneNo: Text; TemplateCode: Code[20]; DelayUntil: DateTime)
+    local procedure GetJobQueueCategoryCode(): Code[10]
     var
-        NaviDocsManagement: Codeunit "NPR NaviDocs Management";
-        RecRef: RecordRef;
+        SMSSetup: Record "NPR SMS Setup";
+        JobQueueCategory: Record "Job Queue Category";
+        DefMessJobCatLbl: Label 'SendMessage';
     begin
-        DataTypeManagement.GetRecordRef(RecordVariant, RecRef);
-        NaviDocsManagement.AddDocumentEntryWithHandlingProfileExt(RecRef, NaviDocsHandlingProfileCode, 0, PhoneNo, TemplateCode, DelayUntil);
+        SMSSetup.Get();
+        if SMSSetup."Job Queue Category Code" <> '' then
+            exit(SMSSetup."Job Queue Category Code");
+
+        JobQueueCategory.InsertRec(
+            CopyStr(DefMessJobCatLbl, 1, MaxStrLen(JobQueueCategory.Code)),
+            CopyStr(DefMessJobCatLbl, 1, MaxStrLen(JobQueueCategory.Description)));
+        exit(JobQueueCategory.Code);
     end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6059767, 'OnAddHandlingProfilesToLibrary', '', true, true)]
-    local procedure AddNaviDocsHandlingProfile()
-    var
-        NaviDocsManagement: Codeunit "NPR NaviDocs Management";
-    begin
-        NaviDocsManagement.AddHandlingProfileToLibrary(NaviDocsHandlingProfileCode, NaviDocsHandlingProfileTxt, false, false, false, false);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6059767, 'OnShowTemplate', '', false, false)]
-    local procedure ShowTemplateFromNaviDocs(var RequestHandled: Boolean; NaviDocsEntry: Record "NPR NaviDocs Entry")
-    var
-        SMSTemplateHeader: Record "NPR SMS Template Header";
-        RecRef: RecordRef;
-    begin
-        if RequestHandled or (NaviDocsEntry."Document Handling Profile" <> NaviDocsHandlingProfileCode) then
-            exit;
-        RequestHandled := true;
-
-        if NaviDocsEntry."Template Code" <> '' then
-            if SMSTemplateHeader.Get(NaviDocsEntry."Template Code") then begin
-                PAGE.RunModal(PAGE::"NPR SMS Template Card", SMSTemplateHeader);
-                exit;
-            end;
-
-        if not RecRef.Get(NaviDocsEntry."Record ID") then
-            exit;
-        if FindTemplate(RecRef, SMSTemplateHeader) then
-            PAGE.RunModal(PAGE::"NPR SMS Template Card", SMSTemplateHeader);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6059767, 'OnManageDocument', '', false, false)]
-    local procedure HandleNaviDocsDocument(var IsDocumentHandled: Boolean; ProfileCode: Code[20]; var NaviDocsEntry: Record "NPR NaviDocs Entry"; ReportID: Integer; var WithSuccess: Boolean; var ErrorMessage: Text)
-    var
-        SMSTemplateHeader: Record "NPR SMS Template Header";
-        RecRef: RecordRef;
-    begin
-        if IsDocumentHandled or (ProfileCode <> NaviDocsHandlingProfileCode) then
-            exit;
-        if NaviDocsEntry."Template Code" <> '' then
-            SMSTemplateHeader.SetRange(Code, NaviDocsEntry."Template Code");
-
-        if RecRef.Get(NaviDocsEntry."Record ID") then;
-        if not FindTemplate(RecRef, SMSTemplateHeader) then
-            ErrorMessage := StrSubstNo(Error005, SMSTemplateHeader.TableCaption, NaviDocsEntry."Document Description", NaviDocsEntry."No.");
-        if ErrorMessage = '' then
-            if not TrySendSMSForNaviDocs(NaviDocsEntry, SMSTemplateHeader, RecRef) then
-                ErrorMessage := StrSubstNo(Error006, GetLastErrorText);
-        IsDocumentHandled := true;
-        WithSuccess := ErrorMessage = '';
-    end;
-
-    [TryFunction]
-    local procedure TrySendSMSForNaviDocs(var NaviDocsEntry: Record "NPR NaviDocs Entry"; var SMSTemplateHeader: Record "NPR SMS Template Header"; RecRef: RecordRef)
-    var
-        SMSManagement: Codeunit "NPR SMS Management";
-    begin
-        SMSManagement.SendSMS(NaviDocsEntry."E-mail (Recipient)", SMSTemplateHeader."Alt. Sender", MakeMessage(SMSTemplateHeader, RecRef));
-    end;
-
-    local procedure NaviDocsHandlingProfileCode(): Text
-    begin
-        exit('SMS');
-    end;
-    #endregion NaviDocs functions
-
+    #endregion
     #region Report Links Azure Functions
     procedure AFReportLink(ReportId: Integer): Text
     begin
@@ -795,52 +812,4 @@ codeunit 6059940 "NPR SMS Management"
         exit('<<AFReportLink>>');
     end;
     #endregion Report Links Azure Functions
-
-    [TryFunction]
-    local procedure CallRestWebServiceNew(RequestURL: Text; Sender: Text; Destination: Text; SMSMessage: Text; var ResponseString: Text)
-    var
-        RequestString: Text;
-        RequestMessage: HttpRequestMessage;
-        ResponseMessage: HttpResponseMessage;
-        WebClient: HttpClient;
-        Headers: HttpHeaders;
-        ContentHeaders: HttpHeaders;
-    begin
-        RequestString := '{';
-        RequestString += '"source":"' + Sender + '",';
-        RequestString += '"destination": "' + Destination + '",';
-        RequestString += '"userData": "' + SMSMessage + '",';
-        RequestString += '"platformId": "COOL",';
-        RequestString += '"platformPartnerId": "' + AzureKeyVaultMgt.GetSecret('SMSMgtPlatformPartnerId') + '",';
-        RequestString += '"useDeliveryReport": false}';
-
-        RequestMessage.SetRequestUri(RequestURL);
-        RequestMessage.Method := 'POST';
-        RequestMessage.GetHeaders(Headers);
-        if Headers.Contains('Authorization') then
-            Headers.Remove('Authorization');
-        Headers.Add('Authorization', 'Basic ' + GetBasicAuthInfo(AzureKeyVaultMgt.GetSecret('SMSMgtUsername'), AzureKeyVaultMgt.GetSecret('SMSMgtPassword')));
-
-        RequestMessage.Content.WriteFrom(RequestString);
-        RequestMessage.Content.GetHeaders(ContentHeaders);
-        if ContentHeaders.Contains('Content-Type') then
-            ContentHeaders.Remove('Content-Type');
-        ContentHeaders.Add('Content-Type', 'application/json;charset=utf-8');
-
-        WebClient.Send(RequestMessage, ResponseMessage);
-
-        if not ResponseMessage.IsSuccessStatusCode then
-            Error('%1 - %2',
-                ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase);
-
-        if not ResponseMessage.Content.ReadAs(ResponseString) then
-            ResponseString := '';
-    end;
-
-    procedure GetBasicAuthInfo(Username: Text; Password: Text): Text
-    var
-        Base64Convert: Codeunit "Base64 Convert";
-    begin
-        exit(Base64Convert.ToBase64(StrSubstNo('%1:%2', Username, Password)))
-    end;
 }

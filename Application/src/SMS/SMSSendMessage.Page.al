@@ -1,12 +1,11 @@
 page 6059944 "NPR SMS Send Message"
 {
-    Caption = 'SMS Send Message';
+    Caption = 'Send SMS';
     DeleteAllowed = false;
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = StandardDialog;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "NPR SMS Template Header";
 
     layout
@@ -19,11 +18,39 @@ page 6059944 "NPR SMS Send Message"
                 {
                     ShowCaption = false;
                     Visible = Mode < 2;
-                    field(PhoneNo; PhoneNo)
+                    field(RecipientType; RecipientType)
                     {
                         ApplicationArea = All;
-                        Caption = 'Phone No';
-                        ToolTip = 'Specifies the value of the Phone No field';
+                        Visible = RecTypeVisible;
+                        Caption = 'Recipient Type';
+                        ToolTip = 'Specifies the value of the Recipient Type field';
+                        trigger OnValidate()
+                        begin
+                            SetRecGroupVisible();
+                        end;
+                    }
+                    group(GroupNoGrp)
+                    {
+                        ShowCaption = false;
+                        Visible = RecGroupVisible;
+                        field(GroupCode; GroupCode)
+                        {
+                            ApplicationArea = All;
+                            Caption = 'Group Code';
+                            ToolTip = 'Specifies the value of the Group Code field';
+                            TableRelation = "NPR SMS Recipient Group";
+                        }
+                    }
+                    group(PhoneNoGrp)
+                    {
+                        ShowCaption = false;
+                        Visible = not RecGroupVisible;
+                        field(PhoneNo; PhoneNo)
+                        {
+                            ApplicationArea = All;
+                            Caption = 'Phone No';
+                            ToolTip = 'Specifies the value of the Phone No field';
+                        }
                     }
                     field(SenderText; SenderText)
                     {
@@ -84,24 +111,10 @@ page 6059944 "NPR SMS Send Message"
                 group(Control6150621)
                 {
                     ShowCaption = false;
-                    field(SendingOption; SendingOption)
-                    {
-                        ApplicationArea = All;
-                        Caption = 'Sending Option';
-                        ToolTip = 'Specifies the value of the Sending Option field';
 
-                        trigger OnValidate()
-                        var
-                            SMSManagement: Codeunit "NPR SMS Management";
-                        begin
-                            if SendingOption = SendingOption::"Through NaviDocs" then
-                                SMSManagement.IsNaviDocsAvailable(true);
-                        end;
-                    }
                     group(Control6150623)
                     {
                         ShowCaption = false;
-                        Visible = SendingOption = 1;
                         field(DelayUntil; DelayUntil)
                         {
                             ApplicationArea = All;
@@ -114,13 +127,9 @@ page 6059944 "NPR SMS Send Message"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnAfterGetCurrRecord()
     begin
-        ShowRecordSelection := ("Table No." <> 0) and ShowRecordSelection and (Mode < Mode::Batch);
+        ShowRecordSelection := (Rec."Table No." <> 0) and ShowRecordSelection and (Mode < Mode::Batch);
         SMSMessageText := SMSManagement.MakeMessage(Rec, SelectedRecordRef);
     end;
 
@@ -132,14 +141,24 @@ page 6059944 "NPR SMS Send Message"
     trigger OnOpenPage()
     begin
         ShowRecordSelection := IsRecRefEmpty(SelectedRecordRef) and (Mode < Mode::Batch);
+        SetRecGroupVisible();
+    end;
+
+    local procedure SetRecGroupVisible()
+    begin
+        RecGroupVisible := RecipientType = RecipientType::Group
     end;
 
     var
         SMSManagement: Codeunit "NPR SMS Management";
         [InDataSet]
+        RecTypeVisible: Boolean;
+        RecGroupVisible: Boolean;
+        RecipientType: Enum "NPR SMS Recipient Type";
         ShowRecordSelection: Boolean;
         SelectedRecordRef: RecordRef;
         PhoneNo: Text;
+        GroupCode: Code[10];
         RecordInfo: Text;
         Text001: Label 'No records in %1 within the filters.';
         SMSMessageText: Text;
@@ -149,6 +168,7 @@ page 6059944 "NPR SMS Send Message"
         DelayUntil: DateTime;
         Mode: Option Test,SingleRecord,Batch;
 
+    [Obsolete('New oveload procedure with Enum "NPR SMS Recipient Type"')]
     procedure SetData(ReceiverPhoneNo: Text; RecRef: RecordRef; Sender: Text; DialogMode: Option Test,SingleRecord,Batch; RecordSelectionText: Text)
     begin
         PhoneNo := ReceiverPhoneNo;
@@ -156,8 +176,23 @@ page 6059944 "NPR SMS Send Message"
         SenderText := Sender;
         Mode := DialogMode;
         InfoText := RecordSelectionText;
+        RecipientType := RecipientType::Field;
+        RecTypeVisible := false;
     end;
 
+    procedure SetData(RecRecipientType: Enum "NPR SMS Recipient Type"; ReceiverGroupNo: Text; ReceiverPhoneNo: Text; RecRef: RecordRef; Sender: Text; DialogMode: Option Test,SingleRecord,Batch; RecordSelectionText: Text; RecTypeVis: Boolean)
+    begin
+        PhoneNo := ReceiverPhoneNo;
+        GroupCode := ReceiverGroupNo;
+        SelectedRecordRef := RecRef;
+        SenderText := Sender;
+        Mode := DialogMode;
+        InfoText := RecordSelectionText;
+        RecipientType := RecRecipientType;
+        RecTypeVisible := RecTypeVis;
+    end;
+
+    [Obsolete('New oveload procedure with Enum "NPR SMS Recipient Type"')]
     procedure GetData(var ReceiverPhoneNo: Text; var RecRef: RecordRef; var SMSBodyText: Text; var Sender: Text; var SendOption: Option; var SendDelayUntil: DateTime)
     begin
         ReceiverPhoneNo := PhoneNo;
@@ -166,6 +201,17 @@ page 6059944 "NPR SMS Send Message"
         Sender := SenderText;
         SendOption := SendingOption;
         SendDelayUntil := DelayUntil;
+    end;
+
+    procedure GetData(var RecRecipientType: Enum "NPR SMS Recipient Type"; var ReceiverGroupNo: Code[10]; var ReceiverPhoneNo: Text; var RecRef: RecordRef; var SMSBodyText: Text; var Sender: Text; var SendDelayUntil: DateTime)
+    begin
+        ReceiverPhoneNo := PhoneNo;
+        ReceiverGroupNo := GroupCode;
+        RecRef := SelectedRecordRef;
+        SMSBodyText := SMSMessageText;
+        Sender := SenderText;
+        SendDelayUntil := DelayUntil;
+        RecRecipientType := RecipientType;
     end;
 
     local procedure SelectRecord(Template: Record "NPR SMS Template Header"; var RecRef: RecordRef): Boolean

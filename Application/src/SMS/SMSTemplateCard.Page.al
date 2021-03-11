@@ -11,22 +11,22 @@ page 6059941 "NPR SMS Template Card"
         {
             group(General)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Alt. Sender"; "Alt. Sender")
+                field("Alt. Sender"; Rec."Alt. Sender")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Alt. Sender field';
                 }
-                field("Table No."; "Table No.")
+                field("Table No."; Rec."Table No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Table No. field';
@@ -35,30 +35,55 @@ page 6059941 "NPR SMS Template Card"
                     var
                         SMSManagement: Codeunit "NPR SMS Management";
                     begin
-                        TableFiltersEnabled := "Table No." <> 0;
-                        CurrPage.SMSTemplateSubform.PAGE.SetReportLinkEnabled(CurrPage.Editable and ("Table No." <> 0) and ("Report ID" <> 0));
+                        TableFiltersEnabled := Rec."Table No." <> 0;
+                        CurrPage.SMSTemplateSubform.PAGE.SetReportLinkEnabled(CurrPage.Editable and (Rec."Table No." <> 0) and (Rec."Report ID" <> 0));
                     end;
                 }
-                field("Table Caption"; "Table Caption")
+                field("Table Caption"; Rec."Table Caption")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Table Caption field';
                 }
-                field(Recipient; Recipient)
+                field("Recipient Type"; Rec."Recipient Type")
                 {
                     ApplicationArea = All;
-                    Lookup = true;
-                    ToolTip = 'Specifies the value of the Recipient field';
+                    ToolTip = 'Specifies the value of the Recipient Type field';
+                    trigger OnValidate()
+                    begin
+                        SetRecipientType()
+                    end;
                 }
-                field("""Table Filters"".HASVALUE"; "Table Filters".HasValue)
+                group(RecipientFld)
+                {
+                    Visible = not RecipientGroupVisible;
+                    ShowCaption = false;
+                    field(Recipient; Rec.Recipient)
+                    {
+                        ApplicationArea = All;
+                        Lookup = true;
+                        ToolTip = 'Specifies the value of the Recipient field';
+                    }
+                }
+                group(RecipientGrp)
+                {
+                    Visible = RecipientGroupVisible;
+                    ShowCaption = false;
+                    field("Recipient Group"; Rec."Recipient Group")
+                    {
+                        ApplicationArea = All;
+                        Lookup = true;
+                        ToolTip = 'Specifies the value of the Recipient Group field';
+                    }
+                }
+                field("""Table Filters"".HASVALUE"; Rec."Table Filters".HasValue)
                 {
                     ApplicationArea = All;
                     Caption = 'Filters on Table';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Filters on Table field';
                 }
-                field("Report ID"; "Report ID")
+                field("Report ID"; Rec."Report ID")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
@@ -66,7 +91,7 @@ page 6059941 "NPR SMS Template Card"
 
                     trigger OnValidate()
                     begin
-                        CurrPage.SMSTemplateSubform.PAGE.SetReportLinkEnabled(CurrPage.Editable and ("Table No." <> 0) and ("Report ID" <> 0));
+                        CurrPage.SMSTemplateSubform.PAGE.SetReportLinkEnabled(CurrPage.Editable and (Rec."Table No." <> 0) and (Rec."Report ID" <> 0));
                     end;
                 }
             }
@@ -105,7 +130,7 @@ page 6059941 "NPR SMS Template Card"
                     Caption = 'Send SMS';
                     Image = SendTo;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Send SMS action';
@@ -141,27 +166,38 @@ page 6059941 "NPR SMS Template Card"
                     Enabled = TableFiltersEnabled;
                     Image = UseFilters;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Table Filters action';
 
                     trigger OnAction()
                     begin
-                        OpenFilterPage;
+                        Rec.OpenFilterPage;
                     end;
                 }
             }
         }
     }
+    trigger OnOpenPage()
+    begin
+        SetRecipientType()
+    end;
 
     trigger OnAfterGetCurrRecord()
     begin
-        TableFiltersEnabled := "Table No." <> 0;
-        CurrPage.SMSTemplateSubform.PAGE.SetReportLinkEnabled(CurrPage.Editable and ("Table No." <> 0) and ("Report ID" <> 0));
+        TableFiltersEnabled := Rec."Table No." <> 0;
+        CurrPage.SMSTemplateSubform.PAGE.SetReportLinkEnabled(CurrPage.Editable and (Rec."Table No." <> 0) and (Rec."Report ID" <> 0));
+        SetRecipientType();
+    end;
+
+    local procedure SetRecipientType()
+    begin
+        RecipientGroupVisible := Rec."Recipient Type" = Rec."Recipient Type"::Group;
     end;
 
     var
         TableFiltersEnabled: Boolean;
+        RecipientGroupVisible: Boolean;
 }
 
