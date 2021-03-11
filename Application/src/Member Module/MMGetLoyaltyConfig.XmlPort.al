@@ -2,10 +2,9 @@ xmlport 6151160 "NPR MM Get Loyalty Config."
 {
 
     Caption = 'Get Loyalty Configuration';
-    Encoding = UTF8;
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-
+    Encoding = UTF8;
     schema
     {
         textelement(GetLoyaltyConfiguration)

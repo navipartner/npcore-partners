@@ -4,6 +4,7 @@ xmlport 6060129 "NPR MM Get Membership"
     Caption = 'Get Membership';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
+    Encoding = UTF8;
 
     schema
     {

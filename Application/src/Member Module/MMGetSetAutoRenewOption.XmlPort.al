@@ -2,10 +2,9 @@ xmlport 6060146 "NPR MM GetSet AutoRenew Option"
 {
 
     Caption = 'GetSet AutoRenew Option';
-    Encoding = UTF8;
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-
+    Encoding = UTF8;
     schema
     {
         textelement(membershipelement)

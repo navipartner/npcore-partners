@@ -2,10 +2,9 @@ xmlport 6151188 "NPR MM Member Comm."
 {
 
     Caption = 'Member Communication';
-    Encoding = UTF8;
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-
+    Encoding = UTF8;
     schema
     {
         textelement(membership)

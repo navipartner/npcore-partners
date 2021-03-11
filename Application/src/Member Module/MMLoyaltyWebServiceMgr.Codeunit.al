@@ -5,7 +5,7 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
 
     trigger OnRun()
     var
-        XmlDoc: DotNet "NPRNetXmlDocument";
+        XmlDoc: XmlDocument;
         ImportType: Record "NPR Nc Import Type";
         FunctionName: Text[100];
     begin
@@ -14,11 +14,11 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
             FunctionName := GetWebserviceFunction("Import Type");
             case FunctionName of
                 'GetLoyaltyPoints':
-                    GetLoyaltyPoints(XmlDoc, "Document ID");
+                    GetLoyaltyPoints(XmlDoc, Rec."Document ID");
                 'GetLoyaltyPointEntries':
-                    GetLoyaltyPoints(XmlDoc, "Document ID"); 
+                    GetLoyaltyPoints(XmlDoc, Rec."Document ID");
                 'GetLoyaltyReceiptList':
-                    GetLoyaltyPoints(XmlDoc, "Document ID"); 
+                    GetLoyaltyPoints(XmlDoc, Rec."Document ID");
 
                 else
                     Error('Implementation for %1 %2 missing in codeunit 6060142', "Import Type", FunctionName);
@@ -31,27 +31,20 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         MEMBERSHIP_NOT_FOUND: Label 'The membership could not be found using the provided search criteria.';
 
-    local procedure GetLoyaltyPoints(XmlDoc: DotNet "NPRNetXmlDocument"; DocumentID: Text[100])
+    local procedure GetLoyaltyPoints(XmlDoc: XmlDocument; DocumentID: Text[100])
     var
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlElementNode: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        i: Integer;
+        Request: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
     begin
 
-        if IsNull(XmlDoc) then
-            exit;
+        XmlDoc.GetRoot(Request);
 
-        XmlElement := XmlDoc.DocumentElement;
-
-        if IsNull(XmlElement) then
-            exit;
-
-        if (not NpXmlDomMgt.FindNodes(XmlElement, 'request', XmlNodeList)) then
+        if (not NpXmlDomMgt.FindNodes(Request.AsXmlNode(), 'request', NodeList)) then
             Error('request node not found.');
 
-        XmlElementNode := XmlNodeList.ItemOf(0);
-        DecodeLoyaltyPointsQuery(XmlElementNode, DocumentID);
+        foreach Node in NodeList do
+            DecodeLoyaltyPointsQuery(Node.AsXmlElement(), DocumentID);
 
     end;
 
@@ -59,7 +52,7 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
     begin
     end;
 
-    local procedure DecodeLoyaltyPointsQuery(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
+    local procedure DecodeLoyaltyPointsQuery(Request: XmlElement; DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
@@ -71,20 +64,15 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
         IsValid: Boolean;
     begin
 
-        if IsNull(XmlElement) then
-            exit(false);
-
         MemberInfoCapture.Init();
         MemberInfoCapture."Import Entry Document ID" := DocumentID;
-        DeserializeMembershipQuery(XmlElement, MemberInfoCapture);
+        DeserializeMembershipQuery(Request, MemberInfoCapture);
 
         if (MemberInfoCapture."External Membership No." <> '') then
             MemberInfoCapture."Membership Entry No." := MembershipManagement.GetMembershipFromExtMembershipNo(MemberInfoCapture."External Membership No.");
 
         if (MemberInfoCapture."External Card No." <> '') then begin
 
-            //IF (MemberInfoCapture."Member Entry No" = 0) THEN
-            //  MemberInfoCapture."Membership Entry No." := MembershipManagement.GetMembershipFromExtCardNo(MemberInfoCapture."External Card No.", WORKDATE, NotFoundReason);
             if (MemberInfoCapture."Membership Entry No." = 0) then
                 MemberInfoCapture."Membership Entry No." := MembershipManagement.GetMembershipFromExtCardNo(MemberInfoCapture."External Card No.", WorkDate, NotFoundReason);
 
@@ -105,28 +93,25 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
     begin
     end;
 
-    local procedure DeserializeMembershipQuery(XmlElement: DotNet NPRNetXmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture")
+    local procedure DeserializeMembershipQuery(Request: XmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture")
     var
         CustomerNo: Code[20];
         Membership: Record "NPR MM Membership";
     begin
 
         MemberInfoCapture."Entry No." := 0;
-        MemberInfoCapture."External Member No" := NpXmlDomMgt.GetXmlText(XmlElement, 'membernumber', MaxStrLen(MemberInfoCapture."External Member No"), false);
-        MemberInfoCapture."External Card No." := NpXmlDomMgt.GetXmlText(XmlElement, 'cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
-        MemberInfoCapture."External Membership No." := NpXmlDomMgt.GetXmlText(XmlElement, 'membershipnumber', MaxStrLen(MemberInfoCapture."External Membership No."), false);
+        MemberInfoCapture."External Member No" := NpXmlDomMgt.GetXmlText(Request, 'membernumber', MaxStrLen(MemberInfoCapture."External Member No"), false);
+        MemberInfoCapture."External Card No." := NpXmlDomMgt.GetXmlText(Request, 'cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
+        MemberInfoCapture."External Membership No." := NpXmlDomMgt.GetXmlText(Request, 'membershipnumber', MaxStrLen(MemberInfoCapture."External Membership No."), false);
 
-        CustomerNo := NpXmlDomMgt.GetXmlText(XmlElement, 'customernumber', 20, false);
+        CustomerNo := NpXmlDomMgt.GetXmlText(Request, 'customernumber', 20, false);
         if (CustomerNo <> '') then begin
             Membership.SetFilter("Customer No.", '=%1', CustomerNo);
             Membership.SetFilter(Blocked, '=%1', false);
             if (Membership.FindFirst()) then
-
-                //MemberInfoCapture."External Member No" := Membership."External Membership No.";
-                //MemberInfoCapture."External Membership No." := Membership."External Membership No.";
-
-                if (MemberInfoCapture."External Membership No." = '') then 
+                if (MemberInfoCapture."External Membership No." = '') then
                     MemberInfoCapture."External Membership No." := Membership."External Membership No.";
+
             if (MemberInfoCapture."External Membership No." <> Membership."External Membership No.") then
                 MemberInfoCapture."External Membership No." := '';
 

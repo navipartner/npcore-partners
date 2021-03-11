@@ -4,7 +4,7 @@ xmlport 6060127 "NPR MM Create Membership"
     Caption = 'Create Membership';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-
+    Encoding = UTF8;
     schema
     {
         textelement(memberships)

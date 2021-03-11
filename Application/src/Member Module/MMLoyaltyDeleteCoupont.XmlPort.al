@@ -3,7 +3,7 @@ xmlport 6151189 "NPR MM Loyalty Delete Coupont"
     Caption = 'Loyalty Delete Coupon';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-
+    Encoding = UTF8;
     schema
     {
         textelement(loyalty)

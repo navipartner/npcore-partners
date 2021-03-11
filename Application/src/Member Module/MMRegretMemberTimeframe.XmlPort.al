@@ -4,7 +4,7 @@ xmlport 6060138 "NPR MM Regret Member Timeframe"
     Caption = 'Change Membership';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-
+    Encoding = UTF8;
     schema
     {
         textelement(memberships)

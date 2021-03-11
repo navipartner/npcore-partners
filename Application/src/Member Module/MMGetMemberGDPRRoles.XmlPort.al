@@ -2,10 +2,9 @@ xmlport 6060144 "NPR MM Get Member GDPR Roles"
 {
 
     Caption = 'Get Member GDPR Roles';
-    Encoding = UTF8;
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-
+    Encoding = UTF8;
     schema
     {
         textelement(members)

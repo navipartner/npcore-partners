@@ -1,9 +1,9 @@
 xmlport 6060128 "NPR MM Add Member"
 {
-
     Caption = 'Add Member';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
+    Encoding = UTF8;
 
     schema
     {

@@ -838,7 +838,6 @@ page 6060134 "NPR MM Member Info Capture"
                 trigger OnAction()
                 var
                     MCSWebcamAPI: Codeunit "NPR MCS Webcam API";
-                    MemberCameraHook: Codeunit "NPR MM Member Camera Hook";
                 begin
                     MCSWebcamAPI.CallCaptureStartByMMMemberInfoCapture(Rec, true);
                 end;
