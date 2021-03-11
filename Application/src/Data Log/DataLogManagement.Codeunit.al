@@ -56,7 +56,12 @@ codeunit 6059899 "NPR Data Log Management"
     var
         TimeStamp: DateTime;
         RecordEntryNo: BigInteger;
+        Handled: Boolean;
     begin
+        OnBeforeDatabaseInsert(RecRef, DataLogDisabled, MonitoredTablesLoaded, Handled);
+        if Handled then
+            exit;
+
         if DataLogDisabled then
             exit;
         if RecRef.IsTemporary then
@@ -82,7 +87,12 @@ codeunit 6059899 "NPR Data Log Management"
     var
         TimeStamp: DateTime;
         RecordEntryNo: BigInteger;
+        Handled: Boolean;
     begin
+        OnBeforeDatabaseModify(RecRef, DataLogDisabled, MonitoredTablesLoaded, Handled);
+        if Handled then
+            exit;
+
         if DataLogDisabled then
             exit;
         if RecRef.IsTemporary then
@@ -113,7 +123,12 @@ codeunit 6059899 "NPR Data Log Management"
         SkipDeletion: Boolean;
         TimeStamp: DateTime;
         RecordEntryNo: BigInteger;
+        Handled: Boolean;
     begin
+        OnBeforeDatabaseDelete(RecRef, DataLogDisabled, MonitoredTablesLoaded, Handled);
+        if Handled then
+            exit;
+
         if DataLogDisabled then
             exit;
         if RecRef.IsTemporary then
@@ -140,7 +155,12 @@ codeunit 6059899 "NPR Data Log Management"
         TimeStamp: DateTime;
         RecordEntryNo: BigInteger;
         PreviousRecordEntryNo: BigInteger;
+        Handled: Boolean;
     begin
+        OnBeforeDatabaseRename(RecRef, DataLogDisabled, MonitoredTablesLoaded, Handled);
+        if Handled then
+            exit;
+
         if DataLogDisabled then
             exit;
         if RecRef.IsTemporary then
@@ -213,7 +233,12 @@ codeunit 6059899 "NPR Data Log Management"
     var
         DataLogSetup: Record "NPR Data Log Setup (Table)";
         DataLogSubscriber: Record "NPR Data Log Subscriber";
+        Handled: Boolean;
     begin
+        OnBeforeLoadMonTables(TempDataLogSetup, TempDataLogSubscriber, Handled);
+        If Handled then
+            exit;
+
         TempDataLogSetup.DeleteAll;
         if DataLogSetup.FindSet then
             repeat
@@ -426,5 +451,30 @@ codeunit 6059899 "NPR Data Log Management"
             TempDataLogSetupField.Insert();
         end;
         exit(TempDataLogSetupField."Ignore Modification");
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeDatabaseInsert(RecRef: RecordRef; var DataLogDisabled: Boolean; var MonitoredTablesLoaded: Boolean; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeDatabaseModify(RecRef: RecordRef; var DataLogDisabled: Boolean; var MonitoredTablesLoaded: Boolean; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeDatabaseDelete(RecRef: RecordRef; var DataLogDisabled: Boolean; var MonitoredTablesLoaded: Boolean; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeDatabaseRename(RecRef: RecordRef; var DataLogDisabled: Boolean; var MonitoredTablesLoaded: Boolean; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeLoadMonTables(var TempDataLogSetup: Record "NPR Data Log Setup (Table)" temporary; var TempDataLogSubscriber: Record "NPR Data Log Subscriber" temporary; var Handled: Boolean)
+    begin
     end;
 }
