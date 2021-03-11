@@ -13,22 +13,22 @@ table 6059974 "NPR Variety Buffer"
 
     fields
     {
-        field(1; "Variety 1 Value"; Code[20])
+        field(1; "Variety 1 Value"; Code[50])
         {
             Caption = 'Variety 1 Value';
             DataClassification = CustomerContent;
         }
-        field(2; "Variety 2 Value"; Code[20])
+        field(2; "Variety 2 Value"; Code[50])
         {
             Caption = 'Variety 2 Value';
             DataClassification = CustomerContent;
         }
-        field(3; "Variety 3 Value"; Code[20])
+        field(3; "Variety 3 Value"; Code[50])
         {
             Caption = 'Variety 3 Value';
             DataClassification = CustomerContent;
         }
-        field(4; "Variety 4 Value"; Code[20])
+        field(4; "Variety 4 Value"; Code[50])
         {
             Caption = 'Variety 4 Value';
             DataClassification = CustomerContent;

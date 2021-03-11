@@ -45,7 +45,7 @@ codeunit 6059971 "NPR Variety Matrix Management"
         //+NPR5.36 [285733]
     end;
 
-    procedure GetValue(VRT1Value: Code[20]; VRT2Value: Code[20]; VRT3Value: Code[20]; VRT4Value: Code[20]; VRTFieldSetup: Record "NPR Variety Field Setup"; var ItemFilters: Record Item) TextValue: Text[250]
+    procedure GetValue(VRT1Value: Code[50]; VRT2Value: Code[50]; VRT3Value: Code[50]; VRT4Value: Code[50]; VRTFieldSetup: Record "NPR Variety Field Setup"; var ItemFilters: Record Item) TextValue: Text[250]
     var
         RecRef: RecordRef;
         FRef: FieldRef;
@@ -137,7 +137,7 @@ codeunit 6059971 "NPR Variety Matrix Management"
         end;
     end;
 
-    procedure SetValue(VRT1Value: Code[20]; VRT2Value: Code[20]; VRT3Value: Code[20]; VRT4Value: Code[20]; VRTFieldSetup: Record "NPR Variety Field Setup"; NewValue: Text[250])
+    procedure SetValue(VRT1Value: Code[50]; VRT2Value: Code[50]; VRT3Value: Code[50]; VRT4Value: Code[50]; VRTFieldSetup: Record "NPR Variety Field Setup"; NewValue: Text[250])
     var
         RecRef: RecordRef;
         FRef: FieldRef;
@@ -454,7 +454,7 @@ codeunit 6059971 "NPR Variety Matrix Management"
         end;
     end;
 
-    procedure GetValueBool(VRT1Value: Code[20]; VRT2Value: Code[20]; VRT3Value: Code[20]; VRT4Value: Code[20]; VRTFieldSetup: Record "NPR Variety Field Setup"; LocationFilter: Code[10]; GD1: Code[10]; GD2: Code[10]): Boolean
+    procedure GetValueBool(VRT1Value: Code[50]; VRT2Value: Code[50]; VRT3Value: Code[50]; VRT4Value: Code[50]; VRTFieldSetup: Record "NPR Variety Field Setup"; LocationFilter: Code[10]; GD1: Code[10]; GD2: Code[10]): Boolean
     var
         RecRef: RecordRef;
         FRef: FieldRef;

@@ -261,7 +261,7 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         exit(true);
     end;
 
-    procedure MemberFastCheckIn(ExternalMemberCardNo: Text[100]; ExternalItemNo: Code[20]; AdmissionCode: Code[20]; Qty: Integer; TicketTokenToIgnore: Text[100])
+    procedure MemberFastCheckIn(ExternalMemberCardNo: Text[100]; ExternalItemNo: Code[50]; AdmissionCode: Code[20]; Qty: Integer; TicketTokenToIgnore: Text[100])
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
@@ -356,9 +356,10 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
             exit;
 
         repeat
-
-            ItemNo := MembershipAdmissionSetup."Ticket No.";
-            VariantCode := '';
+            if MembershipAdmissionSetup."Ticket No. Type" = MembershipAdmissionSetup."Ticket No. Type"::ITEM then begin
+                ItemNo := CopyStr(MembershipAdmissionSetup."Ticket No.", 1, MaxStrLen(ItemNo));
+                VariantCode := '';
+            end;
             if (MembershipAdmissionSetup."Ticket No. Type" = MembershipAdmissionSetup."Ticket No. Type"::ITEM_CROSS_REF) then
                 if (not TicketRequestManager.TranslateBarcodeToItemVariant(MembershipAdmissionSetup."Ticket No.", ItemNo, VariantCode, ResolvingTable)) then
                     Error('Invalid Item Reference barcode %1, it does not translate to an item / variant.', ItemNo);

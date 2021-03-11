@@ -44,7 +44,7 @@ codeunit 6059969 "NPR Description Control"
 
     end;
 
-    procedure GetItemRefDescription(ItemNo: Code[20]; VariantCode: Code[10]): Text[50]
+    procedure GetItemRefDescription(ItemNo: Code[20]; VariantCode: Code[10]): Text[100]
     var
         VRTSetup: Record "NPR Variety Setup";
         Item: Record Item;

@@ -66,7 +66,7 @@ table 6060116 "NPR TM Ticket Reservation Req."
             DataClassification = CustomerContent;
             TableRelation = "NPR TM Ticket Access Entry";
         }
-        field(20; "External Item Code"; Code[20])
+        field(20; "External Item Code"; Code[50])
         {
             Caption = 'External Item Code';
             DataClassification = CustomerContent;

@@ -20,7 +20,7 @@ tableextension 6014442 "NPR Item Variant" extends "Item Variant"
             Description = 'VRT1.00';
             TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("NPR Variety 1"));
         }
-        field(6059972; "NPR Variety 1 Value"; Code[20])
+        field(6059972; "NPR Variety 1 Value"; Code[50])
         {
             Caption = 'Variety 1 Value';
             DataClassification = CustomerContent;
@@ -42,7 +42,7 @@ tableextension 6014442 "NPR Item Variant" extends "Item Variant"
             Description = 'VRT1.00';
             TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("NPR Variety 2"));
         }
-        field(6059975; "NPR Variety 2 Value"; Code[20])
+        field(6059975; "NPR Variety 2 Value"; Code[50])
         {
             Caption = 'Variety 2 Value';
             DataClassification = CustomerContent;
@@ -64,7 +64,7 @@ tableextension 6014442 "NPR Item Variant" extends "Item Variant"
             Description = 'VRT1.00';
             TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("NPR Variety 3"));
         }
-        field(6059978; "NPR Variety 3 Value"; Code[20])
+        field(6059978; "NPR Variety 3 Value"; Code[50])
         {
             Caption = 'Variety 3 Value';
             DataClassification = CustomerContent;
@@ -86,7 +86,7 @@ tableextension 6014442 "NPR Item Variant" extends "Item Variant"
             Description = 'VRT1.00';
             TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("NPR Variety 4"));
         }
-        field(6059981; "NPR Variety 4 Value"; Code[20])
+        field(6059981; "NPR Variety 4 Value"; Code[50])
         {
             Caption = 'Variety 4 Value';
             DataClassification = CustomerContent;

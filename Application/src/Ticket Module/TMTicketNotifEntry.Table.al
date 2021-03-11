@@ -79,7 +79,7 @@ table 6060110 "NPR TM Ticket Notif. Entry"
             Caption = 'Ticket Variant Code';
             DataClassification = CustomerContent;
         }
-        field(53; "Ticket External Item No."; Code[20])
+        field(53; "Ticket External Item No."; Code[50])
         {
             Caption = 'Ticket External Item No.';
             DataClassification = CustomerContent;

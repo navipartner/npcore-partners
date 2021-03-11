@@ -535,7 +535,7 @@ table 6014406 "NPR Sale Line POS"
             DataClassification = CustomerContent;
             InitValue = true;
         }
-        field(43; "Serial No."; Code[20])
+        field(43; "Serial No."; Code[50])
         {
             Caption = 'Serial No.';
             DataClassification = CustomerContent;
@@ -1826,7 +1826,7 @@ table 6014406 "NPR Sale Line POS"
         SalesLine."Description 2" := "Description 2";
     end;
 
-    procedure CheckSerialNoApplication(ItemNo: Code[20]; SerialNo: Code[20])
+    procedure CheckSerialNoApplication(ItemNo: Code[20]; SerialNo: Code[50])
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
@@ -1843,7 +1843,7 @@ table 6014406 "NPR Sale Line POS"
         end;
     end;
 
-    procedure CheckSerialNoAuditRoll(ItemNo: Code[20]; SerialNo: Code[20]; Positive: Boolean)
+    procedure CheckSerialNoAuditRoll(ItemNo: Code[20]; SerialNo: Code[50]; Positive: Boolean)
     var
         Err001: Label '%2 %1 is already in stock but has not been posted yet';
         Err002: Label '%2 %1 has already been sold to a customer but is not yet posted';

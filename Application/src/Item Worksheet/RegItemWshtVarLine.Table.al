@@ -117,7 +117,7 @@ table 6060047 "NPR Reg. Item Wsht Var. Line"
             Editable = false;
             FieldClass = FlowField;
         }
-        field(6059982; "Variety 1 Value"; Code[20])
+        field(6059982; "Variety 1 Value"; Code[50])
         {
             Caption = 'Variety 1 Value';
             DataClassification = CustomerContent;
@@ -141,7 +141,7 @@ table 6060047 "NPR Reg. Item Wsht Var. Line"
             Editable = false;
             FieldClass = FlowField;
         }
-        field(6059985; "Variety 2 Value"; Code[20])
+        field(6059985; "Variety 2 Value"; Code[50])
         {
             Caption = 'Variety 2 Value';
             DataClassification = CustomerContent;
@@ -165,7 +165,7 @@ table 6060047 "NPR Reg. Item Wsht Var. Line"
             Editable = false;
             FieldClass = FlowField;
         }
-        field(6059988; "Variety 3 Value"; Code[20])
+        field(6059988; "Variety 3 Value"; Code[50])
         {
             Caption = 'Variety 3 Value';
             DataClassification = CustomerContent;
@@ -195,7 +195,7 @@ table 6060047 "NPR Reg. Item Wsht Var. Line"
             Editable = false;
             FieldClass = FlowField;
         }
-        field(6059991; "Variety 4 Value"; Code[20])
+        field(6059991; "Variety 4 Value"; Code[50])
         {
             Caption = 'Variety 4 Value';
             DataClassification = CustomerContent;

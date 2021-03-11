@@ -115,7 +115,7 @@ table 6059896 "NPR Data Log Subscriber"
     {
     }
 
-    procedure AddAsSubscriber(SubscriberCode: Code[10]; TableNo: Integer)
+    procedure AddAsSubscriber(SubscriberCode: Code[30]; TableNo: Integer)
     begin
         if Get(SubscriberCode, TableNo) then
             exit;

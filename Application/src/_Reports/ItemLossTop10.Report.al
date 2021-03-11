@@ -62,7 +62,7 @@ report 6014543 "NPR Item - Loss - Top 10"
             column(ItemDescription; ItemDescription)
             {
             }
-            column(ItemNo__; "ItemNo.")
+            column(ItemNo__; ItemNo)
             {
             }
             column(Rank; Rank)
@@ -130,9 +130,9 @@ report 6014543 "NPR Item - Loss - Top 10"
             trigger OnAfterGetRecord()
             begin
                 Rank += 1;
-                "ItemNo." := "Item Report Sorting".Template;
+                ItemNo := CopyStr("Item Report Sorting".Template, 1, MaxStrLen(ItemNo));
                 ItemDescription := '';
-                if Item1.Get("ItemNo.") then
+                if Item1.Get(ItemNo) then
                     ItemDescription := Item1.Description;
                 ItemCostAmount := "Item Report Sorting"."Decimal 2";
                 ShrinkagePct := Pct("Decimal 3", "Decimal 4");
@@ -214,7 +214,7 @@ report 6014543 "NPR Item - Loss - Top 10"
 
     var
         Item1: Record Item;
-        "ItemNo.": Code[20];
+        ItemNo: Code[20];
         SourceCodeFilter: Code[10];
         ItemDescription: Text[100];
         ItemFilters: Text[250];

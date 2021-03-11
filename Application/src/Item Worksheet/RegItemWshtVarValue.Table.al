@@ -28,7 +28,7 @@ table 6060048 "NPR Reg. Item Wsht Var. Value"
             DataClassification = CustomerContent;
             NotBlank = true;
         }
-        field(6; Value; Code[20])
+        field(6; Value; Code[50])
         {
             Caption = 'Value';
             DataClassification = CustomerContent;

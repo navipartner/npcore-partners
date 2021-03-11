@@ -250,7 +250,7 @@ table 6014422 "NPR Retail Journal Line"
             Caption = 'Discount Unit Price';
             DataClassification = CustomerContent;
         }
-        field(31; "Serial No."; Code[20])
+        field(31; "Serial No."; Code[50])
         {
             Caption = 'Serial No.';
             DataClassification = CustomerContent;
@@ -705,7 +705,7 @@ table 6014422 "NPR Retail Journal Line"
             "Register No." := RetailJournalHeader."Register No.";
     end;
 
-    procedure SetItem(ItemNo: Code[20]; VariantCode: Code[10]; BarcodeValue: Code[20])
+    procedure SetItem(ItemNo: Code[20]; VariantCode: Code[10]; BarcodeValue: Code[50])
     begin
         if Barcode <> '' then
             Validate(Barcode, BarcodeValue)

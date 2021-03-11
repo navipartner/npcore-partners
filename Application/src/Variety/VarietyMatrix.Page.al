@@ -1271,10 +1271,10 @@ page 6059974 "NPR Variety Matrix"
 
     procedure SetValue(FieldNumber: Integer): Text[250]
     var
-        VRT1Value: Code[20];
-        VRT2Value: Code[20];
-        VRT3Value: Code[20];
-        VRT4Value: Code[20];
+        VRT1Value: Code[50];
+        VRT2Value: Code[50];
+        VRT3Value: Code[50];
+        VRT4Value: Code[50];
     begin
         VRT1Value := "Variety 1 Value";
         VRT2Value := "Variety 2 Value";

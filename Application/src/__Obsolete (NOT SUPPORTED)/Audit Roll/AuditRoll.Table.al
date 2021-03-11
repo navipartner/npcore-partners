@@ -198,7 +198,7 @@ table 6014407 "NPR Audit Roll"
             DataClassification = CustomerContent;
             InitValue = true;
         }
-        field(43; "Serial No."; Code[20])
+        field(43; "Serial No."; Code[50])
         {
             Caption = 'Serial No.';
             DataClassification = CustomerContent;

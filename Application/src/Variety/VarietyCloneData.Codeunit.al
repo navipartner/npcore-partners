@@ -385,7 +385,7 @@ codeunit 6059972 "NPR Variety Clone Data"
         //+NPR5.36 [288696]
     end;
 
-    procedure GetNextVariantCode(ItemNo: Code[20]; Variant1Code: Code[20]; Variant2Code: Code[20]; Variant3Code: Code[20]; Variant4Code: Code[20]) NewVariantCode: Code[10]
+    procedure GetNextVariantCode(ItemNo: Code[20]; Variant1Code: Code[50]; Variant2Code: Code[50]; Variant3Code: Code[50]; Variant4Code: Code[50]) NewVariantCode: Code[10]
     var
         VarietySetup: Record "NPR Variety Setup";
         NoSeriesMgt: Codeunit NoSeriesManagement;
@@ -446,7 +446,7 @@ codeunit 6059972 "NPR Variety Clone Data"
         end;
     end;
 
-    procedure GetVarietyDesc(Variety: Code[20]; VarietyTable: Code[40]; VarietyValue: Code[20]; var TempDesc: Text[250])
+    procedure GetVarietyDesc(Variety: Code[20]; VarietyTable: Code[40]; VarietyValue: Code[50]; var TempDesc: Text[250])
     var
         VRTTable: Record "NPR Variety Table";
         VRTValue: Record "NPR Variety Value";
@@ -907,7 +907,7 @@ codeunit 6059972 "NPR Variety Clone Data"
         //+VRT1.11
     end;
 
-    procedure LookupBarcodes(ItemNo: Code[20]; VariantCode: Code[10]): Code[20]
+    procedure LookupBarcodes(ItemNo: Code[20]; VariantCode: Code[10]): Code[50]
     var
         ItemRef: Record "Item Reference";
     begin
@@ -994,7 +994,7 @@ codeunit 6059972 "NPR Variety Clone Data"
         //+NPR5.29 [260516]
     end;
 
-    procedure GetFromVariety(var ItemVariant: Record "Item Variant"; ItemNo: Code[20]; VRT1: Code[20]; VRT2: Code[20]; VRT3: Code[20]; VRT4: Code[20]): Boolean
+    procedure GetFromVariety(var ItemVariant: Record "Item Variant"; ItemNo: Code[20]; VRT1: Code[50]; VRT2: Code[50]; VRT3: Code[50]; VRT4: Code[50]): Boolean
     var
         ItemVar: Record "Item Variant";
     begin
@@ -1025,7 +1025,7 @@ codeunit 6059972 "NPR Variety Clone Data"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure GetNewVariantCode(ItemNo: Code[20]; Variant1Code: Code[20]; Variant2Code: Code[20]; Variant3Code: Code[20]; Variant4Code: Code[20]; var NewVariantCode: Code[10])
+    local procedure GetNewVariantCode(ItemNo: Code[20]; Variant1Code: Code[50]; Variant2Code: Code[50]; Variant3Code: Code[50]; Variant4Code: Code[50]; var NewVariantCode: Code[10])
     begin
         //-NPR5.43 [317108]
     end;

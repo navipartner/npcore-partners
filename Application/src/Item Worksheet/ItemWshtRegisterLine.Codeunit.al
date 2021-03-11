@@ -104,9 +104,9 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
                             ItemWkshVariantLine.Action::CreateNew:
                                 begin
                                     if (ItemWkshVariantLine."Variety 1 Value" <> '') or
-                                       (ItemWkshVariantLine."Variety 1 Value" <> '') or
-                                       (ItemWkshVariantLine."Variety 1 Value" <> '') or
-                                       (ItemWkshVariantLine."Variety 1 Value" <> '') then begin
+                                       (ItemWkshVariantLine."Variety 2 Value" <> '') or
+                                       (ItemWkshVariantLine."Variety 3 Value" <> '') or
+                                       (ItemWkshVariantLine."Variety 4 Value" <> '') then begin
                                         UpdateAndCopyVariety("Variety 1", "Variety 1 Table (Base)", "Variety 1 Table (New)", ItemWkshVariantLine."Variety 1 Value");
                                         UpdateAndCopyVariety("Variety 2", "Variety 2 Table (Base)", "Variety 2 Table (New)", ItemWkshVariantLine."Variety 2 Value");
                                         UpdateAndCopyVariety("Variety 3", "Variety 3 Table (Base)", "Variety 3 Table (New)", ItemWkshVariantLine."Variety 3 Value");
@@ -253,7 +253,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         UpdateItemAttributes;
     end;
 
-    local procedure UpdateAndCopyVarieties(var ItemworkshLine: Record "NPR Item Worksheet Line"; VarietyNo: Integer; Variety: Code[10]; VarietyTableFrom: Code[20]; VarietyTableTo: Code[20]; CreateCopy: Boolean; CopyValues: Boolean)
+    local procedure UpdateAndCopyVarieties(var ItemworkshLine: Record "NPR Item Worksheet Line"; VarietyNo: Integer; Variety: Code[10]; VarietyTableFrom: Code[40]; VarietyTableTo: Code[40]; CreateCopy: Boolean; CopyValues: Boolean)
     var
         ItemWorksheetVariantLineToCreate: Record "NPR Item Worksh. Variant Line";
         VarietyGroup: Record "NPR Variety Group";
@@ -261,8 +261,8 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         VarietyTableOld: Record "NPR Variety Table";
         VarietyValue: Record "NPR Variety Value";
         IsUpdated: Boolean;
-        NewTableCode: Code[20];
-        PrefixCode: Code[20];
+        NewTableCode: Code[40];
+        PrefixCode: Code[40];
         SuffixCode: Code[20];
     begin
         if CreateCopy then begin
@@ -350,12 +350,12 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         end;
     end;
 
-    local procedure FindNewVarietyNames(ItemWkshLine: Record "NPR Item Worksheet Line"; VarietyNo: Integer; Variety: Code[20]; VarietyTableFrom: Code[20]; VarietyTableTo: Code[20]; CreateCopy: Boolean): Code[50]
+    local procedure FindNewVarietyNames(ItemWkshLine: Record "NPR Item Worksheet Line"; VarietyNo: Integer; Variety: Code[20]; VarietyTableFrom: Code[40]; VarietyTableTo: Code[40]; CreateCopy: Boolean): Code[40]
     var
         VarietyGroup: Record "NPR Variety Group";
         VarietyTableOld: Record "NPR Variety Table";
-        NewTableCode: Code[20];
-        PrefixCode: Code[20];
+        NewTableCode: Code[40];
+        PrefixCode: Code[40];
         SuffixCode: Code[20];
     begin
         if VarietyTableFrom = '' then
@@ -400,7 +400,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
             exit(VarietyTableFrom);
     end;
 
-    local procedure UpdateAndCopyVariety(Variety: Code[20]; VarietyTableFrom: Code[20]; VarietyTableTo: Code[20]; VarietyValue: Code[20])
+    local procedure UpdateAndCopyVariety(Variety: Code[20]; VarietyTableFrom: Code[40]; VarietyTableTo: Code[40]; VarietyValue: Code[50])
     var
         VarietyTable: Record "NPR Variety Table";
         ExistingVarityValue: Record "NPR Variety Value";
@@ -425,7 +425,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         end;
     end;
 
-    local procedure UpdateVarietyValue(ParType: Code[10]; ParTable: Code[20]; ParValue: Code[20]; ParSortOrder: Integer; ParDescription: Text[30])
+    local procedure UpdateVarietyValue(ParType: Code[10]; ParTable: Code[40]; ParValue: Code[50]; ParSortOrder: Integer; ParDescription: Text[30])
     var
         VarietyTable: Record "NPR Variety Table";
         VarietyValue: Record "NPR Variety Value";

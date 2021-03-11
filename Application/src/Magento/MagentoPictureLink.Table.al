@@ -101,7 +101,7 @@ table 6151412 "NPR Magento Picture Link"
             DataClassification = CustomerContent;
             TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety Type"));
         }
-        field(60; "Variety Value"; Code[20])
+        field(60; "Variety Value"; Code[50])
         {
             Caption = 'Variety Value';
             DataClassification = CustomerContent;

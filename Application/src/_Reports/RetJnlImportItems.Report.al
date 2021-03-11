@@ -111,13 +111,13 @@ report 6014424 "NPR Ret. Jnl. - Import Items"
         RetailJournalHeader: Record "NPR Retail Journal Header";
         RetailJournalLine: Record "NPR Retail Journal Line";
         OnlyInventory: Boolean;
-        RetailJournalCode: Code[20];
+        RetailJournalCode: Code[40];
         LastLineNo: Integer;
         ItemVariants: Record "Item Variant";
         ItemReference: Record "Item Reference";
         ImportUnitCost: Option "Standard Cost","Unit Cost","Last direct cost";
 
-    procedure SetJournal(RetailJournalCodeIn: Code[20])
+    procedure SetJournal(RetailJournalCodeIn: Code[40])
     begin
         RetailJournalCode := RetailJournalCodeIn;
         RetailJournalHeader.Get(RetailJournalCode);

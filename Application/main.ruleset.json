@@ -83,6 +83,11 @@
             "justification": "Use a text constant for passing user messages and errors without concatenations."
         },
         {
+            "id": "AA0219",
+            "action":"None",
+            "justification": "The Tooltip property of Fields must start with 'Specifies'."
+        },
+        {
             "id": "AA0220",
             "action":"Error",
             "justification": "The value of the Tooltip property of Fields must be filled."
@@ -291,7 +296,236 @@
             "id": "AW0011",
             "action":"Error",
             "justification": "Add PromotedOnly=true to some or all promoted actions to avoid identical actions from appearing in both the promoted and default sections of the command bar."
-        }  
-               
+        },  
+        {
+            "id": "AA0001",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0002",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0003",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0005",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0008",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0013",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0018",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0022",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0040",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0073",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0074",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0100",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0105",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0131",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0136",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0137",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0139",
+            "action":"Warning",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0150",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0175",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0181",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0194",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0198",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0462",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0202",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0204",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0205",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0206",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0207",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0210",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0211",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0213",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0214",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0217",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0218",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0221",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0224",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0225",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0227",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0228",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0230",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0231",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0232",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0233",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0237",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0240",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        },
+        {
+            "id": "AA0470",
+            "action":"None",
+            "justification": "Excluding Codecop rules to have few included."
+        }     
     ]
 }

@@ -538,7 +538,7 @@ table 6150622 "NPR POS Sales Line"
             Caption = 'Retail Serial No.';
             DataClassification = CustomerContent;
         }
-        field(6500; "Serial No."; Code[20])
+        field(6500; "Serial No."; Code[50])
         {
             Caption = 'Serial No.';
             DataClassification = CustomerContent;

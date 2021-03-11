@@ -1299,7 +1299,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         exit(PepperConfiguration."Default POS Timeout (Seconds)" * 1000);
     end;
 
-    local procedure GetPepperReceiptEncoding(PepperTerminal: Record "NPR Pepper Terminal"): Code[50]
+    local procedure GetPepperReceiptEncoding(PepperTerminal: Record "NPR Pepper Terminal"): Code[20]
     begin
 
         if PepperTerminal."Pepper Receipt Encoding" = 0 then
@@ -1308,7 +1308,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
             exit(UpperCase(Format(PepperTerminal."Pepper Receipt Encoding", 0)));
     end;
 
-    local procedure GetNavReceiptEncoding(PepperTerminal: Record "NPR Pepper Terminal"): Code[50]
+    local procedure GetNavReceiptEncoding(PepperTerminal: Record "NPR Pepper Terminal"): Code[20]
     begin
 
         if PepperTerminal."NAV Receipt Encoding" = 0 then

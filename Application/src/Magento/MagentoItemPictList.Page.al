@@ -4,8 +4,7 @@ page 6151413 "NPR Magento Item Pict. List"
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = List;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "Item Variant";
     SourceTableTemporary = true;
 
@@ -134,6 +133,7 @@ page 6151413 "NPR Magento Item Pict. List"
         Text000: Label 'Item No. must not be blank';
         HasVariants: Boolean;
         Text001: Label 'Main Item Pictures';
+        VarietyTooLongErr: Label 'You cannot use variety with more than %1 characters.';
 
     procedure SetItemNo(NewItemNo: Code[20])
     begin
@@ -260,7 +260,10 @@ page 6151413 "NPR Magento Item Pict. List"
             ItemVariant.SetRange("NPR Blocked", false);
             if ItemVariant.FindFirst then begin
                 Rec.Init;
-                Rec."Item No." := VarietyValue.Value;
+                if StrLen(VarietyValue.Value) > MaxStrLen(Rec."Item No.") then
+                    Error(VarietyTooLongErr)
+                else
+                    Rec."Item No." := CopyStr(VarietyValue.Value, 1, MaxStrLen(Rec."Item No."));
                 Rec.Description := VarietyValue.Description;
                 Rec."NPR Variety 1" := VarietyValue.Type;
                 Rec."NPR Variety 1 Table" := VarietyValue.Table;
@@ -293,7 +296,10 @@ page 6151413 "NPR Magento Item Pict. List"
             ItemVariant.SetRange("NPR Blocked", false);
             if ItemVariant.FindFirst then begin
                 Rec.Init;
-                Rec."Item No." := VarietyValue.Value;
+                if StrLen(VarietyValue.Value) > MaxStrLen(Rec."Item No.") then
+                    Error(VarietyTooLongErr)
+                else
+                    Rec."Item No." := CopyStr(VarietyValue.Value, 1, MaxStrLen(Rec."Item No."));
                 Rec.Description := VarietyValue.Description;
                 Rec."NPR Variety 2" := VarietyValue.Type;
                 Rec."NPR Variety 2 Table" := VarietyValue.Table;
@@ -326,7 +332,10 @@ page 6151413 "NPR Magento Item Pict. List"
             ItemVariant.SetRange("NPR Blocked", false);
             if ItemVariant.FindFirst then begin
                 Rec.Init;
-                Rec."Item No." := VarietyValue.Value;
+                if StrLen(VarietyValue.Value) > MaxStrLen(Rec."Item No.") then
+                    Error(VarietyTooLongErr)
+                else
+                    Rec."Item No." := CopyStr(VarietyValue.Value, 1, MaxStrLen(Rec."Item No."));
                 Rec.Description := VarietyValue.Description;
                 Rec."NPR Variety 3" := VarietyValue.Type;
                 Rec."NPR Variety 3 Table" := VarietyValue.Table;
@@ -359,7 +368,10 @@ page 6151413 "NPR Magento Item Pict. List"
             ItemVariant.SetRange("NPR Blocked", false);
             if ItemVariant.FindFirst then begin
                 Rec.Init;
-                Rec."Item No." := VarietyValue.Value;
+                if StrLen(VarietyValue.Value) > MaxStrLen(Rec."Item No.") then
+                    Error(VarietyTooLongErr)
+                else
+                    Rec."Item No." := CopyStr(VarietyValue.Value, 1, MaxStrLen(Rec."Item No."));
                 Rec.Description := VarietyValue.Description;
                 Rec."NPR Variety 4" := VarietyValue.Type;
                 Rec."NPR Variety 4 Table" := VarietyValue.Table;

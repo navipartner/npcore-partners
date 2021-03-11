@@ -115,7 +115,7 @@ page 6151412 "NPR Magento Pict. Link Subform"
         MiniatureSinglePicture: Boolean;
         VarietyTypeCode: Code[10];
         VarietyTableCode: Code[40];
-        VarietyValueCode: Code[20];
+        VarietyValueCode: Code[50];
 
     procedure SetItemNoFilter(NewItemNo: Code[20])
     begin
@@ -142,7 +142,7 @@ page 6151412 "NPR Magento Pict. Link Subform"
         SetVariantFilters();
     end;
 
-    procedure SetVarietyFilters(NewVarietyTypeCode: Code[10]; NewVarietyTableCode: Code[40]; NewVarietyValueCode: Code[20])
+    procedure SetVarietyFilters(NewVarietyTypeCode: Code[10]; NewVarietyTableCode: Code[40]; NewVarietyValueCode: Code[50])
     begin
         VarietyTypeCode := NewVarietyTypeCode;
         VarietyTableCode := NewVarietyTableCode;

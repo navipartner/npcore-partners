@@ -642,6 +642,7 @@ page 6014490 "NPR Retail Journal Header"
                         n: Integer;
                         t001: Label 'Validating...';
                         t002: Label '@1@@@@@@@@@@';
+                        OverflowErr: Label '%1 should not be over %2 characters.';
                     begin
 
                         //CurrForm.SubLine.FORM.getSelectionFilter(jnlLines);
@@ -654,8 +655,12 @@ page 6014490 "NPR Retail Journal Header"
                             n := jnlLines.Count;
                             repeat
                                 d.Update(1, Round(i / n * 10000, 1, '>'));
+
                                 if jnlLines."Item No." = '' then
-                                    jnlLines."Item No." := jnlLines.Barcode;
+                                    if StrLen(jnlLines.Barcode) < MaxStrLen(jnlLines."Item No.") then
+                                        Error(OverflowErr, jnlLines.FieldCaption(Barcode), MaxStrLen(jnlLines."Item No."))
+                                    else
+                                        jnlLines."Item No." := CopyStr(jnlLines.Barcode, 1, MaxStrLen(jnlLines."Item No."));
                                 jnlLines.Validate("Item No.");
                                 jnlLines.Modify(true);
                                 i += 1;

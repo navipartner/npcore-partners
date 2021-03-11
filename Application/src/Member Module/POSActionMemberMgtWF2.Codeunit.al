@@ -167,7 +167,7 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         MembershipEvents: Codeunit "NPR MM Membership Events";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        ExternalItemNo: Code[20];
+        ExternalItemNo: Code[50];
         LogEntryNo: Integer;
         ResponseCode: Integer;
         FrontEndInputMethod: Option;
@@ -752,7 +752,7 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
 
     end;
 
-    local procedure AddItemToPOS(POSSession: Codeunit "NPR POS Session"; MemberInfoEntryNo: Integer; ExternalItemNo: Code[20]; Description: Text[100]; Description2: Text[80]; Quantity: Decimal; UnitPrice: Decimal; var SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure AddItemToPOS(POSSession: Codeunit "NPR POS Session"; MemberInfoEntryNo: Integer; ExternalItemNo: Code[50]; Description: Text[100]; Description2: Text[80]; Quantity: Decimal; UnitPrice: Decimal; var SaleLinePOS: Record "NPR Sale Line POS")
     var
         Line: Record "NPR Sale Line POS";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -760,6 +760,7 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         ItemNo: Code[20];
         VariantCode: Code[10];
         Resolver: Integer;
+        NotFoundErr: Label 'Item number %1 not found.';
     begin
 
         POSSession.GetSaleLine(POSSaleLine);
@@ -767,8 +768,8 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         DeleteMemberInfoCapture(Line); // If I somehow reused an existing entry, delete it. (New entry does not have receipt number set yet)
 
         if (not MemberRetailIntegration.TranslateBarcodeToItemVariant(ExternalItemNo, ItemNo, VariantCode, Resolver)) then
-            ItemNo := ExternalItemNo;
-
+            Error(NotFoundErr, ExternalItemNo);
+           
         Line.Type := Line.Type::Item;
         Line."No." := ItemNo;
         Line."Variant Code" := VariantCode;

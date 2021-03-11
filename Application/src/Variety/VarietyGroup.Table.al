@@ -478,11 +478,11 @@ table 6059976 "NPR Variety Group"
         //+NPR5.43 [317108]
     end;
 
-    procedure GetVariantCodeExample(): Code[20]
+    procedure GetVariantCodeExample(): Code[50]
     var
-        Var1Value: Code[20];
-        Var2Value: Code[20];
-        Var3Value: Code[20];
+        Var1Value: Code[50];
+        Var2Value: Code[50];
+        Var3Value: Code[50];
     begin
         //-NPR5.43 [317108]
         Var1Value := GetVariantValue("Variant Code Part 1");
@@ -492,7 +492,7 @@ table 6059976 "NPR Variety Group"
         //+NPR5.43 [317108]
     end;
 
-    local procedure GetVariantValue(SelectedOption: Option " ",Variety1Value,Variety2Value,Variety3Value,Variety4Value,NoSeries): Code[20]
+    local procedure GetVariantValue(SelectedOption: Option " ",Variety1Value,Variety2Value,Variety3Value,Variety4Value,NoSeries): Code[50]
     var
         VarietyValue: Record "NPR Variety Value";
     begin
@@ -528,12 +528,12 @@ table 6059976 "NPR Variety Group"
         //+NPR5.43 [317108]
     end;
 
-    local procedure FormatValues(Value1: Code[20]; Sep1: Text; Value2: Code[20]; Sep2: Text; Value3: Code[20]): Code[20]
+    local procedure FormatValues(Value1: Code[50]; Sep1: Text; Value2: Code[50]; Sep2: Text; Value3: Code[50]): Code[50]
     var
         NewVariantCode: Code[50];
-        NewVar1Code: Code[20];
-        NewVar2Code: Code[20];
-        NewVar3Code: Code[20];
+        NewVar1Code: Code[50];
+        NewVar2Code: Code[50];
+        NewVar3Code: Code[50];
         CurrentLength: Integer;
     begin
         //-NPR5.43 [317108]

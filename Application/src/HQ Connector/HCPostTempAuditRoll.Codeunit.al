@@ -214,7 +214,7 @@ codeunit 6150902 "NPR HC Post Temp Audit Roll"
         end;
     end;
 
-    procedure PostTransaction(AccNo: Code[20]; Amount2: Decimal; CashRegisterNo: Code[10]; AccType: Integer; GlobalDimension1: Code[20]; ForceDesc: Text[50]; PostingDate: Date; var TempPost: Record "NPR HC Audit Roll Posting" temporary)
+    procedure PostTransaction(AccNo: Code[20]; Amount2: Decimal; CashRegisterNo: Code[10]; AccType: Integer; GlobalDimension1: Code[20]; ForceDesc: Text[80]; PostingDate: Date; var TempPost: Record "NPR HC Audit Roll Posting" temporary)
     var
         Bogf1: Label 'Todays changes %1 Register %2';
         Bogf2: Label 'Paind on %1 Register %2';

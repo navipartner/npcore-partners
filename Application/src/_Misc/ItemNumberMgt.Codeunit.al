@@ -175,7 +175,7 @@ codeunit 6060042 "NPR Item Number Mgt."
         end;
     end;
 
-    procedure GetItemBarcode(ItemNo: Code[20]; VariantCode: Code[20]; UnitOfMeasure: Code[10]; VendorNo: Code[20]) BarCode: Code[20]
+    procedure GetItemBarcode(ItemNo: Code[20]; VariantCode: Code[20]; UnitOfMeasure: Code[10]; VendorNo: Code[20]) BarCode: Code[50]
     var
         Item: Record Item;
         ItemReference: Record "Item Reference";
@@ -239,7 +239,7 @@ codeunit 6060042 "NPR Item Number Mgt."
         exit(Item."Vendor Item No.");
     end;
 
-    procedure UpdateBarcode(ItemNo: Code[20]; VariantCode: Code[20]; BarCode: Code[20]; BarCodeType: Option AltNo,CrossReference)
+    procedure UpdateBarcode(ItemNo: Code[20]; VariantCode: Code[20]; BarCode: Code[50]; BarCodeType: Option AltNo,CrossReference)
     var
         ItemReference: Record "Item Reference";
         Item: Record Item;

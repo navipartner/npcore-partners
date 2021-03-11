@@ -539,7 +539,7 @@ xmlport 6150902 "NPR HC Sales Document"
                         fieldelement(icpartnerreftype; "Sales Line"."IC Partner Ref. Type")
                         {
                         }
-                        fieldelement(icpartnerreference; "Sales Line"."IC Partner Reference")
+                        fieldelement(icpartnerreference; "Sales Line"."IC Item Reference No.")
                         {
                         }
                         fieldelement(prepaymentpercent; "Sales Line"."Prepayment %")
