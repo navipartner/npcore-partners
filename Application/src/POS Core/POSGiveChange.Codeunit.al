@@ -1,11 +1,7 @@
 codeunit 6150634 "NPR POS Give Change"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
-        TextNoReturnPaymentType: Label 'Setup missing: no %1 could be found to give the customer change in. ';
+        TextNoReturnPaymentType: Label 'Setup missing: no %1 could be found to give the customer change in. ', Comment = '%1=POSPaymentMethod.TableCaption()';
         TextChange: Label 'Change';
         POSSetup: Codeunit "NPR POS Setup";
 
@@ -46,42 +42,33 @@ codeunit 6150634 "NPR POS Give Change"
         exit((PaymentAmount - SaleAmount - RoundingAmount));
     end;
 
-    local procedure "--- Helper functions"()
-    begin
-    end;
-
     local procedure InsertOutPaymentLine(var SalePOS: Record "NPR Sale POS"; AmountIn: Decimal; NoIn: Code[10]; DescriptionIn: Text)
     var
         SaleLinePOS: Record "NPR Sale Line POS";
     begin
-        with SaleLinePOS do begin
-            Init;
-            "Register No." := SalePOS."Register No.";
-            "Sales Ticket No." := SalePOS."Sales Ticket No.";
-            Date := SalePOS.Date;
-            "Sale Type" := "Sale Type"::Payment;
-            "Line No." := GetLastLineNo(SalePOS) + 10000;
-            Insert(true);
-            "Location Code" := SalePOS."Location Code";
-            Reference := SalePOS.Reference;
-            Type := Type::Payment;
-            "No." := NoIn;
-            Description := DescriptionIn;
-            "Amount Including VAT" := AmountIn;
-            "Shortcut Dimension 1 Code" := SalePOS."Shortcut Dimension 1 Code";
-            "Shortcut Dimension 2 Code" := SalePOS."Shortcut Dimension 2 Code";
-            "Dimension Set ID" := SalePOS."Dimension Set ID";
-            Modify(true);
-        end;
+        SaleLinePOS.Init();
+        SaleLinePOS."Register No." := SalePOS."Register No.";
+        SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
+        SaleLinePOS.Date := SalePOS.Date;
+        SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Payment;
+        SaleLinePOS."Line No." := GetLastLineNo(SalePOS) + 10000;
+        SaleLinePOS.Insert(true);
+        SaleLinePOS."Location Code" := SalePOS."Location Code";
+        SaleLinePOS.Reference := SalePOS.Reference;
+        SaleLinePOS.Type := SaleLinePOS.Type::Payment;
+        SaleLinePOS."No." := NoIn;
+        SaleLinePOS.Description := DescriptionIn;
+        SaleLinePOS."Amount Including VAT" := AmountIn;
+        SaleLinePOS."Shortcut Dimension 1 Code" := SalePOS."Shortcut Dimension 1 Code";
+        SaleLinePOS."Shortcut Dimension 2 Code" := SalePOS."Shortcut Dimension 2 Code";
+        SaleLinePOS."Dimension Set ID" := SalePOS."Dimension Set ID";
+        SaleLinePOS.Modify(true);
     end;
 
     local procedure GetReturnPaymentType(SalePOS: Record "NPR Sale POS"): Code[10]
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
-        POSUnit: Record "NPR POS Unit";
     begin
-        POSUnit.Get(SalePOS."Register No.");
-
         POSPaymentMethod.Reset();
         POSPaymentMethod.SetRange("Processing Type", POSPaymentMethod."Processing Type"::CASH);
         POSPaymentMethod.SetRange("Block POS Payment", false);
@@ -89,13 +76,13 @@ codeunit 6150634 "NPR POS Give Change"
         if POSPaymentMethod.FindFirst then
             exit(POSPaymentMethod.Code);
 
-        Error(TextNoReturnPaymentType, POSPaymentMethod.TableCaption);
+        Error(TextNoReturnPaymentType, POSPaymentMethod.TableCaption());
     end;
 
     local procedure GetRoundingAmount(SalePOS: Record "NPR Sale POS"; ChangeAmount: Decimal): Decimal
     begin
-        SetPOSSetupPOSUnitContext(SalePOS."Register No.");
-        if (POSSetup.AmountRoundingPrecision = 0) or (POSSetup.RoundingAccount(false) = '') then
+        SetPOSSetupPOSUnitContext(SalePOS."POS Store Code");
+        if (POSSetup.AmountRoundingPrecision() = 0) or (POSSetup.RoundingAccount(false) = '') then
             exit(0);
         exit(ChangeAmount - Round(ChangeAmount, POSSetup.AmountRoundingPrecision, POSSetup.AmountRoundingDirection));
     end;
@@ -104,13 +91,11 @@ codeunit 6150634 "NPR POS Give Change"
     var
         SaleLinePOS: Record "NPR Sale Line POS";
     begin
-        with SaleLinePOS do begin
-            SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
-            SetRange("Register No.", SalePOS."Register No.");
-            SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-            if SaleLinePOS.FindLast then;
-            exit(SaleLinePOS."Line No.");
-        end;
+        SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        if SaleLinePOS.FindLast() then;
+        exit(SaleLinePOS."Line No.");
     end;
 
     local procedure GetSaleAmountInclTax(SalePOS: Record "NPR Sale POS"): Decimal
@@ -118,28 +103,26 @@ codeunit 6150634 "NPR POS Give Change"
         SaleLinePOS: Record "NPR Sale Line POS";
         TotalAmount: Decimal;
     begin
-        with SaleLinePOS do begin
-            SetRange("Register No.", SalePOS."Register No.");
-            SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-            SetRange(Date, SalePOS.Date);
-            SetRange("Sale Type", "Sale Type"::Sale);
-            if FindSet then
-                repeat
-                    TotalAmount := TotalAmount + "Amount Including VAT";
-                until Next = 0;
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetRange(Date, SalePOS.Date);
+        SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
+        if SaleLinePOS.FindSet() then
+            repeat
+                TotalAmount := TotalAmount + SaleLinePOS."Amount Including VAT";
+            until SaleLinePOS.Next() = 0;
 
-            SetRange("Sale Type", "Sale Type"::Deposit);
-            if FindSet then
-                repeat
-                    TotalAmount := TotalAmount + "Amount Including VAT";
-                until Next = 0;
+        SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Deposit);
+        if SaleLinePOS.FindSet() then
+            repeat
+                TotalAmount := TotalAmount + SaleLinePOS."Amount Including VAT";
+            until SaleLinePOS.Next() = 0;
 
-            SetRange("Sale Type", "Sale Type"::"Out payment");
-            if FindSet then
-                repeat
-                    TotalAmount := TotalAmount - "Amount Including VAT";
-                until Next = 0;
-        end;
+        SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::"Out payment");
+        if SaleLinePOS.FindSet() then
+            repeat
+                TotalAmount := TotalAmount - SaleLinePOS."Amount Including VAT";
+            until SaleLinePOS.Next() = 0;
         exit(TotalAmount);
     end;
 
@@ -148,16 +131,14 @@ codeunit 6150634 "NPR POS Give Change"
         SaleLinePOS: Record "NPR Sale Line POS";
         TotalAmount: Decimal;
     begin
-        with SaleLinePOS do begin
-            SetRange("Register No.", SalePOS."Register No.");
-            SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-            SetRange(Date, SalePOS.Date);
-            SetRange("Sale Type", "Sale Type"::Payment);
-            if FindSet then
-                repeat
-                    TotalAmount := TotalAmount + "Amount Including VAT";
-                until Next = 0;
-        end;
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetRange(Date, SalePOS.Date);
+        SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Payment);
+        if SaleLinePOS.FindSet() then
+            repeat
+                TotalAmount := TotalAmount + SaleLinePOS."Amount Including VAT";
+            until SaleLinePOS.Next() = 0;
         exit(TotalAmount);
     end;
 

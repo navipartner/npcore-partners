@@ -1,10 +1,5 @@
 codeunit 6150636 "NPR POS Rounding"
 {
-
-    trigger OnRun()
-    begin
-    end;
-
     procedure InsertRounding(SalePOS: Record "NPR Sale POS"; RoundAmount: Decimal) InsertedRounding: Decimal
     var
         GLAccount: Record "G/L Account";
@@ -32,7 +27,7 @@ codeunit 6150636 "NPR POS Rounding"
         SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        if SaleLinePOS.FindLast then;
+        if SaleLinePOS.FindLast() then;
         exit(SaleLinePOS."Line No.");
     end;
 
