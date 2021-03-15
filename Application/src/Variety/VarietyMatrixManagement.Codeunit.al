@@ -1,20 +1,5 @@
 codeunit 6059971 "NPR Variety Matrix Management"
 {
-    // NPR4.15/JDH/20150730 CASE 224331 Fixed calculation of inventory to use new field
-    // VRT1.11/MHA/20160412 CASE 236840 Cell Data not be displayed for Blocked variants
-    // NPR5.28/JDH /20161128 CASE 255961 Added Functions to handle OnDrillDown Event
-    // VRT1.20/JDH /20170106 CASE 260545 Total Quantity added
-    // NPR5.31/JDH /20170502 CASE 271133 Added Purchase Prices
-    // NPR5.32/JDH /20170510 CASE 274170 Variable Cleanup
-    // NPR5.33/JDH /20170629 CASE 282177 Deletes reference to Item Variant that is deleted
-    // NPR5.36/NPKNAV/20171003  CASE 285733 Transport NPR5.36 - 3 October 2017
-    // NPR5.47/JDH /20180917 CASE 324997 Added New publisher to use for more flexible publisher subscriber funktionality
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         TMPVRTBuffer: Record "NPR Variety Buffer" temporary;
         MRecref: RecordRef;
@@ -26,23 +11,13 @@ codeunit 6059971 "NPR Variety Matrix Management"
     procedure SetRecord(MasterRecRef: RecordRef; ItemNo: Code[20])
     begin
         MRecref := MasterRecRef;
-        //-NPR5.36 [285733]
-        //IF MasterRecRef.NUMBER = DATABASE::"Item Variant" THEN BEGIN
-        //  TMPVRTBuffer.LoadAll(TMPVRTBuffer, ItemNo, TRUE, MasterRecRef.RECORDID);
-        //END ELSE BEGIN
-        //  TMPVRTBuffer.LoadAll(TMPVRTBuffer, ItemNo, FALSE, MasterRecRef.RECORDID);
-        //  SetRecordDefault(MRecref);
-        //END;
-        //+NPR5.36 [285733]
     end;
 
     procedure LoadMatrixData(ItemNo: Code[20]; HideInactive: Boolean)
     begin
-        //-NPR5.36 [285733]
         TMPVRTBuffer.LoadCombinations(TMPVRTBuffer, ItemNo, MRecref.Number = DATABASE::"Item Variant", MRecref.RecordId, HideInactive);
         if MRecref.Number <> DATABASE::"Item Variant" then
             SetRecordDefault(MRecref);
-        //+NPR5.36 [285733]
     end;
 
     procedure GetValue(VRT1Value: Code[50]; VRT2Value: Code[50]; VRT3Value: Code[50]; VRT4Value: Code[50]; VRTFieldSetup: Record "NPR Variety Field Setup"; var ItemFilters: Record Item) TextValue: Text[250]
@@ -56,10 +31,8 @@ codeunit 6059971 "NPR Variety Matrix Management"
         if TMPVRTBuffer."Variant Code" = '' then
             exit('-');
 
-        //-VRT1.11
         if ItemVariant.Get(TMPVRTBuffer."Item No.", TMPVRTBuffer."Variant Code") and ItemVariant."NPR Blocked" and ((VRTFieldSetup."Table No." <> DATABASE::"Item Variant") or (VRTFieldSetup."Field No." <> ItemVariant.FieldNo("NPR Blocked"))) then
             exit('-');
-        //+VRT1.11
 
         case VRTFieldSetup.Type of
             VRTFieldSetup.Type::Field:
@@ -71,10 +44,7 @@ codeunit 6059971 "NPR Variety Matrix Management"
                                 FRef := RecRef.Field(VRTFieldSetup."Field No.");
                                 TextValue := Format(FRef.Value);
                             end;
-                        //-NPR5.31 [271133]
-                        //VRTFieldSetup."Table No." = 7002:
                         VRTFieldSetup."Table No." in [7002, 7012]:
-                            //+NPR5.31 [271133]
                             begin
                                 if (Format(TMPVRTBuffer."Master Record ID") <> '') then begin
                                     RecRef.Get(TMPVRTBuffer."Master Record ID");
@@ -86,25 +56,18 @@ codeunit 6059971 "NPR Variety Matrix Management"
                 end;
             VRTFieldSetup.Type::Internal:
                 begin
-                    //-NPR5.47 [327541]
-                    //TextValue := GetIntFunc(VRTFieldSetup, LocationFilter, GD1, GD2);
                     TextValue := GetIntFunc(VRTFieldSetup, ItemFilters."Location Filter", ItemFilters."Global Dimension 1 Filter", ItemFilters."Global Dimension 2 Filter");
-                    //+NPR5.47 [327541]
                 end;
-            //-NPR5.47 [327541]
             VRTFieldSetup.Type::Subscriber:
                 begin
                     GetVarietyMatrixFieldValue(TMPVRTBuffer, VRTFieldSetup, TextValue, VRTFieldSetup."Variety Matrix Subscriber 1", ItemFilters, 0);
                 end;
-        //+NPR5.47 [327541]
         end;
 
-        //-NPR5.47 [327541]
-        //IF VRTFieldSetup."Secondary Field No." = 0 THEN
         if ((VRTFieldSetup."Secondary Type" = VRTFieldSetup."Secondary Type"::Field) and (VRTFieldSetup."Secondary Field No." = 0)) or
            ((VRTFieldSetup."Secondary Type" = VRTFieldSetup."Secondary Type"::Internal) and (VRTFieldSetup."Secondary Field No." = 0)) or
-           ((VRTFieldSetup."Secondary Type" = VRTFieldSetup."Secondary Type"::Subscriber) and (VRTFieldSetup."Variety Matrix Subscriber 2" = '')) then
-            //+NPR5.47 [327541]
+           ((VRTFieldSetup."Secondary Type" = VRTFieldSetup."Secondary Type"::Subscriber) and (VRTFieldSetup."Variety Matrix Subscriber 2" = ''))
+        then
             exit;
 
         case VRTFieldSetup."Secondary Type" of
@@ -112,7 +75,6 @@ codeunit 6059971 "NPR Variety Matrix Management"
                 begin
                     if VRTFieldSetup."Table No." = VRTFieldSetup."Secondary Table No." then begin
                         if Format(TMPVRTBuffer."Record ID (TMP)") <> '' then begin
-                            //RecRef.GET(TMPVRTBuffer."Record ID (TMP)");
                             FRef := RecRef.Field(VRTFieldSetup."Secondary Field No.");
                             TextValue += ' (' + Format(FRef.Value) + ')';
                         end;
@@ -121,19 +83,13 @@ codeunit 6059971 "NPR Variety Matrix Management"
                 end;
             VRTFieldSetup."Secondary Type"::Internal:
                 begin
-                    //-NPR5.47 [327541]
-                    //TextValue += GetIntFunc2(VRTFieldSetup, LocationFilter, GD1, GD2);
                     TextValue += GetIntFunc2(VRTFieldSetup, ItemFilters."Location Filter", ItemFilters."Global Dimension 1 Filter", ItemFilters."Global Dimension 2 Filter");
-                    //+NPR5.47 [327541]
                 end;
-            //-NPR5.47 [327541]
             VRTFieldSetup."Secondary Type"::Subscriber:
                 begin
                     GetVarietyMatrixFieldValue(TMPVRTBuffer, VRTFieldSetup, TextValue2, VRTFieldSetup."Variety Matrix Subscriber 2", ItemFilters, 1);
                     TextValue += ' (' + TextValue2 + ')';
                 end;
-        //+NPR5.47 [327541]
-
         end;
     end;
 
@@ -149,10 +105,7 @@ codeunit 6059971 "NPR Variety Matrix Management"
         VRTCloneData: Codeunit "NPR Variety Clone Data";
     begin
         TMPVRTBuffer.Get(VRT1Value, VRT2Value, VRT3Value, VRT4Value);
-        //-NPR5.32 [274170]
-        //Item.GET(TMPVRTBuffer."Item No.");
         GetItem(TMPVRTBuffer."Item No.");
-        //+NPR5.32 [274170]
 
         case VRTFieldSetup.Type of
             VRTFieldSetup.Type::Field:
@@ -202,9 +155,7 @@ codeunit 6059971 "NPR Variety Matrix Management"
                             end;
                         'CODE':
                             begin
-                                //-NPR5.36 [288696]
                                 Evaluate(Code, NewValue);
-                                //+NPR5.36 [288696]
                                 if VRTFieldSetup."Validate Field" then
                                     FRef.Validate(Code)
                                 else
@@ -233,44 +184,17 @@ codeunit 6059971 "NPR Variety Matrix Management"
     procedure SetRecordDefault(var RecRef: RecordRef)
     var
         ItemVariant: Record "Item Variant";
-        KRef: KeyRef;
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         FRef: FieldRef;
-        Int: Integer;
         RecRef2: RecordRef;
         FRef2: FieldRef;
         ItemNoField: Integer;
         ItemVariantField: Integer;
+        Int: Integer;
     begin
         //filter on the lines so they can be used later
         RecRef2.Open(RecRef.Number);
-        case true of
-            RecRef2.FieldExist(6059971):
-                begin
-                    //Primary key filters (except Line no.)
-                    KRef := RecRef.KeyIndex(1);
-                    for Int := 1 to KRef.FieldCount do begin
-                        FRef := KRef.FieldIndex(Int);
-                        if UpperCase(Format(FRef.Type)) <> 'INTEGER' then begin
-                            //we dont want to filter on Line No.
-                            FRef2 := RecRef2.Field(FRef.Number);
-                            FRef2.SetRange(FRef.Value);
-                        end;
-                    end;
-                    //Master Line No. Filter
-                    FRef := RecRef.Field(6059971);
-                    FRef2 := RecRef2.Field(6059971);
-                    FRef2.SetRange(FRef.Value);
-                end;
-            RecRef2.FieldExist(6059972):
-                begin
-                    FRef := RecRef.Field(6059972);
-                    FRef2 := RecRef2.Field(6059972);
-                    FRef2.SetRange(FRef.Value);
-                end;
-            else
-                Error('NOT IMPLEMENTED YET');
-
-        end;
+        MasterLineMapMgt.FilterRecRefOnMasterId(RecRef2, RecRef, false);
 
         //find the important fields
         for Int := 1 to RecRef.FieldCount do begin
@@ -281,65 +205,6 @@ codeunit 6059971 "NPR Variety Matrix Management"
                 (FRef.Relation = 5401) and (ItemVariantField = 0):
                     ItemVariantField := FRef.Number;
             end;
-        end;
-
-        if RecRef2.FindSet(false, false) then
-            repeat
-                FRef := RecRef2.Field(ItemNoField);
-                FRef2 := RecRef2.Field(ItemVariantField);
-                if (Format(FRef2.Value) <> '') then begin
-                    ItemVariant.Get(FRef.Value, FRef2.Value);
-                    TMPVRTBuffer.Get(ItemVariant."NPR Variety 1 Value", ItemVariant."NPR Variety 2 Value",
-                                     ItemVariant."NPR Variety 3 Value", ItemVariant."NPR Variety 4 Value");
-                    TMPVRTBuffer."Record ID (TMP)" := RecRef2.RecordId;
-                    TMPVRTBuffer.Modify;
-                end;
-            until RecRef2.Next = 0;
-    end;
-
-    procedure SetRecordDefaultRR(var RecRef: RecordRef)
-    var
-        ItemVariant: Record "Item Variant";
-        KRef: KeyRef;
-        FRef: FieldRef;
-        Int: Integer;
-        RecRef2: RecordRef;
-        FRef2: FieldRef;
-        ItemNoField: Integer;
-        ItemVariantField: Integer;
-    begin
-        //filter on the lines so they can be used later
-        RecRef2.Open(RecRef.Number);
-
-        KRef := RecRef.KeyIndex(1);
-        for Int := 1 to KRef.FieldCount do begin
-            FRef := KRef.FieldIndex(Int);
-            if UpperCase(Format(FRef.Type)) <> 'INTEGER' then begin
-                //we dont want to filter on Line No.
-                FRef2 := RecRef2.Field(FRef.Number);
-                FRef2.SetRange(FRef.Value);
-            end;
-        end;
-
-        //find the important fields
-        for Int := 1 to RecRef.FieldCount do begin
-            FRef := RecRef.FieldIndex(Int);
-            case true of
-                (FRef.Relation = 27) and (ItemNoField = 0):
-                    ItemNoField := FRef.Number;
-                (FRef.Relation = 5401) and (ItemVariantField = 0):
-                    ItemVariantField := FRef.Number;
-            end;
-        end;
-
-        //Master Line No. Filter
-        if RecRef2.FieldExist(6059971) then begin
-            FRef := RecRef.Field(6059971);
-            FRef2 := RecRef2.Field(6059971);
-            FRef2.SetRange(FRef.Value);
-        end else begin
-            //the field Master Line no. doesnt exists as number 6059971 -> find it
-            Error('NOT IMPLEMENTED YET');
         end;
 
         if RecRef2.FindSet(false, false) then
@@ -404,10 +269,6 @@ codeunit 6059971 "NPR Variety Matrix Management"
         exit(' (' + GetIntFunc(VRTFieldSetup, LocationFilter, GD1, GD2) + ')');
     end;
 
-    local procedure GetSubscriberValue(FunctionName: Text)
-    begin
-    end;
-
     procedure SetValueIntFunc(VRTFieldSetup: Record "NPR Variety Field Setup"; NewValue: Text[250])
     var
         VRTCloneData: Codeunit "NPR Variety Clone Data";
@@ -425,15 +286,12 @@ codeunit 6059971 "NPR Variety Matrix Management"
                         //delete Variant
                         ItemVariant.Get(TMPVRTBuffer."Item No.", TMPVRTBuffer."Variant Code");
                         ItemVariant.Delete(true);
-                        //-NPR5.33 [282177]
                         TMPVRTBuffer."Variant Code" := '';
                         TMPVRTBuffer.Modify;
-                        //+NPR5.33 [282177]
                     end else begin
                         VRTCloneData.SetupVariant(Item, TMPVRTBuffer, NewValue);
                         TMPVRTBuffer.Modify;
                     end;
-                    //+NPR5.32 [274170]
                 end;
             3: //Barcode (ItemRef)
                 begin
@@ -491,64 +349,33 @@ codeunit 6059971 "NPR Variety Matrix Management"
     procedure OnDrillDown(VrtBuffer: Record "NPR Variety Buffer"; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; var ItemFilters: Record Item)
     begin
         TMPVRTBuffer.Get(VrtBuffer."Variety 1 Value", VrtBuffer."Variety 2 Value", VrtBuffer."Variety 3 Value", VrtBuffer."Variety 4 Value");
-        //-NPR5.47 [324997]
         if VrtFieldSetup."OnDrillDown Subscriber" <> '' then
             OnDrillDownVarietyMatrix(TMPVRTBuffer, VrtFieldSetup, FieldValue, 0, ItemFilters)
         else
-            //+NPR5.47 [324997]
-            OnDrillDownEvent(TMPVRTBuffer, VrtFieldSetup, FieldValue); //-NPR5.36 [288696] Added FieldValue parameter
+            OnDrillDownEvent(TMPVRTBuffer, VrtFieldSetup, FieldValue);
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnDrillDownEvent(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024])
     begin
-        //-NPR5.28 [255961]
-        //-NPR5.36 [288696] Added FieldValue parameter
     end;
 
     procedure GetTotal(RecRef: RecordRef; FieldNo: Integer): Decimal
     var
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         RecRef2: RecordRef;
-        KRef: KeyRef;
         FRef: FieldRef;
         FRef2: FieldRef;
         Int: Integer;
         Total: Decimal;
         Dec: Decimal;
     begin
-        //-VRT1.20 [260545]
         FRef := RecRef.Field(FieldNo);
         if UpperCase(Format(FRef.Type)) <> 'DECIMAL' then
             exit;
         RecRef2.Open(RecRef.Number);
-        case true of
-            RecRef2.FieldExist(6059971):
-                begin
-                    //Primary key filters (except Line no.)
-                    KRef := RecRef.KeyIndex(1);
-                    for Int := 1 to KRef.FieldCount do begin
-                        FRef := KRef.FieldIndex(Int);
-                        if UpperCase(Format(FRef.Type)) <> 'INTEGER' then begin
-                            //we dont want to filter on Line No.
-                            FRef2 := RecRef2.Field(FRef.Number);
-                            FRef2.SetRange(FRef.Value);
-                        end;
-                    end;
-                    //Master Line No. Filter
-                    FRef := RecRef.Field(6059971);
-                    FRef2 := RecRef2.Field(6059971);
-                    FRef2.SetRange(FRef.Value);
-                end;
-            RecRef2.FieldExist(6059972):
-                begin
-                    FRef := RecRef.Field(6059972);
-                    FRef2 := RecRef2.Field(6059972);
-                    FRef2.SetRange(FRef.Value);
-                end;
-            else
-                Error('NOT IMPLEMENTED YET');
 
-        end;
+        MasterLineMapMgt.FilterRecRefOnMasterId(RecRef2, RecRef, false);
 
         if RecRef2.FindSet(false, false) then
             repeat
@@ -558,7 +385,6 @@ codeunit 6059971 "NPR Variety Matrix Management"
             until RecRef2.Next = 0;
 
         exit(Total);
-        //+VRT1.20 [260545]
     end;
 
     procedure MATRIX_GenerateColumnCaptions(MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn; Item: Record Item; ShowCrossVRTNo: Option VRT1,VRT2,VRT3,VRT4; var MATRIX_CaptionSet: array[10] of Text; var MATRIX_CurrentNoOfColumns: Integer; var MATRIX_CaptionRange: Text; HideInactive: Boolean; var MATRIX_PrimKeyFirstCaptionInCu: Text)
@@ -573,7 +399,6 @@ codeunit 6059971 "NPR Variety Matrix Management"
         Variety4UsedValues: Query "NPR Variety 4 Used Values";
         VarietyNotUsed: Boolean;
     begin
-        //-NPR5.31 [271133]
         Clear(MATRIX_CaptionSet);
         MATRIX_CurrentNoOfColumns := ArrayLen(MATRIX_CaptionSet);
 
@@ -583,10 +408,8 @@ codeunit 6059971 "NPR Variety Matrix Management"
                 ShowCrossVRTNo::VRT1:
                     begin
                         Variety1UsedValues.SetRange(Item_No_Filter, Item."No.");
-                        //-NPR5.36 [285733]
                         Variety1UsedValues.SetRange(Variety_1, Item."NPR Variety 1");
                         Variety1UsedValues.SetRange(Variety_1_Table, Item."NPR Variety 1 Table");
-                        //+NPR5.36 [285733]
 
                         Variety1UsedValues.SetRange(Blocked, false);
                         Variety1UsedValues.Open;
@@ -595,7 +418,6 @@ codeunit 6059971 "NPR Variety Matrix Management"
                                 TempVarietyValue.Init;
                                 TempVarietyValue := VarietyValue;
                                 TempVarietyValue.Insert;
-                                //END;
                             end else
                                 VarietyNotUsed := Variety1UsedValues.Variety_1 = '';
                         end;
@@ -603,10 +425,8 @@ codeunit 6059971 "NPR Variety Matrix Management"
                 ShowCrossVRTNo::VRT2:
                     begin
                         Variety2UsedValues.SetRange(Item_No_Filter, Item."No.");
-                        //-NPR5.36 [285733]
                         Variety2UsedValues.SetRange(Variety_2, Item."NPR Variety 2");
                         Variety2UsedValues.SetRange(Variety_2_Table, Item."NPR Variety 2 Table");
-                        //+NPR5.36 [285733]
 
                         Variety2UsedValues.SetRange(Blocked, false);
                         Variety2UsedValues.Open;
@@ -615,7 +435,6 @@ codeunit 6059971 "NPR Variety Matrix Management"
                                 TempVarietyValue.Init;
                                 TempVarietyValue := VarietyValue;
                                 TempVarietyValue.Insert;
-                                //END;
                             end else
                                 VarietyNotUsed := Variety2UsedValues.Variety_2 = '';
 
@@ -624,11 +443,8 @@ codeunit 6059971 "NPR Variety Matrix Management"
                 ShowCrossVRTNo::VRT3:
                     begin
                         Variety3UsedValues.SetRange(Item_No_Filter, Item."No.");
-                        //-NPR5.36 [285733]
                         Variety3UsedValues.SetRange(Variety_3, Item."NPR Variety 3");
                         Variety3UsedValues.SetRange(Variety_3_Table, Item."NPR Variety 3 Table");
-                        //+NPR5.36 [285733]
-
                         Variety3UsedValues.SetRange(Blocked, false);
                         Variety3UsedValues.Open;
                         while Variety3UsedValues.Read do begin
@@ -642,11 +458,8 @@ codeunit 6059971 "NPR Variety Matrix Management"
                 ShowCrossVRTNo::VRT4:
                     begin
                         Variety4UsedValues.SetRange(Item_No_Filter, Item."No.");
-                        //-NPR5.36 [285733]
                         Variety4UsedValues.SetRange(Variety_4, Item."NPR Variety 4");
                         Variety4UsedValues.SetRange(Variety_4_Table, Item."NPR Variety 4 Table");
-                        //+NPR5.36 [285733]
-
                         Variety4UsedValues.SetRange(Blocked, false);
                         Variety4UsedValues.Open;
                         while Variety4UsedValues.Read do begin
@@ -656,7 +469,6 @@ codeunit 6059971 "NPR Variety Matrix Management"
                                 TempVarietyValue.Insert;
                             end;
                         end;
-
                     end;
             end;
             TempVarietyValue.SetCurrentKey(Type, Table, "Sort Order");
@@ -731,7 +543,6 @@ codeunit 6059971 "NPR Variety Matrix Management"
 
         MatrixMgt.GenerateMatrixData(RecRef, MATRIX_SetWanted, ArrayLen(MATRIX_CaptionSet), 3,
           MATRIX_PrimKeyFirstCaptionInCu, MATRIX_CaptionSet, MATRIX_CaptionRange, MATRIX_CurrentNoOfColumns);
-        //+NPR5.31 [271133]
     end;
 
     procedure TickAllCombinations(VRTFieldSetup: Record "NPR Variety Field Setup")
@@ -739,22 +550,17 @@ codeunit 6059971 "NPR Variety Matrix Management"
         ItemVariant: Record "Item Variant";
         VRTCloneData: Codeunit "NPR Variety Clone Data";
     begin
-        //-NPR5.32 [274170]
-        with TMPVRTBuffer do begin
-            //LoadAll(TMPVRTBuffer, Item."No.", FALSE, Item.RECORDID);
-            if FindSet then
-                repeat
-                    if (VRTFieldSetup.Type = VRTFieldSetup.Type::Internal) and (VRTFieldSetup."Field No." = 2) then begin
-                        //create Variant
-                        if not VRTCloneData.GetFromVariety(ItemVariant, "Item No.", "Variety 1 Value", "Variety 2 Value", "Variety 3 Value", "Variety 4 Value") then
-                            SetValue("Variety 1 Value", "Variety 2 Value", "Variety 3 Value", "Variety 4 Value", VRTFieldSetup, Format(true));
-                    end else begin
-                        if VRTCloneData.GetFromVariety(ItemVariant, "Item No.", "Variety 1 Value", "Variety 2 Value", "Variety 3 Value", "Variety 4 Value") then
-                            SetValue("Variety 1 Value", "Variety 2 Value", "Variety 3 Value", "Variety 4 Value", VRTFieldSetup, Format(true));
-                    end;
-                until Next = 0;
-        end;
-        //+NPR5.32 [274170]
+        if TMPVRTBuffer.FindSet then
+            repeat
+                if (VRTFieldSetup.Type = VRTFieldSetup.Type::Internal) and (VRTFieldSetup."Field No." = 2) then begin
+                    //create Variant
+                    if not VRTCloneData.GetFromVariety(ItemVariant, TMPVRTBuffer."Item No.", TMPVRTBuffer."Variety 1 Value", TMPVRTBuffer."Variety 2 Value", TMPVRTBuffer."Variety 3 Value", TMPVRTBuffer."Variety 4 Value") then
+                        SetValue(TMPVRTBuffer."Variety 1 Value", TMPVRTBuffer."Variety 2 Value", TMPVRTBuffer."Variety 3 Value", TMPVRTBuffer."Variety 4 Value", VRTFieldSetup, Format(true));
+                end else begin
+                    if VRTCloneData.GetFromVariety(ItemVariant, TMPVRTBuffer."Item No.", TMPVRTBuffer."Variety 1 Value", TMPVRTBuffer."Variety 2 Value", TMPVRTBuffer."Variety 3 Value", TMPVRTBuffer."Variety 4 Value") then
+                        SetValue(TMPVRTBuffer."Variety 1 Value", TMPVRTBuffer."Variety 2 Value", TMPVRTBuffer."Variety 3 Value", TMPVRTBuffer."Variety 4 Value", VRTFieldSetup, Format(true));
+                end;
+            until TMPVRTBuffer.Next = 0;
     end;
 
     procedure TickCurrentRow(VRTFieldSetup: Record "NPR Variety Field Setup"; CurrVRTBuffer: Record "NPR Variety Buffer")
@@ -762,67 +568,54 @@ codeunit 6059971 "NPR Variety Matrix Management"
         ItemVariant: Record "Item Variant";
         VRTCloneData: Codeunit "NPR Variety Clone Data";
     begin
-        //-NPR5.32 [274170]
-        with TMPVRTBuffer do begin
-            //LoadAll(TMPVRTBuffer, Item."No.", FALSE, Item.RECORDID);
-            if (CurrVRTBuffer."Variety 1 Value" <> '') then
-                SetRange("Variety 1 Value", CurrVRTBuffer."Variety 1 Value");
-            if (CurrVRTBuffer."Variety 2 Value" <> '') then
-                SetRange("Variety 2 Value", CurrVRTBuffer."Variety 2 Value");
-            if (CurrVRTBuffer."Variety 3 Value" <> '') then
-                SetRange("Variety 3 Value", CurrVRTBuffer."Variety 3 Value");
-            if (CurrVRTBuffer."Variety 4 Value" <> '') then
-                SetRange("Variety 4 Value", CurrVRTBuffer."Variety 4 Value");
+        if (CurrVRTBuffer."Variety 1 Value" <> '') then
+            TMPVRTBuffer.SetRange(TMPVRTBuffer."Variety 1 Value", CurrVRTBuffer."Variety 1 Value");
+        if (CurrVRTBuffer."Variety 2 Value" <> '') then
+            TMPVRTBuffer.SetRange(TMPVRTBuffer."Variety 2 Value", CurrVRTBuffer."Variety 2 Value");
+        if (CurrVRTBuffer."Variety 3 Value" <> '') then
+            TMPVRTBuffer.SetRange(TMPVRTBuffer."Variety 3 Value", CurrVRTBuffer."Variety 3 Value");
+        if (CurrVRTBuffer."Variety 4 Value" <> '') then
+            TMPVRTBuffer.SetRange(TMPVRTBuffer."Variety 4 Value", CurrVRTBuffer."Variety 4 Value");
 
-            if FindSet then
-                repeat
-                    if (VRTFieldSetup.Type = VRTFieldSetup.Type::Internal) and (VRTFieldSetup."Field No." = 2) then begin
-                        //create Variant
-                        if not VRTCloneData.GetFromVariety(ItemVariant, "Item No.", "Variety 1 Value", "Variety 2 Value", "Variety 3 Value", "Variety 4 Value") then
-                            SetValue("Variety 1 Value", "Variety 2 Value", "Variety 3 Value", "Variety 4 Value", VRTFieldSetup, Format(true));
-                    end else begin
-                        if VRTCloneData.GetFromVariety(ItemVariant, "Item No.", "Variety 1 Value", "Variety 2 Value", "Variety 3 Value", "Variety 4 Value") then
-                            SetValue("Variety 1 Value", "Variety 2 Value", "Variety 3 Value", "Variety 4 Value", VRTFieldSetup, Format(true));
-                    end;
-                until Next = 0;
+        if TMPVRTBuffer.FindSet then
+            repeat
+                if (VRTFieldSetup.Type = VRTFieldSetup.Type::Internal) and (VRTFieldSetup."Field No." = 2) then begin
+                    //create Variant
+                    if not VRTCloneData.GetFromVariety(ItemVariant, TMPVRTBuffer."Item No.", TMPVRTBuffer."Variety 1 Value", TMPVRTBuffer."Variety 2 Value", TMPVRTBuffer."Variety 3 Value", TMPVRTBuffer."Variety 4 Value") then
+                        SetValue(TMPVRTBuffer."Variety 1 Value", TMPVRTBuffer."Variety 2 Value", TMPVRTBuffer."Variety 3 Value", TMPVRTBuffer."Variety 4 Value", VRTFieldSetup, Format(true));
+                end else begin
+                    if VRTCloneData.GetFromVariety(ItemVariant, TMPVRTBuffer."Item No.", TMPVRTBuffer."Variety 1 Value", TMPVRTBuffer."Variety 2 Value", TMPVRTBuffer."Variety 3 Value", TMPVRTBuffer."Variety 4 Value") then
+                        SetValue(TMPVRTBuffer."Variety 1 Value", TMPVRTBuffer."Variety 2 Value", TMPVRTBuffer."Variety 3 Value", TMPVRTBuffer."Variety 4 Value", VRTFieldSetup, Format(true));
+                end;
+            until TMPVRTBuffer.Next = 0;
 
-            SetRange("Variety 1 Value");
-            SetRange("Variety 2 Value");
-            SetRange("Variety 3 Value");
-            SetRange("Variety 4 Value");
-        end;
-        //+NPR5.32 [274170]
+        TMPVRTBuffer.SetRange(TMPVRTBuffer."Variety 1 Value");
+        TMPVRTBuffer.SetRange(TMPVRTBuffer."Variety 2 Value");
+        TMPVRTBuffer.SetRange(TMPVRTBuffer."Variety 3 Value");
+        TMPVRTBuffer.SetRange(TMPVRTBuffer."Variety 4 Value");
+
     end;
 
     local procedure GetItem(ItemNo: Code[20])
     begin
-        //-NPR5.32 [274170]
         if Item."No." = ItemNo then
             exit;
         Item.Get(ItemNo);
-        //+NPR5.32 [274170]
     end;
 
     procedure OnLookup(VrtBuffer: Record "NPR Variety Buffer"; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; var ItemFilters: Record Item)
     begin
-        //-NPR5.47 [324997]
         TMPVRTBuffer.Get(VrtBuffer."Variety 1 Value", VrtBuffer."Variety 2 Value", VrtBuffer."Variety 3 Value", VrtBuffer."Variety 4 Value");
         OnDrillDownVarietyMatrix(TMPVRTBuffer, VrtFieldSetup, FieldValue, 1, ItemFilters);
-        //+NPR5.47 [324997]
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnDrillDownVarietyMatrix(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; CalledFrom: Option OnDrillDown,OnLookup; var ItemFilters: Record Item)
     begin
-        //-NPR5.28 [255961]
-        //-NPR5.36 [288696] Added FieldValue parameter
     end;
 
     [IntegrationEvent(false, false)]
     local procedure GetVarietyMatrixFieldValue(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; SubscriberName: Text; var ItemFilters: Record Item; CalledFrom: Option PrimaryField,SecondaryField)
     begin
-        //-NPR5.47 [327541]
-        //+NPR5.47 [327541]
     end;
 }
-

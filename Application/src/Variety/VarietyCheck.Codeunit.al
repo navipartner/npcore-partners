@@ -111,31 +111,30 @@ codeunit 6059974 "NPR Variety Check"
         if ItemJnlLine."Item Charge No." <> '' then
             exit;
 
-        with ItemJnlLine do begin
-            case VRTSetup."Item Journal Blocking" of
-                VRTSetup."Item Journal Blocking"::TotalBlockItemIfVariants:
-                    begin
-                        ItemVar.SetRange("Item No.", "Item No.");
+        case VRTSetup."Item Journal Blocking" of
+            VRTSetup."Item Journal Blocking"::TotalBlockItemIfVariants:
+                begin
+                    ItemVar.SetRange("Item No.", ItemJnlLine."Item No.");
+                    ItemVar.SetRange("NPR Blocked", false);
+                    if not ItemVar.IsEmpty then
+                        ItemJnlLine.TestField(ItemJnlLine."Variant Code");
+                end;
+            VRTSetup."Item Journal Blocking"::SaleBlockItemIfVariants:
+                begin
+                    if ItemJnlLine."Entry Type" in [ItemJnlLine."Entry Type"::Purchase, ItemJnlLine."Entry Type"::Sale] then begin
+                        ItemVar.SetRange("Item No.", ItemJnlLine."Item No.");
                         ItemVar.SetRange("NPR Blocked", false);
                         if not ItemVar.IsEmpty then
-                            TestField("Variant Code");
+                            ItemJnlLine.TestField(ItemJnlLine."Variant Code");
                     end;
-                VRTSetup."Item Journal Blocking"::SaleBlockItemIfVariants:
-                    begin
-                        if ItemJnlLine."Entry Type" in [ItemJnlLine."Entry Type"::Purchase, ItemJnlLine."Entry Type"::Sale] then begin
-                            ItemVar.SetRange("Item No.", "Item No.");
-                            ItemVar.SetRange("NPR Blocked", false);
-                            if not ItemVar.IsEmpty then
-                                TestField("Variant Code");
-                        end;
-                    end;
-            end;
-
-            if "Variant Code" <> '' then begin
-                ItemVar.Get("Item No.", "Variant Code");
-                ItemVar.TestField("NPR Blocked", false);
-            end;
+                end;
         end;
+
+        if ItemJnlLine."Variant Code" <> '' then begin
+            ItemVar.Get(ItemJnlLine."Item No.", ItemJnlLine."Variant Code");
+            ItemVar.TestField("NPR Blocked", false);
+        end;
+
     end;
 
     procedure CheckDeleteVarietyValue(VRTValue: Record "NPR Variety Value")
@@ -283,265 +282,166 @@ codeunit 6059974 "NPR Variety Check"
 
     local procedure SetNewMasterLineT37(OldMasterLine: Record "Sales Line")
     var
-        SalesLine: Record "Sales Line";
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
     begin
-        with SalesLine do begin
-            SetRange("Document Type", OldMasterLine."Document Type");
-            SetRange("Document No.", OldMasterLine."Document No.");
-            SetRange("NPR Master Line No.", OldMasterLine."NPR Master Line No.");
-            SetRange("NPR Is Master", false);
-
-            if IsEmpty then
-                exit;
-
-            FindFirst;
-            ModifyAll("NPR Master Line No.", "Line No.", true);
-            Get("Document Type", "Document No.", "Line No.");
-            "NPR Is Master" := true;
-            Modify;
-        end;
+        MasterLineMapMgt.TransferOwnershipToNextInLine(Database::"Sales Line", OldMasterLine.SystemId);
     end;
 
     local procedure SetNewMasterLineT39(OldMasterLine: Record "Purchase Line")
     var
-        PurchaseLine: Record "Purchase Line";
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
     begin
-        with PurchaseLine do begin
-            SetRange("Document Type", OldMasterLine."Document Type");
-            SetRange("Document No.", OldMasterLine."Document No.");
-            SetRange("NPR Master Line No.", OldMasterLine."NPR Master Line No.");
-            SetRange("NPR Is Master", false);
-
-            if IsEmpty then
-                exit;
-
-            FindFirst;
-            ModifyAll("NPR Master Line No.", "Line No.", true);
-            Get("Document Type", "Document No.", "Line No.");
-            "NPR Is Master" := true;
-            Modify;
-        end;
+        MasterLineMapMgt.TransferOwnershipToNextInLine(Database::"Purchase Line", OldMasterLine.SystemId);
     end;
 
     local procedure SetNewMasterLineT83(OldMasterLine: Record "Item Journal Line")
     var
-        ItemJournalLine: Record "Item Journal Line";
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
     begin
-        with ItemJournalLine do begin
-            SetRange("Journal Template Name", OldMasterLine."Journal Template Name");
-            SetRange("Journal Batch Name", OldMasterLine."Journal Batch Name");
-            SetRange("NPR Master Line No.", OldMasterLine."NPR Master Line No.");
-            SetRange("NPR Is Master", false);
-
-            if IsEmpty then
-                exit;
-
-            FindFirst;
-            ModifyAll("NPR Master Line No.", "Line No.", true);
-            Get("Journal Template Name", "Journal Batch Name", "Line No.");
-            "NPR Is Master" := true;
-            Modify;
-        end;
+        MasterLineMapMgt.TransferOwnershipToNextInLine(Database::"Item Journal Line", OldMasterLine.SystemId);
     end;
 
     local procedure SetNewMasterLineT5741(OldMasterLine: Record "Transfer Line")
     var
-        TransferLine: Record "Transfer Line";
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
     begin
-        with TransferLine do begin
-            SetRange("Document No.", OldMasterLine."Document No.");
-            SetRange("NPR Master Line No.", OldMasterLine."NPR Master Line No.");
-            SetRange("NPR Is Master", false);
-
-            if IsEmpty then
-                exit;
-
-            FindFirst;
-            ModifyAll("NPR Master Line No.", "Line No.", true);
-            Get("Document No.", "Line No.");
-            "NPR Is Master" := true;
-            Modify;
-        end;
+        MasterLineMapMgt.TransferOwnershipToNextInLine(Database::"Transfer Line", OldMasterLine.SystemId);
     end;
 
     local procedure SetNewMasterLineT6014422(OldMasterLine: Record "NPR Retail Journal Line")
     var
-        RetailJournalLine: Record "NPR Retail Journal Line";
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
     begin
-        with RetailJournalLine do begin
-            SetRange("No.", OldMasterLine."No.");
-            SetRange("Master Line No.", OldMasterLine."Master Line No.");
-            SetRange("Is Master", false);
-
-            if IsEmpty then
-                exit;
-
-            FindFirst;
-            ModifyAll("Master Line No.", "Line No.", true);
-            Get("No.", "Line No.");
-            "Is Master" := true;
-            Modify;
-        end;
+        MasterLineMapMgt.TransferOwnershipToNextInLine(Database::"NPR Retail Journal Line", OldMasterLine.SystemId);
     end;
 
-    [EventSubscriber(ObjectType::Table, 37, 'OnAfterDeleteEvent', '', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterDeleteEvent', '', true, false)]
     local procedure OnAfterDeleteMasterVarietyLineT37(var Rec: Record "Sales Line"; RunTrigger: Boolean)
-    var
-        SalesLine: Record "Sales Line";
     begin
-        if Rec.IsTemporary then
-            exit;
-
-        if not Rec."NPR Is Master" then
+        if Rec.IsTemporary() then
             exit;
 
         SetNewMasterLineT37(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 37, 'OnAfterValidateEvent', 'No.', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterValidateEvent', 'No.', true, false)]
     local procedure OnAfterValidateItemNoT37(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
+    var
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
     begin
-        if Rec.IsTemporary then
-            exit;
-
-        if not xRec."NPR Is Master" then
-            exit;
-
-        if Rec."NPR Is Master" then
+        if Rec.IsTemporary() then
             exit;
 
         if Rec."No." = xRec."No." then
+            exit;
+
+        if MasterLineMapMgt.IsMaster(Database::"Sales Line", Rec.SystemId) then
             exit;
 
         SetNewMasterLineT37(xRec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 39, 'OnAfterDeleteEvent', '', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Purchase Line", 'OnAfterDeleteEvent', '', true, false)]
     local procedure OnAfterDeleteMasterVarietyLineT39(var Rec: Record "Purchase Line"; RunTrigger: Boolean)
-    var
-        SalesLine: Record "Sales Line";
     begin
-        if Rec.IsTemporary then
-            exit;
-
-        if not Rec."NPR Is Master" then
+        if Rec.IsTemporary() then
             exit;
 
         SetNewMasterLineT39(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 39, 'OnAfterValidateEvent', 'No.', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Purchase Line", 'OnAfterValidateEvent', 'No.', true, false)]
     local procedure OnAfterValidateItemNoT39(var Rec: Record "Purchase Line"; var xRec: Record "Purchase Line"; CurrFieldNo: Integer)
+    var
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
     begin
-        if Rec.IsTemporary then
-            exit;
-
-        if not xRec."NPR Is Master" then
-            exit;
-
-        if Rec."NPR Is Master" then
+        if Rec.IsTemporary() then
             exit;
 
         if Rec."No." = xRec."No." then
             exit;
 
+        if MasterLineMapMgt.IsMaster(Database::"Purchase Line", Rec.SystemId) then
+            exit;
+
         SetNewMasterLineT39(xRec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 83, 'OnAfterDeleteEvent', '', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Item Journal Line", 'OnAfterDeleteEvent', '', true, false)]
     local procedure OnAfterDeleteMasterVarietyLineT83(var Rec: Record "Item Journal Line"; RunTrigger: Boolean)
-    var
-        SalesLine: Record "Sales Line";
     begin
-        if Rec.IsTemporary then
-            exit;
-
-        if not Rec."NPR Is Master" then
+        if Rec.IsTemporary() then
             exit;
 
         SetNewMasterLineT83(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 83, 'OnAfterValidateEvent', 'Item No.', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Item Journal Line", 'OnAfterValidateEvent', 'Item No.', true, false)]
     local procedure OnAfterValidateItemNoT83(var Rec: Record "Item Journal Line"; var xRec: Record "Item Journal Line"; CurrFieldNo: Integer)
+    var
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
     begin
         if Rec.IsTemporary then
             exit;
 
-        if not xRec."NPR Is Master" then
-            exit;
-
-        if Rec."NPR Is Master" then
-            exit;
-
         if Rec."Item No." = xRec."Item No." then
+            exit;
+
+        if MasterLineMapMgt.IsMaster(Database::"Item Journal Line", Rec.SystemId) then
             exit;
 
         SetNewMasterLineT83(xRec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 5741, 'OnAfterDeleteEvent', '', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Transfer Line", 'OnAfterDeleteEvent', '', true, false)]
     local procedure OnAfterDeleteMasterVarietyLineT5741(var Rec: Record "Transfer Line"; RunTrigger: Boolean)
-    var
-        SalesLine: Record "Sales Line";
     begin
-        if Rec.IsTemporary then
-            exit;
-
-        if not Rec."NPR Is Master" then
+        if Rec.IsTemporary() then
             exit;
 
         SetNewMasterLineT5741(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 5741, 'OnAfterValidateEvent', 'Item No.', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Transfer Line", 'OnAfterValidateEvent', 'Item No.', true, false)]
     local procedure OnAfterValidateItemNoT5741(var Rec: Record "Transfer Line"; var xRec: Record "Transfer Line"; CurrFieldNo: Integer)
+    var
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
     begin
-        if Rec.IsTemporary then
-            exit;
-
-        if not xRec."NPR Is Master" then
-            exit;
-
-        if Rec."NPR Is Master" then
+        if Rec.IsTemporary() then
             exit;
 
         if Rec."Item No." = xRec."Item No." then
+            exit;
+
+        if MasterLineMapMgt.IsMaster(Database::"Transfer Line", Rec.SystemId) then
             exit;
 
         SetNewMasterLineT5741(xRec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014422, 'OnAfterDeleteEvent', '', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Retail Journal Line", 'OnAfterDeleteEvent', '', true, false)]
     local procedure OnAfterDeleteMasterVarietyLineT6014422(var Rec: Record "NPR Retail Journal Line"; RunTrigger: Boolean)
-    var
-        SalesLine: Record "Sales Line";
     begin
-        if Rec.IsTemporary then
-            exit;
-
-        if not Rec."Is Master" then
+        if Rec.IsTemporary() then
             exit;
 
         SetNewMasterLineT6014422(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6014422, 'OnAfterValidateEvent', 'Item No.', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Retail Journal Line", 'OnAfterValidateEvent', 'Item No.', true, false)]
     local procedure OnAfterValidateItemNoT6014422(var Rec: Record "NPR Retail Journal Line"; var xRec: Record "NPR Retail Journal Line"; CurrFieldNo: Integer)
+    var
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
     begin
-        if Rec.IsTemporary then
-            exit;
-
-        if not xRec."Is Master" then
-            exit;
-
-        if Rec."Is Master" then
+        if Rec.IsTemporary() then
             exit;
 
         if Rec."Item No." = xRec."Item No." then
             exit;
 
+        if MasterLineMapMgt.IsMaster(Database::"NPR Retail Journal Line", Rec.SystemId) then
+            exit;
+
         SetNewMasterLineT6014422(xRec);
     end;
 }
-

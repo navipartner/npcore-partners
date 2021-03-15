@@ -2,7 +2,6 @@ table 6014422 "NPR Retail Journal Line"
 {
     Caption = 'Retail Journal Line';
     DataClassification = CustomerContent;
-
     fields
     {
         field(1; "No."; Code[40])
@@ -504,12 +503,16 @@ table 6014422 "NPR Retail Journal Line"
             Caption = 'Is Master';
             Description = 'VRT';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = '"NPR Master Line Map" used instead.';
         }
         field(6059971; "Master Line No."; Integer)
         {
             Caption = 'Master Line No.';
             Description = 'VRT';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = '"NPR Master Line Map" used instead.';
         }
     }
 
@@ -539,9 +542,7 @@ table 6014422 "NPR Retail Journal Line"
         RecNo: Integer;
         Dia: Dialog;
         Text001: Label 'Creating lines @1@@@@@@@';
-        Text002: Label '%1 line(s) transferred to %2';
         Currency: Record Currency;
-        ExchangeLabel: Record "NPR Exchange Label";
 
     procedure FindItemSalesPrice()
     var
@@ -798,4 +799,3 @@ table 6014422 "NPR Retail Journal Line"
         end;
     end;
 }
-
