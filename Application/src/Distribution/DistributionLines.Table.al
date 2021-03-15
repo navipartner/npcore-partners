@@ -1,7 +1,5 @@
 table 6151058 "NPR Distribution Lines"
 {
-    // NPR5.38.01/JKL /20180126  CASE 289017 Object created - Replenishment Module
-
     Caption = 'Distribution Lines';
     DataClassification = CustomerContent;
 
@@ -102,24 +100,24 @@ table 6151058 "NPR Distribution Lines"
         {
             Caption = 'Purchase Order No.';
             DataClassification = CustomerContent;
-            TableRelation = "Purchase Header" WHERE("Document Type" = CONST(Order),
-                                                     "No." = FIELD("Purchase Order No."));
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(301; "Purchase Order Line"; Integer)
         {
             Caption = 'Purchase Order Line';
             DataClassification = CustomerContent;
-            TableRelation = "Purchase Line" WHERE("Document Type" = CONST(Order),
-                                                   "Document No." = FIELD("Purchase Order No."),
-                                                   "Line No." = FIELD("Purchase Order Line"));
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(302; "Qty On PO"; Decimal)
         {
-            CalcFormula = Sum ("Purchase Line"."Outstanding Quantity" WHERE("Document Type" = CONST(Order),
-                                                                            "NPR Retail Replenishment No." = FIELD("Distribution Id"),
-                                                                            Type = CONST(Item),
-                                                                            "No." = FIELD("Distribution Item"),
-                                                                            "Location Code" = FIELD(Location)));
+            CalcFormula = Sum("NPR Distribution Map".Quantity
+                            where(
+                                "Distribution Id" = field("Distribution Id"),
+                                "Table Id" = const(39), // Purchase Line
+                                "Item No." = field("Distribution Item"),
+                                "Location Code" = field(Location)));
             Caption = 'Qty On PO';
             Editable = false;
             FieldClass = FlowField;
@@ -128,17 +126,24 @@ table 6151058 "NPR Distribution Lines"
         {
             Caption = 'Transfer Order No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(311; "Transfer Order Line"; Integer)
         {
             Caption = 'Transfer Order Line';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(312; "Qty On Transfer"; Decimal)
         {
-            CalcFormula = Sum ("Transfer Line"."Outstanding Quantity" WHERE("NPR Retail Replenishment No." = FIELD("Distribution Id"),
-                                                                            "Item No." = FIELD("Distribution Item"),
-                                                                            "Transfer-to Code" = FIELD(Location)));
+            CalcFormula = Sum("NPR Distribution Map".Quantity
+                            where(
+                                "Distribution Id" = field("Distribution Id"),
+                                "Table Id" = const(5741), // Transfer Line
+                                "Item No." = field("Distribution Item"),
+                                "Location Code" = field(Location)));
             Caption = 'Qty On Transfer';
             Editable = false;
             FieldClass = FlowField;

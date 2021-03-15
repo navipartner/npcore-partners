@@ -1,11 +1,5 @@
 page 6014592 "NPR Item Repl. by Store Matrix"
 {
-    // NPR4.16/TJ/20151115 CASE 222281 Page Created
-    // NPR4.18/TJ/20160121 CASE 222281 Visible removed on action without functionality
-    // NPR5.41/TS  /20180105 CASE 300893 Removed BlankZero on Text Array
-    // NPR5.48/TS  /20181206 CASE 338656 Added Missing Picture to Action
-    // NPR5.49/BHR /20190204 CASE 340712 replace the Lookup Page "Fields" From page 7702  to page 6014547
-
     Caption = 'Item Replen. by Stores Matrix';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -64,24 +58,24 @@ page 6014592 "NPR Item Repl. by Store Matrix"
             }
             repeater(Group)
             {
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Item No. field';
                 }
-                field("Item Description"; "Item Description")
+                field("Item Description"; Rec."Item Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item Description field';
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field("Variant Description"; "Variant Description")
+                field("Variant Description"; Rec."Variant Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Variant Description field';
@@ -306,11 +300,6 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                 Visible = false;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Variety action';
-
-                trigger OnAction()
-                begin
-                    //CallVarietyWrapper();
-                end;
             }
         }
     }
@@ -339,7 +328,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
         MaxNoOfCol := ArrayLen(MatrixData);
 
         PrepareMatrix(true, 1);
-        if FindFirst then;
+        if Rec.FindFirst() then;
     end;
 
     var
@@ -395,12 +384,11 @@ page 6014592 "NPR Item Repl. by Store Matrix"
         FldRef: FieldRef;
         FieldCap: Text;
         ErrDecimal: Label 'You can only set decimal values.';
-        VarietyErr: Label 'You need to be positioned on one of the data columns.';
 
     local procedure ValidateShowField()
     begin
         FieldTable.SetRange("No.", ShowField);
-        if not FieldTable.FindFirst then
+        if not FieldTable.FindFirst() then
             Error(FieldDoesntExist, ShowField);
         FieldCap := FieldTable."Field Caption";
         CurrPage.Update(false);
@@ -432,7 +420,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                             UpdateRowsFromSavedData(Item."No.");
                     until Item.Next = 0;
             PrepareRows::"Single Row Dyn. Col.":
-                FetchItemOrItemVariant("Item No.", "Variant Code", PrepareRows);
+                FetchItemOrItemVariant(Rec."Item No.", Rec."Variant Code", PrepareRows);
         end;
     end;
 
@@ -442,11 +430,11 @@ page 6014592 "NPR Item Repl. by Store Matrix"
     begin
         if ShowField <> 0 then begin
             Clear(MatrixData);
-            ItemReplenByStore.SetRange("Item No.", "Item No.");
-            ItemReplenByStore.SetRange("Variant Code", "Variant Code");
+            ItemReplenByStore.SetRange("Item No.", Rec."Item No.");
+            ItemReplenByStore.SetRange("Variant Code", Rec."Variant Code");
             for i := 1 to NoOfColUsed do begin
                 ItemReplenByStore.SetRange("Store Group Code", MatrixColumnCaptions[i]);
-                if ItemReplenByStore.FindFirst then begin
+                if ItemReplenByStore.FindFirst() then begin
                     RecRef.GetTable(ItemReplenByStore);
                     FldRef := RecRef.Field(ShowField + 1);
                     MatrixData[i] := FldRef.Value;
@@ -458,18 +446,14 @@ page 6014592 "NPR Item Repl. by Store Matrix"
 
     local procedure FetchItemOrItemVariant(ItemNo: Code[20]; VariantCode: Code[10]; PrepareRows: Option " ","Fixed Columns","Dynamic Columns","Single Row Dyn. Col.")
     begin
-        "Item No." := ItemNo;
-        "Variant Code" := VariantCode;
+        Rec."Item No." := ItemNo;
+        Rec."Variant Code" := VariantCode;
         case PrepareRows of
             PrepareRows::"Fixed Columns":
-                Insert;
+                Rec.Insert();
             PrepareRows::"Dynamic Columns", PrepareRows::"Single Row Dyn. Col.":
                 UpdateMatrixData();
         end;
-    end;
-
-    local procedure AssistEditCol(ColumnNo: Integer)
-    begin
     end;
 
     local procedure SetColProperty(PropertyType: Option " ",Visible,Editable,Emphasize; ColumnNo: Integer)
@@ -594,7 +578,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
         DecValue: Decimal;
         DeleteRecord: Boolean;
     begin
-        if ItemReplenByStore.Get(MatrixColumnCaptions[ColumnNo], "Item No.", "Variant Code") then begin
+        if ItemReplenByStore.Get(MatrixColumnCaptions[ColumnNo], Rec."Item No.", Rec."Variant Code") then begin
             RecRef.GetTable(ItemReplenByStore);
             FldRef := RecRef.Field(ShowField + 1);
             if MatrixData[ColumnNo] <> Format(FldRef) then begin
@@ -602,28 +586,28 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                     FldRef.Value := MatrixData[ColumnNo];
                     FldRef := RecRef.Field(ShowField);
                     FldRef.Value := 0;
-                    RecRef.Modify;
+                    RecRef.Modify();
                     CheckAndDelete(ColumnNo);
                 end else begin
                     if not Evaluate(DecValue, MatrixData[ColumnNo]) then
                         Error(ErrDecimal);
                     FldRef := RecRef.Field(ShowField);
                     FldRef.Validate(DecValue);
-                    RecRef.Modify;
+                    RecRef.Modify();
                 end;
             end;
         end else begin
-            ItemReplenByStore.Init;
+            ItemReplenByStore.Init();
             ItemReplenByStore."Store Group Code" := MatrixColumnCaptions[ColumnNo];
-            ItemReplenByStore."Item No." := "Item No.";
-            ItemReplenByStore."Variant Code" := "Variant Code";
-            ItemReplenByStore.Insert;
+            ItemReplenByStore."Item No." := Rec."Item No.";
+            ItemReplenByStore."Variant Code" := Rec."Variant Code";
+            ItemReplenByStore.Insert();
             RecRef.GetTable(ItemReplenByStore);
             FldRef := RecRef.Field(ShowField);
             if not Evaluate(DecValue, MatrixData[ColumnNo]) then
                 Error(ErrDecimal);
             FldRef.Validate(DecValue);
-            RecRef.Modify;
+            RecRef.Modify();
         end;
         SetColProperty(3, ColumnNo);
     end;
@@ -638,7 +622,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
     begin
         //this block of code can be removed when TestItemIsVariety function in VarietyWrapper is finished
         //from here
-        Item.Get("Item No.");
+        Item.Get(Rec."Item No.");
         VarietyExists := ((Item."NPR Variety 1" <> '') and (Item."NPR Variety 1 Table" <> '')) or
                          ((Item."NPR Variety 2" <> '') and (Item."NPR Variety 2 Table" <> '')) or
                          ((Item."NPR Variety 3" <> '') and (Item."NPR Variety 3 Table" <> '')) or
@@ -647,18 +631,18 @@ page 6014592 "NPR Item Repl. by Store Matrix"
             exit;
         //to here
 
-        if ItemReplenishByStore.Get(MatrixColumnCaptions[ColumnNo], "Item No.", "Variant Code") then
+        if ItemReplenishByStore.Get(MatrixColumnCaptions[ColumnNo], Rec."Item No.", Rec."Variant Code") then
             VarietyWrapper.ItemReplenishmentShowVariety(ItemReplenishByStore, ShowField + 1)
         else begin
-            ItemReplenishByStore.Init;
+            ItemReplenishByStore.Init();
             ItemReplenishByStore."Store Group Code" := MatrixColumnCaptions[ColumnNo];
-            ItemReplenishByStore."Item No." := "Item No.";
-            ItemReplenishByStore."Variant Code" := "Variant Code";
-            ItemReplenishByStore.Insert;
+            ItemReplenishByStore."Item No." := Rec."Item No.";
+            ItemReplenishByStore."Variant Code" := Rec."Variant Code";
+            ItemReplenishByStore.Insert();
             VarietyWrapper.ItemReplenishmentShowVariety(ItemReplenishByStore, ShowField + 1);
         end;
         CheckAndDelete(ColumnNo);
-        UpdateRowsFromSavedData("Item No.");
+        UpdateRowsFromSavedData(Rec."Item No.");
         CurrPage.Update(false);
     end;
 
@@ -666,29 +650,30 @@ page 6014592 "NPR Item Repl. by Store Matrix"
     var
         ItemReplenByStore: Record "NPR Item Repl. by Store";
         ItemReplenByStore2: Record "NPR Item Repl. by Store";
+        MasterLineMap: Record "NPR Master Line Map";
+        RR: RecordRef;
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         CanDelete: Boolean;
     begin
-        ItemReplenByStore.Get(MatrixColumnCaptions[ColumnNo], "Item No.", "Variant Code");
-        ItemReplenByStore2.SetRange("Master Record Reference", ItemReplenByStore."Master Record Reference");
-        ItemReplenByStore2.SetRange("Is Master", false);
+        ItemReplenByStore.Get(MatrixColumnCaptions[ColumnNo], Rec."Item No.", Rec."Variant Code");
         if (ItemReplenByStore."Reorder Point Text" = '') and (ItemReplenByStore."Reorder Quantity Text" = '') and (ItemReplenByStore."Maximum Inventory Text" = '') then begin
-            CanDelete := not ItemReplenByStore."Is Master";
-            if not CanDelete then
-                CanDelete := ItemReplenByStore2.Count = 0;
-        end;
-        if CanDelete then begin
-            ItemReplenByStore.Delete;
+            if not MasterLineMap.Get(Database::"NPR Item Repl. by Store", ItemReplenByStore.SystemId) then
+                Clear(MasterLineMap);
 
-            /* if deletion of temp record is needed then uncomment this block
-              FOR i := 1 TO NoOfColUsed DO
-                CanDelete := CanDelete AND (MatrixData[i] = '');
-              IF CanDelete THEN
-                DELETE;
-            */
+            // Can delete if it is not master or if is master without children
+            CanDelete := not MasterLineMap."Is Master";
+            if not CanDelete then begin
+                RR.GetTable(ItemReplenByStore);
+                MasterLineMapMgt.FilterRecRefOnMasterId(RR, RR, true);
+                CanDelete := RR.Count() = 0;
+            end;
+        end;
+
+        if CanDelete then begin
+            ItemReplenByStore.Delete();
 
             CurrPage.Update(false);
         end;
-
     end;
 
     local procedure UpdateRowsFromSavedData(ItemNo: Code[20])
@@ -698,15 +683,14 @@ page 6014592 "NPR Item Repl. by Store Matrix"
         ItemReplenishByStore.Reset;
         ItemReplenishByStore.SetRange("Item No.", ItemNo);
         ItemReplenishByStore.SetFilter("Variant Code", '<>%1', '');
-        if ItemReplenishByStore.FindSet then
+        if ItemReplenishByStore.FindSet() then
             repeat
-                if not Get('', ItemReplenishByStore."Item No.", ItemReplenishByStore."Variant Code") then begin
-                    Init;
-                    "Item No." := ItemReplenishByStore."Item No.";
-                    "Variant Code" := ItemReplenishByStore."Variant Code";
-                    Insert;
+                if not Rec.Get('', ItemReplenishByStore."Item No.", ItemReplenishByStore."Variant Code") then begin
+                    Rec.Init();
+                    Rec."Item No." := ItemReplenishByStore."Item No.";
+                    Rec."Variant Code" := ItemReplenishByStore."Variant Code";
+                    Rec.Insert();
                 end;
-            until ItemReplenishByStore.Next = 0;
+            until ItemReplenishByStore.Next() = 0;
     end;
 }
-

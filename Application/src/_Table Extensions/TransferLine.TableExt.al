@@ -21,18 +21,24 @@ tableextension 6014444 "NPR Transfer Line" extends "Transfer Line"
             Caption = 'Is Master';
             DataClassification = CustomerContent;
             Description = 'VRT';
+            ObsoleteState = Removed;
+            ObsoleteReason = '"NPR Master Line Map" used instead.';
         }
         field(6059971; "NPR Master Line No."; Integer)
         {
             Caption = 'Master Line No.';
             DataClassification = CustomerContent;
             Description = 'VRT';
+            ObsoleteState = Removed;
+            ObsoleteReason = '"NPR Master Line Map" used instead.';
         }
         field(6151051; "NPR Retail Replenishment No."; Integer)
         {
             Caption = 'Retail Replenisment No.';
             DataClassification = CustomerContent;
             Description = 'NPR5.38.01';
+            ObsoleteState = Removed;
+            ObsoleteReason = '"NPR Distrib. Table Map" used instead.';
         }
     }
 }

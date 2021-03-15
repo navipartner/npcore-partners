@@ -1,12 +1,5 @@
 tableextension 6014452 "NPR Item Journal Line" extends "Item Journal Line"
 {
-    // NPR7.100.000/LS/220114  : Retail Merge
-    //                                        Added fields 6014401..6014604
-    // NPR4.04/JDH/20150427  CASE 212229  Removed references to old Variant solution "Color Size"
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
-    // NPR5.30/TJ  /20170224 CASE 266866 Removed unused fields
-    //                                   Renamed and recaptioned our fields to follow proper naming standards
-    // NPR5.36/JDH/20150304 CASE 201022 Added Variety Fields for grouping
     fields
     {
         field(6014401; "NPR Group Sale"; Boolean)
@@ -58,12 +51,16 @@ tableextension 6014452 "NPR Item Journal Line" extends "Item Journal Line"
             Caption = 'Is Master';
             DataClassification = CustomerContent;
             Description = 'VRT';
+            ObsoleteState = Removed;
+            ObsoleteReason = '"NPR Master Line Map" used instead.';
         }
         field(6059971; "NPR Master Line No."; Integer)
         {
             Caption = 'Master Line No.';
             DataClassification = CustomerContent;
             Description = 'VRT';
+            ObsoleteState = Removed;
+            ObsoleteReason = '"NPR Master Line Map" used instead.';
         }
     }
 }

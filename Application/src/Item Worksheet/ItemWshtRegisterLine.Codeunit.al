@@ -22,15 +22,11 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         RegisteredWorksheetVariantLine: Record "NPR Reg. Item Wsht Var. Line";
         RegisteredWorksheetVarietyValue: Record "NPR Reg. Item Wsht Var. Value";
         RegisteredWorksheetLine: Record "NPR Regist. Item Worksh Line";
-        RegisteredWorksheet: Record "NPR Registered Item Works.";
         NoSeriesMgt: Codeunit NoSeriesManagement;
-        ItemWorksheetItemManagement: Codeunit "NPR Item Worksheet Item Mgt.";
-        ItemWkshCheckLine: Codeunit "NPR Item Wsht.-Check Line";
         VarietyCloneData: Codeunit "NPR Variety Clone Data";
         CalledFromTest: Boolean;
         NewItemNo: Code[20];
         VariantExistErr: Label 'Variant already exists.';
-        RecRefTextMaster: Text[250];
 
     procedure RunWithCheck(var ItemWkshLine2: Record "NPR Item Worksheet Line")
     begin
@@ -41,176 +37,175 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
 
     local procedure "Code"()
     begin
-        with ItemWkshLine do begin
-            if EmptyLine then
-                exit;
+        if ItemWkshLine.EmptyLine then
+            exit;
 
-            if Status = Status::Validated then begin
-                ItemWorksheetTemplate.Get("Worksheet Template Name");
-                if Action <> Action::Skip then
-                    OnBeforeRegisterLine(ItemWkshLine);
-                case Action of
-                    Action::Skip:
-                        begin
-                            if "Item No." = '' then
-                                "Item No." := "Existing Item No.";
-                        end;
-                    Action::CreateNew:
-                        begin
+        if ItemWkshLine.Status = ItemWkshLine.Status::Validated then begin
+            ItemWorksheetTemplate.Get(ItemWkshLine."Worksheet Template Name");
+            if ItemWkshLine.Action <> ItemWkshLine.Action::Skip then
+                OnBeforeRegisterLine(ItemWkshLine);
+            case ItemWkshLine.Action of
+                ItemWkshLine.Action::Skip:
+                    begin
+                        if ItemWkshLine."Item No." = '' then
+                            ItemWkshLine."Item No." := ItemWkshLine."Existing Item No.";
+                    end;
+                ItemWkshLine.Action::CreateNew:
+                    begin
+                        Item.Init();
+                        if ItemWkshLine."Item No." <> '' then begin
                             Item.Init();
-                            if "Item No." <> '' then begin
-                                Item.Init();
-                                Item."No." := "Item No.";
-                                Item."No. Series" := "No. Series";
-                                Item.Validate("No.");
-                                "Item No." := Item."No.";
-                                Item."No. Series" := "No. Series";
-                                Item.Insert(true);
-                            end else begin
-                                Item.Init();
-                                NewItemNo := GetNewItemNo;
-                                if NewItemNo = '' then
-                                    NoSeriesMgt.InitSeries("No. Series", '', 0D, NewItemNo, "No. Series");
-                                Item."No." := NewItemNo;
-                                Item.Validate("No.", NewItemNo);
-                                Item."No. Series" := "No. Series";
-                                Item.Insert(true);
-                                "Item No." := NewItemNo;
-                            end;
-                            CreateItem;
+                            Item."No." := ItemWkshLine."Item No.";
+                            Item."No. Series" := ItemWkshLine."No. Series";
+                            Item.Validate("No.");
+                            ItemWkshLine."Item No." := Item."No.";
+                            Item."No. Series" := ItemWkshLine."No. Series";
+                            Item.Insert(true);
+                        end else begin
+                            Item.Init();
+                            NewItemNo := ItemWkshLine.GetNewItemNo;
+                            if NewItemNo = '' then
+                                NoSeriesMgt.InitSeries(ItemWkshLine."No. Series", '', 0D, NewItemNo, ItemWkshLine."No. Series");
+                            Item."No." := NewItemNo;
+                            Item.Validate("No.", NewItemNo);
+                            Item."No. Series" := ItemWkshLine."No. Series";
+                            Item.Insert(true);
+                            ItemWkshLine."Item No." := NewItemNo;
                         end;
-                    Action::UpdateOnly:
-                        begin
-                            "Item No." := "Existing Item No.";
-                            UpdateItem;
-                        end;
-                    Action::UpdateAndCreateVariants:
-                        begin
-                            "Item No." := "Existing Item No.";
-                            UpdateItem;
-                        end;
-                end;
+                        CreateItem;
+                    end;
+                ItemWkshLine.Action::UpdateOnly:
+                    begin
+                        ItemWkshLine."Item No." := ItemWkshLine."Existing Item No.";
+                        UpdateItem;
+                    end;
+                ItemWkshLine.Action::UpdateAndCreateVariants:
+                    begin
+                        ItemWkshLine."Item No." := ItemWkshLine."Existing Item No.";
+                        UpdateItem;
+                    end;
+            end;
 
-                ItemWkshVariantLine.Reset;
-                ItemWkshVariantLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
-                ItemWkshVariantLine.SetRange("Worksheet Name", "Worksheet Name");
-                ItemWkshVariantLine.SetRange("Worksheet Line No.", "Line No.");
-                ItemWkshVariantLine.SetFilter("Heading Text", '%1', ''); //Skip Headers
-                if ItemWkshVariantLine.FindSet then
-                    repeat
-                        if ItemWkshVariantLine.Action <> ItemWkshVariantLine.Action::Skip then
-                            OnBeforeRegisterVariantLine(ItemWkshVariantLine);
-                        case ItemWkshVariantLine.Action of
-                            ItemWkshVariantLine.Action::CreateNew:
-                                begin
-                                    if (ItemWkshVariantLine."Variety 1 Value" <> '') or
-                                       (ItemWkshVariantLine."Variety 2 Value" <> '') or
-                                       (ItemWkshVariantLine."Variety 3 Value" <> '') or
-                                       (ItemWkshVariantLine."Variety 4 Value" <> '') then begin
-                                        UpdateAndCopyVariety("Variety 1", "Variety 1 Table (Base)", "Variety 1 Table (New)", ItemWkshVariantLine."Variety 1 Value");
-                                        UpdateAndCopyVariety("Variety 2", "Variety 2 Table (Base)", "Variety 2 Table (New)", ItemWkshVariantLine."Variety 2 Value");
-                                        UpdateAndCopyVariety("Variety 3", "Variety 3 Table (Base)", "Variety 3 Table (New)", ItemWkshVariantLine."Variety 3 Value");
-                                        UpdateAndCopyVariety("Variety 4", "Variety 4 Table (Base)", "Variety 4 Table (New)", ItemWkshVariantLine."Variety 4 Value");
-                                        if ItemWkshVariantLine."Item No." = '' then
-                                            ItemWkshVariantLine."Item No." := "Item No.";
-                                        CreateVariant(ItemWkshVariantLine);
-                                        ItemWkshVariantLine.UpdateBarcode();
-                                        ProcessVariantLineSalesPrice();
-                                        ProcessVariantLinePurchasePrice();
-                                    end;
-                                end;
-                            ItemWkshVariantLine.Action::Update:
-                                begin
-                                    ItemVariant.Get(ItemWkshVariantLine."Existing Item No.", ItemWkshVariantLine."Existing Variant Code");
-                                    ItemWkshVariantLine."Item No." := ItemWkshVariantLine."Existing Item No.";
-                                    ItemWkshVariantLine."Variant Code" := ItemWkshVariantLine."Existing Variant Code";
-                                    if ItemWkshVariantLine.Description <> '' then
-                                        ItemVariant.Description := ItemWkshVariantLine.Description;
-                                    ItemVariant."NPR Blocked" := ItemWkshVariantLine.Blocked;
-                                    ItemVariant.Modify(true);
+            ItemWkshVariantLine.Reset;
+            ItemWkshVariantLine.SetRange("Worksheet Template Name", ItemWkshLine."Worksheet Template Name");
+            ItemWkshVariantLine.SetRange("Worksheet Name", ItemWkshLine."Worksheet Name");
+            ItemWkshVariantLine.SetRange("Worksheet Line No.", ItemWkshLine."Line No.");
+            ItemWkshVariantLine.SetFilter("Heading Text", '%1', '');
+            //Skip Headers
+            if ItemWkshVariantLine.FindSet then
+                repeat
+                    if ItemWkshVariantLine.Action <> ItemWkshVariantLine.Action::Skip then
+                        OnBeforeRegisterVariantLine(ItemWkshVariantLine);
+                    case ItemWkshVariantLine.Action of
+                        ItemWkshVariantLine.Action::CreateNew:
+                            begin
+                                if (ItemWkshVariantLine."Variety 1 Value" <> '') or
+                                   (ItemWkshVariantLine."Variety 2 Value" <> '') or
+                                   (ItemWkshVariantLine."Variety 3 Value" <> '') or
+                                   (ItemWkshVariantLine."Variety 4 Value" <> '') then begin
+                                    UpdateAndCopyVariety(ItemWkshLine."Variety 1", ItemWkshLine."Variety 1 Table (Base)", ItemWkshLine."Variety 1 Table (New)", ItemWkshVariantLine."Variety 1 Value");
+                                    UpdateAndCopyVariety(ItemWkshLine."Variety 2", ItemWkshLine."Variety 2 Table (Base)", ItemWkshLine."Variety 2 Table (New)", ItemWkshVariantLine."Variety 2 Value");
+                                    UpdateAndCopyVariety(ItemWkshLine."Variety 3", ItemWkshLine."Variety 3 Table (Base)", ItemWkshLine."Variety 3 Table (New)", ItemWkshVariantLine."Variety 3 Value");
+                                    UpdateAndCopyVariety(ItemWkshLine."Variety 4", ItemWkshLine."Variety 4 Table (Base)", ItemWkshLine."Variety 4 Table (New)", ItemWkshVariantLine."Variety 4 Value");
+                                    if ItemWkshVariantLine."Item No." = '' then
+                                        ItemWkshVariantLine."Item No." := ItemWkshLine."Item No.";
+                                    CreateVariant(ItemWkshVariantLine);
                                     ItemWkshVariantLine.UpdateBarcode();
                                     ProcessVariantLineSalesPrice();
                                     ProcessVariantLinePurchasePrice();
                                 end;
-                        end;
-                        ItemWkshVariantLine.Modify(true);
-                        if ItemWkshVariantLine.Action <> ItemWkshVariantLine.Action::Skip then
-                            OnAfterRegisterVariantLine(ItemWkshVariantLine);
-                    until ItemWkshVariantLine.Next = 0;
-                Validate(Status, Status::Processed);
-                if not CalledFromTest then
-                    Modify(true);
-                if Action <> Action::Skip then
-                    OnAfterRegisterLine(ItemWkshLine);
-            end;
+                            end;
+                        ItemWkshVariantLine.Action::Update:
+                            begin
+                                ItemVariant.Get(ItemWkshVariantLine."Existing Item No.", ItemWkshVariantLine."Existing Variant Code");
+                                ItemWkshVariantLine."Item No." := ItemWkshVariantLine."Existing Item No.";
+                                ItemWkshVariantLine."Variant Code" := ItemWkshVariantLine."Existing Variant Code";
+                                if ItemWkshVariantLine.Description <> '' then
+                                    ItemVariant.Description := ItemWkshVariantLine.Description;
+                                ItemVariant."NPR Blocked" := ItemWkshVariantLine.Blocked;
+                                ItemVariant.Modify(true);
+                                ItemWkshVariantLine.UpdateBarcode();
+                                ProcessVariantLineSalesPrice();
+                                ProcessVariantLinePurchasePrice();
+                            end;
+                    end;
+                    ItemWkshVariantLine.Modify(true);
+                    if ItemWkshVariantLine.Action <> ItemWkshVariantLine.Action::Skip then
+                        OnAfterRegisterVariantLine(ItemWkshVariantLine);
+                until ItemWkshVariantLine.Next = 0;
+            ItemWkshLine.Validate(ItemWkshLine.Status, ItemWkshLine.Status::Processed);
             if not CalledFromTest then
-                CreateRegisteredWorksheetLines();
+                ItemWkshLine.Modify(true);
+            if ItemWkshLine.Action <> ItemWkshLine.Action::Skip then
+                OnAfterRegisterLine(ItemWkshLine);
         end;
+        if not CalledFromTest then
+            CreateRegisteredWorksheetLines();
+
     end;
 
     local procedure CreateItem()
     begin
         GetItem(ItemWkshLine."Item No.");
-        with Item do begin
-            Validate("Vendor Item No.", ItemWkshLine."Vendor Item No.");
-            if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Vendor No.")) then
-                Validate("Vendor No.", ItemWkshLine."Vendor No.");
-            Validate(Description, ItemWkshLine.Description);
-            if ItemWkshLine."Direct Unit Cost" <> 0 then
-                if (ItemWkshLine."Purchase Price Currency Code" = '') then
-                    Validate("Last Direct Cost", ItemWkshLine."Direct Unit Cost");
-            Validate("Costing Method", ItemWkshLine."Costing Method");
-            if ItemWkshLine."Costing Method" = ItemWkshLine."Costing Method"::Standard then
-                if (ItemWkshLine."Purchase Price Currency Code" = '') then
-                    Validate("Standard Cost", ItemWkshLine."Direct Unit Cost");
-            if "Unit Cost" = 0 then
-                "Unit Cost" := ItemWkshLine."Direct Unit Cost";
-            if (ItemWkshLine."Sales Price Currency Code" = '') then
-                if ItemWkshLine."Sales Price Start Date" <= WorkDate then
-                    Validate("Unit Price", ItemWkshLine."Sales Price");
-            if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Base Unit of Measure")) then
-                Validate("Base Unit of Measure", ItemWkshLine."Base Unit of Measure");
-            if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Inventory Posting Group")) then
-                Validate("Inventory Posting Group", ItemWkshLine."Inventory Posting Group");
-            if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Gen. Prod. Posting Group")) then
-                Validate("Gen. Prod. Posting Group", ItemWkshLine."Gen. Prod. Posting Group");
-            if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Tax Group Code")) then
-                Validate("Tax Group Code", ItemWkshLine."Tax Group Code");
-            if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("VAT Prod. Posting Group")) then
-                Validate("VAT Prod. Posting Group", ItemWkshLine."VAT Prod. Posting Group");
-            if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Global Dimension 1 Code")) then
-                Validate("Global Dimension 1 Code", ItemWkshLine."Global Dimension 1 Code");
-            if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Global Dimension 2 Code")) then
-                Validate("Global Dimension 2 Code", ItemWkshLine."Global Dimension 2 Code");
-            ItemWkshLine."Variety 1 Table (New)" := FindNewVarietyNames(ItemWkshLine, 1, ItemWkshLine."Variety 1", ItemWkshLine."Variety 1 Table (Base)", ItemWkshLine."Variety 1 Table (New)", ItemWkshLine."Create Copy of Variety 1 Table");
-            ItemWkshLine."Variety 2 Table (New)" := FindNewVarietyNames(ItemWkshLine, 2, ItemWkshLine."Variety 2", ItemWkshLine."Variety 2 Table (Base)", ItemWkshLine."Variety 2 Table (New)", ItemWkshLine."Create Copy of Variety 2 Table");
-            ItemWkshLine."Variety 3 Table (New)" := FindNewVarietyNames(ItemWkshLine, 3, ItemWkshLine."Variety 3", ItemWkshLine."Variety 3 Table (Base)", ItemWkshLine."Variety 3 Table (New)", ItemWkshLine."Create Copy of Variety 3 Table");
-            ItemWkshLine."Variety 4 Table (New)" := FindNewVarietyNames(ItemWkshLine, 4, ItemWkshLine."Variety 4", ItemWkshLine."Variety 4 Table (Base)", ItemWkshLine."Variety 4 Table (New)", ItemWkshLine."Create Copy of Variety 4 Table");
-            "NPR Variety 1" := ItemWkshLine."Variety 1";
-            "NPR Variety 1 Table" := ItemWkshLine."Variety 1 Table (New)";
-            "NPR Variety 2" := ItemWkshLine."Variety 2";
-            "NPR Variety 2 Table" := ItemWkshLine."Variety 2 Table (New)";
-            "NPR Variety 3" := ItemWkshLine."Variety 3";
-            "NPR Variety 3 Table" := ItemWkshLine."Variety 3 Table (New)";
-            "NPR Variety 4" := ItemWkshLine."Variety 4";
-            "NPR Variety 4 Table" := ItemWkshLine."Variety 4 Table (New)";
-            "NPR Cross Variety No." := ItemWkshLine."Cross Variety No.";
-            "NPR Variety Group" := ItemWkshLine."Variety Group";
-            if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Sales Unit of Measure")) then
-                Validate("Sales Unit of Measure", ItemWkshLine."Sales Unit of Measure");
-            if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Sales Unit of Measure")) then
-                Validate("Purch. Unit of Measure", ItemWkshLine."Sales Unit of Measure");
-            if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Manufacturer Code")) then
-                Validate("Manufacturer Code", ItemWkshLine."Manufacturer Code");
-            if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Item Category Code")) then
-                Validate("Item Category Code", ItemWkshLine."Item Category Code");
-            Validate("Net Weight", ItemWkshLine."Net Weight");
-            Validate("Gross Weight", ItemWkshLine."Gross Weight");
-            if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Tariff No.")) then
-                Validate("Tariff No.", ItemWkshLine."Tariff No.");
-            ValidateFields(Item, ItemWkshLine, true, false);
-            Modify(true);
-        end;
+        Item.Validate(Item."Vendor Item No.", ItemWkshLine."Vendor Item No.");
+        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Vendor No.")) then
+            Item.Validate(Item."Vendor No.", ItemWkshLine."Vendor No.");
+        Item.Validate(Item.Description, ItemWkshLine.Description);
+        if ItemWkshLine."Direct Unit Cost" <> 0 then
+            if (ItemWkshLine."Purchase Price Currency Code" = '') then
+                Item.Validate(Item."Last Direct Cost", ItemWkshLine."Direct Unit Cost");
+        Item.Validate(Item."Costing Method", ItemWkshLine."Costing Method");
+        if ItemWkshLine."Costing Method" = ItemWkshLine."Costing Method"::Standard then
+            if (ItemWkshLine."Purchase Price Currency Code" = '') then
+                Item.Validate(Item."Standard Cost", ItemWkshLine."Direct Unit Cost");
+        if Item."Unit Cost" = 0 then
+            Item."Unit Cost" := ItemWkshLine."Direct Unit Cost";
+        if (ItemWkshLine."Sales Price Currency Code" = '') then
+            if ItemWkshLine."Sales Price Start Date" <= WorkDate then
+                Item.Validate(Item."Unit Price", ItemWkshLine."Sales Price");
+        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Base Unit of Measure")) then
+            Item.Validate(Item."Base Unit of Measure", ItemWkshLine."Base Unit of Measure");
+        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Inventory Posting Group")) then
+            Item.Validate(Item."Inventory Posting Group", ItemWkshLine."Inventory Posting Group");
+        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Gen. Prod. Posting Group")) then
+            Item.Validate(Item."Gen. Prod. Posting Group", ItemWkshLine."Gen. Prod. Posting Group");
+        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Tax Group Code")) then
+            Item.Validate(Item."Tax Group Code", ItemWkshLine."Tax Group Code");
+        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("VAT Prod. Posting Group")) then
+            Item.Validate(Item."VAT Prod. Posting Group", ItemWkshLine."VAT Prod. Posting Group");
+        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Global Dimension 1 Code")) then
+            Item.Validate(Item."Global Dimension 1 Code", ItemWkshLine."Global Dimension 1 Code");
+        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Global Dimension 2 Code")) then
+            Item.Validate(Item."Global Dimension 2 Code", ItemWkshLine."Global Dimension 2 Code");
+        ItemWkshLine."Variety 1 Table (New)" := FindNewVarietyNames(ItemWkshLine, 1, ItemWkshLine."Variety 1", ItemWkshLine."Variety 1 Table (Base)", ItemWkshLine."Variety 1 Table (New)", ItemWkshLine."Create Copy of Variety 1 Table");
+        ItemWkshLine."Variety 2 Table (New)" := FindNewVarietyNames(ItemWkshLine, 2, ItemWkshLine."Variety 2", ItemWkshLine."Variety 2 Table (Base)", ItemWkshLine."Variety 2 Table (New)", ItemWkshLine."Create Copy of Variety 2 Table");
+        ItemWkshLine."Variety 3 Table (New)" := FindNewVarietyNames(ItemWkshLine, 3, ItemWkshLine."Variety 3", ItemWkshLine."Variety 3 Table (Base)", ItemWkshLine."Variety 3 Table (New)", ItemWkshLine."Create Copy of Variety 3 Table");
+        ItemWkshLine."Variety 4 Table (New)" := FindNewVarietyNames(ItemWkshLine, 4, ItemWkshLine."Variety 4", ItemWkshLine."Variety 4 Table (Base)", ItemWkshLine."Variety 4 Table (New)", ItemWkshLine."Create Copy of Variety 4 Table");
+        Item."NPR Variety 1" := ItemWkshLine."Variety 1";
+        Item."NPR Variety 1 Table" := ItemWkshLine."Variety 1 Table (New)";
+        Item."NPR Variety 2" := ItemWkshLine."Variety 2";
+        Item."NPR Variety 2 Table" := ItemWkshLine."Variety 2 Table (New)";
+        Item."NPR Variety 3" := ItemWkshLine."Variety 3";
+        Item."NPR Variety 3 Table" := ItemWkshLine."Variety 3 Table (New)";
+        Item."NPR Variety 4" := ItemWkshLine."Variety 4";
+        Item."NPR Variety 4 Table" := ItemWkshLine."Variety 4 Table (New)";
+        Item."NPR Cross Variety No." := ItemWkshLine."Cross Variety No.";
+        Item."NPR Variety Group" := ItemWkshLine."Variety Group";
+        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Sales Unit of Measure")) then
+            Item.Validate(Item."Sales Unit of Measure", ItemWkshLine."Sales Unit of Measure");
+        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Sales Unit of Measure")) then
+            Item.Validate(Item."Purch. Unit of Measure", ItemWkshLine."Sales Unit of Measure");
+        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Manufacturer Code")) then
+            Item.Validate(Item."Manufacturer Code", ItemWkshLine."Manufacturer Code");
+        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Item Category Code")) then
+            Item.Validate(Item."Item Category Code", ItemWkshLine."Item Category Code");
+        Item.Validate(Item."Net Weight", ItemWkshLine."Net Weight");
+        Item.Validate(Item."Gross Weight", ItemWkshLine."Gross Weight");
+        if not MapStandardItemWorksheetLineField(Item, ItemWkshLine.FieldNo("Tariff No.")) then
+            Item.Validate(Item."Tariff No.", ItemWkshLine."Tariff No.");
+        ValidateFields(Item, ItemWkshLine, true, false);
+        Item.Modify(true);
+
 
         ItemWkshLine.UpdateBarcode();
         ProcessLineSalesPrices();
@@ -225,24 +220,23 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
     local procedure UpdateItem()
     begin
         GetItem(ItemWkshLine."Item No.");
-        with Item do begin
-            if ("Vendor Item No." <> ItemWkshLine."Vendor Item No.") and (ItemWkshLine."Vendor Item No." <> '') then
-                Validate("Vendor Item No.", ItemWkshLine."Vendor Item No.");
-            if ("Vendor No." <> ItemWkshLine."Vendor No.") and (ItemWkshLine."Vendor No." <> '') then
-                Validate("Vendor No.", ItemWkshLine."Vendor No.");
-            if (Description <> ItemWkshLine.Description) and (ItemWkshLine.Description <> '') then
-                Validate(Description, ItemWkshLine.Description);
-            if ("Tariff No." <> ItemWkshLine."Tariff No.") and (ItemWkshLine."Tariff No." <> '') then
-                Validate("Tariff No.", ItemWkshLine."Tariff No.");
-            if ("Net Weight" <> ItemWkshLine."Net Weight") and (ItemWkshLine."Net Weight" <> 0) then
-                Validate("Net Weight", ItemWkshLine."Net Weight");
-            if ("Gross Weight" <> ItemWkshLine."Gross Weight") and (ItemWkshLine."Gross Weight" <> 0) then
-                Validate("Gross Weight", ItemWkshLine."Gross Weight");
-            if "Unit Cost" = 0 then
-                "Unit Cost" := ItemWkshLine."Direct Unit Cost";
-            Modify(true);
-            ValidateFields(Item, ItemWkshLine, true, false);
-        end;
+        if (Item."Vendor Item No." <> ItemWkshLine."Vendor Item No.") and (ItemWkshLine."Vendor Item No." <> '') then
+            Item.Validate(Item."Vendor Item No.", ItemWkshLine."Vendor Item No.");
+        if (Item."Vendor No." <> ItemWkshLine."Vendor No.") and (ItemWkshLine."Vendor No." <> '') then
+            Item.Validate(Item."Vendor No.", ItemWkshLine."Vendor No.");
+        if (Item.Description <> ItemWkshLine.Description) and (ItemWkshLine.Description <> '') then
+            Item.Validate(Item.Description, ItemWkshLine.Description);
+        if (Item."Tariff No." <> ItemWkshLine."Tariff No.") and (ItemWkshLine."Tariff No." <> '') then
+            Item.Validate(Item."Tariff No.", ItemWkshLine."Tariff No.");
+        if (Item."Net Weight" <> ItemWkshLine."Net Weight") and (ItemWkshLine."Net Weight" <> 0) then
+            Item.Validate(Item."Net Weight", ItemWkshLine."Net Weight");
+        if (Item."Gross Weight" <> ItemWkshLine."Gross Weight") and (ItemWkshLine."Gross Weight" <> 0) then
+            Item.Validate(Item."Gross Weight", ItemWkshLine."Gross Weight");
+        if Item."Unit Cost" = 0 then
+            Item."Unit Cost" := ItemWkshLine."Direct Unit Cost";
+        Item.Modify(true);
+        ValidateFields(Item, ItemWkshLine, true, false);
+
         ItemWkshLine.UpdateBarcode;
         ProcessLineSalesPrices;
         ProcessLinePurchasePrices;
@@ -777,6 +771,7 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
     var
         ItemWorksheeVarieties: Record "NPR Item Worksh. Variety Value";
         SalesPrice: Record "Sales Price";
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         SalesUnitOfMeasure: Code[10];
         SalesPriceEndDate: Date;
         SalesPriceStartDate: Date;
@@ -831,18 +826,16 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
                 end;
         end;
         SalesPrice.SetRange("Starting Date", SalesPriceStartDate);
-        if SalesPrice.FindFirst then begin
+        if SalesPrice.FindFirst() then begin
             if SalesPrice."Ending Date" <> SalesPriceEndDate then begin
                 SalesPrice.Validate("Ending Date", SalesPriceEndDate);
             end;
             if SalesPrice."Unit Price" <> ItemWkshLine."Sales Price" then begin
                 SalesPrice.Validate("Unit Price", ItemWkshLine."Sales Price");
             end;
-            if not SalesPrice."NPR Is Master" then begin
-                SalesPrice.Validate("NPR Master Record Reference", Format(SalesPrice.RecordId));
-                SalesPrice.Validate("NPR Is Master", true);
-            end;
             SalesPrice.Modify(true);
+            if not MasterLineMapMgt.IsMaster(Database::"Sales Price", SalesPrice.SystemId) then
+                MasterLineMapMgt.CreateMap(Database::"Sales Price", SalesPrice.SystemId, SalesPrice.SystemId);
         end else begin
             SalesPrice.Init();
             SalesPrice.Validate("Item No.", ItemWkshLine."Item No.");
@@ -855,9 +848,9 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
             SalesPrice.Validate("Minimum Quantity", 0);
             SalesPrice.Validate("Unit Price", ItemWkshLine."Sales Price");
             SalesPrice.Validate("Ending Date", SalesPriceEndDate);
-            SalesPrice.Validate("NPR Master Record Reference", Format(SalesPrice.RecordId));
-            SalesPrice.Validate("NPR Is Master", true);
             SalesPrice.Insert(true);
+
+            MasterLineMapMgt.CreateMap(Database::"Sales Price", SalesPrice.SystemId, SalesPrice.SystemId);
         end;
         case ItemWorksheetTemplate."Sales Price Handling" of
             ItemWorksheetTemplate."Sales Price Handling"::"Item+Variant":
@@ -878,11 +871,13 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         ItemWorksheeVarieties: Record "NPR Item Worksh. Variety Value";
         SalesPrice: Record "Sales Price";
         SalesPriceMaster: Record "Sales Price";
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         OnlyCloseExistingPrices: Boolean;
         SalesUnitOfMeasure: Code[10];
         SalesPriceEndDate: Date;
         SalesPriceStartDate: Date;
         VariantSalesPrice: Decimal;
+        MasterLineFound: Boolean;
     begin
         if (ItemWorksheetTemplate."Sales Price Handling" = ItemWorksheetTemplate."Sales Price Handling"::Item) or
            (ItemWorksheetTemplate."Sales Price Handling" = ItemWorksheetTemplate."Sales Price Handling"::"Item+Date") then
@@ -953,16 +948,25 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
             else
                 SalesPriceMaster.SetRange("Unit of Measure Code", SalesUnitOfMeasure);
             SalesPriceMaster.SetRange("Minimum Quantity", 0, 1);
-            SalesPriceMaster.SetRange("NPR Is Master", true);
-            if SalesPriceMaster.FindFirst then begin
+            MasterLineFound := false;
+            if SalesPriceMaster.FindSet() then // todo: rewrite with query (or not, sales price is going)?
+                repeat
+                    if MasterLineMapMgt.IsMaster(Database::"Sales Price", SalesPriceMaster.SystemId) then begin
+                        MasterLineFound := true;
+                        break;
+                    end;
+                until SalesPriceMaster.Next() = 0;
+            // SalesPriceMaster.SetRange("NPR Is Master", true);
+            if MasterLineFound then begin
                 SalesPrice := SalesPriceMaster;
                 SalesPrice."Variant Code" := ItemWkshVariantLine."Variant Code";
                 if (SalesPriceMaster."Unit Price" <> VariantSalesPrice) and (not OnlyCloseExistingPrices) then begin
                     SalesPrice.Validate("Variant Code");
                     SalesPrice.Validate("Unit Price", VariantSalesPrice);
-                    SalesPrice.Validate("NPR Is Master", false);
                     SalesPrice.Validate("Ending Date", SalesPriceEndDate);
                     SalesPrice.Insert(true);
+
+                    MasterLineMapMgt.CreateMap(Database::"Sales Line", SalesPrice.SystemId, SalesPriceMaster.SystemId);
                 end;
             end else begin
                 SalesPrice.Init();
@@ -1160,10 +1164,6 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
                 PurchasePrice.Insert(true);
             end;
         end;
-    end;
-
-    local procedure UpdateVariant()
-    begin
     end;
 
     procedure InsertChangeRecords(VarItemWkshLine: Record "NPR Item Worksheet Line")
@@ -1406,8 +1406,6 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
         exit(false);
     end;
 
-
-
     local procedure ValidateFieldRef(SourceFldRef: FieldRef; TargetFldRef: FieldRef): Boolean
     var
         ItemWorksheetFieldMapping: Record "NPR Item Worksh. Field Mapping";
@@ -1643,4 +1641,3 @@ codeunit 6060046 "NPR Item Wsht.Register Line"
     begin
     end;
 }
-
