@@ -1,7 +1,5 @@
 query 6059804 "NPR Retail Sales by Dim. 1"
 {
-    // NPR5.29/BHR/20160104 CASE 262439 Query for sales by dimension1 on value entry (used on chart)
-
     Caption = 'Retail Sales by Dimension 1';
 
     elements

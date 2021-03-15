@@ -1,9 +1,9 @@
-page 6059813 "NPR Retail Sales Chart"
+Page 6059816 "NPR Retail Sales Chart by Shop"
 {
-    Caption = 'Margin/Turnover by Period';
+    Caption = 'Margin/Turnover by Shop';
     PageType = CardPart;
-    UsageCategory = None;
     SourceTable = "Business Chart Buffer";
+    UsageCategory = None;
 
     layout
     {
@@ -11,19 +11,33 @@ page 6059813 "NPR Retail Sales Chart"
         {
             field("Date Range"; StatusText)
             {
-                ApplicationArea = All;
+                ApplicationArea = Basic;
                 ShowCaption = true;
                 Style = Strong;
-                StyleExpr = TRUE;
-                ToolTip = 'Specifies the value of the StatusText field';
+                StyleExpr = true;
+            }
+            field(ChartType; ChartType)
+            {
+                Caption = 'Chart type';
+                ApplicationArea = Basic;
+                ShowCaption = true;
+                Style = Strong;
+                StyleExpr = true;
+
+                trigger OnValidate()
+                begin
+                    ChartTypeIsChanged := true;
+                    UpdateChart();
+                end;
             }
             usercontrol(chart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
             {
-                ApplicationArea = All;
+                ApplicationArea = Basic;
+
                 trigger AddInReady()
                 begin
                     ChartIsReady := true;
-                    UpdateChart;
+                    UpdateChart();
                 end;
             }
         }
@@ -39,120 +53,121 @@ page 6059813 "NPR Retail Sales Chart"
                 Image = Period;
                 action(Day)
                 {
+                    ApplicationArea = Basic;
                     Caption = 'Day';
-                    ApplicationArea = All;
-                    ToolTip = 'Filter by day';
-                    Image = Filter;
 
                     trigger OnAction()
                     begin
                         Period := Period::" ";
-                        PeriodType := PeriodType::Day;
-                        UpdateChart;
+                        PeriodType := Periodtype::Day;
+                        UpdateChart();
                     end;
                 }
                 action(Week)
                 {
+                    ApplicationArea = Basic;
                     Caption = 'Week';
-                    ApplicationArea = All;
-                    ToolTip = 'Filter by week';
-                    Image = Filter;
 
                     trigger OnAction()
                     begin
                         Period := Period::" ";
-                        PeriodType := PeriodType::Week;
-                        UpdateChart;
+                        PeriodType := Periodtype::Week;
+                        UpdateChart();
                     end;
                 }
                 action(Month)
                 {
+                    ApplicationArea = Basic;
                     Caption = 'Month';
-                    ApplicationArea = All;
-                    ToolTip = 'Filter by month';
-                    Image = Filter;
 
                     trigger OnAction()
                     begin
                         Period := Period::" ";
-                        PeriodType := PeriodType::Month;
-                        UpdateChart;
+                        PeriodType := Periodtype::Month;
+                        UpdateChart();
                     end;
                 }
                 action(Quarter)
                 {
+                    ApplicationArea = Basic;
                     Caption = 'Quarter';
-                    ApplicationArea = All;
-                    ToolTip = 'Filter by quarter';
-                    Image = Filter;
 
                     trigger OnAction()
                     begin
                         Period := Period::" ";
-                        PeriodType := PeriodType::Quarter;
-                        UpdateChart;
+                        PeriodType := Periodtype::Quarter;
+                        UpdateChart();
                     end;
                 }
                 action(Year)
                 {
+                    ApplicationArea = Basic;
                     Caption = 'Year';
-                    ApplicationArea = All;
-                    ToolTip = 'Filter by year';
-                    Image = Filter;
 
                     trigger OnAction()
                     begin
                         Period := Period::" ";
-                        PeriodType := PeriodType::Year;
-                        UpdateChart;
+                        PeriodType := Periodtype::Year;
+                        UpdateChart();
                     end;
                 }
             }
             action(Previous)
             {
+                ApplicationArea = Basic;
                 Caption = 'Previous';
                 Image = PreviousRecord;
-                ApplicationArea = All;
-                ToolTip = 'Executes the Previous action';
 
                 trigger OnAction()
                 begin
                     Period := Period::Previous;
-                    UpdateChart;
+                    UpdateChart();
                 end;
             }
-            action("Next")
+            action(Next)
             {
+                ApplicationArea = Basic;
                 Caption = 'Next';
                 Image = NextRecord;
-                ApplicationArea = All;
-                ToolTip = 'Executes the Next action';
 
                 trigger OnAction()
                 begin
                     Period := Period::Next;
-                    UpdateChart;
+                    UpdateChart();
                 end;
             }
         }
     }
 
     var
-        ChartIsReady: Boolean;
+        ChartMgt: Codeunit "NPR Retail Chart Mgt by Shop";
         BusChartBuf: Record "Business Chart Buffer";
-        ChartMgt: Codeunit "NPR Retail Chart Mgt.";
         StatusText: Text[250];
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;
         Period: Option " ",Next,Previous;
+        ChartType: Option "Dimension 1","Dimension 2";
+        ChartIsReady: Boolean;
+        ChartTypeIsChanged: Boolean;
+        StartDate: Date;
+        Enddate: Date;
+
+    trigger OnOpenPage()
+    begin
+        ChartType := ChartType::"Dimension 1";
+    end;
 
     local procedure UpdateChart()
     begin
         if not ChartIsReady then
             exit;
-
-        ChartMgt.TurnOver_Revenue(BusChartBuf, Period, PeriodType);
+        case ChartType of
+            ChartType::"Dimension 2":
+                ChartMgt.TurnOver_RevenuebyDim2(BusChartBuf, Period, PeriodType, StartDate, Enddate, ChartTypeIsChanged);
+            ChartType::"Dimension 1":
+                ChartMgt.TurnOver_RevenuebyDim1(BusChartBuf, Period, PeriodType, StartDate, Enddate, ChartTypeIsChanged);
+        end;
         BusChartBuf.Update(CurrPage.chart);
-        StatusText := StrSubstNo('%1 to %2', BusChartBuf."Period Filter Start Date", BusChartBuf."Period Filter End Date");
+        StatusText := StrSubstNo('%1 to %2', StartDate, Enddate);
+        ChartTypeIsChanged := false;
     end;
 }
-
