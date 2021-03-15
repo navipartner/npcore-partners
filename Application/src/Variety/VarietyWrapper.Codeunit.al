@@ -1,43 +1,17 @@
 codeunit 6059970 "NPR Variety Wrapper"
 {
-    // VRT1.01/MMV /20150513 CASE 213635 Added handling of RJL
-    // NPR4.16/TJ  /20151103 CASE 222281 Added handling of Item Replenishment by Store
-    // VRT1.11/JDH /20160530 CASE 242940 new events to support auto popup + moved event listeners to this CU
-    // NPR5.23/JDH /20160620 CASE xxxxxx Code missing for Variety Group change
-    // NPR5.23.02/JDH/20160624 CASE xxxxxx call to barcode creation mistakenly discontinued in CU 6014424
-    // NPR5.27/BHR /20160928 CASE 250687 Fix, call retail function to display  correct description.
-    // VRT1.20/JDH /20161213 CASE 260472 Moved Description control to new CU
-    // VRT1.20/JDH /20170105 CASE 260516 Variety Lookup from Transfer lines
-    // VRT1.20/JDH /20161012 CASE 251896 Missing call if a modification of Item variety setup is allowed
-    // VRT1.20/JDH /20161012 CASE 262474 Event listeners implemented
-    // NPR5.31/JDH /20170502 CASE 271133 Added Purchase Prices
-    // NPR5.36/JDH /20170921 CASE 288696 Item Journal line added to Variety Matrix
-    // NPR5.37/MHA /20171004 CASE 292138 Location Filter added to Show Variety from Document Line functions
-    // NPR5.37/JDH /20171018 CASE 293486 Changed function ItemIsVariety to global
-    // NPR5.37/JDH /20171023 CASE 293486 A new function "ShowVarietyMatrix" has been added, that is not used here, but rather to "copy paste" to pages where you want the Variety Matrix to popup
-    // NPR5.47/JDH /20180918 CASE 327541 several filters transferred from the source to the matrix, so they can be used for calculation later
-    // NPR5.51/THRO/20190716 CASE 361514 EventPublisherElement changed in P30OnAfterActionEventVariety. Action renamed on Page 30
-    // NPR5.51/BHR /20190826 CASE 366143 Event Publisher for Item Journal 40OnAfterActionEventVariety
-
-
-    trigger OnRun()
-    begin
-    end;
-
     procedure ShowVarietyMatrix(var ItemParm: Record Item; ShowFieldNo: Integer)
     var
         RecRef: RecordRef;
         VRTShowTable: Codeunit "NPR Variety ShowTables";
         ItemVar: Record "Item Variant";
     begin
-        with ItemParm do begin
-            //test variant item
-            TestItemIsVariety(ItemParm);
-            //RecRef.GETTABLE(ItemParm);
-            ItemVar.SetRange("Item No.", ItemParm."No.");
-            RecRef.GetTable(ItemVar);
-            VRTShowTable.ShowVarietyMatrix(RecRef, ItemParm, ShowFieldNo);
-        end;
+        //test variant item
+        TestItemIsVariety(ItemParm);
+        ItemVar.SetRange("Item No.", ItemParm."No.");
+        RecRef.GetTable(ItemVar);
+        VRTShowTable.ShowVarietyMatrix(RecRef, ItemParm, ShowFieldNo);
+
     end;
 
     procedure ShowMaintainItemMatrix(var ItemParm: Record Item; ShowFieldNo: Integer)
@@ -46,64 +20,48 @@ codeunit 6059970 "NPR Variety Wrapper"
         VRTShowTable: Codeunit "NPR Variety ShowTables";
         ItemVar: Record "Item Variant";
     begin
-        //-VRT1.11
-        with ItemParm do begin
-            //test variant item
-            TestItemIsVariety(ItemParm);
-            //RecRef.GETTABLE(ItemParm);
-            ItemVar.SetRange("Item No.", ItemParm."No.");
-            //-NPR5.47 [327541]
-            ItemParm.SetFilter("Date Filter", GetCalculationDate(WorkDate));
-            //+NPR5.47 [327541]
-            RecRef.GetTable(ItemVar);
-            VRTShowTable.ShowBooleanMatrix(RecRef, ItemParm, ShowFieldNo);
-        end;
-        //+VRT1.11
+        //test variant item
+        TestItemIsVariety(ItemParm);
+        ItemVar.SetRange("Item No.", ItemParm."No.");
+        ItemParm.SetFilter("Date Filter", GetCalculationDate(WorkDate));
+        RecRef.GetTable(ItemVar);
+        VRTShowTable.ShowBooleanMatrix(RecRef, ItemParm, ShowFieldNo);
     end;
 
     procedure SalesLineShowVariety(SalesLine: Record "Sales Line"; ShowFieldNo: Integer)
     var
         Item: Record Item;
+        MasterLineMap: Record "NPR Master Line Map";
         VRTShowTable: Codeunit "NPR Variety ShowTables";
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         RecRef: RecordRef;
     begin
-        with SalesLine do begin
-            //Fetch base data
-            TestField(Type, Type::Item);
-            Item.Get("No.");
+        //Fetch base data
+        SalesLine.TestField(SalesLine.Type, SalesLine.Type::Item);
+        Item.Get(SalesLine."No.");
+        //check its a Variety item
+        TestItemIsVariety(Item);
+        //find or create a line that is a master line
+        if not MasterLineMap.Get(Database::"Sales Line", SalesLine.SystemId) then
+            Clear(MasterLineMap);
 
-            //check its a Variety item
-            TestItemIsVariety(Item);
-
-            //find or create a line that is a master line
-            if not "NPR Is Master" then begin
-                if "NPR Master Line No." = 0 then begin
-                    //virgin line
-                    "NPR Is Master" := true;
-                    "NPR Master Line No." := "Line No.";
-                    Modify;
-                    Commit;
-                end else
-                    //existing Variety
-                    Get("Document Type", "Document No.", "NPR Master Line No.");
-            end;
-        end;
+        if not MasterLineMap."Is Master" then
+            if IsNullGuid(MasterLineMap."Master Id") then begin
+                //virgin line
+                MasterLineMapMgt.CreateMap(Database::"Sales Line", SalesLine.SystemId, SalesLine.SystemId);
+                Commit();
+            end else
+                //existing Variety
+                SalesLine.GetBySystemId(MasterLineMap."Master Id");
 
         //Show the matrix form
         RecRef.GetTable(SalesLine);
-        //-NPR5.37 [292138]
         Item.SetFilter("Location Filter", SalesLine."Location Code");
-        //+NPR5.37 [292138]
-
-        //-NPR5.47 [327541]
         Item.SetFilter("Date Filter", GetCalculationDate(SalesLine."Shipment Date"));
         Item.SetFilter("Global Dimension 1 Filter", SalesLine."Shortcut Dimension 1 Code");
         Item.SetFilter("Global Dimension 2 Filter", SalesLine."Shortcut Dimension 2 Code");
         Item.SetFilter("Bin Filter", SalesLine."Bin Code");
-        //Item.SETFILTER("Lot No. Filter",
-        //Item.SETFILTER("Serial No. Filter",
         Item.SetFilter("Drop Shipment Filter", '%1', SalesLine."Drop Shipment");
-        //+NPR5.47 [327541]
 
         VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
     end;
@@ -111,226 +69,37 @@ codeunit 6059970 "NPR Variety Wrapper"
     procedure PurchLineShowVariety(PurchLine: Record "Purchase Line"; ShowFieldNo: Integer)
     var
         Item: Record Item;
+        MasterLineMap: Record "NPR Master Line Map";
         VRTShowTable: Codeunit "NPR Variety ShowTables";
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         RecRef: RecordRef;
     begin
-        with PurchLine do begin
-            //Fetch base data
-            TestField(Type, Type::Item);
-            Item.Get("No.");
+        //Fetch base data
+        PurchLine.TestField(PurchLine.Type, PurchLine.Type::Item);
+        Item.Get(PurchLine."No.");
+        //check its a Variety item
+        TestItemIsVariety(Item);
+        //find or create a line that is a master line
+        if not MasterLineMap.Get(Database::"Purchase Line", PurchLine.SystemId) then
+            Clear(MasterLineMap);
 
-            //check its a Variety item
-            TestItemIsVariety(Item);
-
-            //find or create a line that is a master line
-            if not "NPR Is Master" then begin
-                if "NPR Master Line No." = 0 then begin
-                    //virgin line
-                    "NPR Is Master" := true;
-                    "NPR Master Line No." := "Line No.";
-                    Modify;
-                    Commit;
-                end else
-                    //existing Variety
-                    Get("Document Type", "Document No.", "NPR Master Line No.");
-            end;
-        end;
+        if not MasterLineMap."Is Master" then
+            if IsNullGuid(MasterLineMap."Master Id") then begin
+                //virgin line
+                MasterLineMapMgt.CreateMap(Database::"Purchase Line", PurchLine.SystemId, PurchLine.SystemId);
+                Commit();
+            end else
+                //existing Variety
+                PurchLine.GetBySystemId(MasterLineMap."Master Id");
 
         //Show the matrix form
         RecRef.GetTable(PurchLine);
-        //-NPR5.37 [292138]
         Item.SetFilter("Location Filter", PurchLine."Location Code");
-        //+NPR5.37 [292138]
-
-        //-NPR5.47 [327541]
         Item.SetFilter("Date Filter", GetCalculationDate(PurchLine."Expected Receipt Date"));
         Item.SetFilter("Global Dimension 1 Filter", PurchLine."Shortcut Dimension 1 Code");
         Item.SetFilter("Global Dimension 2 Filter", PurchLine."Shortcut Dimension 2 Code");
         Item.SetFilter("Bin Filter", PurchLine."Bin Code");
-        //Item.SETFILTER("Lot No. Filter",
-        //Item.SETFILTER("Serial No. Filter",
         Item.SetFilter("Drop Shipment Filter", '%1', PurchLine."Drop Shipment");
-        //+NPR5.47 [327541]
-
-        VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
-    end;
-
-    procedure SalesShipmentLineShowVariety(SalesShipLine: Record "Sales Shipment Line"; ShowFieldNo: Integer)
-    var
-        Item: Record Item;
-        VRTShowTable: Codeunit "NPR Variety ShowTables";
-        RecRef: RecordRef;
-    begin
-        with SalesShipLine do begin
-            TestField(Type, Type::Item);
-            Item.Get("No.");
-
-            TestItemIsVariety(Item);
-        end;
-
-        RecRef.GetTable(SalesShipLine);
-        //-NPR5.37 [292138]
-        Item.SetFilter("Location Filter", SalesShipLine."Location Code");
-        //+NPR5.37 [292138]
-
-        //-NPR5.47 [327541]
-        Item.SetFilter("Date Filter", GetCalculationDate(SalesShipLine."Shipment Date"));
-        Item.SetFilter("Global Dimension 1 Filter", SalesShipLine."Shortcut Dimension 1 Code");
-        Item.SetFilter("Global Dimension 2 Filter", SalesShipLine."Shortcut Dimension 2 Code");
-        Item.SetFilter("Bin Filter", SalesShipLine."Bin Code");
-        //Item.SETFILTER("Lot No. Filter",
-        //Item.SETFILTER("Serial No. Filter",
-        Item.SetFilter("Drop Shipment Filter", '%1', SalesShipLine."Drop Shipment");
-        //+NPR5.47 [327541]
-
-        VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
-    end;
-
-    procedure SalesInvLineShowVariety(SalesInvLine: Record "Sales Invoice Line"; ShowFieldNo: Integer)
-    var
-        Item: Record Item;
-        VRTShowTable: Codeunit "NPR Variety ShowTables";
-        RecRef: RecordRef;
-    begin
-        with SalesInvLine do begin
-            TestField(Type, Type::Item);
-            Item.Get("No.");
-
-            TestItemIsVariety(Item);
-        end;
-
-        RecRef.GetTable(SalesInvLine);
-        //-NPR5.47 [327541]
-        Item.SetFilter("Location Filter", SalesInvLine."Location Code");
-        Item.SetFilter("Date Filter", GetCalculationDate(SalesInvLine."Shipment Date"));
-        Item.SetFilter("Global Dimension 1 Filter", SalesInvLine."Shortcut Dimension 1 Code");
-        Item.SetFilter("Global Dimension 2 Filter", SalesInvLine."Shortcut Dimension 2 Code");
-        Item.SetFilter("Bin Filter", SalesInvLine."Bin Code");
-        //Item.SETFILTER("Lot No. Filter",
-        //Item.SETFILTER("Serial No. Filter",
-        Item.SetFilter("Drop Shipment Filter", '%1', SalesInvLine."Drop Shipment");
-        //+NPR5.47 [327541]
-
-        VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
-    end;
-
-    procedure SalesCrMemoLineShowVariety(SalesCrMemoLine: Record "Sales Cr.Memo Line"; ShowFieldNo: Integer)
-    var
-        Item: Record Item;
-        VRTShowTable: Codeunit "NPR Variety ShowTables";
-        RecRef: RecordRef;
-    begin
-        with SalesCrMemoLine do begin
-            TestField(Type, Type::Item);
-            Item.Get("No.");
-
-            TestItemIsVariety(Item);
-        end;
-
-        RecRef.GetTable(SalesCrMemoLine);
-        //-NPR5.37 [292138]
-        Item.SetFilter("Location Filter", SalesCrMemoLine."Location Code");
-        //+NPR5.37 [292138]
-        //-NPR5.47 [327541]
-        Item.SetFilter("Date Filter", GetCalculationDate(SalesCrMemoLine."Shipment Date"));
-        Item.SetFilter("Global Dimension 1 Filter", SalesCrMemoLine."Shortcut Dimension 1 Code");
-        Item.SetFilter("Global Dimension 2 Filter", SalesCrMemoLine."Shortcut Dimension 2 Code");
-        Item.SetFilter("Bin Filter", SalesCrMemoLine."Bin Code");
-        //Item.SETFILTER("Lot No. Filter",
-        //Item.SETFILTER("Serial No. Filter",
-        //Item.SETFILTER("Drop Shipment Filter", '%1',
-        //+NPR5.47 [327541]
-
-        VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
-    end;
-
-    procedure PurchReceiptLineShowVariety(PurchRcptLine: Record "Purch. Rcpt. Line"; ShowFieldNo: Integer)
-    var
-        Item: Record Item;
-        VRTShowTable: Codeunit "NPR Variety ShowTables";
-        RecRef: RecordRef;
-    begin
-        with PurchRcptLine do begin
-            TestField(Type, Type::Item);
-            Item.Get("No.");
-
-            TestItemIsVariety(Item);
-        end;
-
-        RecRef.GetTable(PurchRcptLine);
-        //-NPR5.37 [292138]
-        Item.SetFilter("Location Filter", PurchRcptLine."Location Code");
-        //+NPR5.37 [292138]
-
-        //-NPR5.47 [327541]
-        Item.SetFilter("Date Filter", GetCalculationDate(PurchRcptLine."Expected Receipt Date"));
-        Item.SetFilter("Global Dimension 1 Filter", PurchRcptLine."Shortcut Dimension 1 Code");
-        Item.SetFilter("Global Dimension 2 Filter", PurchRcptLine."Shortcut Dimension 2 Code");
-        Item.SetFilter("Bin Filter", PurchRcptLine."Bin Code");
-        //Item.SETFILTER("Lot No. Filter",
-        //Item.SETFILTER("Serial No. Filter",
-        //Item.SETFILTER("Drop Shipment Filter", '%1',
-        //+NPR5.47 [327541]
-
-        VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
-    end;
-
-    procedure PurchInvLineShowVariety(PurchInvLine: Record "Purch. Inv. Line"; ShowFieldNo: Integer)
-    var
-        Item: Record Item;
-        VRTShowTable: Codeunit "NPR Variety ShowTables";
-        RecRef: RecordRef;
-    begin
-        with PurchInvLine do begin
-            TestField(Type, Type::Item);
-            Item.Get("No.");
-
-            TestItemIsVariety(Item);
-        end;
-
-        RecRef.GetTable(PurchInvLine);
-        //-NPR5.37 [292138]
-        Item.SetFilter("Location Filter", PurchInvLine."Location Code");
-        //+NPR5.37 [292138]
-        //-NPR5.47 [327541]
-        Item.SetFilter("Date Filter", GetCalculationDate(PurchInvLine."Expected Receipt Date"));
-        Item.SetFilter("Global Dimension 1 Filter", PurchInvLine."Shortcut Dimension 1 Code");
-        Item.SetFilter("Global Dimension 2 Filter", PurchInvLine."Shortcut Dimension 2 Code");
-        Item.SetFilter("Bin Filter", PurchInvLine."Bin Code");
-        //Item.SETFILTER("Lot No. Filter",
-        //Item.SETFILTER("Serial No. Filter",
-        //Item.SETFILTER("Drop Shipment Filter", '%1',
-        //+NPR5.47 [327541]
-
-        VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
-    end;
-
-    procedure PurchCrMemoLineShowVariety(PurchCrMemoLine: Record "Purch. Cr. Memo Line"; ShowFieldNo: Integer)
-    var
-        Item: Record Item;
-        VRTShowTable: Codeunit "NPR Variety ShowTables";
-        RecRef: RecordRef;
-    begin
-        with PurchCrMemoLine do begin
-            TestField(Type, Type::Item);
-            Item.Get("No.");
-
-            TestItemIsVariety(Item);
-        end;
-
-        RecRef.GetTable(PurchCrMemoLine);
-        //-NPR5.37 [292138]
-        Item.SetFilter("Location Filter", PurchCrMemoLine."Location Code");
-        //+NPR5.37 [292138]
-        //-NPR5.47 [327541]
-        Item.SetFilter("Date Filter", GetCalculationDate(PurchCrMemoLine."Expected Receipt Date"));
-        Item.SetFilter("Global Dimension 1 Filter", PurchCrMemoLine."Shortcut Dimension 1 Code");
-        Item.SetFilter("Global Dimension 2 Filter", PurchCrMemoLine."Shortcut Dimension 2 Code");
-        Item.SetFilter("Bin Filter", PurchCrMemoLine."Bin Code");
-        //Item.SETFILTER("Lot No. Filter",
-        //Item.SETFILTER("Serial No. Filter",
-        //Item.SETFILTER("Drop Shipment Filter", '%1',
-        //+NPR5.47 [327541]
 
         VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
     end;
@@ -338,30 +107,28 @@ codeunit 6059970 "NPR Variety Wrapper"
     procedure SalesPriceShowVariety(SalesPrice: Record "Sales Price"; ShowFieldNo: Integer)
     var
         Item: Record Item;
+        MasterLineMap: Record "NPR Master Line Map";
         VRTShowTable: Codeunit "NPR Variety ShowTables";
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         RecRef: RecordRef;
     begin
-        with SalesPrice do begin
-            //Fetch base data
-            Item.Get("Item No.");
+        //Fetch base data
+        Item.Get(SalesPrice."Item No.");
+        //check its a Variety item
+        TestItemIsVariety(Item);
+        //find or create a line that is a master line
+        if not MasterLineMap.Get(Database::"Sales Price", SalesPrice.SystemId) then
+            Clear(MasterLineMap);
 
-            //check its a Variety item
-            TestItemIsVariety(Item);
-
-            //find or create a line that is a master line
-            if not "NPR Is Master" then begin
-                if "NPR Master Record Reference" = '' then begin
-                    //virgin line - can only be done on blank Variant Code
-                    TestField("Variant Code", '');
-                    "NPR Is Master" := true;
-                    "NPR Master Record Reference" := SalesPrice.GetPosition(false);
-                    Modify;
-                    Commit;
-                end else
-                    //existing Variety
-                    SetPosition("NPR Master Record Reference");
-            end;
-        end;
+        if not MasterLineMap."Is Master" then
+            if IsNullGuid(MasterLineMap."Master Id") then begin
+                //virgin line - can only be done on blank Variant Code
+                SalesPrice.TestField(SalesPrice."Variant Code", '');
+                MasterLineMapMgt.CreateMap(Database::"Sales Price", SalesPrice.SystemId, SalesPrice.SystemId);
+                Commit();
+            end else
+                //existing Variety
+                SalesPrice.GetBySystemId(MasterLineMap."Master Id");
 
         //Show the matrix form
         RecRef.GetTable(SalesPrice);
@@ -371,30 +138,28 @@ codeunit 6059970 "NPR Variety Wrapper"
     procedure PurchPriceShowVariety(PurchPrice: Record "Purchase Price"; ShowFieldNo: Integer)
     var
         Item: Record Item;
+        MasterLineMap: Record "NPR Master Line Map";
         VRTShowTable: Codeunit "NPR Variety ShowTables";
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         RecRef: RecordRef;
     begin
-        with PurchPrice do begin
-            //Fetch base data
-            Item.Get("Item No.");
+        //Fetch base data
+        Item.Get(PurchPrice."Item No.");
+        //check its a Variety item
+        TestItemIsVariety(Item);
+        //find or create a line that is a master line
+        if not MasterLineMap.Get(Database::"Purchase Price", PurchPrice.SystemId) then
+            Clear(MasterLineMap);
 
-            //check its a Variety item
-            TestItemIsVariety(Item);
-
-            //find or create a line that is a master line
-            if not "NPR Is Master" then begin
-                if "NPR Master Record Reference" = '' then begin
-                    //virgin line - can only be done on blank Variant Code
-                    TestField("Variant Code", '');
-                    "NPR Is Master" := true;
-                    "NPR Master Record Reference" := PurchPrice.GetPosition(false);
-                    Modify;
-                    Commit;
-                end else
-                    //existing Variety
-                    SetPosition("NPR Master Record Reference");
-            end;
-        end;
+        if not MasterLineMap."Is Master" then
+            if IsNullGuid(MasterLineMap."Master Id") then begin
+                //virgin line - can only be done on blank Variant Code
+                PurchPrice.TestField(PurchPrice."Variant Code", '');
+                MasterLineMapMgt.CreateMap(Database::"Purchase Price", PurchPrice.SystemId, PurchPrice.SystemId);
+                Commit();
+            end else
+                //existing Variety
+                PurchPrice.GetBySystemId(MasterLineMap."Master Id");
 
         //Show the matrix form
         RecRef.GetTable(PurchPrice);
@@ -404,183 +169,141 @@ codeunit 6059970 "NPR Variety Wrapper"
     procedure RetailJournalLineShowVariety(RetailJournalLine: Record "NPR Retail Journal Line"; ShowFieldNo: Integer)
     var
         Item: Record Item;
+        MasterLineMap: Record "NPR Master Line Map";
         VRTShowTable: Codeunit "NPR Variety ShowTables";
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         RecRef: RecordRef;
     begin
-        //-VRT1.01
-        with RetailJournalLine do begin
-            //Fetch base data
-            Item.Get("Item No.");
+        //Fetch base data
+        Item.Get(RetailJournalLine."Item No.");
+        //check its a Variety item
+        TestItemIsVariety(Item);
+        //find or create a line that is a master line
+        if not MasterLineMap.Get(Database::"NPR Retail Journal Line", RetailJournalLine.SystemId) then
+            Clear(MasterLineMap);
 
-            //check its a Variety item
-            TestItemIsVariety(Item);
-
-            //find or create a line that is a master line
-            if not "Is Master" then begin
-                if "Master Line No." = 0 then begin
-                    //virgin line
-                    "Is Master" := true;
-                    "Master Line No." := "Line No.";
-                    Modify;
-                    Commit;
-                end else
-                    //existing Variety
-                    Get("No.", "Line No.");
-            end;
-        end;
+        if not MasterLineMap."Is Master" then
+            if IsNullGuid(MasterLineMap."Master Id") then begin
+                //virgin line
+                MasterLineMapMgt.CreateMap(Database::"NPR Retail Journal Line", RetailJournalLine.SystemId, RetailJournalLine.SystemId);
+                Commit();
+            end else
+                //existing Variety
+                RetailJournalLine.GetBySystemId(MasterLineMap."Master Id");
 
         RecRef.GetTable(RetailJournalLine);
         VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
-        //+VRT1.01
     end;
 
     procedure ItemReplenishmentShowVariety(ItemReplenishByStore: Record "NPR Item Repl. by Store"; ShowFieldNo: Integer)
     var
         Item: Record Item;
+        MasterLineMap: Record "NPR Master Line Map";
         VRTShowTable: Codeunit "NPR Variety ShowTables";
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         RecRef: RecordRef;
     begin
-        //-NPR4.16
-        with ItemReplenishByStore do begin
-            //Fetch base data
-            Item.Get("Item No.");
+        //Fetch base data
+        Item.Get(ItemReplenishByStore."Item No.");
+        //check its a Variety item
+        TestItemIsVariety(Item);
+        //find or create a line that is a master line
+        if not MasterLineMap.Get(Database::"NPR Item Repl. by Store", ItemReplenishByStore.SystemId) then
+            Clear(MasterLineMap);
 
-            //check its a Variety item
-            TestItemIsVariety(Item);
-
-            //find or create a line that is a master line
-            if not "Is Master" then begin
-                if "Master Record Reference" = '' then begin
-                    //virgin line - can only be done on blank Variant Code
-                    TestField("Variant Code", '');
-                    "Is Master" := true;
-                    "Master Record Reference" := ItemReplenishByStore.GetPosition(false);
-                    Modify;
-                    Commit;
-                end else
-                    //existing Variety
-                    SetPosition("Master Record Reference");
-            end;
-        end;
+        if not MasterLineMap."Is Master" then
+            if IsNullGuid(MasterLineMap."Master Id") then begin
+                //virgin line - can only be done on blank Variant Code
+                ItemReplenishByStore.TestField(ItemReplenishByStore."Variant Code", '');
+                MasterLineMapMgt.CreateMap(Database::"NPR Item Repl. by Store", ItemReplenishByStore.SystemId, ItemReplenishByStore.SystemId);
+                Commit();
+            end else
+                //existing Variety
+                ItemReplenishByStore.GetBySystemId(MasterLineMap."Master Id");
 
         //Show the matrix form
         RecRef.GetTable(ItemReplenishByStore);
         VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
-        //+NPR4.16
     end;
 
     local procedure ItemJnlLineShowVariety(ItemJnlLine: Record "Item Journal Line"; ShowFieldNo: Integer)
     var
         Item: Record Item;
+        MasterLineMap: Record "NPR Master Line Map";
         VRTShowTable: Codeunit "NPR Variety ShowTables";
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         RecRef: RecordRef;
     begin
-        //-NPR5.36 [288696]
-        with ItemJnlLine do begin
-            //Fetch base data
-            Item.Get("Item No.");
+        //Fetch base data
+        Item.Get(ItemJnlLine."Item No.");
+        //check its a Variety item
+        TestItemIsVariety(Item);
+        //find or create a line that is a master line
+        if not MasterLineMap.Get(Database::"Item Journal Line", ItemJnlLine.SystemId) then
+            Clear(MasterLineMap);
 
-            //check its a Variety item
-            TestItemIsVariety(Item);
-
-            //find or create a line that is a master line
-            if not "NPR Is Master" then begin
-                if "NPR Master Line No." = 0 then begin
-                    //virgin line
-                    "NPR Is Master" := true;
-                    "NPR Master Line No." := "Line No.";
-                    Modify;
-                    Commit;
-                end else
-                    //existing Variety
-                    Get("Journal Template Name", "Journal Batch Name", "Line No.");
-            end;
-        end;
+        if not MasterLineMap."Is Master" then
+            if IsNullGuid(MasterLineMap."Master Id") then begin
+                //virgin line
+                MasterLineMapMgt.CreateMap(Database::"Item Journal Line", ItemJnlLine.SystemId, ItemJnlLine.SystemId);
+                Commit();
+            end else
+                //existing Variety
+                ItemJnlLine.GetBySystemId(MasterLineMap."Master Id");
 
         //transfer the filter to the matrix, so inventory can be shown for this location
         if ItemJnlLine."Location Code" <> '' then
             Item.SetRange("Location Filter", ItemJnlLine."Location Code");
 
         RecRef.GetTable(ItemJnlLine);
-        //-NPR5.37 [292138]
         Item.SetFilter("Location Filter", ItemJnlLine."Location Code");
-        //+NPR5.37 [292138]
-        //-NPR5.47 [327541]
         Item.SetFilter("Date Filter", GetCalculationDate(ItemJnlLine."Posting Date"));
         Item.SetFilter("Global Dimension 1 Filter", ItemJnlLine."Shortcut Dimension 1 Code");
         Item.SetFilter("Global Dimension 2 Filter", ItemJnlLine."Shortcut Dimension 2 Code");
         Item.SetFilter("Bin Filter", ItemJnlLine."Bin Code");
-        //Item.SETFILTER("Lot No. Filter",
-        //Item.SETFILTER("Serial No. Filter",
         Item.SetFilter("Drop Shipment Filter", '%1', ItemJnlLine."Drop Shipment");
-        //+NPR5.47 [327541]
 
         VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
-        //+NPR5.36 [288696]
     end;
 
     procedure TestItemIsVariety(Item: Record Item)
     begin
-    end;
-
-    procedure ItemIsVariety(ItemNo: Code[20]): Boolean
-    var
-        Item: Record Item;
-    begin
-        //-VRT1.11
-        if ItemNo = '' then
-            exit(false);
-
-        Item.Get(ItemNo);
-        exit((Item."NPR Variety 1" <> '') or (Item."NPR Variety 2" <> '') or (Item."NPR Variety 3" <> '') or (Item."NPR Variety 4" <> ''));
-        //+VRT1.11
+        // forgotten check? todo?
     end;
 
     procedure TransferLineShowVariety(TransferLine: Record "Transfer Line"; ShowFieldNo: Integer)
     var
         Item: Record Item;
+        MasterLineMap: Record "NPR Master Line Map";
         VRTShowTable: Codeunit "NPR Variety ShowTables";
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         RecRef: RecordRef;
     begin
-        //-VRT1.20 [260516]
-        with TransferLine do begin
-            //Fetch base data
-            Item.Get("Item No.");
+        //Fetch base data
+        Item.Get(TransferLine."Item No.");
+        //check its a Variety item
+        TestItemIsVariety(Item);
+        //find or create a line that is a master line
+        if not MasterLineMap.Get(Database::"Transfer Line", TransferLine.SystemId) then
+            Clear(MasterLineMap);
 
-            //check its a Variety item
-            TestItemIsVariety(Item);
-
-            //find or create a line that is a master line
-            if not "NPR Is Master" then begin
-                if "NPR Master Line No." = 0 then begin
-                    //virgin line
-                    "NPR Is Master" := true;
-                    "NPR Master Line No." := "Line No.";
-                    Modify;
-                    Commit;
-                end else
-                    //existing Variety
-                    Get("Document No.", "NPR Master Line No.");
-            end;
-        end;
+        if not MasterLineMap."Is Master" then
+            if IsNullGuid(MasterLineMap."Master Id") then begin
+                //virgin line
+                MasterLineMapMgt.CreateMap(Database::"Transfer Line", TransferLine.SystemId, TransferLine.SystemId);
+                Commit();
+            end else
+                //existing Variety
+                TransferLine.GetBySystemId(MasterLineMap."Master Id");
 
         //Show the matrix form
         RecRef.GetTable(TransferLine);
-        //-NPR5.37 [292138]
         Item.SetFilter("Location Filter", TransferLine."Transfer-from Code");
-        //+NPR5.37 [292138]
-        //-NPR5.47 [327541]
         Item.SetFilter("Date Filter", GetCalculationDate(TransferLine."Shipment Date"));
         Item.SetFilter("Global Dimension 1 Filter", TransferLine."Shortcut Dimension 1 Code");
         Item.SetFilter("Global Dimension 2 Filter", TransferLine."Shortcut Dimension 2 Code");
-        //Item.SETFILTER("Bin Filter",
-        //Item.SETFILTER("Lot No. Filter",
-        //Item.SETFILTER("Serial No. Filter",
-        //Item.SETFILTER("Drop Shipment Filter", '%1',
-        //+NPR5.47 [327541]
 
         VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
-        //+VRT1.20 [260516]
     end;
 
     [EventSubscriber(ObjectType::Table, 5401, 'OnAfterInsertEvent', '', false, false)]
@@ -589,9 +312,7 @@ codeunit 6059970 "NPR Variety Wrapper"
         VRTCloneData: Codeunit "NPR Variety Clone Data";
     begin
         if RunTrigger then
-            //-VRT1.00
             VRTCloneData.InsertDefaultBarcode(Rec."Item No.", Rec.Code, true);
-        //+VRT1.00
     end;
 
     [EventSubscriber(ObjectType::Table, 5401, 'OnBeforeDeleteEvent', '', false, false)]
@@ -600,9 +321,7 @@ codeunit 6059970 "NPR Variety Wrapper"
         VRTCheck: Codeunit "NPR Variety Check";
     begin
         if RunTrigger then
-            //-VRT1.00
             VRTCheck.CheckItemVariantDeleteAllowed(Rec);
-        //+VRT1.00
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 21, 'OnAfterCheckItemJnlLine', '', false, false)]
@@ -610,9 +329,7 @@ codeunit 6059970 "NPR Variety Wrapper"
     var
         VRTCheck: Codeunit "NPR Variety Check";
     begin
-        //-VRT1.00
         VRTCheck.PostingCheck(ItemJnlLine);
-        //+VRT1.00
     end;
 
     [EventSubscriber(ObjectType::Page, 30, 'OnAfterActionEvent', 'NPR VarietyMatrix', false, false)]
@@ -620,9 +337,7 @@ codeunit 6059970 "NPR Variety Wrapper"
     var
         VRTWrapper: Codeunit "NPR Variety Wrapper";
     begin
-        //-VRT1.00
         VRTWrapper.ShowVarietyMatrix(Rec, 0);
-        //+VRT1.00
     end;
 
     [EventSubscriber(ObjectType::Page, 7002, 'OnAfterActionEvent', 'NPR Variety', false, false)]
@@ -630,9 +345,7 @@ codeunit 6059970 "NPR Variety Wrapper"
     var
         VRTWrapper: Codeunit "NPR Variety Wrapper";
     begin
-        //-VRT1.00
         VRTWrapper.SalesPriceShowVariety(Rec, 0);
-        //+VRT1.00
     end;
 
     [EventSubscriber(ObjectType::Page, 7012, 'OnAfterActionEvent', 'NPR Variety', false, false)]
@@ -640,9 +353,7 @@ codeunit 6059970 "NPR Variety Wrapper"
     var
         VRTWrapper: Codeunit "NPR Variety Wrapper";
     begin
-        //-VRT1.00
         VRTWrapper.PurchPriceShowVariety(Rec, 0);
-        //+VRT1.00
     end;
 
     [EventSubscriber(ObjectType::Table, 27, 'OnAfterValidateEvent', 'NPR Variety Group', true, false)]
@@ -651,37 +362,32 @@ codeunit 6059970 "NPR Variety Wrapper"
         VrtGroup: Record "NPR Variety Group";
         VrtCheck: Codeunit "NPR Variety Check";
     begin
-        //-NPR5.23
-        with Rec do begin
-            if "NPR Variety Group" = xRec."NPR Variety Group" then
-                exit;
+        if Rec."NPR Variety Group" = xRec."NPR Variety Group" then
+            exit;
 
-            //updateitem
-            if "NPR Variety Group" = '' then
-                VrtGroup.Init
-            else
-                VrtGroup.Get("NPR Variety Group");
-            "NPR Variety 1" := VrtGroup."Variety 1";
-            "NPR Variety 1 Table" := VrtGroup.GetVariety1Table(Rec);
-            "NPR Variety 2" := VrtGroup."Variety 2";
-            "NPR Variety 2 Table" := VrtGroup.GetVariety2Table(Rec);
-            "NPR Variety 3" := VrtGroup."Variety 3";
-            "NPR Variety 3 Table" := VrtGroup.GetVariety3Table(Rec);
-            "NPR Variety 4" := VrtGroup."Variety 4";
-            "NPR Variety 4 Table" := VrtGroup.GetVariety4Table(Rec);
-            "NPR Cross Variety No." := VrtGroup."Cross Variety No.";
+        //updateitem
+        if Rec."NPR Variety Group" = '' then
+            VrtGroup.Init
+        else
+            VrtGroup.Get(Rec."NPR Variety Group");
 
-            //Above code will be executed IF its a temporary record - Below wont be executed if its a temporary record
-            if Rec.IsTemporary then
-                exit;
+        Rec."NPR Variety 1" := VrtGroup."Variety 1";
+        Rec."NPR Variety 1 Table" := VrtGroup.GetVariety1Table(Rec);
+        Rec."NPR Variety 2" := VrtGroup."Variety 2";
+        Rec."NPR Variety 2 Table" := VrtGroup.GetVariety2Table(Rec);
+        Rec."NPR Variety 3" := VrtGroup."Variety 3";
+        Rec."NPR Variety 3 Table" := VrtGroup.GetVariety3Table(Rec);
+        Rec."NPR Variety 4" := VrtGroup."Variety 4";
+        Rec."NPR Variety 4 Table" := VrtGroup.GetVariety4Table(Rec);
+        Rec."NPR Cross Variety No." := VrtGroup."Cross Variety No.";
 
-            //check change allowed
-            VrtCheck.ChangeItemVariety(Rec, xRec);
-
-            //copy base table info (if needed)
-            VrtGroup.CopyTableData(Rec);
-        end;
-        //+NPR5.23
+        //Above code will be executed IF its a temporary record - Below wont be executed if its a temporary record
+        if Rec.IsTemporary then
+            exit;
+        //check change allowed
+        VrtCheck.ChangeItemVariety(Rec, xRec);
+        //copy base table info (if needed)
+        VrtGroup.CopyTableData(Rec);
     end;
 
     [EventSubscriber(ObjectType::Table, 27, 'OnAfterInsertEvent', '', true, false)]
@@ -689,10 +395,8 @@ codeunit 6059970 "NPR Variety Wrapper"
     var
         VRTCloneData: Codeunit "NPR Variety Clone Data";
     begin
-        //-NPR5.23.02
         if RunTrigger then
             VRTCloneData.InsertDefaultBarcode(Rec."No.", '', true);
-        //+NPR5.23.02
     end;
 
     [EventSubscriber(ObjectType::Table, 27, 'OnAfterModifyEvent', '', true, false)]
@@ -700,139 +404,70 @@ codeunit 6059970 "NPR Variety Wrapper"
     var
         VrtCheck: Codeunit "NPR Variety Check";
     begin
-        //-VRT1.20 [251896]
         if Rec.IsTemporary then
             exit;
+
         VrtCheck.ChangeItemVariety(Rec, xRec);
-        //+VRT1.20 [251896]
     end;
 
     [EventSubscriber(ObjectType::Page, 40, 'OnAfterActionEvent', 'NPR Variety', true, true)]
     local procedure P40OnAfterActionEventShowVariety(var Rec: Record "Item Journal Line")
     begin
-        //-NPR5.51 [366143]
         ItemJnlLineShowVariety(Rec, 0);
-        //+NPR5.51 [366143]
     end;
 
     [EventSubscriber(ObjectType::Page, 46, 'OnAfterActionEvent', 'NPR Variety', true, true)]
     local procedure P46OnAfterActionEventShowVariety(var Rec: Record "Sales Line")
     begin
-        //-VRT1.20 [262474]
         SalesLineShowVariety(Rec, 0);
-        //+VRT1.20 [262474]
     end;
 
     [EventSubscriber(ObjectType::Page, 47, 'OnAfterActionEvent', 'NPR Variety', true, true)]
     local procedure P47OnAfterActionEventShowVariety(var Rec: Record "Sales Line")
     begin
-        //-VRT1.20 [262474]
         SalesLineShowVariety(Rec, 0);
-        //+VRT1.20 [262474]
     end;
 
     [EventSubscriber(ObjectType::Page, 54, 'OnAfterActionEvent', 'NPR Variety', true, true)]
     local procedure P54OnAfterActionEventShowVariety(var Rec: Record "Purchase Line")
     begin
-        //-VRT1.20 [262474]
         PurchLineShowVariety(Rec, 0);
-        //+VRT1.20 [262474]
     end;
 
     [EventSubscriber(ObjectType::Page, 55, 'OnAfterActionEvent', 'NPR Variety', true, true)]
     local procedure P55OnAfterActionEventShowVariety(var Rec: Record "Purchase Line")
     begin
-        //-VRT1.20 [262474]
         PurchLineShowVariety(Rec, 0);
-        //+VRT1.20 [262474]
     end;
 
     [EventSubscriber(ObjectType::Page, 95, 'OnAfterActionEvent', 'NPR Variety', true, true)]
     local procedure P95OnAfterActionEventShowVariety(var Rec: Record "Sales Line")
     begin
-        //-VRT1.20 [262474]
         SalesLineShowVariety(Rec, 0);
-        //+VRT1.20 [262474]
     end;
 
     [EventSubscriber(ObjectType::Page, 96, 'OnAfterActionEvent', 'NPR Variety', true, true)]
     local procedure P96OnAfterActionEventShowVariety(var Rec: Record "Sales Line")
     begin
-        //-VRT1.20 [262474]
         SalesLineShowVariety(Rec, 0);
-        //+VRT1.20 [262474]
     end;
 
     [EventSubscriber(ObjectType::Page, 98, 'OnAfterActionEvent', 'NPR Variety', true, true)]
     local procedure P98OnAfterActionEventShowVariety(var Rec: Record "Purchase Line")
     begin
-        //-VRT1.20 [262474]
         PurchLineShowVariety(Rec, 0);
-        //+VRT1.20 [262474]
-    end;
-
-    [EventSubscriber(ObjectType::Page, 131, 'OnAfterActionEvent', 'NPR Variety', true, true)]
-    local procedure P131OnAfterActionEventShowVariety(var Rec: Record "Sales Shipment Line")
-    begin
-        //-VRT1.20 [262474]
-        SalesShipmentLineShowVariety(Rec, 0);
-        //+VRT1.20 [262474]
-    end;
-
-    [EventSubscriber(ObjectType::Page, 133, 'OnAfterActionEvent', 'NPR Variety', true, true)]
-    local procedure P133OnAfterActionEventShowVariety(var Rec: Record "Sales Invoice Line")
-    begin
-        //-VRT1.20 [262474]
-        SalesInvLineShowVariety(Rec, 0);
-        //+VRT1.20 [262474]
-    end;
-
-    [EventSubscriber(ObjectType::Page, 135, 'OnAfterActionEvent', 'NPR Variety', true, true)]
-    local procedure P135OnAfterActionEventShowVariety(var Rec: Record "Sales Cr.Memo Line")
-    begin
-        //-VRT1.20 [262474]
-        SalesCrMemoLineShowVariety(Rec, 0);
-        //+VRT1.20 [262474]
-    end;
-
-    [EventSubscriber(ObjectType::Page, 137, 'OnAfterActionEvent', 'NPR Variety', true, true)]
-    local procedure P137OnAfterActionEventShowVariety(var Rec: Record "Purch. Rcpt. Line")
-    begin
-        //-VRT1.20 [262474]
-        PurchReceiptLineShowVariety(Rec, 0);
-        //+VRT1.20 [262474]
-    end;
-
-    [EventSubscriber(ObjectType::Page, 139, 'OnAfterActionEvent', 'NPR Variety', true, true)]
-    local procedure P139OnAfterActionEventShowVariety(var Rec: Record "Purch. Inv. Line")
-    begin
-        //-VRT1.20 [262474]
-        PurchInvLineShowVariety(Rec, 0);
-        //+VRT1.20 [262474]
-    end;
-
-    [EventSubscriber(ObjectType::Page, 141, 'OnAfterActionEvent', 'NPR Variety', true, true)]
-    local procedure P141OnAfterActionEventShowVariety(var Rec: Record "Purch. Cr. Memo Line")
-    begin
-        //-VRT1.20 [262474]
-        PurchCrMemoLineShowVariety(Rec, 0);
-        //+VRT1.20 [262474]
     end;
 
     [EventSubscriber(ObjectType::Page, 393, 'OnAfterActionEvent', 'NPR Variety', true, true)]
     local procedure P393OnAfterActionEventShowVariety(var Rec: Record "Item Journal Line")
     begin
-        //-NPR5.36 [288696]
         ItemJnlLineShowVariety(Rec, 0);
-        //+NPR5.36 [288696]
     end;
 
     [EventSubscriber(ObjectType::Page, 5741, 'OnAfterActionEvent', 'NPR Variety', true, true)]
     local procedure P5741OnAfterActionEventShowVariety(var Rec: Record "Transfer Line")
     begin
-        //-VRT1.20 [262474]
         TransferLineShowVariety(Rec, 0);
-        //+VRT1.20 [262474]
     end;
 
     [EventSubscriber(ObjectType::Page, 6059974, 'OnOpenPageEvent', '', false, false)]
@@ -840,42 +475,14 @@ codeunit 6059970 "NPR Variety Wrapper"
     var
         VrtFieldSetup: Record "NPR Variety Field Setup";
     begin
-        //-NPR5.36 [285733]
         VrtFieldSetup.UpdateToLatestVersion;
-        //+NPR5.36 [285733]
-    end;
-
-    local procedure ShowVariety()
-    var
-        VarietyWrapper: Codeunit "NPR Variety Wrapper";
-    begin
-        //-NPR5.37 [293486]
-        //New Function that can be copy pasted to sales order subform pages (and with a small change purchase etc.) to show Variety Matrix after entering the item no.
-        //This function must be placed directly on the subpage (due to the use of saverecord and update)
-        //This function will thereby NOT work in Extensions.
-        //a line of code must also be added on the field that should trigger the popup - should likely be field "No."
-        /*
-        IF Type <> Type::Item THEN
-          EXIT;
-        
-        IF NOT VarietyWrapper.ItemIsVariety("No.") THEN
-          EXIT;
-        
-        CurrPage.SAVERECORD;
-        VarietyWrapper.SalesLineShowVariety(Rec, 0);
-        CurrPage.UPDATE(FALSE);
-        */
-        //+NPR5.37 [293486]
-
     end;
 
     local procedure GetCalculationDate(DateIn: Date): Text
     begin
-        //-NPR5.47 [327541]
         if DateIn <> 0D then
             exit(Format(DateIn));
+
         exit(Format(WorkDate));
-        //+NPR5.47 [327541]
     end;
 }
-

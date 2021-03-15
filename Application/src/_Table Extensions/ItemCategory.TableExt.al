@@ -102,7 +102,7 @@
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "NPR Global Dimension 1 Code");
+                NPRValidateShortcutDimCode(1, "NPR Global Dimension 1 Code");
             end;
         }
         field(6014410; "NPR Global Dimension 2 Code"; Code[20])
@@ -113,7 +113,7 @@
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "NPR Global Dimension 1 Code");
+                NPRValidateShortcutDimCode(2, "NPR Global Dimension 1 Code");
             end;
         }
         field(6014411; "NPR Date Filter"; Date)
@@ -254,7 +254,7 @@
         }
     }
 
-    procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
+    procedure NPRValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     var
         DimMgt: Codeunit DimensionManagement;
     begin

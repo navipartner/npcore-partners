@@ -1,7 +1,5 @@
 table 6014474 "NPR Item Repl. by Store"
 {
-    // NPR4.16/TJ/20151115 CASE 222281 Table Created
-
     Caption = 'Item Replenishment by Store';
     DataClassification = CustomerContent;
 
@@ -30,6 +28,8 @@ table 6014474 "NPR Item Repl. by Store"
             OptionCaption = ' ,Fixed Reorder Qty.,Maximum Qty.,Order';
             OptionMembers = " ","Fixed Reorder Qty.","Maximum Qty.","Order";
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(20; "Reorder Point"; Decimal)
         {
@@ -119,11 +119,15 @@ table 6014474 "NPR Item Repl. by Store"
         {
             Caption = 'Is Master';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = '"NPR Master Line Map" used instead.';
         }
         field(6059972; "Master Record Reference"; Text[250])
         {
             Caption = 'Master Record Reference';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = '"NPR Master Line Map" used instead.';
         }
     }
 
@@ -138,4 +142,3 @@ table 6014474 "NPR Item Repl. by Store"
     {
     }
 }
-

@@ -33,18 +33,13 @@ codeunit 6059972 "NPR Variety Clone Data"
         MasterPurchPrice: Record "Purchase Price";
         MasterItemJnlLine: Record "Item Journal Line";
     begin
-        //-NPR5.29 [263917]
-        //IF NOT ItemVariant.GetFromVariety(Item."No.", TMPVRTBuffer."Variety 1 Value", TMPVRTBuffer."Variety 2 Value",
         if not GetFromVariety(ItemVariant, Item."No.", TMPVRTBuffer."Variety 1 Value", TMPVRTBuffer."Variety 2 Value",
-        //+NPR5.29 [263917]
                                          TMPVRTBuffer."Variety 3 Value", TMPVRTBuffer."Variety 4 Value") then
             Clear(ItemVariant);
 
-        //-NPR5.32 [274170]
         //if the variant cant be found, its not created, and none of the functions below makes sence to call
         if ItemVariant.Code = '' then
             Error(ItemVariantDontExisit);
-        //+NPR5.32 [274170]
 
         case MRecref.Number of
             DATABASE::"Item Variant":
@@ -68,45 +63,35 @@ codeunit 6059972 "NPR Variety Clone Data"
                     Evaluate(TMPVRTBuffer."Record ID (TMP)", SetupSalesPrice(MasterSalesPrice, Item, ItemVariant));
                 end;
 
-            //-VRT1.01
             DATABASE::"NPR Retail Journal Line":
                 begin
                     MRecref.SetTable(MasterRetailJournalLine);
                     Evaluate(TMPVRTBuffer."Record ID (TMP)", SetupRetailJournalLine(MasterRetailJournalLine, Item, ItemVariant));
                 end;
-            //+VRT1.01
 
-            //-NPR4.16
             DATABASE::"NPR Item Repl. by Store":
                 begin
                     MRecref.SetTable(MasterItemReplenishment);
                     Evaluate(TMPVRTBuffer."Record ID (TMP)", SetupItemReplenishment(MasterItemReplenishment, Item, ItemVariant));
                 end;
-            //+NPR4.16
 
-            //-NPR5.29 [260516]
             DATABASE::"Transfer Line":
                 begin
                     MRecref.SetTable(MasterTransferLine);
                     Evaluate(TMPVRTBuffer."Record ID (TMP)", SetupTransferLine(MasterTransferLine, Item, ItemVariant));
                 end;
-            //+NPR5.29 [260516]
 
-            //-NPR5.31 [271133]
             DATABASE::"Purchase Price":
                 begin
                     MRecref.SetTable(MasterPurchPrice);
                     Evaluate(TMPVRTBuffer."Record ID (TMP)", SetupPurchPrice(MasterPurchPrice, Item, ItemVariant));
                 end;
-            //+NPR5.31 [271133]
 
-            //-NPR5.36 [288696]
             DATABASE::"Item Journal Line":
                 begin
                     MRecref.SetTable(MasterItemJnlLine);
                     Evaluate(TMPVRTBuffer."Record ID (TMP)", SetupItemJnlLine(MasterItemJnlLine, Item, ItemVariant));
                 end;
-        //+NPR5.36 [288696]
 
         end;
         //if the master record has been changed (the record ID is identical), a reload is needed
@@ -119,41 +104,45 @@ codeunit 6059972 "NPR Variety Clone Data"
     procedure SetupSalesLine(var MasterSalesLine: Record "Sales Line"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
     var
         NewSalesLine: Record "Sales Line";
-        LineNo: Integer;
         SalesLine2: Record "Sales Line";
         RecRef: RecordRef;
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
+        LineNo: Integer;
     begin
         //check if a new line is needed (is variant code filled?)
         if MasterSalesLine."Variant Code" = '' then begin
             //Variant Code is blank. Use this one for the current line
             MasterSalesLine.Validate("Variant Code", ItemVariant.Code);
-            MasterSalesLine.Modify;
+            MasterSalesLine.Modify();
             RecRef.GetTable(MasterSalesLine);
             exit(Format(RecRef.RecordId));
         end;
 
         SalesLine2.SetRange("Document Type", MasterSalesLine."Document Type");
         SalesLine2.SetRange("Document No.", MasterSalesLine."Document No.");
-        SalesLine2.FindLast;
-        if SalesLine2."NPR Master Line No." = MasterSalesLine."Line No." then
+        SalesLine2.FindLast();
+
+        // if SalesLine2."NPR Master Line No." = MasterSalesLine."Line No." then
+        if MasterLineMapMgt.IsMaster(Database::"Sales Line", SalesLine2.SystemId) then
             LineNo := SalesLine2."Line No." + 10000
         else begin
-            SalesLine2.SetRange("NPR Master Line No.", MasterSalesLine."Line No.");
-            SalesLine2.FindLast;
-            LineNo := SalesLine2."Line No." + 1;
+            LineNo := SalesLine2."Line No." + 1; // fallback
+            if SalesLine2.GetBySystemId(MasterLineMapMgt.GetLastInLineSystemId(Database::"Sales Line", MasterSalesLine.SystemId)) then
+                LineNo := SalesLine2."Line No." + 1;
         end;
 
         NewSalesLine := MasterSalesLine;
         NewSalesLine."Line No." := LineNo;
-        NewSalesLine.Insert;
+        NewSalesLine.Insert();
         NewSalesLine.Validate(Quantity, 0);
         NewSalesLine.Validate("Variant Code", ItemVariant.Code);
         //dimensions
         NewSalesLine.Validate("Shortcut Dimension 1 Code", MasterSalesLine."Shortcut Dimension 1 Code");
         NewSalesLine.Validate("Shortcut Dimension 2 Code", MasterSalesLine."Shortcut Dimension 2 Code");
-        NewSalesLine."NPR Is Master" := false;
+        NewSalesLine.Modify();
 
-        NewSalesLine.Modify;
+        MasterLineMapMgt.CreateMap(Database::"Sales Line", NewSalesLine.SystemId, MasterSalesLine.SystemId);
+
         RecRef.GetTable(NewSalesLine);
         exit(Format(RecRef.RecordId));
     end;
@@ -161,28 +150,30 @@ codeunit 6059972 "NPR Variety Clone Data"
     procedure SetupPurchLine(var MasterPurchLine: Record "Purchase Line"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
     var
         NewPurchLine: Record "Purchase Line";
-        LineNo: Integer;
         PurchLine2: Record "Purchase Line";
         RecRef: RecordRef;
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
+        LineNo: Integer;
     begin
         //check if a new line is needed (is variant code filled?)
         if MasterPurchLine."Variant Code" = '' then begin
             //Variant Code is blank. Use this one for the current line
             MasterPurchLine.Validate("Variant Code", ItemVariant.Code);
-            MasterPurchLine.Modify;
+            MasterPurchLine.Modify();
             RecRef.GetTable(MasterPurchLine);
             exit(Format(RecRef.RecordId));
         end;
 
         PurchLine2.SetRange("Document Type", MasterPurchLine."Document Type");
         PurchLine2.SetRange("Document No.", MasterPurchLine."Document No.");
-        PurchLine2.FindLast;
-        if PurchLine2."NPR Master Line No." = MasterPurchLine."Line No." then
+        PurchLine2.FindLast();
+
+        if MasterLineMapMgt.IsMaster(Database::"Purchase Line", PurchLine2.SystemId) then
             LineNo := PurchLine2."Line No." + 10000
         else begin
-            PurchLine2.SetRange("NPR Master Line No.", MasterPurchLine."Line No.");
-            PurchLine2.FindLast;
-            LineNo := PurchLine2."Line No." + 1;
+            LineNo := PurchLine2."Line No." + 1; // fallback
+            if PurchLine2.GetBySystemId(MasterLineMapMgt.GetLastInLineSystemId(Database::"Purchase Line", MasterPurchLine.SystemId)) then
+                LineNo := PurchLine2."Line No." + 1;
         end;
 
         NewPurchLine := MasterPurchLine;
@@ -193,9 +184,11 @@ codeunit 6059972 "NPR Variety Clone Data"
         //dimensions
         NewPurchLine.Validate("Shortcut Dimension 1 Code", MasterPurchLine."Shortcut Dimension 1 Code");
         NewPurchLine.Validate("Shortcut Dimension 2 Code", MasterPurchLine."Shortcut Dimension 2 Code");
-        NewPurchLine."NPR Is Master" := false;
 
-        NewPurchLine.Modify;
+        NewPurchLine.Modify();
+
+        MasterLineMapMgt.CreateMap(Database::"Purchase Line", NewPurchLine.SystemId, MasterPurchLine.SystemId);
+
         RecRef.GetTable(NewPurchLine);
         exit(Format(RecRef.RecordId));
     end;
@@ -210,20 +203,15 @@ codeunit 6059972 "NPR Variety Clone Data"
         if not CreateVariant then
             exit;
 
-        //-NPR5.29 [263917]
         //IF ItemVariant.GetFromVariety(Item."No.", VRTBuffer."Variety 1 Value",
         if GetFromVariety(ItemVariant, Item."No.", VRTBuffer."Variety 1 Value",
-        //+NPR5.29 [263917]
                                      VRTBuffer."Variety 2 Value", VRTBuffer."Variety 3 Value",
                                      VRTBuffer."Variety 4 Value") then
             Error('Variant already exists');
 
         ItemVariant.Init;
         ItemVariant."Item No." := Item."No.";
-        //-NPR5.43 [317108]
-        //ItemVariant.Code := GetNextVariantCode;
         ItemVariant.Code := GetNextVariantCode(Item."No.", VRTBuffer."Variety 1 Value", VRTBuffer."Variety 2 Value", VRTBuffer."Variety 3 Value", VRTBuffer."Variety 4 Value");
-        //+NPR5.43 [317108]
         ItemVariant."NPR Variety 1" := Item."NPR Variety 1";
         ItemVariant."NPR Variety 1 Table" := Item."NPR Variety 1 Table";
         ItemVariant."NPR Variety 1 Value" := VRTBuffer."Variety 1 Value";
@@ -249,109 +237,104 @@ codeunit 6059972 "NPR Variety Clone Data"
     procedure SetupSalesPrice(var MasterSalesPrice: Record "Sales Price"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
     var
         NewSalesPrice: Record "Sales Price";
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         RecRef: RecordRef;
     begin
         //check if a new line is needed (is variant code filled?)
-        with MasterSalesPrice do begin
-            NewSalesPrice := MasterSalesPrice;
-            NewSalesPrice."Variant Code" := ItemVariant.Code;
-            NewSalesPrice.Insert;
-            NewSalesPrice."NPR Is Master" := false;
+        NewSalesPrice := MasterSalesPrice;
+        NewSalesPrice."Variant Code" := ItemVariant.Code;
+        NewSalesPrice.Insert();
 
-            NewSalesPrice.Modify;
-            RecRef.GetTable(NewSalesPrice);
-            exit(Format(RecRef.RecordId));
-        end;
+        MasterLineMapMgt.CreateMap(Database::"Sales Price", NewSalesPrice.SystemId, MasterSalesPrice.SystemId);
+
+        RecRef.GetTable(NewSalesPrice);
+        exit(Format(RecRef.RecordId));
+
     end;
 
     procedure SetupPurchPrice(var MasterPurchPrice: Record "Purchase Price"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
     var
         NewPurchPrice: Record "Purchase Price";
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         RecRef: RecordRef;
     begin
         //check if a new line is needed (is variant code filled?)
-        //-NPR5.31 [271133]
-        with MasterPurchPrice do begin
-            NewPurchPrice := MasterPurchPrice;
-            NewPurchPrice."Variant Code" := ItemVariant.Code;
-            NewPurchPrice.Insert;
-            NewPurchPrice."NPR Is Master" := false;
+        NewPurchPrice := MasterPurchPrice;
+        NewPurchPrice."Variant Code" := ItemVariant.Code;
+        NewPurchPrice.Insert();
 
-            NewPurchPrice.Modify;
-            RecRef.GetTable(NewPurchPrice);
-            exit(Format(RecRef.RecordId));
-        end;
-        //+NPR5.31 [271133]
+        MasterLineMapMgt.CreateMap(Database::"Purchase Price", NewPurchPrice.SystemId, MasterPurchPrice.SystemId);
+
+        RecRef.GetTable(NewPurchPrice);
+        exit(Format(RecRef.RecordId));
     end;
 
     procedure SetupRetailJournalLine(var MasterRetailJournalLine: Record "NPR Retail Journal Line"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
     var
         NewRetailJournalLine: Record "NPR Retail Journal Line";
         RetailJournalLine2: Record "NPR Retail Journal Line";
-        LineNo: Integer;
         RecRef: RecordRef;
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
+        LineNo: Integer;
     begin
-        //-VRT1.01
         //check if a new line is needed (is variant code filled?)
         if MasterRetailJournalLine."Variant Code" = '' then begin
             //Variant Code is blank. Use this one for the current line
             MasterRetailJournalLine.Validate("Variant Code", ItemVariant.Code);
-            MasterRetailJournalLine.Modify;
+            MasterRetailJournalLine.Modify();
             RecRef.GetTable(MasterRetailJournalLine);
             exit(Format(RecRef.RecordId));
         end;
 
         RetailJournalLine2.SetRange("No.", MasterRetailJournalLine."No.");
-        RetailJournalLine2.FindLast;
-        if RetailJournalLine2."Line No." = MasterRetailJournalLine."Line No." then
+        RetailJournalLine2.FindLast();
+
+        if MasterLineMapMgt.IsMaster(Database::"NPR Retail Journal Line", RetailJournalLine2.SystemId) then
             LineNo := RetailJournalLine2."Line No." + 10000
         else begin
-            RetailJournalLine2.SetRange("Master Line No.", MasterRetailJournalLine."Line No.");
-            RetailJournalLine2.FindLast;
-            LineNo := RetailJournalLine2."Line No." + 1;
+            LineNo := RetailJournalLine2."Line No." + 1; // fallback
+            if RetailJournalLine2.GetBySystemId(MasterLineMapMgt.GetLastInLineSystemId(Database::"NPR Retail Journal Line", MasterRetailJournalLine.SystemId)) then
+                LineNo := RetailJournalLine2."Line No." + 1;
         end;
 
         NewRetailJournalLine := MasterRetailJournalLine;
         NewRetailJournalLine."Line No." := LineNo;
-        NewRetailJournalLine.Insert;
+        NewRetailJournalLine.Insert();
         NewRetailJournalLine.Validate("Quantity to Print", 0);
         NewRetailJournalLine.Validate("Variant Code", ItemVariant.Code);
-        NewRetailJournalLine."Is Master" := false;
+        NewRetailJournalLine.Modify();
 
-        NewRetailJournalLine.Modify;
+        MasterLineMapMgt.CreateMap(Database::"NPR Retail Journal Line", NewRetailJournalLine.SystemId, MasterRetailJournalLine.SystemId);
+
         RecRef.GetTable(NewRetailJournalLine);
         exit(Format(RecRef.RecordId));
-        //+VRT1.01
     end;
 
     procedure SetupItemReplenishment(var MasterItemReplenishment: Record "NPR Item Repl. by Store"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
     var
         NewItemReplenishment: Record "NPR Item Repl. by Store";
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         RecRef: RecordRef;
     begin
-        //-NPR4.16
         //check if a new line is needed (is variant code filled?)
-        with MasterItemReplenishment do begin
-            NewItemReplenishment := MasterItemReplenishment;
-            NewItemReplenishment."Variant Code" := ItemVariant.Code;
-            NewItemReplenishment.Insert;
-            NewItemReplenishment."Is Master" := false;
+        NewItemReplenishment := MasterItemReplenishment;
+        NewItemReplenishment."Variant Code" := ItemVariant.Code;
+        NewItemReplenishment.Insert;
 
-            NewItemReplenishment.Modify;
-            RecRef.GetTable(NewItemReplenishment);
-            exit(Format(RecRef.RecordId));
-        end;
-        //+NPR4.16
+        MasterLineMapMgt.CreateMap(Database::"NPR Item Repl. by Store", NewItemReplenishment.SystemId, MasterItemReplenishment.SystemId);
+
+        RecRef.GetTable(NewItemReplenishment);
+        exit(Format(RecRef.RecordId));
     end;
 
     procedure SetupItemJnlLine(var MasterItemJnlLine: Record "Item Journal Line"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
     var
         NewItemJnlLine: Record "Item Journal Line";
-        RecRef: RecordRef;
         ItemJnlLine2: Record "Item Journal Line";
+        RecRef: RecordRef;
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         LineNo: Integer;
     begin
-        //-NPR5.36 [288696]
         //check if a new line is needed (is variant code filled?)
         if MasterItemJnlLine."Variant Code" = '' then begin
             //Variant Code is blank. Use this one for the current line
@@ -363,13 +346,15 @@ codeunit 6059972 "NPR Variety Clone Data"
 
         ItemJnlLine2.SetRange("Journal Template Name", MasterItemJnlLine."Journal Template Name");
         ItemJnlLine2.SetRange("Journal Batch Name", MasterItemJnlLine."Journal Batch Name");
-        ItemJnlLine2.FindLast;
-        if ItemJnlLine2."Line No." = MasterItemJnlLine."Line No." then
+        ItemJnlLine2.FindLast();
+
+        // if ItemJnlLine2."Line No." = MasterItemJnlLine."Line No." then
+        if MasterLineMapMgt.IsMaster(Database::"Item Journal Line", ItemJnlLine2.SystemId) then
             LineNo := ItemJnlLine2."Line No." + 10000
         else begin
-            ItemJnlLine2.SetRange("NPR Master Line No.", MasterItemJnlLine."Line No.");
-            ItemJnlLine2.FindLast;
-            LineNo := ItemJnlLine2."Line No." + 1;
+            LineNo := ItemJnlLine2."Line No." + 1; // fallback
+            if ItemJnlLine2.GetBySystemId(MasterLineMapMgt.GetLastInLineSystemId(Database::"Item Journal Line", MasterItemJnlLine.SystemId)) then
+                LineNo := ItemJnlLine2."Line No." + 1;
         end;
 
         NewItemJnlLine := MasterItemJnlLine;
@@ -377,12 +362,12 @@ codeunit 6059972 "NPR Variety Clone Data"
         NewItemJnlLine.Insert;
         NewItemJnlLine.Validate(Quantity, 0);
         NewItemJnlLine.Validate("Variant Code", ItemVariant.Code);
-        NewItemJnlLine."NPR Is Master" := false;
+        NewItemJnlLine.Modify();
 
-        NewItemJnlLine.Modify;
+        MasterLineMapMgt.CreateMap(Database::"Item Journal Line", NewItemJnlLine.SystemId, MasterItemJnlLine.SystemId);
+
         RecRef.GetTable(NewItemJnlLine);
         exit(Format(RecRef.RecordId));
-        //+NPR5.36 [288696]
     end;
 
     procedure GetNextVariantCode(ItemNo: Code[20]; Variant1Code: Code[50]; Variant2Code: Code[50]; Variant3Code: Code[50]; Variant4Code: Code[50]) NewVariantCode: Code[10]
@@ -404,46 +389,40 @@ codeunit 6059972 "NPR Variety Clone Data"
     var
         TempDesc: Text[250];
     begin
-        with ItemVariant do begin
-            //-VRT1.11
-            if not GetVRTSetup() then
-                exit;
-            //-NPR5.44 [321665]
-            //IF VRTSetup."Variant Description" IN [VRTSetup."Variant Description"::VarietyTableSetupFirst50,VRTSetup."Variant Description"::VarietyTableSetupNext50]
-            if ((VRTSetup."Variant Description" in [VRTSetup."Variant Description"::VarietyTableSetupFirst50, VRTSetup."Variant Description"::VarietyTableSetupNext50]) or
-               (VRTSetup."Variant Description 2" in [VRTSetup."Variant Description"::VarietyTableSetupFirst50, VRTSetup."Variant Description"::VarietyTableSetupNext50]))
-               //+NPR5.44 [321665]
-               then begin
-                //+VRT1.11
-                GetVarietyDesc("NPR Variety 1", "NPR Variety 1 Table", "NPR Variety 1 Value", TempDesc);
-                GetVarietyDesc("NPR Variety 2", "NPR Variety 2 Table", "NPR Variety 2 Value", TempDesc);
-                GetVarietyDesc("NPR Variety 3", "NPR Variety 3 Table", "NPR Variety 3 Value", TempDesc);
-                GetVarietyDesc("NPR Variety 4", "NPR Variety 4 Table", "NPR Variety 4 Value", TempDesc);
-                //-VRT1.11
-            end;
-            //Description := COPYSTR(TempDesc, 1, MAXSTRLEN(Description));
-            case VRTSetup."Variant Description" of
-                VRTSetup."Variant Description"::VarietyTableSetupFirst50:
-                    Description := CopyStr(TempDesc, 1, MaxStrLen(Description));
-                VRTSetup."Variant Description"::VarietyTableSetupNext50:
-                    Description := CopyStr(TempDesc, MaxStrLen(Description), MaxStrLen(Description));
-                VRTSetup."Variant Description"::ItemDescription1:
-                    Description := Item.Description;
-                VRTSetup."Variant Description"::ItemDescription2:
-                    Description := Item."Description 2";
-            end;
-            case VRTSetup."Variant Description 2" of
-                VRTSetup."Variant Description 2"::VarietyTableSetupFirst50:
-                    "Description 2" := CopyStr(TempDesc, 1, MaxStrLen("Description 2"));
-                VRTSetup."Variant Description 2"::VarietyTableSetupNext50:
-                    "Description 2" := CopyStr(TempDesc, MaxStrLen(Description), MaxStrLen("Description 2"));
-                VRTSetup."Variant Description 2"::ItemDescription1:
-                    "Description 2" := CopyStr(Item.Description, 1, MaxStrLen("Description 2"));
-                VRTSetup."Variant Description 2"::ItemDescription2:
-                    "Description 2" := Item."Description 2";
-            end;
-            //+VRT1.11
+        if not GetVRTSetup() then
+            exit;
+
+        if ((VRTSetup."Variant Description" in [VRTSetup."Variant Description"::VarietyTableSetupFirst50, VRTSetup."Variant Description"::VarietyTableSetupNext50]) or
+           (VRTSetup."Variant Description 2" in [VRTSetup."Variant Description"::VarietyTableSetupFirst50, VRTSetup."Variant Description"::VarietyTableSetupNext50]))
+           then begin
+            GetVarietyDesc(ItemVariant."NPR Variety 1", ItemVariant."NPR Variety 1 Table", ItemVariant."NPR Variety 1 Value", TempDesc);
+            GetVarietyDesc(ItemVariant."NPR Variety 2", ItemVariant."NPR Variety 2 Table", ItemVariant."NPR Variety 2 Value", TempDesc);
+            GetVarietyDesc(ItemVariant."NPR Variety 3", ItemVariant."NPR Variety 3 Table", ItemVariant."NPR Variety 3 Value", TempDesc);
+            GetVarietyDesc(ItemVariant."NPR Variety 4", ItemVariant."NPR Variety 4 Table", ItemVariant."NPR Variety 4 Value", TempDesc);
         end;
+
+        case VRTSetup."Variant Description" of
+            VRTSetup."Variant Description"::VarietyTableSetupFirst50:
+                ItemVariant.Description := CopyStr(TempDesc, 1, MaxStrLen(ItemVariant.Description));
+            VRTSetup."Variant Description"::VarietyTableSetupNext50:
+                ItemVariant.Description := CopyStr(TempDesc, MaxStrLen(ItemVariant.Description), MaxStrLen(ItemVariant.Description));
+            VRTSetup."Variant Description"::ItemDescription1:
+                ItemVariant.Description := Item.Description;
+            VRTSetup."Variant Description"::ItemDescription2:
+                ItemVariant.Description := Item."Description 2";
+        end;
+
+        case VRTSetup."Variant Description 2" of
+            VRTSetup."Variant Description 2"::VarietyTableSetupFirst50:
+                ItemVariant."Description 2" := CopyStr(TempDesc, 1, MaxStrLen(ItemVariant."Description 2"));
+            VRTSetup."Variant Description 2"::VarietyTableSetupNext50:
+                ItemVariant."Description 2" := CopyStr(TempDesc, MaxStrLen(ItemVariant.Description), MaxStrLen(ItemVariant."Description 2"));
+            VRTSetup."Variant Description 2"::ItemDescription1:
+                ItemVariant."Description 2" := CopyStr(Item.Description, 1, MaxStrLen(ItemVariant."Description 2"));
+            VRTSetup."Variant Description 2"::ItemDescription2:
+                ItemVariant."Description 2" := Item."Description 2";
+        end;
+
     end;
 
     procedure GetVarietyDesc(Variety: Code[20]; VarietyTable: Code[40]; VarietyValue: Code[50]; var TempDesc: Text[250])
@@ -498,7 +477,6 @@ codeunit 6059972 "NPR Variety Clone Data"
         NextCode: Code[20];
         NoSeriesMgt: Codeunit NoSeriesManagement;
     begin
-        //-VRT1.11
         if not GetVRTSetup() then
             exit;
 
@@ -516,7 +494,6 @@ codeunit 6059972 "NPR Variety Clone Data"
             VRTSetup."Barcode Type (Item Cross Ref.)"::EAN13:
                 InsertItemRef(ItemNo, VariantCode, CreateBarcodeEAN13(NextCode), 3, '');
         end;
-        //+VRT1.11
     end;
 
     procedure InsertItemRef(ItemNo: Code[20]; VariantCode: Code[10]; Barcode: Code[20]; CrossRefType: Option " ",Customer,Vendor,"Bar Code"; CrossRefTypeNo: Code[20])
@@ -569,7 +546,6 @@ codeunit 6059972 "NPR Variety Clone Data"
 
         VRTSetupFetched := VRTSetup.Get;
         exit(VRTSetupFetched);
-        //+VRT1.01
     end;
 
     procedure CreateEAN13BarcodeNoSeries(IsInternal: Boolean)
@@ -592,14 +568,13 @@ codeunit 6059972 "NPR Variety Clone Data"
         end else begin
             Prefix := '57';
             CompNo := '12345';
-            //-VRT1.11
+
             InputDialog.SetInput(1, Prefix, Text005);
             InputDialog.SetInput(2, CompNo, Text006);
             InputDialog.LookupMode(true);
             if InputDialog.RunModal = ACTION::LookupOK then;
             InputDialog.InputCode(1, Prefix);
             InputDialog.InputCode(2, CompNo);
-            //+VRT1.11
 
             if (Prefix = '') or (CompNo = '') then
                 exit;
@@ -635,7 +610,6 @@ codeunit 6059972 "NPR Variety Clone Data"
         NewTableCode: Code[20];
         ItemVariant: Record "Item Variant";
     begin
-        //-VRT1.10
         case VarietyNo of
             VarietyNo::Ask:
                 begin
@@ -738,7 +712,6 @@ codeunit 6059972 "NPR Variety Clone Data"
                     ItemVariant.ModifyAll("NPR Variety 4 Table", NewTableCode, false);
                 end;
         end;
-        //+VRT1.10
     end;
 
     procedure ShowEAN13BarcodeNoSetup()
@@ -779,7 +752,6 @@ codeunit 6059972 "NPR Variety Clone Data"
                 '   ' + Format(VarietySetup."EAN-External") + '-' + Filler[2] + '-' + NextNo[2] + '-x\' +
                 '    Last Item reference found: ' + ItemRef2."Reference No." + '\'
         );
-        //+VRT1.11
     end;
 
     procedure AssignBarcodes(Item: Record Item)
@@ -787,7 +759,6 @@ codeunit 6059972 "NPR Variety Clone Data"
         ItemVar: Record "Item Variant";
         ItemRef: Record "Item Reference";
     begin
-        //-VRT1.11
         if not GetVRTSetup() then
             exit;
 
@@ -810,7 +781,6 @@ codeunit 6059972 "NPR Variety Clone Data"
                         AddItemRef(Item."No.", ItemVar.Code);
                 end;
             until ItemVar.Next = 0;
-        //+VRT1.11
     end;
 
     procedure UpdateVariantDescriptions()
@@ -821,7 +791,6 @@ codeunit 6059972 "NPR Variety Clone Data"
         Item: Record Item;
         Dia: Dialog;
     begin
-        //-VRT1.11
         if not Confirm(Text009, false, ItemVariant.TableCaption) then
             exit;
 
@@ -846,7 +815,6 @@ codeunit 6059972 "NPR Variety Clone Data"
 
         if GuiAllowed then
             Dia.Close;
-        //+VRT1.11
     end;
 
     procedure UpdateItemRefDescription()
@@ -858,7 +826,6 @@ codeunit 6059972 "NPR Variety Clone Data"
         ItemVar: Record "Item Variant";
         Dia: Dialog;
     begin
-        //-VRT1.11
         if not Confirm(Text009, false, ItemRef.TableCaption) then
             exit;
         GetVRTSetup;
@@ -904,106 +871,59 @@ codeunit 6059972 "NPR Variety Clone Data"
 
         if GuiAllowed then
             Dia.Close;
-        //+VRT1.11
     end;
 
-    procedure LookupBarcodes(ItemNo: Code[20]; VariantCode: Code[10]): Code[50]
-    var
-        ItemRef: Record "Item Reference";
-    begin
-        //-VRT1.20 [261631]
-        case GetPrimaryBarcodeTableNo of
-            DATABASE::"Item Reference":
-                begin
-                    ItemRef.SetRange("Item No.", ItemNo);
-                    ItemRef.SetRange("Reference Type", ItemRef."Reference Type"::"Bar Code");
-                    if VariantCode <> '' then
-                        ItemRef.SetRange("Variant Code", VariantCode);
-                    if PAGE.RunModal(0, ItemRef) = ACTION::LookupOK then
-                        exit(ItemRef."Reference No.");
-                end;
-        end;
-        //+VRT1.20 [261631]
-    end;
-
-    procedure AddCustomBarcode(ItemNo: Code[20]; VariantCode: Code[10]; Barcode: Code[20])
-    var
-        ItemVariant: Record "Item Variant";
-    begin
-        //-VRT1.20 [261631]
-        if VariantCode = '' then begin
-            ItemVariant.SetRange("Item No.", ItemNo);
-            if not ItemVariant.IsEmpty then begin
-                if PAGE.RunModal(0, ItemVariant) = ACTION::LookupOK then
-                    VariantCode := ItemVariant.Code;
-            end;
-        end;
-
-        case GetPrimaryBarcodeTableNo of
-            DATABASE::"Item Reference":
-                InsertItemRef(ItemNo, VariantCode, Barcode, 3, '')
-        end;
-        //+VRT1.20 [261631]
-    end;
-
-    local procedure GetPrimaryBarcodeTableNo(): Integer
-    begin
-                exit(DATABASE::"Item Reference");
-    end;
 
     procedure SetupTransferLine(var MasterTransferLine: Record "Transfer Line"; Item: Record Item; ItemVariant: Record "Item Variant") RecordID: Text[250]
     var
         NewTransferLine: Record "Transfer Line";
-        LineNo: Integer;
         TransferLine2: Record "Transfer Line";
         RecRef: RecordRef;
+        MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
+        LineNo: Integer;
     begin
-        //-NPR5.29 [260516]
         //check if a new line is needed (is variant code filled?)
         if MasterTransferLine."Variant Code" = '' then begin
             //Variant Code is blank. Use this one for the current line
             MasterTransferLine.Validate("Variant Code", ItemVariant.Code);
-            MasterTransferLine.Modify;
+            MasterTransferLine.Modify();
             RecRef.GetTable(MasterTransferLine);
             exit(Format(RecRef.RecordId));
         end;
 
         TransferLine2.SetRange("Document No.", MasterTransferLine."Document No.");
-        TransferLine2.FindLast;
-        if TransferLine2."NPR Master Line No." = MasterTransferLine."Line No." then
+        TransferLine2.FindLast();
+
+        if MasterLineMapMgt.IsMaster(Database::"Transfer Line", TransferLine2.SystemId) then
             LineNo := TransferLine2."Line No." + 10000
         else begin
-            TransferLine2.SetRange("NPR Master Line No.", MasterTransferLine."Line No.");
-            TransferLine2.FindLast;
-            LineNo := TransferLine2."Line No." + 1;
+            LineNo := TransferLine2."Line No." + 1; // fallback
+            if TransferLine2.GetBySystemId(MasterLineMapMgt.GetLastInLineSystemId(Database::"Transfer Line", MasterTransferLine.SystemId)) then
+                LineNo := TransferLine2."Line No." + 1;
         end;
 
         NewTransferLine := MasterTransferLine;
         NewTransferLine."Line No." := LineNo;
-        NewTransferLine.Insert;
+        NewTransferLine.Insert();
         NewTransferLine.Validate(Quantity, 0);
         NewTransferLine.Validate("Variant Code", ItemVariant.Code);
         //dimensions
         NewTransferLine.Validate("Shortcut Dimension 1 Code", MasterTransferLine."Shortcut Dimension 1 Code");
         NewTransferLine.Validate("Shortcut Dimension 2 Code", MasterTransferLine."Shortcut Dimension 2 Code");
-        NewTransferLine."NPR Is Master" := false;
+        NewTransferLine.Modify();
 
-        NewTransferLine.Modify;
+        MasterLineMapMgt.CreateMap(Database::"Transfer Line", NewTransferLine.SystemId, MasterTransferLine.SystemId);
+
         RecRef.GetTable(NewTransferLine);
         exit(Format(RecRef.RecordId));
-        //+NPR5.29 [260516]
     end;
 
     procedure GetFromVariety(var ItemVariant: Record "Item Variant"; ItemNo: Code[20]; VRT1: Code[50]; VRT2: Code[50]; VRT3: Code[50]; VRT4: Code[50]): Boolean
     var
         ItemVar: Record "Item Variant";
     begin
-        //-NPR5.29 [263917]
         Clear(ItemVariant);
-        //-NPR5.55 [361515]
-        //ItemVar.SETCURRENTKEY("Item No.","Variety 1 Value","Variety 2 Value","Variety 3 Value","Variety 4 Value");
         ItemVar.SetCurrentKey("Item No.", Code);
-        //+NPR5.55 [361515]
         ItemVar.SetRange("Item No.", ItemNo);
         ItemVar.SetRange("NPR Variety 1 Value", VRT1);
         ItemVar.SetRange("NPR Variety 2 Value", VRT2);
@@ -1015,19 +935,16 @@ codeunit 6059972 "NPR Variety Clone Data"
         ItemVar.FindFirst;
         ItemVariant.Get(ItemVar."Item No.", ItemVar.Code);
         exit(true);
-        //+NPR5.29 [263917]
     end;
 
     [IntegrationEvent(false, false)]
     local procedure CheckIfSkipCreateDefaultBarcode(ItemNo: Code[20]; VariantCode: Code[10]; var SkipCreateDefaultBarcode: Boolean; var Handled: Boolean)
     begin
-        //-NPR5.42 [315499]
     end;
 
     [IntegrationEvent(false, false)]
     local procedure GetNewVariantCode(ItemNo: Code[20]; Variant1Code: Code[50]; Variant2Code: Code[50]; Variant3Code: Code[50]; Variant4Code: Code[50]; var NewVariantCode: Code[10])
     begin
-        //-NPR5.43 [317108]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6059972, 'GetNewVariantCode', '', true, true)]
@@ -1062,4 +979,3 @@ codeunit 6059972 "NPR Variety Clone Data"
         end;
     end;
 }
-
