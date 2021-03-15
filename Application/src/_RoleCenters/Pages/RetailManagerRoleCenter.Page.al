@@ -25,6 +25,16 @@ page 6151241 "NPR Manager"
                 Caption = 'Purchase Activities';
                 ApplicationArea = All;
             }
+            part(RetailSalesChart; "NPR Retail Sales Chart")
+            {
+                ApplicationArea = All;
+                Visible = false;
+            }
+            part(RetailSalesByShopChart; "NPR Retail Sales Chart by Shop")
+            {
+                ApplicationArea = All;
+                Visible = false;
+            }
             part(PowerBi; "Power BI Report Spinner Part")
             {
                 ApplicationArea = All;
