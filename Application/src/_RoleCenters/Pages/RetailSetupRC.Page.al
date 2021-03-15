@@ -464,12 +464,19 @@ page 6151245 "NPR Retail Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the CleanCash Setup List action';
                 }
-                action("Retail Replenisment Setup")
+                action("Retention Policy Setup List")
                 {
-                    Caption = 'Retail Replenisment Setup';
-                    RunObject = page "NPR Retail Replenish. SKU List";
+                    Caption = 'Retention Policy Setup List';
+                    RunObject = page "Retention Policy Setup List";
+                    ApplicationArea = All; 
+                    ToolTip = 'Executes the Retention Policy Setup List action';
+                }
+                action ("SMS Setup")
+                {
+                    Caption = 'SMS Setup';
+                    RunObject = page "NPR SMS Setup";
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Retail Replenisment Setup action';
+                    ToolTip = 'Run the SMS setup page';
                 }
             }
 
@@ -557,6 +564,13 @@ page 6151245 "NPR Retail Setup RC"
                     RunObject = page "NPR Discount Priority List";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Discount Priority List action';
+                }
+                action("Retail Replenisment Setup")
+                {
+                    Caption = 'Retail Replenisment Setup';
+                    RunObject = page "NPR Retail Replenish. SKU List";
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the Retail Replenisment Setup action';
                 }
 
             }
