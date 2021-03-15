@@ -7,11 +7,6 @@ page 6151241 "NPR Manager"
     {
         area(rolecenter)
         {
-            part(Control7; "Headline RC Order Processor")
-            {
-                ApplicationArea = Basic, Suite;
-            }
-
             part("NP Retail SO Processor Act"; "NPR SO Processor Act")
             {
                 ApplicationArea = All;
