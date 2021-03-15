@@ -138,7 +138,7 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         }
         field(6014422; "NPR Supervisor POS"; Boolean)
         {
-            Caption = 'Supervisor POS';
+            Caption = 'Supervisor';
             DataClassification = CustomerContent;
             Description = 'NPR5.38';
         }

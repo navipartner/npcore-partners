@@ -95,8 +95,12 @@ page 6014404 "NPR SMS Setup"
         {
             action(RunJob)
             {
-                Caption = 'Run Send SMS Job';
+                Caption = 'Send SMS Job';
+                ToolTip = 'Run send SMS Job';
                 Image = ExecuteAndPostBatch;
+                Promoted = true; 
+                PromotedOnly = true; 
+                PromotedCategory = Process; 
                 ApplicationArea = All;
                 trigger OnAction()
                 var
@@ -104,6 +108,18 @@ page 6014404 "NPR SMS Setup"
                 begin
                     MessageJOBHandler.Run();
                 end;
+            }
+            action(SMSLog)
+            {
+                Caption = 'SMS Log Page';
+                ToolTip = 'Run SMS log Page';
+                Image = ListPage; 
+                Promoted = true; 
+                PromotedOnly = true; 
+                PromotedCategory = Process;
+                ApplicationArea = All; 
+                RunObject = page "NPR SMS Log"; 
+
             }
         }
     }
