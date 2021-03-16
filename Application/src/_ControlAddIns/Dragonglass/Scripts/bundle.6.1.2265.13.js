@@ -49119,7 +49119,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _dragonglass_capabilities_AppInterface__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dragonglass-capabilities/AppInterface */ "./packages/dragonglass-react/src/dragonglass-capabilities/AppInterface.js");
 
 
-var DRAGONGLASS_VERSION = "6.1.2246.12";
+var DRAGONGLASS_VERSION = "6.1.2265.13";
 var initializeVersion = function initializeVersion() {
   dragonglass_core__WEBPACK_IMPORTED_MODULE_0__["GlobalEventDispatcher"].addEventListener(dragonglass_core__WEBPACK_IMPORTED_MODULE_0__["GLOBAL_EVENTS"].FRAMEWORK_READY, function () {
     return _dragonglass_capabilities_AppInterface__WEBPACK_IMPORTED_MODULE_1__["AppInterface"].invokeFrontEndEvent("announceFrameworkVersion", {
@@ -69804,7 +69804,7 @@ var populateContentWithDefaults = function populateContentWithDefaults(content) 
   if (!param.bodyStyle) param.bodyStyle = _objectSpread({}, DEFAULT_BODY_STYLE);
   if (!param.title) param.title = DEFAULT_TITLE;
   if (!param.amount) param.amount = DEFAULT_AMOUNT;
-  if (!param.spinnerImg) param.spinnerImg = dragonglass_nav__WEBPACK_IMPORTED_MODULE_3__["NAV"].mapPath("Images/".concat(DEFAULT_SPINNER));
+  if (!param.spinnerImg) param.spinnerImg = dragonglass_nav__WEBPACK_IMPORTED_MODULE_3__["NAV"].instance.mapPath("Images/".concat(DEFAULT_SPINNER));
   param.ui = getDefaultUI(param);
   return param;
 };
@@ -80327,4 +80327,4 @@ exports.reducer = dragonglass_redux_1.createReducer(workflows_initial_state_1.in
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.6.1.2246.12.js
+//# sourceMappingURL=bundle.6.1.2265.13.js.map
