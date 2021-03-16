@@ -636,9 +636,8 @@ codeunit 6151551 "NPR NpXml Mgt."
             AddTextToOutputTempBlob(JsonRequest);
             RequestContent.WriteFrom(JsonRequest);
         end else begin
-            AddXmlToOutputTempBlob(XmlDoc2, 'Xml Template: ' + NpXmlTemplate.Code + ' || Api ' + Format(NpXmlTemplate."API Type") + ' Transfer: ' + NpXmlTemplate."API Url");
-            OutputTempBlob.CreateInStream(InStr);
-            RequestContent.WriteFrom(InStr);
+            XmlDoc2.WriteTo(RequestText);
+            RequestContent.WriteFrom(RequestText);
         end;
 
         RequestContent.GetHeaders(ContentHeader);
@@ -689,16 +688,18 @@ codeunit 6151551 "NPR NpXml Mgt."
                 AddApiHeader(NpXmlApiHeader, Client, RequestHeader, ContentHeader);
             until NpXmlApiHeader.Next = 0;
 
-        if not ResponseMessage.IsSuccessStatusCode then begin
-            ExceptionMessage := ResponseMessage.ReasonPhrase;
-            AddTextToResponseTempBlob(ExceptionMessage);
-            Error('');
-        end;
-
         RequestMessage.Content(RequestContent);
         Client.Send(RequestMessage, ResponseMessage);
 
         ResponseMessage.Content.ReadAs(Response);
+
+        if not ResponseMessage.IsSuccessStatusCode then begin
+            ExceptionMessage := ResponseMessage.ReasonPhrase;
+            if Response <> '' then
+                ExceptionMessage += '\\' + Response;
+            AddTextToResponseTempBlob(ExceptionMessage);
+            Error('');
+        end;
 
         if (NpXmlTemplate."API Response Path" <> '') and (Response <> '') and (not IsJson) then begin
             Response := XMLDomManagement.RemoveNamespaces(Response);
