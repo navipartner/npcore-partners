@@ -233,6 +233,8 @@ codeunit 85021 "NPR NpXml Tests"
     end;
 
     local procedure ConfigureXmlTemplateForAPI(var NpXmlTemplate: Record "NPR NpXml Template")
+    var
+        NpXmlElement: Record "NPR NpXml Element";
     begin
         NpXmlTemplate."FTP Transfer" := false;
         NpXmlTemplate."API Transfer" := true;
@@ -244,6 +246,11 @@ codeunit 85021 "NPR NpXml Tests"
         NpXmlTemplate."API Authorization" := 'bearer tfqlwf5mtq3ny5s2ugtcjydosqrb32k1';
         NpXmlTemplate."API Accept" := 'naviconnect/xml';
         NpXmlTemplate.Modify();
+
+        NpXmlElement.SetRange("Xml Template Code", NpXmlTemplate.Code);
+        NpXmlElement.SetFilter("Element Name", '%1|%2', 'ticket_setup*', 'ticket_type*');
+        if NpXmlElement.FindSet() then
+            NpXmlElement.ModifyAll(Active, false);
     end;
 
     local procedure ConfigureXmlTemplateForFTP(var NpXmlTemplate: Record "NPR NpXml Template")
