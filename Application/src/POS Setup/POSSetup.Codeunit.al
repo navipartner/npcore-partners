@@ -182,6 +182,7 @@ codeunit 6150708 "NPR POS Setup"
 
     procedure SetPOSUnit(POSUnit: Record "NPR POS Unit")
     begin
+        POSStoreRec.Get(POSUnit."POS Store Code");
         POSUnitRec := POSUnit;
         InitializeSetupPosUnit(POSUnitRec);
         FindPOSPostingProfile();
