@@ -342,7 +342,7 @@ codeunit 85002 "NPR Library - POS Master Data"
         POSPostingProfile."Automatic Item Posting" := POSPostingProfile."Automatic Item Posting"::AfterSale;
         POSPostingProfile."Automatic POS Posting" := POSPostingProfile."Automatic POS Posting"::AfterSale;
         POSPostingProfile."Automatic Posting Method" := POSPostingProfile."Automatic Posting Method"::Direct;
-        POSPostingProfile."POS Sales Rounding Account" := LibraryERM.CreateGLAccountNo();
+        POSPostingProfile."POS Sales Rounding Account" := LibraryERM.CreateGLAccountWithSalesSetup();
         POSPostingProfile."POS Sales Amt. Rndng Precision" := 0.5;
 
         LibraryUtility.CreateNoSeries(NoSeries, true, false, true);
@@ -424,12 +424,12 @@ codeunit 85002 "NPR Library - POS Master Data"
 
     procedure CreateItemForPOSSaleUsage(var Item: Record Item; POSUnit: Record "NPR POS Unit"; POSStore: Record "NPR POS Store")
     var
-        NPRLibraryInventory: Codeunit "NPR Library - Inventory";
         LibraryRandom: Codeunit "Library - Random";
+        LibraryInventory: Codeunit "Library - Inventory";
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin
         POSStore.GetProfile(POSPostingProfile);
-        NPRLibraryInventory.CreateItem(Item);
+        LibraryInventory.CreateItem(Item);
         Item.Validate("VAT Bus. Posting Gr. (Price)", POSPostingProfile."VAT Bus. Posting Group");
 
         Item."Price Includes VAT" := true;
