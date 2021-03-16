@@ -348,7 +348,20 @@ codeunit 6150614 "NPR POS Create Entry"
         POSSalesLine."Shortcut Dimension 1 Code" := SaleLinePOS."Shortcut Dimension 1 Code";
         POSSalesLine."Shortcut Dimension 2 Code" := SaleLinePOS."Shortcut Dimension 2 Code";
         POSSalesLine."Dimension Set ID" := SaleLinePOS."Dimension Set ID";
-
+        if ReverseSign then begin
+            POSSalesLine.Quantity := -POSSalesLine.Quantity;
+            POSSalesLine."Line Discount Amount Excl. VAT" := -POSSalesLine."Line Discount Amount Excl. VAT";
+            POSSalesLine."Line Discount Amount Incl. VAT" := -POSSalesLine."Line Discount Amount Incl. VAT";
+            POSSalesLine."Amount Excl. VAT" := -POSSalesLine."Amount Excl. VAT";
+            POSSalesLine."Amount Incl. VAT" := -POSSalesLine."Amount Incl. VAT";
+            POSSalesLine."Line Dsc. Amt. Excl. VAT (LCY)" := -POSSalesLine."Line Dsc. Amt. Excl. VAT (LCY)";
+            POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)" := -POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)";
+            POSSalesLine."Amount Excl. VAT (LCY)" := -POSSalesLine."Amount Excl. VAT (LCY)";
+            POSSalesLine."Amount Incl. VAT (LCY)" := -POSSalesLine."Amount Incl. VAT (LCY)";
+            POSSalesLine."VAT Base Amount" := -POSSalesLine."VAT Base Amount";
+            POSSalesLine."Quantity (Base)" := -POSSalesLine."Quantity (Base)";
+            POSSalesLine."VAT Difference" := -POSSalesLine."VAT Difference";
+        end;
         OnBeforeInsertPOSSalesLine(SalePOS, SaleLinePOS, POSEntry, POSSalesLine);
         POSSalesLine.Insert();
         OnAfterInsertPOSSalesLine(SalePOS, SaleLinePOS, POSEntry, POSSalesLine);
