@@ -71,12 +71,6 @@ report 6014497 "NPR Campaign Vendor List"
                 column(QuantitySold_PeriodDiscountLine_caption; "Period Discount Line".FieldCaption("Quantity Sold"))
                 {
                 }
-                column(Photo_PeriodDiscountLine; "Period Discount Line".Photo)
-                {
-                }
-                column(Photo_PeriodDiscountLine_Caption; "Period Discount Line".FieldCaption(Photo))
-                {
-                }
                 dataitem("Retail Comment"; "NPR Retail Comment")
                 {
                     DataItemLink = "No." = FIELD(Code), "No. 2" = FIELD("Item No.");

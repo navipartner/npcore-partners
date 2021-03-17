@@ -24,6 +24,11 @@ page 6150616 "NPR POS Unit List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
+                field(Status; Rec.Status)
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
+                }
                 field("POS Store Code"; Rec."POS Store Code")
                 {
                     ApplicationArea = All;
@@ -43,12 +48,6 @@ page 6150616 "NPR POS Unit List"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
-                }
-                field(Status; Rec.Status)
-                {
-                    ApplicationArea = All;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Ean Box Sales Setup"; Rec."Ean Box Sales Setup")
                 {

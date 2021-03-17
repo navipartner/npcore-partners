@@ -414,13 +414,6 @@ page 6151245 "NPR Retail Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Info List action';
                 }
-                action("POS Keyboard Binding Setup")
-                {
-                    Caption = 'POS Keyboard Binding Setup';
-                    RunObject = Page "NPR POS Keyboard Bind. Setup";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the POS Keyboard Binding Setup action';
-                }
                 action("POS Web Fonts")
                 {
                     Caption = 'POS Web Fonts';

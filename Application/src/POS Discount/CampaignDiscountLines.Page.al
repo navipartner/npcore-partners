@@ -1,19 +1,5 @@
 page 6014454 "NPR Campaign Discount Lines"
 {
-    // //-NPR3.0b ved Simon 2005.08.02
-    //   Oversaettelser
-    // NPR5.26/BHR/20160712 CASE 246594 Display field Cross reference
-    // NPR5.36/TJ  /20170809  CASE 286283 Renamed variables/function into english and into proper naming terminology
-    //                                    Removed unused variables/functions
-    // NPR5.38/AP  /20171103  CASE 295330 Setting editable=FALSE on "Quantity On Purchase Order" and "Inventory" since they where not
-    //                                    corretly set to editable=No on table field properties
-    // NPR5.38/TS  /20171207  CASE 299031 Added field Page No. in advert
-    // NPR5.38/TS  /20171213  CASE 299274 Added fields Photo,Priority
-    // NPR5.38/TS  /20180105  CASE 300893 Renamed OnAfterGetCurrRecord to AfterGetCurrentRecord
-    // NPR5.38/TS  /20171213  CASE 299281 Added Field Comment
-    // NPR5.40/MMV /20180214  CASE 294655 Performance optimization
-    // NPR5.54/BHR /20200129  CASE 387439 removed unused functions and fields as per case.
-
     Caption = 'Period Discount Lines';
     DelayedInsert = true;
     PageType = ListPart;
@@ -28,11 +14,6 @@ page 6014454 "NPR Campaign Discount Lines"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Cross-Reference No."; "Cross-Reference No.")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Cross-Reference No. field';
-                }
                 field("Item No."; "Item No.")
                 {
                     ApplicationArea = All;
@@ -56,6 +37,11 @@ page 6014454 "NPR Campaign Discount Lines"
                             Commit;
                         end;
                     end;
+                }
+                field("Cross-Reference No."; "Cross-Reference No.")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cross-Reference No. field';
                 }
                 field("Variant Code"; "Variant Code")
                 {
@@ -138,25 +124,10 @@ page 6014454 "NPR Campaign Discount Lines"
                     Visible = false;
                     ToolTip = 'Specifies the value of the Price Includes VAT field';
                 }
-                field("Page no. in advert"; "Page no. in advert")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Page no. in advert field';
-                }
                 field(Priority; Priority)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Priority field';
-                }
-                field("Pagenumber in paper"; "Pagenumber in paper")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Pagenumber in paper field';
-                }
-                field(Photo; Photo)
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Photo field';
                 }
             }
         }

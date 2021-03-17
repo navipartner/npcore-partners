@@ -349,6 +349,9 @@ table 6014414 "NPR Period Discount Line"
         field(215; "Page no. in advert"; Integer)
         {
             Caption = 'Page no. in advert';
+            ObsoleteState = Removed; 
+            ObsoleteReason = 'Not used anymore';
+            ObsoleteTag = 'Field won"t be used anymore 16/03/2021';
             Description = 'NPR5.38';
             DataClassification = CustomerContent;
         }
@@ -361,12 +364,18 @@ table 6014414 "NPR Period Discount Line"
         field(219; "Pagenumber in paper"; Text[30])
         {
             Caption = 'Pagenumber in paper';
+            ObsoleteState = Removed; 
+            ObsoleteReason = 'Not used anymore';
+            ObsoleteTag = 'Field won"t be used anymore 16/03/2021';
             Description = 'NPR5.38';
             DataClassification = CustomerContent;
         }
         field(220; Photo; Boolean)
         {
             Caption = 'Photo';
+            ObsoleteState = Removed; 
+            ObsoleteReason = 'Not used anymore';
+            ObsoleteTag = 'Field won"t be used anymore 16/03/2021';
             Description = 'NPR5.38';
             DataClassification = CustomerContent;
         }
