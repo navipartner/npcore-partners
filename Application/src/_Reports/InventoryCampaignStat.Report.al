@@ -99,9 +99,6 @@ report 6014499 "NPR Inventory Campaign Stat."
                 {
                     AutoFormatType = 1;
                 }
-                column(Pagenoinadvert_PeriodDiscountLine; "Period Discount Line"."Page no. in advert")
-                {
-                }
                 column(PeriodDiscountLine_VendorNo; "Period Discount Line"."Vendor No.")
                 {
                 }
