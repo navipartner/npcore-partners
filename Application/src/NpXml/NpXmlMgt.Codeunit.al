@@ -349,7 +349,6 @@ codeunit 6151551 "NPR NpXml Mgt."
         NodeElement: XmlElement;
         AttributeCollection: XmlAttributeCollection;
         Attribute: XmlAttribute;
-        ParentElement: XmlElement;
     begin
         ElementValue := '';
         Clear(NpXmlAttribute);
@@ -395,27 +394,25 @@ codeunit 6151551 "NPR NpXml Mgt."
                 Element.Add(CData);
                 Node := Element.AsXmlNode();
             end;
-        end else begin
-            ParentElement := XmlElement.Create('initialize');
-            Node.GetParent(ParentElement);
+        end else
+            if ElementValue <> '' then begin
+                NewElement := XmlElement.Create(Node.AsXmlElement.LocalName);
+                NewElement.Add(ElementValue);
 
-            NewElement := XmlElement.Create(Node.AsXmlElement.LocalName);
-            NewElement.Add(ElementValue);
+                if Node.AsXmlElement.HasAttributes then begin
+                    AttributeCollection := Node.AsXmlElement.Attributes();
+                    foreach Attribute in AttributeCollection do
+                        NewElement.Add(Attribute);
+                end;
 
-            if Node.AsXmlElement.HasAttributes then begin
-                AttributeCollection := Node.AsXmlElement.Attributes();
-                foreach Attribute in AttributeCollection do
-                    NewElement.Add(Attribute);
+                ChildNodesList := Node.AsXmlElement.GetChildNodes();
+                foreach ChildNode in ChildNodesList do
+                    NewElement.Add(ChildNode);
+
+                Node.AddAfterSelf(NewElement);
+                if Node.Remove() then
+                    Node := NewElement.AsXmlNode();
             end;
-
-            ChildNodesList := Node.AsXmlElement.GetChildNodes();
-            foreach ChildNode in ChildNodesList do
-                NewElement.Add(ChildNode);
-
-            Node.AddAfterSelf(NewElement);
-            if Node.Remove() then
-                ParentElement.SelectSingleNode('//' + GetXmlElementXPath(NewElement), Node);
-        end;
     end;
 
     [IntegrationEvent(false, false)]
