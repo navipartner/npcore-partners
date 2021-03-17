@@ -1,8 +1,5 @@
 codeunit 6151180 "NPR Retail Cross Ref. Mgt."
 {
-    // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
-
-
     trigger OnRun()
     begin
         TestReferenceRegEx();
@@ -26,10 +23,6 @@ codeunit 6151180 "NPR Retail Cross Ref. Mgt."
 
         Duration := CurrentDateTime - Starttime;
         Message('Duration: %1\Pattern: %2\Reference: %3', Duration, Pattern, ReferenceNo);
-    end;
-
-    local procedure "--- Init"()
-    begin
     end;
 
     [IntegrationEvent(false, false)]
@@ -73,10 +66,6 @@ codeunit 6151180 "NPR Retail Cross Ref. Mgt."
             RetailCrossReference.Modify(true);
     end;
 
-    local procedure "--- Cleanup"()
-    begin
-    end;
-
     procedure RemoveRetailReference(RetailID: Guid; TableID: Integer)
     var
         RetailCrossReference: Record "NPR Retail Cross Reference";
@@ -89,10 +78,6 @@ codeunit 6151180 "NPR Retail Cross Ref. Mgt."
 
         if RetailCrossReference."Table ID" = TableID then
             RetailCrossReference.Delete(true);
-    end;
-
-    local procedure "--- Find"()
-    begin
     end;
 
     procedure GetRetailID(TableID: Integer; ReferenceNo: Text) RetailID: Guid
@@ -111,65 +96,56 @@ codeunit 6151180 "NPR Retail Cross Ref. Mgt."
         if not RetailCrossReference.FindFirst then
             exit;
 
-        exit(RetailCrossReference."Retail ID");
+        RetailID := RetailCrossReference."Retail ID";
     end;
 
-    local procedure "--- Generate Reference No"()
-    begin
-    end;
-
+    #region Generate Reference No
     procedure RegExReplace(Input: Text; PosStoreCode: Text) Output: Text
     var
-        Match: DotNet NPRNetMatch;
-        RegEx: DotNet NPRNetRegex;
+        RegEx: Codeunit DotNet_Regex;
         Pattern: Text;
     begin
         Pattern := '(?<SerialNo>\[PS\])';
-        RegEx := RegEx.Regex(Pattern);
+        RegEx.Regex(Pattern);
         Output := RegEx.Replace(Input, PosStoreCode);
-        exit(Output);
     end;
 
     procedure RegExReplacePS(Input: Text; PosStoreCode: Text) Output: Text
     var
-        Match: DotNet NPRNetMatch;
-        RegEx: DotNet NPRNetRegex;
+        RegEx: Codeunit DotNet_Regex;
         Pattern: Text;
     begin
         Pattern := '(?<SerialNo>\[PS\])';
-        RegEx := RegEx.Regex(Pattern);
+        RegEx.Regex(Pattern);
         Output := RegEx.Replace(Input, PosStoreCode);
-        exit(Output);
     end;
 
     procedure RegExReplacePU(Input: Text; PosUnitNo: Text) Output: Text
     var
-        Match: DotNet NPRNetMatch;
-        RegEx: DotNet NPRNetRegex;
+        RegEx: Codeunit DotNet_Regex;
         Pattern: Text;
     begin
         Pattern := '(?<SerialNo>\[PU\])';
-        RegEx := RegEx.Regex(Pattern);
+        RegEx.Regex(Pattern);
         Output := RegEx.Replace(Input, PosUnitNo);
-        exit(Output);
     end;
 
     procedure RegExReplaceS(Input: Text; SerialNo: Text) Output: Text
     var
-        Match: DotNet NPRNetMatch;
-        RegEx: DotNet NPRNetRegex;
+        RegEx: Codeunit DotNet_Regex;
         Pattern: Text;
     begin
         Pattern := '(?<SerialNo>\[S\])';
-        RegEx := RegEx.Regex(Pattern);
+        RegEx.Regex(Pattern);
         Output := RegEx.Replace(Input, SerialNo);
-        exit(Output);
     end;
 
     procedure RegExReplaceAN(Input: Text) Output: Text
     var
-        Match: DotNet NPRNetMatch;
-        RegEx: DotNet NPRNetRegex;
+        Match: Codeunit DotNet_Match;
+        RegEx: Codeunit DotNet_Regex;
+        GroupCollection: Codeunit DotNet_GroupCollection;
+        DotNetGroup: Codeunit DotNet_Group;
         Pattern: Text;
         ReplaceString: Text;
         RandomQty: Integer;
@@ -178,28 +154,30 @@ codeunit 6151180 "NPR Retail Cross Ref. Mgt."
         Pattern := '(?<RandomStart>\[AN\*?)' +
                    '(?<RandomQty>\d?)' +
                    '(?<RandomEnd>\])';
-        RegEx := RegEx.Regex(Pattern);
-
-        Match := RegEx.Match(Input);
+        RegEx.Regex(Pattern);
+        RegEx.Match(Input, Match);
         while Match.Success do begin
             ReplaceString := '';
             RandomQty := 1;
-            if Evaluate(RandomQty, Format(Match.Groups.Item('RandomQty'))) then;
+            Match.Groups(GroupCollection);
+            GroupCollection.ItemGroupName('RandomQty', DotNetGroup);
+            if Evaluate(RandomQty, Format(DotNetGroup.Value())) then;
             for i := 1 to RandomQty do
                 ReplaceString += Format(GenerateRandomChar());
             Input := RegEx.Replace(Input, ReplaceString, 1);
 
-            Match := RegEx.Match(Input);
+            RegEx.Match(Input, Match);
         end;
 
         Output := Input;
-        exit(Output);
     end;
 
     procedure RegExReplaceN(Input: Text) Output: Text
     var
-        Match: DotNet NPRNetMatch;
-        RegEx: DotNet NPRNetRegex;
+        Match: Codeunit DotNet_Match;
+        RegEx: Codeunit DotNet_Regex;
+        GroupCollection: Codeunit DotNet_GroupCollection;
+        DotNetGroup: Codeunit DotNet_Group;
         Pattern: Text;
         ReplaceString: Text;
         RandomQty: Integer;
@@ -208,46 +186,42 @@ codeunit 6151180 "NPR Retail Cross Ref. Mgt."
         Pattern := '(?<RandomStart>\[N\*?)' +
                    '(?<RandomQty>\d?)' +
                    '(?<RandomEnd>\])';
-        RegEx := RegEx.Regex(Pattern);
-
-        Match := RegEx.Match(Input);
+        RegEx.Regex(Pattern);
+        RegEx.Match(Input, Match);
         while Match.Success do begin
             ReplaceString := '';
             RandomQty := 1;
-            if Evaluate(RandomQty, Format(Match.Groups.Item('RandomQty'))) then;
+            Match.Groups(GroupCollection);
+            GroupCollection.ItemGroupName('RandomQty', DotNetGroup);
+            if Evaluate(RandomQty, Format(DotNetGroup.Value())) then;
             for i := 1 to RandomQty do
                 ReplaceString += Format(Random(9));
             Input := RegEx.Replace(Input, ReplaceString, 1);
 
-            Match := RegEx.Match(Input);
+            RegEx.Match(Input, Match);
         end;
 
         Output := Input;
-        exit(Output);
     end;
 
     procedure RegExReplaceL(Input: Text; LineNo: Text) Output: Text
     var
-        Match: DotNet NPRNetMatch;
-        RegEx: DotNet NPRNetRegex;
+        RegEx: Codeunit DotNet_Regex;
         Pattern: Text;
     begin
         Pattern := '(?<SerialNo>\[L\])';
-        RegEx := RegEx.Regex(Pattern);
+        RegEx.Regex(Pattern);
         Output := RegEx.Replace(Input, LineNo);
-        exit(Output);
     end;
 
     procedure RegExReplaceNL(Input: Text; NaturalLineNo: Text) Output: Text
     var
-        Match: DotNet NPRNetMatch;
-        RegEx: DotNet NPRNetRegex;
+        RegEx: Codeunit DotNet_Regex;
         Pattern: Text;
     begin
         Pattern := '(?<SerialNo>\[NL\])';
-        RegEx := RegEx.Regex(Pattern);
+        RegEx.Regex(Pattern);
         Output := RegEx.Replace(Input, NaturalLineNo);
-        exit(Output);
     end;
 
     local procedure GenerateRandomChar() RandomChar: Char
@@ -266,7 +240,8 @@ codeunit 6151180 "NPR Retail Cross Ref. Mgt."
         RandomChar := (RandomInt mod 25) + 65;
         RandomText := UpperCase(Format(RandomChar));
         RandomChar := RandomText[1];
-        exit(RandomChar);
     end;
+
+    #endregion
 }
 
