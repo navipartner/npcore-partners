@@ -19,8 +19,8 @@ codeunit 6151460 "NPR M2 Setup Mgt."
 
         if XmlElement.SelectNodes('//stores/store', NodeList) then
             foreach XmlElement2 in NodeList do begin
-                RootItemGroupNo := NpXmlDomMgt.GetXmlText(XmlElement, '//root_category', MaxStrLen(RootItemGroupNo), true);
-                if not NpXmlDomMgt.FindNode(XmlElement.AsXmlNode(), '//root_category', XmlElement3) then
+                RootItemGroupNo := NpXmlDomMgt.GetXmlText(XmlElement, 'root_category', MaxStrLen(RootItemGroupNo), true);
+                if not NpXmlDomMgt.FindNode(XmlElement.AsXmlNode(), 'root_category', XmlElement3) then
                     Error(Text000, MagentoWebsite.Code);
                 RootItemGroupNo := NpXmlDomMgt.GetXmlAttributeText(XmlElement3, 'external_id', true);
                 CreateRootItemGroup(RootItemGroupNo, CopyStr(MagentoWebsite.Name, 1, 50));
@@ -199,8 +199,12 @@ codeunit 6151460 "NPR M2 Setup Mgt."
         foreach XmlElement in XmlNodeList do begin
             XmlElement.AsXmlElement().Attributes().Get('code', Attribute);
             PaymentCode := Attribute.Value;
-            XmlElement.AsXmlElement().Attributes().Get('type', Attribute);
-            PaymentType := Attribute.Value;
+
+            // We need to wrap this in an if since AL native methods throws a runtime exception
+            // if the specified attribute does not exist. Since this is the "subtype" of the 
+            // payment method, we can accept this attribute missing
+            if XmlElement.AsXmlElement().Attributes().Get('type', Attribute) then
+                PaymentType := Attribute.Value;
 
             if not PaymentMapping.Get(PaymentCode, PaymentType) then begin
                 PaymentMapping.Init;
@@ -306,9 +310,9 @@ codeunit 6151460 "NPR M2 Setup Mgt."
 
         XmlDoc.AsXmlNode().SelectNodes('//tax_class', XmlNodeList);
         foreach XmlElement in XmlNodeList do begin
-            ClassName := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement.AsXmlElement(), '//class_name', 0, false), 1, MaxStrLen(MagentoTaxClass.Name));
+            ClassName := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement.AsXmlElement(), 'class_name', 0, false), 1, MaxStrLen(MagentoTaxClass.Name));
             ClassType := -1;
-            case LowerCase(NpXmlDomMgt.GetXmlText(XmlElement.AsXmlElement(), '//class_type', 0, false)) of
+            case LowerCase(NpXmlDomMgt.GetXmlText(XmlElement.AsXmlElement(), 'class_type', 0, false)) of
                 'customer':
                     ClassType := MagentoTaxClass.Type::Customer.AsInteger();
                 'product':
@@ -336,8 +340,6 @@ codeunit 6151460 "NPR M2 Setup Mgt."
         XmlNodeList2: XmlNodeList;
         Attribute: XmlAttribute;
         Element: XmlElement;
-        i: Integer;
-        j: Integer;
     begin
         MagentoSetup.Get;
         if not MagentoSetup."Magento Enabled" then
@@ -350,18 +352,17 @@ codeunit 6151460 "NPR M2 Setup Mgt."
             if not MagentoWebsite.Get(Attribute.Value) then begin
                 MagentoWebsite.Init;
                 MagentoWebsite.Code := Attribute.Value;
-                MagentoWebsite.Name := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), '//name', 0, false);
-                MagentoWebsite."Default Website" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), '//is_default', 0, false) = '1';
+                MagentoWebsite.Name := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'name', 0, false);
+                MagentoWebsite."Default Website" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'is_default', 0, false) = '1';
                 MagentoWebsite.Insert(true);
             end else begin
-                MagentoWebsite.Name := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), '//name', 0, false);
-                MagentoWebsite."Default Website" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), '//is_default', 0, false) = '1';
+                MagentoWebsite.Name := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'name', 0, false);
+                MagentoWebsite."Default Website" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'is_default', 0, false) = '1';
                 MagentoWebsite.Modify(true);
             end;
 
             if Node.SelectNodes('store_groups/store_group', XmlNodeList2) then
-                for j := 1 to XmlNodeList2.Count do begin
-                    XmlNodeList2.Get(i, Node2);
+                foreach Node2 in XmlNodeList2 do begin
                     Element := Node2.AsXmlElement();
                     CreateStores(Element, MagentoWebsite);
                 end;
