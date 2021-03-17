@@ -470,9 +470,7 @@ table 6014612 "NPR Retail Campaign Items"
                                             "Unit Purchase Price" := Item."Last Direct Cost";
                                     end;
 
-                                    "Page no. in advert" := PeriodDiscountLine."Page no. in advert";
                                     "Priority 2" := PeriodDiscountLine.Priority;
-                                    Photo := PeriodDiscountLine.Photo;
                                     "Unit Price" := PeriodDiscountLine."Unit Price";
                                     "Campaign Unit Price" := PeriodDiscountLine."Campaign Unit Price";
                                     RetailComment.SetRange("Table ID", 6014414);

@@ -75,8 +75,6 @@ codeunit 6151052 "NPR Retail Replenish. Mgt."
                                                 ReplenishmentDemandLine."Campaign Unit Price" := PeriodDiscountLine."Campaign Unit Price";
                                                 ReplenishmentDemandLine."Campaign Unit Cost" := PeriodDiscountLine."Campaign Unit Cost";
                                                 ReplenishmentDemandLine.Priority := PeriodDiscountLine.Priority;
-                                                ReplenishmentDemandLine."Page no. in advert" := PeriodDiscountLine."Page no. in advert";
-                                                ReplenishmentDemandLine.Photo := PeriodDiscountLine.Photo;
                                                 RetailComment.SetRange("Table ID", 6014414);
                                                 RetailComment.SetRange("No.", PeriodDiscountLine.Code);
                                                 RetailComment.SetRange("No. 2", PeriodDiscountLine."Item No.");

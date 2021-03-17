@@ -45,6 +45,11 @@ page 6150614 "NPR POS Store List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
+                field("Location Code"; "Location Code")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Location Code field';
+                }
                 field("Store Group Code"; "Store Group Code")
                 {
                     ApplicationArea = All;
@@ -59,11 +64,6 @@ page 6150614 "NPR POS Store List"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Store Locality Code field';
-                }
-                field("Location Code"; "Location Code")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Location Code field';
                 }
             }
         }
