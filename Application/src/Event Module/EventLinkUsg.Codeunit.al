@@ -1,13 +1,7 @@
 codeunit 6060157 "NPR Event Link Usg."
 {
-    // NPR5.49/TJ  /20190204 CASE 331208 New object copied from standard codeunit 1026
-    //                                   AutoConfirm feature added
-
+    //New object copied from standard codeunit 1026
     Permissions = TableData "Job Usage Link" = rimd;
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         Text001: Label 'The specified %1 does not have %2 enabled.', Comment = 'The specified Job Planning Line does not have Usage Link enabled.';

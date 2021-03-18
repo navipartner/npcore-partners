@@ -1,7 +1,5 @@
 page 6060158 "NPR Event Web Sales Setup"
 {
-    // NPR5.48/TJ  /20190124 CASE 263728 New object
-
     Caption = 'Event Web Sales Setup';
     PageType = List;
     SourceTable = "NPR Event Web Sales Setup";
@@ -79,10 +77,6 @@ page 6060158 "NPR Event Web Sales Setup"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

@@ -1,7 +1,5 @@
 table 6060163 "NPR Event Attr. Temp. Filter"
 {
-    // NPR5.33/TJ  /20170601 CASE 277946 New object created
-
     Caption = 'Event Attribute Temp. Filter';
     DataClassification = CustomerContent;
 

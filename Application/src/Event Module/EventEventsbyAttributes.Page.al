@@ -1,8 +1,5 @@
 page 6151582 "NPR Event Events by Attributes"
 {
-    // NPR5.33/TJ  /20170628 CASE 277946 New object created
-    // NPR5.38/TJ  /20171023 CASE 291965 Added View action
-
     Caption = 'Events by Attributes';
     CardPageID = "NPR Event Card";
     Editable = false;

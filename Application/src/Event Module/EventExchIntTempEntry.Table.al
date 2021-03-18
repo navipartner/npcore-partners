@@ -1,7 +1,5 @@
 table 6060161 "NPR Event Exch.Int.Temp.Entry"
 {
-    // NPR5.34/TJ  /20170728 CASE 277938 New object
-
     Caption = 'Event Exch. Int. Temp. Entry';
     DataClassification = CustomerContent;
 
@@ -42,10 +40,6 @@ table 6060161 "NPR Event Exch.Int.Temp.Entry"
         key(Key1; "Code", "Source Record ID")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnInsert()

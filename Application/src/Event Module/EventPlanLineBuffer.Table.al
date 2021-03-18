@@ -1,7 +1,5 @@
 table 6060160 "NPR Event Plan. Line Buffer"
 {
-    // NPR5.55/TJ  /20200331 CASE 397741 New object
-
     Caption = 'Event Planning Line Buffer';
     DataClassification = CustomerContent;
 
@@ -124,10 +122,6 @@ table 6060160 "NPR Event Plan. Line Buffer"
         key(Key1; "Job No.", "Job Task No.", "Job Planning Line No.", "Line No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnInsert()

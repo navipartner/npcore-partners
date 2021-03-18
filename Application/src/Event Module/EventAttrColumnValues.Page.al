@@ -1,8 +1,5 @@
 page 6060164 "NPR Event Attr. Column Values"
 {
-    // NPR5.31/NPKNAV/20170502  CASE 269162 Transport NPR5.31 - 2 May 2017
-    // NPR5.38/TJ  /20171221 CASE Fixed Name and ENU caption of the page
-
     AutoSplitKey = true;
     Caption = 'Attribute Column Values';
     PageType = List;
@@ -45,10 +42,6 @@ page 6060164 "NPR Event Attr. Column Values"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

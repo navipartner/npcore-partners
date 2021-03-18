@@ -1,9 +1,5 @@
 page 6151575 "NPR Event Notes"
 {
-    // NPR5.31/NPKNAV/20170502  CASE 269162 Transport NPR5.31 - 2 May 2017
-    // NPR5.32/TJ  /20170523 CASE 277397 View Event action will only open an event if note exists
-    //                                   Added Image property to action View Event
-
     Caption = 'Event Notes';
     Editable = false;
     PageType = ListPart;
@@ -64,10 +60,8 @@ page 6151575 "NPR Event Notes"
                     Job: Record Job;
                     RecRef: RecordRef;
                 begin
-                    //-NPR5.32 [277397]
                     if "Link ID" = 0 then
                         exit;
-                    //+NPR5.32 [277397]
                     RecRef.Get("Record ID");
                     RecRef.SetTable(Job);
                     Job.SetRecFilter;
@@ -93,8 +87,8 @@ page 6151575 "NPR Event Notes"
         Job: Record Job;
         JobCount: Integer;
         NoteInStream: InStream;
-        BinaryReader: DotNet NPRNetBinaryReader;
-        MemoryStream: DotNet NPRNetMemoryStream;
+        BufferText: Text;
+        NoteInStreamText: Text;
         NoteText: BigText;
         LinkID: Integer;
     begin
@@ -112,10 +106,13 @@ page 6151575 "NPR Event Notes"
                             Clear(NoteInStream);
                             RecordLink.CalcFields(Note);
                             RecordLink.Note.CreateInStream(NoteInStream);
-                            MemoryStream := MemoryStream.MemoryStream;
-                            MemoryStream := NoteInStream;
-                            BinaryReader := BinaryReader.BinaryReader(MemoryStream);
-                            NoteText.AddText(BinaryReader.ReadString);
+                            BufferText := '';
+                            NoteInStreamText := '';
+                            while not NoteInStream.EOS do begin
+                                NoteInStream.ReadText(BufferText);
+                                NoteInStreamText := BufferText;
+                            end;
+                            NoteText.AddText(NoteInStreamText);
                             LinkID += 1;
                             Init;
                             "Link ID" := LinkID;

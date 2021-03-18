@@ -1,7 +1,5 @@
 page 6151588 "NPR Event Atributes Info"
 {
-    // NPR5.38/TJ  /20171122 CASE 291965 New object
-
     Caption = 'Event Atributes Info';
     InsertAllowed = false;
     PageType = ListPart;

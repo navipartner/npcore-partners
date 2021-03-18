@@ -1,8 +1,5 @@
 page 6151585 "NPR Event Statistics"
 {
-    // NPR5.37/NPKNAV/20171030  CASE 287806 Transport NPR5.37 - 27 October 2017
-    // NPR5.48/JAVA/20181130 CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
-
     Caption = 'Event Statistics';
     Editable = false;
     LinksAllowed = false;
@@ -2095,10 +2092,6 @@ page 6151585 "NPR Event Statistics"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 
     trigger OnAfterGetCurrRecord()

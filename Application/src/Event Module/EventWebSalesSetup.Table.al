@@ -1,7 +1,5 @@
 table 6060152 "NPR Event Web Sales Setup"
 {
-    // NPR5.48/TJ  /20190124 CASE 263728 New object
-
     Caption = 'Event Web Sales Setup';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Event Web Sales Setup";
@@ -37,10 +35,6 @@ table 6060152 "NPR Event Web Sales Setup"
         key(Key1; Type, "No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

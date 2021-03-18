@@ -1,7 +1,5 @@
 page 6151584 "NPR Event Exch. Int. Mail Sum."
 {
-    // NPR5.39/TJ  /20180214 CASE 285388 New object
-
     Caption = 'Event Exch. Int. Email Summary';
     Editable = false;
     PageType = Worksheet;
@@ -37,10 +35,6 @@ page 6151584 "NPR Event Exch. Int. Mail Sum."
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 
     trigger OnAfterGetRecord()

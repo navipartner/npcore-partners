@@ -1,6 +1,5 @@
 page 6151576 "NPR Event Resource Overview"
 {
-
     Caption = 'Event Resource Overview';
     Editable = false;
     PageType = ListPart;
@@ -99,7 +98,7 @@ page 6151576 "NPR Event Resource Overview"
                     Caption = 'Day';
                     ApplicationArea = All;
                     ToolTip = 'Filters by day';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin

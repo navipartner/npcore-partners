@@ -1,7 +1,5 @@
 page 6151581 "NPR Event Attr. Temp. Filters"
 {
-    // NPR5.33/TJ  /20170629 CASE 277946 New object created
-
     Caption = 'Event Attribute Temp. Filters';
     PageType = List;
     UsageCategory = Administration;

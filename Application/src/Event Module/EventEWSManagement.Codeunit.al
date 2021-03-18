@@ -1,38 +1,5 @@
 codeunit 6060151 "NPR Event EWS Management"
 {
-    // NPR5.29/NPKNAV/20170127  CASE 248723 Transport NPR5.29 - 27 januar 2017
-    // NPR5.31/TJ  /20170316 CASE 269162 Uri property needed for sending e-mails between different organizations
-    //                                   Cleaner error message if using wrong email provider/password
-    //                                   Copied functions related with file name creation from "Event E-mail Management" codeunit
-    // NPR5.32/TJ  /20170502 CASE 274405 Function IncludeAttachmentCheck now returns boolean instead of giving an error
-    //                                   Before creating file for attachment, file is deleted from server just in case it allready exists
-    //                                   When checking if base layout is set, checking also if custom report layout exists at all
-    // NPR5.32/TJ  /20170515 CASE 275946 Removed functions GetOrganizerAccount and GetOrganizerPassword
-    //                                   New functions GetOrganizerSetup, InitializeExchangeService and SetOrganizerExchangeUrl
-    //                                   Improvement on authentication so Url is used if possible instead of AutoDiscover every time
-    //                                   Renamed function TestAccountSpecified to OrganizerAccountSet and added one more parameter and return value
-    //                                   Renamed functions AuthenticateExchangeService and AuthenticateExchServWithLog to AutoDiscoveExchangeService and AutoDiscoverExchangeServiceWIthLog
-    // NPR5.34/TJ  /20170706 CASE 277938 New functions for selecting exchange integration template
-    //                                   Function UseTemplate copied from codeunits Event Calendar Management and Event Email Management and rewritten
-    // NPR5.34/TJ  /20170725 CASE 275991 Added new parameter to function InitializeExchService so different e-mail owner can be selected when sending an e-mail
-    //                                   Added code to GetOrganizerSetup and SetOrganizerExchangeUrl
-    // NPR5.35/TJ  /20170804 CASE 285826 Recoded usage of .NET assemblies that are specific for current NAV version
-    // NPR5.38/TJ  /20171019 CASE 285194 New funcionality around password usage
-    //                                   Recoded several functions
-    // NPR5.39/TJ  /20171221 CASE 285388 New funcionality to detect e-mail info
-    // NPR5.40/TJ  /20180313 CASE 307700 Function GetEmailTemplateHeader now properly returns a template found in template filter
-    // NPR5.45/TJ  /20180605 CASE 317448 Function InitializeExchService now has a return value
-    // NPR5.46/TJ  /20180904 CASE 323953 New function GetEventExchIntEmail
-    // NPR5.48/TJ  /20181217 CASE 327413 Fixed issue with no default e-mail
-    // NPR5.48/TJ  /20190130 CASE 342511 Easier to see for which calendar item type is template selection for
-    // NPR5.55/TJ  /20200204 CASE 374887 When searching for email template using current job instead of searching for it
-    //                                   New function SetSkipLookup
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         EventVersionSpecificMgt: Codeunit "NPR Event Vers. Specific Mgt.";
         ExchItemType: Option "E-Mail",Appointment,"Meeting Request";
@@ -61,7 +28,6 @@ codeunit 6060151 "NPR Event EWS Management"
         Resource: Record Resource;
         SearchForDefaultAccount: Boolean;
     begin
-        //-NPR5.38 [285194]
         SearchForDefaultAccount := Job."NPR Organizer E-Mail" = '';
         if IsEmailBeingSent then
             SearchForDefaultAccount := SearchForDefaultAccount and ((IsEmailBeingSent and (Job."Person Responsible" <> '') and Resource.Get(Job."Person Responsible") and (Resource."NPR E-Mail" = ''))
@@ -74,7 +40,6 @@ codeunit 6060151 "NPR Event EWS Management"
                       Job.FieldCaption("Person Responsible"), Resource.FieldCaption("NPR E-Mail"));
         end;
         exit(not SearchForDefaultAccount);
-        //+NPR5.38 [285194]
     end;
 
     local procedure GetOrganizerSetup(Job: Record Job; var Source: Text)
@@ -82,49 +47,23 @@ codeunit 6060151 "NPR Event EWS Management"
         Resource: Record Resource;
         UserName: Text;
     begin
-        //-NPR5.38 [285194]
         EventExchIntEmailGlobal.SetRange("Default Organizer E-Mail", true);
         if EventExchIntEmailGlobal.FindFirst then begin
             UserName := EventExchIntEmailGlobal."E-Mail";
-            //-NPR5.39 [285388]
             Source := GetObjectCaption(8, PAGE::"NPR Event Exch. Int. E-Mails") + ': ' + EventExchIntEmailGlobal.FieldCaption("Default Organizer E-Mail");
         end;
-        //+NPR5.39 [285388]
         if Job."NPR Organizer E-Mail" <> '' then begin
             UserName := Job."NPR Organizer E-Mail";
-            //-NPR5.39 [285388]
             Source := GetObjectCaption(8, PAGE::"NPR Event Card") + ': ' + Job.FieldCaption("NPR Organizer E-Mail");
         end;
-        //+NPR5.39 [285388]
         if (ExchItemType = ExchItemType::"E-Mail") and (Job."Person Responsible" <> '') and Resource.Get(Job."Person Responsible") and (Resource."NPR E-Mail" <> '') then begin
             UserName := Resource."NPR E-Mail";
-            //-NPR5.39 [285388]
             Source := GetObjectCaption(8, PAGE::"NPR Event Card") + ': ' + Job.FieldCaption("Person Responsible");
         end;
-        //+NPR5.39 [285388]
-        //-NPR5.48 [327413]
-        /*
-        EventExchIntEmailGlobal.GET(UserName);
-        //+NPR5.38 [285194]
-        */
         if not EventExchIntEmailGlobal.Get(UserName) then begin
             Clear(EventExchIntEmailGlobal);
             Source := GetObjectCaption(8, PAGE::"NPR Event Card") + ': ' + Job.FieldCaption("NPR Organizer E-Mail");
         end;
-        //+NPR5.48 [327413]
-
-    end;
-
-    local procedure UpdateEventExchIntEmailExchangeUrl()
-    var
-        Resource: Record Resource;
-        Url: Text;
-    begin
-        Url := EventVersionSpecificMgt.ExchServiceWrapperGetExchangeServiceUrl();
-        //-NPR5.38 [285194]
-        EventExchIntEmailGlobal."Exchange Server Url" := Url;
-        EventExchIntEmailGlobal.Modify;
-        //+NPR5.38 [285194]
     end;
 
     procedure CheckStatus(Job: Record Job; ShowError: Boolean) StatusOK: Boolean
@@ -142,102 +81,21 @@ codeunit 6060151 "NPR Event EWS Management"
         exit(Status.AsInteger() > 0);
     end;
 
-    [TryFunction]
-    local procedure AutoDiscoverExchangeService(var ExchService: DotNet NPRNetExchangeService; Job: Record Job; ForceAutoDiscover: Boolean)
-    var
-        EmailNotDiscovered: Label 'E-mail provided %1 is not discoverable. Please verify you''re using Microsoft Exchange e-mail account and have entered proper e-mail account and password.';
-        Uri: DotNet NPRNetUri;
-        Source: Text;
-    begin
-        //-NPR5.38 [285194]
-        if ForceAutoDiscover then
-            //-NPR5.39 [285388]
-            //GetOrganizerSetup(Job);
-            GetOrganizerSetup(Job, Source);
-        //+NPR5.39 [285388]
-        if not EventVersionSpecificMgt.ExchServiceWrapperAutodiscoverServiceUrl(EventExchIntEmailGlobal."E-Mail") then
-            Error(EmailNotDiscovered, EventExchIntEmailGlobal."E-Mail");
-        //+NPR5.38 [285194]
-    end;
-
-    procedure AutoDiscoverExchangeServiceWithLog(RecordId: RecordID; var ExchService: DotNet NPRNetExchangeService; Job: Record Job; ForceAutoDiscover: Boolean): Boolean
-    var
-        ActivityLog: Record "Activity Log";
-        ActivityDescription: Label 'Auto Discovering...';
-        AutoDiscoverContext: Label 'AUTO DISCOVER';
-    begin
-        //-NPR5.38 [285194]
-        //IF NOT AutoDiscoverExchangeService(ExchService) THEN BEGIN
-        if not AutoDiscoverExchangeService(ExchService, Job, ForceAutoDiscover) then begin
-            //+NPR5.38 [285194]
-            ActivityLog.LogActivity(RecordId, 1, AutoDiscoverContext, ActivityDescription, CopyStr(GetLastErrorText, 1, MaxStrLen(ActivityLog."Activity Message")));
-            exit(false);
-        end else
-            //-NPR5.38 [285194]
-            //SetOrganizerExchangeUrl(Job);
-            UpdateEventExchIntEmailExchangeUrl();
-        //+NPR5.38 [285194]
-        exit(true);
-    end;
-
     procedure InitializeExchService(RecordId: RecordID; Job: Record Job; var ExchService: DotNet NPRNetExchangeService; ExchItemType2: Option "E-Mail",Appointment,"Meeting Request"): Boolean
     var
-        ExchangeCredentials: DotNet NPRNetExchangeCredentials;
-        NetworkCredential: DotNet NPRNetNetworkCredential;
         Uri: DotNet NPRNetUri;
         Source: Text;
     begin
-        //-NPR5.34 [275991]
-        //GetOrganizerSetup(Job);
-        //-NPR5.38 [285194]
-        //GetOrganizerSetup(Job,ExchItemType);
         ExchItemType := ExchItemType2;
-        //-NPR5.39 [285388]
-        //GetOrganizerSetup(Job);
         GetOrganizerSetup(Job, Source);
-        //+NPR5.39 [285388]
-        //+NPR5.38 [285194]
-        //+NPR5.34 [275991]
-        //-NPR5.35 [285826]
-        /*
-        ExchServiceWrapper := ExchServiceWrapper.ExchangeServiceWrapper(
-                                ExchangeCredentials.op_Implicit(
-                                  NetworkCredential.NetworkCredential(UserName,Password)));
-        ExchService := ExchServiceWrapper.Service();
-        */
-        //-NPR5.38 [285194]
-        //EventVersionSpecificMgt.ExchServiceWrapperConstructor(UserName,Password);
         EventVersionSpecificMgt.ExchServiceWrapperConstructor(EventExchIntEmailGlobal."E-Mail", GetEmailPassword(EventExchIntEmailGlobal));
-        //+NPR5.38 [285194]
         EventVersionSpecificMgt.ExchServiceWrapperService(ExchService);
-        //+NPR5.35 [285826]
-        //-NPR5.38 [285194]
         if EventExchIntEmailGlobal."Exchange Server Url" = '' then begin
-            //+NPR5.38 [285194]
-            //-NPR5.38 [285194]
-            //IF NOT AutoDiscoverExchangeServiceWithLog(RecordId,ExchService,Job) THEN
-            if not AutoDiscoverExchangeServiceWithLog(RecordId, ExchService, Job, false) then
-                //+NPR5.38 [285194]
-                //-NPR5.45 [317448]
-                //ERROR('');
-                exit(false);
-            //+NPR5.45 [317448]
-            //-NPR5.35 [285826]
-            //ExchangeUrl := ExchServiceWrapper.ExchangeServiceUrl;
-            //-NPR5.38 [285194]
-            //ExchangeUrl := EventVersionSpecificMgt.ExchServiceWrapperGetExchangeServiceUrl();
-            //+NPR5.38 [285194]
-            //+NPR5.35 [285826]
+            exit(false);
         end;
-        //-NPR5.38 [285194]
-        //Uri := Uri.Uri(ExchangeUrl);
         Uri := Uri.Uri(EventExchIntEmailGlobal."Exchange Server Url");
-        //+NPR5.38 [285194]
         ExchService.Url := Uri;
-        //-NPR5.45 [317448]
         exit(true);
-        //+NPR5.45 [317448]
-
     end;
 
     procedure SetJobPlanLineFilter(Job: Record Job; var JobPlanningLine: Record "Job Planning Line")
@@ -299,35 +157,22 @@ codeunit 6060151 "NPR Event EWS Management"
         with ReportLayoutSelection do begin
             if not Get(ReportID, CompanyName) then
                 exit(false);
-            //-NPR5.32 [274405]
-            //EXIT((Type = Type::"Custom Layout") AND ("Custom Report Layout ID" <> 0));
-            exit((Type = Type::"Custom Layout") and CustomReportLayout.Get("Custom Report Layout Code")); //NAV 2017
-                                                                                                          //+NPR5.32 [274405]
+            exit((Type = Type::"Custom Layout") and CustomReportLayout.Get("Custom Report Layout Code"));
         end;
     end;
 
     procedure IncludeAttachmentCheck(Job: Record Job; Usage: Option): Boolean
     begin
         if not CustomizedLayoutFound(Job, Usage) then
-            //-NPR5.32 [274405]
-            /*
-            IF NOT BaseReportLayoutExists(Usage) THEN
-              ERROR(NoReportLayout);
-            */
-          exit(BaseReportLayoutExists(Usage));
+            exit(BaseReportLayoutExists(Usage));
         exit(true);
-        //+NPR5.32 [274405]
-
     end;
 
     procedure CreateFilePath(Job: Record Job; FileName: Text; EMailTemplateHeader: Record "NPR E-mail Template Header"): Text
     var
         FileMgt: Codeunit "File Management";
     begin
-        //-NPR5.34 [277938]
-        //EXIT(FileMgt.GetDirectoryName(FileName) + '\' + CreateFileName(Job,ForWhat) + '.' + FileMgt.GetExtension(FileName));
         exit(FileMgt.GetDirectoryName(FileName) + '\' + CreateFileName(Job, EMailTemplateHeader) + '.' + FileMgt.GetExtension(FileName));
-        //+NPR5.34 [277938]
     end;
 
     procedure CreateFileName(Job: Record Job; EMailTemplateHeader: Record "NPR E-mail Template Header") Name: Text
@@ -337,18 +182,8 @@ codeunit 6060151 "NPR Event EWS Management"
         EventCalendarMgt: Codeunit "NPR Event Calendar Mgt.";
     begin
         Name := Job.FieldCaption("NPR Event") + '-' + Format(Job."NPR Event Status") + '-' + Job."No.";
-        //-NPR5.34 [277938]
-        /*
-        CASE ForWhat OF
-          ForWhat::Email: HasTemplate := EventEmailMgt.UseTemplate(Job,EMailTemplateHeader);
-          ForWhat::Calendar: HasTemplate := EventCalendarMgt.UseTemplate(EMailTemplateHeader);
-        END;
-        IF HasTemplate THEN BEGIN
-          RecRef.GETTABLE(Job);
-        */
         if not EMailTemplateHeader.IsEmpty then begin
             RecRef.GetTable(Job);
-            //+NPR5.34 [277938]
             if EMailTemplateHeader.Filename <> '' then
                 Name := ParseEmailTemplateText(RecRef, EMailTemplateHeader.Filename);
         end;
@@ -362,13 +197,8 @@ codeunit 6060151 "NPR Event EWS Management"
         EventWordLayout: Record "NPR Event Word Layout";
         EventMgt: Codeunit "NPR Event Management";
     begin
-        //-NPR5.34 [277938]
-        //FileName := CreateFilePath(Job,FileMgt.ServerTempFileName('pdf'),ForWhat);
         FileName := CreateFilePath(Job, FileMgt.ServerTempFileName('pdf'), EMailTemplateHeader);
-        //+NPR5.34 [277938]
-        //-NPR5.32 [274405]
         FileMgt.DeleteServerFile(FileName);
-        //+NPR5.32 [274405]
         if CustomizedLayoutFound(Job, Usage) then begin
             EventWordLayout.Get(Job.RecordId, Usage + 1);
             EventMgt.MergeAndSaveWordLayout(EventWordLayout, 1, FileName);
@@ -425,34 +255,21 @@ codeunit 6060151 "NPR Event EWS Management"
                 EmailTemplateFilter.SetRange("E-mail Template Code", EmailTemplateHeader.Code);
                 EmailTemplateFilter.SetRange("Table No.", EmailTemplateHeader."Table No.");
                 if EmailTemplateFilter.FindSet then begin
-                    //-NPR5.55 [374887]
                     RecordExists := true;
-                    //+NPR5.55 [374887]
                     repeat
                         FieldRef := RecRef.Field(EmailTemplateFilter."Field No.");
-                        //-NPR5.55 [374887]
-                        /*
-                          FieldRef.SETFILTER(EmailTemplateFilter.Value);
-                        UNTIL EmailTemplateFilter.NEXT = 0;
-                        RecordExists := RecRef.FINDFIRST;
-                        CLEAR(FieldRef);
-                        */
                         FieldRef2 := RecRef2.Field(EmailTemplateFilter."Field No.");
                         if Evaluate(FieldRef2, EmailTemplateFilter.Value) then
                             RecordExists := RecordExists and (Format(FieldRef2) = Format(FieldRef))
                         else
                             RecordExists := false;
                     until (EmailTemplateFilter.Next = 0) or (not RecordExists);
-                    //+NPR5.55 [374887]
                 end;
             until (EmailTemplateHeader.Next = 0) or RecordExists;
 
-        //-NPR5.40 [307700]
         if RecordExists then
             EmailTemplateHeader.Get(EmailTemplateFilter."E-mail Template Code")
         else
-            //IF NOT RecordExists THEN
-            //+NPR5.40 [307700]
             RecordExists := EmailTemplateHeader.FindFirst;
         exit(RecordExists);
 
@@ -479,14 +296,10 @@ codeunit 6060151 "NPR Event EWS Management"
             exit(false);
         if EventExchIntTemplate.FindFirst and (EventExchIntTemplate.Count = 1) then
             exit(true);
-        //-NPR5.55 [374887]
         if SkipLookup then
             exit(false);
-        //+NPR5.55 [374887]
         EventExchIntTemplates.LookupMode := true;
-        //-NPR5.48 [342511]
         EventExchIntTemplates.Caption := StrSubstNo(ExchTemplateCaption, Format(ExchItemType, 0, 0));
-        //+NPR5.48 [342511]
         EventExchIntTemplates.SetTableView(EventExchIntTemplate);
         if EventExchIntTemplates.RunModal = ACTION::LookupOK then begin
             EventExchIntTemplates.GetRecord(EventExchIntTemplate);
@@ -502,10 +315,8 @@ codeunit 6060151 "NPR Event EWS Management"
     begin
         if (EventExchIntTemplate.Code <> '') and EventExchIntTempEntry.Get(EventExchIntTemplate.Code, Job.RecordId) and EventExchIntTempEntry.Active then
             exit(true);
-        //-NPR5.55 [374887]
         if SkipLookup then
             exit(false);
-        //+NPR5.55 [374887]
         EventExchIntTempEntry.SetRange("Source Record ID", Job.RecordId);
         EventExchIntTempEntries.LookupMode := true;
         EventExchIntTempEntries.SetTableView(EventExchIntTempEntry);
@@ -559,19 +370,12 @@ codeunit 6060151 "NPR Event EWS Management"
     var
         ExchService: DotNet NPRNetExchangeService;
         ConnectionSuccessMsg: Label 'Connection succeeded.';
-        NameResolutionCollection: DotNet NPRNetNameResolutionCollection;
-        NameResolution: DotNet NPRNetNameResolution;
-        DateTimeObject: DotNet NPRNetDateTime;
-        ExchangeVersion: DotNet NPRNetExchangeVersion;
-        ExchangeServerInfo: DotNet NPRNetExchangeServerInfo;
         Job: Record Job;
     begin
         EventExchIntEmail.TestField("E-Mail");
         EventVersionSpecificMgt.ExchServiceWrapperConstructor(EventExchIntEmail."E-Mail", GetEmailPassword(EventExchIntEmail));
         EventVersionSpecificMgt.ExchServiceWrapperService(ExchService);
         EventExchIntEmailGlobal := EventExchIntEmail;
-        AutoDiscoverExchangeService(ExchService, Job, false);
-        EventExchIntEmail."Exchange Server Url" := EventVersionSpecificMgt.ExchServiceWrapperGetExchangeServiceUrl();
         Message(ConnectionSuccessMsg);
     end;
 
@@ -715,16 +519,12 @@ codeunit 6060151 "NPR Event EWS Management"
 
     procedure GetEventExchIntEmail(var EventExchIntEmail: Record "NPR Event Exch. Int. E-Mail")
     begin
-        //-NPR5.46 [323953]
         EventExchIntEmail := EventExchIntEmailGlobal;
-        //+NPR5.46 [323953]
     end;
 
     procedure SetSkipLookup(SkipLookupHere: Boolean)
     begin
-        //-NPR5.55 [374887]
         SkipLookup := SkipLookupHere;
-        //+NPR5.55 [374887]
     end;
 }
 

@@ -1,8 +1,5 @@
 page 6060166 "NPR Event Next 10 Events"
 {
-    // NPR5.31/NPKNAV/20170502  CASE 269162 Transport NPR5.31 - 2 May 2017
-    // NPR5.32/TJ  /20170523 CASE 277397 Added Image property to all actions missing it
-
     Caption = 'Next 10 Events';
     CardPageID = "NPR Event Card";
     Editable = false;
@@ -95,8 +92,6 @@ page 6060166 "NPR Event Next 10 Events"
                         ResourceList.LookupMode := true;
                         if ResourceList.RunModal = ACTION::LookupOK then begin
                             ResourceList.GetRecord(Resource);
-                            //  PersonResponsible := Resource."No.";
-                            //  PersonResponsibleName := Resource.Name;
                             SetRange("Person Responsible", Resource."No.");
                         end;
                     end;
@@ -124,10 +119,7 @@ page 6060166 "NPR Event Next 10 Events"
     end;
 
     var
-        PersonResponsible: Code[10];
-        PersonResponsibleName: Text;
         MaxNoOfEvents: Integer;
-        Filters: Text;
 
     local procedure CreateList()
     var

@@ -1,10 +1,5 @@
 page 6060154 "NPR Event Standard Dialog"
 {
-    // NPR5.29/NPKNAV/20170127  CASE 248723 Transport NPR5.29 - 27 januar 2017
-    // NPR5.38/TJ  /20171019    CASE 285194 Renamed function GetParameter to GetMessage
-    //                                      Renamed page from Event Message Standard Dialog to Event Standard Dialog
-    //                                      Added extra variables/functions for password input
-
     Caption = 'Event Standard Dialog';
     PageType = StandardDialog;
     UsageCategory = Administration;
@@ -38,10 +33,6 @@ page 6060154 "NPR Event Standard Dialog"
                 ToolTip = 'Specifies the value of the Confirm Password field';
             }
         }
-    }
-
-    actions
-    {
     }
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean

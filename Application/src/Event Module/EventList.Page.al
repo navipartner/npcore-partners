@@ -694,7 +694,6 @@ page 6060152 "NPR Event List"
     var
         EventCalendarMgt: Codeunit "NPR Event Calendar Mgt.";
         EventEmailMgt: Codeunit "NPR Event Email Management";
-        EventMgt: Codeunit "NPR Event Management";
         EventEWSMgt: Codeunit "NPR Event EWS Management";
         EventTicketMgt: Codeunit "NPR Event Ticket Mgt.";
         ExtendedPriceEnabled: Boolean;

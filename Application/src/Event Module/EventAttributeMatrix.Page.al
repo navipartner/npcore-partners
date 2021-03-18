@@ -1,10 +1,5 @@
 page 6060155 "NPR Event Attribute Matrix"
 {
-    // NPR5.31/NPKNAV/20170502  CASE 269162 Transport NPR5.31 - 2 May 2017
-    // NPR5.33/TJ  /20170530 CASE 277946 Fixed all variable/functions/constants with wrong namings
-    //                                   Enabled Job No. visibility feature
-    //                                   Added new function SetFilterMode
-
     Caption = 'Event Attribute Matrix';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -253,7 +248,6 @@ page 6060155 "NPR Event Attribute Matrix"
         FilterGroup := 2;
         SetRange("Template Name", EventAttrTemplate."Row Template Name");
         FilterGroup := 0;
-        //JobNoVisible := FALSE;
     end;
 
     procedure SetJob(JobNo2: Code[20])
@@ -262,17 +256,7 @@ page 6060155 "NPR Event Attribute Matrix"
         Job.Get(JobNo);
         Clear(EventAttrTemplate);
         TemplateName := '';
-        //-NPR5.33 [277972]
-        /*
-        IF Job."Event Attribute Template Name" <> '' THEN
-          SetAttrTemplate(Job."Event Attribute Template Name");
-        */
-        //+NPR5.33 [277972]
-
-        //-NPR5.33 [277946]
         JobNoVisible := true;
-        //+NPR5.33 [277946]
-
     end;
 
     local procedure GetColumnSetup(Forward: Boolean)
@@ -337,10 +321,7 @@ page 6060155 "NPR Event Attribute Matrix"
     var
         CollumnNo: Integer;
     begin
-        //-NPR5.33 [277946]
-        //AttrColumnEditable := Type = Type::" ";
         AttrColumnEditable := (Type = Type::" ") or FilterMode;
-        //+NPR5.33 [277946]
     end;
 
     local procedure ReadEventAttributes()
@@ -348,20 +329,14 @@ page 6060155 "NPR Event Attribute Matrix"
         ColumnNo: Integer;
     begin
         for ColumnNo := 1 to ArrayLen(AttrColumnLineNo) do
-            //-NPR5.33 [277946]
-            //EventAttrMgt.EventAttributeEntryAction(2,TemplateName,JobNo,Rec."Line No.",AttrColumnLineNo[ColumnNo],AttrColumnCaption[ColumnNo],AttrColumnValue[ColumnNo]);
             EventAttrMgt.EventAttributeEntryAction(2, TemplateName, JobNo, Rec."Line No.", AttrColumnLineNo[ColumnNo], AttrColumnCaption[ColumnNo], AttrColumnValue[ColumnNo], FilterMode, FilterName);
-        //+NPR5.33 [277946]
     end;
 
     local procedure CheckAndUpdate(ColumnNo: Integer)
     var
         ActionHere: Integer;
     begin
-        //-NPR5.33 [277946]
-        //EventAttrMgt.CheckAndUpdate(TemplateName,JobNo,Rec."Line No.",AttrColumnLineNo[ColumnNo],AttrColumnCaption[ColumnNo],AttrColumnValue[ColumnNo]);
         EventAttrMgt.CheckAndUpdate(TemplateName, JobNo, Rec."Line No.", AttrColumnLineNo[ColumnNo], AttrColumnCaption[ColumnNo], AttrColumnValue[ColumnNo], FilterMode, FilterName);
-        //+NPR5.33 [277946]
         CurrPage.Update(false);
     end;
 

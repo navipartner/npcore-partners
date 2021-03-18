@@ -1,7 +1,5 @@
 codeunit 6060156 "NPR Event Management TQ"
 {
-    // NPR5.32/NPKNAV/20170526  CASE 275954 Transport NPR5.32 - 26 May 2017
-
     TableNo = "NPR Task Line";
 
     trigger OnRun()

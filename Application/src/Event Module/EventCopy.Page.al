@@ -221,10 +221,6 @@ page 6151577 "NPR Event Copy"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnOpenPage()
     begin
         PlanningLineType := PlanningLineType::"Schedule+Contract";

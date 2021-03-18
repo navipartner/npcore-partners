@@ -43,7 +43,6 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                         EventTaskLines: Page "NPR Event Task Lines";
                         JobTask: Record "Job Task";
                     begin
-                        //-NPR5.49 [331208]
                         JobTask.SetRange("Job No.", Rec."Job No.");
                         if "Job Task No." <> '' then
                             JobTask.Get("Job No.", "Job Task No.");
@@ -53,7 +52,6 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                             EventTaskLines.GetRecord(JobTask);
                             Validate("Job Task No.", JobTask."Job Task No.");
                         end;
-                        //+NPR5.49 [331208]
                     end;
                 }
                 field("Line Type"; "Line Type")
@@ -735,10 +733,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
 
                     trigger OnAction()
                     begin
-                        //-NPR5.49 [331208]
-                        //JobCreateInvoice.GetJobPlanningLineInvoices(Rec);
                         EventMgt.GetJobPlanningLineInvoices(Rec);
-                        //+NPR5.49 [331208]
                     end;
                 }
                 separator(Separator123)
@@ -799,9 +794,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
 
                     trigger OnAction()
                     begin
-                        //-NPR5.49 [345047]
                         InsertExtendedText(true);
-                        //+NPR5.49 [345047]
                     end;
                 }
             }
@@ -833,9 +826,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
 
     trigger OnAfterGetRecord()
     begin
-        //-NPR5.55 [397741]
         ShowAsBold := Rec."NPR Group Line" and (Rec."NPR Group Source Line No." = 0);
-        //+NPR5.55 [397741]
     end;
 
     trigger OnInit()
@@ -855,7 +846,6 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
         "Document No.Editable" := true;
         "Currency DateEditable" := true;
         "Planning DateEditable" := true;
-
         "Job Task No.Visible" := true;
         "Job No.Visible" := true;
     end;
@@ -876,14 +866,8 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
     begin
         SetUpNewLine(xRec);
 
-        //-NPR5.31 [269162]
-        //-NPR5.32 [278090]
-        //Job.GET(Rec."Job No.");
-        //IF Job."Starting Date" <> 0D THEN
         if Job.Get(Rec."Job No.") and (Job."Starting Date" <> 0D) then
-            //+NPR5.32 [278090]
             Validate("Planning Date", Job."Starting Date");
-        //+NPR5.31 [269162]
     end;
 
     trigger OnOpenPage()
@@ -900,7 +884,6 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
     end;
 
     var
-        JobCreateInvoice: Codeunit "Job Create-Invoice";
         ActiveField: Option " ",Cost,CostLCY,PriceLCY,Price;
         Text001: Label 'This job planning line was automatically generated. Do you want to continue?';
         JobNo: Code[20];
@@ -942,7 +925,6 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
         ShowAsBold: Boolean;
         EventCalendarMgt: Codeunit "NPR Event Calendar Mgt.";
         EventEmailMgt: Codeunit "NPR Event Email Management";
-        EventTicketMgt: Codeunit "NPR Event Ticket Mgt.";
         EventMgt: Codeunit "NPR Event Management";
 
     local procedure CreateSalesInvoice(CrMemo: Boolean)
@@ -975,26 +957,6 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
         "Unit CostEditable" := Edit;
     end;
 
-    procedure SetActiveField(ActiveField2: Integer)
-    begin
-        ActiveField := ActiveField2;
-    end;
-
-    procedure SetJobNo(No: Code[20])
-    begin
-        JobNo := No;
-    end;
-
-    procedure SetJobNoVisible(JobNoVisible: Boolean)
-    begin
-        "Job No.Visible" := JobNoVisible;
-    end;
-
-    procedure SetJobTaskNoVisible(JobTaskNoVisible: Boolean)
-    begin
-        "Job Task No.Visible" := JobTaskNoVisible;
-    end;
-
     local procedure PerformAutoReserve()
     begin
         if (Reserve = Reserve::Always) and
@@ -1014,15 +976,6 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
     local procedure PlanningDateOnAfterValidate()
     begin
         if "Planning Date" <> xRec."Planning Date" then
-            PerformAutoReserve;
-    end;
-
-    local procedure NoOnAfterValidate()
-    begin
-        //-NPR5.49 [345047]
-        InsertExtendedText(false);
-        //+NPR5.49 [345047]
-        if "No." <> xRec."No." then
             PerformAutoReserve;
     end;
 
@@ -1059,7 +1012,6 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
     var
         EventTransferExtText: Codeunit "NPR Event Transf.Ext.Text Mgt.";
     begin
-        //-NPR5.49 [345047]
         if EventTransferExtText.EventCheckIfAnyExtText(Rec, Unconditionally) then begin
             CurrPage.SaveRecord;
             Commit;
@@ -1067,7 +1019,6 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
         end;
         if EventTransferExtText.MakeUpdate then
             CurrPage.Update(true);
-        //+NPR5.49 [345047]
     end;
 }
 

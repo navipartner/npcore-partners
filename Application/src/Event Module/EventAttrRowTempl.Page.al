@@ -1,7 +1,5 @@
 page 6060159 "NPR Event Attr. Row Templ."
 {
-    // NPR5.31/NPKNAV/20170502  CASE 269162 Transport NPR5.31 - 2 May 2017
-
     Caption = 'Attribute Row Templates';
     PageType = List;
     UsageCategory = Administration;
