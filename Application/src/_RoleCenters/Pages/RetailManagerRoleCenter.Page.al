@@ -7,10 +7,6 @@ page 6151241 "NPR Manager"
     {
         area(rolecenter)
         {
-            part("NP Retail SO Processor Act"; "NPR SO Processor Act")
-            {
-                ApplicationArea = All;
-            }
             part(Control6150616; "NPR Activities")
             {
                 ApplicationArea = All;

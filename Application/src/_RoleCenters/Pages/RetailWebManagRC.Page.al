@@ -13,11 +13,6 @@ page 6151244 "NPR Retail Web Manager RC"
                 ApplicationArea = Basic, Suite;
             }
 
-            part("NP Retail SO Processor Act"; "NPR SO Processor Act")
-            {
-                ApplicationArea = All;
-
-            }
             part(NPRETAILACTIVITIES; "NPR Activities")
             {
                 ApplicationArea = All;
