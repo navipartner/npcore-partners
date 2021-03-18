@@ -8,12 +8,11 @@ codeunit 6014401 "NPR Dimension Mgt."
         HasGotGLSetup: Boolean;
         GLSetupShortcutDimCode: array[8] of Code[20];
         Text002: Label 'This Shortcut Dimension is not defined in the %1.';
-
+    #region GetGLSetup
     local procedure GetGLSetup()
     var
         GLSetup: Record "General Ledger Setup";
     begin
-        //GetGLSetup
         if not HasGotGLSetup then begin
             GLSetup.Get;
             GLSetupShortcutDimCode[1] := GLSetup."Shortcut Dimension 1 Code";
@@ -27,14 +26,14 @@ codeunit 6014401 "NPR Dimension Mgt."
             HasGotGLSetup := true;
         end;
     end;
-
+    #endregion
+    #region UpdateDocDefaultDim
     procedure UpdateNPRDefaultDim(TableID: Integer; RegisterNo: Code[10]; SalesTicketNo: Code[20]; Date2: Date; SaleType: Option; LineNo: Integer; No: Code[20]; var GlobalDim1Code: Code[20]; var GlobalDim2Code: Code[20])
     var
         NPRLineDimension: Record "NPR Line Dimension";
         RecRef: RecordRef;
         ChangeLogMgt: Codeunit "Change Log Management";
     begin
-        //UpdateDocDefaultDim
         GetGLSetup;
         NPRLineDimension.SetRange("Table ID", TableID);
         NPRLineDimension.SetRange("Register No.", RegisterNo);
@@ -46,7 +45,7 @@ codeunit 6014401 "NPR Dimension Mgt."
         NPRLineDimension.DeleteAll;
         GlobalDim1Code := '';
         GlobalDim2Code := '';
-        if TempDimBuf2.Find('-') then begin
+        if TempDimBuf2.FindSet() then begin
             repeat
                 NPRLineDimension.Init;
                 NPRLineDimension.Validate("Table ID", TableID);
@@ -70,7 +69,8 @@ codeunit 6014401 "NPR Dimension Mgt."
             TempDimBuf2.DeleteAll;
         end;
     end;
-
+    #endregion
+    #region GetDefaultDim
     procedure GetDefaultDim(TableID: array[10] of Integer; No: array[10] of Code[20]; SourceCode: Code[20]; var GlobalDim1Code: Code[20]; var GlobalDim2Code: Code[20])
     var
         DefaultDimPriority1: Record "Default Dimension Priority";
@@ -80,11 +80,10 @@ codeunit 6014401 "NPR Dimension Mgt."
         j: Integer;
         NoFilter: array[2] of Code[20];
     begin
-        //GetDefaultDim
         GetGLSetup;
         TempDimBuf2.Reset;
         TempDimBuf2.DeleteAll;
-        if TempDimBuf1.Find('-') then begin
+        if TempDimBuf1.FindSet() then begin
             repeat
                 TempDimBuf2.Init;
                 TempDimBuf2 := TempDimBuf1;
@@ -98,13 +97,13 @@ codeunit 6014401 "NPR Dimension Mgt."
                 NoFilter[1] := No[i];
                 for j := 1 to 2 do begin
                     DefaultDim.SetRange("No.", NoFilter[j]);
-                    if DefaultDim.Find('-') then begin
+                    if DefaultDim.FindSet() then begin
                         repeat
                             if (DefaultDim."Dimension Value Code" <> '') or
                                (DefaultDim."Value Posting" = DefaultDim."Value Posting"::"Code Mandatory")
                             then begin
                                 TempDimBuf2.SetRange("Dimension Code", DefaultDim."Dimension Code");
-                                if not TempDimBuf2.Find('-') then begin
+                                if not TempDimBuf2.FindSet() then begin
                                     TempDimBuf2.Init;
                                     TempDimBuf2."Table ID" := DefaultDim."Table ID";
                                     TempDimBuf2."Entry No." := 0;
@@ -158,10 +157,10 @@ codeunit 6014401 "NPR Dimension Mgt."
         end;
         TempDimBuf2.Reset;
     end;
-
+    #endregion
+    #region TypeToTableEksp
     procedure TypeToTableNPR(Type: Option "G/L",Item,"Item Group",Repair,,Payment,"Open/Close",BOM,Customer,Comment): Integer
     begin
-        //TypeToTableEksp
         case Type of
             Type::"G/L":
                 exit(DATABASE::"G/L Account");
@@ -183,10 +182,10 @@ codeunit 6014401 "NPR Dimension Mgt."
                 exit(DATABASE::"NPR Retail Comment");
         end;
     end;
-
+    #endregion
+    #region DiscountTypeToTableNPR
     procedure DiscountTypeToTableNPR(Type: Option " ",Period,Mix,"Multi-Piece","Sales Card",BOM,,Rounding,Combination,Customer): Integer
     begin
-        //DiscountTypeToTableNPR
         case Type of
             Type::" ":
                 exit(0);
@@ -208,7 +207,8 @@ codeunit 6014401 "NPR Dimension Mgt."
                 exit(0);
         end;
     end;
-
+    #endregion
+    #region DeleteNPRDim
     procedure DeleteNPRDim(TableID: Integer; RegisterNo: Code[10]; SalesTicketNo: Code[20]; Date2: Date; SaleType: Option; LineNo: Integer; No: Code[20])
     var
         NPRLineDimension: Record "NPR Line Dimension";
@@ -223,13 +223,13 @@ codeunit 6014401 "NPR Dimension Mgt."
         NPRLineDimension.SetRange("No.", No);
         NPRLineDimension.DeleteAll;
     end;
-
+    #endregion
+    #region LookupDimValueCode
     procedure LookupDimValueCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     var
         DimVal: Record "Dimension Value";
         GLSetup: Record "General Ledger Setup";
     begin
-        //LookupDimValueCode
         GetGLSetup;
         if GLSetupShortcutDimCode[FieldNumber] = '' then
             Error(Text002, GLSetup.TableCaption);
@@ -242,19 +242,20 @@ codeunit 6014401 "NPR Dimension Mgt."
             ShortcutDimCode := DimVal.Code;
         end;
     end;
-
+    #endregion
+    #region ValidateDimValueCode
     procedure ValidateDimValueCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
-        //ValidateDimValueCode
         DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
     end;
-
+    #endregion
+    #region SaveDefaultDim
     procedure SaveDefaultDim(TableID: Integer; No: Code[20]; FieldNumber: Integer; ShortcutDimCode: Code[20])
     begin
-        //SaveDefaultDim
         DimMgt.SaveDefaultDim(TableID, No, FieldNumber, ShortcutDimCode);
     end;
-
+    #endregion
+    #region SaveEkspDim
     procedure SaveNPRDim(TableID: Integer; RegisterNo: Code[10]; SalesTicketNo: Code[20]; Date2: Date; SaleType: Option; LineNo: Integer; No: Code[20]; FieldNumber: Integer; ShortcutDimCode: Code[20])
     var
         NPRLineDim: Record "NPR Line Dimension";
@@ -262,7 +263,6 @@ codeunit 6014401 "NPR Dimension Mgt."
         xRecRef: RecordRef;
         ChangeLogMgt: Codeunit "Change Log Management";
     begin
-        //SaveEkspDim
         GetGLSetup;
         if ShortcutDimCode <> '' then begin
             if NPRLineDim.Get(TableID, RegisterNo, SalesTicketNo, Date2, SaleType, LineNo, No, GLSetupShortcutDimCode[FieldNumber]) then begin
@@ -304,14 +304,14 @@ codeunit 6014401 "NPR Dimension Mgt."
         end;
 
     end;
-
+    #endregion
+    #region SaveTempDim
     procedure SaveTempDim(FieldNumber: Integer; ShortcutDimCode: Code[20])
     begin
-        //SaveTempDim
         GetGLSetup;
         TempDimBuf2.SetRange("Dimension Code", GLSetupShortcutDimCode[FieldNumber]);
         if ShortcutDimCode <> '' then begin
-            if TempDimBuf2.Find('-') then begin
+            if TempDimBuf2.FindFirst() then begin
                 TempDimBuf2.Validate("Dimension Value Code", ShortcutDimCode);
                 TempDimBuf2.Modify;
             end else begin
@@ -323,10 +323,11 @@ codeunit 6014401 "NPR Dimension Mgt."
                 TempDimBuf2.Insert;
             end;
         end else
-            if TempDimBuf2.Find('-') then begin
+            if TempDimBuf2.FindFirst() then begin
                 TempDimBuf2."Dimension Value Code" := '';
                 TempDimBuf2.Modify;
             end;
     end;
+    #endregion
 }
 

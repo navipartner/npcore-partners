@@ -1,13 +1,7 @@
 codeunit 6014598 "NPR POS End Sale: Dim.SaleStat"
 {
-    // NPR5.38/ANEN/20171228 CASE 298185 Functions to register stat on dimension in trans.
-    // NPR5.40/TSA /20180126 CASE 303399 Using setup to dictate which action to run on view change
-    // NPR5.40/TSA /20180305 CASE 303399 Refactored because action parameter storage has changed
-    // NPR5.40/VB  /20180307 CASE 306347 Refactored retrieval of POS Action
-    // NPR5.54/TSA /20200220 CASE 391850 Handled the POSSetup per unit
 
-
-    [EventSubscriber(ObjectType::Codeunit, 6150704, 'OnBeforeChangeToPaymentView', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Front End Management", 'OnBeforeChangeToPaymentView', '', true, true)]
     local procedure CU_CodeunitPOSFrontEndManagement_OnBeforeChangeToPaymentView(var Sender: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session")
     var
         POSAction: Record "NPR POS Action";
@@ -15,20 +9,12 @@ codeunit 6014598 "NPR POS End Sale: Dim.SaleStat"
         POSParameterValue: Record "NPR POS Parameter Value";
         Setup: Codeunit "NPR POS Setup";
     begin
-        //-NPR5.40 [303399]
-
-        //-NPR5.54 [391850]
-        // POSSetup.GET ();
         POSSession.GetSetup(Setup);
         Setup.GetNamedActionSetup(POSSetup);
-        //+NPR5.54 [391850]
 
         if (POSSetup."OnBeforePaymentView Action" <> '') then begin
-            //-NPR5.40 [306347]
-            //  POSAction.GET (POSSetup."OnBeforePaymentView Action");
             if not POSSession.RetrieveSessionAction(POSSetup."OnBeforePaymentView Action", POSAction) then
                 POSAction.Get(POSSetup."OnBeforePaymentView Action");
-            //+NPR5.40 [306347]
 
             POSParameterValue.FilterParameters(POSSetup.RecordId, POSSetup.FieldNo("OnBeforePaymentView Action"));
 
@@ -47,14 +33,10 @@ codeunit 6014598 "NPR POS End Sale: Dim.SaleStat"
                         else
                             POSAction.SetWorkflowInvocationParameter(POSParameterValue.Name, POSParameterValue.Value, Sender);
                     end;
-
                 until (POSParameterValue.Next() = 0);
-
             end;
-
             Sender.InvokeWorkflow(POSAction);
         end;
-        //+NPR5.40 [303399]
     end;
 
     local procedure ToInteger(TextValue: Text) IntegerValue: Integer
