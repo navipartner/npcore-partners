@@ -1,7 +1,5 @@
 table 6060165 "NPR Event Exc.Int.Summ. Buffer"
 {
-    // NPR5.39/TJ  /20180214 CASE 285388 New object
-
     Caption = 'Event Exc. Int. Summary Buffer';
     DataClassification = CustomerContent;
 
@@ -44,10 +42,6 @@ table 6060165 "NPR Event Exc.Int.Summ. Buffer"
         key(Key1; "Entry No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

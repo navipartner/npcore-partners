@@ -1,8 +1,5 @@
 page 6060160 "NPR Event Attribute Templ."
 {
-    // NPR5.31/NPKNAV/20170502  CASE 269162 Transport NPR5.31 - 2 May 2017
-    // NPR5.33/NPKNAV/20170630  CASE 277946 Transport NPR5.33 - 30 June 2017
-
     Caption = 'Attribute Templates';
     PageType = List;
     SourceTable = "NPR Event Attribute Template";

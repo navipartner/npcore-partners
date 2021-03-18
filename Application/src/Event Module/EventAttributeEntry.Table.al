@@ -1,9 +1,5 @@
 table 6060159 "NPR Event Attribute Entry"
 {
-    // NPR5.31/NPKNAV/20170502  CASE 269162 Transport NPR5.31 - 2 May 2017
-    // NPR5.33/TJ  /20170530 CASE 277946 New fields Filter and Filter Name
-    // NPR5.55/TJ  /20200427 CASE 400214 Added TableRelation property to field "Template Name"
-
     Caption = 'Event Attribute Entry';
     DataClassification = CustomerContent;
 
@@ -64,10 +60,6 @@ table 6060159 "NPR Event Attribute Entry"
         key(Key1; "Entry No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

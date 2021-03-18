@@ -1,7 +1,5 @@
 page 6059831 "NPR Event Period Distr. Dialog"
 {
-    // NPR5.55/TJ  /20200326 CASE 397741 New object
-
     Caption = 'Event Period Distr. Dialog';
     PageType = StandardDialog;
     UsageCategory = Administration;
@@ -147,10 +145,6 @@ page 6059831 "NPR Event Period Distr. Dialog"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnOpenPage()
     begin
         IncludeAllDays();
@@ -158,10 +152,6 @@ page 6059831 "NPR Event Period Distr. Dialog"
 
     var
         JobPlanningLineTemp: Record "Job Planning Line" temporary;
-        StartDate: Date;
-        EndDate: Date;
-        StartTime: Time;
-        EndTime: Time;
         DaysOfWeek: array[7] of Boolean;
         DateError: Label '%1 must be before %2.';
         DaysOfWeekOption: Option All,Some;

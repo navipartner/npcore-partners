@@ -1,9 +1,5 @@
 codeunit 6060165 "NPR Event Plan.Line Group. Mgt"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         NoDaysSetErr: Label 'You need to set at least one day of the week.';
         RecreateConfirm: Label 'This line will be deleted and recreated. Any related grouping lines will be deleted and recreated per new setup. Do you want to continue?';

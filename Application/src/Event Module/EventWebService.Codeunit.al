@@ -1,12 +1,5 @@
 codeunit 6060158 "NPR Event Web Service"
 {
-    // NPR5.48/TJ  /20190124 CASE 263728 New object
-
-
-    trigger OnRun()
-    begin
-    end;
-
     procedure CopyEventFromTemplate(BundledItemNo: Code[20]; TemplateEventNo: Code[20]; BillToCustomerNo: Code[20]; BundledItemQuantity: Decimal; BundledItemPrice: Decimal; StartDateTime: DateTime; EndDateTime: DateTime; AdditionalItems: XMLport "NPR Event Import Opt. Items"; var ReturnMessage: Text): Boolean
     var
         EventSalesSetup: Record "NPR Event Web Sales Setup";
@@ -109,7 +102,6 @@ codeunit 6060158 "NPR Event Web Service"
         AdditionalItems.GetOptionalItems(TempJobPlanningLine);
         if TempJobPlanningLine.FindSet then
             repeat
-                //JobPlanningLine := TempJobPlanningLine;
                 JobPlanningLine.Init;
                 JobPlanningLine."Job No." := TargetJob."No.";
                 JobPlanningLine."Job Task No." := JobTask."Job Task No.";

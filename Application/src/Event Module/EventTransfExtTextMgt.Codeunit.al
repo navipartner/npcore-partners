@@ -1,12 +1,5 @@
 codeunit 6060163 "NPR Event Transf.Ext.Text Mgt."
 {
-    // NPR5.49/TJ  /20190218 CASE 345047 New object
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         GLAcc: Record "G/L Account";
         Item: Record Item;

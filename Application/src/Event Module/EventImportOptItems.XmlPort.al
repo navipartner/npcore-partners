@@ -1,7 +1,5 @@
 xmlport 6060150 "NPR Event Import Opt. Items"
 {
-    // NPR5.48/TJ  /20190124 CASE 263728 New object
-
     Caption = 'Event Import Optional Items';
     UseDefaultNamespace = true;
 
@@ -36,18 +34,6 @@ xmlport 6060150 "NPR Event Import Opt. Items"
                     "Job Planning Line"."Line No." := i;
                 end;
             }
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 

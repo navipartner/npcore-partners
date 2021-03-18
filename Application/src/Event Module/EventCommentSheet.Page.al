@@ -38,10 +38,6 @@ page 6059834 "NPR Event Comment Sheet"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         SetUpNewLine;

@@ -1,7 +1,5 @@
 page 6151579 "NPR Event Exch.Int.Tmp.Entries"
 {
-    // NPR5.34/TJ  /20170728 CASE 277938 New object
-
     Caption = 'Event Exch. Int. Temp. Entries';
     PageType = List;
     UsageCategory = Administration;
@@ -31,10 +29,6 @@ page 6151579 "NPR Event Exch.Int.Tmp.Entries"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

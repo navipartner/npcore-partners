@@ -57,7 +57,7 @@ page 6060157 "NPR Event Word Layouts"
                 Caption = 'Copy';
                 Image = CopyDocument;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Make a copy of a layout.';
 
@@ -74,7 +74,7 @@ page 6060157 "NPR Event Word Layouts"
                 Caption = 'Import Layout';
                 Image = Import;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Import a layout Word file.';
@@ -89,30 +89,14 @@ page 6060157 "NPR Event Word Layouts"
                 Caption = 'Export Layout';
                 Image = Export;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
-                ToolTip = 'Export a layout to a Word file.';
+                ToolTip = 'Export a layout to a Word file. Then you can Edit it in Word, save the changes to the file, and chose Import Layout action to import it back to BC.';
 
                 trigger OnAction()
                 begin
                     Rec.ExportLayout('', true);
-                end;
-            }
-            action(EditLayout)
-            {
-                Caption = 'Edit Layout';
-                Image = EditReminder;
-                Promoted = true;
-				PromotedOnly = true;
-                PromotedCategory = Process;
-                Visible = CanEdit;
-                ApplicationArea = All;
-                ToolTip = 'Edit the report layout in Word, make changes to the file, and close Word to continue.';
-
-                trigger OnAction()
-                begin
-                    Rec.EditLayout;
                 end;
             }
             action(UpdateWordLayout)
@@ -138,7 +122,7 @@ page 6060157 "NPR Event Word Layouts"
                 Caption = 'Preview Report';
                 Image = "Report";
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = "Report";
                 ApplicationArea = All;
                 ToolTip = 'Preview the report as pdf.';
@@ -153,7 +137,7 @@ page 6060157 "NPR Event Word Layouts"
                 Caption = 'Request Page';
                 Image = "Report";
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = "Report";
                 ApplicationArea = All;
                 ToolTip = 'View or set filters to be applied to the report.';
@@ -188,7 +172,6 @@ page 6060157 "NPR Event Word Layouts"
         Job: Record Job;
         UpdateSuccesMsg: Label 'Layout has been updated to use the current report design.';
         UpdateNotRequiredMsg: Label 'Layout is up-to-date. No further updates are required.';
-        CaptionTxt: Label '%1 - %2 %3', Locked = true;
         PageCaption: Text;
         CanEdit: Boolean;
         IsWindowsClient: Boolean;

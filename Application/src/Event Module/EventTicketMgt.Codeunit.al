@@ -1,29 +1,5 @@
 codeunit 6060154 "NPR Event Ticket Mgt."
 {
-    // NPR5.29/NPKNAV/20170127  CASE 248723 Transport NPR5.29 - 27 januar 2017
-    // NPR5.30/TJ  /20170228 CASE 265580 Fixed an issue with updating ticket qty. for any item (not just ticket)
-    // NPR5.34/TJ  /20170725 CASE 285043 Removed issuing a ticket when registering
-    //                                   Function CreateTicketReservRequest is not Local anymore
-    //                                   Revoking a ticket can only be achieved if ticket status is Registered
-    //                                   Several functions are recoded to either show an error or just exit
-    // NPR5.36/TJ  /20170901 CASE 289046 New functions for ticket removal
-    //                                   Removed subscriber JobPlanningLineOnAfterDelete and created new subscriber JobPlanningLineOnBeforeDelete
-    //                                   Removed subscriber JobPlanningLineTypeOnAfterValidate
-    // NPR5.43/TJ  /20170811 CASE 262079 New functions for collecting/showing tickets from ticket server
-    // NPR5.45/TJ  /20180122 CASE 303044 Fixed an issue regarding deleting ticket line with blank Ticket Status
-    // NPR5.45/TJ  /20180802 CASE 318710 Fixed an issue with ticket confirmation and log
-    // NPR5.45/TJ  /20180727 CASE 323386 Fixed the issue with ticket reservation editing
-    // NPR5.48/TJ  /20181112 CASE 323386 Allowing ticket quantity change regardless of default schedule
-    // NPR5.48/TJ  /20181113 CASE 335824 Removed/recoded any usage of field Ticket No. on table Job Planning Line
-    //                                   New function ShowIssuedTickets
-    //                                   Revoking is now done from the Ticket List/Ticket Request list
-    // NPR5.55/TJ  /20200109 CASE 377120 Recoded reservation request creation
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         TicketContext: Label 'TICKET';
         EventMgt: Codeunit "NPR Event Management";
@@ -44,14 +20,8 @@ codeunit 6060154 "NPR Event Ticket Mgt."
         Job.Get(Rec."Job No.");
         if not EventMgt.IsEventJob(Job) then
             exit;
-        //-NPR5.43 [262079]
-        //Rec."Ticket Token" := '';
         Rec.Validate("NPR Ticket Token", '');
-        //+NPR5.43 [262079]
         Rec."NPR Ticket Status" := Rec."NPR Ticket Status"::" ";
-        //-NPR5.48 [335824]
-        //Rec."Ticket No." := '';
-        //+NPR5.48 [335824]
         Rec.Modify;
     end;
 
@@ -60,7 +30,6 @@ codeunit 6060154 "NPR Event Ticket Mgt."
     var
         Job: Record Job;
     begin
-        //-NPR5.36 [289046]
         if not RunTrigger then
             exit;
         Job.Get(Rec."Job No.");
@@ -68,7 +37,6 @@ codeunit 6060154 "NPR Event Ticket Mgt."
             exit;
         if IsValidTicket(Rec, false) and not ConfirmTicketDelete(Rec, true, true) then
             Error('');
-        //+NPR5.36 [289046]
     end;
 
     [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'No.', false, false)]
@@ -81,21 +49,11 @@ codeunit 6060154 "NPR Event Ticket Mgt."
         Job.Get(Rec."Job No.");
         if not EventMgt.IsEventJob(Job) then
             exit;
-        //-NPR5.36 [289046]
-        /*
-        IF Rec.Type = Rec.Type::Item THEN BEGIN
-          IF Rec."No." <> xRec."No." THEN
-            DeleteTicketReservRequest(Rec,TRUE,TRUE);
-        */
         if IsValidTicket(Rec, false) then begin
             if Rec."No." <> xRec."No." then
                 ConfirmTicketDelete(Rec, true, true);
-            //+NPR5.36 [289046]
             if Rec."No." <> '' then
-                //-NPR5.34 [285043]
-                //CreateTicketReservRequest(Rec);
                 CreateTicketReservRequest(Rec, false, false);
-            //+NPR5.34 [285043]
         end;
 
     end;
@@ -112,17 +70,7 @@ codeunit 6060154 "NPR Event Ticket Mgt."
         if Rec.Type = Rec.Type::Item then begin
             if Rec.Quantity = xRec.Quantity then
                 exit;
-            //-NPR5.48 [323386]
-            /*
-            //-NPR5.45 [323386]
-            UpdateAllowed := xRec.Quantity = 0;
-            IF NOT UpdateAllowed THEN
-              UpdateAllowed := NOT RedirectToEditReservation(Rec,0,CurrFieldNo);
-            IF UpdateAllowed THEN
-            //+NPR5.45 [323386]
-            */
             if CurrFieldNo = Rec.FieldNo(Quantity) then
-                //+NPR5.48 [323386]
                 UpdateReservReqQty(Rec);
         end;
 
@@ -146,18 +94,8 @@ codeunit 6060154 "NPR Event Ticket Mgt."
         ReqExists: Boolean;
     begin
         if Rec."NPR Ticket Collect Status" in [Rec."NPR Ticket Collect Status"::" ", Rec."NPR Ticket Collect Status"::"Not Collected"] then begin
-            //-NPR5.48 [335824]
-            /*
-            IF TMTicket.GET(Rec."Ticket No.") THEN
-              ReqExists := TMTicketResRequest.GET(TMTicket."Ticket Reservation Entry No.")
-            ELSE BEGIN
-            */
-            //+NPR5.48 [335824]
             TMTicketResRequest.SetRange("Session Token ID", Rec."NPR Ticket Token");
             ReqExists := TMTicketResRequest.FindFirst;
-            //-NPR5.48 [335824]
-            //END;
-            //+NPR5.48 [335824]
             if ReqExists then begin
                 TMTicketResRequest."DIY Print Order Requested" := false;
                 TMTicketResRequest.Modify;
@@ -172,23 +110,13 @@ codeunit 6060154 "NPR Event Ticket Mgt."
         QtyZeroOrLessNotAllowed: Label '%1 can''t be less than or equal to 0.';
         TicketResReqExists: Label 'Ticket reservation request already exists.';
     begin
-        //-NPR5.34 [285043]
-        //IF NOT IsValidTicket(JobPlanningLine) THEN
         if not IsValidTicket(JobPlanningLine, ShowError) then
-            //+NPR5.34 [285043]
             exit;
         if JobPlanningLine.Quantity <= 0 then
-            //-NPR5.34 [285043]
             if ShowError then
                 Error(QtyZeroOrLessNotAllowed)
             else
-                //+NPR5.34 [285043]
                 exit;
-        //-NPR5.34 [285043]
-        /*
-        IF JobPlanningLine."Ticket Token" <> '' THEN
-          EXIT;
-        */
         if TicketRequestManager.TokenRequestExists(JobPlanningLine."NPR Ticket Token") then
             if ShowError then
                 Error(TicketResReqExists)
@@ -200,73 +128,10 @@ codeunit 6060154 "NPR Event Ticket Mgt."
                 Error(ProperTicketStatusErr, JobPlanningLine.FieldCaption("NPR Ticket Status"), JobPlanningLine."NPR Ticket Status"::" ", JobPlanningLine."NPR Ticket Status"::Revoked)
             else
                 exit;
-        //+NPR5.34 [285043]
-        //-NPR5.55 [377120]
-        //CreateReservationRequest(JobPlanningLine,JobPlanningLine."Ticket Token" = '');
         JobPlanningLine.Validate("NPR Ticket Token", TicketRequestManager.POS_CreateReservationRequest('', 0, JobPlanningLine."No.", JobPlanningLine."Variant Code", JobPlanningLine.Quantity, ''));
         JobPlanningLine."NPR Ticket Status" := JobPlanningLine."NPR Ticket Status"::Registered;
-        //+NPR5.55 [377120]
-        //-NPR5.34 [285043]
-        //IssueTicketWithLog(JobPlanningLine,FALSE);
         if FromAction then
             JobPlanningLine.Modify;
-        //+NPR5.34 [285043]
-
-    end;
-
-    local procedure CreateReservationRequest(var JobPlanningLine: Record "Job Planning Line"; RequestNewToken: Boolean)
-    var
-        TicketReservRequest: Record "NPR TM Ticket Reservation Req.";
-        Admission: Record "NPR TM Admission";
-        TicketAdmBOM: Record "NPR TM Ticket Admission BOM";
-        TicketManagement: Codeunit "NPR TM Ticket Management";
-        TicketReqManager: Codeunit "NPR TM Ticket Request Manager";
-        AdmSchEntry: Record "NPR TM Admis. Schedule Entry";
-    begin
-        //-NPR5.55 [377120]
-        /*
-        IF RequestNewToken THEN
-          //-NPR5.43 [262079]
-          //JobPlanningLine."Ticket Token" := TicketReqManager.GetNewToken();
-          JobPlanningLine.VALIDATE("Ticket Token",TicketReqManager.GetNewToken());
-          //+NPR5.43 [262079]
-        JobPlanningLine."Ticket Status" := JobPlanningLine."Ticket Status"::Registered;
-        
-        TicketAdmBOM.SETRANGE("Item No.",JobPlanningLine."No.");
-        TicketAdmBOM.SETRANGE("Variant Code",JobPlanningLine."Variant Code");
-        TicketAdmBOM.FINDSET();
-        REPEAT
-          Admission.GET(TicketAdmBOM."Admission Code");
-        
-          CLEAR(TicketReservRequest);
-          TicketReservRequest."Entry No." := 0;
-          TicketReservRequest."Session Token ID" := JobPlanningLine."Ticket Token";
-          TicketReservRequest."Ext. Line Reference No." := JobPlanningLine."Line No.";
-          TicketReservRequest."Admission Code" := TicketAdmBOM."Admission Code";
-        
-          TicketReservRequest."External Item Code" := TicketReqManager.GetExternalNo(JobPlanningLine."No.",JobPlanningLine."Variant Code");
-          TicketReservRequest.Quantity := JobPlanningLine.Quantity;
-          TicketReservRequest."External Member No." := '';
-          TicketReservRequest."Admission Description" := Admission.Description;
-        
-          CASE Admission."Default Schedule" OF
-            Admission."Default Schedule"::TODAY,
-            Admission."Default Schedule"::NEXT_AVAILABLE:
-              IF AdmSchEntry.GET(TicketManagement.GetCurrentScheduleEntry(Admission."Admission Code", TRUE)) THEN BEGIN
-                TicketReservRequest."External Adm. Sch. Entry No." := AdmSchEntry."External Schedule Entry No.";
-                TicketReservRequest."Scheduled Time Description" := STRSUBSTNO('%1 - %2',AdmSchEntry."Admission Start Date",AdmSchEntry."Admission Start Time");
-              END;
-          END;
-        
-          TicketReservRequest."Created Date Time" := CURRENTDATETIME;
-          TicketReservRequest."Request Status" := TicketReservRequest."Request Status"::WIP;
-          TicketReservRequest."Request Status Date Time" := CURRENTDATETIME;
-          TicketReservRequest."Expires Date Time" := CURRENTDATETIME + 1500 * 1000;
-          TicketReservRequest.INSERT;
-        UNTIL TicketAdmBOM.NEXT = 0;
-        */
-        //+NPR5.55 [377120]
-
     end;
 
     local procedure DeleteTicketReservRequest(var JobPlanningLine: Record "Job Planning Line"; RemoveRequest: Boolean; RemoveToken: Boolean)
@@ -277,14 +142,8 @@ codeunit 6060154 "NPR Event Ticket Mgt."
             exit;
         TicketRequestManager.DeleteReservationRequest(JobPlanningLine."NPR Ticket Token", RemoveRequest);
         JobPlanningLine."NPR Ticket Status" := JobPlanningLine."NPR Ticket Status"::" ";
-        //-NPR5.48 [335824]
-        //JobPlanningLine."Ticket No." := '';
-        //+NPR5.48 [335824]
         if RemoveToken then
-            //-NPR5.43 [262079]
-            //JobPlanningLine."Ticket Token" := '';
             JobPlanningLine.Validate("NPR Ticket Token", '');
-        //+NPR5.43 [262079]
     end;
 
     local procedure IsValidTicket(JobPlanningLine: Record "Job Planning Line"; ShowError: Boolean): Boolean
@@ -293,36 +152,25 @@ codeunit 6060154 "NPR Event Ticket Mgt."
         TicketType: Record "NPR TM Ticket Type";
     begin
         if JobPlanningLine.Type <> JobPlanningLine.Type::Item then
-            //-NPR5.34 [285043]
             if ShowError then
                 JobPlanningLine.TestField(Type, JobPlanningLine.Type::Item)
             else
-                //+NPR5.34 [285043]
                 exit(false);
-        //-NPR5.36 [289046]
-        //Item.GET(JobPlanningLine."No.");
         if Item.Get(JobPlanningLine."No.") then begin
-            //+NPR5.36 [289046]
             if Item."NPR Ticket Type" = '' then
-                //-NPR5.34 [285043]
                 if ShowError then
                     Item.TestField("NPR Ticket Type")
                 else
-                    //+NPR5.34 [285043]
                     exit(false);
             TicketType.Get(Item."NPR Ticket Type");
             if (not TicketType."Is Ticket") then
-                //-NPR5.34 [285043]
                 if ShowError then
                     TicketType.TestField("Is Ticket")
                 else
-                    //+NPR5.34 [285043]
                     exit;
             exit(true);
-            //-NPR5.36 [289046]
         end;
         exit(false);
-        //+NPR5.36 [289046]
     end;
 
     procedure IssueTicketWithLog(var JobPlanningLine: Record "Job Planning Line"; FromAction: Boolean)
@@ -333,31 +181,15 @@ codeunit 6060154 "NPR Event Ticket Mgt."
         ActivityDescription: Label 'Issueing ticket...';
         TicketNo: Code[20];
     begin
-        //-NPR5.34 [285043]
-        /*
-        IF JobPlanningLine."Ticket Status" = JobPlanningLine."Ticket Status"::Revoked THEN BEGIN
-        //  DeleteTicketReservRequest(JobPlanningLine,TRUE,FALSE);
-          CreateReservationRequest(JobPlanningLine,JobPlanningLine."Ticket Token" = '');
-        END;
-        */
         IsValidTicket(JobPlanningLine, true);
-        //+NPR5.34 [285043]
-        //-NPR5.45 [323386]
         RedirectToEditReservation(JobPlanningLine, 1, 0);
-        //+NPR5.45 [323386]
         if TicketRequestManager.IssueTicketFromReservationToken(JobPlanningLine."NPR Ticket Token", false, ResponseMessage) <> 0 then
             ActivityLog.LogActivity(JobPlanningLine.RecordId, 1, TicketContext, ActivityDescription, CopyStr(ResponseMessage, 1, MaxStrLen(ActivityLog."Activity Message")))
         else
             JobPlanningLine."NPR Ticket Status" := JobPlanningLine."NPR Ticket Status"::Issued;
-        //-NPR5.48 [335824]
-        /*
-        IF TicketRequestManager.GetTokenTicket(JobPlanningLine."Ticket Token",TicketNo) THEN
-          JobPlanningLine."Ticket No." := TicketNo;
-        */
-        //+NPR5.48 [335824]
+
         if FromAction then
             JobPlanningLine.Modify;
-
     end;
 
     procedure EditTicketReservationWithLog(var JobPlanningLine: Record "Job Planning Line")
@@ -368,23 +200,14 @@ codeunit 6060154 "NPR Event Ticket Mgt."
         TicketNo: Code[20];
         ActivityDescription: Label 'Editing reservation...';
     begin
-        //-NPR5.45 [323386]
         if JobPlanningLine."NPR Ticket Token" = '' then
             exit;
         if AcquireTicketAdmissionSchedule(JobPlanningLine, ResponseMessage) then begin
             JobPlanningLine."NPR Ticket Status" := JobPlanningLine."NPR Ticket Status"::Issued;
-            //-NPR5.48 [335824]
-            /*
-            IF TicketRequestManager.GetTokenTicket(JobPlanningLine."Ticket Token",TicketNo) THEN
-              JobPlanningLine."Ticket No." := TicketNo;
-            */
-            //+NPR5.48 [335824]
             JobPlanningLine.Modify;
         end else
             if ResponseMessage <> '' then
                 ActivityLog.LogActivity(JobPlanningLine.RecordId, 1, TicketContext, ActivityDescription, CopyStr(ResponseMessage, 1, MaxStrLen(ActivityLog."Activity Message")));
-        //+NPR5.45 [323386]
-
     end;
 
     procedure EditTicketHolder(JobPlanningLine: Record "Job Planning Line")
@@ -398,24 +221,13 @@ codeunit 6060154 "NPR Event Ticket Mgt."
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
     begin
-        //-NPR5.30 [265580]
-        //-NPR5.34 [285043]
-        //IF NOT IsValidTicket(JobPlanningLine) THEN
         if not IsValidTicket(JobPlanningLine, false) then
-            //+NPR5.34 [285043]
             exit;
-        //+NPR5.30 [265580]
         if JobPlanningLine."NPR Ticket Token" = '' then begin
-            //-NPR5.34 [285043]
-            //CreateTicketReservRequest(JobPlanningLine);
             CreateTicketReservRequest(JobPlanningLine, false, false);
-            //+NPR5.34 [285043]
-            //  IssueTicketWithLog(JobPlanningLine,FALSE);
         end;
-        //-NPR5.34 [285043]
         if JobPlanningLine."NPR Ticket Status" in [JobPlanningLine."NPR Ticket Status"::Issued, JobPlanningLine."NPR Ticket Status"::Confirmed] then
             Error(ProperTicketStatusErr, JobPlanningLine.FieldCaption("NPR Ticket Status"), JobPlanningLine."NPR Ticket Status"::Registered, JobPlanningLine."NPR Ticket Status"::Revoked);
-        //+NPR5.34 [285043]
         TicketRequestManager.UpdateReservationQuantity(JobPlanningLine."NPR Ticket Token", JobPlanningLine.Quantity);
     end;
 
@@ -429,10 +241,7 @@ codeunit 6060154 "NPR Event Ticket Mgt."
     begin
         TicketReservationRequest.FilterGroup(2);
         TicketReservationRequest.SetCurrentKey("Session Token ID");
-        //-NPR5.45 [323386]
-        //TicketReservationRequest.SETFILTER("Session Token ID",'=%1',Token);
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', JobPlanningLine."NPR Ticket Token");
-        //+NPR5.45 [323386]
         TicketReservationRequest.FilterGroup(0);
         TicketReservationRequest.FindSet();
         repeat
@@ -445,11 +254,6 @@ codeunit 6060154 "NPR Event Ticket Mgt."
         DisplayTicketeservationRequest.SetTableView(TicketReservationRequest);
         DisplayTicketeservationRequest.LookupMode(true);
         DisplayTicketeservationRequest.Editable(true);
-        //-NPR5.45 [323386]
-        /*
-        IF DisplayTicketeservationRequest.RUNMODAL = ACTION::LookupOK THEN
-          EXIT(TRUE);
-        */
         DisplayTicketeservationRequest.LoadTicketRequest(JobPlanningLine."NPR Ticket Token");
         DisplayTicketeservationRequest.SetTicketItem(JobPlanningLine."No.", JobPlanningLine."Variant Code");
         DisplayTicketeservationRequest.AllowQuantityChange(true);
@@ -461,7 +265,6 @@ codeunit 6060154 "NPR Event Ticket Mgt."
                 exit(true);
             end;
         end;
-        //+NPR5.45 [323386]
         exit(false);
 
     end;
@@ -472,7 +275,6 @@ codeunit 6060154 "NPR Event Ticket Mgt."
         Admission: Record "NPR TM Admission";
         ErrorMsg: Text;
     begin
-        //-NPR5.45 [323386]
         Redirect := false;
         TicketBOM.SetRange("Item No.", JobPlanningLine."No.");
         TicketBOM.SetRange("Variant Code", JobPlanningLine."Variant Code");
@@ -492,7 +294,6 @@ codeunit 6060154 "NPR Event Ticket Mgt."
                     Redirect := true;
                 end;
             until (TicketBOM.Next = 0) or Redirect;
-        //+NPR5.45 [323386]
     end;
 
     local procedure AcquireTicketParticipant(Token: Text[100]; ExternalMemberNo: Code[20]): Boolean
@@ -559,55 +360,6 @@ codeunit 6060154 "NPR Event Ticket Mgt."
         //END;
         */
         //+NPR5.48 [335824]
-
-    end;
-
-    local procedure CreateRevokeRequest(var JobPlanningLine: Record "Job Planning Line")
-    begin
-        //-NPR5.48 [335824]
-        /*
-        Ticket.GET(JobPlanningLine."Ticket No.");
-        
-        //-NPR5.43 [262079]
-        //JobPlanningLine."Ticket Token" := TicketRequestManager.GetNewToken();
-        JobPlanningLine.VALIDATE("Ticket Token",TicketRequestManager.GetNewToken());
-        //+NPR5.43 [262079]
-        
-        TicketAccessEntry.SETRANGE("Ticket No.",Ticket."No.");
-        TicketAccessEntry.FINDSET;
-        REPEAT
-          Admission.GET(TicketAccessEntry."Admission Code");
-        
-          DetTicketAccessEntry.SETRANGE("Ticket Access Entry No.",TicketAccessEntry."Entry No.");
-          DetTicketAccessEntry.SETRANGE(Type,DetTicketAccessEntry.Type::ADMITTED);
-          IF DetTicketAccessEntry.FINDFIRST THEN
-            ERROR(TICKET_USED,JobPlanningLine."Ticket No.",Admission.Description,DetTicketAccessEntry."Created Datetime");
-        
-          DetTicketAccessEntry.SETRANGE(Type,DetTicketAccessEntry.Type::CANCELED);
-          IF DetTicketAccessEntry.FINDFIRST THEN
-            ERROR(TICKET_CANCELLED,JobPlanningLine."Ticket No.",DetTicketAccessEntry."Created Datetime");
-        
-          CLEAR(ReservationRequest);
-          ReservationRequest."Entry No." := 0;
-          ReservationRequest."Session Token ID" := JobPlanningLine."Ticket Token";
-          ReservationRequest."Ext. Line Reference No." := JobPlanningLine."Line No.";
-          ReservationRequest."Admission Code" := TicketAccessEntry."Admission Code";
-        
-          ReservationRequest."Revoke Ticket Request" := TRUE;
-          ReservationRequest."Revoke Access Entry No." := TicketAccessEntry."Entry No.";
-        
-          ReservationRequest."External Member No." := Ticket."External Member Card No.";
-          ReservationRequest."Admission Description" := Admission.Description;
-        
-          ReservationRequest."Created Date Time" := CURRENTDATETIME;
-          ReservationRequest."Request Status" := ReservationRequest."Request Status"::WIP;
-          ReservationRequest."Request Status Date Time" := CURRENTDATETIME;
-          ReservationRequest."Expires Date Time" := CURRENTDATETIME + 1500 * 1000;
-          ReservationRequest.INSERT;
-        UNTIL TicketAccessEntry.NEXT = 0;
-        */
-        //+NPR5.48 [335824]
-
     end;
 
     procedure ConfirmTicketWithLog(var JobPlanningLine: Record "Job Planning Line")
@@ -617,33 +369,20 @@ codeunit 6060154 "NPR Event Ticket Mgt."
         ResponseMessage: Text;
     begin
         JobPlanningLine.TestField("NPR Ticket Token");
-        //-NPR5.48 [335824]
-        //JobPlanningLine.TESTFIELD("Ticket No.");
-        //+NPR5.48 [335824]
         JobPlanningLine.TestField("NPR Ticket Status", JobPlanningLine."NPR Ticket Status"::Issued);
-        //-NPR5.45 [318710]
-        /*
-        IF NOT ConfirmTicket(JobPlanningLine) THEN
-          ActivityLog.LogActivity(JobPlanningLine.RECORDID,1,TicketContext,ActivityDescription,COPYSTR(GETLASTERRORTEXT,1,MAXSTRLEN(ActivityLog."Activity Message")))
-        */
         if not ConfirmTicket(JobPlanningLine, ResponseMessage) then
             ActivityLog.LogActivity(JobPlanningLine.RecordId, 1, TicketContext, ActivityDescription, CopyStr(ResponseMessage, 1, MaxStrLen(ActivityLog."Activity Message")))
-        //+NPR5.45 [318710]
         else begin
             JobPlanningLine."NPR Ticket Status" := JobPlanningLine."NPR Ticket Status"::Confirmed;
             JobPlanningLine.Modify;
         end;
-
     end;
 
     local procedure ConfirmTicket(JobPlanningLine: Record "Job Planning Line"; var ResponseMessage: Text): Boolean
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
     begin
-        //-NPR5.45 [318710]
-        //TicketRequestManager.ConfirmReservationRequestWithValidate(JobPlanningLine."Ticket Token");
         exit(TicketRequestManager.ConfirmReservationRequest(JobPlanningLine."NPR Ticket Token", ResponseMessage));
-        //+NPR5.45 [318710]
     end;
 
     procedure CheckItemIsTicketAndRemove(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; RemoveRequest: Boolean; RemoveToken: Boolean): Boolean
@@ -659,10 +398,8 @@ codeunit 6060154 "NPR Event Ticket Mgt."
     var
         TicketRemoveConfirm: Label 'There''s already a ticket reservation or an issued ticket. Do you want these to be removed?';
     begin
-        //-NPR5.45 [303044]
         if Rec."NPR Ticket Status" = Rec."NPR Ticket Status"::" " then
             exit(true);
-        //+NPR5.45 [303044]
 
         if Rec."NPR Ticket Status" <> Rec."NPR Ticket Status"::" " then
             if Confirm(TicketRemoveConfirm) then begin
@@ -710,17 +447,11 @@ codeunit 6060154 "NPR Event Ticket Mgt."
     begin
         TMTicketSetup.Get();
         TMTicketSetup.TestField("Print Server Order URL");
-        //-NPR5.48 [335824]
-        /*
-        TMTicket.GET(Rec."Ticket No.");
-        TMTicketDIYTicketPrint.GenerateTicketPrint(TMTicket."Ticket Reservation Entry No.",TRUE,ErrorText);
-        */
         TicketReservationRequest.SetRange("Session Token ID", Rec."NPR Ticket Token");
         if not TicketReservationRequest.FindFirst then
             ErrorText := StrSubstNo(TicketResReqError, TicketReservationRequest.TableCaption, Rec.FieldCaption("NPR Ticket Token"), Rec."NPR Ticket Token");
         if ErrorText = '' then
             TMTicketDIYTicketPrint.GenerateTicketPrint(TicketReservationRequest."Entry No.", true, ErrorText);
-        //+NPR5.48 [335824]
         if ErrorText <> '' then
             Error(ErrorText);
 
@@ -762,10 +493,7 @@ codeunit 6060154 "NPR Event Ticket Mgt."
     local procedure SetTicketFilter(var Rec: Record "Job Planning Line")
     begin
         Rec.SetRange(Type, Rec.Type::Item);
-        //-NPR5.48 [335824]
-        //Rec.SETFILTER("Ticket No.",'<>%1','');
         Rec.SetFilter("NPR Ticket Token", '<>%1', '');
-        //+NPR5.48 [335824]
         Rec.SetRange("NPR Ticket Status", Rec."NPR Ticket Status"::Issued);
     end;
 
@@ -779,23 +507,24 @@ codeunit 6060154 "NPR Event Ticket Mgt."
 
     procedure DownloadTicket(Rec: Record "Job Planning Line") FileName: Text
     var
-        WebClient: DotNet NPRNetWebClient;
+        WebClient: HttpClient;
+        Response: HttpResponseMessage;
         FileMgt: Codeunit "File Management";
+        Stream: InStream;
         LocalFileName: Text;
     begin
         //function created to test specific URLs for download
         //to test, create an action on page 6060151 and call this function
         /*
-        FileName := FileMgt.ServerTempFileName('pdf');
-        FileName := FileMgt.GetDirectoryName(FileName) + '\' + Rec.Description + '.' + FileMgt.GetExtension(FileName);
-        WebClient := WebClient.WebClient;
-        //WebClient.DownloadFile(GetTicketURL(Rec),FileName);
-        WebClient.DownloadFile('http://test.ticket.navipartner.dk/orderPdf/',FileName);
-        LocalFileName := FileMgt.ClientTempFileName('pdf');
-        FileMgt.DownloadToFile(FileName,LocalFileName);
-        MESSAGE('Downloaded to: ' + LocalFileName);
+        FileName := Rec.Description + '.' + FileMgt.GetExtension(FileName);
+        //WebClient.Get('http://test.ticket.navipartner.dk/orderPdf/', Response);
+        WebClient.Get(GetTicketURL(Rec), Response);
+        if (not Response.IsSuccessStatusCode()) then
+            exit;
+        Response.Content.ReadAs(Stream);
+        DownloadFromStream(Stream, 'Save file', '', 'PDF File (*.pdf)|*.pdf', FileName);
+        Message(FileName + 'downloaded to default Downloads folder or selected folder.');
         */
-
     end;
 
     procedure ShowTicketPrintout(Rec: Record "Job Planning Line")
@@ -816,13 +545,11 @@ codeunit 6060154 "NPR Event Ticket Mgt."
         TMTicketResReq: Record "NPR TM Ticket Reservation Req.";
         TMTicket: Record "NPR TM Ticket";
     begin
-        //-NPR5.48 [335824]
         TMTicket.SetRange("Ticket Reservation Entry No.", -1);
         TMTicketResReq.SetRange("Session Token ID", Rec."NPR Ticket Token");
         if TMTicketResReq.FindFirst then
             TMTicket.SetRange("Ticket Reservation Entry No.", TMTicketResReq."Entry No.");
         PAGE.Run(0, TMTicket);
-        //+NPR5.48 [335824]
     end;
 }
 

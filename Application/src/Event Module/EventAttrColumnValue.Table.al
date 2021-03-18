@@ -1,8 +1,5 @@
 table 6060157 "NPR Event Attr. Column Value"
 {
-    // NPR5.31/NPKNAV/20170502  CASE 269162 Transport NPR5.31 - 2 May 2017
-    // NPR5.33/TJ  /20170529 CASE Added delete check and Type modify check
-
     Caption = 'Event Attribute Column Value';
     DataClassification = CustomerContent;
 
@@ -32,10 +29,8 @@ table 6060157 "NPR Event Attr. Column Value"
 
             trigger OnValidate()
             begin
-                //-NPR5.33 [277946]
                 if Type <> xRec.Type then
                     EventAttrMgt.TemplateHasEntries(1, "Template Name");
-                //+NPR5.33 [277946]
             end;
         }
         field(30; "Include in Formula"; Boolean)
@@ -57,15 +52,9 @@ table 6060157 "NPR Event Attr. Column Value"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     begin
-        //-NPR5.33 [277946]
         EventAttrMgt.TemplateHasEntries(1, "Template Name");
-        //+NPR5.33 [277946]
     end;
 
     var
