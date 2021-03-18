@@ -125,10 +125,6 @@ table 6060151 "NPR Event Word Layout"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnInsert()
     begin
         GetJobFromRecID(Job);
@@ -319,12 +315,6 @@ table 6060151 "NPR Event Word Layout"
         Modify;
 
         exit(ErrorMessage);
-    end;
-
-    procedure EditLayout()
-    begin
-        UpdateLayout(true, true);
-        EventMgt.EditTemplate(Rec);
     end;
 
     local procedure InsertCustomXmlPart(var EventWordTemplate: Record "NPR Event Word Layout")

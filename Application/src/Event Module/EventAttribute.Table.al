@@ -1,7 +1,5 @@
 table 6060162 "NPR Event Attribute"
 {
-    // NPR5.33/TJ  /20170628 CASE 277972 New object created
-
     Caption = 'Event Attribute';
     DataClassification = CustomerContent;
 
@@ -30,10 +28,6 @@ table 6060162 "NPR Event Attribute"
         key(Key1; "Job No.", "Template Name")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnDelete()

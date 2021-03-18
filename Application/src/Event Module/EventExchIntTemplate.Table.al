@@ -1,11 +1,5 @@
 table 6060150 "NPR Event Exch. Int. Template"
 {
-    // NPR5.34/TJ  /20170728 CASE 277938 New object
-    // NPR5.35/TJ  /20170822 CASE 281185 Added fields "Reminder Enabled (Calendar)" and "Reminder (Minutes) (Calendar)"
-    // NPR5.36/TJ  /20170912 CASE 287800 Added field "First Day Only (Appointment)"
-    // NPR5.43/TJ  /20180322 CASE 262079 New field "Ticket URL Placeholder(E-Mail)"
-    // NPR5.55/TJ  /20200129 CASE 374887 New fields "Auto. Send. Enabled (E-Mail)" and "Auto.Send.Event Status(E-Mail)"
-
     Caption = 'Event Exch. Int. Template';
     DataClassification = CustomerContent;
     LookupPageID = "NPR Event Exch. Int. Templates";
@@ -110,10 +104,8 @@ table 6060150 "NPR Event Exch. Int. Template"
 
             trigger OnValidate()
             begin
-                //-NPR5.35 [281185]
                 if "Reminder (Minutes) (Calendar)" < 0 then
                     Error(ReminderMinutesPositiveOnly, FieldCaption("Reminder (Minutes) (Calendar)"));
-                //+NPR5.35 [281185]
             end;
         }
         field(90; "First Day Only (Appointment)"; Boolean)
@@ -149,10 +141,6 @@ table 6060150 "NPR Event Exch. Int. Template"
         key(Key1; "Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnDelete()

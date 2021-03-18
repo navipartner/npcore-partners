@@ -1,23 +1,5 @@
 codeunit 6060155 "NPR Event Attribute Mgt."
 {
-    // NPR5.31/NPKNAV/20170502  CASE 269162 Transport NPR5.31 - 2 May 2017
-    // NPR5.33/TJ  /20170529 CASE 277946 Expanded Type parameter in function TemplateHasEntries and changed to be global function
-    //                                   Function ExcludeRowFromFormula changed to global function
-    //                                   Moved function ExcludeRowFromFormula to table Event Attribute Row Value
-    //                                   Removed subscribers from tables Event Attribute Row Value and Event Attribute Column Value and recreated them on those same tables
-    //                                   Changed EventAttributeFound text constant
-    //                                   Fixed namings of variables/functions/constants
-    //                                   Added new parameter FilterMode to functions CheckAndUpdate, EventAttributeEntryAction and CheckDelete
-    // NPR5.33/TJ  /20170606 CASE 277972 Added copy of Event Attribute in function CopyAttributes
-    //                                   Removed subscriber JobEventAttrTemplateOnAfterValidate and used on table trigger Event Attribute - OnDelete
-    // NPR5.38/TJ  /20171006 CASE 291965 Fixed a bug with function EventTemplateReportEventAttributeSetOnPreDataItem not returning proper boolean value
-    //                                   Fixed updating formula result so only Decimal type is taken and only columns with "Include in Formula"
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         EventAttributeFound: Label 'You can''t change %1 as it is already part of template (or is a template) which has assigned values. If you wish to change it, create new template and do changes on it.';
         EventAttributeTemplateOnReport: Record "NPR Event Attribute Template";
@@ -69,21 +51,6 @@ codeunit 6060155 "NPR Event Attribute Mgt."
         EventAttributeRowValue: Record "NPR Event Attr. Row Value";
         EventAttributeColumnValue: Record "NPR Event Attr. Column Value";
     begin
-        //-NPR5.33 [277946]
-        /*
-        CASE Type OF
-          Type::Row: EventAttributeTemplate.SETRANGE("Row Template Name",Name);
-          Type::Collumn: EventAttributeTemplate.SETRANGE("Column Template Name",Name);
-        END;
-        IF EventAttributeTemplate.ISEMPTY THEN
-          EXIT(FALSE);
-        EventAttributeTemplate.FINDSET;
-        REPEAT
-          EventAttributeEntry.SETRANGE("Template Name",EventAttributeTemplate.Name);
-          Found := NOT EventAttributeEntry.ISEMPTY;
-        UNTIL (EventAttributeTemplate.NEXT = 0) OR Found;
-        EXIT(Found);
-        */
         case Type of
             Type::Row:
                 begin
@@ -109,8 +76,6 @@ codeunit 6060155 "NPR Event Attribute Mgt."
             if not EventAttributeEntry.IsEmpty then
                 Error(EventAttributeFound, TableCaption);
         until EventAttributeTemplate.Next = 0;
-        //+NPR5.33 [277946]
-
     end;
 
     procedure ExcludeRowFromFormula(Rec: Record "NPR Event Attr. Row Value")
@@ -176,26 +141,20 @@ codeunit 6060155 "NPR Event Attribute Mgt."
         if EventAttributeEntry.FindLast then
             EntryNo := EventAttributeEntry."Entry No.";
         SetEventAttributeEntryFilter(TemplateName, JobNo, RowLineNo, ColumnLineNo, EventAttributeEntry);
-        //-NPR5.33 [277946]
         EventAttributeEntry.SetRange(Filter, FilterMode);
         EventAttributeEntry.SetRange("Filter Name", FilterName);
-        //+NPR5.33 [277946]
         EventAttrTemplate.Get(TemplateName);
         case ActionHere of
             ActionHere::"Insert/Modify":
                 begin
-                    //-NPR5.33 [277946]
                     if not FilterMode then begin
-                        //+NPR5.33 [277946]
                         EventAttrColValue.Get(EventAttrTemplate."Column Template Name", ColumnLineNo);
                         case EventAttrColValue.Type of
                             EventAttrColValue.Type::Decimal:
                                 if not Evaluate(ValueDec, Value) then
                                     Error(WrongDataType, ColumnCaption, EventAttrColValue.Type);
                         end;
-                        //-NPR5.33 [277946]
                     end;
-                    //+NPR5.33 [277946]
                     if EventAttributeEntry.FindFirst then begin
                         EventAttributeEntry."Value Text" := Value;
                         EventAttributeEntry."Value Decimal" := ValueDec;
@@ -208,10 +167,8 @@ codeunit 6060155 "NPR Event Attribute Mgt."
                         EventAttributeEntry."Column Line No." := ColumnLineNo;
                         EventAttributeEntry."Value Text" := Value;
                         EventAttributeEntry."Value Decimal" := ValueDec;
-                        //-NPR5.33 [277946]
                         EventAttributeEntry.Filter := FilterMode;
                         EventAttributeEntry."Filter Name" := FilterName;
-                        //+NPR5.33 [277946]
                         EventAttributeEntry.Insert;
                     end;
                 end;
@@ -258,21 +215,13 @@ codeunit 6060155 "NPR Event Attribute Mgt."
                 case EventAttrRowValue.Type of
                     EventAttrRowValue.Type::Sum:
                         begin
-                            //-NPR5.38 [291965]
                             if EventAttrColValue.Get(EventAttributeTemplate."Column Template Name", ColumnLineNo) and
                                 (EventAttrColValue.Type = EventAttrColValue.Type::Decimal) and
                                 EventAttrColValue."Include in Formula" then
-                                //+NPR5.38 [291965]
                                 NewValue := Format(CalculateSum(TemplateName, JobNo, ColumnLineNo, EventAttrRowValue.Formula));
-                            //-NPR5.33 [277946]
-                            //IF CheckDelete(TemplateName,ColumnLineNo,NewValue) THEN
                             if CheckDelete(TemplateName, ColumnLineNo, NewValue, false) then
-                                //+NPR5.33 [277946]
                                 ActionHere := 1;
-                            //-NPR5.33 [277946]
-                            //EventAttributeEntryAction(ActionHere,TemplateName,JobNo,EventAttrRowValue."Line No.",ColumnLineNo,ColumnCaption,NewValue);
                             EventAttributeEntryAction(ActionHere, TemplateName, JobNo, EventAttrRowValue."Line No.", ColumnLineNo, ColumnCaption, NewValue, false, '');
-                            //+NPR5.33 [277946]
                         end;
                 end;
             until EventAttrRowValue.Next = 0;
@@ -282,16 +231,10 @@ codeunit 6060155 "NPR Event Attribute Mgt."
     var
         ActionHere: Integer;
     begin
-        //-NPR5.33 [277946]
-        //IF CheckDelete(TemplateName,ColumnLineNo,AttributeValue) THEN
         if CheckDelete(TemplateName, ColumnLineNo, AttributeValue, FilterMode) then
-            //+NPR5.33 [277946]
             ActionHere := 1;
-        //-NPR5.33 [277946]
-        //EventAttributeEntryAction(ActionHere,TemplateName,JobNo,RowLineNo,ColumnLineNo,ColumnCaption,AttributeValue);
         EventAttributeEntryAction(ActionHere, TemplateName, JobNo, RowLineNo, ColumnLineNo, ColumnCaption, AttributeValue, FilterMode, FilterName);
         if not FilterMode then
-            //+NPR5.33 [277946]
             UpdateFormulaResult(TemplateName, JobNo, RowLineNo, ColumnLineNo, ColumnCaption);
     end;
 
@@ -306,11 +249,9 @@ codeunit 6060155 "NPR Event Attribute Mgt."
             EventAttrColValue.Type::Text:
                 exit(AttributeValue = '');
             EventAttrColValue.Type::Decimal:
-                //-NPR5.33 [277946]
                 if FilterMode then
                     exit(AttributeValue = '')
                 else
-                    //+NPR5.33 [277946]
                     exit(AttributeValue in ['0', '']);
         end;
     end;
@@ -324,7 +265,6 @@ codeunit 6060155 "NPR Event Attribute Mgt."
         EventAttributeFrom: Record "NPR Event Attribute";
         EventAttributeTo: Record "NPR Event Attribute";
     begin
-        //-NPR5.33 [277972]
         if FromEventNo <> '' then begin
             EventAttributeFrom.SetRange("Job No.", FromEventNo);
             if FromTemplateName <> '' then
@@ -338,7 +278,6 @@ codeunit 6060155 "NPR Event Attribute Mgt."
                         Clear(EventAttributeTo);
                 until EventAttributeFrom.Next = 0;
         end;
-        //+NPR5.33 [277972]
 
         if EventAttributeEntryTo.FindLast then
             NextEntryNo := EventAttributeEntryTo."Entry No.";
@@ -444,9 +383,7 @@ codeunit 6060155 "NPR Event Attribute Mgt."
         EventAttributeRowValue.SetRange(Promote, true);
         EventAttrColumnValueOnReport.SetRange("Template Name", EventAttributeTemplateOnReport."Column Template Name");
         EventAttrColumnValueOnReport.SetRange(Promote, true);
-        //-NPR5.38 [291965]
         exit(not EventAttributeRowValue.IsEmpty);
-        //+NPR5.38 [291965]
     end;
 
     procedure EventTemplateReportEventAttributeSetOnAfterGetRecord(EventAttributeRowValue: Record "NPR Event Attr. Row Value"; var AttributeValue: array[5] of Text; var ColumnCaption: array[5] of Text; JobNo: Code[20])

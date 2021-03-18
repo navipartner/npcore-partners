@@ -661,10 +661,7 @@ page 6014549 "NPR Event Planning Lines"
 
                         trigger OnAction()
                         begin
-                            //-NPR5.45 [323386]
-                            //EventTicketMgt.EditTicketReservation(Rec);
                             EventTicketMgt.EditTicketReservationWithLog(Rec);
-                            //+NPR5.45 [323386]
                             CurrPage.Update(false);
                         end;
                     }
@@ -888,10 +885,7 @@ page 6014549 "NPR Event Planning Lines"
 
                     trigger OnAction()
                     begin
-                        //-NPR5.49 [331208]
-                        //JobCreateInvoice.GetJobPlanningLineInvoices(Rec);
                         EventMgt.GetJobPlanningLineInvoices(Rec);
-                        //+NPR5.49 [331208]
                     end;
                 }
                 separator(Separator123)
@@ -952,9 +946,7 @@ page 6014549 "NPR Event Planning Lines"
 
                     trigger OnAction()
                     begin
-                        //-NPR5.49 [345047]
                         InsertExtendedText(true);
-                        //+NPR5.49 [345047]
                     end;
                 }
             }
@@ -970,9 +962,7 @@ page 6014549 "NPR Event Planning Lines"
 
                     trigger OnAction()
                     begin
-                        //-NPR5.48 [335824]
                         EventTicketMgt.ShowIssuedTickets(Rec);
-                        //+NPR5.48 [335824]
                     end;
                 }
                 action(ActivityLog)
@@ -1036,14 +1026,8 @@ page 6014549 "NPR Event Planning Lines"
     begin
         SetUpNewLine(xRec);
 
-        //-NPR5.31 [269162]
-        //-NPR5.32 [278090]
-        //Job.GET(Rec."Job No.");
-        //IF Job."Starting Date" <> 0D THEN
         if Job.Get(Rec."Job No.") and (Job."Starting Date" <> 0D) then
-            //+NPR5.32 [278090]
             Validate("Planning Date", Job."Starting Date");
-        //+NPR5.31 [269162]
     end;
 
     trigger OnOpenPage()
@@ -1060,7 +1044,6 @@ page 6014549 "NPR Event Planning Lines"
     end;
 
     var
-        JobCreateInvoice: Codeunit "Job Create-Invoice";
         ActiveField: Option " ",Cost,CostLCY,PriceLCY,Price;
         Text001: Label 'This job planning line was automatically generated. Do you want to continue?';
         JobNo: Code[20];
@@ -1134,19 +1117,9 @@ page 6014549 "NPR Event Planning Lines"
         "Unit CostEditable" := Edit;
     end;
 
-    procedure SetActiveField(ActiveField2: Integer)
-    begin
-        ActiveField := ActiveField2;
-    end;
-
     procedure SetJobNo(No: Code[20])
     begin
         JobNo := No;
-    end;
-
-    procedure SetJobNoVisible(JobNoVisible: Boolean)
-    begin
-        "Job No.Visible" := JobNoVisible;
     end;
 
     procedure SetJobTaskNoVisible(JobTaskNoVisible: Boolean)
@@ -1178,9 +1151,7 @@ page 6014549 "NPR Event Planning Lines"
 
     local procedure NoOnAfterValidate()
     begin
-        //-NPR5.49 [345047]
         InsertExtendedText(false);
-        //+NPR5.49 [345047]
         if "No." <> xRec."No." then
             PerformAutoReserve;
     end;
@@ -1218,7 +1189,6 @@ page 6014549 "NPR Event Planning Lines"
     var
         EventTransferExtText: Codeunit "NPR Event Transf.Ext.Text Mgt.";
     begin
-        //-NPR5.49 [345047]
         if EventTransferExtText.EventCheckIfAnyExtText(Rec, Unconditionally) then begin
             CurrPage.SaveRecord;
             Commit;
@@ -1226,7 +1196,6 @@ page 6014549 "NPR Event Planning Lines"
         end;
         if EventTransferExtText.MakeUpdate then
             CurrPage.Update(true);
-        //+NPR5.49 [345047]
     end;
 }
 

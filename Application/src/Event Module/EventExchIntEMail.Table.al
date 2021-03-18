@@ -1,8 +1,5 @@
 table 6060166 "NPR Event Exch. Int. E-Mail"
 {
-    // NPR5.38/NPKNAV/20180126  CASE 285194 Transport NPR5.38 - 26 January 2018
-    // NPR5.46/TJ  /20180605  CASE 317448 New fields "Time Zone Id", "Time Zone Display Name" and "Time Zone Custom Offset (Min)"
-
     Caption = 'Event Exch. Int. E-Mail';
     DataClassification = CustomerContent;
     LookupPageID = "NPR Event Exch. Int. E-Mails";
@@ -57,7 +54,6 @@ table 6060166 "NPR Event Exch. Int. E-Mail"
                 TimeZone: Record "Time Zone";
                 TimeZones: Page "Time Zones";
             begin
-                //-NPR5.46 [323953]
                 if TimeZone.Get("Time Zone No.") then
                     TimeZones.SetRecord(TimeZone);
                 TimeZones.LookupMode(true);
@@ -65,12 +61,11 @@ table 6060166 "NPR Event Exch. Int. E-Mail"
                     TimeZones.GetRecord(TimeZone);
                     Validate("Time Zone No.", TimeZone."No.");
                 end;
-                //+NPR5.46 [323953]
             end;
         }
         field(51; "Time Zone Display Name"; Text[250])
         {
-            CalcFormula = Lookup ("Time Zone"."Display Name" WHERE("No." = FIELD("Time Zone No.")));
+            CalcFormula = Lookup("Time Zone"."Display Name" WHERE("No." = FIELD("Time Zone No.")));
             Caption = 'Time Zone Display Name';
             Description = 'NPR5.46';
             Editable = false;
@@ -120,11 +115,6 @@ table 6060166 "NPR Event Exch. Int. E-Mail"
     begin
         EventEWSMgt.SetEmailPassword(Rec);
         Modify;
-    end;
-
-    local procedure GetPassword(): Text
-    begin
-        exit(EventEWSMgt.GetEmailPassword(Rec));
     end;
 
     procedure TestServerConnection()

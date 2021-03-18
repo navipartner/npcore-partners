@@ -1,9 +1,5 @@
 table 6060156 "NPR Event Attr. Row Value"
 {
-    // NPR5.31/NPKNAV/20170502  CASE 269162 Transport NPR5.31 - 2 May 2017
-    // NPR5.33/TJ  /20170529 CASE 277946 Added delete check and Type/Formula modify checks
-    // NPR5.38/TJ  /20171023 CASE 291965 Insert is also not possible if template has entries
-
     Caption = 'Event Attribute Row Value';
     DataClassification = CustomerContent;
 
@@ -33,10 +29,8 @@ table 6060156 "NPR Event Attr. Row Value"
 
             trigger OnValidate()
             begin
-                //-NPR5.33 [277946]
                 if Type <> xRec.Type then
                     EventAttrMgt.TemplateHasEntries(0, "Template Name");
-                //+NPR5.33 [277946]
 
                 if Type = Type::" " then
                     Formula := '';
@@ -49,10 +43,8 @@ table 6060156 "NPR Event Attr. Row Value"
 
             trigger OnValidate()
             begin
-                //-NPR5.33 [277946]
                 if Formula <> xRec.Formula then
                     EventAttrMgt.TemplateHasEntries(0, "Template Name");
-                //+NPR5.33 [277946]
             end;
         }
         field(40; Promote; Boolean)
@@ -69,23 +61,15 @@ table 6060156 "NPR Event Attr. Row Value"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     begin
-        //-NPR5.33 [277946]
         EventAttrMgt.TemplateHasEntries(0, "Template Name");
         EventAttrMgt.ExcludeRowFromFormula(Rec);
-        //+NPR5.33 [277946]
     end;
 
     trigger OnInsert()
     begin
-        //-NPR5.38 [291965]
         EventAttrMgt.TemplateHasEntries(0, "Template Name");
-        //+NPR5.38 [291965]
     end;
 
     var

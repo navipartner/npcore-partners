@@ -1,7 +1,6 @@
 page 6151587 "NPR Event Invoices"
 {
-    // NPR5.49/TJ  /20190124 New object created as a copy from standard page 1029
-
+    //New object created as a copy from standard page 1029
     Caption = 'Event Invoices';
     DeleteAllowed = false;
     Editable = false;

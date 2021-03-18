@@ -1,7 +1,5 @@
 page 6060163 "NPR Event Attr. Row Values"
 {
-    // NPR5.31/NPKNAV/20170502  CASE 269162 Transport NPR5.31 - 2 May 2017
-
     AutoSplitKey = true;
     Caption = 'Attribute Row Values';
     PageType = List;
@@ -53,10 +51,6 @@ page 6060163 "NPR Event Attr. Row Values"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 
     var

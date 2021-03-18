@@ -1807,8 +1807,6 @@ page 6060150 "NPR Event Card"
         [InDataSet]
         CurrencyCodeEditable: Boolean;
         EventCalendarMgt: Codeunit "NPR Event Calendar Mgt.";
-        EventMgt: Codeunit "NPR Event Management";
-        WrongCompanyErr: Label 'You cannot select a layout that is specific to another company.';
         EventAttrMgt: Codeunit "NPR Event Attribute Mgt.";
         [InDataSet]
         AttributeVisibleSet1: Boolean;
@@ -1900,11 +1898,6 @@ page 6060150 "NPR Event Card"
             CurrencyCodeEditable := false
         else
             CurrencyCodeEditable := true;
-    end;
-
-    local procedure BilltoCustomerNoOnAfterValidat()
-    begin
-        CurrPage.Update;
     end;
 
     local procedure GetAttributeTemplateSetup(AttributeSetNo: Integer)

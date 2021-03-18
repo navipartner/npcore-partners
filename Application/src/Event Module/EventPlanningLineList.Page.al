@@ -1,7 +1,5 @@
 page 6060161 "NPR Event Planning Line List"
 {
-    // NPR5.31/NPKNAV/20170502  CASE 269162 Transport NPR5.31 - 2 May 2017
-
     Caption = 'Event Planning Line List';
     Editable = false;
     PageType = List;

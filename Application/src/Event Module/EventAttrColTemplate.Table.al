@@ -1,8 +1,5 @@
 table 6060155 "NPR Event Attr. Col. Template"
 {
-    // NPR5.31/NPKNAV/20170502  CASE 269162 Transport NPR5.31 - 2 May 2017
-    // NPR5.33/TJ  /20170529 CASE 277946 Added code for deletion and a check
-
     Caption = 'Event Attribute Col. Template';
     DataClassification = CustomerContent;
     LookupPageID = "NPR Event Attr. Col. Templates";
@@ -28,20 +25,14 @@ table 6060155 "NPR Event Attr. Col. Template"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     var
         EventAttrMgt: Codeunit "NPR Event Attribute Mgt.";
         EventAttrColValue: Record "NPR Event Attr. Column Value";
     begin
-        //-NPR5.33 [277946]
         EventAttrMgt.TemplateHasEntries(1, Name);
         EventAttrColValue.SetRange("Template Name", Name);
         EventAttrColValue.DeleteAll;
-        //+NPR5.33 [277946]
     end;
 }
 

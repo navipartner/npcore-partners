@@ -1,7 +1,5 @@
 page 6151583 "NPR Event Attributes"
 {
-    // NPR5.33/TJ  /20170628 277972 New object created
-
     Caption = 'Event Attributes';
     PageType = List;
     UsageCategory = Administration;

@@ -1,7 +1,5 @@
 page 6059832 "NPR Event Plan. Line Buffer"
 {
-    // NPR5.55/TJ  /20200330 CASE 397741 New object
-
     AutoSplitKey = true;
     Caption = 'Event Planning Line Buffer';
     PageType = List;

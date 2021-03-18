@@ -4,10 +4,6 @@ codeunit 6060150 "NPR Event Management"
                   TableData "Job Register" = imd,
                   TableData "Value Entry" = rimd;
 
-    trigger OnRun()
-    begin
-    end;
-
     var
         JobsSetup: Record "Jobs Setup";
         GLSetup: Record "General Ledger Setup";
@@ -837,77 +833,6 @@ codeunit 6060150 "NPR Event Management"
     local procedure InProperStatus(Status: Enum "NPR Event Status"): Boolean
     begin
         exit(Status.AsInteger() < 3);
-    end;
-
-    procedure EditTemplate(EventWordLayout: Record "NPR Event Word Layout")
-    var
-        TempBlob: Codeunit "Temp Blob";
-        TempBlob2: Codeunit "Temp Blob";
-        FileMgt: Codeunit "File Management";
-        [RunOnClient]
-        WordApplication: DotNet NPRNetApplicationClass;
-        [RunOnClient]
-
-
-        WordDocument: DotNet NPRNetDocument;
-        [RunOnClient]
-        WdWindowState: DotNet NPRNetWdWindowState;
-        FileName: Text;
-        NewFileName: Text;
-        NewFileName2: Text;
-        ErrorMessage: Text;
-        LoadModifiedDoc: Boolean;
-        WordCaption: Text;
-        LoadDocQst: Label 'The template document has been edited in Word.\\Do you want to import the changes?';
-        WordNotFoundErr: Label 'You cannot edit the template because Microsoft Word is not available on your computer. To edit the template, you must install a supported version of Word.';
-        WaitMsg: Label 'Please wait while the template opens in Word.\After the template opens in Word, make changes to it,\and then close the Word document to continue.';
-        Window: Dialog;
-        Job: Record Job;
-    begin
-        if not CanLoadType(WordApplication) then
-            Error(WordNotFoundErr);
-
-        EventWordLayout.GetJobFromRecID(Job);
-        WordCaption := Job."No." + ' ' + Format(EventWordLayout.Usage) + ' ' + EventWordLayout.TableCaption;
-        Clear(TempBlob);
-        TempBlob.FromRecord(EventWordLayout, EventWordLayout.FieldNo(Layout));
-        Window.Open(WaitMsg);
-        FileName := FileMgt.BLOBExport(TempBlob, FileName, false);
-
-        EventVersionSpecificMgt.WordHelperGetApplication(WordApplication, ErrorMessage);
-        if IsNull(WordApplication) then
-            Error(WordNotFoundErr);
-
-        EventVersionSpecificMgt.WordHandlerConstructor();
-        EventVersionSpecificMgt.WordHelperCallOpen(WordApplication, FileName, false, false, WordDocument);
-        WordDocument.ActiveWindow.Caption := WordCaption;
-        WordDocument.Application.Visible := true;
-        WordDocument.ActiveWindow.WindowState := WdWindowState.wdWindowStateNormal;
-
-        WordApplication.WindowState := WdWindowState.wdWindowStateMinimize;
-        WordApplication.Visible := true;
-        WordApplication.Activate;
-        WordApplication.WindowState := WdWindowState.wdWindowStateNormal;
-
-        WordDocument.Saved := true;
-        WordDocument.Application.Activate;
-
-        NewFileName := EventVersionSpecificMgt.WordHandlerWaitForDocument(WordDocument);
-        Window.Close;
-
-        Clear(WordApplication);
-
-        LoadModifiedDoc := Confirm(LoadDocQst);
-
-        if LoadModifiedDoc then begin
-            FileMgt.BLOBImport(TempBlob, NewFileName);
-            EventWordLayout.ImportLayoutBlob(TempBlob, '');
-        end;
-
-        FileMgt.DeleteClientFile(FileName);
-        if FileName <> NewFileName then
-            FileMgt.DeleteClientFile(NewFileName);
-
     end;
 
     procedure SaveReportAs(Job: Record Job; TemplateType: Option Customer,Team; SaveAs: Option Word,PDF; FileName: Text)
