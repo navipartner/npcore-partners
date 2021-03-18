@@ -1,8 +1,5 @@
 codeunit 6014606 "NPR Dimension Lookup"
 {
-    // NPR5.22/VB/20160413 CASE 235391 Codeunit created to support dimension lookup
-    // NPR5.22/AP/20160414 CASE 235391 Added triggering of UpdateAllLineDim
-
     TableNo = "NPR Sale POS";
 
     trigger OnRun()

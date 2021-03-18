@@ -1,7 +1,5 @@
 table 6151053 "NPR POS Paym. View Log Entry"
 {
-    // NPR5.51/MHA /20190723  CASE 351688 Object created
-
     Caption = 'POS Payment View Log Entry';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Paym. View Log Entries";
@@ -68,10 +66,6 @@ table 6151053 "NPR POS Paym. View Log Entry"
         key(Key5; "POS Unit", "POS Sales No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

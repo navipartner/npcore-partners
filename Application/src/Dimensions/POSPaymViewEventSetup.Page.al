@@ -13,50 +13,58 @@ page 6151054 "NPR POS Paym. View Event Setup"
         {
             group(General)
             {
-                field("Dimension Popup Enabled"; "Dimension Popup Enabled")
+                field("Dimension Popup Enabled"; Rec."Dimension Popup Enabled")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Dimension Popup Enabled field';
                 }
-                field("Dimension Code"; "Dimension Code")
+                field("Dimension Code"; Rec."Dimension Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Dimension Code field';
                 }
-                field("Popup per"; "Popup per")
+                field("Popup per"; Rec."Popup per")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Popup per field';
                 }
-                field("Popup every"; "Popup every")
+                field("Popup every"; Rec."Popup every")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Popup every field';
                 }
-                field("Popup Start Time"; "Popup Start Time")
+                field("Popup Start Time"; Rec."Popup Start Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Popup Start Time field';
                 }
-                field("Popup End Time"; "Popup End Time")
+                field("Popup End Time"; Rec."Popup End Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Popup End Time field';
                 }
-                field("Popup Mode"; "Popup Mode")
+                field("Popup Mode"; Rec."Popup Mode")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Dimension Popup Mode field';
                 }
-                field("Create New Dimension Values"; "Create New Dimension Values")
+                field("Create New Dimension Values"; Rec."Create New Dimension Values")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Create New Dimension Values field';
                 }
-                field("Skip Popup on Dimension Value"; "Skip Popup on Dimension Value")
+                field("Skip Popup on Dimension Value"; Rec."Skip Popup on Dimension Value")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Skip Popup on Dimension Value field';
+                }
+            }
+            group(FilterGr)
+            {
+                Caption = 'Popup Filter';
+                part("NPR Popup Dim. Filter"; "NPR Popup Dim. Filter")
+                {
+                    ApplicationArea = All;
                 }
             }
         }
@@ -87,9 +95,9 @@ page 6151054 "NPR POS Paym. View Event Setup"
 
     trigger OnInit()
     begin
-        if not Get then begin
-            Init;
-            Insert;
+        if not Rec.Get then begin
+            Rec.Init;
+            Rec.Insert;
         end;
     end;
 }

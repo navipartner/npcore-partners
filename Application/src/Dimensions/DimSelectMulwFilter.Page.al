@@ -1,7 +1,5 @@
 page 6014546 "NPR Dim. Select.Mul.w.Filter"
 {
-    // NPR5.53/ALPO/20191016 CASE 371478 Dimension filter selection page for report 60144441 "POS Item Sales with Dimensions"
-
     Caption = 'Dimension Selection';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -18,24 +16,24 @@ page 6014546 "NPR Dim. Select.Mul.w.Filter"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Selected; Selected)
+                field(Selected; Rec.Selected)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Selected field';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Dimension Value Filter"; "Dimension Value Filter")
+                field("Dimension Value Filter"; Rec."Dimension Value Filter")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Dimension Value Filter field';
@@ -43,19 +41,14 @@ page 6014546 "NPR Dim. Select.Mul.w.Filter"
             }
         }
     }
-
-    actions
-    {
-    }
-
     procedure GetDimSelBuf(var TheDimSelectionBuf: Record "Dimension Selection Buffer")
     begin
         TheDimSelectionBuf.DeleteAll;
-        if Find('-') then
+        if Rec.FindSet() then
             repeat
                 TheDimSelectionBuf := Rec;
                 TheDimSelectionBuf.Insert;
-            until Next = 0;
+            until Rec.Next = 0;
     end;
 
     procedure InsertDimSelBuf(NewSelected: Boolean; NewCode: Text[30]; NewDescription: Text[30]; NewDimValueFilter: Text[250])
@@ -68,18 +61,18 @@ page 6014546 "NPR Dim. Select.Mul.w.Filter"
             if Dim.Get(NewCode) then
                 NewDescription := Dim.GetMLName(GlobalLanguage);
 
-        Init;
-        Selected := NewSelected;
-        Code := NewCode;
-        Description := NewDescription;
-        "Dimension Value Filter" := NewDimValueFilter;
-        case Code of
+        Rec.Init;
+        Rec.Selected := NewSelected;
+        Rec.Code := NewCode;
+        Rec.Description := NewDescription;
+        Rec."Dimension Value Filter" := NewDimValueFilter;
+        case Rec.Code of
             GLAcc.TableCaption:
-                "Filter Lookup Table No." := DATABASE::"G/L Account";
+                Rec."Filter Lookup Table No." := DATABASE::"G/L Account";
             BusinessUnit.TableCaption:
-                "Filter Lookup Table No." := DATABASE::"Business Unit";
+                Rec."Filter Lookup Table No." := DATABASE::"Business Unit";
         end;
-        Insert;
+        Rec.Insert;
     end;
 }
 
