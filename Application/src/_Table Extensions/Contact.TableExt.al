@@ -72,21 +72,15 @@ tableextension 6014437 "NPR Contact" extends Contact
             Editable = false;
             FieldClass = FlowField;
         }
-        field(6151435; "NPR Magento Account Status"; Option)
+        field(6151435; "NPR Magento Account Status"; Enum "NPR Magento Account Status")
         {
             Caption = 'Magento Account Status';
             DataClassification = CustomerContent;
-            Description = '//-NPR5.48 [320424]';
-            OptionCaption = 'Active,Blocked,Checkout Blocked';
-            OptionMembers = ACTIVE,BLOCKED,CHECKOUT_BLOCKED;
         }
-        field(6151440; "NPR Magento Price Visibility"; Option)
+        field(6151440; "NPR Magento Price Visibility"; Enum "NPR Magento Price Visibility")
         {
             Caption = 'Magento Price Visibility';
             DataClassification = CustomerContent;
-            Description = '//-NPR5.48 [320424]';
-            OptionCaption = 'Visible,Hidden';
-            OptionMembers = VISIBLE,HIDDEN;
         }
     }
 }
