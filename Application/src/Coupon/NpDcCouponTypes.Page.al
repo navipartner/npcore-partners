@@ -122,20 +122,6 @@ page 6151591 "NPR NpDc Coupon Types"
                 ApplicationArea = All;
                 ToolTip = 'Executes the Co&mments action';
             }
-            action("How-to Videos")
-            {
-                Caption = 'How-to Videos';
-                Image = UserInterface;
-                ApplicationArea = All;
-                ToolTip = 'Executes the How-to Videos action';
-
-                trigger OnAction()
-                var
-                    EmbeddedVideoMgt: Codeunit "NPR Embedded Video Mgt.";
-                begin
-                    EmbeddedVideoMgt.ShowEmbeddedVideos('NPDC');
-                end;
-            }
         }
     }
 }
