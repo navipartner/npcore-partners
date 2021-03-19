@@ -250,18 +250,25 @@ codeunit 85021 "NPR NpXml Tests"
             XmlTemplate.Get(TemplateCode);
     end;
 
-    local procedure ConfigureXmlTemplateForAPI(var XmlTemplate: Record "NPR NpXml Template")
+    local procedure ConfigureXmlTemplateForAPI(var NpXmlTemplate: Record "NPR NpXml Template")
+    var
+        NpXmlElement: Record "NPR NpXml Element";
     begin
-        XmlTemplate."FTP Transfer" := false;
-        XmlTemplate."API Transfer" := true;
-        XmlTemplate."API Type" := XmlTemplate."API Type"::"REST (Json)";
-        XmlTemplate."API Url" := 'http://new.ottosuenson.dk/rest/all/V1/naviconnect/products';
-        XmlTemplate."API Method" := XmlTemplate."API Method"::POST;
-        XmlTemplate."API Username Type" := XmlTemplate."API Username Type"::Custom;
-        XmlTemplate."API Content-Type" := 'naviconnect/json';
-        XmlTemplate."API Authorization" := 'bearer tfqlwf5mtq3ny5s2ugtcjydosqrb32k1';
-        XmlTemplate."API Accept" := 'naviconnect/xml';
-        XmlTemplate.Modify();
+        NpXmlTemplate."FTP Transfer" := false;
+        NpXmlTemplate."API Transfer" := true;
+        NpXmlTemplate."API Type" := NpXmlTemplate."API Type"::"REST (Json)";
+        NpXmlTemplate."API Url" := 'http://new.ottosuenson.dk/rest/all/V1/naviconnect/products';
+        NpXmlTemplate."API Method" := NpXmlTemplate."API Method"::POST;
+        NpXmlTemplate."API Username Type" := NpXmlTemplate."API Username Type"::Custom;
+        NpXmlTemplate."API Content-Type" := 'naviconnect/json';
+        NpXmlTemplate."API Authorization" := 'bearer tfqlwf5mtq3ny5s2ugtcjydosqrb32k1';
+        NpXmlTemplate."API Accept" := 'naviconnect/xml';
+        NpXmlTemplate.Modify();
+
+        NpXmlElement.SetRange("Xml Template Code", NpXmlTemplate.Code);
+        NpXmlElement.SetFilter("Element Name", '%1|%2', 'ticket_setup*', 'ticket_type*');
+        if NpXmlElement.FindSet() then
+            NpXmlElement.ModifyAll(Active, false);
     end;
 
     local procedure ConfigureXmlTemplateForFTP(var XmlTemplate: Record "NPR NpXml Template")
