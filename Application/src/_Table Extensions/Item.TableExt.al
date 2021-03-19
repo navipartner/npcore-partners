@@ -22,11 +22,11 @@ tableextension 6014427 "NPR Item" extends Item
             ObsoleteReason = 'This field won"t be used anymore';
             ObsoleteTag = 'Refactoring 2/2/2021';
         }
-        field(6014410; "NPR Label Barcode"; Code[20])
+        field(6014410; "NPR Label Barcode"; Code[50])
         {
             Caption = 'Label barcode';
             DataClassification = CustomerContent;
-            TableRelation = "Item Cross Reference"."Cross-Reference No." where("Item No." = field("No."), "Cross-Reference Type" = const("Bar Code"));
+            ObsoleteState = Removed;
         }
         field(6014418; "NPR Explode BOM auto"; Boolean)
         {

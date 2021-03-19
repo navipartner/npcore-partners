@@ -270,11 +270,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the NPR NPRE Item Routing Profile field';
                     }
-                    field("NPR Label Barcode"; Rec."NPR Label Barcode")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the NPR Label Barcode field';
-                    }
                 }
 
                 group("NPR NPR_Control6150669")
