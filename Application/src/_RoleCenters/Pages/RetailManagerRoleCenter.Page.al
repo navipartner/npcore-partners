@@ -20,6 +20,7 @@ page 6151241 "NPR Manager"
             {
                 Caption = 'Purchase Activities';
                 ApplicationArea = All;
+                Visible = false;
             }
             part(PowerBi; "Power BI Report Spinner Part")
             {
@@ -201,7 +202,7 @@ page 6151241 "NPR Manager"
                 group(ActionGroup6014408)
                 {
                     Caption = 'Retail';
-                    Image = Report; 
+                    Image = Report;
                     group(Management)
                     {
                         Caption = 'Management';
@@ -209,7 +210,7 @@ page 6151241 "NPR Manager"
 
                         {
                             Caption = 'Salespersons';
-                            Image = SalesPerson; 
+                            Image = SalesPerson;
                             action("NPR Sales Person Top 20")
                             {
                                 Caption = 'NPR Sales Person Top 20';
@@ -259,12 +260,12 @@ page 6151241 "NPR Manager"
                         group(History)
                         {
                             Caption = 'History';
-                            Image = History; 
+                            Image = History;
 
                             group(HistoryList)
                             {
                                 Caption = 'Lists';
-                                Image = List; 
+                                Image = List;
 
                                 action("Sales Ticket Statistics")
                                 {
@@ -294,7 +295,7 @@ page 6151241 "NPR Manager"
                             group(HistoryReport)
                             {
                                 Caption = 'Reports and Analysis';
-                                Image = AnalysisView; 
+                                Image = AnalysisView;
                                 action("NPR Sales per week year/Last year")
                                 {
                                     Caption = 'NPR Sales per week year/Last year';
@@ -325,16 +326,16 @@ page 6151241 "NPR Manager"
                     group(ItemandPrices)
                     {
                         Caption = 'Item & Prices';
-                        Image = ItemCosts; 
+                        Image = ItemCosts;
                         group(Goods)
                         {
                             Caption = 'Goods';
-                            Image = Item; 
+                            Image = Item;
 
                             group(Lists)
                             {
                                 Caption = 'Lists';
-                                Image = List; 
+                                Image = List;
                                 action("Retail Item List")
                                 {
                                     Caption = 'Retail Item';
@@ -363,7 +364,7 @@ page 6151241 "NPR Manager"
                             group(ReportsGoods)
                             {
                                 Caption = 'Reports and Analysis';
-                                Image = AnalysisView; 
+                                Image = AnalysisView;
                                 action("NPR Inventory by age")
                                 {
                                     Caption = 'NPR Inventory by age';
@@ -513,13 +514,13 @@ page 6151241 "NPR Manager"
                         group(Lines)
                         {
                             Caption = 'Lines';
-                            Image = AllLines; 
+                            Image = AllLines;
 
                             group(ListsLine)
                             {
 
                                 Caption = 'Lists';
-                                Image = List; 
+                                Image = List;
                                 action("Item Groups")
                                 {
                                     Caption = 'Item AddOns';
@@ -549,7 +550,7 @@ page 6151241 "NPR Manager"
                             {
 
                                 Caption = 'Reports and Analysis';
-                                Image = AnalysisView; 
+                                Image = AnalysisView;
                                 action("NPR Item Group Overview")
                                 {
                                     Caption = 'NPR Item Group Overview';
@@ -587,11 +588,11 @@ page 6151241 "NPR Manager"
                         group(Discount)
                         {
                             Caption = 'Discount';
-                            Image = Discount; 
+                            Image = Discount;
                             group(DiscountList)
                             {
                                 Caption = 'Lists';
-                                Image = List; 
+                                Image = List;
                                 action("Item Groups Tree")
                                 {
                                     Caption = 'Mix Discounts';
@@ -621,7 +622,7 @@ page 6151241 "NPR Manager"
                             {
 
                                 Caption = 'Reports and Analysis';
-                                Image = AnalysisView; 
+                                Image = AnalysisView;
                                 action("NPR Period Discount Statistics")
                                 {
                                     Caption = 'NPR Period Discount Statistics';
@@ -780,7 +781,7 @@ page 6151241 "NPR Manager"
                     Caption = 'POS Entry List';
                     Image = RegisteredDocs;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = page "NPR POS Entry List";
                     ToolTip = 'View POS Entry that have been done.';
@@ -792,7 +793,7 @@ page 6151241 "NPR Manager"
                     Caption = 'POS Quotes';
                     Image = RegisteredDocs;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = page "NPR POS Quotes";
                     ToolTip = 'View POS Quotes that have been done.';
@@ -804,7 +805,7 @@ page 6151241 "NPR Manager"
                     Caption = 'Posted Sales Invoices List';
                     Image = RegisteredDocs;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "Posted Sales Invoices";
                     ToolTip = 'View Sales Invoices that have been done.';
@@ -816,7 +817,7 @@ page 6151241 "NPR Manager"
                     Caption = 'Posted Sales Credit Memos List';
                     Image = RegisteredDocs;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "Posted Sales Credit Memos";
                     ToolTip = 'View Sales Credit Memos that have been done.';
@@ -827,7 +828,7 @@ page 6151241 "NPR Manager"
                     Caption = 'Repair Document List';
                     Image = RegisteredDocs;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Customer Repair List";
                     ToolTip = 'View the list of Repair List.';
@@ -934,8 +935,9 @@ page 6151241 "NPR Manager"
                 ToolTip = 'Executes the Purchase Return Order action';
             }
         }
-        area(Processing){
-            
+        area(Processing)
+        {
+
             group(Vendor)
             {
                 Caption = 'Vendor';

@@ -27,11 +27,6 @@ page 6151254 "NPR Acc. Payables Act"
                     DrillDownPageID = "Purchase Return Order List";
                     ToolTip = 'Specifies the number of purchase return orders that are displayed in the Finance Cue on the Role Center. The documents are filtered by today''s date.';
                 }
-                field("Outstanding Vendor Invoices"; Rec."Outstanding Vendor Invoices")
-                {
-                    ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the number of invoices from your vendors that have not been paid yet.';
-                }
 
                 field("Pending Inc. Documents"; Rec."NPR Pending Inc. Documents")
                 {
