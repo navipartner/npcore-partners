@@ -99,7 +99,7 @@ table 6150615 "NPR POS Unit"
         }
         field(205; "POS Sales Workflow Set"; Code[20])
         {
-            Caption = 'POS Sales Workflow Set';
+            Caption = 'POS Scenarios Profile';
             DataClassification = CustomerContent;
             Description = 'NPR5.45';
             TableRelation = "NPR POS Sales Workflow Set";
