@@ -126,6 +126,7 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
                 end;
             OperationType::RefundList:
                 begin
+                    ApplyEftRefundListFilters(EFTTransactionRequest);
                     if not SelectTransaction(EFTTransactionRequest) then
                         exit;
                     EFTTransactionMgt.StartReferencedRefund(EFTSetup, SalePOS, '', 0, EFTTransactionRequest."Entry No.");
@@ -218,6 +219,12 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
     local procedure SelectTransaction(var EftTransactionRequestOut: Record "NPR EFT Transaction Request"): Boolean
     begin
         exit(PAGE.RunModal(0, EftTransactionRequestOut) = ACTION::LookupOK);
+    end;
+
+    local procedure ApplyEftRefundListFilters(var EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    begin
+        EFTTransactionRequest.SetRange("Processing Type", EFTTransactionRequest."Processing Type"::PAYMENT);
+        EFTTransactionRequest.SetRange(Reversed, false);
     end;
 
     local procedure "// Parameter Handling"()
