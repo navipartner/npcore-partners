@@ -1,30 +1,20 @@
 codeunit 6059941 "NPR NaviDocs Handl. Prof. Tmpl"
 {
-    // NPR5.30/THRO/20170228 CASE 267474 Template codeunit for new NaviDocs Handling codeunit
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         NaviDocsHandlingProfileTxt: Label 'Add Description here';
         DataTypeManagement: Codeunit "Data Type Management";
 
     procedure DoHandleNaviDocs(RecordVariant: Variant): Boolean
     var
-        HttpResponseMessage: DotNet NPRNetHttpResponseMessage;
-        StringContent: DotNet NPRNetStringContent;
-        Encoding: DotNet NPRNetEncoding;
-        IComm: Record "NPR I-Comm";
-        ServiceCalc: Codeunit "NPR Service Calculation";
-        SMSHandled: Boolean;
-        ForeignPhone: Boolean;
-        ServiceCode: Code[20];
-        Result: Text;
-        ErrorHandled: Boolean;
+        Handled: Boolean;
     begin
-        // Handle the record...
+        OnDoHandleNaviDocs(RecordVariant, Handled);
+        exit(Handled);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnDoHandleNaviDocs(RecordVariant: Variant; var Handled: Boolean)
+    begin
     end;
 
     procedure AddToNaviDocs(RecordVariant: Variant; Recepient: Text; ReportID: Integer; DelayUntil: DateTime)
@@ -38,7 +28,7 @@ codeunit 6059941 "NPR NaviDocs Handl. Prof. Tmpl"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059767, 'OnAddHandlingProfilesToLibrary', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NaviDocs Management", 'OnAddHandlingProfilesToLibrary', '', true, true)]
     local procedure AddNaviDocsHandlingProfile()
     var
         NaviDocsManagement: Codeunit "NPR NaviDocs Management";
@@ -47,7 +37,7 @@ codeunit 6059941 "NPR NaviDocs Handl. Prof. Tmpl"
             NaviDocsManagement.AddHandlingProfileToLibrary(NaviDocsHandlingProfileCode, NaviDocsHandlingProfileTxt, false, false, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059767, 'OnShowTemplate', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NaviDocs Management", 'OnShowTemplate', '', false, false)]
     local procedure ShowTemplateFromNaviDocs(var RequestHandled: Boolean; NaviDocsEntry: Record "NPR NaviDocs Entry")
     var
         RecRef: RecordRef;
@@ -63,7 +53,7 @@ codeunit 6059941 "NPR NaviDocs Handl. Prof. Tmpl"
         Message('Showing the Template');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059767, 'OnManageDocument', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NaviDocs Management", 'OnManageDocument', '', false, false)]
     local procedure HandleNaviDocsDocument(var IsDocumentHandled: Boolean; ProfileCode: Code[20]; var NaviDocsEntry: Record "NPR NaviDocs Entry"; ReportID: Integer; var WithSuccess: Boolean; var ErrorMessage: Text)
     var
         RecRef: RecordRef;
