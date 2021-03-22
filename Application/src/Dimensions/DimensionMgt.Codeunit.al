@@ -357,7 +357,7 @@ codeunit 6014401 "NPR Dimension Mgt."
                 TempDimBuf2.Modify;
             end;
     end;
-
+    #endregion
     procedure OpenFormDefaultDimensions(TableID: Integer; No: Code[20])
     begin
         //OpenFormDefaultDimensions
