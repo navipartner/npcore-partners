@@ -1420,6 +1420,12 @@ table 6014406 "NPR Sale Line POS"
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
         }
+        field(6060; "Magento Brand"; Code[20])
+        {
+            Caption = 'Magento Brand';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Magento Brand";
+        }
         field(6100; "Main Line No."; Integer)
         {
             Caption = 'Main Line No.';
@@ -2262,6 +2268,7 @@ table 6014406 "NPR Sale Line POS"
             "Unit of Measure Code" := Item."Base Unit of Measure";
 
         DescriptionControl.GetDescriptionPOS(Rec, xRec, Item);
+        "Magento Brand" := Item."NPR Magento Brand";
     end;
 
     local procedure InitFromItemCategory()
