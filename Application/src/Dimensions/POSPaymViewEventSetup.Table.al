@@ -1,8 +1,5 @@
 table 6151054 "NPR POS Paym. View Event Setup"
 {
-    // NPR5.51/MHA /20190723  CASE 351688 Object created
-    // NPR5.51/MHA /20190823  CASE 359601 Added field 80 "Skip Popup on Dimension Value"
-
     Caption = 'POS Payment View Event Setup';
     DataClassification = CustomerContent;
 
@@ -73,10 +70,6 @@ table 6151054 "NPR POS Paym. View Event Setup"
         key(Key1; "Primary Key")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 
