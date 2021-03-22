@@ -1,7 +1,5 @@
 codeunit 6014451 "NPR Set Dimension POS"
 {
-    // #235391/RA/20160509 CASE 235391 Add demension to Sales POS lines
-
     TableNo = "NPR Sale POS";
 
     trigger OnRun()

@@ -1,17 +1,9 @@
 codeunit 6151053 "NPR POS Paym. View Event Mgt."
 {
-    // NPR5.51/MHA /20190723  CASE 351688 Object created - Dimension Statistics during POS OnPayment View
-    // NPR5.51/MHA /20190925  CASE 359601 Added Skip Popup on Dimension Value
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Enter Dimension on POS Sale';
 
-    [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
         if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then
@@ -27,7 +19,7 @@ codeunit 6151053 "NPR POS Paym. View Event Mgt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150728, 'OnPaymentView', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS View Change WF Mgt.", 'OnPaymentView', '', true, true)]
     local procedure PopupDimension(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
     var
         POSPaymentViewEventSetup: Record "NPR POS Paym. View Event Setup";
@@ -47,10 +39,9 @@ codeunit 6151053 "NPR POS Paym. View Event Mgt."
         POSSession.GetFrontEnd(POSFrontEndMgt, false);
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        //-NPR5.51 [359601]
+
         if SkipPopup(SalePOS, POSPaymentViewEventSetup) then
             exit;
-        //+NPR5.51 [359601]
 
         POSPaymentViewLogEntry.SetCurrentKey("POS Unit", "Sales Ticket No.");
         POSPaymentViewLogEntry.SetRange("POS Unit", SalePOS."Register No.");
@@ -83,9 +74,7 @@ codeunit 6151053 "NPR POS Paym. View Event Mgt."
             Clear(POSPaymentViewLogEntry);
             POSPaymentViewLogEntry.Init;
             POSPaymentViewLogEntry."Entry No." := 0;
-            //-NPR5.51 [359601]
             POSPaymentViewLogEntry."POS Store" := SalePOS."POS Store Code";
-            //+NPR5.51 [359601]
             POSPaymentViewLogEntry."POS Unit" := SalePOS."Register No.";
             POSPaymentViewLogEntry."Sales Ticket No." := SalePOS."Sales Ticket No.";
             POSPaymentViewLogEntry."POS Sales No." := POSSalesNo;
@@ -126,7 +115,7 @@ codeunit 6151053 "NPR POS Paym. View Event Mgt."
 
     local procedure SkipPopup(SalePOS: Record "NPR Sale POS"; var POSPaymentViewEventSetup: Record "NPR POS Paym. View Event Setup"): Boolean
     begin
-        //-NPR5.51 [359601]
+
         if not POSPaymentViewEventSetup.Get then
             exit(true);
 
@@ -139,15 +128,33 @@ codeunit 6151053 "NPR POS Paym. View Event Mgt."
         if POSPaymentViewEventSetup."Dimension Code" = '' then
             exit(true);
 
-        //-#359601 [359601]
         if POSPaymentViewEventSetup."Skip Popup on Dimension Value" then begin
             if HasDimValue(SalePOS, POSPaymentViewEventSetup."Dimension Code") then
                 exit(true);
         end;
-        //+#359601 [359601]
+
+        if SkipOnItemFilter(SalePOS) then
+            exit(true);
 
         exit(false);
-        //+NPR5.51 [359601]
+    end;
+
+    local procedure SkipOnItemFilter(SalePOS: Record "NPR Sale POS"): Boolean;
+    var
+        SalePOSLine: Record "NPR Sale Line POS";
+        PopupDimFilter: Record "NPR Popup Dim. Filter";
+    begin
+        if PopupDimFilter.IsEmpty() then
+            exit(false);
+        SalePOSLine.SetRange(Type, SalePOSLine.Type::Item);
+        if not SalePOSLine.FindSet() then
+            exit(true);
+        repeat
+            if PopupDimFilter.Get(PopupDimFilter.Type::Item, SalePOSLine."No.") or PopupDimFilter.Get(PopupDimFilter.Type::"Item Category", SalePOSLine."Item Category Code") then
+                exit(false);
+        until SalePOSLine.Next() = 0;
+
+        exit(true);
     end;
 
     local procedure ValidTime(CheckTime: Time; StartTime: Time; EndTime: Time): Boolean
@@ -168,7 +175,6 @@ codeunit 6151053 "NPR POS Paym. View Event Mgt."
     var
         DimensionSetEntry: Record "Dimension Set Entry";
     begin
-        //-NPR5.51 [359601]
         if SalePOS."Dimension Set ID" = 0 then
             exit(false);
         DimensionSetEntry.SetRange("Dimension Set ID", SalePOS."Dimension Set ID");
@@ -177,7 +183,6 @@ codeunit 6151053 "NPR POS Paym. View Event Mgt."
             exit(false);
 
         exit(DimensionSetEntry."Dimension Value Code" <> '');
-        //+NPR5.51 [359601]
     end;
 
     local procedure CurrCodeunitId(): Integer
