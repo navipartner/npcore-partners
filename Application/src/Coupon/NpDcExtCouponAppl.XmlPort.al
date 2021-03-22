@@ -71,6 +71,10 @@ xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
                         fieldelement(line_amount_incl_vat; TempSaleLinePOSReq."Amount Including VAT")
                         {
                         }
+                        fieldelement(magento_brand; TempSaleLinePOSReq."Magento Brand")
+                        {
+                            MinOccurs = Zero;
+                        }
 
                         trigger OnAfterInitRecord()
                         begin
@@ -86,7 +90,10 @@ xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
                                 Item.Get(TempSaleLinePOSReq."No.");
                                 TempSaleLinePOSReq.Description := Item.Description;
                             end;
-
+                            if TempSaleLinePOSReq."Magento Brand" = '' then begin
+                                Item.Get(TempSaleLinePOSReq."No.");
+                                TempSaleLinePOSReq."Magento Brand" := Item."NPR Magento Brand";
+                            end;
                             if (TempSaleLinePOSReq."Description 2" = '') and (TempSaleLinePOSReq."Variant Code" <> '') then begin
                                 ItemVariant.Get(TempSaleLinePOSReq."No.", TempSaleLinePOSReq."Variant Code");
                                 TempSaleLinePOSReq."Description 2" := CopyStr(ItemVariant.Description, 1, MaxStrLen(TempSaleLinePOSReq."Description 2"));
@@ -190,6 +197,10 @@ xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
                         fieldelement(line_amount_incl_vat; TempSaleLinePOSRes."Amount Including VAT")
                         {
                         }
+                        fieldelement(magento_brand; TempSaleLinePOSRes."Magento Brand")
+                        {
+                        }
+
                     }
                 }
 

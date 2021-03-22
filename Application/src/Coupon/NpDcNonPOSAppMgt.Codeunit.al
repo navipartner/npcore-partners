@@ -142,6 +142,7 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
         SaleLinePOS."VAT %" := TempSaleLinePOS."VAT %";
         SaleLinePOS.Description := TempSaleLinePOS.Description;
         SaleLinePOS."Description 2" := TempSaleLinePOS."Description 2";
+        SaleLinePOS."Magento Brand" := TempSaleLinePOS."Magento Brand";
         SaleLinePOS."Unit Price" := TempSaleLinePOS."Unit Price";
         SaleLinePOS.Quantity := TempSaleLinePOS.Quantity;
         SaleLinePOS."Amount Including VAT" := TempSaleLinePOS."Amount Including VAT";

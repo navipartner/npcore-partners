@@ -16,12 +16,10 @@ table 6151596 "NPR NpDc Coupon List Item"
             Caption = 'Line No.';
             DataClassification = CustomerContent;
         }
-        field(10; Type; Option)
+        field(10; Type; Enum "NPR NpDc Coupon Type")
         {
             Caption = 'Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Item,Item Group,Item Disc. Group';
-            OptionMembers = Item,"Item Group","Item Disc. Group";
         }
         field(15; "No."; Code[20])
         {
@@ -31,13 +29,16 @@ table 6151596 "NPR NpDc Coupon List Item"
             ELSE
             IF (Type = CONST("Item Group")) "Item Category"
             ELSE
-            IF (Type = CONST("Item Disc. Group")) "Item Discount Group";
+            IF (Type = CONST("Item Disc. Group")) "Item Discount Group"
+            ELSE
+            IF (Type = CONST("Magento Brand")) "NPR Magento Brand";
 
             trigger OnValidate()
             var
                 Item: Record Item;
                 ItemDiscountGroup: Record "Item Discount Group";
                 ItemCategory: Record "Item Category";
+                MagentoBrand: Record "NPR Magento Brand";
             begin
                 case Type of
                     Type::Item:
@@ -58,6 +59,13 @@ table 6151596 "NPR NpDc Coupon List Item"
                         begin
                             ItemDiscountGroup.Get("No.");
                             Description := ItemDiscountGroup.Description;
+                            "Unit Price" := 0;
+                            "Profit %" := 0;
+                        end;
+                    Type::"Magento Brand":
+                        begin
+                            MagentoBrand.Get("No.");
+                            Description := MagentoBrand.Name;
                             "Unit Price" := 0;
                             "Profit %" := 0;
                         end;
