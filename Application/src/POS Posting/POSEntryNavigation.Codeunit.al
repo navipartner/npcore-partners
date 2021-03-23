@@ -66,11 +66,6 @@ codeunit 6150635 "NPR POS Entry Navigation"
         OpenPOSEntryListFromCustomer(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Page, Page::"Customer List", 'OnAfterActionEvent', 'NPR POS Entries', true, true)]
-    local procedure CustomerListOnAfterActionPOSEntries(var Rec: Record Customer)
-    begin
-        OpenPOSEntryListFromCustomer(Rec);
-    end;
 
     [EventSubscriber(ObjectType::Page, Page::"Contact Card", 'OnAfterActionEvent', 'NPR POS Entries', true, true)]
     local procedure ContactCardOnAfterActionPOSEntries(var Rec: Record Contact)

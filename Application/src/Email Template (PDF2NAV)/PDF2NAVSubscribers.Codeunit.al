@@ -26,21 +26,6 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
         EmailDocMgt.RunEmailLog(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Page, 22, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
-    local procedure Page22OnActionSendAsPDF(var Rec: Record Customer)
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.SendReport(Rec, false);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 22, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
-    local procedure Page22OnActionEmailLog(var Rec: Record Customer)
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.RunEmailLog(Rec);
-    end;
 
     [EventSubscriber(ObjectType::Page, 41, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
     local procedure Page41OnActionSendAsPDF(var Rec: Record "Sales Header")

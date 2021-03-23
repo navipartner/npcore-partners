@@ -66,17 +66,6 @@ codeunit 6014437 "NPR Phone Lookup"
         Rec.Modify(false);
     end;
 
-    [EventSubscriber(ObjectType::Page, Page::"Contact List", 'OnAfterActionEvent', 'NPR PhoneLookup', false, false)]
-    local procedure ContactListOnAfterAction(var Rec: Record Contact)
-    var
-        TempTDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary;
-        PhoneNoLookup: Page "NPR Phone No lookup";
-    begin
-        TempTDCNamesNumbersBuffer."Create Contact" := true;
-        PhoneNoLookup.Setrec(TempTDCNamesNumbersBuffer);
-        PhoneNoLookup.RunModal();
-    end;
-
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterValidateEvent', 'No.', true, true)]
     local procedure CustomerOnValidateNo(var Rec: Record Customer; var xRec: Record Customer; CurrFieldNo: Integer)
     var
@@ -107,16 +96,6 @@ codeunit 6014437 "NPR Phone Lookup"
         Rec.Modify(false);
     end;
 
-    [EventSubscriber(ObjectType::Page, Page::"Customer List", 'OnAfterActionEvent', 'NPR PhoneLookup', false, false)]
-    local procedure CustomerListOnAfterAction(var Rec: Record Customer)
-    var
-        TempTDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary;
-        PhoneNoLookup: Page "NPR Phone No lookup";
-    begin
-        TempTDCNamesNumbersBuffer."Create Customer" := true;
-        PhoneNoLookup.Setrec(TempTDCNamesNumbersBuffer);
-        PhoneNoLookup.RunModal();
-    end;
 
     [EventSubscriber(ObjectType::Table, Database::Vendor, 'OnAfterValidateEvent', 'No.', true, true)]
     local procedure VendorOnValidateNo(var Rec: Record Vendor; var xRec: Record Vendor; CurrFieldNo: Integer)
