@@ -77,7 +77,6 @@ codeunit 6150702 "NPR POS UI Management"
         Menu.SetFilter("Register Type", '%1|%2', POSViewProfile.Code, '');
         Menu.SetFilter("Register No.", '%1|%2', POSUnit."No.", '');
         Menu.SetFilter("Salesperson Code", '%1|%2', Salesperson.Code, '');
-        Menu.SetRange("Available on Desktop", true);                // TODO: fix this after developing app stuff
 
         if Menu.FindSet() then
             repeat
@@ -99,8 +98,6 @@ codeunit 6150702 "NPR POS UI Management"
         MenuButton.SetRange(Blocked, false);
         Menu.CopyFilter("Register Type", MenuButton."Register Type");
         Menu.CopyFilter("Register No.", MenuButton."Register No.");
-        Menu.CopyFilter("Available in App", MenuButton."Available in App");
-        Menu.CopyFilter("Available on Desktop", MenuButton."Available on Desktop");
         MenuButton.SetRange("Parent ID", 0);
 
         InitializeMenuButtons(MenuButton, MenuObj, POSSession, tmpPOSParameterValue);
