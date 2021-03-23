@@ -39,12 +39,6 @@ xmlport 6150701 "NPR POS Menu Export/Import"
                 fieldelement(SalespersonCode; "POS Menu"."Salesperson Code")
                 {
                 }
-                fieldelement(AvailableOnDesktop; "POS Menu"."Available on Desktop")
-                {
-                }
-                fieldelement(AvailableOnApp; "POS Menu"."Available in App")
-                {
-                }
                 tableelement("POS Menu Button"; "NPR POS Menu Button")
                 {
                     AutoReplace = true;

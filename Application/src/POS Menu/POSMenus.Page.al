@@ -42,16 +42,6 @@ page 6150701 "NPR POS Menus"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
-                field("Available on Desktop"; "Available on Desktop")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Available on Desktop field';
-                }
-                field("Available in App"; "Available in App")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Available in App field';
-                }
             }
         }
     }
@@ -65,7 +55,7 @@ page 6150701 "NPR POS Menus"
                 Caption = 'Buttons';
                 Image = Hierarchy;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Menu Buttons";
