@@ -710,18 +710,6 @@ table 6014406 "NPR Sale Line POS"
                     "Custom Price" := false;
                     "Eksp. Salgspris" := false;
                     GetAmount(Rec, Item, FindItemSalesPrice());
-                end else begin
-                    GetPOSHeader;
-                    if Customer.Get(SalePOS."Customer No.") then begin
-                        if Customer."NPR Type" = Customer."NPR Type"::Cash then begin
-                            if Customer."Prices Including VAT" then
-                                Validate("Unit Price", "Special price" * (1 + "VAT %" / 100))
-                            else
-                                Validate("Unit Price", "Special price");
-                            if "Discount %" <> 0 then
-                                Validate("Discount %", 0);
-                        end;
-                    end;
                 end;
             end;
         }

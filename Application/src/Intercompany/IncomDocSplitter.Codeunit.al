@@ -1,23 +1,20 @@
 codeunit 6060074 "NPR Incom. Doc. Splitter"
 {
-    // NPR5.27/BR  /20160927 CASE 252817 Object Created
-
-
     trigger OnRun()
     var
         VendorCode: Code[20];
     begin
         VendorCode := GetVendorCode;
-        Initialize;
-        ReadFileAndSplit;
+        Initialize();
+        ReadFileAndSplit();
         ImportSplitFiles(VendorCode);
-        Commit;
+        Commit();
         if NoOfIncominDocsCreated > 0 then begin
-            if GuiAllowed then
+            if GuiAllowed() then
                 if Confirm(StrSubstNo(TextDocsCreatedProcess, Format(NoOfIncominDocsCreated)), false) then
-                    CreateDocs;
+                    CreateDocs();
         end else begin
-            if GuiAllowed then
+            if GuiAllowed() then
                 Message(TextNoIncomingDocs);
 
         end;
@@ -212,40 +209,7 @@ codeunit 6060074 "NPR Incom. Doc. Splitter"
     end;
 
     local procedure GetSplitParameters(DataExchDef: Record "Data Exch. Def"; var SplitMethod: Option "0",GroupByColumn,SplitOnValueFirstField; var SplitOnColumn: Integer; var SplitOnValue: Text)
-    var
-        DataExchColumnDef: Record "Data Exch. Column Def";
     begin
-        DataExchColumnDef.Reset;
-        DataExchColumnDef.SetRange("Data Exch. Def Code", DataExchDef.Code);
-        DataExchColumnDef.SetFilter("NPR Split File", '>0');
-        if DataExchColumnDef.FindFirst then begin
-            SplitMethod := DataExchColumnDef."NPR Split File";
-            SplitOnColumn := DataExchColumnDef."Column No.";
-            SplitOnValue := DataExchColumnDef."NPR Split Value";
-        end else
-            SplitMethod := 0;
-    end;
-
-    local procedure "---Subscribers"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Table, 1223, 'OnAfterValidateEvent', 'NPR Split File', false, false)]
-    local procedure OnValidateSplitFileSetSplitValue(var Rec: Record "Data Exch. Column Def"; var xRec: Record "Data Exch. Column Def"; CurrFieldNo: Integer)
-    var
-        DataExchColumnDef: Record "Data Exch. Column Def";
-        TextOnlyOne: Label 'Only one Column can be set up to split files on per Data Exchange Definition.';
-    begin
-        if Rec."NPR Split File" <> Rec."NPR Split File"::NewFileOnSplitValue then
-            Rec."NPR Split Value" := '';
-        if Rec."NPR Split File" > 0 then begin
-            DataExchColumnDef.Reset;
-            DataExchColumnDef.SetRange("Data Exch. Def Code", Rec."Data Exch. Def Code");
-            DataExchColumnDef.SetFilter("Column No.", '<>%1', Rec."Column No.");
-            DataExchColumnDef.SetFilter("NPR Split File", '>0');
-            if not DataExchColumnDef.IsEmpty then
-                Error(TextOnlyOne);
-        end;
+        SplitMethod := 0;
     end;
 }
-

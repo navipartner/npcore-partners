@@ -408,13 +408,6 @@ page 6151245 "NPR Retail Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Retail Cross References action';
                 }
-                action(Scanners)
-                {
-                    Caption = 'Scanners';
-                    RunObject = Page "NPR Scanner - List";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Scanners action';
-                }
                 action("POS Info List")
                 {
                     Caption = 'POS Info List';

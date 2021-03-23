@@ -182,7 +182,6 @@ table 6014405 "NPR Sale POS"
                         repeat
                             xSaleLinePOS := SaleLinePOS;
                             Item.Get(SaleLinePOS."No.");
-                            SaleLinePOS.Internal := Cust."NPR Internal y/n";
                             SaleLinePOS."Customer Price Group" := "Customer Price Group";
                             SaleLinePOS."Allow Line Discount" := "Allow Line Discount";
                             SaleLinePOS."Price Includes VAT" := "Prices Including VAT";

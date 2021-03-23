@@ -10,20 +10,6 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 38, 'OnAfterValidateEvent', 'Pay-to Vendor No.', true, true)]
-    local procedure OnAfterValidateEventPayToVendorNo(var Rec: Record "Purchase Header"; var xRec: Record "Purchase Header"; CurrFieldNo: Integer)
-    var
-        Vendor: Record Vendor;
-    begin
-        if Vendor.Get(Rec."Pay-to Vendor No.") then begin
-            Rec."NPR Pay-to E-mail" := Vendor."E-Mail";
-        end;
-    end;
-
-    local procedure "-- Page Subscribers"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Page, 21, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
     local procedure Page21OnActionSendAsPDF(var Rec: Record Customer)
     var
@@ -368,4 +354,3 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
         EmailDocMgt.RunEmailLog(Rec);
     end;
 }
-

@@ -1008,7 +1008,7 @@ codeunit 6060150 "NPR Event Management"
         Resource: Record Resource;
     begin
         Resource.Get(JobPlanningLine."No.");
-        SetupValue := Resource."NPR Over Capacitate Resource";
+        SetupValue := Resource."NPR Over Capacitate Resource".AsInteger();
         if SetupValue = 0 then
             SetupValue := JobsSetup."NPR Over Capacitate Resource".AsInteger();
         exit(SetupValue);

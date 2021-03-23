@@ -1,6 +1,10 @@
 codeunit 6150631 "NPR POS Post via Task Queue"
 {
-    TableNo = "NPR Task Line";
+
+    TableNo = "Job Queue Entry";
+
+    var
+        JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
 
     trigger OnRun()
     var
@@ -12,19 +16,20 @@ codeunit 6150631 "NPR POS Post via Task Queue"
         ErrorDuringPosting: Boolean;
     begin
         CheckForParameters(Rec);
-        POSPostEntries.SetPostCompressed(Rec.GetParameterBool('COMPRESSED'));
-        if Rec.GetParameterBool('ITEMPOSTING') then begin
+
+        POSPostEntries.SetPostCompressed(JQParamStrMgt.GetBoolean(ParamCompressed()));
+        if JQParamStrMgt.GetBoolean(ParamItemPosting()) then begin
             POSPostEntries.SetPostItemEntries(true);
             POSEntry.SetFilter("Post Item Entry Status", '<2');
         end;
-        if Rec.GetParameterBool('POSPOSTING') then begin
+        if JQParamStrMgt.GetBoolean(ParamPosPosting()) then begin
             POSPostEntries.SetPostPOSEntries(true);
             POSEntry.SetFilter("Post Entry Status", '<2');
         end;
 
-        POSPostEntries.SetPostPOSEntries(Rec.GetParameterBool('POSPOSTING'));
-        POSPostEntries.SetStopOnError(Rec.GetParameterBool('STOPONERROR'));
-        PostingDateOption := Rec.GetParameterInt('DATEOPTION');
+        POSPostEntries.SetPostPOSEntries(JQParamStrMgt.GetBoolean(ParamPosPosting()));
+        POSPostEntries.SetStopOnError(JQParamStrMgt.GetBoolean(ParamStopOnError()));
+        PostingDateOption := JQParamStrMgt.GetInteger(ParamDateOption());
         case PostingDateOption of
             0:
                 ; //No Date Set
@@ -46,9 +51,9 @@ codeunit 6150631 "NPR POS Post via Task Queue"
                 POSPostEntries.SetPostingDate(true, true, WorkDate - 1);   //8: Set Posting Date and Document Date to Day before Workdate
         end;
 
-        POSEntryNoFilter := Rec.GetParameterText('POSENTRYNOFILTER');
+        POSEntryNoFilter := JQParamStrMgt.GetText(ParamPosEntryNofilter());
 
-        POSPeriodRegisterNoFilter := Rec.GetParameterText('PERIODREGNOFILTER');
+        POSPeriodRegisterNoFilter := JQParamStrMgt.GetText(ParamPeriodRegNoFilter());
 
         if POSEntryNoFilter <> '' then
             POSEntry.SetFilter("Entry No.", POSEntryNoFilter);
@@ -67,42 +72,78 @@ codeunit 6150631 "NPR POS Post via Task Queue"
             if (POSPeriodRegisterNoFilter <> '') then
                 POSEntry.SetFilter("POS Period Register No.", POSPeriodRegisterNoFilter);
 
-            Commit;
+            Commit();
 
         until (ErrorDuringPosting or POSEntry.IsEmpty());
     end;
 
-    var
-        Text001: Label 'No Parameters found. Do you wish to have empty Parameters added?';
-        Text002: Label 'Empty Parameters added. Please fill in the parameters before run this task again';
-        Text005: Label 'Company: Name=';
+    procedure ParamItemPosting(): Text
+    begin
+        exit('ITEMPOSTING');
+    end;
 
-    procedure CheckForParameters(TaskLine: Record "NPR Task Line")
+    procedure ParamPosPosting(): Text
+    begin
+        exit('POSPOSTING');
+    end;
+
+    procedure ParamCompressed(): Text
+    begin
+        exit('COMPRESSED');
+    end;
+
+    procedure ParamDateOption(): Text
+    begin
+        exit('DATEOPTION');
+    end;
+
+    procedure ParamStopOnError(): Text
+    begin
+        exit('STOPONERROR');
+    end;
+
+    procedure ParamPosEntryNofilter(): Text
+    begin
+        exit('POSENTRYNOFILTER');
+    end;
+
+    procedure ParamPeriodRegNoFilter(): Text
+    begin
+        exit('PERIODREGNOFILTER');
+    end;
+
+    local procedure CheckForParameters(var JobQueueEntry: Record "Job Queue Entry")
     var
         DateForm: DateFormula;
         Obj: Record "Object";
         FieldType: Option Text,Date,Time,DateTime,"Integer",Decimal,Boolean,DateFilter;
+        NoParamsErr: Label 'No Parameters found.';
+        AddParamsQst: Label 'No Parameters found. Do you wish to have empty Parameters added?';
+        EmptyParamsErr: Label 'Empty Parameters added. Please fill in the parameters before run this task again';
+        ChangeMeTok: Label '=?';
     begin
-        if TaskLine.ParametersExists then
+        JQParamStrMgt.Parse(JobQueueEntry."Parameter String");
+
+        if JQParamStrMgt.HasParams() then
             exit;
 
-        if GuiAllowed then
-            if not Confirm(Text001) then
-                exit;
+        if not JQParamStrMgt.ParamStringContains(ChangeMeTok) then
+            exit;
 
-        TaskLine."Table 1 No." := 2000000006;
-        Evaluate(TaskLine."Table 1 Filter", Text005 + CompanyName);
-        TaskLine.Modify;
+        if GuiAllowed() then
+            if not Confirm(AddParamsQst) then
+                Error(NoParamsErr);
 
-        TaskLine.InsertParameter('COMPRESSED', FieldType::Boolean);
-        TaskLine.InsertParameter('ITEMPOSTING', FieldType::Boolean);
-        TaskLine.InsertParameter('POSPOSTING', FieldType::Boolean);
-        TaskLine.InsertParameter('DATEOPTION', FieldType::Integer);
-        TaskLine.InsertParameter('STOPONERROR', FieldType::Boolean);
-        TaskLine.InsertParameter('POSENTRYNOFILTER', FieldType::Text);
-        TaskLine.InsertParameter('PERIODREGNOFILTER', FieldType::Text);
-        Commit;
-        Error(Text002);
+        JobQueueEntry."Parameter String" := '';
+        JobQueueEntry."Parameter String" += ParamCompressed() + ChangeMeTok + ',';
+        JobQueueEntry."Parameter String" += ParamItemPosting() + ChangeMeTok + ',';
+        JobQueueEntry."Parameter String" += ParamPosPosting() + ChangeMeTok + ',';
+        JobQueueEntry."Parameter String" += ParamDateOption() + ChangeMeTok + ',';
+        JobQueueEntry."Parameter String" += ParamStopOnError() + ChangeMeTok + ',';
+        JobQueueEntry."Parameter String" += ParamPosEntryNofilter() + ChangeMeTok + ',';
+        JobQueueEntry."Parameter String" += ParamPeriodRegNoFilter() + ChangeMeTok;
+        JobQueueEntry.Modify();
+        Commit();
+        Error(EmptyParamsErr);
     end;
 }
-

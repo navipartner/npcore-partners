@@ -1,9 +1,5 @@
 page 6014527 "NPR TouchScreen: G/L Accounts"
 {
-    // NPR4.14/BHR/20150818 CASE 220158 Set Property ModifyAllowed to "No"
-    // NPR4.14/RMT/20150819 CASE 220157 Set ENU page from ENU=Touch Screen - Lookup vendor to ENU=Touch Screen - Lookup G/L Account
-    // NPR5.49/BHR /20190204 CASE 343525  Removed  Fields from Page Income/Balance,Account Type,Net Change,Balance at Date,Balance
-
     Caption = 'Touch Screen - Lookup G/L Account';
     ModifyAllowed = false;
     PageType = List;
@@ -14,7 +10,7 @@ page 6014527 "NPR TouchScreen: G/L Accounts"
                       ORDER(Ascending)
                       WHERE("No." = FILTER(<> ''),
                             Blocked = CONST(false),
-                            "NPR Retail Payment" = CONST(true));
+                            "NPR Is Retail Payment" = CONST(true));
 
     layout
     {
@@ -23,12 +19,12 @@ page 6014527 "NPR TouchScreen: G/L Accounts"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
@@ -36,9 +32,4 @@ page 6014527 "NPR TouchScreen: G/L Accounts"
             }
         }
     }
-
-    actions
-    {
-    }
 }
-

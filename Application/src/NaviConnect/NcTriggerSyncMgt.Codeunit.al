@@ -1,11 +1,10 @@
 codeunit 6151520 "NPR Nc Trigger Sync. Mgt."
 {
-    // NC2.01/BR /20160809  CASE 247479 NaviConnect: Object created
-
-    TableNo = "NPR Task Line";
+    TableNo = "Job Queue Entry";
 
     trigger OnRun()
     var
+        JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
         NcTriggerScheduler: Codeunit "NPR Nc Trigger Scheduler";
         DataLogSubscriberMgt: Codeunit "NPR Data Log Sub. Mgt.";
         NcTrigger: Record "NPR Nc Trigger";
@@ -13,9 +12,12 @@ codeunit 6151520 "NPR Nc Trigger Sync. Mgt."
         RecRef: RecordRef;
         TaskEntryNo: BigInteger;
     begin
-        TriggerCode := CopyStr(UpperCase(GetParameterText(NcTriggerScheduler.GetParamName)), 1, MaxStrLen(NcTrigger.Code));
+        JQParamStrMgt.Parse(Rec."Parameter String");
+
+        Evaluate(TriggerCode, JQParamStrMgt.GetText(NcTriggerScheduler.GetParamName()));
         if TriggerCode = '' then
             exit;
+
         NcTrigger.Get(TriggerCode);
         RecRef.Get(NcTrigger.RecordId);
         InsertTask(RecRef, TaskEntryNo);
@@ -29,14 +31,13 @@ codeunit 6151520 "NPR Nc Trigger Sync. Mgt."
         NcTaskProcessor: Record "NPR Nc Task Processor";
     begin
         NcTaskSetup.SetRange("Table No.", Recref.Number);
-        if not NcTaskSetup.FindFirst then begin
+        if not NcTaskSetup.FindFirst() then
             InsertSetup(NcTaskSetup, Recref);
-        end;
 
-        NcTask.Init;
+        NcTask.Init();
         NcTask."Entry No." := 0;
         NcTask."Task Processor Code" := NcTaskSetup."Task Processor Code";
-        if Recref.Number = DATABASE::"NPR Nc Trigger" then begin
+        if Recref.Number = Database::"NPR Nc Trigger" then begin
             FldRef := Recref.Field(60);
             if Format(FldRef.Value) <> '' then
                 if NcTaskProcessor.Get(Format(FldRef.Value)) then
@@ -49,7 +50,7 @@ codeunit 6151520 "NPR Nc Trigger Sync. Mgt."
         NcTask."Record Position" := Recref.GetPosition(false);
         NcTask."Log Date" := CurrentDateTime;
         NcTask."Record Value" := CopyStr(DelStr(Format(Recref.RecordId), 1, StrLen(Recref.Name) + 2), 1, MaxStrLen(NcTask."Record Value"));
-        NcTask.Insert;
+        NcTask.Insert();
         TaskEntryNo := NcTask."Entry No.";
     end;
 
@@ -61,12 +62,12 @@ codeunit 6151520 "NPR Nc Trigger Sync. Mgt."
     begin
         NcTask.CalcFields(Response);
         if NcTask.Response.HasValue then begin
-            NcTask.Response.CreateInStream(StreamIn, TEXTENCODING::UTF8);
+            NcTask.Response.CreateInStream(StreamIn, TextEncoding::UTF8);
             StreamIn.Read(PreviousResponse);
-        end else begin
+        end else
             PreviousResponse := '';
-        end;
-        NcTask.Response.CreateOutStream(StreamOut, TEXTENCODING::UTF8);
+
+        NcTask.Response.CreateOutStream(StreamOut, TextEncoding::UTF8);
         StreamOut.Write(PreviousResponse + ResponseText);
     end;
 
@@ -77,24 +78,25 @@ codeunit 6151520 "NPR Nc Trigger Sync. Mgt."
         FieldRecord: Record "Field";
         NcTaskField: Record "NPR Nc Task Field";
     begin
-        if not TempEndpoint.IsRecord then
+        if not TempEndpoint.IsRecord() then
             exit;
+
         RecRef.GetTable(TempEndpoint);
-        FieldRecord.Reset;
+        FieldRecord.Reset();
         FieldRecord.SetRange(TableNo, RecRef.Number);
-        if FieldRecord.FindSet then
+        if FieldRecord.FindSet() then
             repeat
-                FieldRecord.Init;
+                FieldRecord.Init();
                 FldRef := RecRef.Field(FieldRecord."No.");
                 NcTaskField."Entry No." := 0;
                 NcTaskField."Field No." := FieldRecord."No.";
                 NcTaskField."Field Name" := FldRef.Name;
                 NcTaskField."Previous Value" := Format(FldRef.Value, 0, 9);
                 NcTaskField."New Value" := FldRef.Value;
-                NcTaskField."Log Date" := CurrentDateTime;
+                NcTaskField."Log Date" := CurrentDateTime();
                 NcTaskField."Task Entry No." := NcTask."Entry No.";
-                NcTaskField.Insert;
-            until FieldRecord.Next = 0;
+                NcTaskField.Insert();
+            until FieldRecord.Next() = 0;
     end;
 
     procedure GetOutput(NcTaskentryNo: Integer): Text
@@ -108,11 +110,11 @@ codeunit 6151520 "NPR Nc Trigger Sync. Mgt."
         if not NcTask.Get(NcTaskentryNo) then
             Error(TextOutputNotFound, Format(NcTaskentryNo));
 
-        if not NcTask."Data Output".HasValue then
+        if not NcTask."Data Output".HasValue() then
             Error(TextNoOutput);
 
         NcTask.CalcFields("Data Output");
-        NcTask."Data Output".CreateInStream(IStream, TEXTENCODING::UTF8);
+        NcTask."Data Output".CreateInStream(IStream, TextEncoding::UTF8);
         StreamReader := StreamReader.StreamReader(IStream);
         exit(StreamReader.ReadToEnd());
     end;
@@ -121,12 +123,12 @@ codeunit 6151520 "NPR Nc Trigger Sync. Mgt."
     var
         NcTaskProcessor: Record "NPR Nc Task Processor";
     begin
-        NcTaskSetup.Init;
-        NcTaskProcessor.FindFirst;
+        NcTaskSetup.Init();
+        NcTaskProcessor.FindFirst();
         NcTaskSetup."Task Processor Code" := NcTaskProcessor.Code;
         NcTaskSetup."Entry No." := 0;
         NcTaskSetup.Validate("Table No.", RecRef.Number);
-        NcTaskSetup.Validate("Codeunit ID", CODEUNIT::"NPR Nc Trigger Task Mgt.");
+        NcTaskSetup.Validate("Codeunit ID", Codeunit::"NPR Nc Trigger Task Mgt.");
         NcTaskSetup.Insert(true);
     end;
 }

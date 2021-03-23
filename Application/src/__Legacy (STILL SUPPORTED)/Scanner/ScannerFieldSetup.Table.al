@@ -1,9 +1,9 @@
 table 6014448 "NPR Scanner: Field Setup"
 {
-    // NPR5.40/BHR/20180326 CASE 308408 Rename field 8 Where to "Where To"
-
     Caption = 'Scanner - Field Setup';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Not used.';
 
     fields
     {
@@ -77,4 +77,3 @@ table 6014448 "NPR Scanner: Field Setup"
     {
     }
 }
-

@@ -1,19 +1,39 @@
 codeunit 6060058 "NPR Item Wksht. TaskQueue Mgt."
 {
-    TableNo = "NPR Task Line";
+    TableNo = "Job Queue Entry";
+
     trigger OnRun()
     var
+        JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
         Register: Boolean;
         BatchName: Text;
         TemplateName: Text;
     begin
-        TemplateName := UpperCase(GetParameterText('TEMPLATE_NAME'));
-        BatchName := UpperCase(GetParameterText('BATCH_NAME'));
-        Register := GetParameterBool('REGISTER_ITEM_WKSHT');
+        // Expected "Parameter String" like TEMPLATE_NAME=template,BATCH_NAME=batch,REGISTER_ITEM_WKSHT
+        JQParamStrMgt.Parse(Rec."Parameter String");
 
-        Commit;
+        Register := JQParamStrMgt.GetBoolean(ParamRegisterItemWksht());
+        evaluate(TemplateName, JQParamStrMgt.GetText(ParamTemplateName()));
+        evaluate(BatchName, JQParamStrMgt.GetText(ParamBatchName()));
+
+        Commit();
         if Register then
             RegisterItemWkshtBatch(TemplateName, BatchName);
+    end;
+
+    procedure ParamTemplateName(): Text
+    begin
+        exit('TEMPLATE_NAME');
+    end;
+
+    procedure ParamBatchName(): Text
+    begin
+        exit('BATCH_NAME');
+    end;
+
+    procedure ParamRegisterItemWksht(): Text
+    begin
+        exit('REGISTER_ITEM_WKSHT');
     end;
 
     local procedure RegisterItemWkshtBatch(TemplateName: Text; BatchName: Text)
@@ -25,10 +45,8 @@ codeunit 6060058 "NPR Item Wksht. TaskQueue Mgt."
         ItemWkshtLine.SetRange("Worksheet Name", BatchName);
         ItemWkshtLine.FilterGroup(0);
 
-        if ItemWkshtLine.IsEmpty then
-            exit;
-
-        CODEUNIT.Run(CODEUNIT::"NPR Item Wsht.-Regist. Batch", ItemWkshtLine);
+        if not ItemWkshtLine.IsEmpty() then
+            Codeunit.Run(Codeunit::"NPR Item Wsht.-Regist. Batch", ItemWkshtLine);
     end;
 }
 
