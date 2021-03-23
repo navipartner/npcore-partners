@@ -117,15 +117,6 @@ codeunit 6014442 "NPR Event Subscriber (Cust)"
         exit(true);
     end;
 
-    [EventSubscriber(ObjectType::Page, Page::"Customer List", 'OnAfterActionEvent', 'NPR ItemLedgerEntries', false, false)]
-    local procedure CustomerListActionEventItemLedgerEntries(var Rec: Record Customer)
-    var
-        ItemLedgerEntry: Record "Item Ledger Entry";
-    begin
-        ItemLedgerEntry.SetRange("Source No.", Rec."No.");
-        PAGE.RunModal(PAGE::"Item Ledger Entries", ItemLedgerEntry);
-    end;
-
     [EventSubscriber(ObjectType::Page, Page::"Customer Card", 'OnAfterActionEvent', 'NPR ItemLedgerEntries', false, false)]
     local procedure CustomerCardOnAfterActionEventItemLedgerEntries(var Rec: Record Customer)
     var

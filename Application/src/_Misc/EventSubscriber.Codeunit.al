@@ -349,15 +349,6 @@ codeunit 6014404 "NPR Event Subscriber"
         ImportfromScannerFileTO.Run();
     end;
 
-    [EventSubscriber(ObjectType::Page, Page::"Concurrent Session List", 'OnAfterActionEvent', 'NPR Kill Session', false, false)]
-    local procedure ConcurrentSessionListOnAfterActionEventKillSession(var Rec: Record "Active Session")
-    var
-        KillSessionQst: Label 'Kill Session   ?';
-    begin
-        if Confirm(KillSessionQst, false) then
-            StopSession(Rec."Session ID");
-    end;
-
     [EventSubscriber(ObjectType::Page, Page::"NPR Campaign Discount", 'OnAfterActionEvent', 'Transfer from Period Discount', false, false)]
     local procedure CampaignDiscountOnAfterActionEventTransferFromPeriodDiscount(var Rec: Record "NPR Period Discount")
     var
