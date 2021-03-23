@@ -8,7 +8,6 @@ table 6014580 "NPR Object Output Selection"
         field(1; "User ID"; Code[50])
         {
             Caption = 'User ID';
-            NotBlank = true;
             TableRelation = User."User Name";
             ValidateTableRelation = false;
             DataClassification = EndUserIdentifiableInformation;
