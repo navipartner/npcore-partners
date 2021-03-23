@@ -1,17 +1,5 @@
 tableextension 6014434 "NPR Purchase Header" extends "Purchase Header"
 {
-    // NPR7.100.000/LS/220114  : Retail Merge
-    //                           Added Field 6014401
-    // 
-    // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
-    //   - Added Field 6014414 "Pay-to E-mail" for defining Recipient when sending E-mail using PDF2NAV.
-    //   - Added Field 6014415 "Document Processing" for defining Print action on Purch. Doc. Posting.
-    // PN1.08/MHA/20151214  CASE 228859 Pdf2Nav (New Version List)
-    // NPR4.00/TJ/20160406 CASE 238572 Moving custom code in standard places to a subscriber codeunit
-    // NPR5.39/THRO/20180222 CASE 304256 Moved code on OnAfterValidate "Pay-to Vendor No." to subscriber
-    // NPR5.44/BHR/20180709 CASE 321560 New fields "Sell-to" 6014420 to 6014430
-    // NPR5.53/MHA /20191211 CASE 380837 Added fields 6151300 "NpEc Store Code", 6151305 "NpEc Document No."
-    // NPR5.54/MHA /20200311  CASE 390380 Removed fields 6151300 "NpEc Store Code", 6151305 "NpEc Document No."
     fields
     {
         field(6014401; "NPR Sent"; Boolean)
@@ -19,12 +7,16 @@ tableextension 6014434 "NPR Purchase Header" extends "Purchase Header"
             Caption = 'Sent';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6014414; "NPR Pay-to E-mail"; Text[80])
         {
             Caption = 'Pay-to E-mail';
             DataClassification = CustomerContent;
             Description = 'PN1.00';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6014415; "NPR Document Processing"; Option)
         {

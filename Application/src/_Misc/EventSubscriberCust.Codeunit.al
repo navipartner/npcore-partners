@@ -16,17 +16,14 @@ codeunit 6014442 "NPR Event Subscriber (Cust)"
         if not RunTrigger then
             exit;
 
-        if Rec."NPR Type" <> Rec."NPR Type"::Cash then begin
-            if Rec."No." = '' then begin
-                GetSalesSetup;
-                SalesSetup.TestField("Customer Nos.");
-                NoSeriesMgt.InitSeries(SalesSetup."Customer Nos.", '', 0D, Rec."No.", Rec."No. Series");
-                Rec."Invoice Disc. Code" := Rec."No.";
-            end;
-        end else
-            if Rec."No." = '' then
-                Error(NoNumberErr);
-        Rec."NPR Primary Key Length" := StrLen(Rec."No.");
+        if Rec."No." = '' then
+            exit;
+
+        GetSalesSetup();
+        SalesSetup.TestField("Customer Nos.");
+        NoSeriesMgt.InitSeries(SalesSetup."Customer Nos.", '', 0D, Rec."No.", Rec."No. Series");
+        Rec."Invoice Disc. Code" := Rec."No.";
+
         Rec.Modify();
     end;
 
@@ -107,18 +104,6 @@ codeunit 6014442 "NPR Event Subscriber (Cust)"
         PaymentTerms.Get(Rec."Payment Terms Code");
         if Format(PaymentTerms."Due Date Calculation") = '' then
             Error(PaymentTermsErr, PaymentTerms.FieldCaption("Due Date Calculation"), PaymentTerms.Code);
-        if Format(PaymentTerms."Due Date Calculation") = Format(0D) then
-            Rec."NPR Type" := Rec."NPR Type"::Cash
-        else
-            Rec."NPR Type" := Rec."NPR Type"::Customer;
-
-        if (xRec."NPR Type" = xRec."NPR Type"::Cash) and (xRec."NPR Type" <> Rec."NPR Type") then begin
-            if not Confirm(StrSubstNo(ConvertCustQst, Rec.Name), false) then begin
-                Rec."Payment Terms Code" := xRec."Payment Terms Code";
-                Rec."NPR Type" := Rec."NPR Type"::Cash;
-            end else
-                Rec."NPR Type" := Rec."NPR Type"::Customer;
-        end;
     end;
 
     local procedure GetSalesSetup(): Boolean

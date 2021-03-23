@@ -1,7 +1,5 @@
 codeunit 6151508 "NPR Nc Task List Processing"
 {
-    // NC2.23/MHA /20191018  CASE 358499 Object created - Process Nc Task List via Job Queue
-
     TableNo = "Job Queue Entry";
 
     trigger OnRun()
@@ -178,22 +176,22 @@ codeunit 6151508 "NPR Nc Task List Processing"
         exit(CODEUNIT::"NPR Nc Task List Processing");
     end;
 
-    local procedure ParamProcessor(): Text
+    procedure ParamProcessor(): Text
     begin
         exit('processor');
     end;
 
-    local procedure ParamMaxRetry(): Text
+    procedure ParamMaxRetry(): Text
     begin
         exit('max_retry');
     end;
 
-    local procedure ParamUpdateTaskList(): Text
+    procedure ParamUpdateTaskList(): Text
     begin
         exit('update_task_list');
     end;
 
-    local procedure ParamProcessTaskList(): Text
+    procedure ParamProcessTaskList(): Text
     begin
         exit('process_task_list');
     end;

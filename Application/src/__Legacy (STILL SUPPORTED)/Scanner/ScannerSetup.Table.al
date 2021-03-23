@@ -1,13 +1,9 @@
 table 6014447 "NPR Scanner - Setup"
 {
-    // NPR5.27/TJ  /20160826  CASE 248276 Removing unused variables and fields, renaming fields and variables to use standard naming procedures
-    // NPR5.29/CLVA/20161122  CASE 252352 Added fields: "FTP Download to Server Folder","FTP Site address","FTP Filename","FTP Username","FTP Password"
-    // NPR5.38/MHA /20171222  CASE 299271 Added field 24 "Backup Filename"
-    // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj -field 40
-
     Caption = 'Scanner - Setup';
-    LookupPageID = "NPR Scanner - List";
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Not used.';
 
     fields
     {
@@ -235,4 +231,3 @@ table 6014447 "NPR Scanner - Setup"
     {
     }
 }
-

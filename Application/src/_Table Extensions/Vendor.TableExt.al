@@ -35,6 +35,8 @@ tableextension 6014424 "NPR Vendor" extends Vendor
             Caption = 'Auto';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6014403; "NPR Item Category Filter"; Code[20])
         {
@@ -82,6 +84,8 @@ tableextension 6014424 "NPR Vendor" extends Vendor
             Caption = 'Primary Key Length';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6014408; "NPR Purchase Value (LCY)"; Decimal)
         {
@@ -96,12 +100,16 @@ tableextension 6014424 "NPR Vendor" extends Vendor
             Caption = 'Purchase Value (LCY)';
             Description = 'NPR7.100.000';
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6014409; "NPR Change-to No."; Code[20])
         {
             Caption = 'Change-to No.';
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(6014415; "NPR Document Processing"; Option)
         {

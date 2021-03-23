@@ -10,13 +10,14 @@ codeunit 6014405 "NPR UPG Aux. Tables"
     local procedure Upgrade()
     var
         UpgradeTag: Codeunit "Upgrade Tag";
-        UpgradeTagLbl: Label 'NPRPUGAuxTables_Upgrade-20210224', Locked = true;
+        UpgradeTagLbl: Label 'NPRPUGAuxTables_Upgrade-20210315-01', Locked = true;
     begin
         if UpgradeTag.HasUpgradeTag(UpgradeTagLbl) then
             exit;
 
         UpgradeValueEntry();
         UpgradeItemLedgerEntry();
+        UpgradeGLAccount();
 
         UpgradeTag.SetUpgradeTag(UpgradeTagLbl);
     end;
@@ -57,5 +58,24 @@ codeunit 6014405 "NPR UPG Aux. Tables"
                 AuxItemLedgerEntry.Insert();
             end
         until ItemLedgEntry.Next() = 0;
+    end;
+
+    local procedure UpgradeGLAccount()
+    var
+        GLAccount: Record "G/L Account";
+        AuxGLAccount: Record "NPR Aux. G/L Account";
+    begin
+        GLAccount.Reset();
+        if not GLAccount.FindSet() then
+            exit;
+
+        repeat
+            if not AuxGLAccount.Get(GLAccount."No.") then begin
+                AuxGLAccount.Init();
+                AuxGLAccount.TransferFields(GLAccount);
+                AuxGLAccount."Retail Payment" := GLAccount."NPR Retail Payment";
+                AuxGLAccount.Insert();
+            end;
+        until GLAccount.Next() = 0;
     end;
 }
