@@ -4,27 +4,22 @@ codeunit 6060132 "NPR MM Import Members"
     trigger OnRun()
     var
         FileManagement: Codeunit "File Management";
-        SuggestFileName: Text[1024];
         FileName: Text[1024];
-        Serverfilename: Text;
     begin
 
         if GuiAllowed then begin
-            SuggestFileName := '';
-            FileName := FileManagement.OpenFileDialog(SELECT_FILE_CAPTION, SuggestFileName, FILE_FILTER);
+            FileName := FileManagement.BLOBImportWithFilter(_TempBlob, SELECT_FILE_CAPTION, '', 'Membership Import Files (*.csv;*.txt)|*.csv;*.txt', 'csv,txt');
 
-            if (SuggestFileName = FileName) then
-                Error('');
-
-            Serverfilename := FileManagement.UploadFileSilent(FileName);
-            SetFileName(Serverfilename);
+            if (FileName = '') then
+                exit;
 
         end;
 
-        Import;
+        Import();
     end;
 
     var
+        _TempBlob: Codeunit "Temp Blob";
         GFileName: Text[250];
         GMessage: Text[250];
         GMemberInfo: Record "NPR MM Member Info Capture";
@@ -79,16 +74,10 @@ codeunit 6060132 "NPR MM Import Members"
         NOT_IMPLEMENTED: Label 'Support for %1 %2 is not implemented.';
         DATE_MASK_ERROR: Label 'Date format mask %1 is not supported.';
 
-    procedure SetFileName(PFileName: Text[250])
-    begin
-        GFileName := PFileName;
-    end;
-
     procedure Import()
     var
-        TxtFile: File;
         IStream: InStream;
-        Fileline: Text;
+        FileLine: Text;
         Window: Dialog;
         RunMode: Integer;
         LowEntryNo: Integer;
@@ -108,9 +97,7 @@ codeunit 6060132 "NPR MM Import Members"
         OPTIONAL := 2;
         GDateMask := 'YYYYMMDD'; // Should be setup or parameter
 
-        TxtFile.TextMode(true);
-        TxtFile.Open(GFileName);
-        TxtFile.CreateInStream(IStream);
+        _TempBlob.CreateInStream(IStream, TextEncoding::UTF8);
 
         MemberInfoCapture.SetFilter("Originates From File Import", '=%1', true);
         if (MemberInfoCapture.FindLast()) then;
@@ -123,13 +110,9 @@ codeunit 6060132 "NPR MM Import Members"
 
         while (not IStream.EOS) do begin
 
-            if (IStream.ReadText(Fileline) > 0) then begin
-                Fileline := Ansi2Ascii(Fileline);
+            if (IStream.ReadText(FileLine) > 0) then begin
 
-                // UTF-8 files start with some bytes identifying the format, get rid of those bytes
-                //IF (lineCount = 1) THEN WHILE (fileline[1] <> '"') DO fileline := COPYSTR (fileline, 2);
-
-                decodeLine(Fileline);
+                decodeLine(FileLine);
                 if GuiAllowed then
                     if ((GLineCount mod 50) = 0) then Window.Update(1, StrSubstNo(PROCESS_INFO, GLineCount, FldFirstName, FldLastName));
 
@@ -142,17 +125,10 @@ codeunit 6060132 "NPR MM Import Members"
 
             end;
 
-            // break
-            // IF lineCount > 35 THEN EXIT;
-
         end;
 
-        TxtFile.Close();
         if GuiAllowed then
             Window.Close();
-
-        //IF (runmode = 2) THEN
-        //  ERROR ('Import was run in test mode, nothing has been imported.');
 
         MemberInfoCapture.Reset();
         MemberInfoCapture.SetFilter("Originates From File Import", '=%1', true);
@@ -491,8 +467,8 @@ codeunit 6060132 "NPR MM Import Members"
         NextByte: Text[1];
     begin
 
-        //  This function splits the text line into 2 parts at first occurence of separator
-        //  Quotecharacter enables separator to occur inside datablock
+        //  This function splits the text line into 2 parts at first occurrence of separator
+        //  Quote character enables separator to occur inside data block
 
         //  example:
         //  23;some text;"some text with a ;";xxxx
@@ -569,273 +545,6 @@ codeunit 6060132 "NPR MM Import Members"
 
         varText := CopyStr(LText, 1, NextFieldPos);
         exit(rField);
-    end;
-
-    local procedure "--Tools"()
-    begin
-    end;
-
-    procedure Ansi2Ascii(_Text: Text): Text
-    begin
-        //Ansi2Ascii
-        if not InternalVars then
-            MakeVars;
-        exit(ConvertStr(_Text, AnsiStr, AsciiStr));
-    end;
-
-    procedure Ascii2Ansi(_Text: Text): Text
-    begin
-        //Ascii2Ansi
-        if not InternalVars then
-            MakeVars;
-        exit(ConvertStr(_Text, AsciiStr, AnsiStr));
-    end;
-
-    local procedure MakeVars()
-    begin
-        //MakeVars
-        AsciiStr[1] := 128;
-        AnsiStr[1] := 199;
-        AsciiStr[2] := 129;
-        AnsiStr[2] := 252;
-        AsciiStr[3] := 130;
-        AnsiStr[3] := 233;
-        AsciiStr[4] := 131;
-        AnsiStr[4] := 226;
-        AsciiStr[5] := 132;
-        AnsiStr[5] := 228;
-        AsciiStr[6] := 133;
-        AnsiStr[6] := 224;
-        AsciiStr[7] := 134;
-        AnsiStr[7] := 229;
-        AsciiStr[8] := 135;
-        AnsiStr[8] := 231;
-        AsciiStr[9] := 136;
-        AnsiStr[9] := 234;
-        AsciiStr[10] := 137;
-        AnsiStr[10] := 235;
-        AsciiStr[11] := 138;
-        AnsiStr[11] := 232;
-        AsciiStr[12] := 139;
-        AnsiStr[12] := 239;
-        AsciiStr[13] := 140;
-        AnsiStr[13] := 238;
-        AsciiStr[14] := 141;
-        AnsiStr[14] := 236;
-        AsciiStr[15] := 142;
-        AnsiStr[15] := 196;
-        AsciiStr[16] := 143;
-        AnsiStr[16] := 197;
-        AsciiStr[17] := 144;
-        AnsiStr[17] := 201;
-        AsciiStr[18] := 145;
-        AnsiStr[18] := 230;
-        AsciiStr[19] := 146;
-        AnsiStr[19] := 198;
-        AsciiStr[20] := 147;
-        AnsiStr[20] := 244;
-        AsciiStr[21] := 148;
-        AnsiStr[21] := 246;
-        AsciiStr[22] := 149;
-        AnsiStr[22] := 242;
-        AsciiStr[23] := 150;
-        AnsiStr[23] := 251;
-        AsciiStr[24] := 151;
-        AnsiStr[24] := 249;
-        AsciiStr[25] := 152;
-        AnsiStr[25] := 255;
-        AsciiStr[26] := 153;
-        AnsiStr[26] := 214;
-        AsciiStr[27] := 154;
-        AnsiStr[27] := 220;
-        AsciiStr[28] := 155;
-        AnsiStr[28] := 248;
-        AsciiStr[29] := 156;
-        AnsiStr[29] := 163;
-        AsciiStr[30] := 157;
-        AnsiStr[30] := 216;
-        AsciiStr[31] := 158;
-        AnsiStr[31] := 215;
-        AsciiStr[32] := 159;
-        AnsiStr[32] := 131;
-        AsciiStr[33] := 160;
-        AnsiStr[33] := 225;
-        AsciiStr[34] := 161;
-        AnsiStr[34] := 237;
-        AsciiStr[35] := 162;
-        AnsiStr[35] := 243;
-        AsciiStr[36] := 163;
-        AnsiStr[36] := 250;
-        AsciiStr[37] := 164;
-        AnsiStr[37] := 241;
-        AsciiStr[38] := 165;
-        AnsiStr[38] := 209;
-        AsciiStr[39] := 166;
-        AnsiStr[39] := 170;
-        AsciiStr[40] := 167;
-        AnsiStr[40] := 186;
-        AsciiStr[41] := 168;
-        AnsiStr[41] := 191;
-        AsciiStr[42] := 169;
-        AnsiStr[42] := 174;
-        AsciiStr[43] := 170;
-        AnsiStr[43] := 172;
-        AsciiStr[44] := 171;
-        AnsiStr[44] := 189;
-        AsciiStr[45] := 172;
-        AnsiStr[45] := 188;
-        AsciiStr[46] := 173;
-        AnsiStr[46] := 161;
-        AsciiStr[47] := 174;
-        AnsiStr[47] := 171;
-        AsciiStr[48] := 175;
-        AnsiStr[48] := 187;
-        AsciiStr[49] := 181;
-        AnsiStr[49] := 193;
-        AsciiStr[50] := 182;
-        AnsiStr[50] := 194;
-        AsciiStr[51] := 183;
-        AnsiStr[51] := 192;
-        AsciiStr[52] := 184;
-        AnsiStr[52] := 169;
-        AsciiStr[53] := 189;
-        AnsiStr[53] := 162;
-        AsciiStr[54] := 190;
-        AnsiStr[54] := 165;
-        AsciiStr[55] := 198;
-        AnsiStr[55] := 227;
-        AsciiStr[56] := 199;
-        AnsiStr[56] := 195;
-        AsciiStr[57] := 207;
-        AnsiStr[57] := 164;
-        AsciiStr[58] := 208;
-        AnsiStr[58] := 240;
-        AsciiStr[59] := 209;
-        AnsiStr[59] := 208;
-        AsciiStr[60] := 210;
-        AnsiStr[60] := 202;
-        AsciiStr[61] := 211;
-        AnsiStr[61] := 203;
-        AsciiStr[62] := 212;
-        AnsiStr[62] := 200;
-        AsciiStr[63] := 214;
-        AnsiStr[63] := 205;
-        AsciiStr[64] := 215;
-        AnsiStr[64] := 206;
-        AsciiStr[65] := 216;
-        AnsiStr[65] := 207;
-        AsciiStr[66] := 221;
-        AnsiStr[66] := 166;
-        AsciiStr[67] := 222;
-        AnsiStr[67] := 204;
-        AsciiStr[68] := 224;
-        AnsiStr[68] := 211;
-        AsciiStr[69] := 225;
-        AnsiStr[69] := 223;
-        AsciiStr[70] := 226;
-        AnsiStr[70] := 212;
-        AsciiStr[71] := 227;
-        AnsiStr[71] := 210;
-        AsciiStr[72] := 228;
-        AnsiStr[72] := 245;
-        AsciiStr[73] := 229;
-        AnsiStr[73] := 213;
-        AsciiStr[74] := 230;
-        AnsiStr[74] := 181;
-        AsciiStr[75] := 231;
-        AnsiStr[75] := 254;
-        AsciiStr[76] := 232;
-        AnsiStr[76] := 222;
-        AsciiStr[77] := 233;
-        AnsiStr[77] := 218;
-        AsciiStr[78] := 234;
-        AnsiStr[78] := 219;
-        AsciiStr[79] := 235;
-        AnsiStr[79] := 217;
-        AsciiStr[80] := 236;
-        AnsiStr[80] := 253;
-        AsciiStr[81] := 237;
-        AnsiStr[81] := 221;
-        AsciiStr[82] := 238;
-        AnsiStr[82] := 175;
-        AsciiStr[83] := 239;
-        AnsiStr[83] := 180;
-        AsciiStr[84] := 240;
-        AnsiStr[84] := 173;
-        AsciiStr[85] := 241;
-        AnsiStr[85] := 177;
-        AsciiStr[86] := 243;
-        AnsiStr[86] := 190;
-        AsciiStr[87] := 244;
-        AnsiStr[87] := 182;
-        AsciiStr[88] := 245;
-        AnsiStr[88] := 167;
-        AsciiStr[89] := 246;
-        AnsiStr[89] := 247;
-        AsciiStr[90] := 247;
-        AnsiStr[90] := 184;
-        AsciiStr[91] := 248;
-        AnsiStr[91] := 176;
-        AsciiStr[92] := 249;
-        AnsiStr[92] := 168;
-        AsciiStr[93] := 250;
-        AnsiStr[93] := 183;
-        AsciiStr[94] := 251;
-        AnsiStr[94] := 185;
-        AsciiStr[95] := 252;
-        AnsiStr[95] := 179;
-        AsciiStr[96] := 253;
-        AnsiStr[96] := 178;
-        AsciiStr[97] := 255;
-        AnsiStr[97] := 160;
-        InternalVars := true;
-    end;
-
-    local procedure MakeVars2()
-    begin
-        AsciiStr := 'ÆüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜø£Ø×ƒáíóúñÑªº¿®¬½¼¡«»¦¦¦¦¦ÁÂÀ©¦¦++¢¥++--+-+ãÃ++--¦-+';
-        AsciiStr := AsciiStr + '¤ðÐÊËÈiÍÎÏ++¦_¦Ì¯ÓßÔÒõÕµþÞÚÛÙýÝ¯´­±=¾¶§÷¸°¨·¹³²¦ ';
-        CharVar[1] := 196;
-        CharVar[2] := 197;
-        CharVar[3] := 201;
-        CharVar[4] := 242;
-        CharVar[5] := 220;
-        CharVar[6] := 186;
-        CharVar[7] := 191;
-        CharVar[8] := 188;
-        CharVar[9] := 187;
-        CharVar[10] := 193;
-        CharVar[11] := 194;
-        CharVar[12] := 192;
-        CharVar[13] := 195;
-        CharVar[14] := 202;
-        CharVar[15] := 203;
-        CharVar[16] := 200;
-        CharVar[17] := 205;
-        CharVar[18] := 206;
-        CharVar[19] := 204;
-        CharVar[20] := 175;
-        CharVar[21] := 223;
-        CharVar[22] := 213;
-        CharVar[23] := 254;
-        CharVar[24] := 218;
-        CharVar[25] := 219;
-        CharVar[26] := 217;
-        CharVar[27] := 180;
-        CharVar[28] := 177;
-        CharVar[29] := 176;
-        CharVar[30] := 185;
-        CharVar[31] := 179;
-        CharVar[32] := 178;
-        AnsiStr := 'Ã³ÚÔõÓÕþÛÙÞ´¯ý' + FORMAT(CharVar[1]) + FORMAT(CharVar[2]) + FORMAT(CharVar[3]) + 'µã¶÷' + FORMAT(CharVar[4]);
-        AnsiStr := AnsiStr + '¹¨ Í' + FORMAT(CharVar[5]) + '°úÏÎâßÝ¾·±Ð¬' + FORMAT(CharVar[6]) + FORMAT(CharVar[7]);
-        AnsiStr := AnsiStr + '«¼¢' + FORMAT(CharVar[8]) + 'í½' + FORMAT(CharVar[9]) + '___ªª' + FORMAT(CharVar[10]) + FORMAT(CharVar[11]);
-        AnsiStr := AnsiStr + FORMAT(CharVar[12]) + '®ªª++óÑ++--+-+Ò' + FORMAT(CharVar[13]) + '++--ª-+ñ­ð';
-        AnsiStr := AnsiStr + FORMAT(CharVar[14]) + FORMAT(CharVar[15]) + FORMAT(CharVar[16]) + 'i' + FORMAT(CharVar[17]) + FORMAT(CharVar[18]);
-        AnsiStr := AnsiStr + '¤++__ª' + FORMAT(CharVar[19]) + FORMAT(CharVar[20]) + 'Ë' + FORMAT(CharVar[21]) + 'ÈÊ§';
-        AnsiStr := AnsiStr + FORMAT(CharVar[22]) + 'Á' + FORMAT(CharVar[23]) + 'Ì' + FORMAT(CharVar[24]) + FORMAT(CharVar[25]);
-        AnsiStr := AnsiStr + FORMAT(CharVar[26]) + '²¦»' + FORMAT(CharVar[27]) + '¡' + FORMAT(CharVar[28]) + '=¥Âº¸©' + FORMAT(CharVar[29]);
-        AnsiStr := AnsiStr + '¿À' + FORMAT(CharVar[30]) + FORMAT(CharVar[31]) + FORMAT(CharVar[32]) + '_ ';
     end;
 
     local procedure MakeNote(Member: Record "NPR MM Member"; CommentText: Text)
