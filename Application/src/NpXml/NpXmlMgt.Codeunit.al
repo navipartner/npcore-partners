@@ -208,8 +208,6 @@ codeunit 6151551 "NPR NpXml Mgt."
         Namespace: Text;
         ChildNodesList: XmlNodeList;
         ChildNode: XmlNode;
-        NodeToRemove: XmlNode;
-        ReferenceNode: XmlNode;
     begin
         if not NpXmlElement.Active then
             exit;
@@ -251,15 +249,11 @@ codeunit 6151551 "NPR NpXml Mgt."
 
 
         if NpXmlElement."Only with Value" then begin
-            if NewXmlNode.AsXmlElement.IsEmpty OR (NewXmlNode.AsXmlElement.InnerXml = '') then begin
-                Node.SelectSingleNode('//' + GetXmlElementXPath(NewXmlNode.AsXmlElement()), NodeToRemove);
-                NodeToRemove.Remove();
-            end
+            if NewXmlNode.AsXmlElement.IsEmpty OR (NewXmlNode.AsXmlElement.InnerXml = '') then
+                NewXmlNode.Remove();
         end else
-            if NpXmlElement.Comment <> '' then begin
-                Node.SelectSingleNode('//' + GetXmlElementXPath(NewXmlNode.AsXmlElement()), ReferenceNode);
-                ReferenceNode.AddBeforeSelf(XmlComment.Create(NpXmlElement.Comment));
-            end;
+            if NpXmlElement.Comment <> '' then
+                NewXmlNode.AddBeforeSelf(XmlComment.Create(NpXmlElement.Comment));
 
         exit(true);
     end;
