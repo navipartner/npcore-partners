@@ -3036,12 +3036,6 @@ End Function
         <Field Name="QuantitySold_PeriodDiscountLine_caption">
           <DataField>QuantitySold_PeriodDiscountLine_caption</DataField>
         </Field>
-        <Field Name="Photo_PeriodDiscountLine">
-          <DataField>Photo_PeriodDiscountLine</DataField>
-        </Field>
-        <Field Name="Photo_PeriodDiscountLine_Caption">
-          <DataField>Photo_PeriodDiscountLine_Caption</DataField>
-        </Field>
         <Field Name="TableID_RetailComment">
           <DataField>TableID_RetailComment</DataField>
         </Field>
