@@ -95,6 +95,9 @@ report 6014432 "NPR Customer Analysis"
                     CurrReport.Skip();
                 CustomerAmountTemp2.Init();
                 CustomerAmountTemp2."Customer No." := Customer1."No.";
+                TempCustomerBuffer.Init();
+                TempCustomerBuffer."No." := Customer1."No.";
+
                 if Sorting = Sorting::Maximum then
                     Multipl := -1
                 else
@@ -105,22 +108,23 @@ report 6014432 "NPR Customer Analysis"
                         begin
                             CustomerAmountTemp2."Amount (LCY)" := Multipl * Customer1."Sales (LCY)";
                             CustomerAmountTemp2."Amount 2 (LCY)" := Multipl * Customer1."Balance (LCY)";
-                            CustomerAmountTemp2."NPR Amount 3 (LCY)" := Multipl * Customer1."Profit (LCY)";
+                            TempCustomerBuffer.Amount := Multipl * Customer1."Profit (LCY)";
                         end;
                     ShowType::Balance:
                         begin
                             CustomerAmountTemp2."Amount (LCY)" := Multipl * Customer1."Balance (LCY)";
                             CustomerAmountTemp2."Amount 2 (LCY)" := Multipl * Customer1."Sales (LCY)";
-                            CustomerAmountTemp2."NPR Amount 3 (LCY)" := Multipl * Customer1."Profit (LCY)";
+                            TempCustomerBuffer.Amount := Multipl * Customer1."Profit (LCY)";
                         end;
                     ShowType::Margin:
                         begin
                             CustomerAmountTemp2."Amount (LCY)" := Multipl * Customer1."Profit (LCY)";
                             CustomerAmountTemp2."Amount 2 (LCY)" := Multipl * Customer1."Sales (LCY)";
-                            CustomerAmountTemp2."NPR Amount 3 (LCY)" := Multipl * Customer1."Balance (LCY)";
+                            TempCustomerBuffer.Amount := Multipl * Customer1."Balance (LCY)";
                         end;
                 end;
                 CustomerAmountTemp2.Insert();
+                TempCustomerBuffer.Insert();
 
                 i += 1;
 
@@ -157,30 +161,32 @@ report 6014432 "NPR Customer Analysis"
                         CurrReport.Break();
                     end;
 
+                TempCustomerBuffer.Get(CustomerAmountTemp2."Customer No.");
+
                 if Number <= ShowQty then
                     case ShowType of
                         ShowType::Sales:
                             begin
                                 CustSalesDKK1 += -CustomerAmountTemp2."Amount (LCY)";
                                 CustBalanceDKK1 += -CustomerAmountTemp2."Amount 2 (LCY)";
-                                CustProfitDKK1 += -CustomerAmountTemp2."NPR Amount 3 (LCY)";
+                                CustProfitDKK1 += -TempCustomerBuffer.Amount;
                             end;
                         ShowType::Balance:
                             begin
                                 CustSalesDKK1 += -CustomerAmountTemp2."Amount 2 (LCY)";
                                 CustBalanceDKK1 += -CustomerAmountTemp2."Amount (LCY)";
-                                CustProfitDKK1 += -CustomerAmountTemp2."NPR Amount 3 (LCY)";
+                                CustProfitDKK1 += -TempCustomerBuffer.Amount;
                             end;
                         ShowType::Margin:
                             begin
                                 CustSalesDKK1 += -CustomerAmountTemp2."Amount 2 (LCY)";
-                                CustBalanceDKK1 += -CustomerAmountTemp2."NPR Amount 3 (LCY)";
+                                CustBalanceDKK1 += -TempCustomerBuffer.Amount;
                                 CustProfitDKK1 += -CustomerAmountTemp2."Amount (LCY)";
                             end;
                     end;
 
-                CustomerAmountTemp2."NPR Location" := Number;
-                CustomerAmountTemp2.Modify();
+                TempCustomerBuffer."Last Statement No." := Number;
+                TempCustomerBuffer.Modify();
                 Window.Update(5, (100 * Round(Number * 100 / DebCount, 1)));
             end;
         }
@@ -413,9 +419,10 @@ report 6014432 "NPR Customer Analysis"
                 end;
 
                 CustomerAmountTemp2.SetRange("Customer No.", Customer."No.");
-                if CustomerAmountTemp2.FindFirst() then
-                    LastLocation := CustomerAmountTemp2."NPR Location"
-                else begin
+                if CustomerAmountTemp2.FindFirst() then begin
+                    TempCustomerBuffer.Get(CustomerAmountTemp2."Customer No.");
+                    LastLocation := TempCustomerBuffer."Last Statement No.";
+                end else begin
                     CustomerAmountTemp2."Amount (LCY)" := 0;
                     CustomerAmountTemp2."Amount 2 (LCY)" := 0;
                     LastLocation := 0;
@@ -509,6 +516,7 @@ report 6014432 "NPR Customer Analysis"
         Customer1: Record Customer;
         CustomerAmountTemp: Record "Customer Amount" temporary;
         CustomerAmountTemp2: Record "Customer Amount" temporary;
+        TempCustomerBuffer: Record Customer temporary;
         Greyed: Boolean;
         MaxDate: Date;
         MinDate: Date;
