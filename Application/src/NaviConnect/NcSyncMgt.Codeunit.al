@@ -1,85 +1,11 @@
 codeunit 6151505 "NPR Nc Sync. Mgt."
 {
-    TableNo = "NPR Task Line";
-
-    trigger OnRun()
-    var
-        TaskProcessor: Record "NPR Nc Task Processor";
-        NaviConnectTaskMgt: Codeunit "NPR Nc Task Mgt.";
-        NcImportMgt: Codeunit "NPR Nc Import Mgt.";
-        MaxRetry: Integer;
-        ImportTypeCode: Code[20];
-    begin
-        SyncStartTime := CurrentDateTime;
-        SyncEndTime := SyncStartTime + GetMaxSyncDuration();
-        TaskProcessor.Code := CopyStr(UpperCase(GetParameterText("Parameter.TaskProcessorCode")), 1, MaxStrLen(TaskProcessor.Code));
-        if TaskProcessor.Code = '' then begin
-            TaskProcessor.Code := "Task Worker Group";
-            SetParameterText(GetParameterText("Parameter.TaskProcessorCode"), TaskProcessor.Code);
-        end;
-        UpdateTaskProcessor(TaskProcessor);
-        Commit;
-
-        ImportTypeCode := CopyStr(UpperCase(GetParameterText("Parameter.DownloadType")), 1, MaxStrLen(ImportTypeCode));
-        UpdateImportList(Rec, ImportTypeCode);
-
-        if GetParameterBool("Parameter.ProcessImport") then
-            ProcessImportEntries();
-
-        if GetParameterBool("Parameter.ImportNewTasks") then
-            NaviConnectTaskMgt.UpdateTasks(TaskProcessor);
-
-        if GetParameterBool("Parameter.ProcessTasks") then begin
-            MaxRetry := GetParameterInt("Parameter.TaskRetryCount");
-            ProcessTasks(TaskProcessor, MaxRetry);
-        end;
-
-        if GetParameterBool("Parameter.ResetTaskCount") then
-            TaskResetCount();
-
-        if GetParameterBool("Parameter.CleanupImport") then
-            NcImportMgt.CleanupImportTypes();
-    end;
-
-    procedure UpdateImportList(TaskLine: Record "NPR Task Line"; ImportTypeCode: Code[20])
-    var
-        ImportType: Record "NPR Nc Import Type";
-        NcDependencyFactory: Codeunit "NPR Nc Dependency Factory";
-        ImportListUpdater: Interface "NPR Nc Import List IUpdate";
-    begin
-        if ImportTypeCode <> '' then
-            ImportType.SetRange("Code", ImportTypeCode);
-        if ImportType.FindSet() then
-            repeat
-                if NcDependencyFactory.CreateNcImportListUpdater(ImportListUpdater, ImportType) then
-                    ImportListUpdater.Update(TaskLine, ImportType);
-            until ImportType.Next() = 0;
-    end;
-
     var
         Text000: Label 'NaviConnect Default';
         Text001: Label 'Error during Ftp Backup (%1):\\%2';
-        SyncStartTime: DateTime;
         SyncEndTime: DateTime;
 
     #region "Download Ftp"
-    procedure DownloadFtp()
-    var
-        ImportType: Record "NPR Nc Import Type";
-        LastErrorMessage: Text;
-    begin
-        ImportType.SetRange("Ftp Enabled", true);
-        if not ImportType.FindSet then
-            exit;
-
-        LastErrorMessage := '';
-        repeat
-            if not DownloadFtpType(ImportType) then
-                LastErrorMessage := GetLastErrorText;
-        until ImportType.Next = 0;
-        if LastErrorMessage <> '' then
-            Error(CopyStr(LastErrorMessage, 1, 1000));
-    end;
 
     procedure DownloadFtpType(ImportType: Record "NPR Nc Import Type"): Boolean
     var
@@ -225,34 +151,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
     #endregion "Download Ftp"
 
     #region "Downlod Server File"
-    procedure DownloadServerFiles()
-    var
-        NcImportEntryTmp: Record "NPR Nc Import Entry" temporary;
-        NcImportType: Record "NPR Nc Import Type";
-        LastErrorText: Text;
-    begin
-        NcImportType.SetRange("Server File Enabled", true);
-        if NcImportType.IsEmpty then
-            exit;
-
-        NcImportType.FindSet;
-        repeat
-            ClearLastError();
-            if not TryDownloadServerFile(NcImportType, NcImportEntryTmp) then
-                LastErrorText := GetLastErrorText + LastErrorText;
-            StoreImportEntries(NcImportEntryTmp);
-            Commit;
-        until NcImportType.Next = 0;
-
-        if LastErrorText <> '' then
-            Error(CopyStr(LastErrorText, 1, 1000));
-    end;
-
-    [TryFunction]
-    local procedure TryDownloadServerFile(NcImportType: Record "NPR Nc Import Type"; var NcImportEntryTmp: Record "NPR Nc Import Entry" temporary)
-    begin
-        DownloadServerFile(NcImportType, NcImportEntryTmp);
-    end;
 
     procedure DownloadServerFile(NcImportType: Record "NPR Nc Import Type")
     var
@@ -334,21 +232,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
             exit(ImportEntry.Imported);
 
         exit(false);
-    end;
-
-    procedure ProcessImportEntries()
-    var
-        ImportEntry: Record "NPR Nc Import Entry";
-    begin
-        ImportEntry.SetRange(Imported, false);
-        ImportEntry.SetRange("Runtime Error", false);
-        ImportEntry.SetFilter("Earliest Import Datetime", '<=%1', CurrentDateTime);
-        if ImportEntry.FindSet then
-            repeat
-                ProcessImportEntry(ImportEntry);
-                if (CurrentDateTime > SyncEndTime) and (SyncEndTime <> 0DT) then
-                    exit;
-            until ImportEntry.Next = 0;
     end;
 
     procedure ProcessTask(var Task: Record "NPR Nc Task"): Boolean
@@ -907,11 +790,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
     #endregion Aux
 
     #region Constants
-    procedure "Parameter.CleanupImport"(): Code[20]
-    begin
-        exit('CLEANUP_IMPORT');
-    end;
-
     procedure "Parameter.DownloadFtp"(): Code[20]
     begin
         exit('DOWNLOAD_FTP');
@@ -922,19 +800,9 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         exit('DOWNLOAD_SERVER_FILE');
     end;
 
-    procedure "Parameter.DownloadType"(): Code[20]
-    begin
-        exit('DOWNLOAD_IMPORT_TYPE');
-    end;
-
     procedure "Parameter.ImportNewTasks"(): Code[20]
     begin
         exit('IMPORT_NEW_TASKS');
-    end;
-
-    procedure "Parameter.ProcessImport"(): Code[20]
-    begin
-        exit('PROCESS_IMPORT');
     end;
 
     procedure "Parameter.ProcessTasks"(): Code[20]
@@ -951,11 +819,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
     begin
         exit('TASK_RETRY_COUNT');
     end;
-
-    procedure "Parameter.TaskProcessorCode"(): Code[20]
-    begin
-        exit('TASK_PROCESSOR_CODE');
-    end;
     #endregion Constants
 
     #region UI
@@ -970,12 +833,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         Process := Process.Start(ProcessStartInfo);
         if Modal then
             Process.WaitForExit();
-    end;
-
-    local procedure GetMaxSyncDuration() SyncDuration: Duration
-    begin
-        SyncDuration := 120000T - 113000T;
-        exit(SyncDuration);
     end;
     #endregion UI
 }

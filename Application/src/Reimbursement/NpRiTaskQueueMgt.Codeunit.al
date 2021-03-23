@@ -1,13 +1,29 @@
 codeunit 6151106 "NPR NpRi Task Queue Mgt."
 {
-    TableNo = "NPR Task Line";
+    TableNo = "Job Queue Entry";
 
     trigger OnRun()
+    var
+        JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
     begin
-        if Rec.GetParameterBool('RUN_DATA_COLLECTIONS') then
+        // Expected "Parmeter String" like: RUN_DATA_COLLECTIONS,RUN_REIMBURSEMENTS
+        JQParamStrMgt.Parse(Rec."Parameter String");
+
+        if JQParamStrMgt.GetBoolean(ParamRunDataCollections()) then
             RunDataCollections();
-        if Rec.GetParameterBool('RUN_REIMBURSEMENTS') then
+
+        if JQParamStrMgt.GetBoolean(ParamRunReimbursements()) then
             RunReimbursements();
+    end;
+
+    procedure ParamRunDataCollections(): Text
+    begin
+        exit('RUN_DATA_COLLECTIONS');
+    end;
+
+    procedure ParamRunReimbursements(): Text
+    begin
+        exit('RUN_REIMBURSEMENTS');
     end;
 
     local procedure RunDataCollections()
@@ -18,14 +34,12 @@ codeunit 6151106 "NPR NpRi Task Queue Mgt."
         NpRiReimbursement.SetFilter("Party Type", '<>%1', '');
         NpRiReimbursement.SetFilter("Party No.", '<>%1', '');
         NpRiReimbursement.SetFilter("Template Code", '<>%1', '');
-        if not NpRiReimbursement.FindSet then
-            exit;
-
-        repeat
-            Clear(NpRiDataCollectionMgt);
-            if NpRiDataCollectionMgt.Run(NpRiReimbursement) then;
-            Commit;
-        until NpRiReimbursement.Next = 0;
+        if NpRiReimbursement.FindSet(true) then
+            repeat
+                Clear(NpRiDataCollectionMgt);
+                if NpRiDataCollectionMgt.Run(NpRiReimbursement) then;
+                Commit();
+            until NpRiReimbursement.Next() = 0;
     end;
 
     local procedure RunReimbursements()
@@ -38,14 +52,11 @@ codeunit 6151106 "NPR NpRi Task Queue Mgt."
         NpRiReimbursement.SetFilter("Template Code", '<>%1', '');
         NpRiReimbursement.SetFilter("Reimbursement Date", '<>%1&>=%2', 0D, Today);
         NpRiReimbursement.SetFilter("Posting Date", '<>%1', 0D);
-        if not NpRiReimbursement.FindSet then
-            exit;
-
-        repeat
-            Clear(NpRiReimbursementMgt);
-            if NpRiReimbursementMgt.Run(NpRiReimbursement) then;
-            Commit;
-        until NpRiReimbursement.Next = 0;
+        if NpRiReimbursement.FindSet(true) then
+            repeat
+                Clear(NpRiReimbursementMgt);
+                if NpRiReimbursementMgt.Run(NpRiReimbursement) then;
+                Commit();
+            until NpRiReimbursement.Next() = 0;
     end;
 }
-
