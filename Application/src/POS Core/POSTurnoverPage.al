@@ -15,19 +15,17 @@ page 6014409 "NPR POS Turnover"
         {
             group(Filters)
             {
+                field(BaseCalculationDate; BaseCalculationDate)
+                {
+                    Caption = 'Calculation Date';
+                    ApplicationArea = All;
+                }
                 field(POSStoreCodeFilter; POSStoreCodeFilter)
                 {
                     Caption = 'POS Store Code';
                     ApplicationArea = All;
                     TableRelation = "NPR POS Store";
                     Editable = POSStoreCodeEditable;
-
-                    trigger OnValidate()
-                    begin
-                        POSStore.SetRange(Code, POSStoreCodeFilter);
-                        POSUnit.SetRange("No.", POSUnitNoFilter);
-                        Rec.FillData(POSStore, POSUnit, Rec);
-                    end;
                 }
                 field(POSUnitNoFilter; POSUnitNoFilter)
                 {
@@ -45,13 +43,6 @@ page 6014409 "NPR POS Turnover"
                             POSUnitNoFilter := POSUnit."No.";
                         end
                     end;
-
-                    trigger OnValidate()
-                    begin
-                        POSStore.SetRange(Code, POSStoreCodeFilter);
-                        POSUnit.SetRange("No.", POSUnitNoFilter);
-                        Rec.FillData(POSStore, POSUnit, Rec);
-                    end;
                 }
             }
             group(Turnover)
@@ -67,25 +58,25 @@ page 6014409 "NPR POS Turnover"
                         StyleExpr = RowStyle1;
                         Editable = false;
                     }
-                    field("This Year"; Rec."This Year")
+                    field("This Year"; "This Year")
                     {
                         ApplicationArea = All;
                         StyleExpr = RowStyle2;
                         Editable = false;
                     }
-                    field("Last Year"; Rec."Last Year")
+                    field("Last Year"; "Last Year")
                     {
                         ApplicationArea = All;
                         StyleExpr = RowStyle2;
                         Editable = false;
                     }
-                    field(Difference; Rec.Difference)
+                    field(Difference; Difference)
                     {
                         ApplicationArea = All;
                         StyleExpr = RowStyle2;
                         Editable = false;
                     }
-                    field("Difference %"; Rec."Difference %")
+                    field("Difference %"; "Difference %")
                     {
                         ApplicationArea = All;
                         StyleExpr = RowStyle2;
@@ -111,7 +102,7 @@ page 6014409 "NPR POS Turnover"
 
                 trigger OnAction()
                 begin
-                    Rec.FillData(POSStore, POSUnit, Rec);
+                    Rec.FillData(BaseCalculationDate, POSStore, POSUnit, Rec);
                     if Rec.FindFirst() then;
                 end;
             }
@@ -125,6 +116,7 @@ page 6014409 "NPR POS Turnover"
         POSUnit: Record "NPR POS Unit";
         POSStoreCodeEditable: Boolean;
         POSUnitNoFilterEditable: Boolean;
+        BaseCalculationDate: Date;
 
     trigger OnInit()
     var
@@ -132,6 +124,7 @@ page 6014409 "NPR POS Turnover"
         POSSessionMgt: Codeunit "NPR POS Session";
         POSSetup: Codeunit "NPR POS Setup";
     begin
+        BaseCalculationDate := WorkDate();
         POSStoreCodeEditable := true;
         POSUnitNoFilterEditable := true;
 
@@ -147,7 +140,7 @@ page 6014409 "NPR POS Turnover"
             POSUnitNoFilterEditable := false;
         end;
 
-        Rec.FillData(POSStore, POSUnit, Rec);
+        Rec.FillData(BaseCalculationDate, POSStore, POSUnit, Rec);
         if Rec.FindFirst() then;
     end;
 
