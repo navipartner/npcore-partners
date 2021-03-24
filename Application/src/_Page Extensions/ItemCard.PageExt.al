@@ -715,6 +715,13 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 Image = ShowList;
                 ApplicationArea = All;
                 ToolTip = 'Executes the All Attributes Values action';
+
+                trigger OnAction()
+                var
+                    NPRAttrManagement: Codeunit "NPR Attribute Management";
+                begin
+                    NPRAttrManagement.ShowMasterDataAttributeValues(Database::Item, Rec."No.");
+                end;
             }
         }
         addafter("Application Worksheet")

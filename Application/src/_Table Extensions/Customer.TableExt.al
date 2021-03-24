@@ -2,6 +2,22 @@ tableextension 6014423 "NPR Customer" extends Customer
 {
     fields
     {
+        modify("Payment Terms Code")
+        {
+            trigger OnAfterValidate()
+            var
+                PaymentTerms: Record "Payment Terms";
+                PaymentTermsErr: Label 'Specify %1 for %2!', Comment = '%1 = Due Date Calculation, %2 = Payment Terms Code';
+                ConvertCustQst: Label 'Want to convert customer %1 from type cash to type customer?', Comment = '%1 = Customer Name';
+            begin
+                if Rec."Payment Terms Code" = '' then
+                    exit;
+
+                PaymentTerms.Get(Rec."Payment Terms Code");
+                if Format(PaymentTerms."Due Date Calculation") = '' then
+                    Error(PaymentTermsErr, PaymentTerms.FieldCaption("Due Date Calculation"), PaymentTerms.Code);
+            end;
+        }
         field(6014400; "NPR Type"; Option)
         {
             Caption = 'Type';
@@ -212,4 +228,51 @@ tableextension 6014423 "NPR Customer" extends Customer
             end;
         }
     }
+
+    trigger OnAfterInsert()
+    var
+        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoNumberErr: Label 'Number must not be blank!';
+    begin
+        if Rec."No." = '' then
+            exit;
+
+        SalesSetup.GetRecordOnce();
+        SalesSetup.TestField("Customer Nos.");
+        NoSeriesMgt.InitSeries(SalesSetup."Customer Nos.", '', 0D, Rec."No.", Rec."No. Series");
+        Rec."Invoice Disc. Code" := Rec."No.";
+
+        Rec.Modify();
+    end;
+
+    trigger OnBeforeDelete()
+    var
+        SalesLinePOS: Record "NPR Sale Line POS";
+        SalesPOS: Record "NPR Sale POS";
+        POSEntry: Record "NPR POS Entry";
+        DeleteCustActiveCashErr: Label 'You can''t delete customer %1 as it is used on active cash payment.', Comment = '%1 = Customer';
+        DeleteCustActiveSalesDocErr: Label 'You can''t delete customer %1 as it is used on an active sales document.', Comment = '%1 = Customer';
+        DeleteCustActivePostedEntriesErr: Label 'You can''t delete customer %1 as there are one or more non posted entries.', Comment = '%1 = Customer';
+    begin
+        if Rec."No." = '' then
+            exit;
+
+        POSEntry.SetRange("Customer No.", Rec."No.");
+        POSEntry.SetRange("Post Entry Status", POSEntry."Post Entry Status"::Unposted);
+        if not POSEntry.IsEmpty() then
+            Error(DeleteCustActivePostedEntriesErr, Rec."No.");
+
+        SalesPOS.SetRange("Customer No.", Rec."No.");
+        if not SalesPOS.IsEmpty() then
+            Error(DeleteCustActiveSalesDocErr, Rec."No.");
+
+        SalesLinePOS.SetRange("Sale Type", SalesLinePOS."Sale Type"::Deposit);
+        SalesLinePOS.SetRange(Type, SalesLinePOS.Type::Customer);
+        SalesLinePOS.SetRange("No.", Rec."No.");
+        if not SalesLinePOS.IsEmpty() then
+            Error(DeleteCustActiveCashErr, Rec."No.");
+    end;
+
+    var
+        SalesSetup: Record "Sales & Receivables Setup";
 }
