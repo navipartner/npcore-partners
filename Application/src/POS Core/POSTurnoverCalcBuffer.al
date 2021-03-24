@@ -71,7 +71,8 @@ table 6014487 "NPR POS Turnover Calc. Buffer"
         ProfitText: Label 'Profit';
         ProfitPctText: Label 'Profit %';
 
-    procedure FillData(var POSStore: Record "NPR POS Store"; var POSUnit: Record "NPR POS Unit"; var Buffer: Record "NPR POS Turnover Calc. Buffer")
+    procedure FillData(BaseCalculationDate: Date; var POSStore: Record "NPR POS Store"; var POSUnit: Record "NPR POS Unit";
+        var Buffer: Record "NPR POS Turnover Calc. Buffer")
     var
         POSEntry: Record "NPR POS Entry";
         i: Integer;
@@ -85,17 +86,20 @@ table 6014487 "NPR POS Turnover Calc. Buffer"
         Buffer.DeleteAll();
         i := 1;
 
-        FromDate[1] := WorkDate() - 1;
-        ToDate[1] := WorkDate() - 1;
-        FromDate[2] := CalcDate('<-1Y>', WorkDate() - 1);
-        ToDate[2] := CalcDate('<-1Y>', WorkDate() - 1);
+        if BaseCalculationDate = 0D then
+            BaseCalculationDate := WorkDate();
+
+        FromDate[1] := BaseCalculationDate - 1;
+        ToDate[1] := BaseCalculationDate - 1;
+        FromDate[2] := CalcDate('<-1Y>', BaseCalculationDate - 1);
+        ToDate[2] := CalcDate('<-1Y>', BaseCalculationDate - 1);
 
         CreateHeaderRow(Buffer, i, DayLastText, Format(FromDate[1]), Format(FromDate[2]));
         CreateDataBlock(FromDate[1], ToDate[1], FromDate[2], ToDate[2], Buffer, i);
 
-        DayOfWeek := Date2DWY(WorkDate(), 1);
-        WeekNo := Date2DWY(WorkDate(), 2);
-        CurrYear := Date2DWY(WorkDate(), 3);
+        DayOfWeek := Date2DWY(BaseCalculationDate, 1);
+        WeekNo := Date2DWY(BaseCalculationDate, 2);
+        CurrYear := Date2DWY(BaseCalculationDate, 3);
         FromDate[1] := DWY2Date(1, WeekNo, CurrYear);
         ToDate[1] := DWY2Date(7, WeekNo, CurrYear);
         FromDate[2] := DWY2Date(1, WeekNo, CurrYear - 1);
@@ -112,34 +116,34 @@ table 6014487 "NPR POS Turnover Calc. Buffer"
             Format(FromDate[2]) + '...' + Format(ToDate[2]));
         CreateDataBlock(FromDate[1], ToDate[1], FromDate[2], ToDate[2], Buffer, i);
 
-        FromDate[1] := CalcDate('<CM><-1M><+1D>', WorkDate());
-        ToDate[1] := CalcDate('<CM>', WorkDate());
-        FromDate[2] := CalcDate('<CM><-1M><-1Y>', WorkDate());
-        ToDate[2] := CalcDate('<CM><-1Y>', WorkDate());
+        FromDate[1] := CalcDate('<CM><-1M><+1D>', BaseCalculationDate);
+        ToDate[1] := CalcDate('<CM>', BaseCalculationDate);
+        FromDate[2] := CalcDate('<CM><-1M><-1Y>', BaseCalculationDate);
+        ToDate[2] := CalcDate('<CM><-1Y>', BaseCalculationDate);
         CreateHeaderRow(Buffer, i, MonthThisCurrentText, Format(FromDate[1]) + '...' + Format(ToDate[1]),
             Format(FromDate[2]) + '...' + Format(ToDate[2]));
         CreateDataBlock(FromDate[1], ToDate[1], FromDate[2], ToDate[2], Buffer, i);
 
-        FromDate[1] := CalcDate('<CM><-2M><+1D>', WorkDate());
-        ToDate[1] := CalcDate('<CM><-2M>', WorkDate());
-        FromDate[2] := CalcDate('<CM><-2M><+1D><-1Y>', WorkDate());
-        ToDate[2] := CalcDate('<CM><-1M><-1Y>', WorkDate());
+        FromDate[1] := CalcDate('<CM><-2M><+1D>', BaseCalculationDate);
+        ToDate[1] := CalcDate('<CM><-2M>', BaseCalculationDate);
+        FromDate[2] := CalcDate('<CM><-2M><+1D><-1Y>', BaseCalculationDate);
+        ToDate[2] := CalcDate('<CM><-2M><-1Y>', BaseCalculationDate);
         CreateHeaderRow(Buffer, i, MonthLastText, Format(FromDate[1]) + '...' + Format(ToDate[1]),
             Format(FromDate[2]) + '...' + Format(ToDate[2]));
         CreateDataBlock(FromDate[1], ToDate[1], FromDate[2], ToDate[2], Buffer, i);
 
-        FromDate[1] := DMY2Date(1, 1, Date2DMY(WorkDate(), 3));
-        ToDate[1] := WorkDate() - 1;
-        FromDate[2] := DMY2Date(1, 1, Date2DMY(WorkDate(), 3) - 1);
-        ToDate[2] := CalcDate('<-1Y>', WorkDate() - 1);
+        FromDate[1] := DMY2Date(1, 1, Date2DMY(BaseCalculationDate, 3));
+        ToDate[1] := BaseCalculationDate - 1;
+        FromDate[2] := DMY2Date(1, 1, Date2DMY(BaseCalculationDate, 3) - 1);
+        ToDate[2] := CalcDate('<-1Y>', BaseCalculationDate - 1);
         CreateHeaderRow(Buffer, i, YearThisCurrentText, Format(FromDate[1]) + '...' + Format(ToDate[1]),
             Format(FromDate[2]) + '...' + Format(ToDate[2]));
         CreateDataBlock(FromDate[1], ToDate[1], FromDate[2], ToDate[2], Buffer, i);
 
-        FromDate[1] := DMY2Date(1, 1, Date2DMY(WorkDate(), 3) - 1);
-        ToDate[1] := CalcDate('<-1Y>', WorkDate() - 1);
-        FromDate[2] := DMY2Date(1, 1, Date2DMY(WorkDate(), 3) - 2);
-        ToDate[2] := CalcDate('<-2Y>', WorkDate() - 1);
+        FromDate[1] := DMY2Date(1, 1, Date2DMY(BaseCalculationDate, 3) - 1);
+        ToDate[1] := CalcDate('<-1Y>', BaseCalculationDate - 1);
+        FromDate[2] := DMY2Date(1, 1, Date2DMY(BaseCalculationDate, 3) - 2);
+        ToDate[2] := CalcDate('<-2Y>', BaseCalculationDate - 1);
         CreateHeaderRow(Buffer, i, YearLastText, Format(FromDate[1]) + '...' + Format(ToDate[1]),
             Format(FromDate[2]) + '...' + Format(ToDate[2]));
         CreateDataBlock(FromDate[1], ToDate[1], FromDate[2], ToDate[2], Buffer, i);
@@ -175,13 +179,13 @@ table 6014487 "NPR POS Turnover Calc. Buffer"
         Buffer.Indentation := 1;
         Buffer.Description := NetText;
         if Values[1] <> 0 then
-            Buffer."This Year" := Format(Values[1]);
+            Buffer."This Year" := Format(Values[1], 0, '<Precision,2><sign><Integer Thousand><Decimals,3>');
         if Values[5] <> 0 then
-            Buffer."Last Year" := Format(Values[5]);
+            Buffer."Last Year" := Format(Values[5], 0, '<Precision,2><sign><Integer Thousand><Decimals,3>');
         if (Values[5] - Values[1]) <> 0 then
-            Buffer.Difference := Format(Values[5] - Values[1]);
+            Buffer.Difference := Format(Values[5] - Values[1], 0, '<Precision,2><sign><Integer Thousand><Decimals,3>');
         if Values[5] <> 0 then
-            Buffer."Difference %" := Format(Round((Values[5] - Values[1]) * 100 / Values[5], 0.1));
+            Buffer."Difference %" := Format(Round((Values[5] - Values[1]) * 100 / Values[5], 0.1), 0, '<Precision,2><sign><Integer Thousand><Decimals,3>');
         Buffer."Row Style" := 'Strong';
         Buffer.Insert();
         i := i + 1;
@@ -191,13 +195,13 @@ table 6014487 "NPR POS Turnover Calc. Buffer"
         Buffer.Indentation := 1;
         Buffer.Description := CostOfSalesText;
         if Values[2] <> 0 then
-            Buffer."This Year" := Format(Values[2]);
+            Buffer."This Year" := Format(Values[2], 0, '<Precision,2><sign><Integer Thousand><Decimals,3>');
         if Values[6] <> 0 then
-            Buffer."Last Year" := Format(Values[6]);
+            Buffer."Last Year" := Format(Values[6], 0, '<Precision,2><sign><Integer Thousand><Decimals,3>');
         if (Values[6] - Values[2]) <> 0 then
-            Buffer.Difference := Format(Values[6] - Values[2]);
+            Buffer.Difference := Format(Values[6] - Values[2], 0, '<Precision,2><sign><Integer Thousand><Decimals,3>');
         if Values[6] <> 0 then
-            Buffer."Difference %" := Format(Round((Values[6] - Values[2]) * 100 / Values[6], 0.1));
+            Buffer."Difference %" := Format(Round((Values[6] - Values[2]) * 100 / Values[6], 0.1), 0, '<Precision,2><sign><Integer Thousand><Decimals,3>');
         Buffer."Row Style" := 'Strong';
         Buffer.Insert();
         i := i + 1;
@@ -207,13 +211,13 @@ table 6014487 "NPR POS Turnover Calc. Buffer"
         Buffer.Indentation := 1;
         Buffer.Description := ProfitText;
         if Values[3] <> 0 then
-            Buffer."This Year" := Format(Values[3]);
+            Buffer."This Year" := Format(Values[3], 0, '<Precision,2><sign><Integer Thousand><Decimals,3>');
         if Values[7] <> 0 then
-            Buffer."Last Year" := Format(Values[7]);
+            Buffer."Last Year" := Format(Values[7], 0, '<Precision,2><sign><Integer Thousand><Decimals,3>');
         if (Values[7] - Values[3]) <> 0 then
-            Buffer.Difference := Format(Values[7] - Values[3]);
+            Buffer.Difference := Format(Values[7] - Values[3], 0, '<Precision,2><sign><Integer Thousand><Decimals,3>');
         if Values[7] <> 0 then
-            Buffer."Difference %" := Format(Round((Values[7] - Values[3]) * 100 / Values[7], 0.1));
+            Buffer."Difference %" := Format(Round((Values[7] - Values[3]) * 100 / Values[7], 0.1), 0, '<Precision,2><sign><Integer Thousand><Decimals,3>');
         Buffer."Row Style" := 'Strong';
         Buffer.Insert();
         i := i + 1;
@@ -223,11 +227,11 @@ table 6014487 "NPR POS Turnover Calc. Buffer"
         Buffer.Indentation := 1;
         Buffer.Description := ProfitPctText;
         if Values[4] <> 0 then
-            Buffer."This Year" := Format(Values[4]);
+            Buffer."This Year" := Format(Values[4], 0, '<Precision,2><sign><Integer Thousand><Decimals,3>');
         if Values[8] <> 0 then
-            Buffer."Last Year" := Format(Values[8]);
+            Buffer."Last Year" := Format(Values[8], 0, '<Precision,2><sign><Integer Thousand><Decimals,3>');
         if (Values[8] - Values[4]) <> 0 then
-            Buffer.Difference := Format(Values[8] - Values[4]);
+            Buffer.Difference := Format(Values[8] - Values[4], 0, '<Precision,2><sign><Integer Thousand><Decimals,3>');
         Buffer."Row Style" := 'Strong';
         Buffer.Insert();
         i := i + 1;
@@ -254,6 +258,9 @@ table 6014487 "NPR POS Turnover Calc. Buffer"
             NetAmount := NetAmount + POSTurnoverQuery.Sales_Amount_Actual;
             CostOfSalesAmount := CostOfSalesAmount + POSTurnoverQuery.Cost_Amount_Actual;
         end;
+        CostOfSalesAmount := -CostOfSalesAmount;
         ProfitAmount := NetAmount - CostOfSalesAmount;
+        if CostOfSalesAmount <> 0 then
+            ProfitPct := Round(100 * ProfitAmount / CostOfSalesAmount, 2);
     end;
 }
