@@ -4,7 +4,7 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
     {
         addafter("Posting Date")
         {
-            field("NPR NPPostingDescription1"; "Posting Description")
+            field("NPR NPPostingDescription1"; Rec."Posting Description")
             {
                 ApplicationArea = All;
                 Visible = false;
@@ -13,7 +13,7 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
         }
         addafter(Control174)
         {
-            field("NPR Bill-to E-mail"; "NPR Bill-to E-mail")
+            field("NPR Bill-to E-mail"; Rec."NPR Bill-to E-mail")
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the NPR Bill-to E-mail field';
@@ -48,9 +48,7 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                     var
                         NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
                     begin
-                        //-NPR5.55 [402013]
                         NpRvSalesDocMgt.ShowRelatedVouchersAction(Rec);
-                        //+NPR5.55 [402013]
                     end;
                 }
             }
@@ -67,9 +65,12 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                 ToolTip = 'Executes the Import from scanner action';
 
                 trigger OnAction()
+                var
+                    ImportfromScannerFileSO: XMLport "NPR Import from ScannerFileSO";
                 begin
-                    //-NPR5.49 [346899]
-                    //-NPR5.49 [346899]
+                    ImportfromScannerFileSO.SelectTable(Rec);
+                    ImportfromScannerFileSO.SetTableView(Rec);
+                    ImportfromScannerFileSO.Run();
                 end;
             }
         }
@@ -88,9 +89,7 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                     var
                         NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
                     begin
-                        //-NPR5.55 [402014]
                         NpRvSalesDocMgt.IssueVoucherAction(Rec);
-                        //+NPR5.55 [402014]
                     end;
                 }
             }
@@ -114,7 +113,6 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
     var
         HasRetailVouchers: Boolean;
 
-
     trigger OnAfterGetCurrRecord()
     begin
         NPRSetHasRetailVouchers();
@@ -124,12 +122,11 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
     var
         NpRvSaleLinePOSVoucher: Record "NPR NpRv Sales Line";
     begin
-        if "No." = '' then
+        if Rec."No." = '' then
             exit;
 
-        NpRvSaleLinePOSVoucher.SetRange("Document Type", "Document Type");
-        NpRvSaleLinePOSVoucher.SetRange("Document No.", "No.");
-        HasRetailVouchers := NpRvSaleLinePOSVoucher.FindFirst;
+        NpRvSaleLinePOSVoucher.SetRange("Document Type", Rec."Document Type");
+        NpRvSaleLinePOSVoucher.SetRange("Document No.", Rec."No.");
+        HasRetailVouchers := not NpRvSaleLinePOSVoucher.IsEmpty();
     end;
 }
-

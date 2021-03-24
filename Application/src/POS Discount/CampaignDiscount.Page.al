@@ -13,42 +13,42 @@ page 6014453 "NPR Campaign Discount"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
-                            CurrPage.Update;
+                        if Rec.AssistEdit(xRec) then
+                            CurrPage.Update();
                     end;
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Created Date"; "Created Date")
+                field("Created Date"; Rec."Created Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Created Date field';
                 }
-                field("Last Date Modified"; "Last Date Modified")
+                field("Last Date Modified"; Rec."Last Date Modified")
                 {
                     ApplicationArea = All;
                     Caption = 'Last Changed';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Last Changed field';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field("Block Custom Disc."; "Block Custom Disc.")
+                field("Block Custom Disc."; Rec."Block Custom Disc.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Block Custom Discount field';
@@ -57,30 +57,30 @@ page 6014453 "NPR Campaign Discount"
             group(Conditions)
             {
                 Caption = 'Conditions';
-                field("Starting date 2"; "Starting Date")
+                field("Starting date 2"; Rec."Starting Date")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                     Lookup = false;
                     ToolTip = 'Specifies the value of the Starting Date field';
                 }
-                field("Ending date 2"; "Ending Date")
+                field("Ending date 2"; Rec."Ending Date")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Closing Date field';
                 }
-                field("Starting Time"; "Starting Time")
+                field("Starting Time"; Rec."Starting Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Starting Time field';
                 }
-                field("Ending Time"; "Ending Time")
+                field("Ending Time"; Rec."Ending Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Closing Time field';
                 }
-                field("Period Type"; "Period Type")
+                field("Period Type"; Rec."Period Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Period Type field';
@@ -88,65 +88,63 @@ page 6014453 "NPR Campaign Discount"
                 group(Period)
                 {
                     Caption = 'Period';
-                    Visible = ("Period Type" = 1);
-                    field("Period Description"; "Period Description")
+                    Visible = (Rec."Period Type" = 1);
+                    field("Period Description"; Rec."Period Description")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         ToolTip = 'Specifies the value of the Period Description field';
                     }
-                    field(Monday; Monday)
+                    field(Monday; Rec.Monday)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Monday field';
                     }
-                    field(Tuesday; Tuesday)
+                    field(Tuesday; Rec.Tuesday)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Tuesday field';
                     }
-                    field(Wednesday; Wednesday)
+                    field(Wednesday; Rec.Wednesday)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Wednesday field';
                     }
-                    field(Thursday; Thursday)
+                    field(Thursday; Rec.Thursday)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Thursday field';
                     }
-                    field(Friday; Friday)
+                    field(Friday; Rec.Friday)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Friday field';
                     }
-                    field(Saturday; Saturday)
+                    field(Saturday; Rec.Saturday)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Saturday field';
                     }
-                    field(Sunday; Sunday)
+                    field(Sunday; Rec.Sunday)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Sunday field';
                     }
                 }
-                field("Customer Disc. Group Filter"; "Customer Disc. Group Filter")
+                field("Customer Disc. Group Filter"; Rec."Customer Disc. Group Filter")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer Disc. Group Filter field';
 
                     trigger OnAssistEdit()
                     begin
-                        //-NPR5.33 [278733]
-                        FilterAssist(FieldNo("Customer Disc. Group Filter"));
-                        //+NPR5.33 [278733]
+                        FilterAssist(Rec.FieldNo("Customer Disc. Group Filter"));
                     end;
                 }
             }
             part(SubForm; "NPR Campaign Discount Lines")
             {
-                SubPageLink = Code = FIELD(Code);
+                SubPageLink = Code = Field(Code);
                 Visible = SubFormVisible;
                 ApplicationArea = All;
             }
@@ -300,6 +298,40 @@ page 6014453 "NPR Campaign Discount"
                         Image = TransferToLines;
                         ApplicationArea = All;
                         ToolTip = 'Executes the Transfer from Period Discount action';
+
+                        trigger OnAction()
+                        var
+                            FromPeriodDiscount: Record "NPR Period Discount";
+                            CampaignDiscounts: Page "NPR Campaign Discount List";
+                            FromPeriodDiscountLine: Record "NPR Period Discount Line";
+                            ToPeriodDiscountLine: Record "NPR Period Discount Line";
+                            NoTransferedItemErr: Label 'There are no items to transfer';
+                            ItemAlreadyExistErr: Label 'Item No. %1 already exists in the period', Comment = '%1 = Item No.';
+                            OkMsg: Label '%1 Items has been transferred to Period %2', Comment = '%1 = Number of Items, %2 = Period';
+                        begin
+                            FromPeriodDiscount.SetFilter(Code, '<>%1', Rec.Code);
+                            CampaignDiscounts.LookupMode := true;
+                            CampaignDiscounts.Editable := false;
+                            CampaignDiscounts.SetTableView(FromPeriodDiscount);
+                            if CampaignDiscounts.RunModal = ACTION::LookupOK then begin
+                                CampaignDiscounts.GetRecord(FromPeriodDiscount);
+                                FromPeriodDiscountLine.SetRange(Code, FromPeriodDiscount.Code);
+                                if not FromPeriodDiscountLine.FindSet() then
+                                    Error(NoTransferedItemErr)
+                                else
+                                    repeat
+                                        if ToPeriodDiscountLine.Get(Rec.Code, FromPeriodDiscountLine."Item No.", FromPeriodDiscountLine."Variant Code") then
+                                            Message(ItemAlreadyExistErr, FromPeriodDiscountLine."Item No.")
+                                        else begin
+                                            ToPeriodDiscountLine.Init();
+                                            ToPeriodDiscountLine := FromPeriodDiscountLine;
+                                            ToPeriodDiscountLine.Code := Rec.Code;
+                                            ToPeriodDiscountLine.Insert(true);
+                                        end;
+                                    until FromPeriodDiscountLine.Next() = 0;
+                                Message(OkMsg, FromPeriodDiscountLine.Count, Rec.Code);
+                            end;
+                        end;
                     }
                     action("Transfer all Items")
                     {
@@ -331,9 +363,9 @@ page 6014453 "NPR Campaign Discount"
 
                     trigger OnAction()
                     begin
-                        SetRange(Code, Code);
-                        REPORT.RunModal(6060100, false, false, Rec);
-                        SetRange(Code);
+                        Rec.SetRange(Code, Rec.Code);
+                        Report.RunModal(Report::"NPR Data Cleanup Fill", false, false, Rec);
+                        Rec.SetRange(Code);
                     end;
                 }
                 separator(Separator1160330020)
@@ -350,34 +382,7 @@ page 6014453 "NPR Campaign Discount"
                     var
                         RetailJournalCode: Codeunit "NPR Retail Journal Code";
                     begin
-                        //-NPR5.46 [294354]
-                        // IF PAGE.RUNMODAL(PAGE::"Retail Journal List","Retail Journal Header") <> ACTION::LookupOK THEN
-                        //  EXIT;
-                        // PeriodDiscountLineRec.SETRANGE(Code,Code);
-                        // IF PeriodDiscountLineRec.FIND('-') THEN
-                        //  REPEAT
-                        //    RetailJournalLine.RESET;
-                        //    RetailJournalLine.SETRANGE("No.","Retail Journal Header"."No.");
-                        //    IF RetailJournalLine.FIND('+') THEN
-                        //      tempInt := RetailJournalLine."Line No." + 10000
-                        //    ELSE
-                        //      tempInt := 10000;
-                        //    tempAntal := PeriodDiscountLineRec.COUNT;
-                        //
-                        //    RetailJournalLine."No." := "Retail Journal Header"."No.";
-                        //    RetailJournalLine."Line No." := tempInt;
-                        //    RetailJournalLine.VALIDATE("Item No.",PeriodDiscountLineRec."Item No.");
-                        //    RetailJournalLine."Variant Code" := PeriodDiscountLineRec."Variant Code";
-                        //    RetailJournalLine."Discount Type" := 1;
-                        //    RetailJournalLine."Discount Unit Price" := PeriodDiscountLineRec."Unit Price";
-                        //    RetailJournalLine."Discount Price Incl. Vat" := PeriodDiscountLineRec."Campaign Unit Price";
-                        //    RetailJournalLine."Discount Code" := PeriodDiscountLineRec.Code;
-                        //    RetailJournalLine.INSERT(TRUE);
-                        //  UNTIL PeriodDiscountLineRec.NEXT = 0;
-                        // MESSAGE(txt001,tempAntal);
-
                         RetailJournalCode.Campaign2RetailJnl(Code, '');
-                        //+NPR5.46 [294354]
                     end;
                 }
                 action("Copy Campaign Discount")
@@ -393,24 +398,21 @@ page 6014453 "NPR Campaign Discount"
                         PeriodDiscountLine1: Record "NPR Period Discount Line";
                         PeriodDiscountLine: Record "NPR Period Discount Line";
                     begin
-                        //-NPR5.30 [265244]
-                        if PAGE.RunModal(PAGE::"NPR Campaign Discount List", PeriodDiscount1) <> ACTION::LookupOK then
+                        if Page.RunModal(Page::"NPR Campaign Discount List", PeriodDiscount1) <> Action::LookupOK then
                             exit;
                         PeriodDiscountLine1.Reset;
-                        PeriodDiscountLine1.SetRange(Code, Code);
+                        PeriodDiscountLine1.SetRange(Code, Rec.Code);
                         PeriodDiscountLine1.DeleteAll;
 
                         PeriodDiscountLine1.Reset;
                         PeriodDiscountLine1.SetRange(Code, PeriodDiscount1.Code);
-                        if PeriodDiscountLine1.FindSet then
+                        if PeriodDiscountLine1.FindSet() then
                             repeat
                                 PeriodDiscountLine.Init;
                                 PeriodDiscountLine.TransferFields(PeriodDiscountLine1);
-                                PeriodDiscountLine.Code := Code;
+                                PeriodDiscountLine.Code := Rec.Code;
                                 PeriodDiscountLine.Insert(true);
                             until PeriodDiscountLine1.Next = 0;
-
-                        //+NPR5.30 [265244]
                     end;
                 }
             }
@@ -440,9 +442,6 @@ page 6014453 "NPR Campaign Discount"
     var
         PeriodDiscount: Record "NPR Period Discount";
     begin
-        //-NPR5.38 [295330]
-        //UpdateStatus();
-        //+NPR5.38 [295330]
         if not PeriodDiscount.Find('-') then begin
             SubFormVisible := false;
             SubFormVisible := true;
@@ -488,11 +487,11 @@ page 6014453 "NPR Campaign Discount"
         if Percentage = 0 then
             exit;
         repeat
-            if PeriodDiscountLine.Get(Code, Item."No.") then
+            if PeriodDiscountLine.Get(Rec.Code, Item."No.") then
                 Message(ErrorNo2, Item."No.")
             else begin
                 PeriodDiscountLine.Init;
-                PeriodDiscountLine.Code := Code;
+                PeriodDiscountLine.Code := Rec.Code;
                 PeriodDiscountLine."Item No." := Item."No.";
                 PeriodDiscountLine."Campaign Unit Price" := (100 - Percentage) / 100 * Item."Unit Price";
                 PeriodDiscountLine."Discount %" := Percentage;
@@ -500,14 +499,13 @@ page 6014453 "NPR Campaign Discount"
                 PeriodDiscountLine."Campaign Unit Cost" := Item."Unit Cost";
                 PeriodDiscountLine.Description := Item.Description;
                 PeriodDiscountLine."Unit Price Incl. VAT" := true;
-                PeriodDiscountLine."Starting Date" := "Starting Date";
-                PeriodDiscountLine."Ending Date" := "Ending Date";
-                PeriodDiscountLine.Status := Status;
-                // Periodelinie.VALIDATE("Unit price", Vare."Unit Price");
+                PeriodDiscountLine."Starting Date" := Rec."Starting Date";
+                PeriodDiscountLine."Ending Date" := Rec."Ending Date";
+                PeriodDiscountLine.Status := Rec.Status;
                 PeriodDiscountLine.Insert(true);
             end;
         until Item.Next = 0;
-        Message(OkMsg, Item.Count, Code);
+        Message(OkMsg, Item.Count, Rec.Code);
     end;
 
     local procedure GetFieldCaption(CaptionFieldNo: Integer) Caption: Text
@@ -515,12 +513,10 @@ page 6014453 "NPR Campaign Discount"
         RecRef: RecordRef;
         FieldRef: FieldRef;
     begin
-        //-NPR5.31 [263093]
         RecRef.GetTable(Rec);
         FieldRef := RecRef.Field(CaptionFieldNo);
         Caption := FieldRef.Caption;
         exit(Caption);
-        //+NPR5.31 [263093]
     end;
 
     local procedure GetPrimaryKeyValue(var RecRef: RecordRef): Text
@@ -528,11 +524,9 @@ page 6014453 "NPR Campaign Discount"
         FieldRef: FieldRef;
         KeyRef: KeyRef;
     begin
-        //-NPR5.31 [263093]
         KeyRef := RecRef.KeyIndex(1);
         FieldRef := KeyRef.FieldIndex(KeyRef.FieldCount);
         exit(FieldRef.Value);
-        //+NPR5.31 [263093]
     end;
 
     local procedure FilterAssist(AssistFieldNo: Integer)
@@ -540,15 +534,14 @@ page 6014453 "NPR Campaign Discount"
         RecRef: RecordRef;
         Caption: Text;
     begin
-        //-NPR5.33 [278733]
         if not SetFiltersOnRecRef(AssistFieldNo, RecRef) then
             exit;
+
         Caption := GetFieldCaption(AssistFieldNo);
         if not RunDynamicRequestPage(Caption, RecRef) then
             exit;
 
         UpdateFiltersOnCurrRec(AssistFieldNo, RecRef);
-        //+NPR5.33 [278733]
     end;
 
     local procedure RunDynamicRequestPage(Caption: Text; var RecRef: RecordRef): Boolean
@@ -560,10 +553,10 @@ page 6014453 "NPR Campaign Discount"
         ReturnFilters: Text;
         EntityID: Code[20];
     begin
-        //-NPR5.33 [278733]
         EntityID := CopyStr(Caption, 1, 20);
         if not RequestPageParametersHelper.BuildDynamicRequestPage(FilterPageBuilder, EntityID, RecRef.Number) then
             exit(false);
+
         FilterPageBuilder.SetView(RecRef.Caption, RecRef.GetView);
         FilterPageBuilder.PageCaption := Caption;
         if not FilterPageBuilder.RunModal then
@@ -581,25 +574,22 @@ page 6014453 "NPR Campaign Discount"
         end;
 
         exit(true);
-        //+NPR5.33 [278733]
     end;
 
     local procedure SetFiltersOnRecRef(FilterFieldNo: Integer; var RecRef: RecordRef): Boolean
     var
         CustomerDiscountGroup: Record "Customer Discount Group";
     begin
-        //-NPR5.33 [278733]
         case FilterFieldNo of
-            FieldNo("Customer Disc. Group Filter"):
+            Rec.FieldNo("Customer Disc. Group Filter"):
                 begin
-                    CustomerDiscountGroup.SetFilter(Code, "Customer Disc. Group Filter");
+                    CustomerDiscountGroup.SetFilter(Code, Rec."Customer Disc. Group Filter");
                     RecRef.GetTable(CustomerDiscountGroup);
                     exit(true);
                 end;
         end;
 
         exit(false);
-        //+NPR5.33 [278733]
     end;
 
     local procedure UpdateFiltersOnCurrRec(FilterFieldNo: Integer; RecRef: RecordRef)
@@ -608,24 +598,21 @@ page 6014453 "NPR Campaign Discount"
         CurrFieldRef: FieldRef;
         PrimaryKeyFilter: Text;
     begin
-        //-NPR5.33 [278733]
         CurrRecRef.GetTable(Rec);
         CurrFieldRef := CurrRecRef.Field(FilterFieldNo);
 
-        if RecRef.IsEmpty then begin
+        if RecRef.IsEmpty() then begin
             CurrFieldRef.Value := '';
             CurrRecRef.SetTable(Rec);
             exit;
         end;
 
-        RecRef.FindSet;
+        RecRef.FindSet();
         PrimaryKeyFilter := GetPrimaryKeyValue(RecRef);
         while RecRef.Next <> 0 do
             PrimaryKeyFilter += '|' + GetPrimaryKeyValue(RecRef);
 
         CurrFieldRef.Value := CopyStr(PrimaryKeyFilter, 1, CurrFieldRef.Length);
         CurrRecRef.SetTable(Rec);
-        //+NPR5.33 [278733]
     end;
 }
-

@@ -4172,9 +4172,6 @@ End Function</Code>
         <Field Name="dgFormat">
           <DataField>dgFormat</DataField>
         </Field>
-        <Field Name="Pagenoinadvert_PeriodDiscountLine">
-          <DataField>Pagenoinadvert_PeriodDiscountLine</DataField>
-        </Field>
         <Field Name="PeriodDiscountLine_VendorNo">
           <DataField>PeriodDiscountLine_VendorNo</DataField>
         </Field>

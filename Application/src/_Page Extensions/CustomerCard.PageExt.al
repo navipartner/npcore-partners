@@ -8,18 +8,18 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
         }
         addafter(AdjProfitPct)
         {
-            field("NPR To Anonymize On"; "NPR To Anonymize On")
+            field("NPR To Anonymize On"; Rec."NPR To Anonymize On")
             {
                 ApplicationArea = All;
                 Editable = ToAnonymizeEditable;
                 ToolTip = 'Specifies the value of the NPR To Anonymize On field';
             }
-            field("NPR Anonymized"; "NPR Anonymized")
+            field("NPR Anonymized"; Rec."NPR Anonymized")
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the NPR Anonymized field';
             }
-            field("NPR Anonymized Date"; "NPR Anonymized Date")
+            field("NPR Anonymized Date"; Rec."NPR Anonymized Date")
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the NPR Anonymized Date field';
@@ -37,7 +37,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 1, "No.", NPRAttrTextArray[1]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(Database::Customer, 1, Rec."No.", NPRAttrTextArray[1]);
                 end;
             }
             field(NPRAttrTextArray_02; NPRAttrTextArray[2])
@@ -50,7 +50,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 2, "No.", NPRAttrTextArray[2]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(Database::Customer, 2, Rec."No.", NPRAttrTextArray[2]);
                 end;
             }
             field(NPRAttrTextArray_03; NPRAttrTextArray[3])
@@ -63,7 +63,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 3, "No.", NPRAttrTextArray[3]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(Database::Customer, 3, Rec."No.", NPRAttrTextArray[3]);
                 end;
             }
             field(NPRAttrTextArray_04; NPRAttrTextArray[4])
@@ -76,7 +76,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 4, "No.", NPRAttrTextArray[4]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(Database::Customer, 4, Rec."No.", NPRAttrTextArray[4]);
                 end;
             }
             field(NPRAttrTextArray_05; NPRAttrTextArray[5])
@@ -89,7 +89,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 5, "No.", NPRAttrTextArray[5]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(Database::Customer, 5, Rec."No.", NPRAttrTextArray[5]);
                 end;
             }
         }
@@ -98,24 +98,24 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
             group("NPR Magento")
             {
                 Caption = 'Magento';
-                field("NPR Magento Display Group"; "NPR Magento Display Group")
+                field("NPR Magento Display Group"; Rec."NPR Magento Display Group")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Magento Display Group field';
                 }
-                field("NPR Magento Store Code"; "NPR Magento Store Code")
+                field("NPR Magento Store Code"; Rec."NPR Magento Store Code")
                 {
                     ApplicationArea = All;
                     Visible = (MagentoVersion >= 2);
                     ToolTip = 'Specifies the value of the NPR Magento Store Code field';
                 }
-                field("NPR Magento Shipping Group"; "NPR Magento Shipping Group")
+                field("NPR Magento Shipping Group"; Rec."NPR Magento Shipping Group")
                 {
                     ApplicationArea = All;
                     Visible = (MagentoVersion >= 2);
                     ToolTip = 'Specifies the value of the NPR Magento Shipping Group field';
                 }
-                field("NPR Magento Payment Group"; "NPR Magento Payment Group")
+                field("NPR Magento Payment Group"; Rec."NPR Magento Payment Group")
                 {
                     ApplicationArea = All;
                     Visible = (MagentoVersion >= 2);
@@ -135,7 +135,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 6, "No.", NPRAttrTextArray[6]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(Database::Customer, 6, Rec."No.", NPRAttrTextArray[6]);
                     end;
                 }
                 field(NPRAttrTextArray_07; NPRAttrTextArray[7])
@@ -148,7 +148,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 7, "No.", NPRAttrTextArray[7]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(Database::Customer, 7, Rec."No.", NPRAttrTextArray[7]);
                     end;
                 }
                 field(NPRAttrTextArray_08; NPRAttrTextArray[8])
@@ -161,7 +161,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 8, "No.", NPRAttrTextArray[8]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(Database::Customer, 8, Rec."No.", NPRAttrTextArray[8]);
                     end;
                 }
                 field(NPRAttrTextArray_09; NPRAttrTextArray[9])
@@ -174,7 +174,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 9, "No.", NPRAttrTextArray[9]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(Database::Customer, 9, Rec."No.", NPRAttrTextArray[9]);
                     end;
                 }
                 field(NPRAttrTextArray_10; NPRAttrTextArray[10])
@@ -187,7 +187,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 10, "No.", NPRAttrTextArray[10]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(Database::Customer, 10, Rec."No.", NPRAttrTextArray[10]);
                     end;
                 }
             }
@@ -208,6 +208,14 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     Image = ItemLedger;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Item Ledger Entries action';
+
+                    trigger OnAction()
+                    var
+                        ItemLedgerEntry: Record "Item Ledger Entry";
+                    begin
+                        ItemLedgerEntry.SetRange("Source No.", Rec."No.");
+                        Page.RunModal(Page::"Item Ledger Entries", ItemLedgerEntry);
+                    end;
                 }
                 action("NPR AuditRoll")
                 {
@@ -232,6 +240,18 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     Image = PrintCheck;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Shipping Label action';
+
+                    trigger OnAction()
+                    var
+                        Customer: Record Customer;
+                        LabelLibrary: Codeunit "NPR Label Library";
+                        RecRef: RecordRef;
+                    begin
+                        Customer := Rec;
+                        Customer.SetRecFilter();
+                        RecRef.GetTable(Customer);
+                        LabelLibrary.PrintCustomShippingLabel(RecRef, '');
+                    end;
                 }
             }
             group("NPR PDF2NAV")
@@ -310,11 +330,10 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 var
                     GDPRManagement: Codeunit "NPR NP GDPR Management";
                 begin
-                    TestField("NPR Anonymized", false);
-                    if (GDPRManagement.DoAnonymization("No.", ReasonText)) then
+                    Rec.TestField("NPR Anonymized", false);
+                    if (GDPRManagement.DoAnonymization(Rec."No.", ReasonText)) then
                         if (not Confirm(Text000, false)) then
                             Error('');
-
 
                     Message(ReasonText);
                 end;
@@ -400,4 +419,3 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
         end;
     end;
 }
-
