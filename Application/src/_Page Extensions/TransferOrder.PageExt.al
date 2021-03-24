@@ -41,6 +41,15 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
 				PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Import From Scanner File action';
+
+                trigger OnAction()
+                var
+                    ImportfromScannerFileTO: XMLport "NPR ImportFromScannerFile TO";
+                begin
+                    ImportfromScannerFileTO.SelectTable(Rec);
+                    ImportfromScannerFileTO.SetTableView(Rec);
+                    ImportfromScannerFileTO.Run();
+                end;
             }
         }
         addafter("Get Bin Content")
@@ -75,16 +84,14 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
                 var
                     CodeunitTransferOrderPP: Codeunit "NPR TransferOrder-Post + Print";
                 begin
-                    //-NPR5.55 [362312]
-                    ReportSelectionRetail.Reset;
+                    ReportSelectionRetail.Reset();
                     ReportSelectionRetail.SetRange("Report Type", ReportSelectionRetail."Report Type"::"Transfer Order");
-                    if ReportSelectionRetail.FindFirst then
+                    if ReportSelectionRetail.FindFirst() then
                         TemplateN := ReportSelectionRetail."Print Template";
                     if TemplateN <> '' then begin
                         CodeunitTransferOrderPP.SetParameter(TemplateN, Rec);
                         CodeunitTransferOrderPP.Run(Rec);
                     end;
-                    //+NPR5.55 [362312]
                 end;
             }
         }
@@ -92,17 +99,15 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
 
     var
         TemplateN: Text;
-        TransferHdr: Record "Transfer Header";
         PostingVisibility: Boolean;
         PostingVisibilityPOS: Boolean;
         ReportSelectionRetail: Record "NPR Report Selection Retail";
         Codeunit6059823: Codeunit "NPR TransferOrder-Post + Print";
         Visiblitycheck: Boolean;
 
-
     trigger OnOpenPage()
     begin
-        Visiblitycheck := Codeunit6059823.GetValues;
+        Visiblitycheck := Codeunit6059823.GetValues();
         if Visiblitycheck then begin
             PostingVisibility := false;
             PostingVisibilityPOS := true;
@@ -112,4 +117,3 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
         end;
     end;
 }
-

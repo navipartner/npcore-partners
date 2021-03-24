@@ -2,6 +2,25 @@ tableextension 6014427 "NPR Item" extends Item
 {
     fields
     {
+        modify("Costing Method")
+        {
+            trigger OnBeforeValidate()
+            begin
+                CheckGroupSale(Rec);
+            end;
+        }
+        modify("Item Category Code")
+        {
+            trigger OnAfterValidate()
+            var
+                ItemCategory: Record "Item Category";
+                ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
+            begin
+                if ItemCategory.Get(Rec."Item Category Code") then
+                    ItemCategoryMgt.SetupItemFromCategory(Rec, ItemCategory);
+            end;
+        }
+
         field(6014400; "NPR Item Group"; Code[10])
         {
             Caption = 'Item Group';
@@ -13,6 +32,14 @@ tableextension 6014427 "NPR Item" extends Item
         {
             Caption = 'Various item sales';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                ItemCostMgt: Codeunit ItemCostManagement;
+            begin
+                CheckGroupSale(Rec);
+                ItemCostMgt.UpdateUnitCost(Rec, '', '', 0, 0, false, false, true, Rec.FieldNo("NPR Group sale"));
+            end;
         }
         field(6014408; "NPR Season"; Code[10])
         {
@@ -405,6 +432,120 @@ tableextension 6014427 "NPR Item" extends Item
         }
     }
 
+    trigger OnBeforeInsert()
+    begin
+        SalesSetup.GetRecordOnce();
 
+        if Rec."Price Includes VAT" and (SalesSetup."VAT Bus. Posting Gr. (Price)" <> '') then
+            Rec."VAT Bus. Posting Gr. (Price)" := SalesSetup."VAT Bus. Posting Gr. (Price)";
+    end;
+
+    trigger OnAfterInsert()
+    begin
+        Rec."NPR Primary Key Length" := StrLen(Rec."No.");
+
+        if Rec."Item Category Code" <> '' then
+            Rec.Validate("Item Category Code");
+
+        Rec.Modify();
+    end;
+
+    trigger OnAfterModify()
+    begin
+        UpdateVendorItemRef(Rec, xRec);
+    end;
+
+    trigger OnBeforeDelete()
+    var
+        MixedDiscountLine: Record "NPR Mixed Discount Line";
+        PeriodDiscountLine: Record "NPR Period Discount Line";
+        SalesLinePOS: Record "NPR Sale Line POS";
+        POSEntry: Record "NPR POS Entry";
+        MixDiscLineNotEmptyErr: Label 'You can''t delete %1 %2 as it''s contained in one or more mixed discount lines.';
+        PerDiscLineNotEmptyErr: Label 'You can''t delete %1 %2 as it''s contained in one or more period discount lines.';
+        POSEntryNotEmptyErr: Label 'You can''t delete item %1 as there aren''t any posted entries for it.';
+        SalesLinePOSNotEmptyErr: Label 'You can''t delete item %1 because it is part of an active sales document.';
+    begin
+        POSEntry.SetRange("Customer No.", Rec."No.");
+        POSEntry.SetRange("Post Entry Status", POSEntry."Post Entry Status"::Unposted);
+        if not POSEntry.IsEmpty() then
+            Error(POSEntryNotEmptyErr, Rec."No.");
+
+        SalesLinePOS.SetRange("Sale Type", SalesLinePOS."Sale Type"::Sale);
+        SalesLinePOS.SetRange(Type, SalesLinePOS.Type::Item);
+        SalesLinePOS.SetRange("No.", Rec."No.");
+        if not SalesLinePOS.IsEmpty() then
+            Error(SalesLinePOSNotEmptyErr, Rec."No.");
+
+        PeriodDiscountLine.SetCurrentKey("Item No.");
+        PeriodDiscountLine.SetRange("Item No.", Rec."No.");
+        if not PeriodDiscountLine.IsEmpty() then
+            Error(PerDiscLineNotEmptyErr, Rec.TableCaption, Rec."No.");
+
+        MixedDiscountLine.SetCurrentKey("No.");
+        MixedDiscountLine.SetRange("No.", Rec."No.");
+        if not MixedDiscountLine.IsEmpty() then
+            Error(MixDiscLineNotEmptyErr, Rec.TableCaption, Rec."No.");
+    end;
+
+    trigger OnAfterDelete()
+    var
+        QtyDiscountLine: Record "NPR Quantity Discount Line";
+    begin
+        QtyDiscountLine.SetRange("Item No.", Rec."No.");
+        QtyDiscountLine.DeleteAll(true);
+    end;
+
+    trigger OnAfterRename()
+    begin
+        Rec."NPR Primary Key Length" := StrLen(Rec."No.");
+        Rec.Modify();
+    end;
+
+
+    var
+        SalesSetup: Record "Sales & Receivables Setup";
+
+    local procedure UpdateVendorItemRef(var Item: Record Item; xItem: Record Item)
+    var
+        ItemReference: Record "Item Reference";
+    begin
+        if Item.IsTemporary() then
+            exit;
+
+        if (Item."Vendor No." = xItem."Vendor No.") and (Item."Vendor Item No." = xItem."Vendor Item No.") then
+            exit;
+
+        ItemReference.SetRange("Item No.", Item."No.");
+        ItemReference.SetRange("Variant Code", '');
+        ItemReference.SetRange("Unit of Measure", xItem."Base Unit of Measure");
+        ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::Vendor);
+        ItemReference.SetRange("Reference Type No.", xItem."Vendor No.");
+        ItemReference.SetRange("Reference No.", xItem."Vendor Item No.");
+        ItemReference.DeleteAll(true);
+
+        if (Item."Vendor No." = '') or (Item."Vendor Item No." = '') then
+            exit;
+
+        if not ItemReference.Get(Item."No.", '', Item."Base Unit of Measure", ItemReference."Reference Type"::Vendor, Item."Vendor No.", Item."Vendor Item No.") then begin
+            ItemReference.Init;
+            ItemReference."Item No." := Item."No.";
+            ItemReference."Variant Code" := '';
+            ItemReference."Unit of Measure" := Item."Base Unit of Measure";
+            ItemReference."Reference Type" := ItemReference."Reference Type"::Vendor;
+            ItemReference."Reference Type No." := Item."Vendor No.";
+            ItemReference."Reference No." := Item."Vendor Item No.";
+            ItemReference.Description := '';
+            ItemReference.Insert(true);
+        end;
+    end;
+
+    local procedure CheckGroupSale(var Item: Record Item)
+    var
+        ErrStd: Label 'Item %1 can''t be Group sale as it''s Costing Method is Standard.';
+    begin
+        if Item."NPR Group sale" then
+            if Item."Costing Method" = Item."Costing Method"::Standard then
+                Error(ErrStd, Item."No.");
+    end;
 }
-

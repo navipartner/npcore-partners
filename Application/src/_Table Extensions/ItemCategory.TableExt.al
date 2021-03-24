@@ -2,6 +2,43 @@
 {
     fields
     {
+        modify(Description)
+        {
+            trigger OnAfterValidate()
+            var
+                Item: Record Item;
+            begin
+                if Rec.IsTemporary() then
+                    exit;
+
+                if xRec.Description = Rec.Description then
+                    exit;
+
+                if Item.Get(Rec.Code) then
+                    if Item."NPR Group sale" then begin
+                        Item.Validate(Description, Rec.Description);
+                        Item.Modify(true);
+                    end;
+            end;
+        }
+        modify("Parent Category")
+        {
+            trigger OnAfterValidate()
+            var
+                ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
+            begin
+                if Rec.IsTemporary() then
+                    exit;
+
+                if (Rec."Parent Category" = xRec."Parent Category") or (Rec."Parent Category" = '') then
+                    exit;
+
+                if xRec."Parent Category" <> '' then
+                    ItemCategoryMgt.CopySetupFromParent(Rec, false)
+                else
+                    ItemCategoryMgt.CopySetupFromParent(Rec, true);
+            end;
+        }
         field(6014400; "NPR Item Template Code"; Code[10])
         {
             DataClassification = CustomerContent;
@@ -253,6 +290,36 @@
                                 "Location Code" = field("NPR Location Filter")));
         }
     }
+
+    trigger OnAfterInsert()
+    var
+        ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if Rec."Parent Category" = '' then
+            exit;
+
+        ItemCategoryMgt.CopyParentItemCategoryDimensions(Rec, false);
+    end;
+
+
+    trigger OnAfterModify()
+    var
+        ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if Format(Rec) <> Format(xRec) then
+            ItemCategoryMgt.CopySetupToChildren(Rec, true);
+
+        if (Rec."Parent Category" = '') or (Rec."Parent Category" = xRec."Parent Category") then
+            exit;
+
+        ItemCategoryMgt.CopyParentItemCategoryDimensions(Rec, xRec."Parent Category" <> '');
+    end;
 
     procedure NPRValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     var
