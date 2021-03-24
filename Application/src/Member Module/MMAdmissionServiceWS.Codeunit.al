@@ -719,6 +719,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
                     end;
                 end;
             end;
+
             if MMAdmissionServiceSetup."Validate Tickes" and not AdmissionIsValid then begin
 
                 //IF TMTicketWebService.ValidateTicketArrival('',Barcode,ScannerStationId,MessageText) THEN BEGIN
@@ -784,9 +785,9 @@ codeunit 6060093 "NPR MM Admission Service WS"
             end;
             if not AdmissionIsValid then begin
                 if StrPos(MessageText, '-1004') > 0 then begin
-                    //ErrorNumber := '1002';
-                    //ErrorDescription := ErrorTooManyLogins;
-                    //DataError := TRUE;
+                    ErrorNumber := '1002';
+                    ErrorDescription := ErrorTooManyLogins;
+                    DataError := true;
                 end else begin
                     ErrorNumber := '3';
                     ErrorDescription := ErrorInvalidGuest;
