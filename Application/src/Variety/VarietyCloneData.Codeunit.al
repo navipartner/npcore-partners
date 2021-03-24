@@ -490,13 +490,13 @@ codeunit 6059972 "NPR Variety Clone Data"
 
         case VRTSetup."Barcode Type (Item Cross Ref.)" of
             VRTSetup."Barcode Type (Item Cross Ref.)"::EAN8:
-                InsertItemRef(ItemNo, VariantCode, CreateBarcodeEAN8(NextCode), 3, '');
+                InsertItemRef(ItemNo, VariantCode, CreateBarcodeEAN8(NextCode), Enum::"Item Reference Type"::"Bar Code", '');
             VRTSetup."Barcode Type (Item Cross Ref.)"::EAN13:
-                InsertItemRef(ItemNo, VariantCode, CreateBarcodeEAN13(NextCode), 3, '');
+                InsertItemRef(ItemNo, VariantCode, CreateBarcodeEAN13(NextCode), Enum::"Item Reference Type"::"Bar Code", '');
         end;
     end;
 
-    procedure InsertItemRef(ItemNo: Code[20]; VariantCode: Code[10]; Barcode: Code[20]; CrossRefType: Option " ",Customer,Vendor,"Bar Code"; CrossRefTypeNo: Code[20])
+    procedure InsertItemRef(ItemNo: Code[20]; VariantCode: Code[10]; Barcode: Code[20]; CrossRefType: Enum "Item Reference Type"; CrossRefTypeNo: Code[20])
     var
         Item: Record Item;
         ItemRef: Record "Item Reference";
