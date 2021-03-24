@@ -53,13 +53,6 @@ page 6014453 "NPR Campaign Discount"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Block Custom Discount field';
                 }
-                field(CommentBoolean; Comment)
-                {
-                    Caption = 'Comment';
-                    ApplicationArea = All;
-                    ShowCaption = false;
-                    ToolTip = 'Specifies the value of the Comment field';
-                }
             }
             group(Conditions)
             {
