@@ -2,9 +2,7 @@ codeunit 6014437 "NPR Phone Lookup"
 {
     var
         IComm: Record "NPR I-Comm";
-        SMSSetup: Record "NPR SMS Setup";
         Initialized: Boolean;
-        ApplyTemplateQst: Label 'Do you wish to apply Config. Template %1?', Comment = '%1 = Config. Template Header Code';
 
 
     procedure RunPhoneLookup(PhoneNo: Text[30]; var TempPhoneLookupBuffer: Record "NPR Phone Lookup Buffer" temporary): Boolean
@@ -125,17 +123,6 @@ codeunit 6014437 "NPR Phone Lookup"
 
         Rec."Last Date Modified" := Today;
         Rec.Modify(false);
-    end;
-
-    [EventSubscriber(ObjectType::Page, Page::"Vendor List", 'OnAfterActionEvent', 'NPR PhoneLookup', false, false)]
-    local procedure VendorListOnAfterAction(var Rec: Record Vendor)
-    var
-        TempTDCNamesNumbersBuffer: Record "NPR Phone Lookup Buffer" temporary;
-        PhoneNoLookup: Page "NPR Phone No lookup";
-    begin
-        TempTDCNamesNumbersBuffer."Create Vendor" := true;
-        PhoneNoLookup.Setrec(TempTDCNamesNumbersBuffer);
-        PhoneNoLookup.RunModal();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR MM Member Info Capture", 'OnAfterValidateEvent', 'Phone No.', true, true)]

@@ -1,19 +1,5 @@
 codeunit 6014447 "NPR Label Library Sub. Mgt."
 {
-    // NPR5.30/NPKNAV/20170310  CASE 262533 Transport NPR5.30 - 26 January 2017
-    // NPR5.43/TS  /20180625 CASE 317852  Added Function ItemJournalOnAfterActionEventPriceLabel
-    // NPR5.46/EMGO/20180910 CASE 324737  Changed ChooseLabel function and PrintLabel function from local til global function.
-    //                                    Added Transfer Shipment Header case to ApplyFilterAndRun
-    // NPR5.46/JDH /20181001 CASE 294354  Restructured functionality for printing
-    // NPR5.51/BHR /20190614 CASE 358287  Add retail print and Price label for Psted Purchase Invoice
-    // NPR5.53/SARA/20191119 CASE 377622 Added Print Price Label for Retail Item Journal
-    // NPR5.55/BHR /202020713 CASE 414268 Add retail print and Price label for warehouse activity line
-
-
-    trigger OnRun()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Page, 7302, 'OnAfterActionEvent', 'NPR PrintLabel', false, false)]
     local procedure BinsOnAfterActionEventPrintLabel(var Rec: Record Bin)
     var
@@ -70,9 +56,7 @@ codeunit 6014447 "NPR Label Library Sub. Mgt."
     var
         ReportSelectionRetail: Record "NPR Report Selection Retail";
     begin
-        //-NPR5.43 [317852]
         PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Price Label");
-        //+NPR5.43 [317852]
     end;
 
     [EventSubscriber(ObjectType::Page, 6014402, 'OnAfterActionEvent', 'PriceLabel', false, false)]
@@ -80,17 +64,13 @@ codeunit 6014447 "NPR Label Library Sub. Mgt."
     var
         ReportSelectionRetail: Record "NPR Report Selection Retail";
     begin
-        //-NPR5.53 [377622]
         PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Price Label");
-        //+NPR5.53 [377622]
     end;
 
     [EventSubscriber(ObjectType::Page, 6014453, 'OnAfterActionEvent', 'RetailPrint', true, true)]
     local procedure CampaignDiscountOnAfterActionEventRetailPrint(var Rec: Record "NPR Period Discount")
     begin
-        //-NPR5.46 [294354]
         ChooseLabel(Rec);
-        //+NPR5.46 [294354]
     end;
 
     [EventSubscriber(ObjectType::Page, 6014453, 'OnAfterActionEvent', 'PriceLabel', true, true)]
@@ -98,9 +78,7 @@ codeunit 6014447 "NPR Label Library Sub. Mgt."
     var
         ReportSelectionRetail: Record "NPR Report Selection Retail";
     begin
-        //-NPR5.46 [294354]
         PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Price Label");
-        //+NPR5.46 [294354]
     end;
 
     [EventSubscriber(ObjectType::Page, 5743, 'OnAfterActionEvent', 'NPR RetailPrint', true, true)]
@@ -129,24 +107,6 @@ codeunit 6014447 "NPR Label Library Sub. Mgt."
         ReportSelectionRetail: Record "NPR Report Selection Retail";
     begin
         PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Price Label");
-    end;
-
-    [EventSubscriber(ObjectType::Page, 7375, 'OnAfterActionEvent', 'NPR RetailPrint', false, false)]
-    local procedure InventoryPutAwayOnAfterActionEventRetailPrint(var Rec: Record "Warehouse Activity Header")
-    begin
-        //-NPR5.55 [414268]
-        ChooseLabel(Rec);
-        //+NPR5.55 [414268]
-    end;
-
-    [EventSubscriber(ObjectType::Page, 7375, 'OnAfterActionEvent', 'NPR PriceLabel', false, false)]
-    local procedure InventoryPutAwayOnAfterActionEventPriceLabel(var Rec: Record "Warehouse Activity Header")
-    var
-        ReportSelectionRetail: Record "NPR Report Selection Retail";
-    begin
-        //-NPR5.55 [414268]
-        PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Inv.PutAway Label");
-        //+NPR5.55 [414268]
     end;
 
     procedure ChooseLabel(VarRec: Variant)
@@ -197,20 +157,15 @@ codeunit 6014447 "NPR Label Library Sub. Mgt."
                 begin
                     RecRef2.SetTable(TransferHeader);
                     TransferLine.SetRange("Document No.", TransferHeader."No.");
-                    //-NPR5.46 [294354]
                     TransferLine.SetRange("Derived From Line No.", 0);
-                    //+NPR5.46 [294354]
                     RecRef.GetTable(TransferLine);
                 end;
-            //-NPR5.46
             DATABASE::"Transfer Shipment Header":
                 begin
                     RecRef2.SetTable(TransferShipmentHeader);
                     TransferShipmentLine.SetRange("Document No.", TransferShipmentHeader."No.");
                     RecRef.GetTable(TransferShipmentLine);
                 end;
-            //+NPR5.46
-            //-NPR5.46 [294354]
             DATABASE::"Transfer Receipt Header":
                 begin
                     RecRef2.SetTable(TransferReceiptHeader);
@@ -223,9 +178,7 @@ codeunit 6014447 "NPR Label Library Sub. Mgt."
                     PeriodDiscountLine.SetRange(Code, PeriodDiscount.Code);
                     RecRef.GetTable(PeriodDiscountLine);
                 end;
-            //+NPR5.46 [294354]
 
-            //-NPR5.51 [358287]
             DATABASE::"Purch. Inv. Header":
                 begin
                     RecRef2.SetTable(PurchInvHeader);
@@ -234,8 +187,6 @@ codeunit 6014447 "NPR Label Library Sub. Mgt."
                         PurchInvLine.SetRange(Type, PurchInvLine.Type::Item);
                     RecRef.GetTable(PurchInvLine);
                 end;
-            //+NPR5.51 [358287]
-            //-NPR5.55 [414268]
             DATABASE::"Warehouse Activity Header":
                 begin
                     RecRef2.SetTable(WarehouseActivityHeader);
@@ -243,7 +194,6 @@ codeunit 6014447 "NPR Label Library Sub. Mgt."
                     WarehouseActivityLine.SetRange("No.", WarehouseActivityHeader."No.");
                     RecRef.GetTable(WarehouseActivityLine);
                 end;
-            //+NPR5.55 [414268]
             else begin
                     RecRef := RecRef2;
                     RecRef.SetRecFilter;
@@ -256,4 +206,3 @@ codeunit 6014447 "NPR Label Library Sub. Mgt."
             LabelLibrary.RunPrintPage(RecRef);
     end;
 }
-

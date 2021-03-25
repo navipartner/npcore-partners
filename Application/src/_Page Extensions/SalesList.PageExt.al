@@ -8,13 +8,13 @@ pageextension 6014445 "NPR Sales List" extends "Sales List"
         }
         addafter("Document Date")
         {
-            field("NPR Amount"; Amount)
+            field("NPR Amount"; Rec.Amount)
             {
                 ApplicationArea = All;
                 Visible = false;
                 ToolTip = 'Specifies the value of the Amount field';
             }
-            field("NPR Amount Including VAT"; "Amount Including VAT")
+            field("NPR Amount Including VAT"; Rec."Amount Including VAT")
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Amount Including VAT field';
@@ -22,23 +22,21 @@ pageextension 6014445 "NPR Sales List" extends "Sales List"
             field("NPR PrepmtAmtInclVAT"; PrepmtAmtInclVAT)
             {
                 ApplicationArea = All;
-                AutoFormatExpression = "Currency Code";
+                AutoFormatExpression = Rec."Currency Code";
                 AutoFormatType = 1;
                 Caption = 'Invoiced Prepmt. Amt. Incl. VAT';
                 ToolTip = 'Specifies the value of the Invoiced Prepmt. Amt. Incl. VAT field';
 
                 trigger OnDrillDown()
                 begin
-                    //-NPR5.53 [360297]
-                    if "Document Type" = "Document Type"::Order then
+                    if Rec."Document Type" = Rec."Document Type"::Order then
                         PostedPrepmtDocumentBuffer.ShowPostedDocumentList(RecordId);
-                    //+NPR5.53 [360297]
                 end;
             }
             field("NPR RemainingAmtInclVAT"; RemainingAmtInclVAT)
             {
                 ApplicationArea = All;
-                AutoFormatExpression = "Currency Code";
+                AutoFormatExpression = Rec."Currency Code";
                 AutoFormatType = 1;
                 Caption = 'Remaining Amount Incl. VAT';
                 Editable = false;
@@ -55,21 +53,20 @@ pageextension 6014445 "NPR Sales List" extends "Sales List"
 
     trigger OnAfterGetRecord()
     begin
-        if "Document Type" = "Document Type"::Order then begin
-            PostedPrepmtDocumentBuffer.Generate(RecordId, true);
-            PrepmtAmtInclVAT := PostedPrepmtDocumentBuffer.TotalAmtInclVAT(RecordId);
+        if Rec."Document Type" = Rec."Document Type"::Order then begin
+            PostedPrepmtDocumentBuffer.Generate(Rec.RecordId, true);
+            PrepmtAmtInclVAT := PostedPrepmtDocumentBuffer.TotalAmtInclVAT(Rec.RecordId);
         end else
             PrepmtAmtInclVAT := 0;
-        RemainingAmtInclVAT := "Amount Including VAT" - PrepmtAmtInclVAT;
+        RemainingAmtInclVAT := Rec."Amount Including VAT" - PrepmtAmtInclVAT;
     end;
 
 
     trigger OnOpenPage()
     begin
-        CopySellToCustomerFilter;
+        Rec.CopySellToCustomerFilter();
 
-        PostedPrepmtDocumentBuffer.Reset;
-        PostedPrepmtDocumentBuffer.DeleteAll;
+        PostedPrepmtDocumentBuffer.Reset();
+        PostedPrepmtDocumentBuffer.DeleteAll();
     end;
 }
-

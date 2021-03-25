@@ -434,12 +434,6 @@ codeunit 6059970 "NPR Variety Wrapper"
         PurchLineShowVariety(Rec, 0);
     end;
 
-    [EventSubscriber(ObjectType::Page, 55, 'OnAfterActionEvent', 'NPR Variety', true, true)]
-    local procedure P55OnAfterActionEventShowVariety(var Rec: Record "Purchase Line")
-    begin
-        PurchLineShowVariety(Rec, 0);
-    end;
-
     [EventSubscriber(ObjectType::Page, 95, 'OnAfterActionEvent', 'NPR Variety', true, true)]
     local procedure P95OnAfterActionEventShowVariety(var Rec: Record "Sales Line")
     begin
@@ -450,12 +444,6 @@ codeunit 6059970 "NPR Variety Wrapper"
     local procedure P96OnAfterActionEventShowVariety(var Rec: Record "Sales Line")
     begin
         SalesLineShowVariety(Rec, 0);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 98, 'OnAfterActionEvent', 'NPR Variety', true, true)]
-    local procedure P98OnAfterActionEventShowVariety(var Rec: Record "Purchase Line")
-    begin
-        PurchLineShowVariety(Rec, 0);
     end;
 
     [EventSubscriber(ObjectType::Page, 393, 'OnAfterActionEvent', 'NPR Variety', true, true)]
