@@ -122,20 +122,21 @@ codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
 
     local procedure VoucherPayment(FrontEnd: Codeunit "NPR POS Front End Management"; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
-        NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary;
         SalePOS: Record "NPR Sale POS";
-        NpRvSalesLine: Record "NPR NpRv Sales Line";
-        VoucherType: Record "NPR NpRv Voucher Type";
-        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         POSSale: Codeunit "NPR POS Sale";
-        VoucherTypeCode: Text;
+        VoucherType: Text;
+        VoucherTypeCode: Code[20];
         ReferenceNo: Text;
         Handled: Boolean;
         POSPaymentLine: Codeunit "NPR POS Payment Line";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         POSLine: Record "NPR Sale Line POS";
     begin
         JSON.SetScopeParameters(ObjectIdentifier());
-        VoucherTypeCode := UpperCase(JSON.GetStringOrFail('VoucherTypeCode', StrSubstNo(ReadingErr, ObjectIdentifier())));
+        VoucherType := UpperCase(JSON.GetStringOrFail('VoucherTypeCode', StrSubstNo(ReadingErr, ObjectIdentifier())));
+        if StrLen(VoucherType) > 20 then
+            Error('Voucher Type can be only 20 characters.');
+        VoucherTypeCode := CopyStr(VoucherType, 1, 20);
 
         JSON.SetScopeRoot();
         JSON.SetScope('$voucher_input', StrSubstNo(SettingScopeErr, ObjectIdentifier()));
@@ -143,55 +144,15 @@ codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
         if ReferenceNo = '' then
             exit;
 
-        if VoucherType.Get(VoucherTypeCode) then;
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        NpRvVoucherBuffer.Init;
-        NpRvVoucherBuffer."Voucher Type" := VoucherType.Code;
-        NpRvVoucherBuffer."Validate Voucher Module" := VoucherType."Validate Voucher Module";
-        NpRvVoucherBuffer."Reference No." := ReferenceNo;
-        NpRvVoucherBuffer."Redeem Date" := SalePOS.Date;
-        NpRvVoucherBuffer."Redeem Partner Code" := VoucherType."Partner Code";
-        NpRvVoucherBuffer."Redeem Register No." := SalePOS."Register No.";
-        NpRvVoucherBuffer."Redeem Sales Ticket No." := SalePOS."Sales Ticket No.";
-        NpRvVoucherBuffer."Redeem User ID" := SalePOS."Salesperson Code";
 
-        NpRvVoucherMgt.ValidateVoucher(NpRvVoucherBuffer);
-
-        VoucherType.Get(NpRvVoucherBuffer."Voucher Type");
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.GetPaymentLine(POSLine);
 
-        POSLine."No." := VoucherType."Payment Type";
-        POSLine."Register No." := SalePOS."Register No.";
-        POSLine.Description := NpRvVoucherBuffer.Description;
-        POSLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
-        POSLine."Amount Including VAT" := NpRvVoucherBuffer.Amount;
-        POSPaymentLine.InsertPaymentLine(POSLine, 0);
-        POSPaymentLine.GetCurrentPaymentLine(POSLine);
+        NpRvVoucherMgt.ApplyVoucherPayment(VoucherTypeCode, ReferenceNo, POSLine, SalePOS, POSSession, FrontEnd, POSPaymentLine, POSLine);
 
-        POSSession.RequestRefreshData();
-
-        NpRvSalesLine.Init;
-        NpRvSalesLine.Id := CreateGuid;
-        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
-        NpRvSalesLine."Retail ID" := POSLine."Retail ID";
-        NpRvSalesLine."Register No." := SalePOS."Register No.";
-        NpRvSalesLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
-        NpRvSalesLine."Sale Type" := POSLine."Sale Type";
-        NpRvSalesLine."Sale Date" := POSLine.Date;
-        NpRvSalesLine."Sale Line No." := POSLine."Line No.";
-
-        NpRvSalesLine.Type := NpRvSalesLine.Type::Payment;
-        NpRvSalesLine."Voucher No." := NpRvVoucherBuffer."No.";
-        NpRvSalesLine."Reference No." := NpRvVoucherBuffer."Reference No.";
-        NpRvSalesLine."Voucher Type" := VoucherType.Code;
-        NpRvSalesLine.Description := VoucherType.Description;
-        NpRvSalesLine.Insert(true);
-
-        NpRvVoucherMgt.ApplyPayment(FrontEnd, POSSession, NpRvSalesLine);
-
-        JSON.SetContext('VoucherType', NpRvVoucherBuffer."Voucher Type");
+        JSON.SetContext('VoucherType', VoucherType);
         FrontEnd.SetActionContext(VoucherPaymentActionCode(), JSON);
     end;
 
@@ -239,4 +200,5 @@ codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
     begin
         exit('1.0');
     end;
+
 }

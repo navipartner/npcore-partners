@@ -1344,10 +1344,7 @@ codeunit 85019 "NPR Tax Free Tests"
             NPRLibraryPOSMasterData.CreatePOSPaymentMethod(_POSPaymentMethod, _POSPaymentMethod."Processing Type"::CASH, '', false);
             _Initialized := true;
         end;
-        //Delete all previous transactions, so all tests are independent instead of triggering lookup prompts for previous errors when not intended.
-        EFTTransactionRequest.SetRange("Register No.", _POSUnit."No.");
-        EFTTransactionRequest.SetRange("Integration Type", EFTTestMockIntegration.IntegrationType());
-        EFTTransactionRequest.DeleteAll;
+NPRLibraryEFT.EFTTransactionCleanup(_POSUnit."No.");
         Commit;
     end;
 

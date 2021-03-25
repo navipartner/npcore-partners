@@ -5,7 +5,7 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         Text001: Label 'Select Voucher Type:';
         Text002: Label 'Issue Return Retail Voucher';
         Text003: Label 'Enter Amount:';
-        Text004: Label 'Maximum Return Amount is: %1';
+
         Text005: Label 'Nothing to return';
         Text006: Label 'The amount of %1 is less that the Minimum Amount allowed (%2) to create a Voucher';
         Text007: Label 'Minimum Amount for %1 %2 is %3';
@@ -288,115 +288,34 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
     local procedure IssueReturnVoucher(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
-        VoucherType: Record "NPR NpRv Voucher Type";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
-        NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
-        POSPaymentMethod: Record "NPR POS Payment Method";
-        TempVoucher: Record "NPR NpRv Voucher" temporary;
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
-        POSPaymentLine: Codeunit "NPR POS Payment Line";
-        POSSale: Codeunit "NPR POS Sale";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
         VoucherTypeCode: Text;
         DiscountType: Text;
         Amount: Decimal;
-        PaidAmount: Decimal;
-        ReturnAmount: Decimal;
-        SaleAmount: Decimal;
-        SubTotal: Decimal;
+        SendMethodPrint, SendMethodEmail, SendMethodSMS : Boolean;
+        Email: Text[80];
+        PhoneNo: Text[30];
     begin
         JSON.SetScopeRoot();
         Amount := JSON.GetDecimalOrFail('ReturnVoucherAmount', StrSubstNo(ReadingErr, ActionCode()));
         if Amount = 0 then
             exit;
 
-        POSSession.GetPaymentLine(POSPaymentLine);
-        POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, SubTotal);
-
         JSON.SetScopeRoot();
         VoucherTypeCode := UpperCase(JSON.GetStringOrFail('VoucherTypeCode', StrSubstNo(ReadingErr, ActionCode())));
-        VoucherType.Get(VoucherTypeCode);
 
-        ReturnAmount := PaidAmount - SaleAmount;
-        POSPaymentMethod.Get(VoucherType."Payment Type");
-        if POSPaymentMethod."Rounding Precision" > 0 then
-            ReturnAmount := Round(ReturnAmount, POSPaymentMethod."Rounding Precision");
-
-        if Amount > ReturnAmount then
-            Error(Text004, ReturnAmount);
-
-        NpRvVoucherMgt.GenerateTempVoucher(VoucherType, TempVoucher);
-
-        POSSession.GetSaleLine(POSSaleLine);
-        POSSaleLine.GetNewSaleLine(SaleLinePOS);
-        SaleLinePOS.Validate("Sale Type", SaleLinePOS."Sale Type"::Payment);
-        SaleLinePOS.Validate(Type, SaleLinePOS.Type::Payment);
-        SaleLinePOS.Validate("No.", VoucherType."Payment Type");
-        SaleLinePOS.Description := VoucherType.Description;
-        SaleLinePOS.Quantity := 0;
-        SaleLinePOS."Unit Price" := 0;
-        SaleLinePOS."Amount Including VAT" := -Amount;
-        POSPaymentLine.InsertPaymentLine(SaleLinePOS, 0);
-        POSPaymentLine.GetCurrentPaymentLine(SaleLinePOS);
-        SaleLinePOS.Quantity := 1;
-        SaleLinePOS.Description := TempVoucher.Description;
-        SaleLinePOS.Modify;
-
-        POSSession.RequestRefreshData();
-
-        NpRvSalesLine.Init;
-        NpRvSalesLine.Id := CreateGuid;
-        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
-        NpRvSalesLine."Retail ID" := SaleLinePOS."Retail ID";
-        NpRvSalesLine."Register No." := SaleLinePOS."Register No.";
-        NpRvSalesLine."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-        NpRvSalesLine."Sale Type" := SaleLinePOS."Sale Type";
-        NpRvSalesLine."Sale Date" := SaleLinePOS.Date;
-        NpRvSalesLine."Sale Line No." := SaleLinePOS."Line No.";
-        NpRvSalesLine.Type := NpRvSalesLine.Type::"New Voucher";
-        NpRvSalesLine."Voucher Type" := VoucherType.Code;
-        NpRvSalesLine."Starting Date" := CurrentDateTime;
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        case SalePOS."Customer Type" of
-            SalePOS."Customer Type"::Ord:
-                begin
-                    NpRvSalesLine.Validate("Customer No.", SalePOS."Customer No.");
-                end;
-            SalePOS."Customer Type"::Cash:
-                begin
-                    NpRvSalesLine.Validate("Contact No.", SalePOS."Customer No.");
-                end;
-        end;
         JSON.SetScopeRoot();
-        NpRvSalesLine."Send via Print" := JSON.GetBoolean('SendMethodPrint');
-        NpRvSalesLine."Send via E-mail" := JSON.GetBoolean('SendMethodEmail');
-        NpRvSalesLine."Send via SMS" := JSON.GetBoolean('SendMethodSMS');
+        SendMethodPrint := JSON.GetBoolean('SendMethodPrint');
+        SendMethodEmail := JSON.GetBoolean('SendMethodEmail');
+        SendMethodSMS := JSON.GetBoolean('SendMethodSMS');
         if JSON.SetScope('$send_method_email') then
-            NpRvSalesLine."E-mail" := CopyStr(JSON.GetString('input'), 1, MaxStrLen(NpRvSalesLine."E-mail"));
+            Email := CopyStr(JSON.GetString('input'), 1, MaxStrLen(Email));
         JSON.SetScopeRoot();
         if JSON.SetScope('$send_method_sms') then
-            NpRvSalesLine."Phone No." := CopyStr(JSON.GetString('input'), 1, MaxStrLen(NpRvSalesLine."Phone No."));
-        NpRvSalesLine."Voucher No." := TempVoucher."No.";
-        NpRvSalesLine."Reference No." := TempVoucher."Reference No.";
-        NpRvSalesLine.Description := TempVoucher.Description;
-        NpRvSalesLine.Insert;
+            PhoneNo := CopyStr(JSON.GetString('input'), 1, MaxStrLen(PhoneNo));
 
-        NpRvVoucherMgt.SetSalesLineReferenceFilter(NpRvSalesLine, NpRvSalesLineReference);
-        if NpRvSalesLineReference.IsEmpty then begin
-            NpRvSalesLineReference.Init;
-            NpRvSalesLineReference.Id := CreateGuid;
-            NpRvSalesLineReference."Voucher No." := TempVoucher."No.";
-            NpRvSalesLineReference."Reference No." := TempVoucher."Reference No.";
-            NpRvSalesLineReference."Sales Line Id" := NpRvSalesLine.Id;
-            NpRvSalesLineReference.Insert;
 
-            SaleLinePOS.Description := TempVoucher.Description;
-            SaleLinePOS.Modify;
-        end;
-
-        POSSession.RequestRefreshData();
+        NpRvVoucherMgt.IssueReturnVoucher(POSSession, VoucherTypeCode, Amount, Email, PhoneNo, SendMethodPrint, SendMethodEmail, SendMethodSMS);
     end;
 
     local procedure VoucherTypeInput(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -508,4 +427,6 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
     begin
         exit('1.1');
     end;
+
+
 }

@@ -228,6 +228,7 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
     begin
         if not SalesHeader.Invoice then
             exit;
+        CheckHeader(SalesHeader);
 
         OnBeforeReleaseSalesDoc(SalesHeader);
 
@@ -393,6 +394,7 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
         TotalAmtInclVat: Decimal;
         VoucherNo: Text;
     begin
+        CheckHeader(SalesHeader);
         if not SelectVoucherType(NpRvVoucherType) then
             exit;
 
@@ -437,6 +439,20 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
                     TempNpRvVoucherType.Insert;
                 end;
             until NpRvVoucherType.Next = 0;
+    end;
+
+    local procedure CheckHeader(SalesHeader: Record "Sales Header")
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NotSupportedErr: Label 'Issuing vouchers in foreign currency is not supported.';
+    begin
+        If SalesHeader."Currency Code" = '' then
+            exit;
+
+        GeneralLedgerSetup.Get();
+        if SalesHeader."Currency Code" <> GeneralLedgerSetup."LCY Code" then
+            Error(NotSupportedErr);
+
     end;
 
     procedure SendVoucher(NpRvVoucher: Record "NPR NpRv Voucher")

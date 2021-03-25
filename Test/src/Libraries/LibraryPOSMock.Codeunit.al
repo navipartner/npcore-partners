@@ -11,12 +11,16 @@ codeunit 85003 "NPR Library - POS Mock"
         POSUnitIdentity: Codeunit "NPR POS Unit Identity";
         POSUnitIdentityRec: Record "NPR POS Unit Identity";
         POSMockFramework: Codeunit "NPR POS Framework: Mock";
+        "Action": Record "NPR POS Action" temporary;
     begin
         POSMockFramework.Constructor();
         POSSession.Constructor(POSMockFramework, POSFrontEnd, POSSetup, POSSession);
         POSUnitIdentity.ConfigureTemporaryDevice(POSUnit."No.", POSUnitIdentityRec);
         POSSetup.InitializeUsingPosUnitIdentity(POSUnitIdentityRec);
         POSSession.StartPOSSession();
+
+        Action.SetSession(POSSession);
+        Action.DiscoverActions();
     end;
 
     procedure InitializePOSSessionAndStartSale(var POSSession: Codeunit "NPR POS Session"; POSUnit: Record "NPR POS Unit"; var POSSale: Codeunit "NPR POS Sale")
@@ -103,7 +107,11 @@ codeunit 85003 "NPR Library - POS Mock"
         POSSession.ClearActionState();
         POSSession.StoreActionState('ContextId', POSSession.BeginAction(POSActionPayment.ActionCode())); //Is done at start of payment action
         POSActionPayment.CapturePayment(POSPaymentMethod, POSSession, FrontEnd, Amount, VoucherNo, Handled); //Capture step of payment action
+        if VoucherNo <> '' then
+            IssueReturnVoucherFromPaymentMethod(POSSession, VoucherNo);
+
         POSActionPayment.TryEndSale(POSPaymentMethod, POSSession); //TryEndSale step of payment action
+        
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(NewSalePOS);
@@ -117,5 +125,205 @@ codeunit 85003 "NPR Library - POS Mock"
 
         exit(true);
     end;
+
+    procedure CreateVoucherLine(POSSession: Codeunit "NPR POS Session"; VoucherTypeCode: Code[20]; Quantity: Decimal; VoucherAmount: Decimal; DiscountType: Text; DiscountAmount: Decimal)
+    var
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
+        VoucherType: Record "NPR NpRv Voucher Type";
+        SalePOS: Record "NPR Sale POS";
+        SaleLinePOS: Record "NPR Sale Line POS";
+        TempVoucher: Record "NPR NpRv Voucher" temporary;
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        QtyNotPositiveErr: Label 'You must specify a positive quantity.';
+    begin
+        VoucherType.Get(VoucherTypeCode);
+
+        NpRvVoucherMgt.GenerateTempVoucher(VoucherType, TempVoucher);
+
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetNewSaleLine(SaleLinePOS);
+        SaleLinePOS.Validate("Sale Type", SaleLinePOS."Sale Type"::Deposit);
+        SaleLinePOS.Validate(Type, SaleLinePOS.Type::"G/L Entry");
+        SaleLinePOS.Validate("No.", VoucherType."Account No.");
+        SaleLinePOS.Description := VoucherType.Description;
+        SaleLinePOS.Quantity := Quantity;
+        if SaleLinePOS.Quantity < 0 then
+            Error(QtyNotPositiveErr);
+
+        POSSaleLine.InsertLine(SaleLinePOS);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        SaleLinePOS."Unit Price" := VoucherAmount;
+
+        case DiscountType of
+            '0':
+                SaleLinePOS."Discount Amount" := DiscountAmount;
+            '1':
+                SaleLinePOS."Discount %" := DiscountAmount;
+        end;
+        SaleLinePOS.UpdateAmounts(SaleLinePOS);
+        if SaleLinePOS."Discount Amount" > 0 then
+            SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::Manual;
+        SaleLinePOS.Description := TempVoucher.Description;
+        SaleLinePOS.Modify(true);
+        POSSession.RequestRefreshData();
+
+        NpRvSalesLine.Init;
+        NpRvSalesLine.Id := CreateGuid;
+        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
+        NpRvSalesLine."Retail ID" := SaleLinePOS."Retail ID";
+        NpRvSalesLine."Register No." := SaleLinePOS."Register No.";
+        NpRvSalesLine."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
+        NpRvSalesLine."Sale Type" := SaleLinePOS."Sale Type";
+        NpRvSalesLine."Sale Date" := SaleLinePOS.Date;
+        NpRvSalesLine."Sale Line No." := SaleLinePOS."Line No.";
+        NpRvSalesLine."Voucher No." := TempVoucher."No.";
+        NpRvSalesLine."Reference No." := TempVoucher."Reference No.";
+        NpRvSalesLine.Description := TempVoucher.Description;
+        NpRvSalesLine.Type := NpRvSalesLine.Type::"New Voucher";
+        NpRvSalesLine."Voucher Type" := VoucherType.Code;
+        NpRvSalesLine.Description := VoucherType.Description;
+        NpRvSalesLine."Starting Date" := CurrentDateTime;
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        case SalePOS."Customer Type" of
+            SalePOS."Customer Type"::Ord:
+                begin
+                    NpRvSalesLine.Validate("Customer No.", SalePOS."Customer No.");
+                end;
+            SalePOS."Customer Type"::Cash:
+                begin
+                    NpRvSalesLine.Validate("Contact No.", SalePOS."Customer No.");
+                end;
+        end;
+
+        NpRvSalesLine.Insert;
+
+        NpRvVoucherMgt.SetSalesLineReferenceFilter(NpRvSalesLine, NpRvSalesLineReference);
+        if NpRvSalesLineReference.IsEmpty then begin
+            NpRvSalesLineReference.Init;
+            NpRvSalesLineReference.Id := CreateGuid;
+            NpRvSalesLineReference."Voucher No." := TempVoucher."No.";
+            NpRvSalesLineReference."Reference No." := TempVoucher."Reference No.";
+            NpRvSalesLineReference."Sales Line Id" := NpRvSalesLine.Id;
+            NpRvSalesLineReference.Insert(true);
+        end;
+        POSSession.RequestRefreshData();
+    end;
+
+    internal procedure PayWithVoucherAndTryEndSaleAndStartNew(POSSession: Codeunit "NPR POS Session"; VoucherType: Code[20]; VoucherReferenceNo: Text[30]): Boolean
+    begin
+        VoucherPayment(POSSession, VoucherReferenceNo, VoucherType);
+        IssueReturnVoucher(POSSession, VoucherType);
+        exit(EndSale(POSSession, VoucherType));
+    end;
+
+
+    local procedure VoucherPayment(POSSession: Codeunit "NPR POS Session"; VoucherReferenceNo: Text[30]; VoucherTypeCode: Code[20])
+    var
+        SalePOS: Record "NPR Sale POS";
+        VoucherType: Record "NPR NpRv Voucher Type";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        FrontEnd: Codeunit "NPR POS Front End Management";
+        POSSale: Codeunit "NPR POS Sale";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        POSLine: Record "NPR Sale Line POS";
+    begin
+        if VoucherReferenceNo = '' then
+            exit;
+
+        POSSession.GetPaymentLine(POSPaymentLine);
+        POSPaymentLine.GetPaymentLine(POSLine);
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        POSSession.GetFrontEnd(FrontEnd, true);
+
+
+        NpRvVoucherMgt.ApplyVoucherPayment(VoucherTypeCode, VoucherReferenceNo, POSLine, SalePOS, POSSession, FrontEnd, POSPaymentLine, POSLine);
+    end;
+
+    procedure VoucherTopUp(POSSession: Codeunit "NPR POS Session"; VoucherNo: Text; VoucherAmount: Decimal; DiscountType: Text; DiscountAmount: Decimal)
+    var
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+    begin
+        if VoucherNo = '' then exit;
+
+
+        NpRvVoucherMgt.TopUpVoucher(POSSession, VoucherNo, DiscountType, VoucherAmount, 0, 0);
+    end;
+
+
+
+    local procedure EndSale(POSSession: Codeunit "NPR POS Session"; VoucherTypeCode: Code[20]): Boolean
+    var
+        NpRvVoucherType: Record "NPR NpRv Voucher Type";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSetup: Codeunit "NPR POS Setup";
+        PaidAmount, ReturnAmount, SaleAmount, Subtotal : Decimal;
+    begin
+        POSSession.GetPaymentLine(POSPaymentLine);
+        POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal);
+
+        POSSession.GetSetup(POSSetup);
+        if Abs(Subtotal) > Abs(POSSetup.AmountRoundingPrecision) then
+            exit(false);
+
+        NpRvVoucherType.Get(VoucherTypeCode);
+        if not POSPaymentMethod.Get(NpRvVoucherType."Payment Type") then
+            exit(false);
+        if not ReturnPOSPaymentMethod.Get(POSPaymentMethod."Return Payment Method Code") then
+            exit(false);
+        if POSPaymentLine.CalculateRemainingPaymentSuggestion(SaleAmount, PaidAmount, POSPaymentMethod, ReturnPOSPaymentMethod, false) <> 0 then
+            exit(false);
+
+        POSSession.GetSale(POSSale);
+        if not POSSale.TryEndSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod) then
+            exit(false);
+        exit(true);
+    end;
+
+    local procedure IssueReturnVoucher(POSSession: Codeunit "NPR POS Session"; VoucherTypeCode: Code[20])
+    var
+        ReturnVoucherType: Record "NPR NpRv Ret. Vouch. Type";
+        VoucherType2: Record "NPR NpRv Voucher Type";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        PaidAmount, ReturnAmount, SaleAmount, Subtotal : Decimal;
+    begin
+        POSSession.GetPaymentLine(POSPaymentLine);
+        POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal);
+        if ReturnAmount = 0 then
+            exit;
+        ReturnAmount := ReturnAmount * (-1);
+        if not ReturnVoucherType.Get(VoucherTypeCode) then
+            exit;
+        if VoucherType2.Get(ReturnVoucherType."Return Voucher Type") and POSPaymentMethod.Get(VoucherType2."Payment Type") then begin
+            if POSPaymentMethod."Rounding Precision" > 0 then
+                ReturnAmount := Round(ReturnAmount, POSPaymentMethod."Rounding Precision");
+            if (POSPaymentMethod."Minimum Amount" > 0) and (Abs(ReturnAmount) < (POSPaymentMethod."Minimum Amount")) then
+                exit;
+            if (VoucherType2."Minimum Amount Issue" > 0) and (Abs(ReturnAmount) < VoucherType2."Minimum Amount Issue") then
+                exit;
+        end;
+
+        NpRvVoucherMgt.IssueReturnVoucher(POSSession, VoucherType2.Code, ReturnAmount, '', '', false, false, false);
+    end;
+
+    local procedure IssueReturnVoucherFromPaymentMethod(POSSession: Codeunit "NPR POS Session"; VoucherNo: Text)
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+    begin
+        NpRvVoucher.SetRange("Reference No.", VoucherNo);
+        if NpRvVoucher.FindFirst() then
+            IssueReturnVoucher(POSSession, NpRvVoucher."Voucher Type");
+    end;
+
+
 }
 

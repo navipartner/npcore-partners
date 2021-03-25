@@ -73,6 +73,29 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
             until NpRvSalesLine.Next = 0;
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSPaymentLine', '', true, false)]
+    local procedure OnAfterInsertPOSPaymentLine(SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS"; POSEntry: Record "NPR POS Entry"; POSPaymentLine: Record "NPR POS Payment Line")
+    var
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+    begin
+        SetSalesLineFilter(SaleLinePos, NpRvSalesLine);
+        if NpRvSalesLine.IsEmpty then
+            exit;
+
+        NpRvSalesLine.SetFilter(Type, '%1|%2|%3', NpRvSalesLine.Type::"New Voucher", NpRvSalesLine.Type::"Top-up", NpRvSalesLine.Type::"Partner Issue Voucher");
+        if NpRvSalesLine.FindSet then
+            repeat
+                IssueVouchers(NpRvSalesLine);
+            until NpRvSalesLine.Next = 0;
+
+        SetSalesLineFilter(SaleLinePos, NpRvSalesLine);
+        NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
+        if NpRvSalesLine.FindSet then
+            repeat
+                PostPayment(NpRvSalesLine);
+            until NpRvSalesLine.Next = 0;
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnAfterEndSale', '', true, true)]
     local procedure OnAfterEndSale(var Sender: Codeunit "NPR POS Sale"; SalePOS: Record "NPR Sale POS")
     var
@@ -209,7 +232,7 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
                     Voucher.Insert(true);
 
                     PrevVoucher := Format(Voucher);
-                    Voucher.Description := CopyStr(VoucherType.Description + ' ' + Voucher."No.", 1, MaxStrLen(Voucher.Description));
+                    Voucher.Description := CopyStr(Voucher."Reference No." + ' ' + VoucherType.Description, 1, MaxStrLen(Voucher.Description));
                     Voucher."Customer No." := NpRvSalesLine."Customer No.";
                     Voucher."Contact No." := NpRvSalesLine."Contact No.";
                     Voucher.Name := NpRvSalesLine.Name;
@@ -766,11 +789,10 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
         TempVoucher.Init;
         TempVoucher."No." := '';
         TempVoucher.Validate("Voucher Type", VoucherType.Code);
-        if VoucherType."No. Series" <> '' then begin
+        if VoucherType."No. Series" <> '' then
             NoSeriesMgt.InitSeries(TempVoucher."No. Series", '', 0D, TempVoucher."No.", TempVoucher."No. Series");
-            TempVoucher.Description := CopyStr(VoucherType.Description + ' ' + TempVoucher."No.", 1, MaxStrLen(TempVoucher.Description));
-        end;
         TempVoucher."Reference No." := GenerateReferenceNo(TempVoucher);
+        TempVoucher.Description := CopyStr(TempVoucher."Reference No." + ' ' + VoucherType.Description, 1, MaxStrLen(TempVoucher.Description));
     end;
 
     procedure GenerateReferenceNo(Voucher: Record "NPR NpRv Voucher") ReferenceNo: Text
@@ -1011,6 +1033,225 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
         VoucherEntry."Partner Code" := VoucherType."Partner Code";
         VoucherEntry."Closed by Entry No." := 0;
         VoucherEntry.Insert();
+    end;
+
+    procedure PrepareVoucherBuffer(var NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary; var SalePOS: Record "NPR Sale POS"; VoucherType: Record "NPR NpRv Voucher Type"; var ReferenceNo: Text)
+    begin
+        NpRvVoucherBuffer.Init;
+        NpRvVoucherBuffer."Voucher Type" := VoucherType.Code;
+        NpRvVoucherBuffer."Validate Voucher Module" := VoucherType."Validate Voucher Module";
+        NpRvVoucherBuffer."Reference No." := ReferenceNo;
+        NpRvVoucherBuffer."Redeem Date" := SalePOS.Date;
+        NpRvVoucherBuffer."Redeem Partner Code" := VoucherType."Partner Code";
+        NpRvVoucherBuffer."Redeem Register No." := SalePOS."Register No.";
+        NpRvVoucherBuffer."Redeem Sales Ticket No." := SalePOS."Sales Ticket No.";
+        NpRvVoucherBuffer."Redeem User ID" := SalePOS."Salesperson Code";
+    end;
+
+    procedure InsertNpRvSalesLine(var NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary; var SalePOS: Record "NPR Sale POS"; var NpRvSalesLine: Record "NPR NpRv Sales Line"; var VoucherType: Record "NPR NpRv Voucher Type"; var POSLine: Record "NPR Sale Line POS")
+    begin
+        NpRvSalesLine.Init;
+        NpRvSalesLine.Id := CreateGuid;
+        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
+        NpRvSalesLine."Retail ID" := POSLine."Retail ID";
+        NpRvSalesLine."Register No." := SalePOS."Register No.";
+        NpRvSalesLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
+        NpRvSalesLine."Sale Type" := POSLine."Sale Type";
+        NpRvSalesLine."Sale Date" := POSLine.Date;
+        NpRvSalesLine."Sale Line No." := POSLine."Line No.";
+
+        NpRvSalesLine.Type := NpRvSalesLine.Type::Payment;
+        NpRvSalesLine."Voucher No." := NpRvVoucherBuffer."No.";
+        NpRvSalesLine."Reference No." := NpRvVoucherBuffer."Reference No.";
+        NpRvSalesLine."Voucher Type" := VoucherType.Code;
+        NpRvSalesLine.Description := VoucherType.Description;
+        NpRvSalesLine.Insert(true);
+    end;
+
+    procedure ApplyVoucherPayment(var VoucherTypeCode: Code[20]; var VoucherNumber: Text; var PaymentLine: Record "NPR Sale Line POS"; var SalePOS: Record "NPR Sale POS"; var POSSession: Codeunit "NPR POS Session"; var FrontEnd: Codeunit "NPR POS Front End Management"; var POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR Sale Line POS")
+    var
+        NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary;
+        VoucherType: Record "NPR NpRv Voucher Type";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+    begin
+        VoucherType.Get(VoucherTypeCode);
+        NpRvVoucherMgt.PrepareVoucherBuffer(NpRvVoucherBuffer, SalePOS, VoucherType, VoucherNumber);
+        NpRvVoucherMgt.ValidateVoucher(NpRvVoucherBuffer);
+
+        POSLine."No." := VoucherType."Payment Type";
+        POSLine."Register No." := SalePOS."Register No.";
+        POSLine.Description := NpRvVoucherBuffer.Description;
+        POSLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
+        POSLine."Amount Including VAT" := NpRvVoucherBuffer.Amount;
+        POSPaymentLine.InsertPaymentLine(POSLine, 0);
+        POSPaymentLine.GetCurrentPaymentLine(POSLine);
+        PaymentLine."Discount Code" := NpRvVoucherBuffer."No.";
+
+        POSSession.RequestRefreshData();
+        NpRvVoucherMgt.InsertNpRvSalesLine(NpRvVoucherBuffer, SalePOS, NpRvSalesLine, VoucherType, POSLine);
+
+        NpRvVoucherMgt.ApplyPayment(FrontEnd, POSSession, NpRvSalesLine);
+    end;
+
+
+    procedure IssueReturnVoucher(var POSSession: Codeunit "NPR POS Session"; VoucherTypeCode: Text; Amount: Decimal; Email: Text[80]; PhoneNo: Text[30]; SendMethodPrint: Boolean; SendMethodEmail: Boolean; SendMethodSMS: Boolean)
+    var
+        VoucherType: Record "NPR NpRv Voucher Type";
+        SalePOS: Record "NPR Sale POS";
+        SaleLinePOS: Record "NPR Sale Line POS";
+        NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        TempVoucher: Record "NPR NpRv Voucher" temporary;
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        PaidAmount: Decimal;
+        ReturnAmount: Decimal;
+        SaleAmount: Decimal;
+        SubTotal: Decimal;
+        Text004: Label 'Maximum Return Amount is: %1';
+    begin
+        POSSession.GetPaymentLine(POSPaymentLine);
+        POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, SubTotal);
+        VoucherType.Get(VoucherTypeCode);
+
+        ReturnAmount := PaidAmount - SaleAmount;
+        POSPaymentMethod.Get(VoucherType."Payment Type");
+        if POSPaymentMethod."Rounding Precision" > 0 then
+            ReturnAmount := Round(ReturnAmount, POSPaymentMethod."Rounding Precision");
+
+        if Amount > ReturnAmount then
+            Error(Text004, ReturnAmount);
+
+        NpRvVoucherMgt.GenerateTempVoucher(VoucherType, TempVoucher);
+
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetNewSaleLine(SaleLinePOS);
+        SaleLinePOS.Validate("Sale Type", SaleLinePOS."Sale Type"::Payment);
+        SaleLinePOS.Validate(Type, SaleLinePOS.Type::Payment);
+        SaleLinePOS.Validate("No.", VoucherType."Payment Type");
+        SaleLinePOS.Description := VoucherType.Description;
+        SaleLinePOS.Quantity := 0;
+        SaleLinePOS."Unit Price" := 0;
+        SaleLinePOS."Amount Including VAT" := -Amount;
+        POSPaymentLine.InsertPaymentLine(SaleLinePOS, 0);
+        POSPaymentLine.GetCurrentPaymentLine(SaleLinePOS);
+        SaleLinePOS.Quantity := 1;
+        SaleLinePOS.Description := TempVoucher.Description;
+        SaleLinePOS.Modify;
+
+        POSSession.RequestRefreshData();
+
+        NpRvSalesLine.Init;
+        NpRvSalesLine."Send via Print" := SendMethodPrint;
+        NpRvSalesLine."Send via E-mail" := SendMethodEmail;
+        NpRvSalesLine."Send via SMS" := SendMethodSMS;
+        if Email <> '' then
+            NpRvSalesLine."E-mail" := Email;
+        if PhoneNo <> '' then
+            NpRvSalesLine."Phone No." := PhoneNo;
+        NpRvSalesLine.Id := CreateGuid;
+        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
+        NpRvSalesLine."Retail ID" := SaleLinePOS."Retail ID";
+        NpRvSalesLine."Register No." := SaleLinePOS."Register No.";
+        NpRvSalesLine."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
+        NpRvSalesLine."Sale Type" := SaleLinePOS."Sale Type";
+        NpRvSalesLine."Sale Date" := SaleLinePOS.Date;
+        NpRvSalesLine."Sale Line No." := SaleLinePOS."Line No.";
+        NpRvSalesLine.Type := NpRvSalesLine.Type::"New Voucher";
+        NpRvSalesLine."Voucher Type" := VoucherType.Code;
+        NpRvSalesLine."Starting Date" := CurrentDateTime;
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        case SalePOS."Customer Type" of
+            SalePOS."Customer Type"::Ord:
+                begin
+                    NpRvSalesLine.Validate("Customer No.", SalePOS."Customer No.");
+                end;
+            SalePOS."Customer Type"::Cash:
+                begin
+                    NpRvSalesLine.Validate("Contact No.", SalePOS."Customer No.");
+                end;
+        end;
+
+        NpRvSalesLine."Voucher No." := TempVoucher."No.";
+        NpRvSalesLine."Reference No." := TempVoucher."Reference No.";
+        NpRvSalesLine.Description := TempVoucher.Description;
+        NpRvSalesLine.Insert;
+
+        NpRvVoucherMgt.SetSalesLineReferenceFilter(NpRvSalesLine, NpRvSalesLineReference);
+        if NpRvSalesLineReference.IsEmpty then begin
+            NpRvSalesLineReference.Init;
+            NpRvSalesLineReference.Id := CreateGuid;
+            NpRvSalesLineReference."Voucher No." := TempVoucher."No.";
+            NpRvSalesLineReference."Reference No." := TempVoucher."Reference No.";
+            NpRvSalesLineReference."Sales Line Id" := NpRvSalesLine.Id;
+            NpRvSalesLineReference.Insert;
+
+            SaleLinePOS.Description := TempVoucher.Description;
+            SaleLinePOS.Modify;
+        end;
+
+        POSSession.RequestRefreshData();
+    end;
+
+    procedure TopUpVoucher(var POSSession: Codeunit "NPR POS Session"; VoucherNo: Text; DiscountType: Text; AmtInput: Decimal; DiscountAmount: Decimal; DiscountPct: Decimal)
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        SaleLinePOS: Record "NPR Sale Line POS";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+    begin
+        NpRvVoucher.Get(VoucherNo);
+
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetNewSaleLine(SaleLinePOS);
+        SaleLinePOS.Validate("Sale Type", SaleLinePOS."Sale Type"::Deposit);
+        SaleLinePOS.Validate(Type, SaleLinePOS.Type::"G/L Entry");
+        SaleLinePOS.Validate("No.", NpRvVoucher."Account No.");
+        SaleLinePOS.Description := NpRvVoucher.Description;
+        SaleLinePOS.Quantity := 1;
+        POSSaleLine.InsertLine(SaleLinePOS);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        SaleLinePOS."Unit Price" := AmtInput;
+        case DiscountType of
+            '0':
+                SaleLinePOS."Discount %" := DiscountPct;
+            '1':
+                SaleLinePOS."Discount Amount" := DiscountAmount;
+        end;
+        SaleLinePOS.UpdateAmounts(SaleLinePOS);
+        if SaleLinePOS."Discount Amount" > 0 then
+            SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::Manual;
+        SaleLinePOS.Modify(true);
+        POSSession.RequestRefreshData();
+
+        NpRvSalesLine.Init;
+        NpRvSalesLine.Id := CreateGuid;
+        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
+        NpRvSalesLine."Retail ID" := SaleLinePOS."Retail ID";
+        NpRvSalesLine."Register No." := SaleLinePOS."Register No.";
+        NpRvSalesLine."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
+        NpRvSalesLine."Sale Type" := SaleLinePOS."Sale Type";
+        NpRvSalesLine."Sale Date" := SaleLinePOS.Date;
+        NpRvSalesLine."Sale Line No." := SaleLinePOS."Line No.";
+        NpRvSalesLine.Type := NpRvSalesLine.Type::"Top-up";
+        NpRvSalesLine."Voucher No." := NpRvVoucher."No.";
+        NpRvSalesLine."Voucher Type" := NpRvVoucher."Voucher Type";
+        NpRvSalesLine.Description := NpRvVoucher.Description;
+        NpRvSalesLine."Starting Date" := CurrentDateTime;
+        NpRvSalesLine."Send via Print" := NpRvVoucher."Send via Print";
+        NpRvSalesLine."Send via E-mail" := NpRvVoucher."Send via E-mail";
+        NpRvSalesLine."Send via SMS" := NpRvVoucher."Send via SMS";
+        if NpRvVoucher."Send via E-mail" then
+            NpRvSalesLine."E-mail" := NpRvVoucher."E-mail";
+        if NpRvVoucher."Send via SMS" then
+            NpRvSalesLine."Phone No." := NpRvVoucher."Phone No.";
+        NpRvSalesLine.Insert(true);
     end;
 
     [IntegrationEvent(false, false)]

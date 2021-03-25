@@ -2841,8 +2841,6 @@ codeunit 85004 "NPR EFT Tests"
         ItemRef: Record "Item Reference";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryEFT: Codeunit "NPR Library - EFT";
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
     begin
         if _Initialized then begin
             //Clean any previous mock session
@@ -2860,16 +2858,8 @@ codeunit 85004 "NPR EFT Tests"
             _Initialized := true;
         end;
 
-        //Delete all previous transactions, so all tests are independent instead of triggering lookup prompts for previous errors when not intended.
-        EFTTransactionRequest.SetRange("Register No.", _POSUnit."No.");
-        EFTTransactionRequest.SetRange("Integration Type", EFTTestMockIntegration.IntegrationType());
-        EFTTransactionRequest.DeleteAll;
-
-        //Delete all item reference from template data, so all tests are independent instead of triggering lookup prompts for previous errors when not intended.
-        ItemRef.SetCurrentKey("Reference No.");
-        ItemRef.SetFilter("Reference No.", '<>%1', '');
-        if not ItemRef.IsEmpty() then
-            ItemRef.DeleteAll();
+        NPRLibraryEFT.EFTTransactionCleanup(_POSUnit."No.");
+        NPRLibraryPOSMasterData.ItemReferenceCleanup();
 
         Commit();
     end;
@@ -2881,6 +2871,8 @@ codeunit 85004 "NPR EFT Tests"
         _POSSession.ClearActionState();
         _POSSession.BeginAction(POSActionPayment.ActionCode()); //Required for EFT payments as they depend on outer PAYMENT workflow session state.
     end;
+
+
 
     [ConfirmHandler]
     procedure ConfirmYesHandler(Question: Text[1024]; var Reply: Boolean)

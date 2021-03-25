@@ -421,6 +421,82 @@ codeunit 85002 "NPR Library - POS Master Data"
         exit(Denominations.Get(LibraryRandom.RandIntInRange(1, Denominations.Count())));
     end;
 
+    local procedure CreateDefaultValidateVoucherModule(): Code[20]
+    var
+        NpRvVoucherModule: Record "NPR NpRv Voucher Module";
+        LibraryUtility: Codeunit "Library - Utility";
+    begin
+        NpRvVoucherModule.SetRange(Type, NpRvVoucherModule.Type::"Validate Voucher");
+        NpRvVoucherModule.SetRange("Event Codeunit ID", Codeunit::"NPR NpRv Module Valid.: Def.");
+        if not NpRvVoucherModule.FindFirst() then begin
+            NpRvVoucherModule.Init();
+            NpRvVoucherModule.Type := NpRvVoucherModule.Type::"Validate Voucher";
+            NpRvVoucherModule.Code := 'DEFAULT';
+            NpRvVoucherModule."Event Codeunit ID" := Codeunit::"NPR NpRv Module Valid.: Def.";
+            NpRvVoucherModule.Insert();
+        end;
+        exit(NpRvVoucherModule.Code);
+    end;
+
+    local procedure CreatePartialApplyVoucherModule(): Code[20]
+    var
+        NpRvVoucherModule: Record "NPR NpRv Voucher Module";
+        LibraryUtility: Codeunit "Library - Utility";
+    begin
+        NpRvVoucherModule.SetRange(Type, NpRvVoucherModule.Type::"Apply Payment");
+        NpRvVoucherModule.SetRange("Event Codeunit ID", Codeunit::"NPR NpRv Module Pay. - Partial");
+        if not NpRvVoucherModule.FindFirst() then begin
+            NpRvVoucherModule.Init();
+            NpRvVoucherModule.Type := NpRvVoucherModule.Type::"Apply Payment";
+            NpRvVoucherModule.Code := 'PARTIAL';
+            NpRvVoucherModule."Event Codeunit ID" := Codeunit::"NPR NpRv Module Pay. - Partial";
+            NpRvVoucherModule.Insert();
+        end;
+        exit(NpRvVoucherModule.Code);
+    end;
+
+    local procedure CreateDefaultApplyVoucherModule(): Code[20]
+    var
+        NpRvVoucherModule: Record "NPR NpRv Voucher Module";
+        LibraryUtility: Codeunit "Library - Utility";
+    begin
+        NpRvVoucherModule.SetRange(Type, NpRvVoucherModule.Type::"Apply Payment");
+        NpRvVoucherModule.SetRange("Event Codeunit ID", Codeunit::"NPR NpRv Module Pay.: Default");
+        if not NpRvVoucherModule.FindFirst() then begin
+            NpRvVoucherModule.Init();
+            NpRvVoucherModule.Type := NpRvVoucherModule.Type::"Apply Payment";
+            NpRvVoucherModule.Code := 'DEFAULT';
+            NpRvVoucherModule."Event Codeunit ID" := Codeunit::"NPR NpRv Module Pay.: Default";
+            NpRvVoucherModule.Insert();
+        end;
+        exit(NpRvVoucherModule.Code);
+    end;
+
+    local procedure CreateDefaultSendVoucherModule(): Code[20]
+    var
+        NpRvVoucherModule: Record "NPR NpRv Voucher Module";
+        LibraryUtility: Codeunit "Library - Utility";
+    begin
+        NpRvVoucherModule.SetRange(Type, NpRvVoucherModule.Type::"Send Voucher");
+        NpRvVoucherModule.SetRange("Event Codeunit ID", Codeunit::"NPR NpRv Module Send: Def.");
+        if not NpRvVoucherModule.FindFirst() then begin
+            NpRvVoucherModule.Init();
+            NpRvVoucherModule.Type := NpRvVoucherModule.Type::"Send Voucher";
+            NpRvVoucherModule.Code := LibraryUtility.GenerateRandomCode20(NpRvVoucherModule.FieldNo(Code), Database::"NPR NpRv Voucher Module");
+            NpRvVoucherModule."Event Codeunit ID" := Codeunit::"NPR NpRv Module Send: Def.";
+            NpRvVoucherModule.Insert();
+        end;
+        exit(NpRvVoucherModule.Code);
+    end;
+
+    local procedure CreateVoucherPaymentMethod(): Code[10]
+    var
+        VoucherPOSPaymentMethod: Record "NPR POS Payment Method";
+    begin
+        CreatePOSPaymentMethod(VoucherPOSPaymentMethod, VoucherPOSPaymentMethod."Processing Type"::VOUCHER, '', false);
+        exit(VoucherPOSPaymentMethod.Code);
+    end;
+
 
     procedure CreateItemForPOSSaleUsage(var Item: Record Item; POSUnit: Record "NPR POS Unit"; POSStore: Record "NPR POS Store")
     var
@@ -447,6 +523,65 @@ codeunit 85002 "NPR Library - POS Master Data"
         LibrarySales.CreateSalesperson(Salesperson);
         Salesperson."NPR Register Password" := '1';
         Salesperson.Modify();
+    end;
+
+    procedure ItemReferenceCleanup()
+    var
+        ItemRef: Record "Item Reference";
+    begin
+        //Delete all item reference from template data, so all tests are independent instead of triggering lookup prompts for previous errors when not intended.
+        ItemRef.SetCurrentKey("Reference No.");
+        ItemRef.SetFilter("Reference No.", '<>%1', '');
+        if not ItemRef.IsEmpty() then
+            ItemRef.DeleteAll();
+    end;
+
+    procedure CreatePartialVoucherType(var VoucherType: Record "NPR NpRv Voucher Type"; AllowTopUp: Boolean)
+    var
+        LibraryUtility: Codeunit "Library - Utility";
+        LibraryERM: Codeunit "Library - ERM";
+    begin
+        VoucherType.Init();
+        VoucherType.Code := 'PARTIAL';
+        VoucherType."Account No." := LibraryERM.CreateGLAccountWithSalesSetup();
+        VoucherType."No. Series" := LibraryERM.CreateNoSeriesCode('P');
+        VoucherType."Arch. No. Series" := LibraryERM.CreateNoSeriesCode('PA');
+        VoucherType."Reference No. Type" := VoucherType."Reference No. Type"::Pattern;
+        VoucherType."Reference No. Pattern" := '28[N][S][N*2]';
+        VoucherType."Validate Voucher Module" := CreateDefaultValidateVoucherModule();
+        VoucherType."Apply Payment Module" := CreatePartialApplyVoucherModule();
+        VoucherType."Send Voucher Module" := CreateDefaultSendVoucherModule();
+        VoucherType."Payment Type" := CreateVoucherPaymentMethod();
+        VoucherType.Insert();
+    end;
+
+    procedure CreateDefaultVoucherType(var VoucherType: Record "NPR NpRv Voucher Type"; AllowTopUp: Boolean)
+    var
+        LibraryUtility: Codeunit "Library - Utility";
+        LibraryERM: Codeunit "Library - ERM";
+    begin
+        VoucherType.Init();
+        VoucherType.Code := 'DEFAULT';
+        VoucherType."Account No." := LibraryERM.CreateGLAccountWithSalesSetup();
+        VoucherType."No. Series" := LibraryERM.CreateNoSeriesCode('D');
+        VoucherType."Arch. No. Series" := LibraryERM.CreateNoSeriesCode('DA');
+        VoucherType."Reference No. Type" := VoucherType."Reference No. Type"::Pattern;
+        VoucherType."Reference No. Pattern" := '18[N][S][N*2]';
+        VoucherType."Validate Voucher Module" := CreateDefaultApplyVoucherModule();
+        VoucherType."Apply Payment Module" := CreateDefaultApplyVoucherModule();
+        VoucherType."Send Voucher Module" := CreateDefaultSendVoucherModule();
+        VoucherType."Payment Type" := CreateVoucherPaymentMethod();
+        VoucherType.Insert();
+    end;
+
+    procedure CreateReturnVoucherType(ReturnVoucherType: Code[20]; VoucherType: Code[20])
+    var
+        NpRvRetVouchType: Record "NPR NpRv Ret. Vouch. Type";
+    begin
+        NpRvRetVouchType.Init();
+        NpRvRetVouchType."Voucher Type" := VoucherType;
+        NpRvRetVouchType."Return Voucher Type" := ReturnVoucherType;
+        NpRvRetVouchType.Insert();
     end;
 
 }
