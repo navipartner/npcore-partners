@@ -224,10 +224,11 @@ codeunit 6150707 "NPR POS Payment Line"
     local procedure ValidatePaymentLine(Line: Record "NPR Sale Line POS")
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
+        POSPaymentMethodNotFound: Label '%1 %2 for POS unit %3 was not found.';
     begin
 
         if not POSPaymentMethod.Get(Line."No.") then
-            Error(POSPaymentMethod.TableCaption, StrSubstNo('%1, %2', Line."No.", Line."Register No."));
+            Error(POSPaymentMethodNotFound, POSPaymentMethod.TableCaption, Line."No.", Line."Register No.");
 
         if (POSPaymentMethod."Account Type" = POSPaymentMethod."Account Type"::"G/L Account") then
             POSPaymentMethod.TestField("Account No.");
