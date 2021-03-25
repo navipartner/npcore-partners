@@ -45,17 +45,24 @@
     end;
 
     procedure GetBoolean(Param: Text) V: Boolean
+    var
+        R: Text;
     begin
         V := false;
-        if ParamDict.ContainsKey(Param) then
-            if evaluate(V, ParamDict.Get(Param)) then;
+        if ParamDict.ContainsKey(Param) then begin
+            R := ParamDict.Get(Param);
+            if R = '' then // if only parameter name is present
+                V := true
+            else
+                evaluate(V, ParamDict.Get(Param));
+        end;
     end;
 
     procedure GetInteger(Param: Text) V: Integer
     begin
         V := 0;
         if ParamDict.ContainsKey(Param) then
-            if evaluate(V, ParamDict.Get(Param)) then;
+            evaluate(V, ParamDict.Get(Param));
     end;
 
     local procedure AddToParamDict(KeyValuePair: Text; ParamDict: Dictionary of [Text, Text])
