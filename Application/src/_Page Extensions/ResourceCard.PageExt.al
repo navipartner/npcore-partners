@@ -20,4 +20,3 @@ pageextension 6014481 "NPR Resource Card" extends "Resource Card"
         }
     }
 }
-

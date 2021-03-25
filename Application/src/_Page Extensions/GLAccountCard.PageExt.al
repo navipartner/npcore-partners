@@ -37,4 +37,3 @@ pageextension 6014422 "NPR G/L Account Card" extends "G/L Account Card"
     var
         RetailPayment: Boolean;
 }
-

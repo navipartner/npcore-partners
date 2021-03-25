@@ -90,10 +90,4 @@ codeunit 6150635 "NPR POS Entry Navigation"
     begin
         OpenPOSEntryListFromSalesDocument(Rec);
     end;
-
-    [EventSubscriber(ObjectType::Page, Page::"Sales Credit Memo", 'OnAfterActionEvent', 'NPR POS Entry', true, true)]
-    local procedure SalesCrMemoOnAfterActionPOSEntry(var Rec: Record "Sales Header")
-    begin
-        OpenPOSEntryListFromSalesDocument(Rec);
-    end;
 }
