@@ -60,8 +60,10 @@ codeunit 6150631 "NPR POS Post via Task Queue"
         if POSPeriodRegisterNoFilter <> '' then
             POSEntry.SetFilter("POS Period Register No.", POSPeriodRegisterNoFilter);
 
-        repeat
+        if POSEntry.IsEmpty() then
+            exit;
 
+        repeat
             if (POSEntry.FindLast()) then
                 POSEntry.SetFilter("POS Period Register No.", '=%1', POSEntry."POS Period Register No.");
 

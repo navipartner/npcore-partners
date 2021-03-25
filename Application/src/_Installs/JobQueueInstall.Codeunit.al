@@ -10,7 +10,7 @@
     procedure AddJobQueues()
     var
         UpgradeTag: Codeunit "Upgrade Tag";
-        UpgradeTagLbl: Label 'NPRJobQueueInstall-20210320', Locked = true;
+        UpgradeTagLbl: Label 'NPRJobQueueInstall-20210324', Locked = true;
     begin
         if UpgradeTag.HasUpgradeTag(UpgradeTagLbl) then
             exit;
@@ -27,9 +27,15 @@
         JobQueueCategory: Record "Job Queue Category";
         JobQueueEntry: Record "Job Queue Entry";
         NCTaskProcessor: Record "NPR Nc Task Processor";
+        NCSetup: Record "NPR Nc Setup";
         NcTaskListProcessing: Codeunit "NPR Nc Task List Processing";
         ParamString: Text[250];
     begin
+        if not NCSetup.FindFirst() then begin
+            NCSetup.Init();
+            NCSetup.Insert();
+        end;
+
         if not NCTaskProcessor.FindFirst() then begin
             NCTaskProcessor.Init();
             NCTaskProcessor.Code := 'NC';
