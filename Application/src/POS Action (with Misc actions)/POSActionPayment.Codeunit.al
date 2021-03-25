@@ -9,6 +9,8 @@ codeunit 6150725 "NPR POS Action: Payment"
         MissingImpl: Label 'Payment failed!\%1 = %2, %3 = %4 on %5 = %6 did not respond with being handled.\\Check the setup for %1 and %5.';
         NO_SALES_LINES: Label 'There are no sales lines in the POS. You must add at least one sales line before handling payment.';
         ReadingErr: Label 'reading in %1';
+        VoucherNotValid: Label 'Voucher %1 is not valid.';
+        VoucherNotFound: Label 'Voucher %1 is not found.';
 
     procedure ActionCode(): Text
     begin
@@ -362,7 +364,7 @@ codeunit 6150725 "NPR POS Action: Payment"
                 POSPaymentMethod."Processing Type"::Cash:
                     Handled := CaptureCashPayment(AmountToCapture, POSPaymentLine, POSLine, POSPaymentMethod);
                 POSPaymentMethod."Processing Type"::"Voucher":
-                    Handled := CaptureVoucherPayment(AmountToCapture, POSPaymentLine, POSLine, POSPaymentMethod);
+                    Handled := CaptureVoucherPayment(AmountToCapture, POSPaymentLine, POSLine, POSPaymentMethod, VoucherNo, SalePOS, POSSession, FrontEnd);
                 POSPaymentMethod."Processing Type"::EFT:
                     Handled := CaptureEftPayment(AmountToCapture, POSSession, POSPaymentLine, POSLine, POSPaymentMethod, FrontEnd);
                 POSPaymentMethod."Processing Type"::CUSTOMER:
@@ -430,19 +432,25 @@ codeunit 6150725 "NPR POS Action: Payment"
         exit(true);
     end;
 
-    local procedure CaptureVoucherPayment(AmountToCaptureLCY: Decimal; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR Sale Line POS"; POSPaymentMethod: Record "NPR POS Payment Method"): Boolean
+    local procedure CaptureVoucherPayment(AmountToCaptureLCY: Decimal; POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR Sale Line POS"; POSPaymentMethod: Record "NPR POS Payment Method"; VoucherNumber: Text; SalePOS: Record "NPR Sale POS"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
     var
         AmountToCapture: Decimal;
+        VoucherStatusMsg: Text;
+        VoucherTypeCode: Code[20];
     begin
         AmountToCapture := 0;
 
         if AmountToCaptureLCY = 0 then
             exit(true);
 
-        POSPaymentLine.ValidateAmountBeforePayment(POSPaymentMethod, AmountToCaptureLCY);
+        if not (VerifyCreditVoucherNumber(VoucherNumber, VoucherTypeCode, VoucherStatusMsg)) then begin
+            if VoucherStatusMsg <> '' then
+                Error(VoucherStatusMsg);
+            Error(VoucherNotValid, VoucherNumber);
+        end;
 
-        POSLine."Amount Including VAT" := AmountToCaptureLCY;
-        POSPaymentLine.InsertPaymentLine(POSLine, AmountToCapture);
+        POSPaymentLine.ValidateAmountBeforePayment(POSPaymentMethod, AmountToCaptureLCY);
+        ApplyCreditVoucherToPaymentLine(VoucherTypeCode, VoucherNumber, POSLine, POSPaymentMethod, AmountToCaptureLCY, AmountToCapture, SalePOS, POSSession, FrontEnd);
 
         exit(true);
     end;
@@ -561,6 +569,70 @@ codeunit 6150725 "NPR POS Action: Payment"
         end;
         exit('');
     end;
+
+    local procedure VerifyCreditVoucherNumber(VoucherNumber: Text; var VoucherTypeCode: Code[20]; VoucherStatusMsg: Text): Boolean
+    begin
+        if (VoucherNumber <> '') then
+            exit(CreditVoucherExist(VoucherNumber, VoucherTypeCode, VoucherStatusMsg));
+
+        exit(false);
+    end;
+
+    local procedure SelectCreditVoucherFromList(var VoucherNoOut: Text): Boolean
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        PageAction: Action;
+    begin
+
+        Clear(VoucherNoOut);
+
+        NpRvVoucher.Reset();
+
+        PageAction := PAGE.RunModal(0, NpRvVoucher);
+
+        if (PageAction = ACTION::LookupOK) then
+            VoucherNoOut := NpRvVoucher."Reference No.";
+
+        if (VoucherNoOut = '') then
+            exit(false);
+
+        exit((PageAction = ACTION::LookupOK));
+    end;
+
+    local procedure CreditVoucherExist(VoucherNo: Text; var VoucherTypeCode: Code[20]; var VoucherStatusMsg: Text): Boolean
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+    begin
+        if (VoucherNo = '') then
+            exit(false);
+        NpRvVoucher.SetFilter("Reference No.", VoucherNo);
+        if NpRvVoucher.FindFirst() then begin
+            VoucherTypeCode := NpRvVoucher."Voucher Type";
+            exit(true)
+        end else begin
+            VoucherStatusMsg := StrSubstNo(VoucherNotFound, VoucherNo);
+            exit(false);
+        end;
+    end;
+
+    local procedure ApplyCreditVoucherToPaymentLine(VoucherTypeCode: Code[20]; VoucherNumber: Text; var PaymentLine: Record "NPR Sale Line POS"; POSPaymentMethod: Record "NPR POS Payment Method"; AmountToCaptureLCY: Decimal; AmountToCapture: Decimal; SalePOS: Record "NPR Sale POS"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        POSLine: Record "NPR Sale Line POS";
+    begin
+        POSSession.GetPaymentLine(POSPaymentLine);
+        POSPaymentLine.GetPaymentLine(POSLine);
+
+        NpRvVoucherMgt.ApplyVoucherPayment(VoucherTypeCode, VoucherNumber, PaymentLine, SalePOS, POSSession, FrontEnd, POSPaymentLine, POSLine);
+
+        AmountToCaptureLCY := POSLine."Amount Including VAT";
+        AmountToCapture := AmountToCapture;
+        exit(true);
+    end;
+
+
 
     procedure TryEndSale(POSPaymentMethod: Record "NPR POS Payment Method"; POSSession: Codeunit "NPR POS Session")
     var

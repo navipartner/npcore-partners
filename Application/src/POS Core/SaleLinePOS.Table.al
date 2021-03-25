@@ -1168,6 +1168,7 @@ table 6014406 "NPR Sale Line POS"
             DataClassification = CustomerContent;
             OptionCaption = ' ,Gift Voucher,Credit Voucher';
             OptionMembers = " ",Gavekort,Tilgodebevis;
+            ObsoleteState = Removed;
         }
         field(5008; "External Document No."; Code[20])
         {

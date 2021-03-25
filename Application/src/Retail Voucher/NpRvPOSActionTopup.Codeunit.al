@@ -165,30 +165,16 @@ codeunit 6151023 "NPR NpRv POS Action Top-up"
 
     local procedure OnActionTopupVoucher(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
-        NpRvVoucher: Record "NPR NpRv Voucher";
-        SaleLinePOS: Record "NPR Sale Line POS";
-        NpRvSalesLine: Record "NPR NpRv Sales Line";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         VoucherNo: Text;
         DiscountType: Text;
+        AmtInput, DiscountAmount, DiscountPct : Decimal;
     begin
         JSON.SetScopeRoot();
         VoucherNo := JSON.GetString('VoucherNo');
-        NpRvVoucher.Get(VoucherNo);
-
-        POSSession.GetSaleLine(POSSaleLine);
-        POSSaleLine.GetNewSaleLine(SaleLinePOS);
-        SaleLinePOS.Validate("Sale Type", SaleLinePOS."Sale Type"::Deposit);
-        SaleLinePOS.Validate(Type, SaleLinePOS.Type::"G/L Entry");
-        SaleLinePOS.Validate("No.", NpRvVoucher."Account No.");
-        SaleLinePOS.Description := NpRvVoucher.Description;
-        SaleLinePOS.Quantity := 1;
-        POSSaleLine.InsertLine(SaleLinePOS);
-        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-
         JSON.SetScopeRoot();
         JSON.SetScope('$amt_input', StrSubstNo(SettingScopeErr, ActionCode()));
-        SaleLinePOS."Unit Price" := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, ActionCode()));
+        AmtInput := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, ActionCode()));
 
         JSON.SetScopeRoot();
         JSON.SetScopeParameters(ActionCode());
@@ -198,43 +184,17 @@ codeunit 6151023 "NPR NpRv POS Action Top-up"
                 begin
                     JSON.SetScopeRoot();
                     JSON.SetScope('$discount_input', StrSubstNo(SettingScopeErr, ActionCode()));
-                    SaleLinePOS."Discount Amount" := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, ActionCode())) * SaleLinePOS.Quantity;
+                    DiscountAmount := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, ActionCode()));
                 end;
             '1':
                 begin
                     JSON.SetScopeRoot();
                     JSON.SetScope('$discount_input', StrSubstNo(SettingScopeErr, ActionCode()));
-                    SaleLinePOS."Discount %" := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, ActionCode()));
+                    DiscountPct := JSON.GetDecimalOrFail('numpad', StrSubstNo(ReadingErr, ActionCode()));
                 end;
         end;
-        SaleLinePOS.UpdateAmounts(SaleLinePOS);
-        if SaleLinePOS."Discount Amount" > 0 then
-            SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::Manual;
-        SaleLinePOS.Modify(true);
-        POSSession.RequestRefreshData();
 
-        NpRvSalesLine.Init;
-        NpRvSalesLine.Id := CreateGuid;
-        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
-        NpRvSalesLine."Retail ID" := SaleLinePOS."Retail ID";
-        NpRvSalesLine."Register No." := SaleLinePOS."Register No.";
-        NpRvSalesLine."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-        NpRvSalesLine."Sale Type" := SaleLinePOS."Sale Type";
-        NpRvSalesLine."Sale Date" := SaleLinePOS.Date;
-        NpRvSalesLine."Sale Line No." := SaleLinePOS."Line No.";
-        NpRvSalesLine.Type := NpRvSalesLine.Type::"Top-up";
-        NpRvSalesLine."Voucher No." := NpRvVoucher."No.";
-        NpRvSalesLine."Voucher Type" := NpRvVoucher."Voucher Type";
-        NpRvSalesLine.Description := NpRvVoucher.Description;
-        NpRvSalesLine."Starting Date" := CurrentDateTime;
-        NpRvSalesLine."Send via Print" := NpRvVoucher."Send via Print";
-        NpRvSalesLine."Send via E-mail" := NpRvVoucher."Send via E-mail";
-        NpRvSalesLine."Send via SMS" := NpRvVoucher."Send via SMS";
-        if NpRvVoucher."Send via E-mail" then
-            NpRvSalesLine."E-mail" := NpRvVoucher."E-mail";
-        if NpRvVoucher."Send via SMS" then
-            NpRvSalesLine."Phone No." := NpRvVoucher."Phone No.";
-        NpRvSalesLine.Insert(true);
+        NpRvVoucherMgt.TopUpVoucher(POSSession, VoucherNo, DiscountType, AmtInput, DiscountAmount, DiscountPct);
     end;
 
     local procedure ActionCode(): Text
@@ -246,4 +206,6 @@ codeunit 6151023 "NPR NpRv POS Action Top-up"
     begin
         exit('1.0');
     end;
+
+
 }
