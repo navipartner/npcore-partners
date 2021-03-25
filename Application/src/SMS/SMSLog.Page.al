@@ -72,6 +72,7 @@ page 6014432 "NPR SMS Log"
                 Caption = 'Set Pending';
                 ApplicationArea = All;
                 ToolTip = 'Executes the Set Pending action';
+                Image = CreateLinesFromTimesheet;
                 trigger OnAction()
                 var
                     MessageLog: Record "NPR SMS Log";

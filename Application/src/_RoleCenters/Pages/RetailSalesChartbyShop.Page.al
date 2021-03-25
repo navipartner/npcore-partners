@@ -55,6 +55,7 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
                 {
                     ApplicationArea = Basic;
                     Caption = 'Day';
+                    Image = ChangeDate;
 
                     trigger OnAction()
                     begin
@@ -67,6 +68,7 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
                 {
                     ApplicationArea = Basic;
                     Caption = 'Week';
+                    Image = ChangeDate;
 
                     trigger OnAction()
                     begin
@@ -79,6 +81,7 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
                 {
                     ApplicationArea = Basic;
                     Caption = 'Month';
+                    Image = ChangeDate;
 
                     trigger OnAction()
                     begin
@@ -91,6 +94,7 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
                 {
                     ApplicationArea = Basic;
                     Caption = 'Quarter';
+                    Image = ChangeDate;
 
                     trigger OnAction()
                     begin
@@ -103,6 +107,7 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
                 {
                     ApplicationArea = Basic;
                     Caption = 'Year';
+                    Image = ChangeDate;
 
                     trigger OnAction()
                     begin
@@ -124,7 +129,7 @@ Page 6059816 "NPR Retail Sales Chart by Shop"
                     UpdateChart();
                 end;
             }
-            action(Next)
+            action("Next")
             {
                 ApplicationArea = Basic;
                 Caption = 'Next';
