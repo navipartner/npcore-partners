@@ -1,6 +1,5 @@
 pageextension 6014419 "NPR Posted P.Credit Memos" extends "Posted Purchase Credit Memos"
 {
-    // NPR5.55/CLVA/20200610 CASE Added Action "Show Imported File"
     actions
     {
         addafter("&Navigate")
@@ -19,12 +18,9 @@ pageextension 6014419 "NPR Posted P.Credit Memos" extends "Posted Purchase Credi
                 var
                     NcImportListPg: Page "NPR Nc Import List";
                 begin
-                    //-366790 [366790]
-                    NcImportListPg.ShowFormattedDocByDocNo("Vendor Cr. Memo No.");
-                    //+366790 [366790]
+                    NcImportListPg.ShowFormattedDocByDocNo(Rec."Vendor Cr. Memo No.");
                 end;
             }
         }
     }
 }
-

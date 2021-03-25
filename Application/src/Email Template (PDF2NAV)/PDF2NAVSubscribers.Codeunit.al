@@ -26,23 +26,6 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
         EmailDocMgt.RunEmailLog(Rec);
     end;
 
-
-    [EventSubscriber(ObjectType::Page, 41, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
-    local procedure Page41OnActionSendAsPDF(var Rec: Record "Sales Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.SendReport(Rec, false);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 41, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
-    local procedure Page41OnActionEmailLog(var Rec: Record "Sales Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.RunEmailLog(Rec);
-    end;
-
     [EventSubscriber(ObjectType::Page, 42, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
     local procedure Page42OnActionSendAsPDF(var Rec: Record "Sales Header")
     var
@@ -123,54 +106,6 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
         EmailDocMgt.RunEmailLog(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Page, 134, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
-    local procedure Page134OnActionSendAsPDF(var Rec: Record "Sales Cr.Memo Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.SendReport(Rec, false);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 134, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
-    local procedure Page134OnActionEmailLog(var Rec: Record "Sales Cr.Memo Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.RunEmailLog(Rec);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 136, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
-    local procedure Page136OnActionSendAsPDF(var Rec: Record "Purch. Rcpt. Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.SendReport(Rec, false);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 136, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
-    local procedure Page136OnActionEmailLog(var Rec: Record "Purch. Rcpt. Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.RunEmailLog(Rec);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 140, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
-    local procedure Page140OnActionSendAsPDF(var Rec: Record "Purch. Cr. Memo Hdr.")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.SendReport(Rec, false);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 140, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
-    local procedure Page140OnActionEmailLog(var Rec: Record "Purch. Cr. Memo Hdr.")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.RunEmailLog(Rec);
-    end;
-
     [EventSubscriber(ObjectType::Page, 143, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
     local procedure Page143OnActionEmailLog(var Rec: Record "Sales Invoice Header")
     var
@@ -189,118 +124,6 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
 
     [EventSubscriber(ObjectType::Page, 144, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
     local procedure Page144OnActionEmailLog(var Rec: Record "Sales Cr.Memo Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.RunEmailLog(Rec);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 438, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
-    local procedure Page438OnActionSendAsPDF(var Rec: Record "Issued Reminder Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.SendReport(Rec, false);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 438, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
-    local procedure Page438OnActionEmailLog(var Rec: Record "Issued Reminder Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.RunEmailLog(Rec);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 5900, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
-    local procedure Page5900OnActionSendAsPDF(var Rec: Record "Service Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.SendReport(Rec, false);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 5900, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
-    local procedure Page5900OnActionEmailLog(var Rec: Record "Service Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.RunEmailLog(Rec);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 5964, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
-    local procedure Page5964OnActionSendAsPDF(var Rec: Record "Service Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.SendReport(Rec, false);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 5964, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
-    local procedure Page5964OnActionEmailLog(var Rec: Record "Service Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.RunEmailLog(Rec);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 5975, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
-    local procedure Page5975OnActionSendAsPDF(var Rec: Record "Service Shipment Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.SendReport(Rec, false);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 5975, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
-    local procedure Page5975OnActionEmailLog(var Rec: Record "Service Shipment Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.RunEmailLog(Rec);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 5978, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
-    local procedure Page5978OnActionSendAsPDF(var Rec: Record "Service Invoice Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.SendReport(Rec, false);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 5978, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
-    local procedure Page5978OnActionEmailLog(var Rec: Record "Service Invoice Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.RunEmailLog(Rec);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 6630, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
-    local procedure Page6630OnActionSendAsPDF(var Rec: Record "Sales Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.SendReport(Rec, false);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 6630, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
-    local procedure Page6630OnActionEmailLog(var Rec: Record "Sales Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.RunEmailLog(Rec);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 6640, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
-    local procedure Page6640OnActionSendAsPDF(var Rec: Record "Purchase Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        EmailDocMgt.SendReport(Rec, false);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 6640, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
-    local procedure Page6640OnActionEmailLog(var Rec: Record "Purchase Header")
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin

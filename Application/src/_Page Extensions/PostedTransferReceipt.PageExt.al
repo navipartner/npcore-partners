@@ -1,6 +1,5 @@
 pageextension 6014466 "NPR Posted Transfer Receipt" extends "Posted Transfer Receipt"
 {
-    // NPR5.46/JDH /20181002 CASE 294354 added RetailPrint and PriceLabel
     actions
     {
         addafter("&Print")
@@ -30,4 +29,3 @@ pageextension 6014466 "NPR Posted Transfer Receipt" extends "Posted Transfer Rec
         }
     }
 }
-

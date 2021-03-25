@@ -105,7 +105,6 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
 
             Clear(TransferOrderList);
             TransferOrderList.SetTableView(TransferHeader);
-            TransferOrderList.NPRSetValues(Template);
             TransferOrderList.Run();
         end;
 

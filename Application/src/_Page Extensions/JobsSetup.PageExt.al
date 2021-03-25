@@ -1,13 +1,5 @@
 pageextension 6014448 "NPR Jobs Setup" extends "Jobs Setup"
 {
-    // NPR5.29/TJ/20161014 CASE 248723 New tab Events with new fields
-    // NPR5.32/TJ/20170525 CASE 275953 New field "Appointment Lasts Whole Day"
-    // NPR5.34/TJ/20170728 CASE 277938 Removed fields "Calendar Template Code","Calendar Confirmed Category","Include Comments in Calendar",
-    //                                 "Quote Email Template Code","Order Email Template Code","Cancel Email Template Code","Appointment Lasts Whole Day"
-    // NPR5.38/TJ/20171027 CASE 285194 Removed entire group with organizer fields
-    // NPR5.48/TJ/20181119 CASE 287903 New field "Post Event on Sales Inv. Post"
-    // NPR5.53/TJ/20200109 CASE 346821 New field "Block Event Deletion"
-    //                                 New action SetStatusToBlockEventDelete
     layout
     {
         addafter(Numbering)
@@ -18,22 +10,22 @@ pageextension 6014448 "NPR Jobs Setup" extends "Jobs Setup"
                 group("NPR Auto. Setup")
                 {
                     Caption = 'Auto. Setup';
-                    field("NPR Auto. Create Job Task Line"; "NPR Auto. Create Job Task Line")
+                    field("NPR Auto. Create Job Task Line"; Rec."NPR Auto. Create Job Task Line")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the NPR Auto. Create Job Task Line field';
                     }
-                    field("NPR Def. Job Task No."; "NPR Def. Job Task No.")
+                    field("NPR Def. Job Task No."; Rec."NPR Def. Job Task No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the NPR Def. Job Task No. field';
                     }
-                    field("NPR Def. Job Task Description"; "NPR Def. Job Task Description")
+                    field("NPR Def. Job Task Description"; Rec."NPR Def. Job Task Description")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the NPR Def. Job Task Description field';
                     }
-                    field("NPR Post Event on Sales Inv. Post"; "NPR Post Event on S.Inv. Post")
+                    field("NPR Post Event on Sales Inv. Post"; Rec."NPR Post Event on S.Inv. Post")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the NPR Post Event on S.Inv. Post field';
@@ -42,23 +34,23 @@ pageextension 6014448 "NPR Jobs Setup" extends "Jobs Setup"
                 group("NPR Time Setup")
                 {
                     Caption = 'Time Setup';
-                    field("NPR Qty. Relates to Start/End Time"; "NPR Qty. Rel. 2 Start/End Time")
+                    field("NPR Qty. Relates to Start/End Time"; Rec."NPR Qty. Rel. 2 Start/End Time")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the NPR Qty. Rel. 2 Start/End Time field';
                     }
-                    field("NPR Time Calc. Unit of Measure"; "NPR Time Calc. Unit of Measure")
+                    field("NPR Time Calc. Unit of Measure"; Rec."NPR Time Calc. Unit of Measure")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the NPR Time Calc. Unit of Measure field';
                     }
                 }
-                field("NPR Over Capacitate Resource"; "NPR Over Capacitate Resource")
+                field("NPR Over Capacitate Resource"; Rec."NPR Over Capacitate Resource")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Over Capacitate Resource field';
                 }
-                field("NPR BlockEventDeletionValue"; "NPR Block Event Deletion".HasValue)
+                field("NPR BlockEventDeletionValue"; Rec."NPR Block Event Deletion".HasValue)
                 {
                     ApplicationArea = All;
                     Caption = 'Block Event Deletion';
@@ -87,4 +79,3 @@ pageextension 6014448 "NPR Jobs Setup" extends "Jobs Setup"
         }
     }
 }
-

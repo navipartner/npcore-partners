@@ -125,4 +125,3 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
     var
         ExchangeLabelTableMap: Record "NPR Exchange Label Map";
 }
-

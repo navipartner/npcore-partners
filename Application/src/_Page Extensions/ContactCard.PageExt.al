@@ -4,7 +4,7 @@ pageextension 6014452 "NPR Contact Card" extends "Contact Card"
     {
         addafter(Name)
         {
-            field("NPR Name 2"; "Name 2")
+            field("NPR Name 2"; Rec."Name 2")
             {
                 ApplicationArea = All;
                 Importance = Additional;
@@ -16,32 +16,32 @@ pageextension 6014452 "NPR Contact Card" extends "Contact Card"
             group("NPR Magento")
             {
                 Caption = 'Magento';
-                field("NPR Magento Contact"; "NPR Magento Contact")
+                field("NPR Magento Contact"; Rec."NPR Magento Contact")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Magento Contact field';
                 }
-                field("NPR Magento Customer Group"; "NPR Magento Customer Group")
+                field("NPR Magento Customer Group"; Rec."NPR Magento Customer Group")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Magento Customer Group field';
                 }
-                field("NPR Magento Payment Methods"; "NPR Magento Payment Methods")
+                field("NPR Magento Payment Methods"; Rec."NPR Magento Payment Methods")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Magento Payment Methods field';
                 }
-                field("NPR Magento Shipment Methods"; "NPR Magento Shipment Methods")
+                field("NPR Magento Shipment Methods"; Rec."NPR Magento Shipment Methods")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Magento Shipment Methods field';
                 }
-                field("NPR Magento Account Status"; "NPR Magento Account Status")
+                field("NPR Magento Account Status"; Rec."NPR Magento Account Status")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Magento Account Status field';
                 }
-                field("NPR Magento Price Visibility"; "NPR Magento Price Visibility")
+                field("NPR Magento Price Visibility"; Rec."NPR Magento Price Visibility")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the NPR Magento Price Visibility field';
