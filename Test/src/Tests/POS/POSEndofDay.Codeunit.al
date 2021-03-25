@@ -9,6 +9,7 @@ codeunit 85020 "NPR POS End of Day"
         _POSSession: Codeunit "NPR POS Session";
         _POSStore: Record "NPR POS Store";
         _POSSetup: Record "NPR POS Setup";
+        _VoucherType: Record "NPR NpRv Voucher Type";
         _EodWorkshiftMode: Option XREPORT,ZREPORT,CLOSEWORKSHIFT;
         _PrimeNumbers: array[10] of Integer;
 
@@ -633,6 +634,7 @@ codeunit 85020 "NPR POS End of Day"
         WorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         BinCheckPoint: Record "NPR POS Payment Bin Checkp.";
         POSBinEntry: Record "NPR POS Bin Entry";
+        NpRvVoucher: Record "NPR NpRv Voucher";
         SaleEnded: Boolean;
         POSEntry: Record "NPR POS Entry";
         DimensionSetId: Integer;
@@ -648,8 +650,7 @@ codeunit 85020 "NPR POS End of Day"
 
         // [Scenario] Check that foreign currency is added correctly for the End of Day summary
         InitializeSetupVoucher();
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
-
+ 
         NumberOfSales := 1;
         SalesOffset := 4;
 
@@ -661,15 +662,17 @@ codeunit 85020 "NPR POS End of Day"
         Item."Unit Price" := _PrimeNumbers[SalesOffset];
         Item.Modify;
 
-        LineQty := 1 + _PrimeNumbers[SalesOffset] / 100; // will be 2 decimals            
+        LineQty := 1 + _PrimeNumbers[SalesOffset] / 100; // will be 2 decimals   
+        LineAmount := Round(_PrimeNumbers[SalesOffset] * LineQty, _POSPaymentMethod."Rounding Precision");
+        CreateVoucherInPOSTransaction(NpRvVoucher, LineAmount);
+
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", LineQty);
 
-        LineAmount := Round(_PrimeNumbers[SalesOffset] * LineQty, _POSPaymentMethod."Rounding Precision");
         TotalAmount += LineAmount;
         TotalNetAmount += Round(LineAmount / (100 + VATPostingSetup."VAT %") * 100, _POSPaymentMethod."Rounding Precision");
         TotalQty += LineQty;
 
-        SaleEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, LineAmount, '1234');
+        SaleEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, LineAmount, NpRvVoucher."Reference No.");
         Assert.IsTrue(SaleEnded, 'Sale should have ended when applying full payment.');
 
         // [WHEN] User invokes the Z-Report
@@ -686,13 +689,12 @@ codeunit 85020 "NPR POS End of Day"
         Assert.AreEqual(TotalAmount, WorkshiftCheckpoint."Redeemed Vouchers (LCY)", StrSubstNo('Value of "%1" is not correct.', WorkshiftCheckpoint.FieldCaption("Redeemed Vouchers (LCY)")));
 
         Assert.AreEqual(0, WorkshiftCheckpoint."EFT (LCY)", StrSubstNo('Value of "%1" is not correct.', WorkshiftCheckpoint.FieldCaption("EFT (LCY)")));
-        Assert.AreEqual(0, WorkshiftCheckpoint."Local Currency (LCY)", StrSubstNo('Value of "%1" is not correct.', WorkshiftCheckpoint.FieldCaption("Local Currency (LCY)")));
+        Assert.AreEqual(LineAmount, WorkshiftCheckpoint."Local Currency (LCY)", StrSubstNo('Value of "%1" is not correct.', WorkshiftCheckpoint.FieldCaption("Local Currency (LCY)")));
         Assert.AreEqual(0, WorkshiftCheckpoint."Foreign Currency (LCY)", StrSubstNo('Value of "%1" is not correct.', WorkshiftCheckpoint.FieldCaption("Foreign Currency (LCY)")));
 
         Assert.AreEqual(TotalNetAmount, WorkshiftCheckpoint."Direct Item Net Sales (LCY)", StrSubstNo('Value of "%1" is not correct.', WorkshiftCheckpoint.FieldCaption("Direct Item Net Sales (LCY)")));
         Assert.AreEqual(TotalNetAmount, WorkshiftCheckpoint."Net Turnover (LCY)", StrSubstNo('Value of "%1" is not correct.', WorkshiftCheckpoint.FieldCaption("Net Turnover (LCY)")));
         Assert.AreEqual(TotalAmount, WorkshiftCheckpoint."Turnover (LCY)", StrSubstNo('Value of "%1" is not correct.', WorkshiftCheckpoint.FieldCaption("Turnover (LCY)")));
-
     end;
 
 
@@ -843,7 +845,6 @@ codeunit 85020 "NPR POS End of Day"
         POSPostingProfile: Record "NPR POS Posting Profile";
         POSEndOfDayProfile: Record "NPR POS End of Day Profile";
         POSPaymentBin: Record "NPR POS Payment Bin";
-        ItemRef: Record "Item Reference";
         NPRLibraryEFT: Codeunit "NPR Library - EFT";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
     begin
@@ -866,11 +867,11 @@ codeunit 85020 "NPR POS End of Day"
             _PrimeNumbers[9] := 53;
             _PrimeNumbers[10] := 59;
 
+            NPRLibraryPOSMasterData.CreatePartialVoucherType(_VoucherType, false);
             NPRLibraryPOSMasterData.CreatePOSSetup(_POSSetup);
             NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
             NPRLibraryPOSMasterData.CreatePOSStore(_POSStore, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreatePOSUnit(_POSUnit, _POSStore.Code, POSPostingProfile.Code);
-
             POSEndOfDayProfile.Code := 'EOD-TEST';
             POSEndOfDayProfile."Z-Report UI" := POSEndOfDayProfile."Z-Report UI"::BALANCING;
             POSEndOfDayProfile.Insert();
@@ -880,14 +881,39 @@ codeunit 85020 "NPR POS End of Day"
             _Initialized := true;
 
         end;
-
-        //Delete all item reference from template data, so all tests are independent instead of triggering lookup prompts for previous errors when not intended.
-        ItemRef.SetCurrentKey("Reference No.");
-        ItemRef.SetFilter("Reference No.", '<>%1', '');
-        if not ItemRef.IsEmpty() then
-            ItemRef.DeleteAll();
+        NPRLibraryPOSMasterData.ItemReferenceCleanup();
 
         Commit;
     end;
+
+    local procedure CreateVoucherInPOSTransaction(var NpRvVoucher: Record "NPR NpRv Voucher"; VoucherAmount: Decimal)
+    var
+        SalePOS: Record "NPR Sale POS";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        POSEntry: Record "NPR POS Entry";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        TransactionEnded: Boolean;
+    begin
+        LibraryPOSMasterData.CreatePOSPaymentMethod(POSPaymentMethod, POSPaymentMethod."Processing Type"::CASH, '', false);
+        POSPaymentMethod."Rounding Precision" := 0.01;
+        POSPaymentMethod.Modify();
+        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        // [WHEN] Create line with issue voucher, finish transaction
+        NPRLibraryPOSMock.CreateVoucherLine(_POSSession, _VoucherType.Code, 1, VoucherAmount, '', 0);
+        TransactionEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, POSPaymentMethod.Code, VoucherAmount, '');
+        // [THEN] Retail Voucher Exist
+        POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+        POSEntry.FindFirst();
+
+        NpRvVoucher.Setrange("Issue Register No.", SalePOS."Register No.");
+        NpRvVoucher.SetRange("Issue Document Type", NpRvVoucher."Issue Document Type"::"Audit Roll");
+        NpRvVoucher.Setrange("Issue Document No.", POSEntry."Document No.");
+        NpRvVoucher.Setrange("Voucher Type", _VoucherType.Code);
+        NpRvVoucher.FindFirst();
+    end;
+   
 
 }

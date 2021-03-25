@@ -37,5 +37,16 @@ codeunit 85000 "NPR Library - EFT"
         POSPaymentMethod."EFT Tip Service Item No." := TipItem."No.";
         POSPaymentMethod.Modify;
     end;
+
+    procedure EFTTransactionCleanup(POSUnitNo: Code[10])
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
+    begin
+        //Delete all previous transactions, so all tests are independent instead of triggering lookup prompts for previous errors when not intended.
+        EFTTransactionRequest.SetRange("Register No.", POSUnitNo);
+        EFTTransactionRequest.SetRange("Integration Type", EFTTestMockIntegration.IntegrationType());
+        EFTTransactionRequest.DeleteAll;
+    end;
 }
 
