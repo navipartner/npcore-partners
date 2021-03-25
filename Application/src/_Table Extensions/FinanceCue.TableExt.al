@@ -12,12 +12,10 @@ tableextension 6151240 "NPR Finance Cue" extends "Finance Cue"
             CalcFormula = Count ("Incoming Document" WHERE("Document Type" = CONST(" "), "Document No." = CONST('')));
             FieldClass = FlowField;
         }
-
         field(6151243; "NPR Posted Purchase order"; Integer)
         {
             CalcFormula = Count ("Purch. Inv. Header");
             FieldClass = FlowField;
         }
-
     }
 }

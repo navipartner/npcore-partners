@@ -71,5 +71,4 @@ tableextension 6014419 "NPR G/L Account" extends "G/L Account"
         if not POSPaymentMethod.IsEmpty() then
             Error(DeleteGLAcc1Err, Rec."No.");
     end;
-
 }

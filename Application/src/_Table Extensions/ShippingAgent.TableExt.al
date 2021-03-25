@@ -1,10 +1,5 @@
 tableextension 6014429 "NPR Shipping Agent" extends "Shipping Agent"
 {
-    // PS1.00/LS/20141021  CASE  188056 : PacSoft Module Integration
-    //                                    Added fields 6014440, 6014441
-    // NPR5.25/MMV /20160621 CASE 233533 Added field 6014442.
-    // NPR5.29/BHR/20161026 CASE 248684  Added field 6014450..6014452
-    // NPR5.43/BHR/20180508 CASE 304453  Added field 6014453
     Caption = 'Shipping Agent';
     fields
     {

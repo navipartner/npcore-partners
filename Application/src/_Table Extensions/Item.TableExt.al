@@ -502,7 +502,6 @@ tableextension 6014427 "NPR Item" extends Item
         Rec.Modify();
     end;
 
-
     var
         SalesSetup: Record "Sales & Receivables Setup";
 

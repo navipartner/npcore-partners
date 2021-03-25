@@ -16,4 +16,3 @@ tableextension 6014402 "NPR Job Planning Line Invoice" extends "Job Planning Lin
         }
     }
 }
-
