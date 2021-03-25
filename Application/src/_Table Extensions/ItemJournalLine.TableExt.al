@@ -64,4 +64,3 @@ tableextension 6014452 "NPR Item Journal Line" extends "Item Journal Line"
         }
     }
 }
-
