@@ -1038,6 +1038,8 @@ page 6014651 "NPR Retail Wizard"
 
         SalespersonBuffer.DeleteAll();
 
+        OnAfterFinishStep(AnyDataToCreate);
+
         CurrPage.Close();
     end;
 
@@ -1069,5 +1071,10 @@ page 6014651 "NPR Retail Wizard"
                MediaResourcesDone.GET(MediaRepositoryDone."Media Resources Ref")
             then
                 TopBannerVisible := MediaResourcesDone."Media Reference".HasValue();
+    end;
+
+    [BusinessEvent(false)]
+    local procedure OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
     end;
 }
