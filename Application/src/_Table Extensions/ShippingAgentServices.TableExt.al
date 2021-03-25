@@ -1,7 +1,5 @@
 tableextension 6014446 "NPR Shipping Agent Services" extends "Shipping Agent Services"
 {
-    // PS1.00/LS/20140509  CASE 190533 Versioned Fields 6014440..6014442 as part of Pacsoft module
-    // NPR5.29/BHR/20161024 CASE 248684 Fields for Pakkelabels 6014451.. 6014452
     fields
     {
         field(6014440; "NPR Service Demand"; Option)

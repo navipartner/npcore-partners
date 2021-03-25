@@ -1,13 +1,5 @@
 tableextension 6014409 "NPR Purch. Rcpt. Header" extends "Purch. Rcpt. Header"
 {
-    // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
-    //   - Added Field 6014414 "Pay-to E-mail" for defining Recipient when sending E-mail using PDF2NAV.
-    //   - Added Field 6014415 "Document Processing" for defining Print action on Purch. Doc. Posting.
-    // PN1.08/MHA/20151214  CASE 228859 Pdf2Nav (New Version List)
-    // NPR5.44/BHR/20180709 CASE 321560 New fields "Sell-to" 6014420 to 6014430
-    // NPR5.48/JDH /20181109 CASE 334163 Added Caption to Sell To Phone No.
-    // NPR5.53/MHA /20191211 CASE 380837 Added fields 6151300 "NpEc Store Code", 6151305 "NpEc Document No."
-    // NPR5.54/MHA /20200311  CASE 390380 Removed fields 6151300 "NpEc Store Code", 6151305 "NpEc Document No."
     fields
     {
         field(6014414; "NPR Pay-to E-mail"; Text[80])
@@ -70,4 +62,3 @@ tableextension 6014409 "NPR Purch. Rcpt. Header" extends "Purch. Rcpt. Header"
         }
     }
 }
-
