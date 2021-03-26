@@ -1,4 +1,4 @@
-page 6014427 "NPR MM Available Coupons"
+page 6014557 "NPR MM Available Coupons"
 {
     PageType = List;
     SourceTable = "NPR MM Loyalty Point Setup";
