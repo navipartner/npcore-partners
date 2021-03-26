@@ -1,0 +1,54 @@
+page 6014421 "NPR MM Select Alteration"
+{
+    PageType = List;
+    UsageCategory = None;
+    SourceTable = "NPR MM Membership Entry";
+    SourceTableTemporary = true;
+    Editable = false;
+    Caption = 'Select Alteration';
+    DataCaptionExpression = _LookupCaption;
+
+    layout
+    {
+        area(Content)
+        {
+            repeater(GroupName)
+            {
+                field("Item No."; Rec."Item No.")
+                {
+                    ApplicationArea = All;
+                }
+                field("Valid From Date"; Rec."Valid From Date")
+                {
+                    ApplicationArea = All;
+                }
+                field("Valid Until Date"; Rec."Valid Until Date")
+                {
+                    ApplicationArea = All;
+                }
+                field("Unit Price"; Rec."Unit Price")
+                {
+                    ApplicationArea = All;
+                }
+                field(Description; Rec.Description)
+                {
+                    ApplicationArea = All;
+                }
+                field("Amount Incl VAT"; Rec."Amount Incl VAT")
+                {
+                    ApplicationArea = All;
+                }
+            }
+        }
+    }
+
+    var
+        _LookupCaption: Text;
+
+    procedure LoadAlterationOption(LookupCaption: Text; var TmpMembershipEntry: Record "NPR MM Membership Entry" temporary)
+    begin
+        _LookupCaption := LookupCaption;
+        Rec.Copy(TmpMembershipEntry, true);
+    end;
+
+}

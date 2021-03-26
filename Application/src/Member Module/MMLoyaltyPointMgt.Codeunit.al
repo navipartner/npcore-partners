@@ -1131,22 +1131,19 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
     local procedure DoLookupCoupon(LookupCaption: Text; var TmpLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary) LineNo: Integer
     var
-        UI: Codeunit "NPR MM Member POS UI";
-        LookupRecRef: RecordRef;
-        Position: Text;
+        AvailableCoupons: Page "NPR MM Available Coupons";
+        PageAction: Action;
+        TmpLoyaltyPointsSetupResponse: Record "NPR MM Loyalty Point Setup" temporary;
     begin
 
         LineNo := 0;
 
-        LookupRecRef.GetTable(TmpLoyaltyPointsSetup);
-        Position := UI.DoLookup(LookupCaption, LookupRecRef);
-
-        if (Position <> '') then begin
-            LookupRecRef.SetPosition(Position);
-            if (LookupRecRef.Find()) then begin
-                LookupRecRef.SetTable(TmpLoyaltyPointsSetup);
-                LineNo := TmpLoyaltyPointsSetup."Line No."
-            end;
+        AvailableCoupons.LoadEntries(LookupCaption, TmpLoyaltyPointsSetup);
+        AvailableCoupons.LookupMode(true);
+        PageAction := AvailableCoupons.RunModal();
+        if (PageAction = Action::LookupOK) then begin
+            AvailableCoupons.GetRecord(TmpLoyaltyPointsSetupResponse);
+            LineNo := TmpLoyaltyPointsSetupResponse."Line No.";
         end;
 
         exit(LineNo);
