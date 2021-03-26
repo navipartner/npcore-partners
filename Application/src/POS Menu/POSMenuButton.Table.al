@@ -245,12 +245,14 @@ table 6150701 "NPR POS Menu Button"
             Caption = 'Available on Desktop';
             DataClassification = CustomerContent;
             InitValue = true;
+            ObsoleteState = Removed;
         }
         field(45; "Available in App"; Boolean)
         {
             Caption = 'Available in App';
             DataClassification = CustomerContent;
             InitValue = true;
+            ObsoleteState = Removed;
         }
     }
 
