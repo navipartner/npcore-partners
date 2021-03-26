@@ -320,7 +320,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         PaymentAmount: Decimal;
         ShopperReference: Text;
     begin
-        TransactionId := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement, 'transaction_id', MaxStrLen(PaymentLine."No."), true));
+        TransactionId := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement, 'transaction_id', MaxStrLen(PaymentLine."No."), false));
         Evaluate(PaymentAmount, NpXmlDomMgt.GetXmlText(XmlElement, 'payment_amount', 0, true), 9);
         if PaymentAmount = 0 then
             exit;
