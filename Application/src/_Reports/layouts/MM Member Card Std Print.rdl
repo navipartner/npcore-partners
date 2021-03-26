@@ -60,8 +60,8 @@
               </Textbox>
               <Image Name="Image1">
                 <Source>Database</Source>
-                <Value>=Convert.ToBase64String(Fields!Barcode.Value)</Value>
-                <MIMEType>image/png</MIMEType>
+                <Value>=Fields!Barcode.Value</Value>
+                <MIMEType>image/bmp</MIMEType>
                 <Sizing>Fit</Sizing>
                 <Top>0.2in</Top>
                 <Height>0.45in</Height>
