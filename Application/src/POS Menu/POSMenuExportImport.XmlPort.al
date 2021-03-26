@@ -115,12 +115,6 @@ xmlport 6150701 "NPR POS Menu Export/Import"
                     fieldelement(ButtonSalespersonCode; "POS Menu Button"."Salesperson Code")
                     {
                     }
-                    fieldelement(ButtonAvailbleOnDesktop; "POS Menu Button"."Available on Desktop")
-                    {
-                    }
-                    fieldelement(ButtonAvailableInApp; "POS Menu Button"."Available in App")
-                    {
-                    }
                     tableelement("POS Parameter Value"; "NPR POS Parameter Value")
                     {
                         LinkFields = Code = FIELD("Menu Code"), ID = FIELD(ID);

@@ -6,7 +6,7 @@ page 6150702 "NPR POS Menu Buttons"
     ApplicationArea = All;
     PromotedActionCategories = 'New,Process,Reports,Level,Order';
     SourceTable = "NPR POS Menu Button";
-    SourceTableView = SORTING("Menu Code",Ordinal);
+    SourceTableView = SORTING("Menu Code", Ordinal);
 
     layout
     {
@@ -140,16 +140,6 @@ page 6150702 "NPR POS Menu Buttons"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
-                field("Available on Desktop"; "Available on Desktop")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Available on Desktop field';
-                }
-                field("Available in App"; "Available in App")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Available in App field';
-                }
             }
         }
     }
@@ -164,7 +154,7 @@ page 6150702 "NPR POS Menu Buttons"
                 Enabled = IsParametersEnabled;
                 Image = RefreshText;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -180,7 +170,7 @@ page 6150702 "NPR POS Menu Buttons"
                 Caption = 'Update Tooltips';
                 Image = UpdateDescription;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -200,7 +190,7 @@ page 6150702 "NPR POS Menu Buttons"
                     Enabled = UnindentEnabled;
                     Image = PreviousRecord;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Left';
@@ -218,7 +208,7 @@ page 6150702 "NPR POS Menu Buttons"
                     Enabled = IndentEnabled;
                     Image = NextRecord;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Right';
@@ -240,7 +230,7 @@ page 6150702 "NPR POS Menu Buttons"
                     Enabled = MoveUpEnabled;
                     Image = MoveUp;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Up';
@@ -258,7 +248,7 @@ page 6150702 "NPR POS Menu Buttons"
                     Enabled = MoveDownEnabled;
                     Image = MoveDown;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Down';
@@ -280,7 +270,7 @@ page 6150702 "NPR POS Menu Buttons"
                 Enabled = IsParametersEnabled;
                 Image = Answers;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -303,7 +293,7 @@ page 6150702 "NPR POS Menu Buttons"
                 Enabled = IsPopupEnabled;
                 Image = Hierarchy;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -319,7 +309,7 @@ page 6150702 "NPR POS Menu Buttons"
                 Caption = 'Caption Localization';
                 Image = Language;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
