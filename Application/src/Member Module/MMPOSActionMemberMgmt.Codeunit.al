@@ -6,9 +6,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     end;
 
     var
-        ILLEGAL_VALUE: Label 'Value %1 is not a valid %2.';
-        ABORTED: Label 'Aborted.';
-        ERRORTITLE: Label 'Error.';
         QTY_CANT_CHANGE: Label 'Changing quantity for membership sales is not possible.';
         ActionDescription: Label 'This action handles member management functions.';
         MemberCardPrompt: Label 'Enter Member Card Number:';
@@ -22,8 +19,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         REGRET_NOT_VALID: Label 'A membership regret rule, explicitly disallows regret at this time.';
         MEMBERSHIP_BLOCKED_NOT_FOUND: Label 'Membership %1 is either blocked or not found.';
         CHANGEMEMBERSHIP_LOOKUP_CAPTION: Label '%1 - %2: %3';
-        UI: Codeunit "NPR MM Member POS UI";
-        SELECT_PRODUCT: Label 'Select product...';
         DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
         MEMBER_REQUIRED: Label 'Member identification must be specified.';
         NOT_MEMBERSHIP_SALES: Label 'The selected sales line is not a membership sales.';
@@ -483,11 +478,11 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MembershipEntry: Record "NPR MM Membership Entry";
         Membership: Record "NPR MM Membership";
-        TmpRetailList: Record "NPR Retail List" temporary;
-        LookupRecRef: RecordRef;
+        TmpMembershipEntries: Record "NPR MM Membership Entry" temporary;
         MembershipEntryNo: Integer;
         ReasonNotFound: Text;
         LineNo: Integer;
+        MembershipEntries: Page "NPR MM Membership Entries View";
     begin
 
         MemberRetailIntegration.POS_ValidateMemberCardNo(false, false, InputMethod, false, ExternalMemberCardNo);
@@ -505,14 +500,13 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         if (MembershipEntry.FindSet()) then begin
             repeat
                 LineNo += 1;
-                TmpRetailList.Number := LineNo;
-                TmpRetailList.Choice := StrSubstNo('%1: (%2) period %3 => %4', DT2Date(MembershipEntry."Created At"), MembershipEntry.Context, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date");
-                TmpRetailList.Value := MembershipEntry."Item No.";
-                TmpRetailList.Insert();
+                TmpMembershipEntries.TransferFields(MembershipEntry, true);
+                TmpMembershipEntries.Insert();
             until (MembershipEntry.Next() = 0);
 
-            LookupRecRef.GetTable(TmpRetailList);
-            UI.DoLookup(SELECT_PRODUCT, LookupRecRef);
+            MembershipEntries.LoadEntries(ExternalMemberCardNo, TmpMembershipEntries);
+            MembershipEntries.RunModal();
+
         end;
     end;
 
@@ -855,50 +849,27 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
     local procedure DoLookupMembershipEntry(LookupCaption: Text; var TmpMembershipEntry: Record "NPR MM Membership Entry" temporary) ItemNo: Code[20]
     var
-        LookupRecRef: RecordRef;
-        LineNo: Integer;
-        Position: Text;
+        SelectAlteration: page "NPR MM Select Alteration";
+        PageAction: Action;
+        TmpMembershipEntryResponse: Record "NPR MM Membership Entry" temporary;
     begin
         ItemNo := '';
 
-        LookupRecRef.GetTable(TmpMembershipEntry);
-        //ConfigureLookupTemplate (Template, LookupRecRef);
-        //Position := Marshaller.Lookup(LookupCaption, Template, LookupRecRef);
-        Position := UI.DoLookup(LookupCaption, LookupRecRef);
-
-        if (Position <> '') then begin
-            LookupRecRef.SetPosition(Position);
-            if (LookupRecRef.Find()) then begin
-                LookupRecRef.SetTable(TmpMembershipEntry);
-                ItemNo := TmpMembershipEntry."Item No.";
-            end;
+        SelectAlteration.LoadAlterationOption(LookupCaption, TmpMembershipEntry);
+        SelectAlteration.LookupMode(true);
+        PageAction := SelectAlteration.RunModal();
+        if (PageAction = Action::LookupOK) then begin
+            SelectAlteration.GetRecord(TmpMembershipEntryResponse);
+            ItemNo := TmpMembershipEntryResponse."Item No.";
         end;
 
         exit(ItemNo);
-    end;
-
-    local procedure SelectMembershipUI(var ExtMembershipNo: Text[100]): Boolean
-    var
-        Membership: Record "NPR MM Membership";
-    begin
-
-        if (ACTION::LookupOK <> PAGE.RunModal(0, Membership)) then
-            exit(false);
-
-        ExtMembershipNo := Membership."External Membership No.";
-        exit(ExtMembershipNo <> '');
     end;
 
     local procedure SelectMemberCardUI(var ExtMemberCardNo: Text[100]): Boolean
     var
         MemberCard: Record "NPR MM Member Card";
     begin
-
-        // if (ACTION::LookupOK <> PAGE.RUNMODAL (0, MemberCard)) then
-        //  exit (false);
-        //
-        // ExtMemberCardNo := MemberCard."External Card No.";
-        // exit (ExtMemberCardNo <> '');
 
         exit(SelectMemberCardViaMemberUI(ExtMemberCardNo));
 
