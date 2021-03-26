@@ -13,7 +13,7 @@ report 6060123 "NPR MM Member Card Std Print"
             column(MemberDate; MemberDate)
             {
             }
-            column(Barcode; ImageMemoryBuffer.Value)
+            column(Barcode; BlobBuffer."Buffer 1")
             {
             }
             column(ExternalMemberNo; "External Member No.")
@@ -83,18 +83,13 @@ report 6060123 "NPR MM Member Card Std Print"
                 PointTo: Integer;
                 Code128Lbl: Label 'CODE128';
             begin
-
                 CalcFields("External Member No.");
                 BarcodeLib.SetAntiAliasing(false);
                 BarcodeLib.SetShowText(false);
                 BarcodeLib.SetBarcodeType(Code128Lbl);
                 BarcodeLib.GenerateBarcode("MM Member Card"."External Card No.", TmpBarcode);
 
-                Clear(ImageMemoryBuffer);
-                ImageMemoryBuffer.init();
-                ImageMemoryRecRef.GetTable(ImageMemoryBuffer);
-                TmpBarcode.ToRecordRef(ImageMemoryRecRef, ImageMemoryBuffer.FieldNo(ImageMemoryBuffer.Value));
-
+                BlobBuffer.GetFromTempBlob(TmpBarcode, 1);
                 Clear(MemberDate);
                 Clear(MemberItem);
                 Clear(CardType);
@@ -126,8 +121,8 @@ report 6060123 "NPR MM Member Card Std Print"
         CompanyInformation: Record "Company Information";
         MMMembershipEntry: Record "NPR MM Membership Entry";
         ImageMemoryBuffer: Record "NPR NpXml Custom Val. Buffer" temporary;
+        BlobBuffer: Record "NPR BLOB buffer" temporary;
         TmpBarcode: Codeunit "Temp Blob";
-        ImageMemoryRecRef: RecordRef;
         ExpiryDateCaption: Label 'Expiry date: ';
         MemberCardNoCaption: Label 'Member No.:';
         MemberNameCaption: Label 'Name: ';
