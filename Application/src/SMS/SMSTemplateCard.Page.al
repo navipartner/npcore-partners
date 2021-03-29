@@ -144,10 +144,10 @@ page 6059941 "NPR SMS Template Card"
                 }
                 action("Send batch SMS")
                 {
-                    Caption = 'Send batch SMS';
+                    Caption = 'Send Batch SMS';
                     Image = SendToMultiple;
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Send batch SMS action';
+                    ToolTip = 'Executes the Send Batch SMS action';
 
                     trigger OnAction()
                     var
