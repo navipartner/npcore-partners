@@ -14,19 +14,19 @@ page 6150702 "NPR POS Menu Buttons"
         {
             repeater(Group)
             {
-                IndentationColumn = Level;
+                IndentationColumn = Rec.Level;
                 IndentationControls = Caption;
-                field(Caption; Caption)
+                field(Caption; Rec.Caption)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Caption field';
                 }
-                field(Tooltip; Tooltip)
+                field(Tooltip; Rec.Tooltip)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Tooltip field';
                 }
-                field("Action Type"; "Action Type")
+                field("Action Type"; Rec."Action Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Action Type field';
@@ -36,106 +36,106 @@ page 6150702 "NPR POS Menu Buttons"
                         SetActionCodeEditable();
                     end;
                 }
-                field("Action Code"; "Action Code")
+                field("Action Code"; Rec."Action Code")
                 {
                     ApplicationArea = All;
                     Style = Unfavorable;
                     StyleExpr = NeedParameterRefresh;
                     ToolTip = 'Specifies the value of the Action Code field';
                 }
-                field("Data Source Name"; "Data Source Name")
+                field("Data Source Name"; Rec."Data Source Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Data Source Name field';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked field';
                 }
-                field("Show Plus/Minus Buttons"; "Show Plus/Minus Buttons")
+                field("Show Plus/Minus Buttons"; Rec."Show Plus/Minus Buttons")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Show Plus/Minus Buttons field';
                 }
-                field("Background Color"; "Background Color")
+                field("Background Color"; Rec."Background Color")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Background Color field';
                 }
-                field("Foreground Color"; "Foreground Color")
+                field("Foreground Color"; Rec."Foreground Color")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Foreground Color field';
                 }
-                field("Icon Class"; "Icon Class")
+                field("Icon Class"; Rec."Icon Class")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Icon Class field';
                 }
-                field("Background Image Url"; "Background Image Url")
+                field("Background Image Url"; Rec."Background Image Url")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Background Image Url field';
                 }
-                field("Caption Position"; "Caption Position")
+                field("Caption Position"; Rec."Caption Position")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Caption Position field';
                 }
-                field("Custom Class Attribute"; "Custom Class Attribute")
+                field("Custom Class Attribute"; Rec."Custom Class Attribute")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Custom Class Attribute field';
                 }
-                field(Bold; Bold)
+                field(Bold; Rec.Bold)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Bold field';
                 }
-                field("Font Size"; "Font Size")
+                field("Font Size"; Rec."Font Size")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Font Size field';
                 }
-                field("Position X"; "Position X")
+                field("Position X"; Rec."Position X")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Position X field';
                 }
-                field("Position Y"; "Position Y")
+                field("Position Y"; Rec."Position Y")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Position Y field';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Enabled field';
                 }
-                field("Blocking UI"; "Blocking UI")
+                field("Blocking UI"; Rec."Blocking UI")
                 {
                     ApplicationArea = All;
                     Editable = IsBlockingUIEnabled;
                     ToolTip = 'Specifies the value of the Blocking UI field';
                 }
-                field("Secure Method Code"; "Secure Method Code")
+                field("Secure Method Code"; Rec."Secure Method Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Secure Method Code field';
                 }
-                field("Register Type"; "Register Type")
+                field("Register Type"; Rec."Register Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS View Profile field';
                 }
-                field("Register No."; "Register No.")
+                field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
-                field("Salesperson Code"; "Salesperson Code")
+                field("Salesperson Code"; Rec."Salesperson Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Salesperson Code field';
@@ -281,9 +281,9 @@ page 6150702 "NPR POS Menu Buttons"
                     POSParameterValue: Record "NPR POS Parameter Value";
                 begin
                     POSParameterValue.SetRange("Table No.", 6150701);
-                    POSParameterValue.SetRange(Code, "Menu Code");
-                    POSParameterValue.SetRange("Record ID", RecordId);
-                    POSParameterValue.SetRange(ID, ID);
+                    POSParameterValue.SetRange(Code, Rec."Menu Code");
+                    POSParameterValue.SetRange("Record ID", Rec.RecordId);
+                    POSParameterValue.SetRange(ID, Rec.ID);
                     PAGE.RunModal(PAGE::"NPR POS Parameter Values", POSParameterValue);
                 end;
             }
@@ -317,7 +317,7 @@ page 6150702 "NPR POS Menu Buttons"
 
                 trigger OnAction()
                 begin
-                    LocalizeData();
+                    Rec.LocalizeData();
                 end;
             }
         }
@@ -346,7 +346,7 @@ page 6150702 "NPR POS Menu Buttons"
         POSAction: Record "NPR POS Action";
     begin
         SetColumnVisibleAttributes();
-        CurrPage.Caption := StrSubstNo(Text001, "Menu Code");
+        CurrPage.Caption := StrSubstNo(Text001, Rec."Menu Code");
         POSAction.DiscoverActions();
     end;
 
@@ -416,8 +416,8 @@ page 6150702 "NPR POS Menu Buttons"
     var
         PopupMenuButton: Record "NPR POS Menu Button";
     begin
-        TestField("Action Type", "Action Type"::PopupMenu);
-        PopupMenuButton.SetRange("Menu Code", "Action Code");
+        Rec.TestField("Action Type", Rec."Action Type"::PopupMenu);
+        PopupMenuButton.SetRange("Menu Code", Rec."Action Code");
         PAGE.Run(0, PopupMenuButton);
     end;
 
@@ -432,7 +432,7 @@ page 6150702 "NPR POS Menu Buttons"
 
     local procedure SetColumnVisibleAttributes()
     begin
-        MenuCodeVisible := (GetRangeMin("Menu Code") = GetRangeMax("Menu Code")) and (GetRangeMax("Menu Code") = '');
+        MenuCodeVisible := (Rec.GetRangeMin("Menu Code") = Rec.GetRangeMax("Menu Code")) and (Rec.GetRangeMax("Menu Code") = '');
     end;
 
     local procedure SetActionEnabledAttributes()
@@ -445,21 +445,21 @@ page 6150702 "NPR POS Menu Buttons"
         IndentEnabled := Rec.IndentAllowed();
         ActionTypeEnabled := Rec.ActionIsEditable();
 
-        MenuButton.SetRange("Menu Code", "Menu Code");
-        MenuButton.SetRange("Parent ID", ID);
+        MenuButton.SetRange("Menu Code", Rec."Menu Code");
+        MenuButton.SetRange("Parent ID", Rec.ID);
         HasSubMenus := not MenuButton.IsEmpty();
 
-        IsParametersEnabled := "Action Type" = "Action Type"::Action;
+        IsParametersEnabled := Rec."Action Type" = Rec."Action Type"::Action;
 
         SetActionCodeEditable();
     end;
 
     local procedure SetActionCodeEditable()
     begin
-        ActionCodeEnabled := ActionTypeEnabled and ("Action Type" <> "Action Type"::Submenu);
-        IsParametersEnabled := "Action Type" in ["Action Type"::Action, "Action Type"::Item, "Action Type"::PopupMenu, "Action Type"::PaymentType];
-        IsPopupEnabled := "Action Type" = "Action Type"::PopupMenu;
-        IsBlockingUIEnabled := "Action Type" <> "Action Type"::Action;
+        ActionCodeEnabled := ActionTypeEnabled and (Rec."Action Type" <> Rec."Action Type"::Submenu);
+        IsParametersEnabled := Rec."Action Type" in [Rec."Action Type"::Action, Rec."Action Type"::Item, Rec."Action Type"::PopupMenu, Rec."Action Type"::PaymentType];
+        IsPopupEnabled := Rec."Action Type" = Rec."Action Type"::PopupMenu;
+        IsBlockingUIEnabled := Rec."Action Type" <> Rec."Action Type"::Action;
     end;
 
     local procedure DoRefreshActionCode()

@@ -8,12 +8,12 @@ page 6150636 "NPR POS View Profile Card"
     layout
     {
 
-        area (factboxes)
+        area(factboxes)
         {
             part(POSViewPic; "NPR POS View Picture")
             {
-                ApplicationArea = Basic, Suite; 
-                Editable =  true; 
+                ApplicationArea = Basic, Suite;
+                Editable = true;
                 SubPageLink = "Code" = FIELD("Code");
             }
         }
@@ -37,7 +37,7 @@ page 6150636 "NPR POS View Profile Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Line Order on Screen field';
                 }
-                field("POS - Show discount fields"; "POS - Show discount fields")
+                field("POS - Show discount fields"; Rec."POS - Show discount fields")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Show Discount field';
@@ -52,10 +52,15 @@ page 6150636 "NPR POS View Profile Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the After End-of-Sale View field';
                 }
-                field("Lock Timeout"; "Lock Timeout")
+                field("Lock Timeout"; Rec."Lock Timeout")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Lock Timeout field';
+                }
+                field("Tax Type"; Rec."Tax Type")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the tax type, POS view should be adjusted for by default';
                 }
             }
             group("Number and Date Formatting")
