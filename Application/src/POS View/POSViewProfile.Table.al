@@ -89,6 +89,13 @@ table 6150651 "NPR POS View Profile"
             Caption = 'Lock Timeout';
             DataClassification = CustomerContent;
         }
+        field(70; "Tax Type"; Option)
+        {
+            Caption = 'Tax Type';
+            DataClassification = CustomerContent;
+            OptionMembers = VAT,"Sales Tax";
+            OptionCaption = 'VAT,Sales Tax';
+        }
         field(6232; "POS - Show discount fields"; Boolean)
         {
             Caption = 'Show Discount';

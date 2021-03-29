@@ -176,12 +176,21 @@ page 6150616 "NPR POS Unit List"
         }
     }
 
-
     local procedure CreateCheckpointWorker(UsePosEntry: Boolean; WithPosting: Boolean; UnitNo: Code[10])
     var
         POSCheckpointMgr: Codeunit "NPR POS Workshift Checkpoint";
     begin
         POSCheckpointMgr.CloseWorkshift(UsePosEntry, WithPosting, UnitNo);
     end;
-}
 
+    procedure GetSelectionFilter(): Text
+    var
+        POSUnit: Record "NPR POS Unit";
+        SelectionFilterManagement: Codeunit SelectionFilterManagement;
+        RecRef: RecordRef;
+    begin
+        CurrPage.SetSelectionFilter(POSUnit);
+        RecRef.GetTable(POSUnit);
+        exit(SelectionFilterManagement.GetSelectionFilter(RecRef, POSUnit.FieldNo("No.")));
+    end;
+}
