@@ -329,6 +329,9 @@ codeunit 6150702 "NPR POS UI Management"
         CaptionLabelPaymentTotal2: Label 'Sale %1';
         CaptionLabelTotalPayed: Label 'Payed';
         CaptionLabelSubtotal: Label 'SUBTOTAL %1';
+        CaptionLabelTotal: Label 'TOTAL %1';
+        CaptionLabelVATAmt: Label 'VAT AMOUNT %1';
+        CaptionLabelTaxAmt: Label 'TAX AMOUNT %1';
         CaptionPaymentInfo: Label 'Payment info';
         CaptionGlobalCancel: Label 'Cancel';
         CaptionGlobalClose: Label 'Close';
@@ -436,6 +439,9 @@ codeunit 6150702 "NPR POS UI Management"
         Captions.Add('Sale_SalesPersonCode', CaptionLabelSalesPersonCode);
         Captions.Add('Login_Clear', CaptionLabelClear);
         Captions.Add('Sale_SubTotal', StrSubstNo(CaptionLabelSubtotal, GetLCYCode));
+        Captions.Add('Sale_Total', StrSubstNo(CaptionLabelTotal, GetLCYCode));
+        Captions.Add('Sale_VATAmt', StrSubstNo(CaptionLabelVATAmt, GetLCYCode));
+        Captions.Add('Sale_TaxAmt', StrSubstNo(CaptionLabelTaxAmt, GetLCYCode));
         Captions.Add('Item_Count', CaptionItemCount);
         Captions.Add('Payment_PaymentInfo', CaptionPaymentInfo);
         Captions.Add('Global_Cancel', CaptionGlobalCancel);
@@ -583,6 +589,7 @@ codeunit 6150702 "NPR POS UI Management"
     procedure SetOptions(Setup: Codeunit "NPR POS Setup")
     var
         POSSetup: Record "NPR POS Setup";
+        POSViewProfile: Record "NPR POS View Profile";
         POSActionParameterMgt: Codeunit "NPR POS Action Param. Mgt.";
         LicenseInformation: Codeunit "NPR License Information";
         Options: JsonObject;
@@ -602,6 +609,8 @@ codeunit 6150702 "NPR POS UI Management"
         Setup.GetNamedActionSetup(POSSetup);
         Options.Add('adminMenuWorkflow_parameters', POSActionParameterMgt.GetParametersAsJson(POSSetup.RecordId, POSSetup.FieldNo("Admin Menu Action Code")));
         Options.Add('nprVersion', LicenseInformation.GetRetailVersion());
+        Setup.GetPOSViewProfile(POSViewProfile);
+        Options.Add('taxationType', Format(POSViewProfile."Tax Type", 0, 9));
 
         OnSetOptions(Setup, Options);
 

@@ -3,6 +3,7 @@ codeunit 6150712 "NPR POS Data Driver: Sale Line"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSource', '', false, false)]
     local procedure GetDataSource(Name: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
+        POSViewProfile: Record "NPR POS View Profile";
         SaleLine: Record "NPR Sale Line POS";
         DataMgt: Codeunit "NPR POS Data Management";
     begin
@@ -12,6 +13,7 @@ codeunit 6150712 "NPR POS Data Driver: Sale Line"
         DataSource.Constructor();
         DataSource.SetId(Name);
         DataSource.SetTableNo(Database::"NPR Sale Line POS");
+        Setup.GetPOSViewProfile(POSViewProfile);
 
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("No."), false);
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo(Type), false);
@@ -25,7 +27,8 @@ codeunit 6150712 "NPR POS Data Driver: Sale Line"
             DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Discount %"), true);
             DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Discount Amount"), true);
         end;
-        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Amount Including VAT"), true);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo(Amount), POSViewProfile."Tax Type" = POSViewProfile."Tax Type"::"Sales Tax");
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Amount Including VAT"), POSViewProfile."Tax Type" = POSViewProfile."Tax Type"::VAT);
 
         DataSource.Totals.Add('AmountExclVAT');
         DataSource.Totals.Add('VATAmount');

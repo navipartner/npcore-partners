@@ -3,8 +3,7 @@ page 6150711 "NPR POS View Card"
     Caption = 'POS View Card';
     PageType = Card;
     SourceTable = "NPR POS View";
-    UsageCategory = Administration; 
-    ApplicationArea = All; 
+    UsageCategory = None;
 
     layout
     {

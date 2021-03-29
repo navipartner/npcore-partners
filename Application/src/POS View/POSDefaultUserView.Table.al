@@ -29,6 +29,16 @@ table 6150712 "NPR POS Default User View"
         {
             Caption = 'User Name';
             DataClassification = CustomerContent;
+
+            TableRelation = User."User Name";
+            ValidateTableRelation = false;
+
+            trigger OnValidate()
+            var
+                UserSelection: Codeunit "User Selection";
+            begin
+                UserSelection.ValidateUserName("User Name");
+            end;
         }
         field(5; "POS View Code"; Code[10])
         {

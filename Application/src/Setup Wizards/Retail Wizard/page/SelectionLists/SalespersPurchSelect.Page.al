@@ -15,12 +15,12 @@ page 6059800 "NPR Salespers/PurchSelect"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the code of the record.';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = Suite, RelationshipMgmt;
                     ToolTip = 'Specifies the name of the record.';
@@ -28,4 +28,13 @@ page 6059800 "NPR Salespers/PurchSelect"
             }
         }
     }
+
+    procedure GetSelectionFilter(): Text
+    var
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
+        SelectionFilterManagement: Codeunit SelectionFilterManagement;
+    begin
+        CurrPage.SetSelectionFilter(SalespersonPurchaser);
+        exit(SelectionFilterManagement.GetSelectionFilterForSalesPersonPurchaser(SalespersonPurchaser));
+    end;
 }

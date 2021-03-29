@@ -23,11 +23,33 @@ table 6150711 "NPR POS Default View"
         {
             Caption = 'Salesperson Filter';
             DataClassification = CustomerContent;
+            TableRelation = "Salesperson/Purchaser";
+            ValidateTableRelation = false;
+
+            trigger OnLookup()
+            var
+                SalespersonList: Page "NPR Salespers/PurchSelect";
+            begin
+                SalespersonList.LookupMode(true);
+                if SalespersonList.RunModal() = Action::LookupOK then
+                    Validate("Salesperson Filter", SalespersonList.GetSelectionFilter());
+            end;
         }
         field(4; "Register Filter"; Text[250])
         {
             Caption = 'POS Unit No. Filter';
             DataClassification = CustomerContent;
+            TableRelation = "NPR POS Unit";
+            ValidateTableRelation = false;
+
+            trigger OnLookup()
+            var
+                POSUnitList: Page "NPR POS Unit List";
+            begin
+                POSUnitList.LookupMode(true);
+                if POSUnitList.RunModal() = Action::LookupOK then
+                    Validate("Register Filter", POSUnitList.GetSelectionFilter());
+            end;
         }
         field(5; "Starting Date"; Date)
         {
