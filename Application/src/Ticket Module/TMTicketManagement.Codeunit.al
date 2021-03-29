@@ -2403,7 +2403,7 @@ codeunit 6059784 "NPR TM Ticket Management"
                     LastAccessDate := DT2Date(DetailedTicketAccessEntry."Created Datetime");
                     CapacityExceeded := (FirstAccessDate <> LastAccessDate);
 
-                    if (not CapacityExceeded) then begin
+                    if (not CapacityExceeded) and (MaxNoOfEntries > 0) then begin
                         AdmittedCount := DetailedTicketAccessEntry.Count();
                         CapacityExceeded := (AdmittedCount > MaxNoOfEntries);
                     end;
