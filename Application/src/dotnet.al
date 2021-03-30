@@ -1220,7 +1220,6 @@ dotnet
 
     assembly("Microsoft.Dynamics.Nav.Integration.Office")
     {
-        Version = '17.0.0.0';
         Culture = 'neutral';
         PublicKeyToken = '31bf3856ad364e35';
 
@@ -1235,7 +1234,6 @@ dotnet
 
     assembly("Microsoft.Dynamics.Nav.DocumentReport")
     {
-        Version = '17.0.0.0';
         Culture = 'neutral';
         PublicKeyToken = '31bf3856ad364e35';
 
@@ -1246,7 +1244,6 @@ dotnet
 
     assembly("Microsoft.Dynamics.Nav.PdfWriter")
     {
-        Version = '17.0.0.0';
         Culture = 'neutral';
         PublicKeyToken = '31bf3856ad364e35';
 
@@ -1257,7 +1254,6 @@ dotnet
 
     assembly("Microsoft.Dynamics.Nav.EwsWrapper")
     {
-        Version = '17.0.0.0';
         Culture = 'neutral';
         PublicKeyToken = '31bf3856ad364e35';
 
@@ -1755,7 +1751,6 @@ dotnet
 
     assembly("Microsoft.Dynamics.Nav.ClientExtensions")
     {
-        Version = '17.0.0.0';
         Culture = 'neutral';
         PublicKeyToken = '31bf3856ad364e35';
 
