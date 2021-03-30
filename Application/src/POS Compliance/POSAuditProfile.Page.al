@@ -1,11 +1,8 @@
 page 6150626 "NPR POS Audit Profile"
 {
-    // NPR5.54/BHR /20200228 CASE 393305 Created Card Page
-
     Caption = 'POS Audit Profile';
     PageType = Card;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     SourceTable = "NPR POS Audit Profile";
 
     layout
@@ -14,62 +11,63 @@ page 6150626 "NPR POS Audit Profile"
         {
             group(General)
             {
-                field("Code"; Code)
+                Caption = 'General';
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field("Sale Fiscal No. Series"; "Sale Fiscal No. Series")
+                field("Sale Fiscal No. Series"; Rec."Sale Fiscal No. Series")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sale Fiscal No. Series field';
                 }
-                field("Credit Sale Fiscal No. Series"; "Credit Sale Fiscal No. Series")
+                field("Credit Sale Fiscal No. Series"; Rec."Credit Sale Fiscal No. Series")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Credit Sale Fiscal No. Series field';
                 }
-                field("Balancing Fiscal No. Series"; "Balancing Fiscal No. Series")
+                field("Balancing Fiscal No. Series"; Rec."Balancing Fiscal No. Series")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Balancing Fiscal No. Series field';
                 }
-                field("Fill Sale Fiscal No. On"; "Fill Sale Fiscal No. On")
+                field("Fill Sale Fiscal No. On"; Rec."Fill Sale Fiscal No. On")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Fill Sale Fiscal No. On field';
                 }
-                field("Audit Log Enabled"; "Audit Log Enabled")
+                field("Audit Log Enabled"; Rec."Audit Log Enabled")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Audit Log Enabled field';
                 }
-                field("Audit Handler"; "Audit Handler")
+                field("Audit Handler"; Rec."Audit Handler")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Audit Handler field';
                 }
-                field("Allow Zero Amount Sales"; "Allow Zero Amount Sales")
+                field("Allow Zero Amount Sales"; Rec."Allow Zero Amount Sales")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Allow Zero Amount Sales field';
                 }
-                field("Print Receipt On Sale Cancel"; "Print Receipt On Sale Cancel")
+                field("Print Receipt On Sale Cancel"; Rec."Print Receipt On Sale Cancel")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Print Receipt On Sale Cancel field';
+                    ToolTip = 'Specifies the value of the Print Receipt on Sale Cancel field';
                 }
-                field("Allow Printing Receipt Copy"; "Allow Printing Receipt Copy")
+                field("Allow Printing Receipt Copy"; Rec."Allow Printing Receipt Copy")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Allow Printing Receipt Copy field';
                 }
-                field("Do Not Print Receipt on Sale"; "Do Not Print Receipt on Sale")
+                field("Do Not Print Receipt on Sale"; Rec."Do Not Print Receipt on Sale")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Do Not Print Receipt on Sale field';
                 }
-                field("Sales Ticket No. Series"; "Sales Ticket No. Series")
+                field("Sales Ticket No. Series"; Rec."Sales Ticket No. Series")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Ticket No. Series field';
@@ -77,9 +75,4 @@ page 6150626 "NPR POS Audit Profile"
             }
         }
     }
-
-    actions
-    {
-    }
 }
-
