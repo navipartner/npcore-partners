@@ -1,0 +1,11 @@
+[
+    { "codeunitId": 136304,"codeunitName": "Job Performance WIP","method": "CalculateWIPForJobWithEmptyEndingDate" },
+    { "codeunitId": 136309,"codeunitName": "Job Posting","method": "PostingPurchaseCreditMemoWithJobAndTracking" },
+    { "codeunitId": 136309,"codeunitName": "Job Posting","method": "PurchaseCreditMemoWithTrackingAndJob" },
+    { "codeunitId": 136311,"codeunitName": "Job Reports II","method": "DocumentEntriesForJobAndResource" },
+    { "codeunitId": 136314,"codeunitName": "Job Quote Report Tests","method": "SendJobQuoteFromJobCardSMTPSetup" },
+    { "codeunitId": 136350,"codeunitName": "UT T Job","method": "MyJobAfterModifyJobProjectManager" },
+    { "codeunitId": 136354,"codeunitName": "UT T Job WIP Method","method": "UTErrorOnValidateWIPCostJobWIPMethod" },
+    { "codeunitId": 136906,"codeunitName": "Job Reports","method": "JobWIPToGLAfterJobPostWIPToGL" },
+    { "codeunitId": 136909,"codeunitName": "Job Posting","method": "PurchaseOrderFCYWithJob" }
+]
