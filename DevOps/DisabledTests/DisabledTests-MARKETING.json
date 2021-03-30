@@ -1,0 +1,14 @@
+[
+    { "codeunitId": 134626,"codeunitName": "Person and Company Contacts","method": "NameAssistEditOnCompanyContactCardWithoutModifyPermissions" },
+    { "codeunitId": 134626,"codeunitName": "Person and Company Contacts","method": "NameAssistEditOnPersonContactCardWithoutModifyPermissions" },
+    { "codeunitId": 136201,"codeunitName": "Marketing Contacts","method": "SalesQuoteEmailDialogForContactSMTPSetup" },
+    { "codeunitId": 136202,"codeunitName": "Marketing Document Logging","method": "InteractionLogEntryQuote" },
+    { "codeunitId": 136208,"codeunitName": "Marketing Interaction","method": "DeleteInteractionTmplWithEmailMergeAttachment" },
+    { "codeunitId": 136208,"codeunitName": "Marketing Interaction","method": "InteractionAttachmentWithWordApp" },
+    { "codeunitId": 136208,"codeunitName": "Marketing Interaction","method": "InteractionSaveMergedDocumentToBLOB" },
+    { "codeunitId": 136208,"codeunitName": "Marketing Interaction","method": "InteractionSaveMergedDocumentToDisk" },
+    { "codeunitId": 136211,"codeunitName": "Marketing Matrix Management","method": "*" },
+    { "codeunitId": 136212,"codeunitName": "Marketing Contacts Search II","method": "DuplicateSearchStringSetupFieldNameLookup" },
+    { "codeunitId": 136213,"codeunitName": "Marketing Segment","method": "InteractionTemplateCodeValidateHdrWhenConfirmUpdateSegLines" },
+    { "codeunitId": 136216,"codeunitName": "Marketing Cues","method": "ContactsDuplicate" }        
+]
