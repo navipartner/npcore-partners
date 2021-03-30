@@ -59,7 +59,7 @@ page 6151247 "NPR Setup Act - Scenarios"
                         Tooltip = 'Show the Getting Started guide again';
 
                         trigger OnAction()
-                        begin  
+                        begin
                             PAGE.RunModal(PAGE::"NPR Getting Started");
                         end;
                     }
@@ -79,9 +79,10 @@ page 6151247 "NPR Setup Act - Scenarios"
 
         ShowProductVideosActivities := ClientTypeManagement.GetCurrentClientType() <> CLIENTTYPE::Phone;
     end;
-
-    var 
-    ClientTypeManagement: Codeunit "Client Type Management";
-    ShowProductVideosActivities: Boolean;
+    
+    var
+        ClientTypeManagement: Codeunit "Client Type Management";
+        ShowProductVideosActivities: Boolean;
+       
 }
 
