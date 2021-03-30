@@ -1,14 +1,12 @@
 page 6151134 "NPR TM Ticket Schedule Wizard"
 {
-    // TM90.1.46/TSA /20200320 CASE 397084 Initial Version
-
     Caption = 'Schedule';
     DelayedInsert = true;
     PageType = ListPart;
     ShowFilter = false;
     SourceTable = "NPR TM Admis. Schedule";
     SourceTableTemporary = true;
-    usagecategory = None;
+    UsageCategory = None;
 
     layout
     {
@@ -17,76 +15,76 @@ page 6151134 "NPR TM Ticket Schedule Wizard"
             repeater(Control6014401)
             {
                 ShowCaption = false;
-                field("Schedule Code"; "Schedule Code")
+                field("Schedule Code"; Rec."Schedule Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Schedule Code field';
                 }
-                field("Start Time"; "Start Time")
+                field("Start Time"; Rec."Start Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Start Time field';
                 }
-                field("Stop Time"; "Stop Time")
+                field("Stop Time"; Rec."Stop Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Stop Time field';
                 }
-                field(Monday; Monday)
+                field(Monday; Rec.Monday)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Monday field';
                 }
-                field(Tuesday; Tuesday)
+                field(Tuesday; Rec.Tuesday)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Tuesday field';
                 }
-                field(Wednesday; Wednesday)
+                field(Wednesday; Rec.Wednesday)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Wednesday field';
                 }
-                field(Thursday; Thursday)
+                field(Thursday; Rec.Thursday)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Thursday field';
                 }
-                field(Friday; Friday)
+                field(Friday; Rec.Friday)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Friday field';
                 }
-                field(Saturday; Saturday)
+                field(Saturday; Rec.Saturday)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Saturday field';
                 }
-                field(Sunday; Sunday)
+                field(Sunday; Rec.Sunday)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Sunday field';
                 }
-                field("Capacity Control"; "Capacity Control")
+                field("Capacity Control"; Rec."Capacity Control")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Capacity Control field';
                 }
-                field("Max Capacity Per Sch. Entry"; "Max Capacity Per Sch. Entry")
+                field("Max Capacity Per Sch. Entry"; Rec."Max Capacity Per Sch. Entry")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Capacity';
                     ToolTip = 'Specifies the value of the Capacity field';
                 }
-                field("Prebook From"; "Prebook From")
+                field("Prebook From"; Rec."Prebook From")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Prebook From field';
                 }
-                field("Prebook Is Required"; "Prebook Is Required")
+                field("Prebook Is Required"; Rec."Prebook Is Required")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Prebook Is Required field';
@@ -107,11 +105,11 @@ page 6151134 "NPR TM Ticket Schedule Wizard"
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
 
-        if ("Start Time" = 0T) or ("Stop Time" = 0T) then
+        if (Rec."Start Time" = 0T) or (Rec."Stop Time" = 0T) then
             exit(false);
 
         ScheduleCode := IncStr(ScheduleCode);
-        "Schedule Code" := ScheduleCode;
+        Rec."Schedule Code" := ScheduleCode;
     end;
 
     var

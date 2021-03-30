@@ -1,14 +1,10 @@
 page 6060094 "NPR TM Ticket Res. Req. Page"
 {
-    // TM1.22/NPKNAV/20170612  CASE 278142 Transport T0007 - 12 June 2017
-    // TM1.23/TSA /20170724 CASE 284752 Added NPR Attribute Support
-    // TM1.26/NPKNAV/20171122  CASE 285601-01 Transport TM1.26 - 22 November 2017
-    // TM1.43/TSA /20190910 CASE 368043 Refactored usage of External Item Code
-
     Caption = 'Ticket Res. Request Page';
     PageType = Card;
     SourceTable = "NPR TM Ticket Reservation Req.";
     UsageCategory = None;
+    InsertAllowed = false;
 
     layout
     {
@@ -17,14 +13,14 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
             group(General)
             {
                 Caption = 'General';
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
-                field("Entry Type"; "Entry Type")
+                field("Entry Type"; Rec."Entry Type")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Importance = Additional;
@@ -32,7 +28,7 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
                     ToolTip = 'Specifies the value of the Entry Type field';
                 }
 
-                field("Created Date Time"; "Created Date Time")
+                field("Created Date Time"; Rec."Created Date Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
@@ -40,13 +36,13 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
                 }
                 group(EntryId)
                 {
-                    field("Session Token ID"; "Session Token ID")
+                    field("Session Token ID"; Rec."Session Token ID")
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Editable = false;
                         ToolTip = 'Specifies the value of the Session Token ID field';
                     }
-                    field("Authorization Code"; "Authorization Code")
+                    field("Authorization Code"; Rec."Authorization Code")
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Editable = false;
@@ -57,42 +53,42 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
             group("Request Details")
             {
                 Caption = 'Reguest Details';
-                field("External Item Code"; "External Item Code")
+                field("External Item Code"; Rec."External Item Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the External Item Code field';
                 }
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Item No. field';
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field("External Adm. Sch. Entry No."; "External Adm. Sch. Entry No.")
+                field("External Adm. Sch. Entry No."; Rec."External Adm. Sch. Entry No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the External Adm. Sch. Entry No. field';
                 }
-                field("Scheduled Time Description"; "Scheduled Time Description")
+                field("Scheduled Time Description"; Rec."Scheduled Time Description")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Scheduled Time Description field';
                 }
-                field("Admission Code"; "Admission Code")
+                field("Admission Code"; Rec."Admission Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Admission Code field';
                 }
-                field("Admission Description"; "Admission Description")
+                field("Admission Description"; Rec."Admission Description")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Admission Description field';
@@ -101,43 +97,43 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
                 {
                     Caption = 'Process';
                 }
-                field("Ext. Line Reference No."; "Ext. Line Reference No.")
+                field("Ext. Line Reference No."; Rec."Ext. Line Reference No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Line Reference No. field';
                 }
-                field("Request Status"; "Request Status")
+                field("Request Status"; Rec."Request Status")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Request Status field';
                 }
-                field("Request Status Date Time"; "Request Status Date Time")
+                field("Request Status Date Time"; Rec."Request Status Date Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Request Status Date Time field';
                 }
-                field("Revoke Ticket Request"; "Revoke Ticket Request")
+                field("Revoke Ticket Request"; Rec."Revoke Ticket Request")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Revoke Ticket Request field';
                 }
-                field("Revoke Access Entry No."; "Revoke Access Entry No.")
+                field("Revoke Access Entry No."; Rec."Revoke Access Entry No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Revoke Access Entry No. field';
                 }
-                field("Expires Date Time"; "Expires Date Time")
+                field("Expires Date Time"; Rec."Expires Date Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Expires Date Time field';
                 }
-                field("Admission Created"; "Admission Created")
+                field("Admission Created"; Rec."Admission Created")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Admission Created field';
                 }
-                field("Payment Option"; "Payment Option")
+                field("Payment Option"; Rec."Payment Option")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Payment Option field';
@@ -146,42 +142,42 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
             group(References)
             {
                 Caption = 'References';
-                field("External Member No."; "External Member No.")
+                field("External Member No."; Rec."External Member No.")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the External Member No. field';
                 }
-                field("External Ticket Number"; "External Ticket Number")
+                field("External Ticket Number"; Rec."External Ticket Number")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the External Ticket Number field';
                 }
-                field("Notification Method"; "Notification Method")
+                field("Notification Method"; Rec."Notification Method")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Notification Method field';
                 }
-                field("Notification Address"; "Notification Address")
+                field("Notification Address"; Rec."Notification Address")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Notification Address field';
                 }
-                field("External Order No."; "External Order No.")
+                field("External Order No."; Rec."External Order No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the External Order No. field';
                 }
-                field("Customer No."; "Customer No.")
+                field("Customer No."; Rec."Customer No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Customer No. field';
                 }
-                field("Receipt No."; "Receipt No.")
+                field("Receipt No."; Rec."Receipt No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Receipt No. field';
                 }
-                field("Line No."; "Line No.")
+                field("Line No."; Rec."Line No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Line No. field';
@@ -190,12 +186,12 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
             group(Print)
             {
                 Caption = 'Print';
-                field("DIY Print Order Requested"; "DIY Print Order Requested")
+                field("DIY Print Order Requested"; Rec."DIY Print Order Requested")
                 {
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the DIY Print Order Requested field';
                 }
-                field("DIY Print Order At"; "DIY Print Order At")
+                field("DIY Print Order At"; Rec."DIY Print Order At")
                 {
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the DIY Print Order At field';
@@ -214,7 +210,7 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 1, "Entry No.", NPRAttrTextArray[1]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 1, Rec."Entry No.", NPRAttrTextArray[1]);
                     end;
                 }
                 field(NPRAttrTextArray_02; NPRAttrTextArray[2])
@@ -227,7 +223,7 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 2, "Entry No.", NPRAttrTextArray[2]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 2, Rec."Entry No.", NPRAttrTextArray[2]);
                     end;
                 }
                 field(NPRAttrTextArray_03; NPRAttrTextArray[3])
@@ -240,7 +236,7 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 3, "Entry No.", NPRAttrTextArray[3]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 3, Rec."Entry No.", NPRAttrTextArray[3]);
                     end;
                 }
                 field(NPRAttrTextArray_04; NPRAttrTextArray[4])
@@ -253,7 +249,7 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 4, "Entry No.", NPRAttrTextArray[4]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 4, Rec."Entry No.", NPRAttrTextArray[4]);
                     end;
                 }
                 field(NPRAttrTextArray_05; NPRAttrTextArray[5])
@@ -266,7 +262,7 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 5, "Entry No.", NPRAttrTextArray[5]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 5, Rec."Entry No.", NPRAttrTextArray[5]);
                     end;
                 }
                 field(NPRAttrTextArray_06; NPRAttrTextArray[6])
@@ -279,7 +275,7 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 6, "Entry No.", NPRAttrTextArray[6]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 6, Rec."Entry No.", NPRAttrTextArray[6]);
                     end;
                 }
                 field(NPRAttrTextArray_07; NPRAttrTextArray[7])
@@ -292,7 +288,7 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 7, "Entry No.", NPRAttrTextArray[7]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 7, Rec."Entry No.", NPRAttrTextArray[7]);
                     end;
                 }
                 field(NPRAttrTextArray_08; NPRAttrTextArray[8])
@@ -305,7 +301,7 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 8, "Entry No.", NPRAttrTextArray[8]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 8, Rec."Entry No.", NPRAttrTextArray[8]);
                     end;
                 }
                 field(NPRAttrTextArray_09; NPRAttrTextArray[9])
@@ -318,7 +314,7 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 9, "Entry No.", NPRAttrTextArray[9]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 9, Rec."Entry No.", NPRAttrTextArray[9]);
                     end;
                 }
                 field(NPRAttrTextArray_10; NPRAttrTextArray[10])
@@ -331,7 +327,7 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 10, "Entry No.", NPRAttrTextArray[10]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 10, Rec."Entry No.", NPRAttrTextArray[10]);
                     end;
                 }
             }
@@ -344,17 +340,13 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
 
     trigger OnAfterGetCurrRecord()
     begin
-
-        //-TM1.23 [284752]
-        NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, DATABASE::"NPR TM Ticket Reservation Req.", "Entry No.");
+        NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, DATABASE::"NPR TM Ticket Reservation Req.", Rec."Entry No.");
         NPRAttrEditable := CurrPage.Editable();
-        //+TM1.23 [284752]
     end;
 
     trigger OnOpenPage()
     begin
 
-        //-TM1.23 [284752]
         NPRAttrManagement.GetAttributeVisibility(DATABASE::"NPR TM Ticket Reservation Req.", NPRAttrVisibleArray);
         NPRAttrVisible01 := NPRAttrVisibleArray[1];
         NPRAttrVisible02 := NPRAttrVisibleArray[2];
@@ -368,7 +360,6 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
         NPRAttrVisible10 := NPRAttrVisibleArray[10];
 
         NPRAttrEditable := CurrPage.Editable();
-        //+TM1.23 [284752]
     end;
 
     var

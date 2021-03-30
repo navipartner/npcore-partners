@@ -1,29 +1,11 @@
 page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
 {
-    // NPR4.14/TSA/20150803 CASE214262 - Initial Version
-    // TM1.00/TSA /20151217 CASE 219658-01 NaviPartner Ticket Management
-    // TM1.07/TSA /20160125 CASE 232495 Admission Code as a fact in ticket statistics
-    // TM1.12/TSA /20160407 CASE 230600 Added DAN Captions
-    // TM1.14/TSA /20160520 CASE 240358 Fixed various features witht the RTC version of Access Statistics Matrix
-    // TM1.15/TSA /20160603 CASE 242771 Transport TM1.15 - 1 June 2016
-    // TM1.15/TSA /20170525 CASE 278049 Fixing issues report by OMA
-    // TM1.22/TSA /20170606 CASE 279257 Fixed the Admission Code Column Filter Screen Refresh
-    // TM1.22/TSA /20170606 CASE 279257 Prefill Column Filter with blocked facts
-    // TM1.23/TSA /20170719 CASE 279257 Fixed minor issues with blocking facts
-    // TM1.26/TSA /20171120 CASE 293916 Added the AdmissionDefinition field to defined what should be counted
-    // TM1.28/TSA /20180202 CASE 304216 Changed intial period to be Day instead of month
-    // TM1.36/TSA /20180727 CASE 323024 Adding dimension variant code
-    // TM1.36/TSA /20180727 CASE 323400 Added admitted including revisits
-    // TM1.39/THRO/20181126 CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
-    // TM1.47/TSA /20200421 CASE 401250 Added a "update statistics" action
-    // TM1.48/TSA /20200705 CASE 409741 Added Admission Forecast Action
-
     Caption = 'Ticket Access Statistics Matrix';
     PageType = ListPlus;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
     AdditionalSearchTerms = 'Ticket Statistics, Admission Statistics';
-
+    PromotedActionCategories = 'New,Process,Report,Update,Navigate';
     layout
     {
         area(content)
@@ -363,7 +345,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
 
     actions
     {
-        area(processing)
+        area(Navigation)
         {
             action("Update Statistics")
             {
@@ -372,43 +354,18 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                 Caption = 'Update Statistics';
                 Image = Refresh;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedIsBig = true;
-
-
+                PromotedCategory = Category4;
                 trigger OnAction()
                 begin
-
-                    //-TM1.47 [401250]
                     TicketAccessStatisticsMgr.BuildCompressedStatistics(Today);
                     UpdateMatrixSubForm;
-                    //+TM1.47 [401250]
                 end;
             }
             group(Periods)
             {
                 Caption = 'Periods';
-                action("Next Period")
-                {
-                    ToolTip = 'Next Period';
-                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    Caption = 'Next Period';
-                    Image = NextRecord;
-                    Promoted = true;
-				    PromotedOnly = true;
-                    PromotedCategory = Process;
-
-
-                    trigger OnAction()
-                    begin
-
-                        FindPeriod('>');
-                        MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
-
-                        CurrPage.Update;
-                        UpdateMatrixSubForm;
-                    end;
-                }
                 action("Previous Period")
                 {
                     ToolTip = 'Previous Period';
@@ -416,14 +373,33 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     Caption = 'Previous Period';
                     Image = PreviousRecord;
                     Promoted = true;
-				    PromotedOnly = true;
-                    PromotedCategory = Process;
-
+                    PromotedOnly = true;
+                    PromotedCategory = Category5;
 
                     trigger OnAction()
                     begin
 
                         FindPeriod('<');
+                        MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
+
+                        CurrPage.Update;
+                        UpdateMatrixSubForm;
+                    end;
+                }
+                action("Next Period")
+                {
+                    ToolTip = 'Next Period';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Caption = 'Next Period';
+                    Image = NextRecord;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category5;
+
+                    trigger OnAction()
+                    begin
+
+                        FindPeriod('>');
                         MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
 
                         CurrPage.Update;
@@ -436,11 +412,9 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     Caption = 'Previous Set';
                     Image = PreviousSet;
                     Promoted = true;
-				    PromotedOnly = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category5;
                     ToolTip = 'Previous Set';
-
 
                     trigger OnAction()
                     begin
@@ -454,11 +428,9 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     Caption = 'Previous Column';
                     Image = PreviousRecord;
                     Promoted = true;
-				    PromotedOnly = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category5;
                     ToolTip = 'Previous Set';
-
 
                     trigger OnAction()
                     begin
@@ -472,11 +444,9 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     Caption = 'Next Column';
                     Image = NextRecord;
                     Promoted = true;
-				    PromotedOnly = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category5;
                     ToolTip = 'Next Set';
-
 
                     trigger OnAction()
                     begin
@@ -490,11 +460,9 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     Caption = 'Next Set';
                     Image = NextSet;
                     Promoted = true;
-				    PromotedOnly = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category5;
                     ToolTip = 'Next Set';
-
 
                     trigger OnAction()
                     begin
@@ -503,39 +471,26 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     end;
                 }
             }
-        }
-        area(navigation)
-        {
             action(Forecast)
             {
                 ToolTip = 'Navigate to Admission Forecast.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Admission Forecast';
-                Ellipsis = true;
                 Image = Forecast;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = "Report";
-                PromotedIsBig = true;
                 RunObject = Page "NPR TM Admis. Forecast Matrix";
-
             }
         }
     }
 
     trigger OnInit()
     begin
-
         LineFactOption := 0;
         ColumnFactOption := 1;
-
-        //-TM1.28 [304216]
-        //PeriodType := PeriodType::Month;
         PeriodType := PeriodType::Day;
-        //+TM1.28 [304216]
-
         SetAutoFilterOnBlockedFacts();
-
         CalcVerticalTotal();
     end;
 
@@ -663,7 +618,6 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                             FieldRef.SetFilter(FilterAndFilter(AdmissionCodeFilter, BlockedAdmissionFactFilter));
                         end;
                     end;
-                //-TM1.36 [323024]
                 ColumnFactOption::VARIANT_CODE:
                     begin
                         FieldRef.SetFilter('%1', TicketFact."Fact Name"::VARIANT_CODE);
@@ -672,8 +626,6 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                             FieldRef.SetFilter(FilterAndFilter(VariantCodeFilter, BlockedVariantFactFilter));
                         end;
                     end;
-                //+TM1.36 [323024]
-
                 else
                     HaveCaptions := false;
             end;
@@ -715,7 +667,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
         end;
 
         if Calendar."Period Start" = 0D then
-            Calendar."Period Start" := Today;  //-+TM1.28 [304216] Calendar."Period Start" := CALCDATE ('<-1D>', WORKDATE);
+            Calendar."Period Start" := Today;
 
         PeriodFormMgt.FindDate(SearchText, Calendar, PeriodType);
         Date1 := Calendar."Period Start";
@@ -738,15 +690,10 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
 
     local procedure UpdateMatrixSubForm()
     begin
-        //-#341289 [341289]
-        // CurrPage.MATRIX.PAGE.SetFilters (ItemFactFilter, TicketTypeFactFilter, DateFactFilter, HourFactFilter, AdmissionCodeFilter, VariantCodeFilter,
-        //  BlockedItemFactFilter, BlockedTicketTypeFactFilter, '', BlockedHourFactFilter, BlockedAdmissionFactFilter, BlockedVariantFactFilter);
-
         CurrPage.MATRIX.PAGE.SetFilters(
           ItemFactFilter, TicketTypeFactFilter, DateFactFilter, HourFactFilter, AdmissionCodeFilter, VariantCodeFilter,
           BlockedItemFactFilter, BlockedTicketTypeFactFilter, '', BlockedHourFactFilter, BlockedAdmissionFactFilter, BlockedVariantFactFilter,
           HideLinesWithZeroAdmissionCount);
-        //+#341289 [341289]
 
         CurrPage.MATRIX.PAGE.Load(
           MATRIX_CaptionSet,
@@ -760,9 +707,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
         TicketStatisticsFilter.SetFilter("Admission Date Filter", FilterAndFilter(DateFactFilter, ''));
         TicketStatisticsFilter.SetFilter("Admission Hour Filter", FilterAndFilter(HourFactFilter, BlockedHourFactFilter));
         TicketStatisticsFilter.SetFilter("Admission Code Filter", FilterAndFilter(AdmissionCodeFilter, BlockedAdmissionFactFilter));
-        //-TM1.36 [323024]
         TicketStatisticsFilter.SetFilter("Variant Code Filter", FilterAndFilter(VariantCodeFilter, BlockedVariantFactFilter));
-        //+TM1.36 [323024]
 
         CalcVerticalTotal();
         CurrPage.Update(false);
@@ -849,13 +794,11 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                         else
                             BlockedHourFactFilter := StrSubstNo('%1&<>%2', BlockedHourFactFilter, TicketAccessFact."Fact Code");
 
-                    //-TM1.36 [323024]
                     TicketAccessFact."Fact Name"::VARIANT_CODE:
                         if (BlockedVariantFactFilter = '') then
                             BlockedVariantFactFilter := StrSubstNo('<>%1', TicketAccessFact."Fact Code")
                         else
                             BlockedVariantFactFilter := StrSubstNo('%1&<>%2', BlockedVariantFactFilter, TicketAccessFact."Fact Code");
-                //+TM1.36 [323024]
                 end;
             until (TicketAccessFact.Next() = 0);
         end;

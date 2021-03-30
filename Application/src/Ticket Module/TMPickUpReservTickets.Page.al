@@ -1,9 +1,5 @@
 page 6060095 "NPR TM Pick-Up Reserv. Tickets"
 {
-    // TM1.23/TSA /20170717 CASE 284248 Initial Version
-    // TM1.25/TSA /20171003 CASE 286397 Added Client Attributes to list
-    // #334163/JDH /20181109 CASE 334163 Added Caption to Actions and the object
-    // TM1.39/NPKNAV/20190125  CASE 343941 Transport TM1.39 - 25 January 2019
 
     Caption = 'TM Pick-Up Reserved Tickets';
     DeleteAllowed = false;
@@ -21,62 +17,62 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
         {
             repeater(Group)
             {
-                field("Created Date Time"; "Created Date Time")
+                field("Created Date Time"; Rec."Created Date Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Created Date Time field';
                 }
-                field("External Member No."; "External Member No.")
+                field("External Member No."; Rec."External Member No.")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the External Member No. field';
                 }
-                field("External Order No."; "External Order No.")
+                field("External Order No."; Rec."External Order No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the External Order No. field';
                 }
-                field("Request Status"; "Request Status")
+                field("Request Status"; Rec."Request Status")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Request Status field';
                 }
-                field("Payment Option"; "Payment Option")
+                field("Payment Option"; Rec."Payment Option")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Payment Option field';
                 }
-                field("Notification Method"; "Notification Method")
+                field("Notification Method"; Rec."Notification Method")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Notification Method field';
                 }
-                field("Notification Address"; "Notification Address")
+                field("Notification Address"; Rec."Notification Address")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Notification Address field';
                 }
-                field("Admission Code"; "Admission Code")
+                field("Admission Code"; Rec."Admission Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Admission Code field';
                 }
-                field("Scheduled Time Description"; "Scheduled Time Description")
+                field("Scheduled Time Description"; Rec."Scheduled Time Description")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Scheduled Time Description field';
                 }
-                field("Customer No."; "Customer No.")
+                field("Customer No."; Rec."Customer No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Customer No. field';
                 }
-                field("External Ticket Number"; "External Ticket Number")
+                field("External Ticket Number"; Rec."External Ticket Number")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the External Ticket Number field';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Quantity field';
@@ -91,7 +87,7 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 1, "Entry No.", NPRAttrTextArray[1]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 1, Rec."Entry No.", NPRAttrTextArray[1]);
                     end;
                 }
                 field(NPRAttrTextArray_02; NPRAttrTextArray[2])
@@ -104,7 +100,7 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 2, "Entry No.", NPRAttrTextArray[2]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 2, Rec."Entry No.", NPRAttrTextArray[2]);
                     end;
                 }
                 field(NPRAttrTextArray_03; NPRAttrTextArray[3])
@@ -117,7 +113,7 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 3, "Entry No.", NPRAttrTextArray[3]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 3, Rec."Entry No.", NPRAttrTextArray[3]);
                     end;
                 }
                 field(NPRAttrTextArray_04; NPRAttrTextArray[4])
@@ -130,7 +126,7 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 4, "Entry No.", NPRAttrTextArray[4]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 4, Rec."Entry No.", NPRAttrTextArray[4]);
                     end;
                 }
                 field(NPRAttrTextArray_05; NPRAttrTextArray[5])
@@ -143,7 +139,7 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 5, "Entry No.", NPRAttrTextArray[5]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 5, Rec."Entry No.", NPRAttrTextArray[5]);
                     end;
                 }
                 field(NPRAttrTextArray_06; NPRAttrTextArray[6])
@@ -156,7 +152,7 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 6, "Entry No.", NPRAttrTextArray[6]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 6, Rec."Entry No.", NPRAttrTextArray[6]);
                     end;
                 }
                 field(NPRAttrTextArray_07; NPRAttrTextArray[7])
@@ -169,7 +165,7 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 7, "Entry No.", NPRAttrTextArray[7]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 7, Rec."Entry No.", NPRAttrTextArray[7]);
                     end;
                 }
                 field(NPRAttrTextArray_08; NPRAttrTextArray[8])
@@ -182,7 +178,7 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 8, "Entry No.", NPRAttrTextArray[8]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 8, Rec."Entry No.", NPRAttrTextArray[8]);
                     end;
                 }
                 field(NPRAttrTextArray_09; NPRAttrTextArray[9])
@@ -195,7 +191,7 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 9, "Entry No.", NPRAttrTextArray[9]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 9, Rec."Entry No.", NPRAttrTextArray[9]);
                     end;
                 }
                 field(NPRAttrTextArray_10; NPRAttrTextArray[10])
@@ -208,7 +204,7 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 10, "Entry No.", NPRAttrTextArray[10]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 10, Rec."Entry No.", NPRAttrTextArray[10]);
                     end;
                 }
             }
@@ -226,7 +222,7 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
                 Caption = 'Confirm & Print';
                 Image = Confirm;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
@@ -242,10 +238,9 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
                 ToolTip = 'Transfer to POS to handle payment.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Pay';
-                Ellipsis = true;
                 Image = Payment;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
@@ -263,7 +258,7 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
                 Caption = 'Print';
                 Image = Print;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
@@ -284,7 +279,7 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
                 Caption = 'Ticket';
                 Image = Navigate;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket List";
                 RunPageLink = "Ticket Reservation Entry No." = FIELD("Entry No.");
@@ -296,17 +291,17 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
     trigger OnAfterGetRecord()
     begin
 
-        NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, DATABASE::"NPR TM Ticket Reservation Req.", "Entry No.");
+        NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, DATABASE::"NPR TM Ticket Reservation Req.", Rec."Entry No.");
         NPRAttrEditable := CurrPage.Editable();
     end;
 
     trigger OnOpenPage()
     begin
 
-        FilterGroup(2);
-        SetFilter("Request Status", '=%1|=%2', "Request Status"::CONFIRMED, "Request Status"::RESERVED);
-        FilterGroup(0);
-        FindFirst();
+        Rec.FilterGroup(2);
+        Rec.SetFilter("Request Status", '=%1|=%2', Rec."Request Status"::CONFIRMED, Rec."Request Status"::RESERVED);
+        Rec.FilterGroup(0);
+        Rec.FindFirst();
 
         NPRAttrManagement.GetAttributeVisibility(DATABASE::"NPR TM Ticket Reservation Req.", NPRAttrVisibleArray);
         NPRAttrVisible01 := NPRAttrVisibleArray[1];
@@ -344,12 +339,12 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
     local procedure ConfirmAndPrint()
     begin
 
-        TestField("Admission Created", true);
-        if ("Payment Option" = "Payment Option"::DIRECT) then
-            Error(NOT_PAID, "External Ticket Number");
+        Rec.TestField("Admission Created", true);
+        if (Rec."Payment Option" = Rec."Payment Option"::DIRECT) then
+            Error(NOT_PAID, Rec."External Ticket Number");
 
-        if ("Request Status" = "Request Status"::RESERVED) then
-            "Request Status" := "Request Status"::CONFIRMED;
+        if (Rec."Request Status" = Rec."Request Status"::RESERVED) then
+            Rec."Request Status" := Rec."Request Status"::CONFIRMED;
 
         PrintTicket();
     end;
@@ -357,8 +352,8 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
     local procedure CreatePosSale()
     begin
 
-        if ("Payment Option" <> "Payment Option"::DIRECT) then
-            Error(TICKET_IS_PAID, "External Ticket Number");
+        if (Rec."Payment Option" <> Rec."Payment Option"::DIRECT) then
+            Error(TICKET_IS_PAID, Rec."External Ticket Number");
     end;
 
     local procedure PrintTicket()
@@ -367,8 +362,8 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
         Ticket: Record "NPR TM Ticket";
     begin
 
-        TestField("Admission Created", true);
-        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', "Entry No.");
+        Rec.TestField("Admission Created", true);
+        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', Rec."Entry No.");
         Ticket.FindFirst();
 
         TicketManagement.PrintSingleTicket(Ticket);

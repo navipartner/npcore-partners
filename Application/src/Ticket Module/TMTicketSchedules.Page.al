@@ -5,7 +5,7 @@ page 6060118 "NPR TM Ticket Schedules"
     SourceTable = "NPR TM Admis. Schedule";
     UsageCategory = Administration;
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-
+    PromotedActionCategories = 'New,Process,Report,Navigate';
     layout
     {
         area(content)
@@ -216,7 +216,7 @@ page 6060118 "NPR TM Ticket Schedules"
                     trigger OnDrillDown()
                     begin
                         CurrPage.SaveRecord;
-                        TestField("Admission Base Calendar Code");
+                        Rec.TestField("Admission Base Calendar Code");
                         CalendarMgmt.ShowCustomizedCalendar(CustomizedCalendarChangeTemp);
                     end;
                 }
@@ -236,7 +236,7 @@ page 6060118 "NPR TM Ticket Schedules"
                 Image = WorkCenter;
                 Promoted = true;
                 PromotedOnly = true;
-                PromotedCategory = Process;
+                PromotedCategory = Category4;
                 PromotedIsBig = true;
 
             }

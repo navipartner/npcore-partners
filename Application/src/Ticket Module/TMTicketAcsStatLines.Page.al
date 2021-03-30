@@ -1,36 +1,22 @@
 page 6060117 "NPR TM Ticket Acs. Stat.Lines"
 {
-    // NPR4.14/TSA/20150803/CASE214262 - Initial Version
-    // TM1.00/TSA/20151217  CASE 219658-01 NaviPartner Ticket Management
-    // TM1.07/TSA/20160125  CASE 232495 Admission Code as a fact in ticket statistics
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // TM1.14/TSA/20160520  CASE 240358 Fixed various features witht the RTC version of Access Statistics Matrix
-    // TM1.15/TSA/20160603  CASE 242771 Transport TM1.15 - 1 June 2016
-    // #278050/TSA/20170525  CASE 278049 Fixing issues report by OMA
-    // TM1.22/TSA/20170606  CASE 279257 Prefill Column Filter with blocked facts, filter string length changed to text
-    // TM1.23/TSA /20170719 CASE 279257 Fixed minor issues with blocking facts
-    // TM1.26/TSA /20171120 CASE 293916 Added AdmissionDefinition variable to defined what gets counted
-    // TM1.36/TSA /20180727 CASE 323024 Added dimension variant code
-    // TM1.39/TSA /20190103 CASE 341289 Hide lines with zero admission
-
     Caption = 'Ticket Access Stat. Lines';
     Editable = false;
     PageType = ListPart;
     SourceTable = "Dimension Code Buffer";
     UsageCategory = None;
-
     layout
     {
         area(content)
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Name field';
@@ -199,18 +185,7 @@ page 6060117 "NPR TM Ticket Acs. Stat.Lines"
         MATRIX_CurrentColumnOrdinal: Integer;
     begin
 
-        //-TM1.39 [341289]
-        // MATRIX_CurrentColumnOrdinal := 0;
-        // WHILE (MATRIX_CurrentColumnOrdinal < MATRIX_CurrentNoOfMatrixColumn) DO BEGIN
-        //  MATRIX_CurrentColumnOrdinal := MATRIX_CurrentColumnOrdinal + 1;
-        //  MATRIX_OnAfterGetRecord (MATRIX_CurrentColumnOrdinal);
-        // END;
-        // MATRIX_OnAfterGetRecord (MATRIX_MaxNoOfMatrixColumn);
-        //+TM1.39 [341289]
-
         LINE_Total := DisplayCellValue(0, 0, false);
-        //IF (ColumnFactOption = ColumnFactOption::PERIOD) THEN
-        //  LINE_Total := '';
     end;
 
     trigger OnFindRecord(Which: Text): Boolean
@@ -218,16 +193,11 @@ page 6060117 "NPR TM Ticket Acs. Stat.Lines"
         Found: Boolean;
         MATRIX_CurrentColumnOrdinal: Integer;
     begin
-        //-TM1.39 [341289]
-        // EXIT (TicketAdmissionStatisticsMgr.FindRec (LineFactOption, Rec, Which, TicketFactLineFilter,
-        //                                            PeriodType, PeriodFilter, PeriodInitialized, InternalDateFilter));
-
         Found := TicketAdmissionStatisticsMgr.FindRec(LineFactOption, Rec, Which, TicketFactLineFilter, PeriodType, PeriodFilter, PeriodInitialized, InternalDateFilter);
         if (Found) then
             MATRIX_OnAfterGetRecord(MATRIX_MaxNoOfMatrixColumn);
 
         exit(Rec.Visible and Found);
-        //+TM1.39 [341289]
     end;
 
     trigger OnNextRecord(Steps: Integer): Integer
@@ -235,10 +205,6 @@ page 6060117 "NPR TM Ticket Acs. Stat.Lines"
         Step: Integer;
         MATRIX_CurrentColumnOrdinal: Integer;
     begin
-        //-TM1.39 [341289]
-        // EXIT (TicketAdmissionStatisticsMgr.NextRec (LineFactOption, Rec, Steps, TicketFactLineFilter,
-        //                                            PeriodType, PeriodFilter));
-
         repeat
             Step := TicketAdmissionStatisticsMgr.NextRec(LineFactOption, Rec, Steps, TicketFactLineFilter, PeriodType, PeriodFilter);
 
@@ -248,7 +214,6 @@ page 6060117 "NPR TM Ticket Acs. Stat.Lines"
         until ((Rec.Visible) or (Step = 0));
 
         exit(Step);
-        //+TM1.39 [341289]
     end;
 
     var
@@ -305,9 +270,6 @@ page 6060117 "NPR TM Ticket Acs. Stat.Lines"
         CurrentColumnOrdinal: Integer;
     begin
 
-        //-TM1.39 [341289]
-        //MATRIX_CellData[MATRIX_ColumnOrdinal] := DisplayCellValue (0, MATRIX_ColumnOrdinal, TRUE);
-
         CurrentColumnOrdinal := 0;
         while (CurrentColumnOrdinal < MATRIX_NumberOfColumns) do begin
             CurrentColumnOrdinal += 1;
@@ -315,7 +277,7 @@ page 6060117 "NPR TM Ticket Acs. Stat.Lines"
 
             Rec.Visible := ((Rec.Visible) or (not HideLinesWithZeroAdmitted) or (MATRIX_CellData[CurrentColumnOrdinal] <> ''));
         end;
-        //+TM1.39 [341289]
+
     end;
 
     procedure Load(MatrixColumns1: array[32] of Text[80]; var MatrixRecords1: array[12] of Record "Dimension Code Buffer"; CurrentNoOfMatrixColumns: Integer; pLineDimOption: Integer; pColumnDimOption: Integer; pDisplayOption: Option; pPeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period"; pAdmissionDefinition: Option)
@@ -348,25 +310,21 @@ page 6060117 "NPR TM Ticket Acs. Stat.Lines"
                 TicketFactLineFilter.SetFilter("Fact Code", DateFactFilter);
             LineFactOption::ADMISSION_HOUR:
                 TicketFactLineFilter.SetFilter("Fact Code", HourFactFilter);
-            //-TM1.36 [323024]
             LineFactOption::VARIANT_CODE:
                 TicketFactLineFilter.SetFilter("Fact Code", VariantCodeFactFilter);
-        //+TM1.36 [323024]
         end;
     end;
 
     procedure SetFilters(pItemFactFilter: Text; pTicketTypeFactFilter: Text; pAdmissionDateFactFilter: Text; pAdmissionHourFactFilter: Text; pAdmissionCodeFactFilter: Text; pVariantCodeFactFilter: Text; pBlockedItemFactFilter: Text; pBlockedTicketTypeFactFilter: Text; pBlockedDateFactFilter: Text; pBlockedHourFactFilter: Text; pBlockedAdmissionFactFilter: Text; pBlockedVariantCodeFactFilter: Text; pHideLinesWithZeroAdmitted: Boolean)
     begin
-        Reset();
+        Rec.Reset();
 
         ItemFactFilter := FilterAndFilter(pItemFactFilter, pBlockedItemFactFilter);
         TicketTypeFactFilter := FilterAndFilter(pTicketTypeFactFilter, pBlockedTicketTypeFactFilter);
         DateFactFilter := FilterAndFilter(pAdmissionDateFactFilter, pBlockedDateFactFilter);
         HourFactFilter := FilterAndFilter(pAdmissionHourFactFilter, pBlockedHourFactFilter);
         AdmissionCodeFactFilter := FilterAndFilter(pAdmissionCodeFactFilter, pBlockedAdmissionFactFilter);
-        //-TM1.36 [323024]
         VariantCodeFactFilter := FilterAndFilter(pVariantCodeFactFilter, pBlockedVariantCodeFactFilter);
-        //+TM1.36 [323024]
 
         TicketStatisticsFilter.Reset();
         TicketStatisticsFilter.SetFilter("Item No. Filter", ItemFactFilter);
@@ -374,9 +332,7 @@ page 6060117 "NPR TM Ticket Acs. Stat.Lines"
         TicketStatisticsFilter.SetFilter("Admission Date Filter", DateFactFilter);
         TicketStatisticsFilter.SetFilter("Admission Hour Filter", HourFactFilter);
         TicketStatisticsFilter.SetFilter("Admission Code Filter", AdmissionCodeFactFilter);
-        //-TM1.36 [323024]
         TicketStatisticsFilter.SetFilter("Variant Code Filter", VariantCodeFactFilter);
-        //+TM1.36 [323024]
 
         TicketDrilldownFilter.Reset();
         TicketDrilldownFilter.SetFilter("Item No.", ItemFactFilter);
@@ -384,13 +340,9 @@ page 6060117 "NPR TM Ticket Acs. Stat.Lines"
         TicketDrilldownFilter.SetFilter("Admission Date", DateFactFilter);
         TicketDrilldownFilter.SetFilter("Admission Hour", HourFactFilter);
         TicketDrilldownFilter.SetFilter("Admission Code", AdmissionCodeFactFilter);
-        //-TM1.36 [323024]
         TicketDrilldownFilter.SetFilter("Variant Code", VariantCodeFactFilter);
-        //+TM1.36 [323024]
 
-        //-TM1.39 [341289]
         HideLinesWithZeroAdmitted := pHideLinesWithZeroAdmitted;
-        //+TM1.39 [341289]
     end;
 
     local procedure FilterAndFilter(pFilter1: Text; pFilter2: Text) newFilter: Text

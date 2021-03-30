@@ -69,7 +69,7 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
 
     actions
     {
-        area(processing)
+        area(Navigation)
         {
             action("Previous Set")
             {
@@ -77,15 +77,12 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
                 Caption = 'Previous Set';
                 Image = PreviousSet;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
-                PromotedIsBig = true;
                 ToolTip = 'Previous Set';
-
 
                 trigger OnAction()
                 begin
-
                     MATRIX_GenerateColumnCaptions(MATRIX_Step::Previous);
                     MATRIX_UpdateSubpage();
                 end;
@@ -96,15 +93,12 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
                 Caption = 'Previous Column';
                 Image = PreviousRecord;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
-                PromotedIsBig = true;
                 ToolTip = 'Previous Set';
-
 
                 trigger OnAction()
                 begin
-
                     MATRIX_GenerateColumnCaptions(MATRIX_Step::PreviousColumn);
                     MATRIX_UpdateSubpage();
                 end;
@@ -115,11 +109,9 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
                 Caption = 'Next Column';
                 Image = NextRecord;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
-                PromotedIsBig = true;
                 ToolTip = 'Next Set';
-
 
                 trigger OnAction()
                 begin
@@ -134,11 +126,9 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
                 Caption = 'Next Set';
                 Image = NextSet;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
-                PromotedIsBig = true;
                 ToolTip = 'Next Set';
-
 
                 trigger OnAction()
                 begin
@@ -146,22 +136,17 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
                     MATRIX_UpdateSubpage();
                 end;
             }
-        }
-        area(navigation)
-        {
+
             action(Statistics)
             {
                 ToolTip = 'Navigate to Ticket Statistics';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Ticket Statistics';
-                Ellipsis = true;
                 Image = Statistics;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = "Report";
-                PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket Acc. Stat. Mtrx";
-
             }
         }
     }

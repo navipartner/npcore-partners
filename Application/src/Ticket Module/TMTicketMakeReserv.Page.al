@@ -114,15 +114,15 @@ page 6060113 "NPR TM Ticket Make Reserv."
                         ResponseMessage: Text;
                     begin
                         //-TM1.45 [382535]
-                        if ("Admission Inclusion" = "Admission Inclusion"::NOT_SELECTED) then
+                        if (Rec."Admission Inclusion" = Rec."Admission Inclusion"::NOT_SELECTED) then
                             Error(QTY_NOT_EDITABLE);
                         //+TM1.45 [382535]
 
-                        if (Quantity < 1) then
+                        if (Rec.Quantity < 1) then
                             Error(QTY_MUST_BE_GT_ZERO);
 
-                        if (xRec.Quantity <> Quantity) then
-                            ChangeQuantity(Quantity);
+                        if (xRec.Quantity <> Rec.Quantity) then
+                            ChangeQuantity(Rec.Quantity);
 
                         CurrPage.Update(false);
                     end;
@@ -139,13 +139,13 @@ page 6060113 "NPR TM Ticket Make Reserv."
                     begin
 
                         if (xRec."Admission Inclusion" = xRec."Admission Inclusion"::REQUIRED) then
-                            Error(NOT_EDITABLE, FieldCaption("Admission Inclusion"));
+                            Error(NOT_EDITABLE, Rec.FieldCaption("Admission Inclusion"));
 
                         if (Rec."Admission Inclusion" = Rec."Admission Inclusion"::REQUIRED) then
-                            Error(NOT_EDITABLE, FieldCaption("Admission Inclusion"));
+                            Error(NOT_EDITABLE, Rec.FieldCaption("Admission Inclusion"));
 
                         if (xRec."Admission Inclusion" <> xRec."Admission Inclusion"::REQUIRED) and (Rec."Admission Inclusion" = Rec."Admission Inclusion"::REQUIRED) then
-                            Error(NOT_REQUIRED, FieldCaption("Admission Inclusion"));
+                            Error(NOT_REQUIRED, Rec.FieldCaption("Admission Inclusion"));
 
                         if (xRec."Admission Inclusion" = xRec."Admission Inclusion"::NOT_SELECTED) and (Rec."Admission Inclusion" <> xRec."Admission Inclusion") then begin
                             CurrentEntryNo := Rec."Entry No.";
@@ -178,7 +178,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
                     trigger OnValidate()
                     begin
 
-                        Rec.ModifyAll("Customer No.", "Customer No.");
+                        Rec.ModifyAll("Customer No.", Rec."Customer No.");
                         CurrPage.Update(false);
 
                         gReservationEdited := true;
@@ -194,7 +194,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
                     trigger OnValidate()
                     begin
 
-                        Rec.ModifyAll("External Order No.", "External Order No.");
+                        Rec.ModifyAll("External Order No.", Rec."External Order No.");
                         CurrPage.Update(false);
 
                         gReservationEdited := true;
@@ -210,7 +210,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
                     trigger OnValidate()
                     begin
 
-                        ModifyAll("Payment Option", "Payment Option");
+                        Rec.ModifyAll("Payment Option", Rec."Payment Option");
                         CurrPage.Update(false);
 
                         gReservationEdited := true;
@@ -233,7 +233,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
 
                         //-TM1.45 [380754]
                         if (Rec."Waiting List Reference Code" <> '') then
-                            if (not TicketWaitingListMgr.GetWaitingListAdmSchEntry("Waiting List Reference Code", CreateDateTime(Today, Time), false, AdmissionScheduleEntry, TicketWaitingList, ResponseMessage)) then
+                            if (not TicketWaitingListMgr.GetWaitingListAdmSchEntry(Rec."Waiting List Reference Code", CreateDateTime(Today, Time), false, AdmissionScheduleEntry, TicketWaitingList, ResponseMessage)) then
                                 Error(ResponseMessage);
 
                         if (Rec."Waiting List Reference Code" = '') then begin
@@ -257,7 +257,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
 
                         end;
 
-                        Modify();
+                        Rec.Modify();
                         gReservationEdited := true;
                         CurrPage.Update(false);
 
@@ -328,7 +328,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
                 var
                     AdmissionSchManagement: Codeunit "NPR TM Admission Sch. Mgt.";
                 begin
-                    AdmissionSchManagement.CreateAdmissionSchedule("Admission Code", false, Today);
+                    AdmissionSchManagement.CreateAdmissionSchedule(Rec."Admission Code", false, Today);
                 end;
             }
         }
@@ -347,13 +347,13 @@ page 6060113 "NPR TM Ticket Make Reserv."
             else
                 gConfirmStatusText := STATUS_CONFIRMED;
 
-        gDisallowReschedule := NOT IsRescheduleAllowed("External Adm. Sch. Entry No.");
+        gDisallowReschedule := NOT IsRescheduleAllowed(Rec."External Adm. Sch. Entry No.");
     end;
 
     trigger OnModifyRecord(): Boolean
     begin
 
-        if (("Request Status" = "Request Status"::CONFIRMED) and ("Admission Created")) then
+        if ((Rec."Request Status" = Rec."Request Status"::CONFIRMED) and (Rec."Admission Created")) then
             Error('Confirmed admissions can not be altered.');
     end;
 
@@ -363,7 +363,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
         if (CloseAction = ACTION::LookupOK) then begin
 
             if (gBatchTicketCreateMode) then
-                if (Rec."Payment Option" <> "Payment Option"::DIRECT) then begin
+                if (Rec."Payment Option" <> Rec."Payment Option"::DIRECT) then begin
                     Rec.TestField("External Order No.");
                     Rec.TestField("Customer No.");
                 end;
@@ -443,15 +443,15 @@ page 6060113 "NPR TM Ticket Make Reserv."
         ToDate: Date;
     begin
 
-        if (NOT IsRescheduleAllowed("External Adm. Sch. Entry No.")) then
+        if (NOT IsRescheduleAllowed(Rec."External Adm. Sch. Entry No.")) then
             Error(RESCHEDULE_NOT_ALLOWED);
 
-        AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', "Admission Code");
+        AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', Rec."Admission Code");
         AdmissionScheduleEntry.SetFilter("Admission Start Date", '>=%1', Today);
         AdmissionScheduleEntry.SetFilter("Admission Is", '=%1', AdmissionScheduleEntry."Admission Is"::OPEN);
         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
 
-        if TMAdmission.Get("Admission Code") then begin
+        if TMAdmission.Get(Rec."Admission Code") then begin
             if (TMAdmission."POS Schedule Selection Date F." <> "0DF") then begin
                 ToDate := CalcDate(TMAdmission."POS Schedule Selection Date F.", Today);
 
@@ -462,12 +462,12 @@ page 6060113 "NPR TM Ticket Make Reserv."
         end;
 
         Clear(PageScheduleEntry);
-        PageScheduleEntry.FillPage(AdmissionScheduleEntry, Quantity, gTicketItemNo, gTicketVariantCode);
+        PageScheduleEntry.FillPage(AdmissionScheduleEntry, Rec.Quantity, gTicketItemNo, gTicketVariantCode);
         PageScheduleEntry.LookupMode(true);
         PageAction := PageScheduleEntry.RunModal();
 
         if ((PageAction = ACTION::Yes) or (PageAction = ACTION::LookupOK)) then begin
-            OldEntryNo := "External Adm. Sch. Entry No.";
+            OldEntryNo := Rec."External Adm. Sch. Entry No.";
             PageScheduleEntry.GetRecord(AdmissionScheduleEntry);
 
             Rec."External Adm. Sch. Entry No." := AdmissionScheduleEntry."External Schedule Entry No.";
@@ -492,7 +492,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
 
             ConfirmOverlappingTimes(Rec."Entry No.", Rec."External Adm. Sch. Entry No.");
 
-            if (OldEntryNo <> "External Adm. Sch. Entry No.") then begin
+            if (OldEntryNo <> Rec."External Adm. Sch. Entry No.") then begin
                 gReservationEdited := true;
 
             end;
@@ -593,7 +593,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
 
         gReservationEdited := false;
         gBatchTicketCreateMode := (Rec."Payment Option" <> Rec."Payment Option"::DIRECT);
-        gChangeRequestMode := ("Entry Type" = "Entry Type"::CHANGE);
+        gChangeRequestMode := (Rec."Entry Type" = Rec."Entry Type"::CHANGE);
         gPrimaryRequestMode := not gChangeRequestMode;
 
         if (ShowDifferentDatesWarning) then

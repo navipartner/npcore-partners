@@ -1,27 +1,5 @@
 table 6060116 "NPR TM Ticket Reservation Req."
 {
-    // NPR4.16/TSA/20150803 TM1.00 Ticket Initial Version
-    // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
-    // TM1.04/TSA/20160115  CASE 231834 General Issues
-    // TM1.05/TSA/20160119  CASE 232250 Added Ext. Line Reference No.
-    // TM1.08/TSA/20160222  CASE 235208 Added new Field Ext. Member No. for referencing a reservation made by members
-    // TM1.08/TSA/20160222  CASE 235208 Added new Admission Code to identify ticket specifics
-    // TM1.09/TSA/20160301  CASE 235860 Sell event tickets in POS
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // TM1.15/TSA/20160513  CASE 240864 Cancel Ticket Request
-    // TM1.16/TSA/20160622  CASE 245004 Added field email and external order no.
-    // TM1.17/TSA/20160913  CASE 251883 Added SMS as Notification Method
-    // TM1.17/TSA/20161025  CASE 256152 Conform to OMA Guidelines
-    // TM1.22/TSA/20170526  CASE 278142 Added field Payment Option, Customer No.
-    // TM1.23/TSA /20170717 CASE 284248 Added Request Option "Reserved"
-    // TM1.23/TSA /20170718 CASE 284248 Added Field Primary Request Line Boolean
-    // TM1.26/TSA /20171102 CASE 285601 Added Field "DIY Print Order Requested", "DIY Print Order At"
-    // TM1.31/TSA /20180524 CASE 316500 Added key "Request Status", "Expires Date Time", IsEmpty dropped from 650 reads to 4 according to profiler for ExpireReservationRequests()
-    // TM1.43/TSA /20190910 CASE 368043 Added Item No. and Variant Code to make a separation from "External Item Code".
-    // TM1.45/TSA /20191204 CASE 380754 Added Waiting List Reference Code, and request status option "Waiting List"
-    // TM1.45/TSA /20191216 CASE 382535 Added "Admission Inclusion", "Notification Format"
-    // TM1.47/TSA /20200526 CASE 382535 Added "Admission Inclusion Status"
-
     Caption = 'Ticket Reservation Request';
     DataClassification = CustomerContent;
 
@@ -220,7 +198,7 @@ table 6060116 "NPR TM Ticket Reservation Req."
         {
             Caption = 'Is Superseeded';
             FieldClass = FlowField;
-            CalcFormula = Exist ("NPR TM Ticket Reservation Req." WHERE("Superseeds Entry No." = FIELD("Entry No.")));
+            CalcFormula = Exist("NPR TM Ticket Reservation Req." WHERE("Superseeds Entry No." = FIELD("Entry No.")));
             Editable = false;
         }
         field(129; "Authorization Code"; Code[10])

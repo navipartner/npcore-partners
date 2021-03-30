@@ -11,6 +11,7 @@ page 6059785 "NPR TM Ticket List"
     UsageCategory = Lists;
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
     AdditionalSearchTerms = 'Issued Tickets';
+    PromotedActionCategories = 'New,Process,Report,Navigate';
 
     layout
     {
@@ -147,24 +148,24 @@ page 6059785 "NPR TM Ticket List"
     {
         area(processing)
         {
+        }
+        area(navigation)
+        {
             action("Create eTicket")
             {
-                ToolTip = 'Create and send ticket to wallet.';
+                ToolTip = 'Create and send ticket to wallet';
                 ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 Caption = 'Create eTicket';
                 Image = ElectronicNumber;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedIsBig = true;
-
+                PromotedCategory = Process;
 
                 trigger OnAction()
                 begin
                     CreateETicket();
                 end;
-            }
-            separator(Separator6014403)
-            {
             }
             action("Block/Unblock Tickets")
             {
@@ -172,7 +173,10 @@ page 6059785 "NPR TM Ticket List"
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Block/Unblock Tickets';
                 Image = Change;
-
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedIsBig = true;
+                PromotedCategory = Process;
 
                 trigger OnAction()
                 begin
@@ -184,9 +188,11 @@ page 6059785 "NPR TM Ticket List"
                 ToolTip = 'Prevents the tickets from being used (irreversible).';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Revoke Ticket';
-                Ellipsis = true;
                 Image = RemoveLine;
-
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedIsBig = true;
+                PromotedCategory = Process;
 
                 trigger OnAction()
                 begin
@@ -198,29 +204,27 @@ page 6059785 "NPR TM Ticket List"
                 Caption = 'Change Ticket Reservation';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 ToolTip = 'Change the time slots that the ticket is valid for.';
-                Ellipsis = true;
                 Image = Reserve;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedIsBig = true;
+                PromotedCategory = Process;
+
                 trigger OnAction()
                 begin
                     ChangeTicketReservation();
                 end;
             }
-        }
-        area(navigation)
-        {
+
             action("Access Entries")
             {
                 ToolTip = 'Navigate to ticket access entries.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Access Entries';
-                Ellipsis = true;
                 Image = EntriesList;
                 Promoted = true;
-				PromotedOnly = true;
-                PromotedCategory = Process;
+                PromotedOnly = true;
+                PromotedCategory = Category4;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket AccessEntry List";
                 RunPageLink = "Ticket No." = FIELD("No.");
@@ -230,13 +234,11 @@ page 6059785 "NPR TM Ticket List"
             {
                 ToolTip = 'Edit ticket holder.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                Caption = 'Ticketholder';
-                Ellipsis = true;
+                Caption = 'Ticket Holder';
                 Image = WIPEntries;
                 Promoted = true;
-				PromotedOnly = true;
-                PromotedCategory = Process;
-
+                PromotedOnly = true;
+                PromotedCategory = Category4;
 
                 trigger OnAction()
                 begin
@@ -248,11 +250,10 @@ page 6059785 "NPR TM Ticket List"
                 ToolTip = 'Navigate to Ticket Request.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Ticket Request';
-                Ellipsis = true;
                 Image = Navigate;
                 Promoted = true;
-				PromotedOnly = true;
-                PromotedCategory = Process;
+                PromotedOnly = true;
+                PromotedCategory = Category4;
 
                 trigger OnAction()
                 begin
@@ -261,9 +262,6 @@ page 6059785 "NPR TM Ticket List"
 
 
             }
-            separator(Separator6014406)
-            {
-            }
             action("View Online Ticket")
             {
                 ToolTip = 'Display the ticket as created on ticket server.';
@@ -271,9 +269,8 @@ page 6059785 "NPR TM Ticket List"
                 Caption = 'View Online Ticket';
                 Image = Web;
                 Promoted = true;
-				PromotedOnly = true;
-                PromotedCategory = Process;
-
+                PromotedOnly = true;
+                PromotedCategory = Category4;
 
                 trigger OnAction()
                 var
@@ -288,14 +285,22 @@ page 6059785 "NPR TM Ticket List"
                 ToolTip = 'Navigate to ticket notification entries.';
                 ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 Caption = 'View Ticket Notifications';
-                Ellipsis = true;
                 Image = ElectronicNumber;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Category4;
                 RunObject = Page "NPR TM Ticket Notif. Entry";
                 RunPageLink = "Ticket No." = FIELD("No.");
 
             }
-            separator(Separator6014407)
+            action(TicketBom)
             {
+                ToolTip = 'Navigate to ticket admission bill-of-material.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Caption = 'Ticket Admission BOM';
+                Image = BOM;
+                RunObject = Page "NPR TM Ticket BOM";
+                RunPageLink = "Item No." = FIELD("Item No.");
             }
             action("Print Selected Tickets")
             {
@@ -304,16 +309,15 @@ page 6059785 "NPR TM Ticket List"
                 Caption = 'Print Selected Tickets';
                 Image = Print;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
                 ShortCutKey = 'Shift+Ctrl+P';
-
 
                 trigger OnAction()
                 var
                     Ticket: Record "NPR TM Ticket";
                     Ticket2: Record "NPR TM Ticket";
                 begin
-
                     CurrPage.SetSelectionFilter(Ticket);
                     Ticket.FindSet();
                     repeat
@@ -329,8 +333,32 @@ page 6059785 "NPR TM Ticket List"
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Issued Tickets';
                 Image = Print;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = "Report";
                 RunObject = Report "NPR Issued Tickets";
-
+            }
+            action(Statistics)
+            {
+                ToolTip = 'Navigate to Ticket Statistics';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Caption = 'Ticket Statistics';
+                Image = Statistics;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = "Report";
+                RunObject = Page "NPR TM Ticket Acc. Stat. Mtrx";
+            }
+            action(Forecast)
+            {
+                ToolTip = 'Navigate to Admission Forecast.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Caption = 'Admission Forecast';
+                Image = Forecast;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = "Report";
+                RunObject = Page "NPR TM Admis. Forecast Matrix";
             }
         }
     }

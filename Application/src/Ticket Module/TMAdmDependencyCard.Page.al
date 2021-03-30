@@ -14,13 +14,13 @@ page 6014484 "NPR TM Adm. Dependency Card"
             {
                 Caption = 'Admission Dependency Rule';
 
-                field("Dependency Code"; "Dependency Code")
+                field("Dependency Code"; Rec."Dependency Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Dependency Code field';
                 }
 
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Description field';

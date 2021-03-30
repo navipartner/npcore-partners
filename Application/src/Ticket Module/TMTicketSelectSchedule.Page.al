@@ -10,7 +10,7 @@ page 6060112 "NPR TM Ticket Select Schedule"
     SourceTable = "NPR TM Admis. Schedule Entry";
     SourceTableTemporary = true;
     SourceTableView = SORTING("Admission Start Date", "Admission Start Time");
-    Usagecategory = None;
+    UsageCategory = None;
 
     layout
     {
@@ -18,20 +18,20 @@ page 6060112 "NPR TM Ticket Select Schedule"
         {
             repeater(Group)
             {
-                field("Schedule Code"; "Schedule Code")
+                field("Schedule Code"; Rec."Schedule Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Schedule Code field';
                 }
-                field("Admission Code"; "Admission Code")
+                field("Admission Code"; Rec."Admission Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Admission Code field';
                 }
-                field("Admission Start Date"; "Admission Start Date")
+                field("Admission Start Date"; Rec."Admission Start Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
@@ -39,7 +39,7 @@ page 6060112 "NPR TM Ticket Select Schedule"
                     StyleExpr = CalendarExceptionText = '';
                     ToolTip = 'Specifies the value of the Admission Start Date field';
                 }
-                field("Admission Start Time"; "Admission Start Time")
+                field("Admission Start Time"; Rec."Admission Start Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;

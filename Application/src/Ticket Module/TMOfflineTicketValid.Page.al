@@ -15,46 +15,46 @@ page 6060093 "NPR TM Offline Ticket Valid."
         {
             repeater(Group)
             {
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Entry No. field';
                 }
-                field("Ticket Reference Type"; "Ticket Reference Type")
+                field("Ticket Reference Type"; Rec."Ticket Reference Type")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Ticket Reference Type field';
                 }
-                field("Ticket Reference No."; "Ticket Reference No.")
+                field("Ticket Reference No."; Rec."Ticket Reference No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Ticket Reference No. field';
                 }
-                field("Admission Code"; "Admission Code")
+                field("Admission Code"; Rec."Admission Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Admission Code field';
                 }
-                field("Member Reference Type"; "Member Reference Type")
+                field("Member Reference Type"; Rec."Member Reference Type")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Member Reference Type field';
                 }
-                field("Member Reference No."; "Member Reference No.")
+                field("Member Reference No."; Rec."Member Reference No.")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Member Reference No. field';
                 }
-                field("Event Type"; "Event Type")
+                field("Event Type"; Rec."Event Type")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Event Type field';
                 }
-                field("Event Date"; "Event Date")
+                field("Event Date"; Rec."Event Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Event Date field';
@@ -75,7 +75,7 @@ page 6060093 "NPR TM Offline Ticket Valid."
                         //+TM90.1.46 [383196]
                     end;
                 }
-                field("Event Time"; "Event Time")
+                field("Event Time"; Rec."Event Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Event Time field';
@@ -96,7 +96,7 @@ page 6060093 "NPR TM Offline Ticket Valid."
                         //+TM90.1.46 [383196]
                     end;
                 }
-                field("Process Status"; "Process Status")
+                field("Process Status"; Rec."Process Status")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Process Status field';
@@ -116,22 +116,22 @@ page 6060093 "NPR TM Offline Ticket Valid."
                         //+TM90.1.46 [383196]
                     end;
                 }
-                field("Process Response Text"; "Process Response Text")
+                field("Process Response Text"; Rec."Process Response Text")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Process Response Text field';
                 }
-                field("Import Reference No."; "Import Reference No.")
+                field("Import Reference No."; Rec."Import Reference No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Import Reference No. field';
                 }
-                field("Imported At"; "Imported At")
+                field("Imported At"; Rec."Imported At")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Imported At field';
                 }
-                field("Import Reference Name"; "Import Reference Name")
+                field("Import Reference Name"; Rec."Import Reference Name")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Import Reference Name field';
@@ -159,7 +159,7 @@ page 6060093 "NPR TM Offline Ticket Valid."
                 trigger OnAction()
                 begin
 
-                    OfflineTicketValidation.ProcessEntry("Entry No.");
+                    OfflineTicketValidation.ProcessEntry(Rec."Entry No.");
                     CurrPage.Update(false);
                 end;
             }
@@ -178,7 +178,7 @@ page 6060093 "NPR TM Offline Ticket Valid."
                 trigger OnAction()
                 begin
 
-                    OfflineTicketValidation.ProcessImportBatch("Import Reference No.");
+                    OfflineTicketValidation.ProcessImportBatch(Rec."Import Reference No.");
                     CurrPage.Update(false);
                 end;
             }
@@ -205,7 +205,7 @@ page 6060093 "NPR TM Offline Ticket Valid."
     trigger OnOpenPage()
     begin
 
-        SetFilter("Process Status", '<>%1', "Process Status"::VALID);
+        Rec.SetFilter("Process Status", '<>%1', Rec."Process Status"::VALID);
     end;
 
     var
