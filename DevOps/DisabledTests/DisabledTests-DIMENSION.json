@@ -1,0 +1,5 @@
+[
+    { "codeunitId": 134076,"codeunitName": "ERM Suggest Vendor Payment","method": "PaymentBySuggestVendorPayment" },
+    { "codeunitId": 134476,"codeunitName": "ERM Dimension Purchase","method": "DimensionOnInvoiceRounding" },
+    { "codeunitId": 134483,"codeunitName": "ERM Change Global Dimensions","method": "T113_ActionPrepareOpensSessionListPagefromNotification" }    
+]

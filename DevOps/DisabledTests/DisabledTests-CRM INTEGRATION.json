@@ -1,0 +1,7 @@
+[
+    { "codeunitId": 139165,"codeunitName": "Integration Table Synch. Test","method": "MappingPageInvokeSynchonizeAllClearsModifiedOnDateTimes" },
+    { "codeunitId": 139194,"codeunitName": "CDS Connection Wizard Tests","method": "CDSConnectionWizardAllowsAnyServerAddressNoSetup" },
+    { "codeunitId": 139194,"codeunitName": "CDS Connection Wizard Tests","method": "CDSConnectionWizardAllowsAnyServerAddressSetupExists" },
+    { "codeunitId": 139194,"codeunitName": "CDS Connection Wizard Tests","method": "VerifyWizardActionBack" },
+    { "codeunitId": 139194,"codeunitName": "CDS Connection Wizard Tests","method": "VerifyWizardEmptyClientIDAndSecretError" }
+]

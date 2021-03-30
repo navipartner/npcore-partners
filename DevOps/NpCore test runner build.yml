@@ -12,6 +12,7 @@ resources:
   - repository: scriptsRepo
     type: git
     name: 'NpCore/NpDevOps'
+    ref: 'refs/heads/releases/1.0'
 
 pool:
   name: NP Core Pipelines
@@ -22,92 +23,122 @@ pool:
   - Agent.OS -equals Windows_NT
   - Agent.OSVersion -equals 10.0.17763
 
-variables:
-  containerName: Build-$(Build.BuildId)
-  serverInstanceName: BC
-  containerAdminUsername: admin
-  containerAdminPassword: P@ssword1
-
-jobs:
-- template: YAML/Templates/Job/CreateBCContainer.yml@scriptsRepo
+extends:
+  template: YAML/Templates/Build/TestRunnerBuild.yml@scriptsRepo
   parameters:
-    timeoutInMinutes: 900
-    containerImageName: mcr.microsoft.com/businesscentral:10.0.17763.1757
-    pipelineConfig: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/PipelineConfig.json'
-    containerName: $(containerName)
-    serverInstanceName: $(serverInstanceName)
-    containerAdminUsername: $(containerAdminUsername) 
-    containerAdminPassword: $(containerAdminPassword)
-    licenseSecureFileName: 'DEV_BC OP 17.flf'
-    scriptsRepo: ScriptsRepo
-    stepList:
-    - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
-      parameters:
-        containerName: $(containerName)
-        containerAdminUsername: $(containerAdminUsername)
-        containerAdminPassword: $(containerAdminPassword)
-        serverInstanceName: $(serverInstanceName)
-        alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Application       
-        dependancies:
-        - package:
-            source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
-            id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
-            destinationPath: '$(ServiceTierFolder)/Add-Ins'
+    testApps:
+    - name: Microsoft_Tests-Misc
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Misc.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-MISC.json'
+      #disabledTests: '@{CodeunitName = "Page Troubleshooting Test"; Method = "*"},@{CodeunitName = "Profile Import/Export Test"; Method = "*"}' # skip CU138696 and CU138697 because of session issues
+    - name: Microsoft_Tests-Bank
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Bank.app'
+    - name: Microsoft_Tests-Cash_Flow
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Cash Flow.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-CASH FLOW.json'
+    - name: Microsoft_Tests-Cost_Accounting
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Cost Accounting.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-COST ACCOUNTING.json'
+    - name: Microsoft_Tests-CRM_integration
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-CRM integration.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-CRM INtEGRATION.json'
+    - name: Microsoft_Tests-Data_Exchange
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Data Exchange.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-DATA EXCHANGE.json'
+    - name: Microsoft_Tests-Dimension
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Dimension.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-DIMENSION.json'
+    - name: Microsoft_Tests-ERM
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-ERM.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-ERM.json'      
+    - name: Microsoft_Tests-Fixed_Asset
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Fixed Asset.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-FIXED ASSETS.json'      
+    - name: Microsoft_Tests-General_Journal
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-General Journal.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-GENERAL JOURNAL.json'      
+    - name: Microsoft_Tests-Graph
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Graph.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-GRAPH.json'            
+    - name: Microsoft_Tests-Integration
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Integration.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-INTEGRATION.json'      
+    - name: Microsoft_Tests-Invoicing
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Invoicing.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-INVOICING.json'      
+    - name: Microsoft_Tests-Job
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Job.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-JOB.json'      
+    - name: Microsoft_Tests-Local
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Local.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-LOCAL.json'      
+    - name: Microsoft_Tests-Marketing
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Marketing.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-MARKETING.json'
+    - name: Microsoft_Tests-Permissions
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Permissions.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-PERMISSIONS.json'      
+    - name: Microsoft_Tests-Physical_Inventory
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Physical Inventory.app'      
+    - name: Microsoft_Tests-Prepayment
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Prepayment.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-PREPAYMENT.json'      
+    - name: Microsoft_Tests-Rapid_Start
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Rapid Start.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-RAPID START.json'      
+    - name: Microsoft_Tests-Report
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Report.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-REPORT.json'     
+    - name: Microsoft_Tests-Resource
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Resource.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-RESOURCE.json'      
+    - name: Microsoft_Tests-Reverse
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Reverse.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-REVERSE.json'      
+    - name: Microsoft_Tests-SCM
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-SCM.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-SCM.json'      
+    # - name: Microsoft_Tests-SINGLESERVER
+    #   appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-SINGLESERVER.app' Freddy always skips this app in his scripts?!
+    - name: Microsoft_Tests-SMB
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-SMB.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-SMB.json'      
+    - name: Microsoft_Tests-SMTP
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-SMTP.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-SMTP.json'      
+    - name: Microsoft_Tests-Upgrade
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Upgrade.app'
+    - name: Microsoft_Tests-User
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-User.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-USER.json'      
+    - name: Microsoft_Tests-VAT
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-VAT.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-VAT.json'      
+    - name: Microsoft_Tests-Workflow
+      appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Workflow.app'
+      disabledTestsJsonFile: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/DisabledTests/DisabledTests-WORKFLOW.json'      
 
-    - template: YAML/Templates/Step/HandleDependancies.yml@scriptsRepo 
-      parameters:
-        dependancies:
-        - appsToDeploy:
-          - path: 'C:\Applications\TestFramework\TestRunner\Microsoft_Test Runner.app'
-          - path: 'C:\Applications\TestFramework\TestLibraries\Assert\Microsoft_Library Assert.app'
-          - path: 'C:\Applications\TestFramework\TestLibraries\Any\Microsoft_Any.app'
-          - path: 'C:\Applications\TestFramework\TestLibraries\Variable Storage\Microsoft_Library Variable Storage.app'
-          - path: 'C:\Applications\system application\test\Microsoft_System Application Test Library.app'
-          - path: 'C:\Applications\baseapp\test\Microsoft_Tests-TestLibraries.app'
-        - package:
-            source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NPCoreTestFixture/nuget/v3/index.json'
-            id: NaviPartner.NPCore.TestFixture.BC160
-            destinationPath: '$(Agent.TempDirectory)/TestFixture/'
-          appsToDeploy:
-            - path: '$(Agent.TempDirectory)/TestFixture/Test_Fixture_Initializer.app'
-        serverInstanceName: $(serverInstanceName)
-
-    - template: YAML/Templates/Step/SetupAndRunTests.yml@scriptsRepo
-      parameters:
-        serverInstanceName: $(serverInstanceName)
-        username: $(containerAdminUsername)
-        password: $(containerAdminPassword)
-        testRunName: 'Microsoft Base App tests'
-        testApps:
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Misc.app'
-            disabledTests: '@{CodeunitName = "Page Troubleshooting Test"; Method = "*"},@{CodeunitName = "Profile Import/Export Test"; Method = "*"}' # skip CU138696 and CU138697 because of session issues
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Bank.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Cash Flow.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Cost Accounting.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-CRM integration.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Data Exchange.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Dimension.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-ERM.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Fixed Asset.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-General Journal.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Graph.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Integration.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Invoicing.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Job.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Local.app'
-          # - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Marketing.app' Microsoft.Dynamics.Nav.Integration.Office.Mock assembly missing
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Permissions.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Physical Inventory.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Prepayment.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Rapid Start.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Report.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Resource.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Reverse.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-SCM.app'
-          # - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-SINGLESERVER.app' Freddy always skips this app in his scripts?!
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-SMB.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-SMTP.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Upgrade.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-User.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-VAT.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Workflow.app'
+    dependancies:
+    - appsToDeploy:
+      - path: 'C:\Applications\TestFramework\TestRunner\Microsoft_Test Runner.app'
+      - path: 'C:\Applications\TestFramework\TestLibraries\Any\Microsoft_Any.app'      
+      - path: 'C:\Applications\TestFramework\TestLibraries\Assert\Microsoft_Library Assert.app'
+      - path: 'C:\Applications\TestFramework\TestLibraries\Variable Storage\Microsoft_Library Variable Storage.app'
+      - path: 'C:\Applications\system application\test\Microsoft_System Application Test Library.app'      
+      - path: 'C:\Applications\baseapp\test\Microsoft_Tests-TestLibraries.app'            
+    - package:
+        source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
+        id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
+        destinationPath: '$(ServiceTierFolder)/Add-Ins'    
+    - package:
+        source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NpCore/nuget/v3/index.json'
+        id: NaviPartner.NPCore.BC170
+        destinationPath: '$(Agent.TempDirectory)/NpRetail/'
+      appsToDeploy:
+        - path: '$(Agent.TempDirectory)/NpRetail/Np_Retail.app'              
+    - package:
+        source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NPCoreTestFixture/nuget/v3/index.json'
+        id: NaviPartner.NPCore.TestFixture.BC160
+        destinationPath: '$(Agent.TempDirectory)/TestFixture/'
+      appsToDeploy:
+        - path: '$(Agent.TempDirectory)/TestFixture/Test_Fixture_Initializer.app'

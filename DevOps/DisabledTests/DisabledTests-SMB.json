@@ -1,0 +1,21 @@
+[
+    { "codeunitId": 138003,"codeunitName": "O365 Sales Calc Disc By Type","method": "GetCustInvoiceDiscPctWhenInvDiscTypeIsAmount" },
+    { "codeunitId": 138009,"codeunitName": "O365 Customer Statistics","method": "AmountOnOrders" },
+    { "codeunitId": 138009,"codeunitName": "O365 Customer Statistics","method": "AmountOnQuotes" },
+    { "codeunitId": 138009,"codeunitName": "O365 Customer Statistics","method": "AmountOnUnpostedCrMemos " },
+    { "codeunitId": 138009,"codeunitName": "O365 Customer Statistics","method": "AmountOnUnpostedInvoices" },
+    { "codeunitId": 138013,"codeunitName": "O365 Purch. Calc Disc. By Type","method": "GetVendInvoiceDiscPctWhenInvDiscTypeIsAmount" },
+    { "codeunitId": 138021,"codeunitName": "O365 Purchase Invoice Stat.","method": "PurchaseInvoicePaidInTwoPayments" },
+    { "codeunitId": 138054,"codeunitName": "O365 Test Update Cust. Addr.","method": "TestUpdateEmtyCustomerFromInvoice" },
+    { "codeunitId": 139049,"codeunitName": "SMB Office Addin Mgmt Test","method": "DownloadContactInsightsManifestUI" },
+    { "codeunitId": 139049,"codeunitName": "SMB Office Addin Mgmt Test","method": "DownloadDocInsightsManifestUI" },
+    { "codeunitId": 139126,"codeunitName": "O365 Activites Tests","method": "AmountsAreCalculatedWhenLastModifiedIsSetTo0" },
+    { "codeunitId": 139126,"codeunitName": "O365 Activites Tests","method": "AmountsAreRefreshedWhenActivitiesPageIsOpened" },
+    { "codeunitId": 139126,"codeunitName": "O365 Activites Tests","method": "AmountsAreRefreshedWhenDataIsStale" },
+    { "codeunitId": 139126,"codeunitName": "O365 Activites Tests","method": "CalcOverdueSalesInvoiceAmount" },
+    { "codeunitId": 139126,"codeunitName": "O365 Activites Tests","method": "CalcSalesThisMonthAmount" },
+    { "codeunitId": 139126,"codeunitName": "O365 Activites Tests","method": "DrillDownCalcOverdueSalesInvoiceAmount" },
+    { "codeunitId": 139126,"codeunitName": "O365 Activites Tests","method": "DrillDownSalesThisMonth" },
+    { "codeunitId": 139126,"codeunitName": "O365 Activites Tests","method": "OverduePurchInvoiceRemainingAmountLCYSortingTest" },
+    { "codeunitId": 139126,"codeunitName": "O365 Activites Tests","method": "OverdueSalesInvoiceRemainingAmountLCYSortingTest" }        
+]

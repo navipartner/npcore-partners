@@ -1,0 +1,4 @@
+[
+    { "codeunitId": 139017,"codeunitName": "SMTP Mail Test","method": "SetupThroughKeyVaultSetupTest" },
+    { "codeunitId": 139022,"codeunitName": "SMTP Page Tests","method": "SetupThroughKeyVaultSetupTest" }        
+]

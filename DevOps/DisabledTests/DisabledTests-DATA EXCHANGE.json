@@ -1,0 +1,7 @@
+[
+    { "codeunitId": 132543,"codeunitName": "Data Exch. Def UT","method": "CheckLineTypesExport" },
+    { "codeunitId": 134161,"codeunitName": "Pmt Export Mgt Gen. Jnl Test","method": "ExportPmtJnlLineNotApplied" },
+    { "codeunitId": 139154,"codeunitName": "Incoming Doc. To Data Exch.UT","method": "TestPeppolImportFails" },
+    { "codeunitId": 139154,"codeunitName": "Incoming Doc. To Data Exch.UT","method": "TestPeppolInvoiceImportLCY" },
+    { "codeunitId": 139154,"codeunitName": "Incoming Doc. To Data Exch.UT","method": "TestPeppolInvoiceToGenJnlLineLCY" }    
+]

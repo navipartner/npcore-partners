@@ -1,0 +1,10 @@
+[
+    { "codeunitId": 134306,"codeunitName": "Copy Workflow Tests","method": "TestCopyEnabledWorkflowToWorkflow" },
+    { "codeunitId": 134306,"codeunitName": "Copy Workflow Tests","method": "TestCopyFirstWorkflowToWorkflow" },
+    { "codeunitId": 134306,"codeunitName": "Copy Workflow Tests","method": "TestCopyTemplateToFirstWorkflow" },
+    { "codeunitId": 134306,"codeunitName": "Copy Workflow Tests","method": "TestCopyTemplateToWorkflowMultipleExist" },
+    { "codeunitId": 134306,"codeunitName": "Copy Workflow Tests","method": "TestCopyWorkflowToWorkflowMultipleExist" },
+    { "codeunitId": 134307,"codeunitName": "Cust. App. Setup Wizard Tests","method": "TestRecordChangeApprovalWizardRunFromList" },
+    { "codeunitId": 134308,"codeunitName": "Item App. Setup Wizard Tests","method": "TestRecordChangeApprovalWizardRunFromCard" },
+    { "codeunitId": 139027,"codeunitName": "Test Background Posting","method": "*" }        
+]

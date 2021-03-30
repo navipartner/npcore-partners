@@ -1,0 +1,6 @@
+[
+    { "codeunitId": 134140,"codeunitName": "ERM Bank Acc Ledger Reversal","method": "BankAccount36x105mm2Columns" },
+    { "codeunitId": 134140,"codeunitName": "ERM Bank Acc Ledger Reversal","method": "BankAccount37x105mm2Columns" },
+    { "codeunitId": 134140,"codeunitName": "ERM Bank Acc Ledger Reversal","method": "BankAccount37x70mm3Columns" },
+    { "codeunitId": 134140,"codeunitName": "ERM Bank Acc Ledger Reversal","method": "BankAccountLabel36x70mm3Columns" }        
+]
