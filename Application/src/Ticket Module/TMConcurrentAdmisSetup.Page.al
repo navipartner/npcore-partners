@@ -1,6 +1,5 @@
 page 6151136 "NPR TM Concurrent Admis. Setup"
 {
-    // TM1.45/TSA/20200122  CASE 385922 Transport TM1.45 - 22 January 2020
 
     Caption = 'Concurrent Admission Setup';
     PageType = List;
@@ -14,27 +13,27 @@ page 6151136 "NPR TM Concurrent Admis. Setup"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Total Capacity"; "Total Capacity")
+                field("Total Capacity"; Rec."Total Capacity")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Total Capacity field';
                 }
-                field("Capacity Control"; "Capacity Control")
+                field("Capacity Control"; Rec."Capacity Control")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Capacity Control field';
                 }
-                field("Concurrency Type"; "Concurrency Type")
+                field("Concurrency Type"; Rec."Concurrency Type")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Concurrency Type field';

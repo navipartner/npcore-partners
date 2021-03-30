@@ -1,7 +1,7 @@
 page 6151133 "NPR TM Ticket Wizard"
 {
     Caption = 'Ticket Setup Wizard';
-    DataCaptionExpression = Description;
+    DataCaptionExpression = Rec.Description;
     DataCaptionFields = Description;
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -175,10 +175,7 @@ page 6151133 "NPR TM Ticket Wizard"
                 ToolTip = 'Navigate to Template List';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Config. Template List';
-                Ellipsis = true;
                 Image = Template;
-                //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedIsBig = true;
                 RunObject = Page "Config. Template List";
                 RunPageView = WHERE("Table ID" = FILTER(6059784 .. 6060130));
 

@@ -23,37 +23,37 @@ page 6060111 "NPR TM Ticket Quick Stats"
             repeater(Group)
             {
                 Editable = false;
-                field("Admission Code"; "Admission Code")
+                field("Admission Code"; Rec."Admission Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Admission Code field';
                 }
-                field("Admission Start Date"; "Admission Start Date")
+                field("Admission Start Date"; Rec."Admission Start Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Admission Start Date field';
                 }
-                field("Admission Start Time"; "Admission Start Time")
+                field("Admission Start Time"; Rec."Admission Start Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Admission Start Time field';
                 }
-                field("Admission End Time"; "Admission End Time")
+                field("Admission End Time"; Rec."Admission End Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Admission End Time field';
                 }
-                field("Open Reservations"; "Open Reservations")
+                field("Open Reservations"; Rec."Open Reservations")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Open Reservations field';
                 }
-                field("Open Admitted"; "Open Admitted")
+                field("Open Admitted"; Rec."Open Admitted")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Open Admitted field';
                 }
-                field(Departed; Departed)
+                field(Departed; Rec.Departed)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Departed field';
@@ -74,7 +74,7 @@ page 6060111 "NPR TM Ticket Quick Stats"
 
     trigger OnAfterGetRecord()
     begin
-        AdmittedCount := "Open Admitted" + Departed;
+        AdmittedCount := Rec."Open Admitted" + Rec.Departed;
     end;
 
     trigger OnOpenPage()

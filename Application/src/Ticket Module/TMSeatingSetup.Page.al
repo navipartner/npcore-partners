@@ -1,7 +1,5 @@
 page 6151130 "NPR TM Seating Setup"
 {
-    // TM1.45/TSA /20191113 CASE 322432 Initial Version
-
     Caption = 'Seating Setup';
     PageType = List;
     SourceTable = "NPR TM Seating Setup";
@@ -14,22 +12,22 @@ page 6151130 "NPR TM Seating Setup"
         {
             repeater(Group)
             {
-                field("Admission Code"; "Admission Code")
+                field("Admission Code"; Rec."Admission Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Admission Code field';
                 }
-                field("Seat Numbering"; "Seat Numbering")
+                field("Seat Numbering"; Rec."Seat Numbering")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Seat Numbering field';
                 }
-                field("Row Numbering"; "Row Numbering")
+                field("Row Numbering"; Rec."Row Numbering")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Row Numbering field';
                 }
-                field("Template Cache"; "Template Cache")
+                field("Template Cache"; Rec."Template Cache")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Template Cache field';
@@ -59,7 +57,7 @@ page 6151130 "NPR TM Seating Setup"
                     SeatingManagement: Codeunit "NPR TM Seating Mgt.";
                 begin
 
-                    SeatingManagement.ShowSeatingTemplate("Admission Code");
+                    SeatingManagement.ShowSeatingTemplate(Rec."Admission Code");
                 end;
             }
         }

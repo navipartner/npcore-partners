@@ -1,12 +1,9 @@
 page 6151132 "NPR TM Seating Wizard"
 {
-    // TM1.45/TSA/20200122  CASE 322432-01 Transport TM1.45 - 22 January 2020
-
     Caption = 'Seating Wizard';
     PageType = Worksheet;
     SourceTable = "Integer";
     UsageCategory = None;
-
     layout
     {
         area(content)

@@ -1,138 +1,137 @@
 page 6060121 "NPR TM Ticket BOM"
 {
-
     Caption = 'Ticket BOM';
     PageType = List;
     SourceTable = "NPR TM Ticket Admission BOM";
     UsageCategory = Administration;
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
     ContextSensitiveHelpPage = 'pages/viewpage.action?pageId=284917767#TicketManagement-_Toc516786672TicketAdmissionBOM';
-
+    PromotedActionCategories = 'New,Process,Report,Create Tickets,Navigate';
     layout
     {
         area(content)
         {
             repeater(Group)
             {
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Item No. field';
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field("Admission Code"; "Admission Code")
+                field("Admission Code"; Rec."Admission Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Admission Code field';
                 }
-                field(Default; Default)
+                field(Default; Rec.Default)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Default field';
                 }
-                field("Sales From Date"; "Sales From Date")
+                field("Sales From Date"; Rec."Sales From Date")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Sales From Date field';
                 }
-                field("Sales Until Date"; "Sales Until Date")
+                field("Sales Until Date"; Rec."Sales Until Date")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Sales Until Date field';
                 }
-                field("Enforce Schedule Sales Limits"; "Enforce Schedule Sales Limits")
+                field("Enforce Schedule Sales Limits"; Rec."Enforce Schedule Sales Limits")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Enforce Schedule Sales Limits field';
                 }
-                field("Admission Entry Validation"; "Admission Entry Validation")
+                field("Admission Entry Validation"; Rec."Admission Entry Validation")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Admission Entry Validation field';
                 }
-                field("Activation Method"; "Activation Method")
+                field("Activation Method"; Rec."Activation Method")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Activation Method field';
                 }
-                field("Percentage of Adm. Capacity"; "Percentage of Adm. Capacity")
+                field("Percentage of Adm. Capacity"; Rec."Percentage of Adm. Capacity")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Percentage of Adm. Capacity field';
                 }
-                field("Max No. Of Entries"; "Max No. Of Entries")
+                field("Max No. Of Entries"; Rec."Max No. Of Entries")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Max No. Of Entries field';
                 }
-                field("Admission Dependency Code"; "Admission Dependency Code")
+                field("Admission Dependency Code"; Rec."Admission Dependency Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Admission Dependency Code field';
                 }
-                field("Revisit Condition (Statistics)"; "Revisit Condition (Statistics)")
+                field("Revisit Condition (Statistics)"; Rec."Revisit Condition (Statistics)")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Revisit Condition (Statistics) field';
                 }
-                field("Duration Formula"; "Duration Formula")
+                field("Duration Formula"; Rec."Duration Formula")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Duration Formula field';
                 }
-                field("Allow Rescan Within (Sec.)"; "Allow Rescan Within (Sec.)")
+                field("Allow Rescan Within (Sec.)"; Rec."Allow Rescan Within (Sec.)")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Allow Rescan Within (Sec.) field';
                 }
-                field("Prefered Sales Display Method"; "Prefered Sales Display Method")
+                field("Prefered Sales Display Method"; Rec."Prefered Sales Display Method")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Prefered Sales Display Method field';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Admission Description"; "Admission Description")
+                field("Admission Description"; Rec."Admission Description")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Admission Description field';
                 }
-                field("Reschedule Policy"; "Reschedule Policy")
+                field("Reschedule Policy"; Rec."Reschedule Policy")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Reschedule Policy field';
                 }
-                field("Reschedule Cut-Off (Hours)"; "Reschedule Cut-Off (Hours)")
+                field("Reschedule Cut-Off (Hours)"; Rec."Reschedule Cut-Off (Hours)")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Reschedule Cut-Off (Hours) field';
                 }
-                field("Revoke Policy"; "Revoke Policy")
+                field("Revoke Policy"; Rec."Revoke Policy")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Revoke Policy field';
                 }
-                field("Refund Price %"; "Refund Price %")
+                field("Refund Price %"; Rec."Refund Price %")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Refund Price % field';
                 }
-                field("Ticket Base Calendar Code"; "Ticket Base Calendar Code")
+                field("Ticket Base Calendar Code"; Rec."Ticket Base Calendar Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Ticket Base Calendar Code field';
@@ -147,21 +146,21 @@ page 6060121 "NPR TM Ticket BOM"
                     trigger OnDrillDown()
                     begin
                         CurrPage.SaveRecord;
-                        TestField("Ticket Base Calendar Code");
+                        Rec.TestField("Ticket Base Calendar Code");
                         CalendarMgmt.ShowCustomizedCalendar(CustomizedCalendarChangeTemp);
                     end;
                 }
-                field("Publish As eTicket"; "Publish As eTicket")
+                field("Publish As eTicket"; Rec."Publish As eTicket")
                 {
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Publish As eTicket field';
                 }
-                field("eTicket Type Code"; "eTicket Type Code")
+                field("eTicket Type Code"; Rec."eTicket Type Code")
                 {
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the eTicket Type Code field';
                 }
-                field("Publish Ticket URL"; "Publish Ticket URL")
+                field("Publish Ticket URL"; Rec."Publish Ticket URL")
                 {
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Publish Ticket URL field';
@@ -174,20 +173,7 @@ page 6060121 "NPR TM Ticket BOM"
     {
         area(navigation)
         {
-            action(Admissions)
-            {
-                ToolTip = 'Navigate to Admissions Setup';
-                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                Caption = 'Admissions';
-                Image = WorkCenter;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                RunObject = Page "NPR TM Ticket Admissions";
-
-            }
-            action("Ticket Setup")
+            Action("Ticket Setup")
             {
                 ToolTip = 'Navigate to ticket setup.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -195,35 +181,99 @@ page 6060121 "NPR TM Ticket BOM"
                 Image = Setup;
                 Promoted = true;
                 PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
+                PromotedCategory = Category5;
                 RunObject = Page "NPR TM Ticket Setup";
-
+            }
+            Action(IssuedTickets)
+            {
+                ToolTip = 'Navigate to Issued Tickets';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Caption = 'Issued Tickets';
+                Image = Navigate;
+                RunObject = Page "NPR TM Ticket List";
+                RunPageLink = "Item No." = field("Item No.");
+            }
+            Action(Admissions)
+            {
+                ToolTip = 'Navigate to Admission Setup';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Caption = 'Admission';
+                Image = WorkCenter;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Category5;
+                RunObject = Page "NPR TM Ticket Admissions";
+                RunPageLink = "Admission Code" = field("Admission Code");
+            }
+            Action(AdmissionsSchedules)
+            {
+                ToolTip = 'Navigate to Admission Schedules';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Caption = 'Admission Schedules';
+                Image = CalendarWorkcenter;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Category5;
+                RunObject = Page "NPR TM Admis. Schedule Lines";
+                RunPageLink = "Admission Code" = field("Admission Code");
+            }
+            Action(AdmissionsSchedulesEntries)
+            {
+                ToolTip = 'Navigate to Admission Schedule Entries';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Caption = 'Schedule Entries';
+                Image = WorkCenterLoad;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Category5;
+                RunObject = Page "NPR TM Admis. Schedule Entry";
+                RunPageLink = "Admission Code" = field("Admission Code");
+            }
+            Action(TicketType)
+            {
+                ToolTip = 'Navigate to Ticket Type';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Caption = 'Ticket Types';
+                Image = Category;
+                RunObject = Page "NPR TM Ticket Type";
+            }
+            action(Items)
+            {
+                ToolTip = 'Navigate to Item List.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Caption = 'Items';
+                Image = ItemLines;
+                RunObject = Page "Item List";
+                RunPageLink = "No." = field("Item No.");
             }
         }
-        area(processing)
+        area(Creation)
         {
-            action("Create Prepaid Tickets")
+            Action("Create Prepaid Tickets")
             {
                 ToolTip = 'Create a set of tickets for which payment has already been handled. (F.ex. free tickets.) ';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Create Prepaid Tickets';
                 Image = PrepaymentInvoice;
-
-
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Category4;
+                PromotedIsBig = true;
                 trigger OnAction()
                 begin
                     MakeTickets(TicketPaymentType::PREPAID);
                 end;
             }
-            action("Create Postpaid Tickets")
+            Action("Create Postpaid Tickets")
             {
                 ToolTip = 'Create a set of tickets that can be invoiced after ticket has been used.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Create Postpaid Tickets';
                 Image = Invoice;
-
-
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Category4;
+                PromotedIsBig = true;
                 trigger OnAction()
                 begin
                     MakeTickets(TicketPaymentType::POSTPAID);
@@ -236,8 +286,8 @@ page 6060121 "NPR TM Ticket BOM"
     begin
         Clear(CustomizedCalendarChangeTemp);
         CustomizedCalendarChangeTemp."Source Type" := CustomizedCalendarChangeTemp."Source Type"::Service;
-        CustomizedCalendarChangeTemp."Source Code" := "Admission Code";
-        CustomizedCalendarChangeTemp."Base Calendar Code" := "Ticket Base Calendar Code";
+        CustomizedCalendarChangeTemp."Source Code" := Rec."Admission Code";
+        CustomizedCalendarChangeTemp."Base Calendar Code" := Rec."Ticket Base Calendar Code";
         if (not CustomizedCalendarChangeTemp.Insert()) then;
     end;
 
@@ -265,11 +315,9 @@ page 6060121 "NPR TM Ticket BOM"
         ShowPrompt: Boolean;
     begin
 
-        //-#308962 [308962] Refactored
-
         Token := TicketRequestManager.GetNewToken();
 
-        if (not FinalizeReservation(CreateTicketRequest(PaymentType, Token, "Item No.", "Variant Code"), "Item No.", "Variant Code")) then begin
+        if (not FinalizeReservation(CreateTicketRequest(PaymentType, Token, Rec."Item No.", Rec."Variant Code"), Rec."Item No.", Rec."Variant Code")) then begin
             TicketRequestManager.DeleteReservationRequest(Token, true);
             exit;
         end;
@@ -307,8 +355,8 @@ page 6060121 "NPR TM Ticket BOM"
             if (Confirm(OFFLINE_VALIDATION)) then begin
                 ImportReferenceNo := OfflineTicketValidationMgr.AddRequestToOfflineValidation(TicketReservationRequest);
                 OfflineTicketValidation.SetFilter("Import Reference No.", '=%1', ImportReferenceNo);
-                Commit;
-                PAGE.RunModal(PAGE::"NPR TM Offline Ticket Valid.", OfflineTicketValidation);
+                Commit();
+                Page.RunModal(Page::"NPR TM Offline Ticket Valid.", OfflineTicketValidation);
             end;
         end;
 
@@ -317,11 +365,9 @@ page 6060121 "NPR TM Ticket BOM"
             TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
             TicketReservationRequest.FindFirst();
             Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
-            Commit;
-            PAGE.Run(PAGE::"NPR TM Ticket List", Ticket);
+            Commit();
+            Page.Run(Page::"NPR TM Ticket List", Ticket);
         end;
-
-        //+#308962 [308962] end refactor
     end;
 
     local procedure CreateTicketRequest(PaymentType: Option; Token: Text; ItemNo: Code[20]; VariantCode: Code[10]): Text
@@ -341,17 +387,11 @@ page 6060121 "NPR TM Ticket BOM"
             TicketReservationRequest."Entry No." := 0;
             TicketReservationRequest."Session Token ID" := Token;
 
-            //-#308962 [308962]
-            // TicketReservationRequest.Quantity := 1;
             TicketReservationRequest.Quantity := GetDefaultQuantity(PaymentType);
-            //+#308962 [308962]
 
             TicketReservationRequest."External Item Code" := TicketRequestManager.GetExternalNo(ItemNo, VariantCode);
-            //-TM1.43 [368043]
             TicketReservationRequest."Item No." := ItemNo;
             TicketReservationRequest."Variant Code" := VariantCode;
-            //+TM1.43 [368043]
-
             TicketReservationRequest."Admission Code" := TicketAdmissionBOM."Admission Code";
             TicketReservationRequest."Admission Description" := TicketAdmissionBOM."Admission Description";
             if (TicketReservationRequest."Admission Description" = '') then
@@ -360,40 +400,38 @@ page 6060121 "NPR TM Ticket BOM"
             TicketReservationRequest."Created Date Time" := CurrentDateTime;
             TicketReservationRequest.Insert();
         until (TicketAdmissionBOM.Next() = 0);
-        Commit;
+        Commit();
 
         exit(Token);
     end;
 
     local procedure FinalizeReservation(Token: Text; ItemNo: Code[20]; VariantCode: Code[10]): Boolean
     var
-        DisplayTicketeservationRequest: Page "NPR TM Ticket Make Reserv.";
+        DisplayTicketReservationRequest: Page "NPR TM Ticket Make Reserv.";
         ResponseMessage: Text;
         PageAction: Action;
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
     begin
 
         repeat
-            Clear(DisplayTicketeservationRequest);
-            DisplayTicketeservationRequest.LoadTicketRequest(Token);
-            DisplayTicketeservationRequest.SetTicketItem(ItemNo, VariantCode);
-            //-TM90.1.46 [386850]
-            DisplayTicketeservationRequest.SetIgnoreScheduleSelectionFilter(true);
-            //+TM90.1.46 [386850]
+            Clear(DisplayTicketReservationRequest);
+            DisplayTicketReservationRequest.LoadTicketRequest(Token);
+            DisplayTicketReservationRequest.SetTicketItem(ItemNo, VariantCode);
+            DisplayTicketReservationRequest.SetIgnoreScheduleSelectionFilter(true);
 
-            DisplayTicketeservationRequest.AllowQuantityChange(true);
-            DisplayTicketeservationRequest.LookupMode(true);
-            DisplayTicketeservationRequest.Editable(true);
+            DisplayTicketReservationRequest.AllowQuantityChange(true);
+            DisplayTicketReservationRequest.LookupMode(true);
+            DisplayTicketReservationRequest.Editable(true);
 
             if (ResponseMessage <> '') then
                 if (not Confirm(SCHEDULE_ERROR, true, ResponseMessage)) then
                     exit(false);
 
-            PageAction := DisplayTicketeservationRequest.RunModal();
-            if (PageAction <> ACTION::LookupOK) then
+            PageAction := DisplayTicketReservationRequest.RunModal();
+            if (PageAction <> Action::LookupOK) then
                 exit(false);
 
-        until (DisplayTicketeservationRequest.FinalizeReservationRequest(false, ResponseMessage) = 0);
+        until (DisplayTicketReservationRequest.FinalizeReservationRequest(false, ResponseMessage) = 0);
 
         exit(true);
     end;
@@ -402,7 +440,6 @@ page 6060121 "NPR TM Ticket BOM"
     var
         TicketSetup: Record "NPR TM Ticket Setup";
     begin
-        //-#308962 [308962]
         if (not TicketSetup.Get()) then;
 
         if (PaymentType = TicketPaymentType::PREPAID) then
@@ -425,7 +462,6 @@ page 6060121 "NPR TM Ticket BOM"
                     ShowPrompt := true;
             end;
 
-        //+#308962 [308962]
     end;
 
     local procedure ShowOfflineValidationPrompt(PaymentType: Option) ShowPrompt: Boolean
@@ -433,7 +469,6 @@ page 6060121 "NPR TM Ticket BOM"
         TicketSetup: Record "NPR TM Ticket Setup";
     begin
 
-        //-#308962 [308962]
         if (not TicketSetup.Get()) then;
 
         if (PaymentType = TicketPaymentType::PREPAID) then
@@ -449,7 +484,6 @@ page 6060121 "NPR TM Ticket BOM"
         if (PaymentType = TicketPaymentType::POSTPAID) then
             ShowPrompt := false;
 
-        //+#308962 [308962]
     end;
 
     local procedure ShowTicketResultList(PaymentType: Option) ShowPrompt: Boolean
@@ -457,7 +491,6 @@ page 6060121 "NPR TM Ticket BOM"
         TicketSetup: Record "NPR TM Ticket Setup";
     begin
 
-        //-#308962 [308962]
         if (not TicketSetup.Get()) then;
 
         if (PaymentType = TicketPaymentType::PREPAID) then
@@ -480,7 +513,6 @@ page 6060121 "NPR TM Ticket BOM"
                     ShowPrompt := true;
             end;
 
-        //+#308962 [308962]
     end;
 
     local procedure ExportToTicketServer(PaymentType: Option) DoExport: Boolean
@@ -488,7 +520,6 @@ page 6060121 "NPR TM Ticket BOM"
         TicketSetup: Record "NPR TM Ticket Setup";
     begin
 
-        //-#308962 [308962]
         if (not TicketSetup.Get()) then;
 
         if (PaymentType = TicketPaymentType::PREPAID) then
@@ -511,7 +542,6 @@ page 6060121 "NPR TM Ticket BOM"
                     DoExport := true;
             end;
 
-        //+#308962 [308962]
     end;
 
     local procedure GetDefaultQuantity(PaymentType: Option): Integer
@@ -519,7 +549,6 @@ page 6060121 "NPR TM Ticket BOM"
         TicketSetup: Record "NPR TM Ticket Setup";
     begin
 
-        //-#308962 [308962]
         if (not TicketSetup.Get()) then
             exit(1);
 
