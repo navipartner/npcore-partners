@@ -1,4 +1,4 @@
-page 6059965 "NPR POS Display Profile"
+page 6059995 "NPR POS Display Profile"
 {
     Caption = 'POS Display Profile';
     PageType = Card;
