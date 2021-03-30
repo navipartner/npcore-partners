@@ -49119,7 +49119,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _dragonglass_capabilities_AppInterface__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dragonglass-capabilities/AppInterface */ "./packages/dragonglass-react/src/dragonglass-capabilities/AppInterface.js");
 
 
-var DRAGONGLASS_VERSION = "6.1.2275.14";
+var DRAGONGLASS_VERSION = "6.1.2279.15";
 var initializeVersion = function initializeVersion() {
   dragonglass_core__WEBPACK_IMPORTED_MODULE_0__["GlobalEventDispatcher"].addEventListener(dragonglass_core__WEBPACK_IMPORTED_MODULE_0__["GLOBAL_EVENTS"].FRAMEWORK_READY, function () {
     return _dragonglass_capabilities_AppInterface__WEBPACK_IMPORTED_MODULE_1__["AppInterface"].invokeFrontEndEvent("announceFrameworkVersion", {
@@ -52077,8 +52077,10 @@ var GridBody = /*#__PURE__*/function (_Component) {
           data = _this$props.data,
           dataSource = _this$props.dataSource,
           dataSourceName = _this$props.dataSourceName,
-          showSelectColumn = _this$props.showSelectColumn;
-      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("tbody", null, data.rows.map(function (row) {
+          showSelectColumn = _this$props.showSelectColumn,
+          reverse = _this$props.reverse;
+      var rows = reverse ? data.rows.reverse() : data.rows;
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("tbody", null, rows.map(function (row) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(_GridRow__WEBPACK_IMPORTED_MODULE_6__["default"], {
           key: row.position,
           position: row.position,
@@ -73808,7 +73810,8 @@ var dataSetMap = {
   state: function state(_state2, ownProps) {
     return {
       dataSource: getDataSourceFromState(ownProps, _state2),
-      data: _state2.data.sets[ownProps.dataSourceName] || emptyDataSet
+      data: _state2.data.sets[ownProps.dataSourceName] || emptyDataSet,
+      reverse: (_state2.options.lineOrderOnScreen || 0) === 1
     };
   }
 };
@@ -80327,4 +80330,4 @@ exports.reducer = dragonglass_redux_1.createReducer(workflows_initial_state_1.in
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.6.1.2275.14.js.map
+//# sourceMappingURL=bundle.6.1.2279.15.js.map

@@ -611,6 +611,7 @@ codeunit 6150702 "NPR POS UI Management"
         Options.Add('nprVersion', LicenseInformation.GetRetailVersion());
         Setup.GetPOSViewProfile(POSViewProfile);
         Options.Add('taxationType', Format(POSViewProfile."Tax Type", 0, 9));
+        Options.Add('lineOrderOnScreen', POSViewProfile."Line Order on Screen");
 
         OnSetOptions(Setup, Options);
 
