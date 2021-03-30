@@ -1,8 +1,5 @@
 page 6059963 "NPR MPOS QR Code FactBox"
 {
-    // NPR5.33/NPKNAV/20170630  CASE 277791 Transport NPR5.33 - 30 June 2017
-    // NPR5.34/CLVA/20170703 CASE 280444 Upgrading MPOS functionality to transcendence
-
     Caption = 'MPOS QR Code FactBox';
     PageType = CardPart;
     UsageCategory = Administration;
@@ -14,7 +11,7 @@ page 6059963 "NPR MPOS QR Code FactBox"
     {
         area(content)
         {
-            field("QR code"; "QR code")
+            field("QR code"; Rec."QR code")
             {
                 ApplicationArea = All;
                 ShowCaption = false;
@@ -33,7 +30,7 @@ page 6059963 "NPR MPOS QR Code FactBox"
                 ShortCutKey = 'Return';
                 ApplicationArea = All;
                 ToolTip = 'Executes the Save To Disk action';
-                Image = Save; 
+                Image = Save;
 
                 trigger OnAction()
                 var
@@ -41,13 +38,13 @@ page 6059963 "NPR MPOS QR Code FactBox"
                     fPath: Text[1024];
                     FileBlob: Codeunit "Temp Blob";
                 begin
-                    if "QR code".HasValue then begin
-                        CalcFields("QR code");
-                        if Company <> '' then
-                            fPath := StringReplace("User ID" + '_' + Company) + '.png'
+                    if Rec."QR code".HasValue then begin
+                        Rec.CalcFields("QR code");
+                        if Rec.Company <> '' then
+                            fPath := StringReplace(Rec."User ID" + '_' + Rec.Company) + '.png'
                         else
-                            fPath := StringReplace("User ID") + '.png';
-                        FileBlob.FromRecord(Rec, FieldNo("QR code"));
+                            fPath := StringReplace(Rec."User ID") + '.png';
+                        FileBlob.FromRecord(Rec, Rec.FieldNo("QR code"));
                         FileManagement.BLOBExport(FileBlob, fPath, true);
                     end;
                 end;

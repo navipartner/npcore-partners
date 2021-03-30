@@ -1,14 +1,8 @@
 table 6059964 "NPR MPOS QR Code"
 {
-    // NPR5.33/NPKNAV/20170630  CASE 277791 Transport NPR5.33 - 30 June 2017
-    // NPR5.34/CLVA/20170703 CASE 280444 Upgrading MPOS functionality to transcendence
-    // NPR5.36/NPKNAV/20171003  CASE 280444-01 Transport NPR5.36 - 3 October 2017
-    // NPR5.42/CLVA/20180302 CASE 304559 Added Company and "Cash Register Id" to the primary key
-
     Caption = 'MPOS QR Code';
     DataClassification = CustomerContent;
     DataPerCompany = false;
-
     fields
     {
         field(1; "User ID"; Code[50])
@@ -95,16 +89,8 @@ table 6059964 "NPR MPOS QR Code"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     var
-        BarCodeType: DotNet NPRNetBarCodeType;
-        BarCodeSettings: DotNet NPRNetBarcodeSettings;
-        BarCodeGenerator: DotNet NPRNetBarCodeGenerator;
-        Image: DotNet NPRNetImage;
-        ImageFormat: DotNet NPRNetImageFormat;
+        BarcodeImageLibrary: Codeunit "NPR Barcode Image Library";
 
     procedure SetDefaults(var MPOSQRCode: Record "NPR MPOS QR Code")
     begin
@@ -203,26 +189,12 @@ table 6059964 "NPR MPOS QR Code"
 
     procedure GenerateBarcode(BarCode: Text; var TempBlob: Codeunit "Temp Blob")
     var
-        MemoryStream: DotNet NPRNetMemoryStream;
-        OutStream: OutStream;
+        QRLbl: Label 'QR', Locked = true;
     begin
-        BarCodeSettings := BarCodeSettings.BarcodeSettings();
-        BarCodeSettings.Data := BarCode;
-
-        BarCodeSettings.X := 2;
-        BarCodeSettings.Y := 2;
-        BarCodeSettings.ShowText := true;
-        BarCodeSettings.UseAntiAlias := true;
-        BarCodeSettings.Type := BarCodeType.QRCode;
-
-        BarCodeGenerator := BarCodeGenerator.BarCodeGenerator(BarCodeSettings);
-        BarCodeSettings.ApplyKey('3YOZI-9N0S5-RD239-JN9R0-WCGL8');
-        Image := BarCodeGenerator.GenerateImage();
-        MemoryStream := MemoryStream.MemoryStream;
-        Image.Save(MemoryStream, ImageFormat.Png);
-        Clear(TempBlob);
-        TempBlob.CreateOutStream(OutStream);
-        CopyStream(OutStream, MemoryStream);
+        BarcodeImageLibrary.SetSizeX(2);
+        BarcodeImageLibrary.SetSizeY(2);
+        BarcodeImageLibrary.SetBarcodeType(QRLbl);
+        BarcodeImageLibrary.GenerateBarcode(BarCode, TempBlob);
     end;
 }
 
