@@ -7,17 +7,14 @@ codeunit 6059965 "NPR MPOS Webservice"
         Clear(WebService);
 
         if not WebService.Get(WebService."Object Type"::Codeunit, 'mpos_service') then begin
-            WebService.Init;
+            WebService.Init();
             WebService."Object Type" := WebService."Object Type"::Codeunit;
             WebService."Service Name" := 'mpos_service';
-            WebService."Object ID" := 6059965;
+            WebService."Object ID" := Codeunit::"NPR MPOS Webservice";
             WebService.Published := true;
-            WebService.Insert;
+            WebService.Insert();
         end;
     end;
-
-    var
-        EmptyJasonResult: Label '{}';
 
     procedure GetCompanyLogo() PictureBase64: Text
     var
@@ -25,7 +22,7 @@ codeunit 6059965 "NPR MPOS Webservice"
         Base64Convert: Codeunit "Base64 Convert";
         InStr: InStream;
     begin
-        CompanyInformation.Get;
+        CompanyInformation.Get();
 
         CompanyInformation.CalcFields(Picture);
         if CompanyInformation.Picture.HasValue then begin
@@ -46,7 +43,7 @@ codeunit 6059965 "NPR MPOS Webservice"
         Base64Convert: Codeunit "Base64 Convert";
         Result: Text;
     begin
-        CompanyInformation.Get;
+        CompanyInformation.Get();
 
         CompanyInformation.CalcFields(Picture);
         if CompanyInformation.Picture.HasValue then begin

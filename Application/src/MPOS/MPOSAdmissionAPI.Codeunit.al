@@ -2,37 +2,39 @@ codeunit 6014493 "NPR MPOS Admission API"
 {
 
     var
-        ActionDescription: Label 'Start Admission API page for Mobile POS.';
-        Err_AdmissionFailed: Label 'Error opening the admission webpage.';
+        ActionDescriptionLbl: Label 'Start Admission API page for Mobile POS.';
+        AdmissionFailedErr: Label 'Error opening the admission webpage.';
 
     local procedure ActionCode(): Text
+    var
+        MposAdmApiLbl: Label 'MPOS_ADMISSION_API', Locked = true;
     begin
-        exit('MPOS_ADMISSION_API');
+        exit(MposAdmApiLbl);
     end;
 
     local procedure ActionVersion(): Text
+    var
+        VersionLbl: Label '1.0', Locked = true;
     begin
-        exit('1.0');
+        exit(VersionLbl);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do begin
-            if DiscoverAction(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion(),
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple) then begin
-                RegisterWorkflowStep('jsbridge', 'respond();');
-                RegisterWorkflow(false);
-                RegisterTextParameter('AdmissionCode', '');
-            end;
+        if Sender.DiscoverAction(
+          ActionCode(),
+          ActionDescriptionLbl,
+          ActionVersion(),
+          Sender.Type::Generic,
+          Sender."Subscriber Instances Allowed"::Multiple) then begin
+            Sender.RegisterWorkflowStep('jsbridge', 'respond();');
+            Sender.RegisterWorkflow(false);
+            Sender.RegisterTextParameter('AdmissionCode', '');
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', true, true)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSBridge: Page "NPR JS Bridge";
@@ -59,13 +61,13 @@ codeunit 6014493 "NPR MPOS Admission API"
             exit;
 
         MPOSProfile.TestField("Ticket Admission Web Url");
-        JSONtext := BuildJSONParams(MPOSProfile."Ticket Admission Web Url", '', '', '', Err_AdmissionFailed);
+        JSONtext := BuildJSONParams(MPOSProfile."Ticket Admission Web Url", '', '', '', AdmissionFailedErr);
 
         JSONMgr.InitializeJObjectParser(Context, FrontEnd);
         AdmissionCode := JSONMgr.GetStringParameter('AdmissionCode');
         JSBridge.SetParameters('Admission', JSONtext, AdmissionCode);
 
-        JSBridge.RunModal;
+        JSBridge.RunModal();
 
     end;
 

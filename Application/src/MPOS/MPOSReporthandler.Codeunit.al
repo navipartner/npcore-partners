@@ -1,7 +1,7 @@
 codeunit 6059976 "NPR MPOS Report handler"
 {
     var
-        Err_CreatePDFFailed: Label 'Error creating PDF report';
+        CreatePDFFailedErr: Label 'Error creating PDF report';
 
     procedure ExecutionHandler(ReportId: Integer; RegisterId: Code[10])
     var
@@ -74,7 +74,7 @@ codeunit 6059976 "NPR MPOS Report handler"
         ReportBlob.CreateInStream(InStr);
         Base64String := Base64Convert.ToBase64(InStr);
 
-        JSON := BuildJSONParams(Filename, '', Base64String, '', Err_CreatePDFFailed);
+        JSON := BuildJSONParams(Filename, '', Base64String, '', CreatePDFFailedErr);
 
         JSBridge.SetParameters('CREATEPDF', JSON, '');
         JSBridge.RunModal;

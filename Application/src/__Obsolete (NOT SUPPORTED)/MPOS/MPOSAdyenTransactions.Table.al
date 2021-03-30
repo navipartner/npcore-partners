@@ -280,9 +280,5 @@ table 6059965 "NPR MPOS Adyen Transactions"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
 

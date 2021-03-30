@@ -5,6 +5,7 @@ table 6059968 "NPR MPOS Nets Transactions"
     ObsoleteState = Removed;
     ObsoleteReason = 'Removing MPOS Payment Gateway';
     ObsoleteTag = 'Removing MPOS Payment Gateway';
+
     fields
     {
         field(1; "Transaction No."; Integer)
@@ -285,10 +286,6 @@ table 6059968 "NPR MPOS Nets Transactions"
         key(Key1; "Transaction No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

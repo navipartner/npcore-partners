@@ -13,48 +13,48 @@ page 6059964 "NPR MPOS QR Code List"
         {
             repeater(Group)
             {
-                field("User ID"; "User ID")
+                field("User ID"; Rec."User ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the User ID field';
                 }
-                field(Password; Password)
+                field(Password; Rec.Password)
                 {
                     ApplicationArea = All;
                     ExtendedDatatype = Masked;
                     ToolTip = 'Specifies the value of the Password field';
                 }
-                field("Client Type"; "Client Type")
+                field("Client Type"; Rec."Client Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Client Type field';
                 }
-                field(Company; Company)
+                field(Company; Rec.Company)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Company field';
                 }
-                field(Tenant; Tenant)
+                field(Tenant; Rec.Tenant)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Tenant field';
                 }
-                field("Payment Gateway"; "Payment Gateway")
+                field("Payment Gateway"; Rec."Payment Gateway")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Payment Gateway field';
                 }
-                field("Cash Register Id"; "Cash Register Id")
+                field("Cash Register Id"; Rec."Cash Register Id")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Unit Id field';
                 }
-                field(Url; Url)
+                field(Url; Rec.Url)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Url field';
                 }
-                field("Webservice Url"; "Webservice Url")
+                field("Webservice Url"; Rec."Webservice Url")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Webservice Url field';
@@ -82,7 +82,7 @@ page 6059964 "NPR MPOS QR Code List"
                 Caption = 'Set Defaults';
                 Image = Add;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -90,7 +90,7 @@ page 6059964 "NPR MPOS QR Code List"
 
                 trigger OnAction()
                 begin
-                    SetDefaults(Rec);
+                    Rec.SetDefaults(Rec);
                 end;
             }
             action("Create QR Code")
@@ -98,7 +98,7 @@ page 6059964 "NPR MPOS QR Code List"
                 Caption = 'Create QR Code';
                 Image = "Action";
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -106,7 +106,7 @@ page 6059964 "NPR MPOS QR Code List"
 
                 trigger OnAction()
                 begin
-                    CreateQRCode(Rec);
+                    Rec.CreateQRCode(Rec);
                 end;
             }
         }

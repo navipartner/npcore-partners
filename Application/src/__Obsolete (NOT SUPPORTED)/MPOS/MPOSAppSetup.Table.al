@@ -81,8 +81,4 @@ table 6059966 "NPR MPOS App Setup"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
