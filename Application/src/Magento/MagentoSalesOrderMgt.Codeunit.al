@@ -1133,13 +1133,14 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
 
     end;
 
-    local procedure SendOrderConfirmation(XmlElement: XmlElement; SalesHeader: Record "Sales Header") MailErrorMessage: Text
+    local procedure SendOrderConfirmation(XmlElement: XmlElement; var SalesHeader: Record "Sales Header") MailErrorMessage: Text
     var
         Customer: Record Customer;
         EmailTemplateHeader: Record "NPR E-mail Template Header";
         ReportSelections: Record "Report Selections";
         EmailMgt: Codeunit "NPR E-mail Management";
         RecRef: RecordRef;
+        RecID: RecordId;
         RecipientEmail: Text;
     begin
 
@@ -1155,6 +1156,8 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
             EmailTemplateHeader."Report ID" := ReportSelections."Report ID";
         end;
         MailErrorMessage := EmailMgt.SendReportTemplate(EmailTemplateHeader."Report ID", RecRef, EmailTemplateHeader, RecipientEmail, true);
+        RecID := RecRef.RecordId();
+        SalesHeader.Get(RecID);
         exit(MailErrorMessage);
     end;
 
