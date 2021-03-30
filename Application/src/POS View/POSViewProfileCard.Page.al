@@ -3,8 +3,7 @@ page 6150636 "NPR POS View Profile Card"
     Caption = 'POS View Profile Card';
     PageType = Card;
     SourceTable = "NPR POS View Profile";
-    UsageCategory = Administration; 
-    ApplicationArea = All; 
+    UsageCategory = None;
 
     layout
     {
@@ -83,7 +82,7 @@ page 6150636 "NPR POS View Profile Card"
                     Image = SuggestNumber;
                     ApplicationArea = All;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Executes the Detect Decimal and Thousands Separators action';

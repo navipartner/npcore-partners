@@ -1,14 +1,9 @@
 table 6059950 "NPR Display Setup"
 {
-    // NPR5.29/CLVA/20170118 CASE 256153 Added field "Image Rotation Interval"
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
-    // NPR5.43/CLVA/20180606 CASE 300254 Added field Activate
-    // NPR5.44/CLVA/20180629 CASE 318695 Added field Prices ex. VAT
-    // NPR5.50/CLVA/20190513 CASE 352390 Added field "Custom Display Codeunit"
-    // NPR5.51/ANPA/20190722 CASE 352390 Added field "Hide reciept"
-
     Caption = 'Display Setup';
     DataClassification = CustomerContent;
+    DrillDownPageID = "NPR POS Display Profiles";
+    LookupPageID = "NPR POS Display Profiles";
 
     fields
     {
@@ -135,12 +130,42 @@ table 6059950 "NPR Display Setup"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
-
     var
         TXT001: Label 'Matrix Display(Customer Display) is already activated on register %1. \Deactivate Customer Display before activating 2nd Display';
+
+
+
+    procedure InitDisplayContent()
+    var
+        DisplayContent: Record "NPR Display Content";
+    begin
+        DisplayContent.Code := 'HTML';
+        if not DisplayContent.Find() then begin
+            DisplayContent.Init();
+            DisplayContent.Type := DisplayContent.Type::Html;
+            DisplayContent.Insert();
+        end;
+
+        DisplayContent.Code := 'IMAGE';
+        if not DisplayContent.Find() then begin
+            DisplayContent.Init();
+            DisplayContent.Type := DisplayContent.Type::Image;
+            DisplayContent.Insert();
+        end;
+
+        DisplayContent.Code := 'VIDEO';
+        if not DisplayContent.Find() then begin
+            DisplayContent.Init();
+            DisplayContent.Type := DisplayContent.Type::Video;
+            DisplayContent.Insert();
+        end;
+
+        OnAfterInitDisplayContent();
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnAfterInitDisplayContent()
+    begin
+    end;
 }
 
