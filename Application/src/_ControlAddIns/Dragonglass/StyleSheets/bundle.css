@@ -5295,6 +5295,10 @@ body {
       display: flex;
       justify-content: center;
       align-items: center; } }
+  .transcendence .dialog__body .caption {
+    color: var(--popup-body-text-color); }
+  .transcendence .dialog__body .button__caption .caption {
+    color: var(--button-text-color); }
 
 .transcendence .dialog__buttons {
   background: var(--popup-button-bg);
@@ -5315,6 +5319,8 @@ body {
       color: #e4e4e4; }
       .transcendence .dialog__buttons .button > div:hover, .transcendence .dialog__buttons .button > div:active {
         background-color: var(--button-bg-hover); }
+    .transcendence .dialog__buttons .button .caption {
+      color: var(--button-text-color); }
   .transcendence .dialog__buttons #button-dialog-ok div {
     background-color: var(--green); }
     .transcendence .dialog__buttons #button-dialog-ok div:hover, .transcendence .dialog__buttons #button-dialog-ok div:active {
@@ -7120,6 +7126,8 @@ body {
   .transcendence .input__textbox::selection {
     background-color: var(--input-selection-bg);
     color: var(--input-selection-color); }
+  .transcendence .input__textbox:read-only {
+    background-color: #a7a7a7; }
 
 .transcendence .text-enter {
   position: absolute;
@@ -7798,9 +7806,12 @@ body {
     display: flex;
     align-items: center;
     padding: 0 15px;
-    background-color: var(--input-bg); }
+    background-color: var(--input-bg);
+    cursor: pointer; }
     .transcendence .plus-minus-editor__buttons .value span {
       color: var(--input-text-color) !important; }
+    .transcendence .plus-minus-editor__buttons .value:hover {
+      background-color: #bababa; }
   .transcendence .plus-minus-editor__buttons .remove {
     color: var(--text-color);
     margin-right: 20px;
@@ -8662,7 +8673,7 @@ body {
   height: auto; }
 
 #walkthrough {
-  width: 32px; }
+  display: none; }
 
 .statusbar__section {
   display: table-cell;
@@ -8700,8 +8711,7 @@ body {
         animation: spin 2s infinite linear; }
     .statusbar__notifications div.has-notifications {
       color: inherit; }
-      .statusbar__notifications div.has-notifications.dg-comment-solid {
-        animation: scale 2s alternate infinite ease-in;
+      .statusbar__notifications div.has-notifications.fa-comment {
         cursor: pointer; }
 
 
