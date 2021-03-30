@@ -1,7 +1,5 @@
 table 6059963 "NPR MPOS EOD Recipts"
 {
-    // NPR5.51/CLVA/20190805 CASE 364011 Created object
-
     Caption = 'MPOS EOD Recipts';
     DataClassification = CustomerContent;
 
@@ -55,10 +53,6 @@ table 6059963 "NPR MPOS EOD Recipts"
         key(Key1; "No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

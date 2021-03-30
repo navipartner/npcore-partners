@@ -1,8 +1,5 @@
 table 6059967 "NPR MPOS Payment Gateway"
 {
-    // NPR5.33/NPKNAV/20170630  CASE 267203 Transport NPR5.33 - 30 June 2017
-    // NPR5.34/CLVA/20170703 CASE 280444 Upgrading MPOS functionality to transcendence
-
     Caption = 'MPOS Payment Gateway';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
@@ -52,10 +49,6 @@ table 6059967 "NPR MPOS Payment Gateway"
         key(Key1; "Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 
