@@ -86,7 +86,6 @@ codeunit 85002 "NPR Library - POS Master Data"
         POSPaymentMethod.Validate("Currency Code", CurrencyCode);
         POSPaymentMethod.Validate("Post Condensed", PostCondensed);
         POSPaymentMethod.Validate("Rounding Type", LibraryRandom.RandIntInRange(0, 2));
-        POSPaymentMethod.Validate("Account Type", POSPaymentMethod."Account Type"::"G/L Account");
         POSPaymentMethod.Validate("Account No.", LibraryERM.CreateGLAccountNo);
         POSPaymentMethod.Validate("Rounding Gains Account", LibraryERM.CreateGLAccountNo);
         POSPaymentMethod.Validate("Rounding Losses Account", LibraryERM.CreateGLAccountNo);
@@ -371,23 +370,9 @@ codeunit 85002 "NPR Library - POS Master Data"
         POSPostingSetup."POS Store Code" := '';
         POSPostingSetup."POS Payment Method Code" := POSPaymentMethod.Code;
         POSPostingSetup."POS Payment Bin Code" := '';
-        case POSPaymentMethod."Account Type" of
-            POSPaymentMethod."Account Type"::Bank:
-                begin
-                    POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::"Bank Account";
-                    POSPostingSetup."Account No." := POSPaymentMethod."Account No.";
-                end;
-            POSPaymentMethod."Account Type"::Customer:
-                begin
-                    POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::Customer;
-                    POSPostingSetup."Account No." := POSPaymentMethod."Account No.";
-                end;
-            POSPaymentMethod."Account Type"::"G/L Account":
-                begin
-                    POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::"G/L Account";
-                    POSPostingSetup."Account No." := POSPaymentMethod."Account No.";
-                end;
-        end;
+        POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::"G/L Account";
+        POSPostingSetup."Account No." := POSPaymentMethod."Account No.";
+
         if not POSPostingSetup.Find then
             POSPostingSetup.Insert(true);
 

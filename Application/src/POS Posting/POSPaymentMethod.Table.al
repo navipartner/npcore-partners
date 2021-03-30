@@ -48,17 +48,13 @@ table 6150616 "NPR POS Payment Method"
         {
             Caption = 'Account Type';
             DataClassification = CustomerContent;
-
+            ObsoleteState = Removed;
         }
         field(29; "Account No."; Code[20])
         {
             Caption = 'Account No.';
             DataClassification = CustomerContent;
-            TableRelation = if ("Account Type" = const("G/L Account")) "G/L Account" where("Direct Posting" = const(true), "Account Type" = const(Posting), Blocked = const(false))
-            else
-            if ("Account Type" = const(Customer)) Customer
-            else
-            if ("Account Type" = const(Bank)) "Bank Account";
+            TableRelation = "G/L Account" where("Direct Posting" = const(true), "Account Type" = const(Posting), Blocked = const(false));
         }
         field(30; "Include In Counting"; Option)
         {
@@ -182,8 +178,6 @@ table 6150616 "NPR POS Payment Method"
             DataClassification = CustomerContent;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
             ObsoleteState = Removed;
-
-          
         }
         field(319; "Global Dimension 2 Code"; Code[20])
         {
@@ -192,8 +186,6 @@ table 6150616 "NPR POS Payment Method"
             DataClassification = CustomerContent;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
             ObsoleteState = Removed;
-
-           
         }
         field(320; "Auto End Sale"; Boolean)
         {

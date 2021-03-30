@@ -230,8 +230,6 @@ codeunit 6150707 "NPR POS Payment Line"
         if not POSPaymentMethod.Get(Line."No.") then
             Error(POSPaymentMethodNotFound, POSPaymentMethod.TableCaption, Line."No.", Line."Register No.");
 
-        if (POSPaymentMethod."Account Type" = POSPaymentMethod."Account Type"::"G/L Account") then
-            POSPaymentMethod.TestField("Account No.");
 
         POSPaymentMethod.TestField("Block POS Payment", false);
     end;

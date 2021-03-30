@@ -76,8 +76,6 @@ codeunit 6014419 "NPR Payment Type POS Upgrade"
         SetProcessingType(POSPaymentMethod, PaymentTypePOS);
         POSPaymentMethod."Currency Code" := GetCurrencyCode(PaymentTypePOS);
         POSPaymentMethod."Vouched By" := POSPaymentMethod."Vouched By"::INTERNAL;
-        POSPaymentMethod."Is Finance Agreement" := false;
-        POSPaymentMethod."Account Type" := "NPR POS Payment Method Account Type".FromInteger(PaymentTypePOS."Account Type");
         POSPaymentMethod."Account No." := GetAccountNo(PaymentTypePOS);
         POSPaymentMethod."Include In Counting" := GetIncludeInCounting(POSPaymentMethod);
         POSPaymentMethod."Fixed Rate" := PaymentTypePOS."Fixed Rate";
@@ -94,8 +92,6 @@ codeunit 6014419 "NPR Payment Type POS Upgrade"
         POSPaymentMethod."Allow Refund" := PaymentTypePOS."Allow Refund";
         POSPaymentMethod."Zero as Default on Popup" := PaymentTypePOS."Zero as Default on Popup";
         POSPaymentMethod."No Min Amount on Web Orders" := PaymentTypePOS."No Min Amount on Web Orders";
-        POSPaymentMethod."Global Dimension 1 Code" := PaymentTypePOS."Global Dimension 1 Code";
-        POSPaymentMethod."Global Dimension 2 Code" := PaymentTypePOS."Global Dimension 2 Code";
         POSPaymentMethod."Auto End Sale" := PaymentTypePOS."Auto End Sale";
         POSPaymentMethod."Payment Method Code" := PaymentTypePOS."Payment Method Code";
         POSPaymentMethod."EFT Surcharge Service Item No." := PaymentTypePOS."EFT Surcharge Service Item No.";
