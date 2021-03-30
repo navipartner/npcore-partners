@@ -1,39 +1,35 @@
 page 6060114 "NPR TM Ticket Access Facts"
 {
-    // NPR4.14/TSA/20150803/CASE214262 - Initial Version
-    // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-
     Caption = 'Ticket Access Facts';
     PageType = List;
     SourceTable = "NPR TM Ticket Access Fact";
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-
+    PromotedActionCategories = 'New,Process,Report,Navigate';
     layout
     {
         area(content)
         {
             repeater(Group)
             {
-                field("Fact Name"; "Fact Name")
+                field("Fact Name"; Rec."Fact Name")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Fact Name field';
                 }
-                field("Fact Code"; "Fact Code")
+                field("Fact Code"; Rec."Fact Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Fact Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Block; Block)
+                field(Block; Rec.Block)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Block field';
@@ -55,7 +51,6 @@ page 6060114 "NPR TM Ticket Access Facts"
         FactCount: Integer;
         More: Boolean;
     begin
-        // EXIT (GETFILTER ("Fact Code"));
 
         CurrPage.SetSelectionFilter(Fact);
         FactCount := Fact.Count;

@@ -14,67 +14,67 @@ page 6151137 "NPR TM Waiting List Setup"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Simultaneous Notification Cnt."; "Simultaneous Notification Cnt.")
+                field("Simultaneous Notification Cnt."; Rec."Simultaneous Notification Cnt.")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Simultaneous Notification Cnt. field';
                 }
-                field("Max Notifications per Address"; "Max Notifications per Address")
+                field("Max Notifications per Address"; Rec."Max Notifications per Address")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Max Notifications per Address field';
                 }
-                field("Expires In (Minutes)"; "Expires In (Minutes)")
+                field("Expires In (Minutes)"; Rec."Expires In (Minutes)")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Expires In (Minutes) field';
                 }
-                field("Notification Delay (Minutes)"; "Notification Delay (Minutes)")
+                field("Notification Delay (Minutes)"; Rec."Notification Delay (Minutes)")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Notification Delay  (Minutes) field';
                 }
-                field(URL; URL)
+                field(URL; Rec.URL)
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the URL field';
                 }
-                field("Activate WL at Remaining Qty."; "Activate WL at Remaining Qty.")
+                field("Activate WL at Remaining Qty."; Rec."Activate WL at Remaining Qty.")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Activate WL at Remaining Qty. field';
                 }
-                field("Remaing Capacity Threshold"; "Remaing Capacity Threshold")
+                field("Remaing Capacity Threshold"; Rec."Remaing Capacity Threshold")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Remaing Capacity Threshold field';
                 }
-                field("Notify Daily From Time"; "Notify Daily From Time")
+                field("Notify Daily From Time"; Rec."Notify Daily From Time")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Notify Daily From Time field';
                 }
-                field("Notify Daily Until Time"; "Notify Daily Until Time")
+                field("Notify Daily Until Time"; Rec."Notify Daily Until Time")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Notify Daily Until Time field';
                 }
-                field("Notify On Opt-In"; "Notify On Opt-In")
+                field("Notify On Opt-In"; Rec."Notify On Opt-In")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Notify On Opt-In field';
                 }
-                field("Enforce Same Item"; "Enforce Same Item")
+                field("Enforce Same Item"; Rec."Enforce Same Item")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Enforce Same Item field';

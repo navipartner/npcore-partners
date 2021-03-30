@@ -1,23 +1,11 @@
 page 6060119 "NPR TM Admis. Schedule Lines"
 {
-    // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
-    // TM1.09/TSA/20160310  CASE 236742 UX improvements
-    // TM1.11/TSA/20160404  CASE 232250 Added new fields 47 and 48
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // TM1.19/TSA/20170220 CASE 266768 Added default filter to not show blocked entries
-    // TM1.24/TSA /20170829 CASE 288396 Added a button for soft regenerare and a message on hard regenerate
-    // TM1.28/TSA /20180201 CASE 303925 Added calendar customization
-    // TM1.28/TSA /20180221 CASE 306039 Added "Visibility On Web"
-    // TM1.37/TSA /20180905 CASE 327324 Added fields for better control of arrival window
-    // TM1.41/TSA /20190507 CASE 353981 Adding Scheduled based pricing
-    // TM1.45/TSA /20191120 CASE 378212 Added sales cut-off date and time
-    // TM1.45/TSA /20200116 CASE 385922 Added Concurrency Code field
-
     Caption = 'Admission Schedule Lines';
     PageType = List;
     SourceTable = "NPR TM Admis. Schedule Lines";
     UsageCategory = Administration;
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+    PromotedActionCategories = 'New,Process,Report,Calculate Entries,Navigate';
 
     layout
     {
@@ -25,86 +13,86 @@ page 6060119 "NPR TM Admis. Schedule Lines"
         {
             repeater(Group)
             {
-                field("Admission Code"; "Admission Code")
+                field("Admission Code"; Rec."Admission Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Admission Code field';
                 }
-                field("Schedule Code"; "Schedule Code")
+                field("Schedule Code"; Rec."Schedule Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Schedule Code field';
                 }
-                field("Visibility On Web"; "Visibility On Web")
+                field("Visibility On Web"; Rec."Visibility On Web")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Visibility On Web field';
                 }
-                field("Process Order"; "Process Order")
+                field("Process Order"; Rec."Process Order")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Process Order field';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Blocked field';
                 }
-                field("Prebook Is Required"; "Prebook Is Required")
+                field("Prebook Is Required"; Rec."Prebook Is Required")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Prebook Is Required field';
                 }
-                field("Max Capacity Per Sch. Entry"; "Max Capacity Per Sch. Entry")
+                field("Max Capacity Per Sch. Entry"; Rec."Max Capacity Per Sch. Entry")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Max Capacity Per Sch. Entry field';
                 }
-                field("Reserved For Web"; "Reserved For Web")
+                field("Reserved For Web"; Rec."Reserved For Web")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Reserved For Web field';
                 }
-                field("Reserved For Members"; "Reserved For Members")
+                field("Reserved For Members"; Rec."Reserved For Members")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Reserved For Members field';
                 }
-                field("Unbookable Before Start (Secs)"; "Unbookable Before Start (Secs)")
+                field("Unbookable Before Start (Secs)"; Rec."Unbookable Before Start (Secs)")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Unbookable Before Start (Secs) field';
                 }
-                field("Bookable Passed Start (Secs)"; "Bookable Passed Start (Secs)")
+                field("Bookable Passed Start (Secs)"; Rec."Bookable Passed Start (Secs)")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Bookable Passed Start (Secs) field';
                 }
-                field("Capacity Control"; "Capacity Control")
+                field("Capacity Control"; Rec."Capacity Control")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Capacity Control field';
                 }
-                field("Concurrency Code"; "Concurrency Code")
+                field("Concurrency Code"; Rec."Concurrency Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Concurrency Code field';
                 }
-                field("Prebook From"; "Prebook From")
+                field("Prebook From"; Rec."Prebook From")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Prebook From field';
                 }
-                field("Schedule Generated Until"; "Schedule Generated Until")
+                field("Schedule Generated Until"; Rec."Schedule Generated Until")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Schedule Generated Until field';
                 }
-                field("Admission Base Calendar Code"; "Admission Base Calendar Code")
+                field("Admission Base Calendar Code"; Rec."Admission Base Calendar Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Admission Base Calendar Code field';
@@ -119,71 +107,71 @@ page 6060119 "NPR TM Admis. Schedule Lines"
                     trigger OnDrillDown()
                     begin
                         CurrPage.SaveRecord;
-                        TestField("Admission Base Calendar Code");
+                        Rec.TestField("Admission Base Calendar Code");
                         CalendarMgmt.ShowCustomizedCalendar(CustomizedCalendarChangeTemp);
                     end;
                 }
-                field("Scheduled Start Time"; "Scheduled Start Time")
+                field("Scheduled Start Time"; Rec."Scheduled Start Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Scheduled Start Time field';
                 }
-                field("Scheduled Stop Time"; "Scheduled Stop Time")
+                field("Scheduled Stop Time"; Rec."Scheduled Stop Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Scheduled Stop Time field';
                 }
-                field("Event Arrival From Time"; "Event Arrival From Time")
+                field("Event Arrival From Time"; Rec."Event Arrival From Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Event Arrival From Time field';
                 }
-                field("Event Arrival Until Time"; "Event Arrival Until Time")
+                field("Event Arrival Until Time"; Rec."Event Arrival Until Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Event Arrival Until Time field';
                 }
-                field("Sales From Date (Rel.)"; "Sales From Date (Rel.)")
+                field("Sales From Date (Rel.)"; Rec."Sales From Date (Rel.)")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Sales From Date (Rel.) field';
                 }
-                field("Sales From Time"; "Sales From Time")
+                field("Sales From Time"; Rec."Sales From Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Sales From Time field';
                 }
-                field("Sales Until Date (Rel.)"; "Sales Until Date (Rel.)")
+                field("Sales Until Date (Rel.)"; Rec."Sales Until Date (Rel.)")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Sales Until Date (Rel.) field';
                 }
-                field("Sales Until Time"; "Sales Until Time")
+                field("Sales Until Time"; Rec."Sales Until Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Sales Until Time field';
                 }
-                field("Pricing Option"; "Pricing Option")
+                field("Pricing Option"; Rec."Pricing Option")
                 {
                     ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Pricing Option field';
                 }
-                field("Price Scope"; "Price Scope")
+                field("Price Scope"; Rec."Price Scope")
                 {
                     ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Price Scope field';
                 }
-                field(Amount; Amount)
+                field(Amount; Rec.Amount)
                 {
                     ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Amount field';
                 }
-                field(Percentage; Percentage)
+                field(Percentage; Rec.Percentage)
                 {
                     ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Percentage field';
                 }
-                field("Amount Includes VAT"; "Amount Includes VAT")
+                field("Amount Includes VAT"; Rec."Amount Includes VAT")
                 {
                     ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Amount Includes VAT field';
@@ -194,47 +182,45 @@ page 6060119 "NPR TM Admis. Schedule Lines"
 
     actions
     {
-        area(processing)
+        area(navigation)
         {
             action("Calculate Schedule Entries")
             {
                 ToolTip = 'Append to the list of generated time slots';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                Caption = 'Calculate Schedule Entries';
+                Caption = 'Calculate New Entries';
                 Image = CalcWorkCenterCalendar;
                 Promoted = true;
-				PromotedOnly = true;
-
+                PromotedOnly = true;
+                PromotedCategory = Category4;
 
                 trigger OnAction()
                 var
                     TMAdmissionSchManagement: Codeunit "NPR TM Admission Sch. Mgt.";
                 begin
 
-                    TMAdmissionSchManagement.CreateAdmissionSchedule("Admission Code", false, WorkDate);
+                    TMAdmissionSchManagement.CreateAdmissionSchedule(Rec."Admission Code", false, WorkDate);
                 end;
             }
             action("Calculate Schedule Entries (Force)")
             {
                 ToolTip = 'Regenerate all time slot entries from today';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                Caption = 'Calculate Schedule Entries (Force)';
+                Caption = 'Recreate Entries';
                 Image = CalcWorkCenterCalendar;
-
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Category4;
 
                 trigger OnAction()
                 var
                     TMAdmissionSchManagement: Codeunit "NPR TM Admission Sch. Mgt.";
                 begin
-                    //-TM1.24 [288396]
                     if (Confirm(FORCE_GENERATE, false)) then
-                        TMAdmissionSchManagement.CreateAdmissionSchedule("Admission Code", true, WorkDate);
-                    //+TM1.24 [288396]
+                        TMAdmissionSchManagement.CreateAdmissionSchedule(Rec."Admission Code", true, WorkDate);
                 end;
             }
-        }
-        area(navigation)
-        {
+
             action(Admission)
             {
                 Caption = 'Admission';
@@ -242,8 +228,8 @@ page 6060119 "NPR TM Admis. Schedule Lines"
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Image = WorkCenter;
                 Promoted = true;
-				PromotedOnly = true;
-                PromotedCategory = Process;
+                PromotedOnly = true;
+                PromotedCategory = Category5;
                 RunObject = Page "NPR TM Ticket Admissions";
                 RunPageLink = "Admission Code" = FIELD("Admission Code");
 
@@ -251,12 +237,12 @@ page 6060119 "NPR TM Admis. Schedule Lines"
             action(Schedules)
             {
                 ToolTip = 'Navigate to Admission Schedules.';
-                Caption = 'Schedules';
+                Caption = 'Schedule';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Image = Workdays;
                 Promoted = true;
-				PromotedOnly = true;
-                PromotedCategory = Process;
+                PromotedOnly = true;
+                PromotedCategory = Category5;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket Schedules";
                 RunPageLink = "Schedule Code" = FIELD("Schedule Code");
@@ -269,8 +255,8 @@ page 6060119 "NPR TM Admis. Schedule Lines"
                 Caption = 'Schedule Entries';
                 Image = WorkCenterLoad;
                 Promoted = true;
-				PromotedOnly = true;
-                PromotedCategory = Process;
+                PromotedOnly = true;
+                PromotedCategory = Category5;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Admis. Schedule Entry";
                 RunPageLink = "Admission Code" = FIELD("Admission Code"),
@@ -282,8 +268,6 @@ page 6060119 "NPR TM Admis. Schedule Lines"
 
     trigger OnOpenPage()
     begin
-
-        //-+TM1.19 [266768]
         Rec.SetFilter(Blocked, '=%1', false);
     end;
 
@@ -291,9 +275,9 @@ page 6060119 "NPR TM Admis. Schedule Lines"
     begin
         Clear(CustomizedCalendarChangeTemp);
         CustomizedCalendarChangeTemp."Source Type" := CustomizedCalendarChangeTemp."Source Type"::Location;
-        CustomizedCalendarChangeTemp."Source Code" := "Admission Code";
-        CustomizedCalendarChangeTemp."Additional Source Code" := "Schedule Code";
-        CustomizedCalendarChangeTemp."Base Calendar Code" := "Admission Base Calendar Code";
+        CustomizedCalendarChangeTemp."Source Code" := Rec."Admission Code";
+        CustomizedCalendarChangeTemp."Additional Source Code" := Rec."Schedule Code";
+        CustomizedCalendarChangeTemp."Base Calendar Code" := Rec."Admission Base Calendar Code";
         if (not CustomizedCalendarChangeTemp.Insert()) then;
     end;
 

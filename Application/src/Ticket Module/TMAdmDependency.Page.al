@@ -15,13 +15,13 @@ page 6014471 "NPR TM Adm. Dependency"
         {
             repeater(GroupName)
             {
-                field("Dependency Code"; "Dependency Code")
+                field("Dependency Code"; Rec."Dependency Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Dependency Code field';
                 }
 
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Description field';

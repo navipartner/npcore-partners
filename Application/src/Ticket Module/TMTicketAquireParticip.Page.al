@@ -25,12 +25,12 @@ page 6060110 "NPR TM Ticket Aquire Particip."
                 group(Control6014411)
                 {
                     ShowCaption = false;
-                    field("Notification Method"; "Notification Method")
+                    field("Notification Method"; Rec."Notification Method")
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         ToolTip = 'Specifies the value of the Notification Method field';
                     }
-                    field("Notification Address"; "Notification Address")
+                    field("Notification Address"; Rec."Notification Address")
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         ShowMandatory = RequireNotificationAddress;
@@ -57,7 +57,7 @@ page 6060110 "NPR TM Ticket Aquire Particip."
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 1, "Entry No.", NPRAttrTextArray[1]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 1, Rec."Entry No.", NPRAttrTextArray[1]);
                     end;
                 }
                 field(NPRAttrTextArray_02; NPRAttrTextArray[2])
@@ -70,7 +70,7 @@ page 6060110 "NPR TM Ticket Aquire Particip."
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 2, "Entry No.", NPRAttrTextArray[2]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 2, Rec."Entry No.", NPRAttrTextArray[2]);
                     end;
                 }
                 field(NPRAttrTextArray_03; NPRAttrTextArray[3])
@@ -83,7 +83,7 @@ page 6060110 "NPR TM Ticket Aquire Particip."
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 3, "Entry No.", NPRAttrTextArray[3]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 3, Rec."Entry No.", NPRAttrTextArray[3]);
                     end;
                 }
                 field(NPRAttrTextArray_04; NPRAttrTextArray[4])
@@ -96,7 +96,7 @@ page 6060110 "NPR TM Ticket Aquire Particip."
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 4, "Entry No.", NPRAttrTextArray[4]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 4, Rec."Entry No.", NPRAttrTextArray[4]);
                     end;
                 }
                 field(NPRAttrTextArray_05; NPRAttrTextArray[5])
@@ -109,7 +109,7 @@ page 6060110 "NPR TM Ticket Aquire Particip."
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 5, "Entry No.", NPRAttrTextArray[5]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 5, Rec."Entry No.", NPRAttrTextArray[5]);
                     end;
                 }
                 field(NPRAttrTextArray_06; NPRAttrTextArray[6])
@@ -122,7 +122,7 @@ page 6060110 "NPR TM Ticket Aquire Particip."
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 6, "Entry No.", NPRAttrTextArray[6]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 6, Rec."Entry No.", NPRAttrTextArray[6]);
                     end;
                 }
                 field(NPRAttrTextArray_07; NPRAttrTextArray[7])
@@ -135,7 +135,7 @@ page 6060110 "NPR TM Ticket Aquire Particip."
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 7, "Entry No.", NPRAttrTextArray[7]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 7, Rec."Entry No.", NPRAttrTextArray[7]);
                     end;
                 }
                 field(NPRAttrTextArray_08; NPRAttrTextArray[8])
@@ -148,7 +148,7 @@ page 6060110 "NPR TM Ticket Aquire Particip."
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 8, "Entry No.", NPRAttrTextArray[8]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 8, Rec."Entry No.", NPRAttrTextArray[8]);
                     end;
                 }
                 field(NPRAttrTextArray_09; NPRAttrTextArray[9])
@@ -161,7 +161,7 @@ page 6060110 "NPR TM Ticket Aquire Particip."
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 9, "Entry No.", NPRAttrTextArray[9]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 9, Rec."Entry No.", NPRAttrTextArray[9]);
                     end;
                 }
                 field(NPRAttrTextArray_10; NPRAttrTextArray[10])
@@ -174,7 +174,7 @@ page 6060110 "NPR TM Ticket Aquire Particip."
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 10, "Entry No.", NPRAttrTextArray[10]);
+                        NPRAttrManagement.SetEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", 10, Rec."Entry No.", NPRAttrTextArray[10]);
                     end;
                 }
             }
@@ -189,7 +189,7 @@ page 6060110 "NPR TM Ticket Aquire Particip."
     begin
 
         //-TM1.23 [284752]
-        NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, DATABASE::"NPR TM Ticket Reservation Req.", "Entry No.");
+        NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, DATABASE::"NPR TM Ticket Reservation Req.", Rec."Entry No.");
         NPRAttrEditable := CurrPage.Editable();
         //+TM1.23 [284752]
     end;
@@ -198,18 +198,18 @@ page 6060110 "NPR TM Ticket Aquire Particip."
     begin
         //-TM1.38 [332109]
         //IF ("Notification Address" <> '') THEN BEGIN
-        if (("Notification Address" <> '') or (SuggestNotificationMethod <> SuggestNotificationMethod::NA)) then begin
+        if ((Rec."Notification Address" <> '') or (SuggestNotificationMethod <> SuggestNotificationMethod::NA)) then begin
             //+TM1.38 [332109]
 
-            "Notification Address" := SuggestNotificationAddress;
+            Rec."Notification Address" := SuggestNotificationAddress;
 
             case SuggestNotificationMethod of
                 SuggestNotificationMethod::EMAIL:
-                    "Notification Method" := "Notification Method"::EMAIL;
+                    Rec."Notification Method" := Rec."Notification Method"::EMAIL;
                 SuggestNotificationMethod::SMS:
-                    "Notification Method" := "Notification Method"::SMS;
+                    Rec."Notification Method" := Rec."Notification Method"::SMS;
                 else
-                    "Notification Method" := "Notification Method"::NA;
+                    Rec."Notification Method" := Rec."Notification Method"::NA;
             end;
         end;
     end;
@@ -238,11 +238,11 @@ page 6060110 "NPR TM Ticket Aquire Particip."
     begin
         if (CloseAction = ACTION::LookupOK) then begin
             if (RequireNotificationAddress) then
-                TestField("Notification Address");
+                Rec.TestField("Notification Address");
 
         end else begin
-            if ((RequireNotificationAddress) and ("Notification Address" = '')) then
-                if (Confirm(EMAIL_INVALID_CONFIRM, true, FieldCaption("Notification Address"))) then
+            if ((RequireNotificationAddress) and (Rec."Notification Address" = '')) then
+                if (Confirm(EMAIL_INVALID_CONFIRM, true, Rec.FieldCaption("Notification Address"))) then
                     Error('');
         end;
     end;
@@ -273,18 +273,18 @@ page 6060110 "NPR TM Ticket Aquire Particip."
     var
         ValidEmail: Boolean;
     begin
-        if ("Notification Method" = "Notification Method"::EMAIL) then begin
-            ValidEmail := (StrPos("Notification Address", '@') > 1);
+        if (Rec."Notification Method" = Rec."Notification Method"::EMAIL) then begin
+            ValidEmail := (StrPos(Rec."Notification Address", '@') > 1);
             if (ValidEmail) then
-                ValidEmail := (StrPos(CopyStr("Notification Address", StrPos("Notification Address", '@')), '.') > 1);
+                ValidEmail := (StrPos(CopyStr(Rec."Notification Address", StrPos(Rec."Notification Address", '@')), '.') > 1);
 
             if (not ValidEmail) then
-                if (Confirm(EMAIL_INVALID_CONFIRM, true, FieldCaption("Notification Address"))) then
-                    Error(INVALID_VALUE, FieldCaption("Notification Address"));
+                if (Confirm(EMAIL_INVALID_CONFIRM, true, Rec.FieldCaption("Notification Address"))) then
+                    Error(INVALID_VALUE, Rec.FieldCaption("Notification Address"));
         end;
 
         if (RequireNotificationAddress) then
-            TestField("Notification Address");
+            Rec.TestField("Notification Address");
     end;
 
     procedure SetAdmissionCode(AdmissionCode: Code[20])
