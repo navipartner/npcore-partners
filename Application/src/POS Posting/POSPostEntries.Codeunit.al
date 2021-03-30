@@ -390,13 +390,13 @@ codeunit 6150615 "NPR POS Post Entries"
                             end;
                             if POSPostingBuffer."Rounding Amount (LCY)" > 0 then begin
                                 POSPaymentMethod.Get(POSPostingBuffer."POS Payment Method Code");
-                                POSPaymentMethod.TestField("Rounding Losses Account");
+                                POSPaymentMethod.TestField("Rounding Gains Account");
                                 MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer,
                                   POSPostingBuffer."Rounding Amount",
                                   POSPostingBuffer."Rounding Amount (LCY)",
                                   GenJournalLine."Gen. Posting Type"::" ",
                                   GenJournalLine."Account Type"::"G/L Account",
-                                  POSPaymentMethod."Rounding Losses Account",
+                                  POSPaymentMethod."Rounding Gains Account",
                                   GenJournalLine."Account Type"::"G/L Account",
                                   '',
                                   POSPostingBuffer."VAT Amount",

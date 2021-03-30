@@ -26,12 +26,6 @@ page 6150619 "NPR POS Payment Method Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Processing Type field. Possible values are Cash,Voucher,Check,EFT,Customer,PayOut.';
                 }
-                field("Account Type"; Rec."Account Type")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Account Type field. Possible values are G/L Account, Customer and Bank.';
-                    ShowMandatory = true;
-                }
                 field("Account No."; Rec."Account No.")
                 {
                     ApplicationArea = All;
