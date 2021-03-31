@@ -18,6 +18,7 @@
         AddNcTaskListProcessingJobQueue();
         AddPosItemPostingJobQueue();
         AddPosPostingJobQueue();
+        AddSMSJobQueue();
 
         UpgradeTag.SetUpgradeTag(UpgradeTagLbl);
     end;
@@ -115,5 +116,28 @@
         JobQueueEntry.Validate("Starting Time", 230000T);
         JobQueueEntry.Validate(Status, JobQueueEntry.Status::Ready);
         JobQueueEntry.Modify(true);
+    end;
+
+    local procedure AddSMSJobQueue()
+    var
+        SMSSetup: Record "NPR SMS Setup";
+        SMSMgt: Codeunit "NPR SMS Management";
+    begin
+        if not SMSSetup.Get() then
+            InsertSMSSetup(SMSSetup);
+        if SMSSetup."Job Queue Category Code" <> '' then
+            SMSMgt.CreateMessageJob(SMSSetup."Job Queue Category Code")
+        else
+            SMSSetup.Validate("Job Queue Category Code", SMSMgt.GetJobQueueCategoryCode());
+        SMSSetup.Modify();
+
+    end;
+
+    local procedure InsertSMSSetup(var SMSSetup: Record "NPR SMS Setup")
+    begin
+        SMSSetup.Init();
+        SMSSetup."Discard Msg. Older Than [Hrs]" := 24;
+        SMSSetup."Auto Send Attempts" := 3;
+        SMSSetup.Insert();
     end;
 }

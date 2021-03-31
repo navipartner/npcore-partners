@@ -783,7 +783,7 @@ codeunit 6059940 "NPR SMS Management"
         JobQueueEntry.DeleteAll(true);
     end;
 
-    local procedure GetJobQueueCategoryCode(): Code[10]
+    procedure GetJobQueueCategoryCode(): Code[10]
     var
         SMSSetup: Record "NPR SMS Setup";
         JobQueueCategory: Record "Job Queue Category";
