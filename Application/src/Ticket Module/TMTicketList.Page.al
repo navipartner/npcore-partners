@@ -151,147 +151,167 @@ page 6059785 "NPR TM Ticket List"
         }
         area(navigation)
         {
-            action("Create eTicket")
+            group(Manage)
             {
-                ToolTip = 'Create and send ticket to wallet';
-                ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
-                Caption = 'Create eTicket';
-                Image = ElectronicNumber;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedIsBig = true;
-                PromotedCategory = Process;
+                Caption = 'Manage';
+                action("Create eTicket")
+                {
+                    ToolTip = 'Create and send ticket to wallet';
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
+                    Caption = 'Create eTicket';
+                    Image = ElectronicNumber;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Process;
 
-                trigger OnAction()
-                begin
-                    CreateETicket();
-                end;
-            }
-            action("Block/Unblock Tickets")
-            {
-                ToolTip = 'Prevents the tickets from being used (reversible).';
-                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                Caption = 'Block/Unblock Tickets';
-                Image = Change;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedIsBig = true;
-                PromotedCategory = Process;
-
-                trigger OnAction()
-                begin
-                    ToggleTicketBlock();
-                end;
-            }
-            action("Revoke Ticket")
-            {
-                ToolTip = 'Prevents the tickets from being used (irreversible).';
-                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                Caption = 'Revoke Ticket';
-                Image = RemoveLine;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedIsBig = true;
-                PromotedCategory = Process;
-
-                trigger OnAction()
-                begin
-                    RevokeTicket();
-                end;
-            }
-            action("Change Ticket Reservation")
-            {
-                Caption = 'Change Ticket Reservation';
-                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                ToolTip = 'Change the time slots that the ticket is valid for.';
-                Image = Reserve;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedIsBig = true;
-                PromotedCategory = Process;
-
-                trigger OnAction()
-                begin
-                    ChangeTicketReservation();
-                end;
-            }
-
-            action("Access Entries")
-            {
-                ToolTip = 'Navigate to ticket access entries.';
-                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                Caption = 'Access Entries';
-                Image = EntriesList;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Category4;
-                PromotedIsBig = true;
-                RunObject = Page "NPR TM Ticket AccessEntry List";
-                RunPageLink = "Ticket No." = FIELD("No.");
-
-            }
-            action(Ticketholder)
-            {
-                ToolTip = 'Edit ticket holder.';
-                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                Caption = 'Ticket Holder';
-                Image = WIPEntries;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Category4;
-
-                trigger OnAction()
-                begin
-                    ChangeTicketholder();
-                end;
-            }
-            action("Ticket Request")
-            {
-                ToolTip = 'Navigate to Ticket Request.';
-                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                Caption = 'Ticket Request';
-                Image = Navigate;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Category4;
-
-                trigger OnAction()
-                begin
-                    DisplayTicketRequest(Rec."Ticket Reservation Entry No.");
-                end;
-
+                    trigger OnAction()
+                    begin
+                        CreateETicket();
+                    end;
+                }
+                action("Block/Unblock Tickets")
+                {
+                    ToolTip = 'Prevents the tickets from being used (reversible).';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Caption = 'Block/Unblock Tickets';
+                    Image = Change;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedIsBig = true;
+                    PromotedCategory = Process;
+                    scope = Repeater;
+                    trigger OnAction()
+                    begin
+                        ToggleTicketBlock();
+                    end;
+                }
+                action("Revoke Ticket")
+                {
+                    ToolTip = 'Prevents the tickets from being used (irreversible).';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Caption = 'Revoke Ticket';
+                    Image = RemoveLine;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedIsBig = true;
+                    PromotedCategory = Process;
+                    scope = Repeater;
+                    trigger OnAction()
+                    begin
+                        RevokeTicket();
+                    end;
+                }
+                action("Change Ticket Reservation")
+                {
+                    Caption = 'Change Ticket Reservation';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Change the time slots that the ticket is valid for.';
+                    Image = Reserve;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedIsBig = true;
+                    PromotedCategory = Process;
+                    scope = Repeater;
+                    trigger OnAction()
+                    begin
+                        ChangeTicketReservation();
+                    end;
+                }
+                action(Ticketholder)
+                {
+                    ToolTip = 'Edit ticket holder.';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Caption = 'Ticket Holder';
+                    Image = WIPEntries;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    scope = Repeater;
+                    trigger OnAction()
+                    begin
+                        ChangeTicketHolder();
+                    end;
+                }
 
             }
-            action("View Online Ticket")
+            group(NavigationGroup)
             {
-                ToolTip = 'Display the ticket as created on ticket server.';
-                ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
-                Caption = 'View Online Ticket';
-                Image = Web;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Category4;
+                Caption = 'Navigate';
+                action("Access Entries")
+                {
+                    ToolTip = 'Navigate to ticket access entries.';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Caption = 'Access Entries';
+                    Image = EntriesList;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+                    PromotedIsBig = true;
+                    RunObject = Page "NPR TM Ticket AccessEntry List";
+                    RunPageLink = "Ticket No." = FIELD("No.");
+                    Scope = Repeater;
+                }
+                action("Ticket Request")
+                {
+                    ToolTip = 'Navigate to Ticket Request.';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Caption = 'Ticket Request';
+                    Image = Navigate;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+                    Scope = Repeater;
 
-                trigger OnAction()
-                var
-                    DIYTicketPrint: Codeunit "NPR TM Ticket DIY Ticket Print";
-                begin
+                    trigger OnAction()
+                    begin
+                        DisplayTicketRequest(Rec."Ticket Reservation Entry No.");
+                    end;
+                }
+                action("View Online Ticket")
+                {
+                    ToolTip = 'Display the ticket as created on ticket server.';
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
+                    Caption = 'View Online Ticket';
+                    Image = Web;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
 
-                    DIYTicketPrint.ViewOnlineSingleTicket(Rec."No.");
-                end;
-            }
-            action("View Ticket Notifications")
-            {
-                ToolTip = 'Navigate to ticket notification entries.';
-                ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
-                Caption = 'View Ticket Notifications';
-                Image = ElectronicNumber;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Category4;
-                RunObject = Page "NPR TM Ticket Notif. Entry";
-                RunPageLink = "Ticket No." = FIELD("No.");
+                    trigger OnAction()
+                    var
+                        DIYTicketPrint: Codeunit "NPR TM Ticket DIY Ticket Print";
+                    begin
+                        DIYTicketPrint.ViewOnlineSingleTicket(Rec."No.");
+                    end;
+                }
+                action("View Ticket Notifications")
+                {
+                    ToolTip = 'Navigate to ticket notification entries.';
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
+                    Caption = 'View Ticket Notifications';
+                    Image = ElectronicNumber;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+                    RunObject = Page "NPR TM Ticket Notif. Entry";
+                    RunPageLink = "Ticket No." = FIELD("No.");
+                }
+                action(Navigate)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Caption = 'Find Sales Transaction';
+                    Image = Navigate;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+                    ToolTip = 'Finds the web invoice or POS Sale.';
+                    Scope = Repeater;
 
+                    trigger OnAction()
+                    begin
+                        ShowTicketSalesTransaction(Rec);
+                    end;
+                }
             }
             action(TicketBom)
             {
@@ -311,8 +331,8 @@ page 6059785 "NPR TM Ticket List"
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ShortCutKey = 'Shift+Ctrl+P';
 
+                Scope = Repeater;
                 trigger OnAction()
                 var
                     Ticket: Record "NPR TM Ticket";
@@ -327,6 +347,7 @@ page 6059785 "NPR TM Ticket List"
                     until (Ticket.Next() = 0);
                 end;
             }
+
             action("Report Issued Tickets")
             {
                 ToolTip = 'Print a report of issued tickets.';
@@ -374,7 +395,7 @@ page 6059785 "NPR TM Ticket List"
         ETICKET_SENT: Label 'eTicket sent.';
         CONFIRM_ETICKET: Label 'Are you sure you want to create and send %1 eTickets?';
 
-    local procedure ChangeTicketholder()
+    local procedure ChangeTicketHolder()
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketNotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
@@ -535,6 +556,39 @@ page 6059785 "NPR TM Ticket List"
                 TmpTicketReservationRequest.TRANSFERFIELDS(TicketReservationRequest, TRUE);
                 TmpTicketReservationRequest.INSERT();
             until (TicketReservationRequest.NEXT() = 0);
+        end;
+    end;
+
+    procedure ShowTicketSalesTransaction(Ticket: Record "NPR TM Ticket")
+    var
+        SalesInvHeader: Record "Sales Invoice Header";
+        PosEntry: Record "NPR Pos Entry";
+        TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+    begin
+        if (Ticket."Sales Receipt No." <> '') then begin
+            PosEntry.SetFilter("Document No.", '=%1', Ticket."Sales Receipt No.");
+            if (PosEntry.FindFirst()) then begin
+                Page.Run(Page::"NPR POS Entry Card", PosEntry);
+                exit;
+            end;
+        end;
+
+        if (TicketReservationReq.Get(Ticket."Ticket Reservation Entry No.")) then begin
+            if (TicketReservationReq."External Order No." <> '') then begin
+                if (not SalesInvHeader.SetCurrentKey("NPR External Order No.")) then;
+                SalesInvHeader.SetFilter("NPR External Order No.", '%1', TicketReservationReq."External Order No.");
+                if (SalesInvHeader.FindFirst()) then begin
+                    PAGE.Run(PAGE::"Posted Sales Invoice", SalesInvHeader);
+                    exit;
+                end;
+
+                SalesInvHeader.Reset();
+                SalesInvHeader.SetFilter("External Document No.", '%1', TicketReservationReq."External Order No.");
+                if (SalesInvHeader.FindFirst()) then begin
+                    PAGE.Run(PAGE::"Posted Sales Invoice", SalesInvHeader);
+                    exit;
+                end;
+            end;
         end;
     end;
 }
