@@ -108,7 +108,7 @@ page 6014405 "NPR Register List"
                 {
                     Caption = '2nd Display Setup';
                     Image = Add;
-                    RunObject = Page "NPR Display Setup";
+                    RunObject = Page "NPR POS Display Profile";
                     RunPageLink = "Register No." = FIELD("Register No.");
                     ApplicationArea = All;
                     ToolTip = 'Executes the 2nd Display Setup action';
