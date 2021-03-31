@@ -193,97 +193,130 @@ page 6060103 "NPR TM Ticket Request"
     {
         area(navigation)
         {
-            action("Issued Tickets")
+            group(NavigationGroup)
             {
-                ToolTip = 'Navigate to Ticket List';
-                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                Caption = 'Issued Tickets';
-                Image = Navigate;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Category4;
-                PromotedIsBig = true;
-                RunObject = Page "NPR TM Ticket List";
-                RunPageLink = "Ticket Reservation Entry No." = FIELD("Entry No.");
+                Caption = 'Navigation';
 
+                action("Issued Tickets")
+                {
+                    ToolTip = 'Navigate to Ticket List';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Caption = 'Issued Tickets';
+                    Image = Navigate;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+                    PromotedIsBig = true;
+                    Scope = Repeater;
+                    RunObject = Page "NPR TM Ticket List";
+                    RunPageLink = "Ticket Reservation Entry No." = FIELD("Entry No.");
+
+                }
+                action(Navigate)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Caption = 'Find Sales Transaction';
+                    Image = Navigate;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+                    Scope = Repeater;
+                    ToolTip = 'Finds the web invoice or POS Sale.';
+
+                    trigger OnAction()
+                    var
+                        TicketList: Page "NPR TM Ticket List";
+                        Ticket: Record "NPR TM Ticket";
+                        TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+                    begin
+                        TicketReservationReq.SetFilter("Session Token ID", '=%1', Rec."Session Token ID");
+                        TicketReservationReq.FindFirst();
+                        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationReq."Entry No.");
+                        if (Ticket.FindFirst()) then
+                            TicketList.ShowTicketSalesTransaction(Ticket);
+                    end;
+                }
+                action("View Online Ticket")
+                {
+                    ToolTip = 'Display the ticket as created on ticket server.';
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
+                    Caption = 'View Online Ticket';
+                    Image = Web;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+
+                    trigger OnAction()
+                    var
+                        DIYTicketPrint: Codeunit "NPR TM Ticket DIY Ticket Print";
+                    begin
+
+                        DIYTicketPrint.ViewOnlineTicketOrder(Rec."Entry No.");
+                    end;
+                }
             }
-            action("View Online Ticket")
+            group(ProcessGroup)
             {
-                ToolTip = 'Display the ticket as created on ticket server.';
-                ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
-                Caption = 'View Online Ticket';
-                Image = Web;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Category4;
+                Caption = 'Process';
+                action("Handle Postpaid Tickets")
+                {
+                    ToolTip = 'Create invoices for tickets with post-payment as payment method.';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Caption = 'Handle Postpaid Tickets';
+                    Image = Invoice;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Process;
 
-                trigger OnAction()
-                var
-                    DIYTicketPrint: Codeunit "NPR TM Ticket DIY Ticket Print";
-                begin
+                    trigger OnAction()
+                    var
+                        TicketManagement: Codeunit "NPR TM Ticket Management";
+                    begin
 
-                    DIYTicketPrint.ViewOnlineTicketOrder(Rec."Entry No.");
-                end;
-            }
+                        TicketManagement.HandlePostpaidTickets(false);
+                    end;
+                }
+                action("Create Offline Admissions")
+                {
+                    ToolTip = 'Transfer tickets to offline journal to manually register admission entries.';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Caption = 'Create Offline Admissions';
+                    Image = PostApplication;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Process;
 
-            action("Handle Postpaid Tickets")
-            {
-                ToolTip = 'Create invoices for tickets with post-payment as payment method.';
-                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                Caption = 'Handle Postpaid Tickets';
-                Image = Invoice;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
+                    trigger OnAction()
+                    var
+                        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+                        OfflineTicketValidationMgr: Codeunit "NPR TM Offline Ticket Valid.";
+                        OfflineTicketValidation: Record "NPR TM Offline Ticket Valid.";
+                        ImportReferenceNo: Integer;
+                    begin
 
-                trigger OnAction()
-                var
-                    TicketManagement: Codeunit "NPR TM Ticket Management";
-                begin
+                        CurrPage.SetSelectionFilter(TicketReservationRequest);
+                        ImportReferenceNo := OfflineTicketValidationMgr.AddRequestToOfflineValidation(TicketReservationRequest);
 
-                    TicketManagement.HandlePostpaidTickets(false);
-                end;
-            }
-            action("Create Offline Admissions")
-            {
-                ToolTip = 'Transfer tickets to offline journal to manually register admission entries.';
-                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                Caption = 'Create Offline Admissions';
-                Image = PostApplication;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-
-                trigger OnAction()
-                var
-                    TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-                    OfflineTicketValidationMgr: Codeunit "NPR TM Offline Ticket Valid.";
-                    OfflineTicketValidation: Record "NPR TM Offline Ticket Valid.";
-                    ImportReferenceNo: Integer;
-                begin
-
-                    CurrPage.SetSelectionFilter(TicketReservationRequest);
-                    ImportReferenceNo := OfflineTicketValidationMgr.AddRequestToOfflineValidation(TicketReservationRequest);
-
-                    OfflineTicketValidation.SetFilter("Import Reference No.", '=%1', ImportReferenceNo);
-                    Commit;
-                    PAGE.RunModal(PAGE::"NPR TM Offline Ticket Valid.", OfflineTicketValidation);
-                end;
-            }
-            action("Revoke Ticket Request")
-            {
-                ToolTip = 'Prevents the tickets from being used (irreversible).';
-                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                Caption = 'Revoke Ticket Request';
-                Image = RemoveLine;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-
-                trigger OnAction()
-                begin
-                    RevokeTicketRequest();
-                end;
+                        OfflineTicketValidation.SetFilter("Import Reference No.", '=%1', ImportReferenceNo);
+                        Commit;
+                        PAGE.RunModal(PAGE::"NPR TM Offline Ticket Valid.", OfflineTicketValidation);
+                    end;
+                }
+                action("Revoke Ticket Request")
+                {
+                    ToolTip = 'Prevents the tickets from being used (irreversible).';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Caption = 'Revoke Ticket Request';
+                    Image = RemoveLine;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    Scope = Repeater;
+                    trigger OnAction()
+                    begin
+                        RevokeTicketRequest();
+                    end;
+                }
             }
         }
         area(reporting)

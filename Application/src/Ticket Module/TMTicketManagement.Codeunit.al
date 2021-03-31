@@ -234,15 +234,15 @@ codeunit 6059784 "NPR TM Ticket Management"
     begin
 
         case PrintObjectType of
-            TicketType."Print Object Type"::CODEUNIT:
+            TicketType."Print Object Type"::Codeunit:
                 begin
                     if (ObjectOutputMgt.GetCodeunitOutputPath(PrintObjectId) <> '') then
                         LinePrintMgt.ProcessCodeunit(PrintObjectId, Ticket)
                     else
-                        CODEUNIT.Run(PrintObjectId, Ticket);
+                        Codeunit.Run(PrintObjectId, Ticket);
                 end;
 
-            TicketType."Print Object Type"::REPORT:
+            TicketType."Print Object Type"::Report:
                 ReportPrinterInterface.RunReport(PrintObjectId, false, false, Ticket);
 
             TicketType."Print Object Type"::TEMPLATE:
@@ -291,7 +291,7 @@ codeunit 6059784 "NPR TM Ticket Management"
 
     local procedure CurrentCodeunitId(): Integer
     begin
-        exit(CODEUNIT::"NPR TM Ticket Management");
+        exit(Codeunit::"NPR TM Ticket Management");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
@@ -535,7 +535,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         NewAdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', NewExtScheduleEntryNo);
         NewAdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
         if (not NewAdmissionScheduleEntry.FindFirst()) then
-            RaiseError(StrSubstNo(INVALID_REFERENCE, NewAdmissionScheduleEntry.TABLECAPTION, NewAdmissionScheduleEntry), '-2002');
+            RaiseError(StrSubstNo(INVALID_REFERENCE, NewAdmissionScheduleEntry.TableCaption(), NewAdmissionScheduleEntry), '-2002');
 
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', TicketNo);
         TicketAccessEntry.SetFilter("Admission Code", '=%1', NewAdmissionScheduleEntry."Admission Code");
@@ -619,7 +619,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         if (not TicketAdmissionBOM.Get(Ticket."Item No.", Ticket."Variant Code", AdmissionScheduleEntry."Admission Code")) then
             exit(false);
 
-        case TicketAdmissionBOM."Reschedule Policy" OF
+        case TicketAdmissionBOM."Reschedule Policy" of
 
             TicketAdmissionBOM."Reschedule Policy"::NOT_ALLOWED:
                 exit(false);
@@ -762,7 +762,7 @@ codeunit 6059784 "NPR TM Ticket Management"
             DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
             DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::ADMITTED);
             if (DetTicketAccessEntry.FindFirst()) then
-                RaiseError(StrSubstNo(QTY_CHANGE_NOT_ALLOWED, TicketNo, DetTicketAccessEntry.TableCaption, DetTicketAccessEntry."Entry No."), QTY_CHANGE_NOT_ALLOWED_NO);
+                RaiseError(StrSubstNo(QTY_CHANGE_NOT_ALLOWED, TicketNo, DetTicketAccessEntry.TableCaption(), DetTicketAccessEntry."Entry No."), QTY_CHANGE_NOT_ALLOWED_NO);
         until (TicketAccessEntry.Next() = 0);
 
         DetTicketAccessEntry.Reset();
@@ -970,7 +970,7 @@ codeunit 6059784 "NPR TM Ticket Management"
     begin
 
         if (not Ticket.Get(TicketNo)) then begin
-            ReasonText := StrSubstNo(INVALID_REFERENCE, Ticket.TableCaption, TicketNo);
+            ReasonText := StrSubstNo(INVALID_REFERENCE, Ticket.TableCaption(), TicketNo);
             exit(false);
         end;
 
@@ -980,7 +980,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', TicketNo);
         TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
         if (not TicketAccessEntry.FindFirst()) then begin
-            ReasonText := StrSubstNo(INVALID_REFERENCE, TicketAccessEntry.TableCaption, TicketAccessEntry.GetFilters);
+            ReasonText := StrSubstNo(INVALID_REFERENCE, TicketAccessEntry.TableCaption(), TicketAccessEntry.GetFilters());
             exit(false);
         end;
 
@@ -1004,7 +1004,7 @@ codeunit 6059784 "NPR TM Ticket Management"
     begin
 
         if (not Ticket.Get(TicketNo)) then begin
-            ReasonText := StrSubstNo(INVALID_REFERENCE, Ticket.TableCaption, TicketNo);
+            ReasonText := StrSubstNo(INVALID_REFERENCE, Ticket.TableCaption(), TicketNo);
             exit(false);
         end;
 
@@ -1014,7 +1014,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', TicketNo);
         TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
         if (not TicketAccessEntry.FindFirst()) then begin
-            ReasonText := StrSubstNo(INVALID_REFERENCE, TicketAccessEntry.TableCaption, TicketAccessEntry.GetFilters);
+            ReasonText := StrSubstNo(INVALID_REFERENCE, TicketAccessEntry.TableCaption(), TicketAccessEntry.GetFilters());
             exit(false);
         end;
 
@@ -1027,7 +1027,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         DetTicketAccessEntry.Open := false;
         DetTicketAccessEntry."Sales Channel No." := ItemNo;
         DetTicketAccessEntry."Created Datetime" := CurrentDateTime;
-        DetTicketAccessEntry."User ID" := UserId;
+        DetTicketAccessEntry."User ID" := UserId();
         DetTicketAccessEntry.Insert();
 
         exit(true);
@@ -1040,7 +1040,7 @@ codeunit 6059784 "NPR TM Ticket Management"
     begin
         TicketTypeForm.HideTickets;
         TicketTypeForm.LookupMode(true);
-        if (TicketTypeForm.RunModal = ACTION::LookupOK) then begin
+        if (TicketTypeForm.RunModal = Action::LookupOK) then begin
             TicketTypeForm.GetRecord(TicketType);
             TicketTypeCode := TicketType.Code;
         end;
@@ -1177,7 +1177,7 @@ codeunit 6059784 "NPR TM Ticket Management"
                     if (not CheckDependencyRule(TicketAccessEntry, AdmissionDependencyLine, StopRuleChecking, ResponseMessage)) then
                         RaiseError(ResponseMessage, '-1013');
 
-                until ((AdmissionDependencyLine.NEXT() = 0) or (StopRuleChecking));
+                until ((AdmissionDependencyLine.Next() = 0) or (StopRuleChecking));
             end else begin
                 ; // Consider OK, no active rules
             end;
@@ -1286,13 +1286,13 @@ codeunit 6059784 "NPR TM Ticket Management"
                             // Find the previous admission entry
                             if (DetTicketAccessEntry.Next(-1) <> 0) then begin
                                 if ((AdmissionDateTime - DetTicketAccessEntry."Created Datetime") < AdmissionDependencyLine.Limit * 1000 * 60) then begin
-                                    ResponseMessage := StrSubstNo(ADM_SCAN_FREQUENCY, SourceAccessEntry."Admission Code", AdmissionDependencyLine.Limit, round((AdmissionDateTime - DetTicketAccessEntry."Created Datetime") / 1000 / 60, 0.1));
+                                    ResponseMessage := StrSubstNo(ADM_SCAN_FREQUENCY, SourceAccessEntry."Admission Code", AdmissionDependencyLine.Limit, Round((AdmissionDateTime - DetTicketAccessEntry."Created Datetime") / 1000 / 60, 0.1));
                                     IsValid := false;
                                 end;
 
                                 // The speed gate vs a mom and a run-away kid ... 
                                 if (not IsValid) then begin
-                                    Ticket.get(SourceAccessEntry."Ticket No.");
+                                    Ticket.Get(SourceAccessEntry."Ticket No.");
                                     TicketBom.Get(Ticket."Item No.", Ticket."Variant Code", SourceAccessEntry."Admission Code");
                                     case TicketBOM."Allow Rescan Within (Sec.)" of
                                         TicketBom."Allow Rescan Within (Sec.)"::SINGLE_ENTRY_ONLY:
@@ -1410,7 +1410,7 @@ codeunit 6059784 "NPR TM Ticket Management"
                     'N', 'A', 'X', 'AN':
                         begin
                             Evaluate(PatternLength, Right);
-                            FOR Itt := 1 TO PatternLength do
+                            for Itt := 1 to PatternLength do
                                 PatternOut := StrSubstNo('%1%2', PatternOut, GenerateRandom(Left));
                         end;
                     else begin
@@ -2142,7 +2142,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         exit(true);
     end;
 
-    local procedure ValidateTicketAdmissionCapacityExceeded(Ticket: Record "NPR TM Ticket"; AdmissionScheduleEntryNo: Integer; TicketExecutionContext: option SALES,ADMISSION)
+    local procedure ValidateTicketAdmissionCapacityExceeded(Ticket: Record "NPR TM Ticket"; AdmissionScheduleEntryNo: Integer; TicketExecutionContext: Option SALES,ADMISSION)
     var
         Admission: Record "NPR TM Admission";
         DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
@@ -2628,7 +2628,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         end;
     end;
 
-    procedure HandlePostpaidTickets(Preview: Boolean)
+    procedure HandlePostpaidTickets(PreviewDocument: Boolean)
     var
         TmpTicket: Record "NPR TM Ticket" temporary;
         TmpAggregatedPerRequest: Record "NPR TM Ticket Access Entry" temporary;
@@ -2652,10 +2652,10 @@ codeunit 6059784 "NPR TM Ticket Management"
         CollectUnhandledPostpaidTickets(ShowDialog, TmpTicket, TmpDetailedAccessEntries);
         AggregatePaymentEntries(ShowDialog, TmpTicket, TmpAggregatedPerRequest, TmpAdmissionPerDate);
 
-        if (not Preview) then begin
+        if (not PreviewDocument) then begin
             CreatePostpaidTicketInvoice(ShowDialog, TmpAggregatedPerRequest, TmpAdmissionPerDate);
             MarkPostpaidTicketAsInvoiced(ShowDialog, TmpDetailedAccessEntries, TmpAggregatedPerRequest, TmpTicket);
-            if (not TmpAggregatedPerRequest.IsEmpty) then begin
+            if (not TmpAggregatedPerRequest.IsEmpty()) then begin
                 TmpAggregatedPerRequest.FindFirst();
                 FirstInvoiceNo := CopyStr(TmpAggregatedPerRequest.Description, 1, 20);
                 TmpAggregatedPerRequest.FindLast();
@@ -2905,34 +2905,61 @@ codeunit 6059784 "NPR TM Ticket Management"
     begin
     end;
 
-    [EventSubscriber(ObjectType::Page, 344, 'OnAfterNavigateFindRecords', '', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::Navigate, 'OnAfterNavigateFindRecords', '', true, true)]
     local procedure OnAfterNavigateFindRecordsSubscriber(var DocumentEntry: Record "Document Entry"; DocNoFilter: Text; PostingDateFilter: Text)
     var
         Ticket: Record "NPR TM Ticket";
+        TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+        SalesInvHeader: Record "Sales Invoice Header";
+        RowsFound: Integer;
     begin
 
         if (Ticket.ReadPermission()) then begin
             if (not Ticket.SetCurrentKey("Sales Receipt No.")) then;
             Ticket.SetFilter("Sales Receipt No.", '%1', DocNoFilter);
-            InsertIntoDocEntry(DocumentEntry, DATABASE::"NPR TM Ticket", 0, CopyStr(DocNoFilter, 1, 20), Ticket.TableCaption, Ticket.Count());
+            InsertIntoDocEntry(DocumentEntry, Database::"NPR TM Ticket", 0, CopyStr(DocNoFilter, 1, 20), Ticket.TableCaption(), Ticket.Count());
+
+            if (not TicketReservationReq.SetCurrentKey("External Order No.")) then;
+            SalesInvHeader.SetFilter("No.", '%1', DocNoFilter);
+            if (SalesInvHeader.FindFirst()) then begin
+                if (SalesInvHeader."External Document No." <> '') then begin
+                    TicketReservationReq.SetFilter("External Order No.", '%1', SalesInvHeader."External Document No.");
+                    RowsFound := InsertIntoDocEntry(DocumentEntry, Database::"NPR TM Ticket Reservation Req.", 0, SalesInvHeader."External Document No.", TicketReservationReq.TableCaption(), TicketReservationReq.Count());
+                end;
+                if ((RowsFound = 0) and (SalesInvHeader."NPR External Order No." <> '')) then begin
+                    TicketReservationReq.SetFilter("External Order No.", '%1', SalesInvHeader."NPR External Order No.");
+                    RowsFound := InsertIntoDocEntry(DocumentEntry, Database::"NPR TM Ticket Reservation Req.", 0, SalesInvHeader."NPR External Order No.", TicketReservationReq.TableCaption(), TicketReservationReq.Count());
+                end;
+            end;
         end;
 
     end;
 
-    [EventSubscriber(ObjectType::Page, 344, 'OnAfterNavigateShowRecords', '', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::Navigate, 'OnAfterNavigateShowRecords', '', true, true)]
     local procedure OnAfterNavigateShowRecordsSubscriber(TableID: Integer; DocNoFilter: Text; PostingDateFilter: Text; ItemTrackingSearch: Boolean)
     var
         Ticket: Record "NPR TM Ticket";
+        TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+        SalesInvHeader: Record "Sales Invoice Header";
     begin
 
-        if (TableID = DATABASE::"NPR TM Ticket") then begin
+        if (TableID = Database::"NPR TM Ticket") then begin
             if (not Ticket.SetCurrentKey("Sales Receipt No.")) then;
             Ticket.SetFilter("Sales Receipt No.", DocNoFilter);
             if (Ticket.IsEmpty()) then
                 exit;
-
-            PAGE.Run(PAGE::"NPR TM Ticket List", Ticket);
+            Page.Run(Page::"NPR TM Ticket List", Ticket);
         end;
+
+        if (TableID = Database::"NPR TM Ticket Reservation Req.") then begin
+            if (not TicketReservationReq.SetCurrentKey("External Order No.")) then;
+            if (SalesInvHeader.Get(DocNoFilter)) then begin
+                TicketReservationReq.SetFilter("External Order No.", SalesInvHeader."External Document No.");
+                if (not TicketReservationReq.IsEmpty()) then
+                    exit;
+                Page.Run(Page::"NPR TM Ticket Request", TicketReservationReq);
+            end;
+        end
     end;
 
     local procedure InsertIntoDocEntry(var DocumentEntry: Record "Document Entry" temporary; DocTableID: Integer; DocType: Integer; DocNoFilter: Code[20]; DocTableName: Text[1024]; DocNoOfRecords: Integer): Integer
@@ -2941,16 +2968,15 @@ codeunit 6059784 "NPR TM Ticket Management"
         if (DocNoOfRecords = 0) then
             exit(DocNoOfRecords);
 
-        with DocumentEntry do begin
-            Init();
-            "Entry No." := "Entry No." + 1;
-            "Table ID" := DocTableID;
-            "Document Type" := DocType;
-            "Document No." := DocNoFilter;
-            "Table Name" := CopyStr(DocTableName, 1, MaxStrLen("Table Name"));
-            "No. of Records" := DocNoOfRecords;
-            Insert();
-        end;
+        DocumentEntry.Init();
+        DocumentEntry."Entry No." := DocumentEntry."Entry No." + 1;
+        DocumentEntry."Table ID" := DocTableID;
+        DocumentEntry."Document Type" := DocType;
+        DocumentEntry."Document No." := DocNoFilter;
+        DocumentEntry."Table Name" := CopyStr(DocTableName, 1, MaxStrLen(DocumentEntry."Table Name"));
+        DocumentEntry."No. of Records" := DocNoOfRecords;
+        if (not DocumentEntry.Insert()) then;
+
         exit(DocNoOfRecords);
 
     end;
