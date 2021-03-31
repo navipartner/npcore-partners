@@ -453,8 +453,10 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         end;
 
         if not Element.SelectSingleNode(Path, Node) then begin
-            if not Required then
+            if not Required then begin
+                ClearLastError;
                 exit(false);
+            end;
 
             Error(Text000, Element.Name + '/' + Path);
         end;
