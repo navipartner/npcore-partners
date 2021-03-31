@@ -23,24 +23,6 @@ page 6014698 "NPR POS Posting Prof. Select"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Automatic Item Posting"; "Automatic Item Posting")
-                {
-                    Visible = false;
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Automatic Item Posting field';
-                }
-                field("Automatic POS Posting"; "Automatic POS Posting")
-                {
-                    Visible = false;
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Automatic POS Posting field';
-                }
-                field("Automatic Posting Method"; "Automatic Posting Method")
-                {
-                    Visible = false;
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Automatic Posting Method field';
-                }
                 field("Default POS Entry No. Series"; "Default POS Entry No. Series")
                 {
                     Visible = false;

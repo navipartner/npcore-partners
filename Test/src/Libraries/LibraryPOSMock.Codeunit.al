@@ -81,10 +81,16 @@ codeunit 85003 "NPR Library - POS Mock"
 
     procedure EndSale(POSSession: Codeunit "NPR POS Session"): Boolean
     var
+        SalePOS: record "NPR Sale POS";
         POSSale: Codeunit "NPR POS Sale";
     begin
         POSSession.GetSale(POSSale);
-        exit(POSSale.TryEndSale(POSSession, false));
+        POSSale.GetCurrentSale(SalePOS);
+
+        if not POSSale.TryEndSale(POSSession, false) then
+            exit(false);
+
+        exit(TryPOSPost(SalePOS));
     end;
 
     procedure PayAndTryEndSaleAndStartNew(POSSession: Codeunit "NPR POS Session"; PaymentMethod: Code[10]; Amount: Decimal; VoucherNo: Text): Boolean
@@ -110,8 +116,11 @@ codeunit 85003 "NPR Library - POS Mock"
         if VoucherNo <> '' then
             IssueReturnVoucherFromPaymentMethod(POSSession, VoucherNo);
 
+
         POSActionPayment.TryEndSale(POSPaymentMethod, POSSession); //TryEndSale step of payment action
-        
+
+        if not TryPOSPost(SalePOS) then
+            exit(false);
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(NewSalePOS);
@@ -214,10 +223,20 @@ codeunit 85003 "NPR Library - POS Mock"
     end;
 
     internal procedure PayWithVoucherAndTryEndSaleAndStartNew(POSSession: Codeunit "NPR POS Session"; VoucherType: Code[20]; VoucherReferenceNo: Text[30]): Boolean
+    var
+        SalePOS: Record "NPR Sale POS";
+        POSSale: Codeunit "NPR POS Sale";
     begin
         VoucherPayment(POSSession, VoucherReferenceNo, VoucherType);
         IssueReturnVoucher(POSSession, VoucherType);
-        exit(EndSale(POSSession, VoucherType));
+
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+
+        if not EndSale(POSSession, VoucherType) then
+            exit(false);
+
+        exit(TryPOSPost(SalePOS));
     end;
 
 
@@ -324,6 +343,13 @@ codeunit 85003 "NPR Library - POS Mock"
             IssueReturnVoucher(POSSession, NpRvVoucher."Voucher Type");
     end;
 
-
+    local procedure TryPOSPost(SalePOS: Record "NPR Sale POS"): Boolean
+    var
+        POSPostMock: Codeunit "NPR Library - POS Post Mock";
+    begin
+        // Used to be triggered automatically
+        Commit();
+        POSPostMock.Initialize(true, true);
+        exit(POSPostMock.Run(SalePOS));
+    end;
 }
-

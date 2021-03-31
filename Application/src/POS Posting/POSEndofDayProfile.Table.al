@@ -100,6 +100,8 @@ table 6150652 "NPR POS End of Day Profile"
             DataClassification = CustomerContent;
             OptionCaption = 'With Message,With Error,Silent';
             OptionMembers = WITH_MESSAGE,WITH_ERROR,SILENT;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Auto posting done only via job queue.';
         }
         field(75; "End of Day Frequency"; Option)
         {
@@ -125,4 +127,3 @@ table 6150652 "NPR POS End of Day Profile"
     var
         PROFILE_MISSMATCH: Label 'The master POS Unit must have the same profile as this unit.';
 }
-
