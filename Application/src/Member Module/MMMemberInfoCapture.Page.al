@@ -837,9 +837,9 @@ page 6060134 "NPR MM Member Info Capture"
 
                 trigger OnAction()
                 var
-                    MCSWebcamAPI: Codeunit "NPR MCS Webcam API";
+                    MembershipManagement: Codeunit "NPR MM Membership Mgt.";
                 begin
-                    MCSWebcamAPI.CallCaptureStartByMMMemberInfoCapture(Rec, true);
+                    MembershipManagement.TakeMemberInfoPicture(Rec);
                 end;
             }
         }

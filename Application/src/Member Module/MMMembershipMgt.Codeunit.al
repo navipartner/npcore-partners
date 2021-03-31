@@ -5117,10 +5117,6 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     end;
 
-    local procedure "--"()
-    begin
-    end;
-
     procedure DeleteCtrlChars(StringToClean: Text): Text
     var
         CtrlChrs: Text[32];
@@ -5136,9 +5132,32 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     end;
 
-    local procedure "--Publishers"()
+    internal procedure TakeMemberInfoPicture(MMMemberInfoCapture: Record "NPR MM Member Info Capture")
+    var
+        Camera: Codeunit Camera;
+        PictureStream: InStream;
+        OStream: OutStream;
+        PictureName: Text;
     begin
+        if Camera.GetPicture(PictureStream, PictureName) then begin
+            MMMemberInfoCapture.Picture.CreateOutStream(OStream);
+            CopyStream(OStream, PictureStream);
+            MMMemberInfoCapture.Modify();
+        end;
     end;
 
+    internal procedure TakeMemberPicture(MMMember: Record "NPR MM Member")
+    var
+        Camera: Codeunit Camera;
+        PictureStream: InStream;
+        OStream: OutStream;
+        PictureName: Text;
+    begin
+        if Camera.GetPicture(PictureStream, PictureName) then begin
+            MMMember.Picture.CreateOutStream(OStream);
+            CopyStream(OStream, PictureStream);
+            MMMember.Modify();
+        end;
+    end;
 }
 
