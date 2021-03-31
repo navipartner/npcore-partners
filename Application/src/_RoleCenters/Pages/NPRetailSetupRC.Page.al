@@ -138,7 +138,7 @@ page 6151245 "NPR Setup RC"
                 action("POS Display Setup")
                 {
                     Caption = 'POS Display Setup';
-                    RunObject = Page "NPR Display Setup";
+                    RunObject = Page "NPR POS Display Profiles";
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Display Setup action';
                 }
