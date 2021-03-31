@@ -76,6 +76,8 @@ tableextension 6014427 "NPR Item" extends Item
         {
             Caption = 'Primary Key Length';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used anymore.';
         }
         field(6014435; "NPR Last Changed at"; DateTime)
         {
@@ -432,17 +434,12 @@ tableextension 6014427 "NPR Item" extends Item
         }
     }
 
-    trigger OnBeforeInsert()
+    trigger OnAfterInsert()
     begin
         SalesSetup.GetRecordOnce();
 
         if Rec."Price Includes VAT" and (SalesSetup."VAT Bus. Posting Gr. (Price)" <> '') then
             Rec."VAT Bus. Posting Gr. (Price)" := SalesSetup."VAT Bus. Posting Gr. (Price)";
-    end;
-
-    trigger OnAfterInsert()
-    begin
-        Rec."NPR Primary Key Length" := StrLen(Rec."No.");
 
         if Rec."Item Category Code" <> '' then
             Rec.Validate("Item Category Code");
@@ -494,12 +491,6 @@ tableextension 6014427 "NPR Item" extends Item
     begin
         QtyDiscountLine.SetRange("Item No.", Rec."No.");
         QtyDiscountLine.DeleteAll(true);
-    end;
-
-    trigger OnAfterRename()
-    begin
-        Rec."NPR Primary Key Length" := StrLen(Rec."No.");
-        Rec.Modify();
     end;
 
     var

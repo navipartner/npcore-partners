@@ -2,22 +2,6 @@ tableextension 6014423 "NPR Customer" extends Customer
 {
     fields
     {
-        modify("Payment Terms Code")
-        {
-            trigger OnAfterValidate()
-            var
-                PaymentTerms: Record "Payment Terms";
-                PaymentTermsErr: Label 'Specify %1 for %2!', Comment = '%1 = Due Date Calculation, %2 = Payment Terms Code';
-                ConvertCustQst: Label 'Want to convert customer %1 from type cash to type customer?', Comment = '%1 = Customer Name';
-            begin
-                if Rec."Payment Terms Code" = '' then
-                    exit;
-
-                PaymentTerms.Get(Rec."Payment Terms Code");
-                if Format(PaymentTerms."Due Date Calculation") = '' then
-                    Error(PaymentTermsErr, PaymentTerms.FieldCaption("Due Date Calculation"), PaymentTerms.Code);
-            end;
-        }
         field(6014400; "NPR Type"; Option)
         {
             Caption = 'Type';
@@ -228,22 +212,6 @@ tableextension 6014423 "NPR Customer" extends Customer
             end;
         }
     }
-
-    trigger OnAfterInsert()
-    var
-        NoSeriesMgt: Codeunit NoSeriesManagement;
-        NoNumberErr: Label 'Number must not be blank!';
-    begin
-        if Rec."No." = '' then
-            exit;
-
-        SalesSetup.GetRecordOnce();
-        SalesSetup.TestField("Customer Nos.");
-        NoSeriesMgt.InitSeries(SalesSetup."Customer Nos.", '', 0D, Rec."No.", Rec."No. Series");
-        Rec."Invoice Disc. Code" := Rec."No.";
-
-        Rec.Modify();
-    end;
 
     trigger OnBeforeDelete()
     var
