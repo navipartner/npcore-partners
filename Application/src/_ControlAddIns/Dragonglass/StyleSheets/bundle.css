@@ -6922,11 +6922,7 @@ body {
       overflow: hidden;
       text-overflow: ellipsis;
       vertical-align: middle;
-      white-space: nowrap;
-      width: var(--grid-column-width); }
-      .transcendence .grid__table table th:first-child,
-      .transcendence .grid__table table td:first-child {
-        width: var(--grid-first-column-width); }
+      white-space: nowrap; }
     .transcendence .grid__table table thead {
       background-color: var(--color-primary);
       color: var(--grid-head-color); }
