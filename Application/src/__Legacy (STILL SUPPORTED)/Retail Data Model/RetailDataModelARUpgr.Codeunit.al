@@ -521,7 +521,6 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
             POSLedgerRegister."Closing Entry No." := "POS Entry No.";
             POSLedgerRegister.Status := POSLedgerRegister.Status::CLOSED;
             POSLedgerRegister.Modify;
-            POSPostingControl.AutomaticPostPeriodRegister(POSLedgerRegister);
         end;
     end;
 

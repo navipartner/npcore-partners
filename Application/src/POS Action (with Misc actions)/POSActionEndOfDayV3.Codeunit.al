@@ -141,7 +141,6 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
                                 if (FinalEndOfDay(POSUnit."No.", SalePOS."Dimension Set ID", BalanceEntryToPrint)) then begin
                                     ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry(POSUnit."No.", SalespersonPurchaser.Code);
                                     POSManagePOSUnit.ClosePOSUnitNo(POSUnit."No.", ClosingEntryNo);
-                                    CheckAndPostAfterBalancing(ClosingEntryNo);
 
                                     Commit;
                                     POSSession.ChangeViewLogin();
@@ -157,7 +156,6 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
                                 ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry(POSUnit."No.", SalespersonPurchaser.Code);
                                 POSManagePOSUnit.ClosePOSUnitNo(POSUnit."No.", ClosingEntryNo);
 
-                                CheckAndPostAfterBalancing(ClosingEntryNo);
 
                                 if (BalanceEntryToPrint <> 0) then begin
                                     Commit;
@@ -240,7 +238,6 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
                                     CloseWorkshift(POSUnitSlaves."No.", DimensionSetId, EntryNo);
                                     ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry(POSUnitSlaves."No.", '');
                                     POSManagePOSUnit.ClosePOSUnitNo(POSUnitSlaves."No.", ClosingEntryNo);
-                                    CheckAndPostAfterBalancing(ClosingEntryNo);
                                 end;
                         until (POSUnitSlaves.Next() = 0);
                     end;
@@ -393,174 +390,6 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
 
         POSSession.StoreActionState('eft_close_list', EFTSetup);
         NextWorkflowStep := NextWorkflowStep::EFT_CLOSE;
-    end;
-
-    procedure CheckAndPostAfterBalancing(POSEntryno: Integer)
-    var
-        POSPeriodRegister: Record "NPR POS Period Register";
-        POSPeriodRegisterPostingFilter: Record "NPR POS Period Register";
-        POSEntry: Record "NPR POS Entry";
-    begin
-        if (not POSEntry.Get(POSEntryno)) then
-            exit;
-
-        if (not POSPeriodRegister.Get(POSEntry."POS Period Register No.")) then
-            exit;
-
-        ItemPosting(POSPeriodRegister);
-        POSPosting(POSPeriodRegister);
-    end;
-
-    local procedure POSPosting(POSPeriodRegister: Record "NPR POS Period Register")
-    var
-        POSPeriodRegisterPostingFilter: Record "NPR POS Period Register";
-        POSStore: Record "NPR POS Store";
-        POSPostingProfile: Record "NPR POS Posting Profile";
-    begin
-        POSStore.GetProfile(POSPeriodRegister."POS Store Code", POSPostingProfile);
-        case (POSPostingProfile."Automatic POS Posting") of
-            POSPostingProfile."Automatic POS Posting"::No:
-                exit;
-            POSPostingProfile."Automatic POS Posting"::AfterSale:
-                exit;
-            POSPostingProfile."Automatic POS Posting"::AfterEndOfDay:
-                POSPeriodRegisterPostingFilter.SetFilter("POS Unit No.", '=%1', POSPeriodRegister."POS Unit No.");
-            POSPostingProfile."Automatic POS Posting"::AfterLastEndofDayStore:
-                begin
-                    POSPeriodRegisterPostingFilter.SetFilter("POS Store Code", '=%1', POSPeriodRegister."POS Store Code");
-                    POSPeriodRegisterPostingFilter.SetFilter(Status, '<>%1', POSPeriodRegisterPostingFilter.Status::CLOSED);
-                    if (POSPeriodRegisterPostingFilter.FindFirst()) then begin
-                        Message('All periods are not closed for %1 %2 - POS Entries have not been posted.', POSPeriodRegister.FieldCaption("POS Store Code"), POSPeriodRegister."POS Store Code");
-                        exit;
-                    end;
-                    POSPeriodRegisterPostingFilter.Reset();
-                    POSPeriodRegisterPostingFilter.SetFilter("POS Store Code", '=%1', POSPeriodRegister."POS Store Code");
-                end;
-            POSPostingProfile."Automatic POS Posting"::AfterLastEndofDayCompany:
-                begin
-                    POSPeriodRegisterPostingFilter.SetFilter(Status, '<>%1', POSPeriodRegisterPostingFilter.Status::CLOSED);
-                    if (POSPeriodRegisterPostingFilter.FindFirst()) then begin
-                        Message('All periods are not closed - POS Entries have not been posted.');
-                        exit;
-                    end;
-                    POSPeriodRegisterPostingFilter.Reset();
-                    POSPeriodRegisterPostingFilter.SetFilter("POS Store Code", '=%1', POSPeriodRegister."POS Store Code");
-                end;
-            else begin
-                    Message('The setting %1 is not yet supported.', POSPostingProfile."Automatic POS Posting");
-                    exit;
-                end;
-        end;
-
-        PostPeriodEntries(POSPeriodRegisterPostingFilter, true, false);
-    end;
-
-    local procedure ItemPosting(POSPeriodRegister: Record "NPR POS Period Register")
-    var
-        POSPeriodRegisterPostingFilter: Record "NPR POS Period Register";
-        POSStore: Record "NPR POS Store";
-        POSPostingProfile: Record "NPR POS Posting Profile";
-    begin
-        POSStore.GetProfile(POSPeriodRegister."POS Store Code", POSPostingProfile);
-        case POSPostingProfile."Automatic Item Posting" of
-            POSPostingProfile."Automatic Item Posting"::No:
-                exit;
-            POSPostingProfile."Automatic Item Posting"::AfterSale:
-                exit;
-            POSPostingProfile."Automatic Item Posting"::AfterEndOfDay:
-                begin
-                    POSPeriodRegisterPostingFilter.SetFilter("POS Unit No.", '=%1', POSPeriodRegister."POS Unit No.");
-                end;
-            POSPostingProfile."Automatic Item Posting"::AfterLastEndofDayStore:
-                begin
-                    POSPeriodRegisterPostingFilter.SetFilter("POS Store Code", '=%1', POSPeriodRegister."POS Store Code");
-                    POSPeriodRegisterPostingFilter.SetFilter(Status, '<>%1', POSPeriodRegisterPostingFilter.Status::CLOSED);
-                    if (POSPeriodRegisterPostingFilter.FindFirst()) then begin
-                        Message('All periods are not closed for %1 %2 - Item Entries have not been posted.', POSPeriodRegister.FieldCaption("POS Store Code"), POSPeriodRegister."POS Store Code");
-                        exit;
-                    end;
-                    POSPeriodRegisterPostingFilter.Reset();
-                    POSPeriodRegisterPostingFilter.SetFilter("POS Store Code", '=%1', POSPeriodRegister."POS Store Code");
-                end;
-            POSPostingProfile."Automatic Item Posting"::AfterLastEndofDayCompany:
-                begin
-                    POSPeriodRegisterPostingFilter.SetFilter(Status, '<>%1', POSPeriodRegisterPostingFilter.Status::CLOSED);
-                    if (POSPeriodRegisterPostingFilter.FindFirst()) then begin
-                        Message('All periods are not closed - Item Entries have not been posted.');
-                        exit;
-                    end;
-                    POSPeriodRegisterPostingFilter.Reset();
-                    POSPeriodRegisterPostingFilter.SetFilter("POS Store Code", '=%1', POSPeriodRegister."POS Store Code");
-                end;
-            else begin
-                    Message('The settting %1 %2 is not yet supported.', POSPostingProfile.FieldCaption("Automatic Item Posting"), POSPostingProfile."Automatic Item Posting");
-                    exit;
-                end;
-        end;
-
-        PostPeriodEntries(POSPeriodRegisterPostingFilter, false, true);
-    end;
-
-    local procedure PostPeriodEntries(var POSPeriodRegisterPostingFilter: Record "NPR POS Period Register"; pPostPOSEntries: Boolean; pPostItemEntries: Boolean)
-    var
-        POSEntry: Record "NPR POS Entry";
-        HaveUnpostedEntries: Boolean;
-        PostingError: Boolean;
-    begin
-        POSPeriodRegisterPostingFilter.SetFilter("Opened Date", '%1..', CreateDateTime(CalcDate('<-7D>', Today), 0T));
-        POSPeriodRegisterPostingFilter.Ascending(false);
-        if (POSPeriodRegisterPostingFilter.FindSet()) then begin
-            repeat
-                POSEntry.SetFilter("POS Period Register No.", '=%1', POSPeriodRegisterPostingFilter."No.");
-
-                if (pPostPOSEntries) then
-                    POSEntry.SetFilter("Post Entry Status", '<2');
-
-                if (pPostItemEntries) then
-                    POSEntry.SetFilter("Post Item Entry Status", '<2');
-
-                HaveUnpostedEntries := not POSEntry.IsEmpty();
-                PostingError := false;
-
-                if (HaveUnpostedEntries) then begin
-                    PostPeriodEntriesWorker(POSPeriodRegisterPostingFilter."No.", pPostPOSEntries, pPostItemEntries);
-                    PostingError := not POSEntry.IsEmpty();
-                end;
-
-                if (PostingError) then
-                    Message(POSEntryPostIssue, POSPeriodRegisterPostingFilter."No.");
-
-            until ((POSPeriodRegisterPostingFilter.Next() = 0) or (PostingError));
-        end;
-    end;
-
-    local procedure PostPeriodEntriesWorker(PosPeriodEntryNo: Integer; pPostPOSEntries: Boolean; pPostItemEntries: Boolean)
-    var
-        POSPeriodRegister: Record "NPR POS Period Register";
-        POSPostEntries: Codeunit "NPR POS Post Entries";
-        POSEntry: Record "NPR POS Entry";
-    begin
-        if (not POSPeriodRegister.Get(PosPeriodEntryNo)) then
-            exit;
-
-        if (POSPeriodRegister.Status <> POSPeriodRegister.Status::CLOSED) then
-            exit;
-
-        if (POSPeriodRegister."End of Day Date" <> 0DT) then
-            if (POSPeriodRegister."Posting Compression" = POSPeriodRegister."Posting Compression"::"Per POS Period") then
-                POSPostEntries.SetPostingDate(true, false, DT2Date(POSPeriodRegister."End of Day Date"));
-
-        POSPostEntries.SetPostCompressed(true);
-        POSPostEntries.SetPostPOSEntries(pPostPOSEntries);
-        POSPostEntries.SetPostItemEntries(pPostItemEntries);
-
-        POSEntry.SetFilter("POS Period Register No.", '=%1', POSPeriodRegister."No.");
-
-        if (not POSEntry.IsEmpty()) then begin
-            Commit;
-            POSPostEntries.Run(POSEntry);
-            Commit;
-        end;
     end;
 
     local procedure OpenDrawer(CashDrawerNo: Code[10]; POSUnit: Record "NPR POS Unit"; SalePOS: Record "NPR Sale POS")
