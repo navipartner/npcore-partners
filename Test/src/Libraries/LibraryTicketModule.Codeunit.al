@@ -24,10 +24,10 @@ codeunit 85011 "NPR Library - Ticket Module"
         // Used for smoke testing
         // This scenario creates a ticket which is always available today.
 
-        CreateNoSerie('TM-ATF001', 'TMATF0000001');
-        CreateNoSerie('NPR-TICKET', 'NPR0000001');
-        CreateNoSerie('TM-PK10', 'TM-PK10000');         // Code 10 number series
-        CreateNoSerie('TM-PK20', 'TM-PK2000000000');    // Code 20 number series
+        CreateNoSerie('ATF-TM-ATF001', 'QWETMATF9000001');
+        CreateNoSerie('ATF-TM-TICKET', 'QWE9000001');
+        CreateNoSerie('ATF-TM-PK10', 'QWEPK10000');         // Code 10 number series
+        CreateNoSerie('ATF-TM-PK20', 'QWEPK2000000000');    // Code 20 number series
 
         TicketTypeCode := CreateTicketType(GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
         AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY));
@@ -125,7 +125,7 @@ codeunit 85011 "NPR Library - Ticket Module"
 
         TicketType.Description := TicketTypeCode;
         TicketType."Print Ticket" := FALSE;
-        TicketType.VALIDATE("No. Series", 'NPR-TICKET');
+        TicketType.VALIDATE("No. Series", 'ATF-TM-TICKET');
         TicketType."External Ticket Pattern" := 'ATF-[S][A*1]-[N]';
         TicketType."Is Ticket" := TRUE;
         TicketType."Defer Revenue" := FALSE;
@@ -329,11 +329,11 @@ codeunit 85011 "NPR Library - Ticket Module"
     begin
         case FromSeries OF
             'TM':
-                exit(NoSeriesManagement.GetNextNo('TM-ATF001', TODAY, TRUE));
+                exit(NoSeriesManagement.GetNextNo('ATF-TM-ATF001', TODAY, TRUE));
             'C1':
-                exit(NoSeriesManagement.GetNextNo('TM-PK10', TODAY, TRUE));
+                exit(NoSeriesManagement.GetNextNo('ATF-TM-PK10', TODAY, TRUE));
             'C2':
-                exit(NoSeriesManagement.GetNextNo('TM-PK20', TODAY, TRUE));
+                exit(NoSeriesManagement.GetNextNo('ATF-TM-PK20', TODAY, TRUE));
             ELSE
                 ERROR('Get Next No %1 from number series is not configured.', FromSeries);
         end;
