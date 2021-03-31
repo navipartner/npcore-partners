@@ -1,19 +1,16 @@
-page 6059952 "NPR Display Content Lines"
+page 6059965 "NPR Disp. Cont. Line Card"
 {
-    Caption = 'Display Content Lines';
-    LinksAllowed = false;
-    PageType = List;
-    UsageCategory = Administration;
-    ApplicationArea = All;
-    Editable = false;
+    Caption = 'Display Content Line Card';
+    PageType = Card;
+    UsageCategory = None;
     SourceTable = "NPR Display Content Lines";
-    CardPageId = "NPR Disp. Cont. Line Card";
+    AutoSplitKey = true;
 
     layout
     {
         area(content)
         {
-            repeater(Group)
+            group(General)
             {
                 field(Url; Rec.Url)
                 {
@@ -49,6 +46,7 @@ page 6059952 "NPR Display Content Lines"
 
     trigger OnOpenPage()
     begin
+
         DisplayContent.Get(Rec.GetFilter("Content Code"));
         if (DisplayContent.Type = DisplayContent.Type::Image) then begin
             ImageIsVisible := true;
