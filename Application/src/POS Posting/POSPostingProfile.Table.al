@@ -47,6 +47,8 @@ table 6150653 "NPR POS Posting Profile"
             DataClassification = CustomerContent;
             OptionCaption = 'No,After Sale,After End Of Day,After Last End Of Day in Store,After Last End Of Day Companywide';
             OptionMembers = No,AfterSale,AfterEndOfDay,AfterLastEndofDayStore,AfterLastEndofDayCompany;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Auto posting done only via job queue.';
         }
         field(60; "Automatic POS Posting"; Option)
         {
@@ -54,6 +56,8 @@ table 6150653 "NPR POS Posting Profile"
             DataClassification = CustomerContent;
             OptionCaption = 'No,After Sale,After End Of Day,After Last End Of Day in Store,After Last End Of Day Companywide';
             OptionMembers = No,AfterSale,AfterEndOfDay,AfterLastEndofDayStore,AfterLastEndofDayCompany;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Auto posting done only via job queue.';
         }
         field(70; "Automatic Posting Method"; Option)
         {
@@ -61,6 +65,8 @@ table 6150653 "NPR POS Posting Profile"
             DataClassification = CustomerContent;
             OptionCaption = 'Start New Session,Direct';
             OptionMembers = StartNewSession,Direct;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Auto posting done only via job queue.';
         }
 
         field(80; "Adj. Cost after Item Posting"; Boolean)

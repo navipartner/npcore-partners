@@ -26,21 +26,6 @@ page 6150639 "NPR POS Post. Profile Card"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Default POS Posting Setup field';
-                }                
-                field("Automatic Item Posting"; Rec."Automatic Item Posting")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Automatic Item Posting field';
-                }
-                field("Automatic POS Posting"; Rec."Automatic POS Posting")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Automatic POS Posting field';
-                }
-                field("Automatic Posting Method"; Rec."Automatic Posting Method")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Automatic Posting Method field';
                 }
                 field("Source Code"; Rec."Source Code")
                 {

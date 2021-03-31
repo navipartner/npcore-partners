@@ -28,21 +28,6 @@ page 6014681 "NPR POS Posting Profiles Step"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Automatic Item Posting"; "Automatic Item Posting")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Automatic Item Posting field';
-                }
-                field("Automatic POS Posting"; "Automatic POS Posting")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Automatic POS Posting field';
-                }
-                field("Automatic Posting Method"; "Automatic Posting Method")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Automatic Posting Method field';
-                }
                 field("Max. POS Posting Diff. (LCY)"; "Max. POS Posting Diff. (LCY)")
                 {
                     ApplicationArea = All;

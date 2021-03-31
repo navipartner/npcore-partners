@@ -679,10 +679,6 @@ codeunit 6150705 "NPR POS Sale"
         Success := RunAfterEndSale_OnRun(xRec);
         if not Success then
             Message(ERROR_AFTER_END_SALE, GetLastErrorText);
-
-        ClearLastError;
-        if not CODEUNIT.Run(CODEUNIT::"NPR POS End Sale Post Proc.", Rec) then
-            Message(ERROR_AFTER_END_SALE, GetLastErrorText);
     end;
 
     local procedure LogStopwatch(Keyword: Text; Duration: Duration)

@@ -338,9 +338,6 @@ codeunit 85002 "NPR Library - POS Master Data"
 
         POSPostingProfile."POS Posting Diff. Account" := LibraryERM.CreateGLAccountNo();
         POSPostingProfile."Max. POS Posting Diff. (LCY)" := 0.5;
-        POSPostingProfile."Automatic Item Posting" := POSPostingProfile."Automatic Item Posting"::AfterSale;
-        POSPostingProfile."Automatic POS Posting" := POSPostingProfile."Automatic POS Posting"::AfterSale;
-        POSPostingProfile."Automatic Posting Method" := POSPostingProfile."Automatic Posting Method"::Direct;
         POSPostingProfile."POS Sales Rounding Account" := LibraryERM.CreateGLAccountWithSalesSetup();
         POSPostingProfile."POS Sales Amt. Rndng Precision" := 0.5;
 

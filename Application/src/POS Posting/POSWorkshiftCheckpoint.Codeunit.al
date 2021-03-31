@@ -136,7 +136,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
 
         // Create the balancing entries and post if z-report
         if (EoDConfirmed) then
-            PosEntryNo := CreateBalancingEntryAndPost(Mode, UnitNo, CheckpointEntryNo, DimensionSetId);
+            PosEntryNo := CreateBalancingEntry(Mode, UnitNo, CheckpointEntryNo, DimensionSetId);
 
     end;
 
@@ -470,7 +470,7 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         exit(true);
     end;
 
-    local procedure CreateBalancingEntryAndPost(Mode: Option; UnitNo: Code[10]; CheckPointEntryNo: Integer; DimensionSetId: Integer) EntryNo: Integer
+    local procedure CreateBalancingEntry(Mode: Option; UnitNo: Code[10]; CheckPointEntryNo: Integer; DimensionSetId: Integer) EntryNo: Integer
     var
         POSUnit: Record "NPR POS Unit";
         POSEndofDayProfile: Record "NPR POS End of Day Profile";
@@ -482,7 +482,6 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         POSEntryToPost: Record "NPR POS Entry";
         POSCheckpointMgr: Codeunit "NPR POS Workshift Checkpoint";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
-        POSPostEntries: Codeunit "NPR POS Post Entries";
         DimMgt: Codeunit DimensionManagement;
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         NoSeriesManagement: Codeunit NoSeriesManagement;
@@ -544,31 +543,6 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
                 POSAuditLogMgt.CreateEntry(POSWorkshiftCheckpoint.RecordId, POSAuditLog."Action Type"::DRAWER_COUNT, POSEntryToPost."Entry No.", POSEntryToPost."Fiscal No.", POSEntryToPost."POS Unit No.");
                 POSAuditLogMgt.CreateEntry(POSWorkshiftCheckpoint.RecordId, POSAuditLog."Action Type"::GRANDTOTAL, POSEntryToPost."Entry No.", POSEntryToPost."Fiscal No.", POSEntryToPost."POS Unit No.");
                 POSAuditLogMgt.CreateEntry(POSWorkshiftCheckpoint.RecordId, POSAuditLog."Action Type"::WORKSHIFT_END, POSEntryToPost."Entry No.", POSEntryToPost."Fiscal No.", POSEntryToPost."POS Unit No.");
-
-                OnBeforePostWorkshift(POSWorkshiftCheckpoint);
-
-                if (POSEntryToPost."Post Item Entry Status" < POSEntryToPost."Post Item Entry Status"::Posted) then
-                    POSPostEntries.SetPostItemEntries(true);
-
-                if (POSEntryToPost."Post Entry Status" < POSEntryToPost."Post Entry Status"::Posted) then
-                    POSPostEntries.SetPostPOSEntries(true);
-
-                POSPostEntries.SetStopOnError(true);
-                POSPostEntries.SetPostCompressed(false);
-
-                if (POSEndofDayProfile."Posting Error Handling" = POSEndofDayProfile."Posting Error Handling"::WITH_ERROR) then begin
-                    POSPostEntries.Run(POSEntryToPost);
-                end else begin
-                    ClearLastError();
-                    Commit;
-                    if (not POSPostEntries.Run(POSEntryToPost)) then begin
-                        POSEntryToPost.Get(EntryNo);
-                        POSEntryToPost."POS Posting Log Entry No." := CreatePOSPostingLogEntry(POSEntryToPost, GetLastErrorText);
-                        POSEntryToPost.Modify;
-                        if (POSEndofDayProfile."Posting Error Handling" = POSEndofDayProfile."Posting Error Handling"::WITH_MESSAGE) then
-                            Message(POSTING_ERROR, GetLastErrorText);
-                    end;
-                end;
 
                 Commit;
             end;

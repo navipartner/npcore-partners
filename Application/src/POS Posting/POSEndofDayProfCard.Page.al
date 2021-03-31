@@ -78,14 +78,7 @@ page 6150752 "NPR POS End of Day Prof. Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Show Zero Amount Lines field';
                 }
-                field("Posting Error Handling"; Rec."Posting Error Handling")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Posting Error Handling field';
-                }
             }
         }
     }
-
-
 }
