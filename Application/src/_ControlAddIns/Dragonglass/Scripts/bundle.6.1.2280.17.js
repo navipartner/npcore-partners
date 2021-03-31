@@ -49119,7 +49119,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _dragonglass_capabilities_AppInterface__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dragonglass-capabilities/AppInterface */ "./packages/dragonglass-react/src/dragonglass-capabilities/AppInterface.js");
 
 
-var DRAGONGLASS_VERSION = "6.1.2279.16";
+var DRAGONGLASS_VERSION = "6.1.2280.17";
 var initializeVersion = function initializeVersion() {
   dragonglass_core__WEBPACK_IMPORTED_MODULE_0__["GlobalEventDispatcher"].addEventListener(dragonglass_core__WEBPACK_IMPORTED_MODULE_0__["GLOBAL_EVENTS"].FRAMEWORK_READY, function () {
     return _dragonglass_capabilities_AppInterface__WEBPACK_IMPORTED_MODULE_1__["AppInterface"].invokeFrontEndEvent("announceFrameworkVersion", {
@@ -52000,13 +52000,15 @@ var Grid = /*#__PURE__*/function (_Component) {
         className: "grid__table grid__table--head ".concat(layout.showSelectColumn ? "grid__table__head--showselectcolumn" : "")
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(_GridHead__WEBPACK_IMPORTED_MODULE_7__["default"], {
         showSelectColumn: layout.showSelectColumn,
-        dataSourceName: layout.dataSource
+        dataSourceName: layout.dataSource,
+        columns: layout.columns
       }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(_Panel__WEBPACK_IMPORTED_MODULE_6__["default"], {
         className: "grid__table grid__table--body ".concat(layout.showSelectColumn ? "grid__table__body--showselectcolumn" : "")
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("table", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(_GridBody__WEBPACK_IMPORTED_MODULE_8__["default"], {
         showSelectColumn: layout.showSelectColumn,
         dataSourceName: layout.dataSource,
-        dataSource: dataSource
+        dataSource: dataSource,
+        columns: layout.columns
       }))), layout.totals && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(_GridTotals__WEBPACK_IMPORTED_MODULE_9__["default"], {
         dataSourceName: layout.dataSource,
         dataSource: dataSource,
@@ -52045,6 +52047,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var _GridRow__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./GridRow */ "./packages/dragonglass-react/src/components/Grid/GridRow.js");
 /* harmony import */ var _redux_reducers_dataReducer__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../redux/reducers/dataReducer */ "./packages/dragonglass-react/src/redux/reducers/dataReducer.js");
+/* harmony import */ var _gridColumns__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./gridColumns */ "./packages/dragonglass-react/src/components/Grid/gridColumns.js");
 
 
 
@@ -52054,6 +52057,7 @@ __webpack_require__.r(__webpack_exports__);
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, result); }; }
 
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
 
 
 
@@ -52080,6 +52084,7 @@ var GridBody = /*#__PURE__*/function (_Component) {
           showSelectColumn = _this$props.showSelectColumn,
           reverse = _this$props.reverse;
       var rows = reverse ? data.rows.reverse() : data.rows;
+      var columns = Object(_gridColumns__WEBPACK_IMPORTED_MODULE_8__["gridColumns"])(this.props.columns, this.props.dataSource.columns);
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("tbody", null, rows.map(function (row) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(_GridRow__WEBPACK_IMPORTED_MODULE_6__["default"], {
           key: row.position,
@@ -52087,7 +52092,8 @@ var GridBody = /*#__PURE__*/function (_Component) {
           dataSource: dataSource,
           dataSourceName: dataSourceName,
           showSelectColumn: showSelectColumn,
-          row: row
+          row: row,
+          columns: columns
         });
       }));
     }
@@ -52122,6 +52128,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react */ "./node_modules/.pnpm/react@16.13.1/node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var _redux_reducers_dataReducer__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../redux/reducers/dataReducer */ "./packages/dragonglass-react/src/redux/reducers/dataReducer.js");
+/* harmony import */ var _gridColumns__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./gridColumns */ "./packages/dragonglass-react/src/components/Grid/gridColumns.js");
 
 
 
@@ -52131,6 +52138,7 @@ __webpack_require__.r(__webpack_exports__);
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, result); }; }
 
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
 
 
 
@@ -52149,12 +52157,11 @@ var GridHead = /*#__PURE__*/function (_Component) {
   _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(GridHead, [{
     key: "render",
     value: function render() {
-      var columns = this.props.dataSource.columns;
-      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("tr", null, columns.filter(function (column) {
-        return column.visible;
-      }).map(function (column) {
+      var columns = Object(_gridColumns__WEBPACK_IMPORTED_MODULE_7__["gridColumns"])(this.props.columns, this.props.dataSource.columns);
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("tr", null, columns.map(function (column) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("th", {
-          key: column.fieldId
+          key: column.fieldId,
+          width: "".concat(column.width, "%")
         }, column.caption);
       })));
     }
@@ -52210,6 +52217,29 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 
 
+var LINE_FORMAT_COLOR = "LineFormat.Color";
+var LINE_FORMAT_WEIGHT = "LineFormat.Weight";
+var LINE_FORMAT_STYLE = "LineFormat.Style";
+
+var cellStyle = function cellStyle(column, fields) {
+  var style = {
+    width: "".concat(column.width, "%")
+  };
+
+  if (fields[LINE_FORMAT_COLOR]) {
+    style.color = fields[LINE_FORMAT_COLOR];
+  }
+
+  if (fields[LINE_FORMAT_WEIGHT]) {
+    style.fontWeight = fields[LINE_FORMAT_WEIGHT];
+  }
+
+  if (fields[LINE_FORMAT_STYLE]) {
+    style.fontStyle = fields[LINE_FORMAT_STYLE];
+  }
+
+  return style;
+};
 
 var Columns = function Columns(_ref) {
   var columns = _ref.columns,
@@ -52217,14 +52247,13 @@ var Columns = function Columns(_ref) {
       showSelectColumn = _ref.showSelectColumn,
       active = _ref.active,
       toggleSelection = _ref.toggleSelection;
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_6___default.a.Fragment, null, columns.filter(function (column) {
-    return column.visible;
-  }).map(function (column, index) {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_6___default.a.Fragment, null, columns.map(function (column, index) {
     var value = row.fields && row.fields[column.fieldId];
     value = row.pending && !value ? value = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement("span", null) : _enums_DataType__WEBPACK_IMPORTED_MODULE_10__["DataType"].behavior[column.dataType].format(value);
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement("td", {
       className: row.pending ? "loading" : "",
-      key: column.fieldId
+      key: column.fieldId,
+      style: cellStyle(column, row.fields)
     }, showSelectColumn && index === 0 ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement("input", {
       type: "checkbox",
       checked: active,
@@ -52282,8 +52311,8 @@ var GridRow = /*#__PURE__*/function (_Component) {
       var _this$props = this.props,
           active = _this$props.active,
           row = _this$props.row,
-          showSelectColumn = _this$props.showSelectColumn;
-      var columns = this.props.dataSource.columns;
+          showSelectColumn = _this$props.showSelectColumn,
+          columns = _this$props.columns;
       var additional = {};
       active && (additional.className = "tr-highlight");
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement("tr", _babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_0___default()({}, additional, {
@@ -52395,6 +52424,102 @@ var GridTotals = /*#__PURE__*/function (_Component) {
 }(react__WEBPACK_IMPORTED_MODULE_5__["Component"]);
 
 /* harmony default export */ __webpack_exports__["default"] = (Object(_redux_reducers_dataReducer__WEBPACK_IMPORTED_MODULE_6__["bindComponentToDataSetState"])(GridTotals));
+
+/***/ }),
+
+/***/ "./packages/dragonglass-react/src/components/Grid/gridColumns.js":
+/*!***********************************************************************!*\
+  !*** ./packages/dragonglass-react/src/components/Grid/gridColumns.js ***!
+  \***********************************************************************/
+/*! exports provided: gridColumns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "gridColumns", function() { return gridColumns; });
+/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/defineProperty */ "./node_modules/.pnpm/@babel/runtime@7.11.2/node_modules/@babel/runtime/helpers/defineProperty.js");
+/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/typeof */ "./node_modules/.pnpm/@babel/runtime@7.11.2/node_modules/@babel/runtime/helpers/typeof.js");
+/* harmony import */ var _babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1__);
+
+
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+var specifiedColumns = function specifiedColumns(layout, dataSource) {
+  var result = [];
+
+  var _iterator = _createForOfIteratorHelper(layout),
+      _step;
+
+  try {
+    var _loop = function _loop() {
+      var included = _step.value;
+      var match = dataSource.find(function (column) {
+        switch (_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default()(included)) {
+          case "number":
+            return "".concat(column.fieldId) === "".concat(included);
+
+          case "object":
+            return "".concat(column.fieldId) === "".concat(included.fieldId);
+        }
+      });
+
+      if (match) {
+        var width = typeof included.width === "number" ? included.width : match.width;
+        result.push(_objectSpread(_objectSpread({}, match), {}, {
+          width: width
+        }));
+      }
+    };
+
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      _loop();
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+
+  return result;
+};
+
+var calculateWidths = function calculateWidths(columns) {
+  var total = columns.reduce(function (prev, current) {
+    return prev + current.width || 0;
+  }, 0);
+
+  var _iterator2 = _createForOfIteratorHelper(columns),
+      _step2;
+
+  try {
+    for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+      var column = _step2.value;
+      column.width = column.width / total * 100;
+    }
+  } catch (err) {
+    _iterator2.e(err);
+  } finally {
+    _iterator2.f();
+  }
+};
+
+var gridColumns = function gridColumns(layout, dataSource) {
+  var columns = Array.isArray(layout) ? specifiedColumns(layout, dataSource) : dataSource.filter(function (column) {
+    return column.visible;
+  });
+  calculateWidths(columns);
+  return columns;
+};
 
 /***/ }),
 
@@ -76475,13 +76600,6 @@ var DEFAULT_VIEW = {
           "type": "grid",
           "id": "salesLines",
           "fontSize": "normal",
-          "columns": [{
-            "fieldId": 10,
-            "width": 10
-          }, 11, 12, 15, 19, 20, {
-            "fieldId": 31,
-            "width": 10
-          }],
           "dataSource": "BUILTIN_SALELINE",
           "totals": [{
             "caption": "l$.Sale_SubTotal",
@@ -80330,4 +80448,4 @@ exports.reducer = dragonglass_redux_1.createReducer(workflows_initial_state_1.in
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.6.1.2279.16.js.map
+//# sourceMappingURL=bundle.6.1.2280.17.js.map
