@@ -467,6 +467,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         RecRef: RecordRef;
         OrderNo: Code[20];
         i: Integer;
+        CurrencyFactor: Decimal;
     begin
         Initialize;
         Clear(SalesHeader);
@@ -599,6 +600,12 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         end;
         SalesHeader.Validate("Location Code", MagentoWebsite."Location Code");
         SalesHeader.Validate("Currency Code", GetCurrencyCode(NpXmlDomMgt.GetElementCode(XmlElement, 'currency_code', MaxStrLen(SalesHeader."Currency Code"), false)));
+        if SalesHeader."Currency Code" <> '' then begin
+            CurrencyFactor := NpXmlDomMgt.GetElementDec(XmlElement, 'currency_factor', false);
+            if CurrencyFactor > 0 then
+                SalesHeader.Validate("Currency Factor", CurrencyFactor);
+        end;
+
         SalesHeader.Modify(true);
 
         OnAfterInsertSalesHeader(CurrImportType, CurrImportEntry, XmlElement, SalesHeader);

@@ -31,6 +31,11 @@ xmlport 6151401 "NPR Magento Sales Order Import"
                     MaxOccurs = Once;
                     MinOccurs = Zero;
                 }
+                textelement(currency_factor)
+                {
+                    MaxOccurs = Once;
+                    MinOccurs = Zero;
+                }
                 textelement(external_document_no)
                 {
                     MaxOccurs = Once;
