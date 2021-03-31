@@ -13,7 +13,7 @@ resources:
   - repository: translations
     type: git
     name: 'NpCore/NpCore-Translations'
-    ref: 'refs/heads/i10n_master'
+    ref: 'refs/heads/master' #i10n_master
 
 pool:
   name: NP Core Pipelines
