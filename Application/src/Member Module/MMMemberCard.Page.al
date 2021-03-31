@@ -497,11 +497,12 @@ page 6060136 "NPR MM Member Card"
 
                 trigger OnAction()
                 var
-                    MCSWebcamAPI: Codeunit "NPR MCS Webcam API";
+                    MembershipManagement: Codeunit "NPR MM Membership Mgt.";
                 begin
-                    MCSWebcamAPI.CallCaptureStartByMMMember(Rec, true);
+                    MembershipManagement.TakeMemberPicture(Rec);
                 end;
             }
+
             action("Import Picture")
             {
                 Caption = 'Import Picture';
