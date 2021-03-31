@@ -10,7 +10,6 @@ report 6014417 "NPR Inventory per Date"
         dataitem(Item; Item)
         {
             CalcFields = "Net Change";
-            DataItemTableView = SORTING("NPR Primary Key Length");
             RequestFilterFields = "No.", "Vendor No.", "Item Category Code", "NPR Group sale";
             column(COMPANYNAME; CompanyName)
             {
