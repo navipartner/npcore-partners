@@ -239,11 +239,11 @@ page 6060121 "NPR TM Ticket BOM"
             }
             action(Items)
             {
-                ToolTip = 'Navigate to Item List.';
+                ToolTip = 'Navigate to Item Card.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                Caption = 'Items';
+                Caption = 'Item';
                 Image = ItemLines;
-                RunObject = Page "Item List";
+                RunObject = Page "Item Card";
                 RunPageLink = "No." = field("Item No.");
             }
         }
