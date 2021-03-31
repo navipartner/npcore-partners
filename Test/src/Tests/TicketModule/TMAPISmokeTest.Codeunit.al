@@ -207,6 +207,7 @@ codeunit 85013 "NPR TM API SmokeTest"
         ScannerStation: Code[10];
         SendNotificationTo: Text;
         ExternalOrderNo: Text;
+        TicketSetup: Record "NPR TM Ticket Setup";
     begin
 
         ItemNo := SelectSmokeTestScenario();
@@ -221,6 +222,9 @@ codeunit 85013 "NPR TM API SmokeTest"
         ReservationOk := TicketApiLibrary.ConfirmTicketReservation(ResponseToken, SendNotificationTo, ExternalOrderNo, ScannerStation, TmpCreatedTickets, ResponseMessage);
         Assert.IsTrue(ReservationOk, ResponseMessage);
         Assert.AreEqual(TmpCreatedTickets.Count(), NumberOfTicketOrders * TicketQuantityPerOrder, 'Number of tickets confirmed does not match number of tickets requested.');
+
+        if (TicketSetup.Get()) then
+            TicketSetup.Delete();
 
         // [TEST]
         // DIY is not setup in this scenario and should fail
