@@ -12,11 +12,6 @@ codeunit 6059941 "NPR NaviDocs Handl. Prof. Tmpl"
         exit(Handled);
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnDoHandleNaviDocs(RecordVariant: Variant; var Handled: Boolean)
-    begin
-    end;
-
     procedure AddToNaviDocs(RecordVariant: Variant; Recepient: Text; ReportID: Integer; DelayUntil: DateTime)
     var
         NaviDocsManagement: Codeunit "NPR NaviDocs Management";
@@ -28,6 +23,11 @@ codeunit 6059941 "NPR NaviDocs Handl. Prof. Tmpl"
         end;
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnDoHandleNaviDocs(RecordVariant: Variant; var Handled: Boolean)
+    begin
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NaviDocs Management", 'OnAddHandlingProfilesToLibrary', '', true, true)]
     local procedure AddNaviDocsHandlingProfile()
     var
@@ -37,21 +37,6 @@ codeunit 6059941 "NPR NaviDocs Handl. Prof. Tmpl"
             NaviDocsManagement.AddHandlingProfileToLibrary(NaviDocsHandlingProfileCode, NaviDocsHandlingProfileTxt, false, false, false, false);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NaviDocs Management", 'OnShowTemplate', '', false, false)]
-    local procedure ShowTemplateFromNaviDocs(var RequestHandled: Boolean; NaviDocsEntry: Record "NPR NaviDocs Entry")
-    var
-        RecRef: RecordRef;
-    begin
-        if RequestHandled or (NaviDocsEntry."Document Handling Profile" <> NaviDocsHandlingProfileCode) then
-            exit;
-        RequestHandled := true;
-
-        if not RecRef.Get(NaviDocsEntry."Record ID") then
-            exit;
-
-        // Add code to Show the template here
-        Message('Showing the Template');
-    end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NaviDocs Management", 'OnManageDocument', '', false, false)]
     local procedure HandleNaviDocsDocument(var IsDocumentHandled: Boolean; ProfileCode: Code[20]; var NaviDocsEntry: Record "NPR NaviDocs Entry"; ReportID: Integer; var WithSuccess: Boolean; var ErrorMessage: Text)

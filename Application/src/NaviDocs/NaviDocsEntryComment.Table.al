@@ -1,7 +1,5 @@
 table 6059769 "NPR NaviDocs Entry Comment"
 {
-    // NPR5.26/THRO/20160808 CASE 248662 Removed field 3 Type
-
     Caption = 'Document Handling Comment';
     DataClassification = CustomerContent;
 
@@ -73,9 +71,6 @@ table 6059769 "NPR NaviDocs Entry Comment"
         }
     }
 
-    fieldgroups
-    {
-    }
 
     trigger OnInsert()
     begin

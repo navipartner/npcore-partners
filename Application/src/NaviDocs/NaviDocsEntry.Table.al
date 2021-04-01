@@ -1,15 +1,5 @@
 table 6059768 "NPR NaviDocs Entry"
 {
-    // NPR5.23/THRO/20160315 CASE 236043 Get Table Caption from Object.Type=Table
-    // NPR5.26/THRO/20160808 CASE 248662 Added Document Handling Profile. Document Handling Option no longer used.
-    //                                   Removed field 3 Type, 300 "Post Shipment",  310 "Post Invoice", 320 "Post Reception" and 1500 "Attached File"
-    //                                   Field 100 External Document No. change to code(35) to match size in salesheader
-    // NPR5.26/THRO/20160908 CASE 250371 Added field 600 "Delay sending until" - for delayed sending of document
-    // NPR5.28/MMV /20161104 CASE 254575 Added option "Contact" to field 190 "Type (Recipient)".
-    // NPR5.30/THRO/20170209 CASE 243998 Use Activity Log for Logging
-    // NPR5.36/THRO/20170913 CASE 289216 Added Template Code. Used to specify a template to use when sending. Overwrite the normal "find a matching template"-function
-    // NPR5.43/THRO/20180614 CASE 315958 Attachment table
-
     Caption = 'NaviDocs';
     DataClassification = CustomerContent;
 
@@ -63,10 +53,8 @@ table 6059768 "NPR NaviDocs Entry"
             var
                 NaviDocsHandlingProfile: Record "NPR NaviDocs Handling Profile";
             begin
-                //-NPR5.26 [248662]
                 if NaviDocsHandlingProfile.Get("Document Handling Profile") then
                     "Document Handling" := NaviDocsHandlingProfile.Description;
-                //+NPR5.26 [248662]
             end;
         }
         field(40; "Document Handling"; Text[100])
@@ -113,11 +101,9 @@ table 6059768 "NPR NaviDocs Entry"
             Editable = false;
             DataClassification = CustomerContent;
         }
-        field(190; "Type (Recipient)"; Option)
+        field(190; "Type (Recipient)"; Enum "NPR NaviDocs Entry Type (Recipient)")
         {
             Caption = 'Type (Recipient)';
-            OptionCaption = ' ,Customer,Vendor,Contact';
-            OptionMembers = " ",Customer,Vendor,Contact;
             DataClassification = CustomerContent;
         }
         field(200; "No. (Recipient)"; Code[20])
@@ -217,10 +203,6 @@ table 6059768 "NPR NaviDocs Entry"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     var
         ActivityLog: Record "Activity Log";
@@ -230,14 +212,12 @@ table 6059768 "NPR NaviDocs Entry"
         NaviDocsEntryComment.SetRange("Document Type", "Document Type");
         NaviDocsEntryComment.SetRange("Document No.", "No.");
         NaviDocsEntryComment.DeleteAll(true);
-        //-NPR5.30 [243998]
+
         ActivityLog.SetRange("Record ID", RecordId);
         ActivityLog.DeleteAll;
-        //+NPR5.30 [243998]
-        //-NPR5.43 [315958]
+
         NaviDocsEntryAttachment.SetRange("NaviDocs Entry No.", "Entry No.");
         NaviDocsEntryAttachment.DeleteAll;
-        //+NPR5.43 [315958]
     end;
 
     trigger OnInsert()
@@ -251,6 +231,5 @@ table 6059768 "NPR NaviDocs Entry"
     var
         NaviDocsEntryComment: Record "NPR NaviDocs Entry Comment";
         Error001: Label 'Please use Lookup (F6).';
-        AdditionalHandlingOptionTxt: Label ',,,,,,,,,,,,,,,,,,,SMS';
 }
 

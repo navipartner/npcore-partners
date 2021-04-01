@@ -1,6 +1,5 @@
 page 6059770 "NPR NaviDocs Comment Subpage"
 {
-    // NPR5.30/THRO/20170209 CASE 243998 Logging in Activity Log - Source table changed + added function SetData
 
     Caption = 'Comments';
     DeleteAllowed = false;
@@ -20,27 +19,27 @@ page 6059770 "NPR NaviDocs Comment Subpage"
         {
             repeater(Group)
             {
-                field("Activity Date"; "Activity Date")
+                field("Activity Date"; Rec."Activity Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Activity Date field';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field("Activity Message"; "Activity Message")
+                field("Activity Message"; Rec."Activity Message")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Activity Message field';
                 }
-                field("User ID"; "User ID")
+                field("User ID"; Rec."User ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the User ID field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -50,45 +49,39 @@ page 6059770 "NPR NaviDocs Comment Subpage"
         }
     }
 
-    actions
-    {
-    }
-
     procedure SetData(NaviDocsEntry: Record "NPR NaviDocs Entry"; UseActivityLog: Boolean)
     var
         NaviDocsEntryComment: Record "NPR NaviDocs Entry Comment";
         ActivityLog: Record "Activity Log";
     begin
-        //-NPR5.30 [243998]
-        if not IsTemporary then
+        if not Rec.IsTemporary then
             exit;
-        DeleteAll;
+        Rec.DeleteAll;
         if UseActivityLog then begin
             ActivityLog.SetRange("Record ID", NaviDocsEntry.RecordId);
             if ActivityLog.FindSet then
                 repeat
                     Rec := ActivityLog;
-                    Insert;
+                    Rec.Insert;
                 until ActivityLog.Next = 0;
         end else begin
             NaviDocsEntryComment.SetRange("Entry No.", NaviDocsEntry."Entry No.");
             if NaviDocsEntryComment.FindSet then
                 repeat
-                    Init;
-                    ID := NaviDocsEntryComment."Line No.";
-                    "Record ID" := NaviDocsEntry.RecordId;
-                    "Activity Date" := CreateDateTime(NaviDocsEntryComment."Insert Date", NaviDocsEntryComment."Insert Time");
-                    "User ID" := NaviDocsEntryComment."User ID";
+                    Rec.Init;
+                    Rec.ID := NaviDocsEntryComment."Line No.";
+                    Rec."Record ID" := NaviDocsEntry.RecordId;
+                    Rec."Activity Date" := CreateDateTime(NaviDocsEntryComment."Insert Date", NaviDocsEntryComment."Insert Time");
+                    Rec."User ID" := NaviDocsEntryComment."User ID";
                     if NaviDocsEntryComment.Warning then
-                        Status := Status::Failed
+                        Rec.Status := Rec.Status::Failed
                     else
-                        Status := Status::Success;
-                    "Activity Message" := NaviDocsEntryComment.Description;
-                    Insert(true);
+                        Rec.Status := Rec.Status::Success;
+                    Rec."Activity Message" := NaviDocsEntryComment.Description;
+                    Rec.Insert(true);
                 until NaviDocsEntryComment.Next = 0;
         end;
         CurrPage.Update(false);
-        //+NPR5.30 [243998]
     end;
 }
 

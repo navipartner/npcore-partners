@@ -1,7 +1,5 @@
 table 6059944 "NPR NaviDocs Entry Attachment"
 {
-    // NPR5.43/THRO/20180531 CASE 315958 Table created
-
     Caption = 'NaviDocs Entry Attachment';
     DataClassification = CustomerContent;
 
@@ -37,12 +35,10 @@ table 6059944 "NPR NaviDocs Entry Attachment"
             Caption = 'Description';
             DataClassification = CustomerContent;
         }
-        field(50; "Internal Type"; Option)
+        field(50; "Internal Type"; Enum "NPR NaviDocs Entry Att. Internal Type")
         {
             Caption = 'Internal Type';
             DataClassification = CustomerContent;
-            OptionCaption = ' ,Report Parameters';
-            OptionMembers = " ","Report Parameters";
         }
     }
 
@@ -53,10 +49,6 @@ table 6059944 "NPR NaviDocs Entry Attachment"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     var
         NoDataText: Label 'No Data in record.';
 
@@ -64,7 +56,6 @@ table 6059944 "NPR NaviDocs Entry Attachment"
     var
         SyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         FileMgt: Codeunit "File Management";
-        StreamReader: DotNet NPRNetStreamReader;
         InStr: InStream;
         Path: Text;
         Content: Text;
@@ -85,12 +76,10 @@ table 6059944 "NPR NaviDocs Entry Attachment"
         exit;
         Data.CreateInStream(InStr, TEXTENCODING::UTF8);
         if IsWebClient() then begin
-            StreamReader := StreamReader.StreamReader(InStr);
-            Content := StreamReader.ReadToEnd();
+            InStr.Read(Content);
             Message(Content);
         end else begin
             Path := TemporaryPath + StrSubstNo(FilenamePattern, "NaviDocs Entry No.", "File Extension");
-            StreamReader := StreamReader.StreamReader(InStr);
             DownloadFromStream(InStr, 'Export', FileMgt.Magicpath, '.xml', Path);
             SyncMgt.RunProcess('notepad.exe', Path, false);
             Sleep(100);

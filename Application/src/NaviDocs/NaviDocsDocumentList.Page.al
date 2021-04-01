@@ -16,43 +16,43 @@ page 6059769 "NPR NaviDocs Document List"
         {
             repeater(Group)
             {
-                field("Document Description"; "Document Description")
+                field("Document Description"; Rec."Document Description")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Document Description field';
                 }
-                field("Posting Date"; "Posting Date")
+                field("Posting Date"; Rec."Posting Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Posting Date field';
                 }
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field("Order No."; "Order No.")
+                field("Order No."; Rec."Order No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Order No. field';
                 }
-                field("External Document No."; "External Document No.")
+                field("External Document No."; Rec."External Document No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the External Document No. field';
                 }
-                field("No. (Recipient)"; "No. (Recipient)")
+                field("No. (Recipient)"; Rec."No. (Recipient)")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the No. (Recipient) field';
                 }
-                field("Name (Recipient)"; "Name (Recipient)")
+                field("Name (Recipient)"; Rec."Name (Recipient)")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -66,46 +66,46 @@ page 6059769 "NPR NaviDocs Document List"
                     OptionCaption = 'Unhandled,Error,Handled';
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field("Document Handling Profile"; "Document Handling Profile")
+                field("Document Handling Profile"; Rec."Document Handling Profile")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document Handling Profile field';
                 }
-                field("Document Handling"; "Document Handling")
+                field("Document Handling"; Rec."Document Handling")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Document Handling field';
                 }
-                field("Report No."; "Report No.")
+                field("Report No."; Rec."Report No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Report No. field';
                 }
-                field("E-mail (Recipient)"; "E-mail (Recipient)")
+                field("E-mail (Recipient)"; Rec."E-mail (Recipient)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the E-mail (Recipient) field';
                 }
-                field("Template Code"; "Template Code")
+                field("Template Code"; Rec."Template Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Template Code field';
                 }
-                field("Printed Qty."; "Printed Qty.")
+                field("Printed Qty."; Rec."Printed Qty.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Printed Qty. field';
                 }
-                field("Processed Qty."; "Processed Qty.")
+                field("Processed Qty."; Rec."Processed Qty.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Processed Qty. field';
                 }
-                field("Delay sending until"; "Delay sending until")
+                field("Delay sending until"; Rec."Delay sending until")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Delay sending until field';
@@ -141,7 +141,7 @@ page 6059769 "NPR NaviDocs Document List"
                     Caption = 'Handle';
                     Image = Start;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
@@ -159,7 +159,7 @@ page 6059769 "NPR NaviDocs Document List"
                     Caption = 'Handle marked';
                     Image = Start;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F9';
@@ -181,7 +181,7 @@ page 6059769 "NPR NaviDocs Document List"
                     Caption = 'Show unhandled';
                     Image = FilterLines;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Ctrl+U';
@@ -190,7 +190,7 @@ page 6059769 "NPR NaviDocs Document List"
 
                     trigger OnAction()
                     begin
-                        SetRange(Status, 0, 1);
+                        Rec.SetRange(Status, 0, 1);
                         CurrPage.Update(false);
                     end;
                 }
@@ -203,7 +203,7 @@ page 6059769 "NPR NaviDocs Document List"
                     Caption = 'Update Status of Marked';
                     Image = GetSourceDoc;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -222,7 +222,7 @@ page 6059769 "NPR NaviDocs Document List"
                     Caption = 'Set Status = Unhandled';
                     Image = ChangeStatus;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category6;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Set Status = Unhandled action';
@@ -239,7 +239,7 @@ page 6059769 "NPR NaviDocs Document List"
                     Caption = 'Set Status = Error';
                     Image = ChangeStatus;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category6;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Set Status = Error action';
@@ -256,7 +256,7 @@ page 6059769 "NPR NaviDocs Document List"
                     Caption = 'Set Status = Handled';
                     Image = ChangeStatus;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedCategory = Category6;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Set Status = Handled action';
@@ -295,7 +295,7 @@ page 6059769 "NPR NaviDocs Document List"
                 Caption = 'Document Card';
                 Image = GetSourceDoc;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Category4;
                 ShortCutKey = 'Shift+F5';
                 ApplicationArea = All;
@@ -311,7 +311,7 @@ page 6059769 "NPR NaviDocs Document List"
                 Caption = 'Master Card';
                 Image = GetSourceDoc;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Category4;
                 ShortCutKey = 'Ctrl+F5';
                 ApplicationArea = All;
@@ -327,7 +327,7 @@ page 6059769 "NPR NaviDocs Document List"
                 Caption = 'Template';
                 Image = MailAttachment;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Category4;
                 ShortCutKey = 'Ctrl+M';
                 ApplicationArea = All;
@@ -348,7 +348,7 @@ page 6059769 "NPR NaviDocs Document List"
 
     trigger OnAfterGetRecord()
     begin
-        StatusText := Status;
+        StatusText := Rec.Status;
     end;
 
     trigger OnOpenPage()
@@ -387,7 +387,7 @@ page 6059769 "NPR NaviDocs Document List"
             repeat
                 NaviDocsEntry3.Copy(NaviDocsEntry2);
                 NaviDocsManagement.Process(NaviDocsEntry3);
-                Commit;
+                Commit();
             until NaviDocsEntry2.Next = 0;
 
         NaviDocsEntry2.Reset;
