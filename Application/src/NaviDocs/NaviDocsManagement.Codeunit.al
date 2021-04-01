@@ -11,7 +11,7 @@ codeunit 6059767 "NPR NaviDocs Management"
             exit;
         ClearLastError();
         if not DocManage(Rec) then begin
-            commit;
+            Commit();
             Error('');
         end;
         Rec.Status := 2;
@@ -48,7 +48,7 @@ codeunit 6059767 "NPR NaviDocs Management"
         NaviDocsEntry."Processed Qty." += 1;
         NaviDocsEntry.Status := 1;
         NaviDocsEntry.Modify;
-        Commit;
+        Commit();
         ManagementStatus := NaviDocsManagement.Run(NaviDocsEntry);
         if (not ManagementStatus) and (GetLastErrorText <> '') then begin
             InsertComment(NaviDocsEntry, GetLastErrorText, true);
@@ -181,187 +181,185 @@ codeunit 6059767 "NPR NaviDocs Management"
         PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr.";
         ReturnShipmentHeader: Record "Return Shipment Header";
     begin
-        with NaviDocsEntry do begin
-            case RecRef.Number of
-                DATABASE::Customer:
-                    begin
-                        RecRef.SetTable(Customer);
-                        "Type (Recipient)" := "Type (Recipient)"::Customer;
-                        "No. (Recipient)" := Customer."No.";
-                        "Name (Recipient)" := Customer.Name;
-                        "Name 2 (Recipient)" := Customer."Name 2";
-                    end;
-                DATABASE::Vendor:
-                    begin
-                        RecRef.SetTable(Vendor);
-                        "Type (Recipient)" := "Type (Recipient)"::Vendor;
-                        "No. (Recipient)" := Vendor."No.";
-                        "Name (Recipient)" := Vendor.Name;
-                        "Name 2 (Recipient)" := Vendor."Name 2";
-                    end;
-                DATABASE::"Sales Header":
-                    begin
-                        RecRef.SetTable(SalesHeader);
-                        "Document Type" := SalesHeader."Document Type".AsInteger();
-                        "Type (Recipient)" := "Type (Recipient)"::Customer;
-                        "No. (Recipient)" := SalesHeader."Sell-to Customer No.";
-                        "Name (Recipient)" := SalesHeader."Sell-to Customer Name";
-                        "Name 2 (Recipient)" := SalesHeader."Sell-to Customer Name 2";
-                        "Posting Date" := SalesHeader."Posting Date";
-                        "External Document No." := SalesHeader."External Document No.";
-                    end;
-                DATABASE::"Purchase Header":
-                    begin
-                        RecRef.SetTable(PurchHeader);
-                        "Document Type" := PurchHeader."Document Type".AsInteger();
-                        "Type (Recipient)" := "Type (Recipient)"::Vendor;
-                        "No. (Recipient)" := PurchHeader."Buy-from Vendor No.";
-                        "Posting Date" := PurchHeader."Posting Date";
-                        "Name (Recipient)" := PurchHeader."Buy-from Vendor Name";
-                        "Name 2 (Recipient)" := PurchHeader."Buy-from Vendor Name 2";
-                    end;
-                DATABASE::"Sales Shipment Header":
-                    begin
-                        RecRef.SetTable(SalesShipmentHeader);
-                        "Type (Recipient)" := "Type (Recipient)"::Customer;
-                        "No. (Recipient)" := SalesShipmentHeader."Sell-to Customer No.";
-                        "Posting Date" := SalesShipmentHeader."Posting Date";
-                        "Name (Recipient)" := SalesShipmentHeader."Sell-to Customer Name";
-                        "Name 2 (Recipient)" := SalesShipmentHeader."Sell-to Customer Name 2";
-                        "External Document No." := SalesShipmentHeader."External Document No.";
-                    end;
-                DATABASE::"Sales Invoice Header":
-                    begin
-                        RecRef.SetTable(SalesInvoiceHeader);
-                        "Type (Recipient)" := "Type (Recipient)"::Customer;
-                        "No. (Recipient)" := SalesInvoiceHeader."Bill-to Customer No.";
-                        "Posting Date" := SalesInvoiceHeader."Posting Date";
-                        "Name (Recipient)" := SalesInvoiceHeader."Bill-to Name";
-                        "Name 2 (Recipient)" := SalesInvoiceHeader."Bill-to Name 2";
-                        "Order No." := SalesInvoiceHeader."Order No.";
-                        "External Document No." := SalesInvoiceHeader."External Document No.";
-                    end;
-                DATABASE::"Sales Cr.Memo Header":
-                    begin
-                        RecRef.SetTable(SalesCrMemoHeader);
-                        "Type (Recipient)" := "Type (Recipient)"::Customer;
-                        "No. (Recipient)" := SalesCrMemoHeader."Bill-to Customer No.";
-                        "Posting Date" := SalesCrMemoHeader."Posting Date";
-                        "Name (Recipient)" := SalesCrMemoHeader."Bill-to Name";
-                        "Name 2 (Recipient)" := SalesCrMemoHeader."Bill-to Name 2";
-                        "External Document No." := SalesCrMemoHeader."External Document No.";
-                    end;
-                DATABASE::"Issued Reminder Header":
-                    begin
-                        RecRef.SetTable(IssuedReminderHeader);
-                        "Type (Recipient)" := "Type (Recipient)"::Customer;
-                        "No. (Recipient)" := IssuedReminderHeader."Customer No.";
-                        "Name (Recipient)" := IssuedReminderHeader.Name;
-                        "Name 2 (Recipient)" := IssuedReminderHeader."Name 2";
-                        "Posting Date" := IssuedReminderHeader."Posting Date";
-                    end;
-                DATABASE::"Issued Fin. Charge Memo Header":
-                    begin
-                        RecRef.SetTable(IssuedFinChargeMemoHeader);
-                        "Type (Recipient)" := "Type (Recipient)"::Customer;
-                        "No. (Recipient)" := IssuedFinChargeMemoHeader."Customer No.";
-                        "Name (Recipient)" := IssuedFinChargeMemoHeader.Name;
-                        "Name 2 (Recipient)" := IssuedFinChargeMemoHeader."Name 2";
-                        "Posting Date" := IssuedFinChargeMemoHeader."Posting Date";
-                    end;
-                DATABASE::"Return Receipt Header":
-                    begin
-                        RecRef.SetTable(ReturnReceiptHeader);
-                        "Type (Recipient)" := "Type (Recipient)"::Customer;
-                        "No. (Recipient)" := ReturnReceiptHeader."Sell-to Customer No.";
-                        "Name (Recipient)" := ReturnReceiptHeader."Sell-to Customer Name";
-                        "Name 2 (Recipient)" := ReturnReceiptHeader."Sell-to Customer Name 2";
-                        "Posting Date" := ReturnReceiptHeader."Posting Date";
-                    end;
-                DATABASE::"Service Header":
-                    begin
-                        RecRef.SetTable(ServiceHeader);
-                        "Document Type" := ServiceHeader."Document Type".AsInteger();
-                        "Type (Recipient)" := "Type (Recipient)"::Customer;
-                        "No. (Recipient)" := ServiceHeader."Customer No.";
-                        "Name (Recipient)" := ServiceHeader.Name;
-                        "Name 2 (Recipient)" := ServiceHeader."Name 2";
-                        "Posting Date" := ServiceHeader."Posting Date";
-                    end;
-                DATABASE::"Service Shipment Header":
-                    begin
-                        RecRef.SetTable(ServiceShipmentHeader);
-                        "Type (Recipient)" := "Type (Recipient)"::Customer;
-                        "No. (Recipient)" := ServiceShipmentHeader."Customer No.";
-                        "Name (Recipient)" := ServiceShipmentHeader.Name;
-                        "Name 2 (Recipient)" := ServiceShipmentHeader."Name 2";
-                        "Posting Date" := ServiceShipmentHeader."Posting Date";
-                    end;
-                DATABASE::"Service Invoice Header":
-                    begin
-                        RecRef.SetTable(ServiceInvoiceHeader);
-                        "Type (Recipient)" := "Type (Recipient)"::Customer;
-                        "No. (Recipient)" := ServiceInvoiceHeader."Bill-to Customer No.";
-                        "Name (Recipient)" := ServiceInvoiceHeader."Bill-to Name";
-                        "Name 2 (Recipient)" := ServiceInvoiceHeader."Bill-to Name 2";
-                        "Posting Date" := ServiceInvoiceHeader."Posting Date";
-                    end;
-                DATABASE::"Service Cr.Memo Header":
-                    begin
-                        RecRef.SetTable(ServiceCrMemoHeader);
-                        "Type (Recipient)" := "Type (Recipient)"::Customer;
-                        "No. (Recipient)" := ServiceCrMemoHeader."Bill-to Customer No.";
-                        "Name (Recipient)" := ServiceCrMemoHeader."Bill-to Name";
-                        "Name 2 (Recipient)" := ServiceCrMemoHeader."Bill-to Name 2";
-                        "Posting Date" := ServiceCrMemoHeader."Posting Date";
-                    end;
-                DATABASE::"Service Contract Header":
-                    begin
-                        RecRef.SetTable(ServiceContractHeader);
-                        "Document Type" := ServiceContractHeader."Contract Type";
-                        "Type (Recipient)" := "Type (Recipient)"::Customer;
-                        "No. (Recipient)" := ServiceContractHeader."Bill-to Customer No.";
-                        ServiceContractHeader.CalcFields("Bill-to Name", "Bill-to Name 2");
-                        "Name (Recipient)" := ServiceContractHeader."Bill-to Name";
-                        "Name 2 (Recipient)" := ServiceContractHeader."Bill-to Name 2";
-                    end;
-                DATABASE::"Purch. Rcpt. Header":
-                    begin
-                        RecRef.SetTable(PurchRcptHeader);
-                        "Type (Recipient)" := "Type (Recipient)"::Vendor;
-                        "No. (Recipient)" := PurchRcptHeader."Buy-from Vendor No.";
-                        "Name (Recipient)" := PurchRcptHeader."Buy-from Vendor Name";
-                        "Name 2 (Recipient)" := PurchRcptHeader."Buy-from Vendor Name 2";
-                        "Posting Date" := PurchRcptHeader."Posting Date";
-                    end;
-                DATABASE::"Purch. Inv. Header":
-                    begin
-                        RecRef.SetTable(PurchInvHeader);
-                        "Type (Recipient)" := "Type (Recipient)"::Vendor;
-                        "No. (Recipient)" := PurchInvHeader."Pay-to Vendor No.";
-                        "Name (Recipient)" := PurchInvHeader."Pay-to Name";
-                        "Name 2 (Recipient)" := PurchInvHeader."Pay-to Name 2";
-                        "Posting Date" := PurchInvHeader."Posting Date";
-                    end;
-                DATABASE::"Purch. Cr. Memo Hdr.":
-                    begin
-                        RecRef.SetTable(PurchCrMemoHdr);
-                        "Type (Recipient)" := "Type (Recipient)"::Vendor;
-                        "No. (Recipient)" := PurchCrMemoHdr."Pay-to Vendor No.";
-                        "Name (Recipient)" := PurchCrMemoHdr."Pay-to Name";
-                        "Name 2 (Recipient)" := PurchCrMemoHdr."Pay-to Name 2";
-                        "Posting Date" := PurchCrMemoHdr."Posting Date";
-                    end;
-                DATABASE::"Return Shipment Header":
-                    begin
-                        RecRef.SetTable(ReturnShipmentHeader);
-                        "Type (Recipient)" := "Type (Recipient)"::Vendor;
-                        "No. (Recipient)" := ReturnShipmentHeader."Buy-from Vendor No.";
-                        "Name (Recipient)" := ReturnShipmentHeader."Buy-from Vendor Name";
-                        "Name 2 (Recipient)" := ReturnShipmentHeader."Buy-from Vendor Name 2";
-                        "Posting Date" := ReturnShipmentHeader."Posting Date";
-                    end;
-            end;
+        case RecRef.Number of
+            DATABASE::Customer:
+                begin
+                    RecRef.SetTable(Customer);
+                    NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
+                    NaviDocsEntry."No. (Recipient)" := Customer."No.";
+                    NaviDocsEntry."Name (Recipient)" := Customer.Name;
+                    NaviDocsEntry."Name 2 (Recipient)" := Customer."Name 2";
+                end;
+            DATABASE::Vendor:
+                begin
+                    RecRef.SetTable(Vendor);
+                    NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Vendor;
+                    NaviDocsEntry."No. (Recipient)" := Vendor."No.";
+                    NaviDocsEntry."Name (Recipient)" := Vendor.Name;
+                    NaviDocsEntry."Name 2 (Recipient)" := Vendor."Name 2";
+                end;
+            DATABASE::"Sales Header":
+                begin
+                    RecRef.SetTable(SalesHeader);
+                    NaviDocsEntry."Document Type" := SalesHeader."Document Type".AsInteger();
+                    NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
+                    NaviDocsEntry."No. (Recipient)" := SalesHeader."Sell-to Customer No.";
+                    NaviDocsEntry."Name (Recipient)" := SalesHeader."Sell-to Customer Name";
+                    NaviDocsEntry."Name 2 (Recipient)" := SalesHeader."Sell-to Customer Name 2";
+                    NaviDocsEntry."Posting Date" := SalesHeader."Posting Date";
+                    NaviDocsEntry."External Document No." := SalesHeader."External Document No.";
+                end;
+            DATABASE::"Purchase Header":
+                begin
+                    RecRef.SetTable(PurchHeader);
+                    NaviDocsEntry."Document Type" := PurchHeader."Document Type".AsInteger();
+                    NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Vendor;
+                    NaviDocsEntry."No. (Recipient)" := PurchHeader."Buy-from Vendor No.";
+                    NaviDocsEntry."Posting Date" := PurchHeader."Posting Date";
+                    NaviDocsEntry."Name (Recipient)" := PurchHeader."Buy-from Vendor Name";
+                    NaviDocsEntry."Name 2 (Recipient)" := PurchHeader."Buy-from Vendor Name 2";
+                end;
+            DATABASE::"Sales Shipment Header":
+                begin
+                    RecRef.SetTable(SalesShipmentHeader);
+                    NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
+                    NaviDocsEntry."No. (Recipient)" := SalesShipmentHeader."Sell-to Customer No.";
+                    NaviDocsEntry."Posting Date" := SalesShipmentHeader."Posting Date";
+                    NaviDocsEntry."Name (Recipient)" := SalesShipmentHeader."Sell-to Customer Name";
+                    NaviDocsEntry."Name 2 (Recipient)" := SalesShipmentHeader."Sell-to Customer Name 2";
+                    NaviDocsEntry."External Document No." := SalesShipmentHeader."External Document No.";
+                end;
+            DATABASE::"Sales Invoice Header":
+                begin
+                    RecRef.SetTable(SalesInvoiceHeader);
+                    NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
+                    NaviDocsEntry."No. (Recipient)" := SalesInvoiceHeader."Bill-to Customer No.";
+                    NaviDocsEntry."Posting Date" := SalesInvoiceHeader."Posting Date";
+                    NaviDocsEntry."Name (Recipient)" := SalesInvoiceHeader."Bill-to Name";
+                    NaviDocsEntry."Name 2 (Recipient)" := SalesInvoiceHeader."Bill-to Name 2";
+                    NaviDocsEntry."Order No." := SalesInvoiceHeader."Order No.";
+                    NaviDocsEntry."External Document No." := SalesInvoiceHeader."External Document No.";
+                end;
+            DATABASE::"Sales Cr.Memo Header":
+                begin
+                    RecRef.SetTable(SalesCrMemoHeader);
+                    NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
+                    NaviDocsEntry."No. (Recipient)" := SalesCrMemoHeader."Bill-to Customer No.";
+                    NaviDocsEntry."Posting Date" := SalesCrMemoHeader."Posting Date";
+                    NaviDocsEntry."Name (Recipient)" := SalesCrMemoHeader."Bill-to Name";
+                    NaviDocsEntry."Name 2 (Recipient)" := SalesCrMemoHeader."Bill-to Name 2";
+                    NaviDocsEntry."External Document No." := SalesCrMemoHeader."External Document No.";
+                end;
+            DATABASE::"Issued Reminder Header":
+                begin
+                    RecRef.SetTable(IssuedReminderHeader);
+                    NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
+                    NaviDocsEntry."No. (Recipient)" := IssuedReminderHeader."Customer No.";
+                    NaviDocsEntry."Name (Recipient)" := IssuedReminderHeader.Name;
+                    NaviDocsEntry."Name 2 (Recipient)" := IssuedReminderHeader."Name 2";
+                    NaviDocsEntry."Posting Date" := IssuedReminderHeader."Posting Date";
+                end;
+            DATABASE::"Issued Fin. Charge Memo Header":
+                begin
+                    RecRef.SetTable(IssuedFinChargeMemoHeader);
+                    NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
+                    NaviDocsEntry."No. (Recipient)" := IssuedFinChargeMemoHeader."Customer No.";
+                    NaviDocsEntry."Name (Recipient)" := IssuedFinChargeMemoHeader.Name;
+                    NaviDocsEntry."Name 2 (Recipient)" := IssuedFinChargeMemoHeader."Name 2";
+                    NaviDocsEntry."Posting Date" := IssuedFinChargeMemoHeader."Posting Date";
+                end;
+            DATABASE::"Return Receipt Header":
+                begin
+                    RecRef.SetTable(ReturnReceiptHeader);
+                    NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
+                    NaviDocsEntry."No. (Recipient)" := ReturnReceiptHeader."Sell-to Customer No.";
+                    NaviDocsEntry."Name (Recipient)" := ReturnReceiptHeader."Sell-to Customer Name";
+                    NaviDocsEntry."Name 2 (Recipient)" := ReturnReceiptHeader."Sell-to Customer Name 2";
+                    NaviDocsEntry."Posting Date" := ReturnReceiptHeader."Posting Date";
+                end;
+            DATABASE::"Service Header":
+                begin
+                    RecRef.SetTable(ServiceHeader);
+                    NaviDocsEntry."Document Type" := ServiceHeader."Document Type".AsInteger();
+                    NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
+                    NaviDocsEntry."No. (Recipient)" := ServiceHeader."Customer No.";
+                    NaviDocsEntry."Name (Recipient)" := ServiceHeader.Name;
+                    NaviDocsEntry."Name 2 (Recipient)" := ServiceHeader."Name 2";
+                    NaviDocsEntry."Posting Date" := ServiceHeader."Posting Date";
+                end;
+            DATABASE::"Service Shipment Header":
+                begin
+                    RecRef.SetTable(ServiceShipmentHeader);
+                    NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
+                    NaviDocsEntry."No. (Recipient)" := ServiceShipmentHeader."Customer No.";
+                    NaviDocsEntry."Name (Recipient)" := ServiceShipmentHeader.Name;
+                    NaviDocsEntry."Name 2 (Recipient)" := ServiceShipmentHeader."Name 2";
+                    NaviDocsEntry."Posting Date" := ServiceShipmentHeader."Posting Date";
+                end;
+            DATABASE::"Service Invoice Header":
+                begin
+                    RecRef.SetTable(ServiceInvoiceHeader);
+                    NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
+                    NaviDocsEntry."No. (Recipient)" := ServiceInvoiceHeader."Bill-to Customer No.";
+                    NaviDocsEntry."Name (Recipient)" := ServiceInvoiceHeader."Bill-to Name";
+                    NaviDocsEntry."Name 2 (Recipient)" := ServiceInvoiceHeader."Bill-to Name 2";
+                    NaviDocsEntry."Posting Date" := ServiceInvoiceHeader."Posting Date";
+                end;
+            DATABASE::"Service Cr.Memo Header":
+                begin
+                    RecRef.SetTable(ServiceCrMemoHeader);
+                    NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
+                    NaviDocsEntry."No. (Recipient)" := ServiceCrMemoHeader."Bill-to Customer No.";
+                    NaviDocsEntry."Name (Recipient)" := ServiceCrMemoHeader."Bill-to Name";
+                    NaviDocsEntry."Name 2 (Recipient)" := ServiceCrMemoHeader."Bill-to Name 2";
+                    NaviDocsEntry."Posting Date" := ServiceCrMemoHeader."Posting Date";
+                end;
+            DATABASE::"Service Contract Header":
+                begin
+                    RecRef.SetTable(ServiceContractHeader);
+                    NaviDocsEntry."Document Type" := ServiceContractHeader."Contract Type";
+                    NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Customer;
+                    NaviDocsEntry."No. (Recipient)" := ServiceContractHeader."Bill-to Customer No.";
+                    ServiceContractHeader.CalcFields("Bill-to Name", "Bill-to Name 2");
+                    NaviDocsEntry."Name (Recipient)" := ServiceContractHeader."Bill-to Name";
+                    NaviDocsEntry."Name 2 (Recipient)" := ServiceContractHeader."Bill-to Name 2";
+                end;
+            DATABASE::"Purch. Rcpt. Header":
+                begin
+                    RecRef.SetTable(PurchRcptHeader);
+                    NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Vendor;
+                    NaviDocsEntry."No. (Recipient)" := PurchRcptHeader."Buy-from Vendor No.";
+                    NaviDocsEntry."Name (Recipient)" := PurchRcptHeader."Buy-from Vendor Name";
+                    NaviDocsEntry."Name 2 (Recipient)" := PurchRcptHeader."Buy-from Vendor Name 2";
+                    NaviDocsEntry."Posting Date" := PurchRcptHeader."Posting Date";
+                end;
+            DATABASE::"Purch. Inv. Header":
+                begin
+                    RecRef.SetTable(PurchInvHeader);
+                    NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Vendor;
+                    NaviDocsEntry."No. (Recipient)" := PurchInvHeader."Pay-to Vendor No.";
+                    NaviDocsEntry."Name (Recipient)" := PurchInvHeader."Pay-to Name";
+                    NaviDocsEntry."Name 2 (Recipient)" := PurchInvHeader."Pay-to Name 2";
+                    NaviDocsEntry."Posting Date" := PurchInvHeader."Posting Date";
+                end;
+            DATABASE::"Purch. Cr. Memo Hdr.":
+                begin
+                    RecRef.SetTable(PurchCrMemoHdr);
+                    NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Vendor;
+                    NaviDocsEntry."No. (Recipient)" := PurchCrMemoHdr."Pay-to Vendor No.";
+                    NaviDocsEntry."Name (Recipient)" := PurchCrMemoHdr."Pay-to Name";
+                    NaviDocsEntry."Name 2 (Recipient)" := PurchCrMemoHdr."Pay-to Name 2";
+                    NaviDocsEntry."Posting Date" := PurchCrMemoHdr."Posting Date";
+                end;
+            DATABASE::"Return Shipment Header":
+                begin
+                    RecRef.SetTable(ReturnShipmentHeader);
+                    NaviDocsEntry."Type (Recipient)" := NaviDocsEntry."Type (Recipient)"::Vendor;
+                    NaviDocsEntry."No. (Recipient)" := ReturnShipmentHeader."Buy-from Vendor No.";
+                    NaviDocsEntry."Name (Recipient)" := ReturnShipmentHeader."Buy-from Vendor Name";
+                    NaviDocsEntry."Name 2 (Recipient)" := ReturnShipmentHeader."Buy-from Vendor Name 2";
+                    NaviDocsEntry."Posting Date" := ReturnShipmentHeader."Posting Date";
+                end;
         end;
     end;
 

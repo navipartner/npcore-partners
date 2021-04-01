@@ -1,7 +1,5 @@
 table 6059770 "NPR NaviDocs Handling Profile"
 {
-    // NPR5.26/THRO/20160808 CASE 248662 Changed table from containing Report Filters to Sending Profile.
-
     Caption = 'NaviDocs Entry Report Filters';
     DrillDownPageID = "NPR NaviDocs Handling Profiles";
     LookupPageID = "NPR NaviDocs Handling Profiles";
@@ -38,7 +36,7 @@ table 6059770 "NPR NaviDocs Handling Profile"
             trigger OnValidate()
             begin
                 if "Default for Print" then
-                    TestDefaultProfiles(0);
+                    TestDefaultProfiles();
                 SetDefaults;
             end;
         }
@@ -50,7 +48,7 @@ table 6059770 "NPR NaviDocs Handling Profile"
             trigger OnValidate()
             begin
                 if "Default for E-Mail" then
-                    TestDefaultProfiles(1);
+                    TestDefaultProfiles();
                 SetDefaults;
             end;
         }
@@ -62,7 +60,7 @@ table 6059770 "NPR NaviDocs Handling Profile"
             trigger OnValidate()
             begin
                 if "Default Electronic Document" then
-                    TestDefaultProfiles(2);
+                    TestDefaultProfiles();
                 SetDefaults;
             end;
         }
@@ -75,15 +73,11 @@ table 6059770 "NPR NaviDocs Handling Profile"
         }
     }
 
-    fieldgroups
-    {
-    }
+
 
     trigger OnInsert()
     begin
-        //-NPR5.26 [248662]
         SetDefaults;
-        //+NPR5.26 [248662]
     end;
 
     var
@@ -96,7 +90,6 @@ table 6059770 "NPR NaviDocs Handling Profile"
     var
         NaviDocsHandlingProfile: Record "NPR NaviDocs Handling Profile";
     begin
-        //-NPR5.26 [248662]
         if "Default for Print" then begin
             NaviDocsHandlingProfile.SetFilter(Code, '<>%1', Code);
             NaviDocsHandlingProfile.SetRange("Default for Print", true);
@@ -115,10 +108,9 @@ table 6059770 "NPR NaviDocs Handling Profile"
             NaviDocsHandlingProfile.ModifyAll("Default Electronic Document", false);
             NaviDocsHandlingProfile.SetRange("Default Electronic Document");
         end;
-        //+NPR5.26 [248662]
     end;
 
-    local procedure TestDefaultProfiles(Type: Option Print,"E-Mail","Electronic Document")
+    local procedure TestDefaultProfiles()
     var
         NaviDocsManagement: Codeunit "NPR NaviDocs Management";
     begin

@@ -1,12 +1,5 @@
 table 6059767 "NPR NaviDocs Setup"
 {
-    // NPR5.26/THRO/20160809 CASE 248662 Removed Field 15 Enable Posting Management
-    //                                   Removed Field 16 Enable Document Management
-    //                                   Trigger update of Handling profiles when activating NaviDocs
-    //                                   Added field 3000 PDF2NAV Send pdf + 3001 PDF2NAV Table Filter
-    // NPR5.30/THRO/20170209 CASE 243998 Added field 50 Log to Activity Log
-    //                                   Added field 60 Keep Log for
-
     Caption = 'NaviDocs Setup';
     DataClassification = CustomerContent;
 
@@ -26,10 +19,8 @@ table 6059767 "NPR NaviDocs Setup"
             var
                 NaviDocsManagement: Codeunit "NPR NaviDocs Management";
             begin
-                //-NPR5.26 [248662]
                 if "Enable NaviDocs" then
                     NaviDocsManagement.CreateHandlingProfileLibrary;
-                //+NPR5.26 [248662]
             end;
         }
         field(20; "Auto Capture Payment"; Boolean)
@@ -47,12 +38,10 @@ table 6059767 "NPR NaviDocs Setup"
             var
                 NaviDocsManagement: Codeunit "NPR NaviDocs Management";
             begin
-                //-NPR5.30 [243998]
                 if (not xRec."Log to Activity Log") and "Log to Activity Log" then
                     NaviDocsManagement.ConvertLog;
                 if xRec."Log to Activity Log" then
                     "Log to Activity Log" := true;
-                //+NPR5.30 [243998]
             end;
         }
         field(60; "Keep Log for"; Duration)
@@ -103,10 +92,6 @@ table 6059767 "NPR NaviDocs Setup"
         key(Key1; "Primary Key")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 
