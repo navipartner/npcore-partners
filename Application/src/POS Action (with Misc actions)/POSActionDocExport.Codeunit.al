@@ -103,10 +103,11 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         DescDocPaymentMenu: Label 'Prompt with different payment methods for handling in new sale, after export is done.';
         CaptionUseLocationFrom: Label 'Use Location From';
         DescUseLocationFrom: Label 'Select source to get location code from for sales document';
-        OptionUseLocationFrom: Label 'POS Store,POS Sale Header,Specific Location';
+        OptionUseLocationFrom: Label '<Undefined>,POS Store,POS Sale Header,Specific Location';
         CaptionUseSpecLocationCode: Label 'Use Specific Location Code';
-        DescUseSpecLocationCode: Label 'Select location code to be used for sales document, if parameter ''Use Location From'' is set to ''Specific Location''';
-        SpecLocationCodeMustBeSpecified: Label 'POS Action''s parameter ''Use Location From'' is set to ''Specific Location''. You must specify location code to be used for sale document as a parameter of the POS action (the parameter name is ''Use Specific Location Code'')';
+        DescUseSpecLocationCode: Label 'Select location code to be used for sales document, if parameter ''%1'' is set to ''%2''', Comment = 'Select location code to be used for sales document, if parameter ''Use Location From'' is set to ''Specific Location''';
+        LocationSourceMustBeSpecified: Label 'POS Action''s parameter ''%1'' cannot be set to ''%2'' value', Comment = 'POS Action''s parameter ''Use Location From'' cannot be set to ''<Undefined>'' value';
+        SpecLocationCodeMustBeSpecified: Label 'POS Action''s parameter ''%1'' is set to ''%2''. You must specify location code to be used for sale document as a parameter of the POS action (the parameter name is ''%3'')', Comment = 'POS Action''s parameter ''Use Location From'' is set to ''Specific Location''. You must specify location code to be used for sale document as a parameter of the POS action (the parameter name is ''Use Specific Location Code'')';
         CaptionSendICOrderConfirmation: Label 'Send IC Order Cnfmn.';
         DescSendICOrderConfirmation: Label 'Send intercompany order confirmation immediately after sales document has been created. ';
         ReadingErr: Label 'reading in %1 of %2';
@@ -119,7 +120,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.9');
+        exit('1.10');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -182,7 +183,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
             Sender.RegisterBooleanParameter('SelectCustomer', true);
             Sender.RegisterBooleanParameter('ShowDocumentPaymentMenu', false);
             Sender.RegisterBooleanParameter('BlockEmptySale', true);
-            Sender.RegisterOptionParameter('UseLocationFrom', 'Register,POS Store,POS Sale,SpecificLocation', 'Register');
+            Sender.RegisterOptionParameter('UseLocationFrom', '<Undefined>,POS Store,POS Sale,SpecificLocation', 'POS Store');
             Sender.RegisterTextParameter('UseSpecLocationCode', '');
             Sender.RegisterBooleanParameter('SendICOrderConfirmation', false);
         end;
@@ -412,7 +413,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         AmountInclVAT: Decimal;
         DocumentTypePozitive: Option "Order",Invoice,Quote,Restrict;
         DocumentTypeNegative: Option ReturnOrder,CreditMemo,Restrict;
-        LocationSource: Option Register,"POS Store","POS Sale",SpecificLocation;
+        LocationSource: Option Undefined,"POS Store","POS Sale",SpecificLocation;
         SpecificLocationCode: Code[10];
     begin
         RetailSalesDocMgt.SetAsk(JSON.GetBooleanParameterOrFail('SetAsk', ActionCode()));
@@ -463,9 +464,11 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
             end;
 
         LocationSource := JSON.GetIntegerParameterOrFail('UseLocationFrom', ActionCode());
+        if LocationSource = LocationSource::Undefined then
+            Error(LocationSourceMustBeSpecified, CaptionUseLocationFrom, SelectStr(LocationSource + 1, OptionUseLocationFrom));
         SpecificLocationCode := JSON.GetStringParameter('UseSpecLocationCode');
         if (LocationSource = LocationSource::SpecificLocation) and (SpecificLocationCode = '') then
-            Error(SpecLocationCodeMustBeSpecified);
+            Error(SpecLocationCodeMustBeSpecified, CaptionUseLocationFrom, SelectStr(LocationSource + 1, OptionUseLocationFrom), CaptionUseSpecLocationCode);
         RetailSalesDocMgt.SetLocationSource(LocationSource, SpecificLocationCode);
     end;
 
@@ -729,7 +732,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
             'UseLocationFrom':
                 Caption := DescUseLocationFrom;
             'UseSpecLocationCode':
-                Caption := DescUseSpecLocationCode;
+                Caption := StrSubstNo(DescUseSpecLocationCode, CaptionUseLocationFrom, SelectStr(4, OptionUseLocationFrom));
             'SendICOrderConfirmation':
                 Caption := DescSendICOrderConfirmation;
         end;
