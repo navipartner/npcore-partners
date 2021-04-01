@@ -1,4 +1,4 @@
-page 6059965 "NPR Disp. Cont. Line Card"
+page 6059999 "NPR Disp. Cont. Line Card"
 {
     Caption = 'Display Content Line Card';
     PageType = Card;
