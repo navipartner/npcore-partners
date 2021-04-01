@@ -1,6 +1,5 @@
 page 6059949 "NPR NaviDocs Entry Attachments"
 {
-    // NPR5.43/THRO/20180531 CASE 315958 Page created
 
     Caption = 'Attachments';
     Editable = false;
@@ -15,17 +14,17 @@ page 6059949 "NPR NaviDocs Entry Attachments"
         {
             repeater(Group)
             {
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Data Type"; "Data Type")
+                field("Data Type"; Rec."Data Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Data Type field';
                 }
-                field("File Extension"; "File Extension")
+                field("File Extension"; Rec."File Extension")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the File Extension field';
@@ -52,7 +51,7 @@ page 6059949 "NPR NaviDocs Entry Attachments"
 
                 trigger OnAction()
                 begin
-                    ShowOutput;
+                    Rec.ShowOutput;
                 end;
             }
         }
