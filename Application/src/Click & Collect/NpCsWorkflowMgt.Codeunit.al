@@ -31,9 +31,10 @@ codeunit 6151196 "NPR NpCs Workflow Mgt."
         NpCsArchCollectMgt: Codeunit "NPR NpCs Arch. Collect Mgt.";
     begin
         if NpCsDocument.Type = NpCsDocument.Type::"Collect in Store" then begin
-            if IsReadyForArchivation(NpCsDocument) then
+            if IsReadyForArchivation(NpCsDocument) then begin
+                RunCallback(NpCsDocument);
                 NpCsArchCollectMgt.ArchiveCollectDocument(NpCsDocument);
-            RunCallback(NpCsDocument);
+            end;
             exit;
         end;
 
