@@ -76,6 +76,7 @@ table 6014405 "NPR Sale POS"
                 Contact: Record Contact;
                 POSPricingProfile: Record "NPR POS Pricing Profile";
                 POSPostingProfile: Record "NPR POS Posting Profile";
+                POSViewProfile: Record "NPR POS View Profile";
                 DoCreate: Boolean;
                 Cust: Record Customer;
                 POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
@@ -159,8 +160,10 @@ table 6014405 "NPR Sale POS"
 
                 if Cust."No." <> '' then
                     "Prices Including VAT" := Cust."Prices Including VAT"
-                else
-                    "Prices Including VAT" := true;
+                else begin
+                    POSUnit.GetProfile(POSViewProfile);
+                    "Prices Including VAT" := POSViewProfile."Tax Type" = POSViewProfile."Tax Type"::VAT;
+                end;
 
                 if not Modify then;
 
@@ -455,6 +458,12 @@ table 6014405 "NPR Sale POS"
                 SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
                 SaleLinePOS.SetRange(Date, Date);
                 if SaleLinePOS.FindSet(true, false) then begin
+                    SaleLinePOS.ModifyAll(Amount, 0);
+                    SaleLinePOS.ModifyAll("Amount Including VAT", 0);
+                    SaleLinePOS.ModifyAll("VAT Base Amount", 0);
+                    SaleLinePOS.ModifyAll("Line Amount", 0);
+                    SaleLinePOS.ModifyAll("Invoice Discount Amount", 0);
+
                     repeat
                         xSaleLinePOS := SaleLinePOS;
 
