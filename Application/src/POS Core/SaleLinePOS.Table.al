@@ -338,11 +338,10 @@ table 6014406 "NPR Sale Line POS"
                         begin
                             if Quantity = 0 then
                                 Error(Err001);
-                            if RetailSetup.Get then
-                                if "Price Includes VAT" then
-                                    "Amount Including VAT" := Round("Unit Price" * Quantity, 0.01) - "Discount Amount"
-                                else
-                                    "Amount Including VAT" := Round("Unit Price" * Quantity * (1 + "VAT %" / 100), 0.01);
+                            if "Price Includes VAT" then
+                                "Amount Including VAT" := Round("Unit Price" * Quantity, 0.01) - "Discount Amount"
+                            else
+                                "Amount Including VAT" := Round("Unit Price" * Quantity * (1 + "VAT %" / 100), 0.01);
                         end;
                     Type::"BOM List":
                         begin
@@ -1963,6 +1962,10 @@ table 6014406 "NPR Sale Line POS"
         TempSaleLinePOS := Rec;
         TempSaleLinePOS."Currency Code" := '';
         POSSalesPriceCalcMgt.FindItemPrice(SalePOS, TempSaleLinePOS);
+        "Allow Line Discount" := TempSaleLinePOS."Allow Line Discount";
+        "Allow Invoice Discount" := TempSaleLinePOS."Allow Invoice Discount";
+        if not "Allow Line Discount" then
+            "Discount %" := 0;
         exit(TempSaleLinePOS."Unit Price");
     end;
 
