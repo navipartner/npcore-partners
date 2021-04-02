@@ -42,19 +42,19 @@ codeunit 6150792 "NPR POS Action - Discount"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.5');
+        exit('1.6');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
         if Sender.DiscoverAction(
-  ActionCode,
-  ActionDescription,
-  ActionVersion,
-  Sender.Type::Generic,
-  Sender."Subscriber Instances Allowed"::Multiple)
-then begin
+            ActionCode,
+            ActionDescription,
+            ActionVersion,
+            Sender.Type::Generic,
+            Sender."Subscriber Instances Allowed"::Multiple)
+        then begin
             Sender.RegisterWorkflowStep('SalespersonPassword',
               'if(param.Security == 1) {passwordpad({title: labels.DiscountAuthorisationTitle,caption: labels.SalespersonPasswordLabel,notBlank: true}).respond("SalespersonPassword").cancel(abort);}');
             Sender.RegisterWorkflowStep('CurrentSalespersonPassword',
@@ -62,7 +62,7 @@ then begin
             Sender.RegisterWorkflowStep('SupervisorPassword',
               'if(param.Security == 3) {passwordpad({title: labels.DiscountAuthorisationTitle,caption: labels.SupervisorPasswordLabel,notBlank: true}).respond("SupervisorPassword").cancel(abort);}');
             Sender.RegisterWorkflowStep('FixedReasonCode', 'if (param.FixedReasonCode != "")  {respond()}');
-            Sender.RegisterWorkflowStep('LookupReasonCode', 'if (param.LookupReasonCode)  {respond()}');
+            Sender.RegisterWorkflowStep('LookupReasonCode', 'if ((param.LookupReasonCode) || (param.ReasonCodeMandatory) && (!context.discountReasonCode)) {respond()}');
             Sender.RegisterWorkflowStep('AddDimensionValue', 'respond();');
             Sender.RegisterWorkflowStep('fixed_input', 'if (param.FixedDiscountNumber != 0) { context.quantity = param.FixedDiscountNumber; }');
             Sender.RegisterWorkflowStep('discount_input',
@@ -98,6 +98,7 @@ then begin
             Sender.RegisterDecimalParameter('FixedDiscountNumber', 0);
             Sender.RegisterTextParameter('FixedReasonCode', '');
             Sender.RegisterBooleanParameter('LookupReasonCode', false);
+            Sender.RegisterBooleanParameter('ReasonCodeMandatory', false);
             Sender.RegisterTextParameter('DimensionCode', '');
             Sender.RegisterTextParameter('DimensionValue', '');
             Sender.RegisterTextParameter('DiscountGroupFilter', '');
@@ -107,7 +108,7 @@ then begin
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnBeforeWorkflow', '', false, false)]
     local procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
         if not Action.IsThisAction(ActionCode) then
@@ -116,7 +117,7 @@ then begin
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin
         Captions.AddActionCaption(ActionCode(), 'DiscountLabel0', TotalAmountLabel);
@@ -136,7 +137,7 @@ then begin
         Captions.AddActionCaption(ActionCode(), 'SupervisorPasswordLabel', Text003);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
@@ -357,9 +358,13 @@ then begin
     local procedure OnActionLookupReasonCode(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         ReasonCode: Record "Reason Code";
+        ReasonCodeMandatoryErr: Label 'Reason Code is mandatory for this discount';
     begin
-        if PAGE.RunModal(0, ReasonCode) <> ACTION::LookupOK then
+        if PAGE.RunModal(0, ReasonCode) <> ACTION::LookupOK then begin
+            if JSON.GetBooleanParameter('ReasonCodeMandatory') then
+                Error(ReasonCodeMandatoryErr);
             exit;
+        end;
 
         JSON.SetContext('discountReasonCode', ReasonCode.Code);
         FrontEnd.SetActionContext(ActionCode(), JSON);
@@ -389,9 +394,12 @@ then begin
         FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', true, false)]
     local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     var
+        CaptionFixedReasonCode: Label 'Reason: Fixed Code';
+        CaptionLookupReasonCode: Label 'Reason: Lookup';
+        CaptionReasonCodeMandatory: Label 'Reason: Mandatory';
         CaptionTotalDiscTargetLines: Label 'Total Discount Target';
     begin
         if POSParameterValue."Action Code" <> ActionCode then
@@ -400,12 +408,21 @@ then begin
         case POSParameterValue.Name of
             'TotalDiscTargetLines':
                 Caption := CaptionTotalDiscTargetLines;
+            'FixedReasonCode':
+                Caption := CaptionFixedReasonCode;
+            'LookupReasonCode':
+                Caption := CaptionLookupReasonCode;
+            'ReasonCodeMandatory':
+                Caption := CaptionReasonCodeMandatory;
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', true, false)]
     local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     var
+        DescFixedReasonCode: Label 'Select a reason code, which will be assigned automatically to sale lines';
+        DescLookupReasonCode: Label 'Ask user to select a reason code, when the action is run';
+        DescReasonCodeMandatory: Label 'Defines whether a reason code must be selected in order for the discount to be successfully applied to sale lines';
         DescTotalDiscTargetLines: Label 'Select target lines multi-line discounts to be applied to';
     begin
         if POSParameterValue."Action Code" <> ActionCode then
@@ -414,10 +431,16 @@ then begin
         case POSParameterValue.Name of
             'TotalDiscTargetLines':
                 Caption := DescTotalDiscTargetLines;
+            'FixedReasonCode':
+                Caption := DescFixedReasonCode;
+            'LookupReasonCode':
+                Caption := DescLookupReasonCode;
+            'ReasonCodeMandatory':
+                Caption := DescReasonCodeMandatory;
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterOptionStringCaption', '', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterOptionStringCaption', '', true, false)]
     local procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     var
         OptionTotalDiscTargetLines: Label 'Auto,Positive quantity lines only,Negative quantity lines only,All non-zero quantity lines,Ask';
@@ -431,7 +454,43 @@ then begin
         end;
     end;
 
-    //--- Locals ---
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', false, false)]
+    local procedure OnLookupValue(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean)
+    var
+        Reason: Record "Reason Code";
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            'FixedReasonCode':
+                begin
+                    if PAGE.RunModal(0, Reason) = ACTION::LookupOK then
+                        POSParameterValue.Value := Reason.Code;
+                end;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnValidateValue', '', false, false)]
+    local procedure OnValidateValue(var POSParameterValue: Record "NPR POS Parameter Value")
+    var
+        Reason: Record "Reason Code";
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            'FixedReasonCode':
+                begin
+                    if POSParameterValue.Value = '' then
+                        exit;
+                    Reason.Code := CopyStr(POSParameterValue.Value, 1, MaxStrLen(Reason.Code));
+                    Reason.Find;
+                end;
+        end;
+    end;
+
+    #region Locals
 
     local procedure ApplyDiscountOnLines(var SalePOS: Record "NPR Sale POS"; DiscountType: Option DiscountAmt,DiscountPct,LineAmt; Discount: Decimal)
     var
@@ -847,6 +906,7 @@ then begin
             AddDimensionToDimensionSet(SaleLinePOS, AddDimensionCode, AddDimensionValueCode);
     end;
 
+    #endregion
     #region Constants
 
     local procedure "DiscType.DiscountAmt"(): Integer
