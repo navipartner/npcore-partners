@@ -70,7 +70,6 @@ codeunit 6151022 "NPR NpRv Partner Mgt."
         ContentHeader.Remove('Content-Type');
         ContentHeader.Add('Content-Type', 'text/xml; charset=utf-8');
         ContentHeader.Add('SOAPAction', 'UpsertPartners');
-        ContentHeader.Remove('Connection');
         ContentHeader := Client.DefaultRequestHeaders();
 
         Client.UseWindowsAuthentication(NpRvPartner."Service Username", NpRvPartner."Service Password");
