@@ -238,13 +238,13 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 
         if Post and Posted then begin
             if Print then begin
-                POSSalesDocumentOutputMgt.SetOnRunOperation(0, 0);
+                POSSalesDocumentOutputMgt.SetOnRunOperation(1, 0);
                 if not POSSalesDocumentOutputMgt.Run(SalesHeader) then
                     Message(PrintingErrorTxt, GetLastErrorText);
             end;
 
             if SendDocument then begin
-                POSSalesDocumentOutputMgt.SetOnRunOperation(1, 0);
+                POSSalesDocumentOutputMgt.SetOnRunOperation(0, 0);
                 if not POSSalesDocumentOutputMgt.Run(SalesHeader) then
                     Message(SendingErrorTxt, GetLastErrorText);
             end;
