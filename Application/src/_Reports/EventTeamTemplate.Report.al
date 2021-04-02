@@ -1,8 +1,8 @@
 report 6060151 "NPR Event Team Template"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Event Team Template.rdlc'; 
-    UsageCategory = ReportsAndAnalysis; 
+    RDLCLayout = './src/_Reports/layouts/Event Team Template.rdlc';
+    UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     Caption = 'Event Team Template';
     dataset
@@ -437,8 +437,6 @@ report 6060151 "NPR Event Team Template"
 
                 trigger OnAfterGetRecord()
                 var
-                    BinaryReader: DotNet NPRNetBinaryReader;
-                    MemoryStream: DotNet NPRNetMemoryStream;
                     NoteInStream: InStream;
                 begin
                     Clear(NoteText);
@@ -446,13 +444,9 @@ report 6060151 "NPR Event Team Template"
                     if Note.HasValue then begin
                         CalcFields(Note);
                         Note.CreateInStream(NoteInStream);
-                        MemoryStream := MemoryStream.MemoryStream;
-                        MemoryStream := NoteInStream;
-                        BinaryReader := BinaryReader.BinaryReader(MemoryStream);
-                        NoteText.AddText(BinaryReader.ReadString);
+                        NoteText.Read(NoteInStream);
                         FromTo := StrSubstNo(FromToLbl, GetUserName("User ID"), GetUserName("To User ID"));
                     end;
-
                 end;
 
                 trigger OnPreDataItem()
