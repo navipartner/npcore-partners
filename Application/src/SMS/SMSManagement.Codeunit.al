@@ -787,7 +787,7 @@ codeunit 6059940 "NPR SMS Management"
     var
         SMSSetup: Record "NPR SMS Setup";
         JobQueueCategory: Record "Job Queue Category";
-        DefMessJobCatLbl: Label 'SendMessage';
+        DefMessJobCatLbl: Label 'NPRSendMessage';
     begin
         SMSSetup.Get();
         if SMSSetup."Job Queue Category Code" <> '' then
