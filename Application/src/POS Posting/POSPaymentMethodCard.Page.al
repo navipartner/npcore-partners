@@ -29,7 +29,7 @@ page 6150619 "NPR POS Payment Method Card"
                 field("Account No."; Rec."Account No.")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Account field related to the General Ledger, Customer or Bank table, depending on Account Type field';
+                    ToolTip = 'Specifies the value of the Account field related to the General Ledger.';
                     ShowMandatory = true;
                 }
 
