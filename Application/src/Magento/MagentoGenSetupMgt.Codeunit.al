@@ -4,31 +4,6 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
 
     #region Init
-    [Obsolete('Use native Business Central objects instead of dotnet.')]
-    local procedure AddElement(var XmlDoc: DotNet "NPRNetXmlDocument"; NodePath: Text; Name: Text[250]; var XmlElement: DotNet NPRNetXmlElement): Boolean
-    var
-        XmlElementParent: DotNet NPRNetXmlElement;
-    begin
-        if IsNull(XmlDoc) then
-            exit(false);
-
-        XmlElementParent := XmlDoc.DocumentElement;
-        if IsNull(XmlElementParent) then
-            exit(false);
-
-        if NodePath <> '' then begin
-            NodePath := LowerCase(NodePath);
-            if not NpXmlDomMgt.FindNode(XmlElementParent, NodePath, XmlElementParent) then
-                exit(false);
-        end;
-
-        if NpXmlDomMgt.FindNode(XmlElementParent, Name, XmlElement) then
-            exit(false);
-
-        NpXmlDomMgt.AddElement(XmlElementParent, Name, XmlElement);
-        exit(not IsNull(XmlElement));
-    end;
-
     local procedure AddElement(var XmlDoc: XmlDocument; NodePath: Text; Name: Text[250]; var XDataElement: XmlElement): Boolean
     var
         XRootElement: XmlElement;
@@ -53,17 +28,6 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         XDataElement := XmlElement.Create(Name);
         XRootElement.Add(XDataElement);
         exit(not XDataElement.IsEmpty);
-    end;
-
-    [Obsolete('Use native Business Central objects instead of dotnet.')]
-    procedure AddContainer(var XmlDoc: DotNet "NPRNetXmlDocument"; NodePath: Text; Name: Text[250])
-    var
-        XmlElement: DotNet NPRNetXmlElement;
-    begin
-        if not AddElement(XmlDoc, NodePath, Name, XmlElement) then
-            exit;
-
-        NpXmlDomMgt.AddAttribute(XmlElement, "AttributeName.ElementType", "ElementType.Container");
     end;
 
     procedure AddContainer(var XmlDoc: XmlDocument; NodePath: Text; Name: Text[250])
@@ -100,19 +64,6 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         XElement.SetAttribute("AttributeName.FieldType"(), 'System.Decimal');
 
         XElement.Add(Format(Value, 0, 9));
-    end;
-
-    [Obsolete('Use native Business Central objects instead of dotnet.')]
-    procedure AddFieldText(var XmlDoc: DotNet "NPRNetXmlDocument"; NodePath: Text; Name: Text[250]; Value: Text[250])
-    var
-        XmlElement: DotNet NPRNetXmlElement;
-    begin
-        if not AddElement(XmlDoc, NodePath, Name, XmlElement) then
-            exit;
-
-        NpXmlDomMgt.AddAttribute(XmlElement, "AttributeName.ElementType", "ElementType.Field");
-        NpXmlDomMgt.AddAttribute(XmlElement, "AttributeName.FieldType", Format(GetDotNetType(Value)));
-        XmlElement.InnerText := Format(Value, 0, 9);
     end;
 
     procedure AddFieldText(var XmlDoc: XmlDocument; NodePath: Text; Name: Text[250]; Value: Text[250])
@@ -318,20 +269,6 @@ codeunit 6151400 "NPR Magento Gen. Setup Mgt."
         exit(Format(NpXmlDomMgt.GetXmlText(XElement, NodePath, 250, true), 0, 9));
 
         exit('');
-    end;
-
-    [Obsolete('Use native Business Central objects instead of dotnet.')]
-    procedure LoadGenericSetup(var TempBlob: Codeunit "Temp Blob"; var XmlDoc: DotNet "NPRNetXmlDocument"): Boolean
-    var
-        InStream: InStream;
-    begin
-        if not TempBlob.HasValue then
-            exit(false);
-
-        TempBlob.CreateInStream(InStream);
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.Load(InStream);
-        exit(true);
     end;
 
     procedure LoadGenericSetup(var TempBlob: Codeunit "Temp Blob"; var XmlDoc: XmlDocument): Boolean
