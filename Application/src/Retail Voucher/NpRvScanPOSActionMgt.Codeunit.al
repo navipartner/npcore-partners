@@ -3,7 +3,7 @@ codeunit 6151014 "NPR NpRv Scan POSAction Mgt."
     var
         Text000: Label 'This action handles Scan Retail Vouchers (Payment).';
         Text001: Label 'Retail Voucher Payment';
-        Text002: Label 'Enter Reference No.:';
+        Text002: Label 'Enter Reference No.';
         ReadingErr: Label 'reading in %1';
         SettingScopeErr: Label 'setting scope in %1';
 

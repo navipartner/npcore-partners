@@ -6,10 +6,10 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         ABORTED: Label 'Aborted.';
         ERRORTITLE: Label 'Error.';
         INVALID_ADMISSION: Label 'Parameter %1 specifies an invalid value for admission code. %2 not found.';
-        TicketNumberPrompt: Label 'Enter Ticketnumber:';
+        TicketNumberPrompt: Label 'Enter Ticketnumber';
         TicketTitle: Label '%1 - Ticket Management.';
-        TicketQtyPrompt: Label 'Confirm group ticket quantity (max %1):';
-        ReferencePrompt: Label 'Enter Ticket Reference Number:';
+        TicketQtyPrompt: Label 'Confirm group ticket quantity (max %1)';
+        ReferencePrompt: Label 'Enter Ticket Reference Number';
         ActionDescription: Label 'This action handles ticket management functions.';
         NotAGroupTicket: Label 'Ticket %1 is not a group ticket.';
         QtyNotSettable: Label 'Quantity for ticket %1 can''t be changed.';

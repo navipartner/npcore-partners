@@ -2,9 +2,9 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
 {
     var
         Text000: Label 'This action Issues Return Retail Vouchers.';
-        Text001: Label 'Select Voucher Type:';
+        Text001: Label 'Select Voucher Type';
         Text002: Label 'Issue Return Retail Voucher';
-        Text003: Label 'Enter Amount:';
+        Text003: Label 'Enter Amount';
 
         Text005: Label 'Nothing to return';
         Text006: Label 'The amount of %1 is less that the Minimum Amount allowed (%2) to create a Voucher';

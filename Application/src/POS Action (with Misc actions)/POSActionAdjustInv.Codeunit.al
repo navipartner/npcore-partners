@@ -2,7 +2,7 @@ codeunit 6150848 "NPR POS Action: Adjust Inv."
 {
     var
         Text000: Label 'Post Inventory Adjustment directly from POS';
-        Text001: Label 'Adjust Inventory Quantity:';
+        Text001: Label 'Adjust Inventory Quantity';
         Text002: Label 'Inventory Adjustment:\- Item: %1 %2 %3\- Current Inventory: %4\- Adjust Quantity: %5\- New Inventory: %6\\Perform Inventory Adjustment?';
         Text003: Label 'Kindly select the Item to Adjust';
         Text004: Label 'Inventory: %1 || %2 %3 %4';

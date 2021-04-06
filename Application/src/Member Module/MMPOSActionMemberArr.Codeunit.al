@@ -2,9 +2,9 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
 {
     var
         ActionDescription: Label 'This action handles member arrival functions.';
-        MemberCardPrompt: Label 'Enter Member Card Number:';
-        MemberNumberPrompt: Label 'Enter Member Number:';
-        MembershipNumberPrompt: Label 'Enter Membership Number:';
+        MemberCardPrompt: Label 'Enter Member Card Number';
+        MemberNumberPrompt: Label 'Enter Member Number';
+        MembershipNumberPrompt: Label 'Enter Membership Number';
         MembershipTitle: Label 'Member Arrival - Membership Management.';
         DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
         POSWorkflowMethod: Option POS,Automatic,GuestCheckin;

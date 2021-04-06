@@ -3,10 +3,10 @@ codeunit 6151023 "NPR NpRv POS Action Top-up"
     var
         Text000: Label 'Apply Top-up (refill) on existing Retail Voucher.';
         Text001: Label 'Top-up Retail Voucher';
-        Text002: Label 'Enter Reference No.:';
-        Text003: Label 'Enter Amount:';
-        Text004: Label 'Enter Discount Amount:';
-        Text005: Label 'Enter Discount Percent:';
+        Text002: Label 'Enter Reference No.';
+        Text003: Label 'Enter Amount';
+        Text004: Label 'Enter Discount Amount';
+        Text005: Label 'Enter Discount Percent';
         Text006: Label 'Top-up is not allowed for Retail Voucher %1';
         ReadingErr: Label 'reading in %1';
         SettingScopeErr: Label 'setting scope in %1';

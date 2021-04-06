@@ -6,8 +6,8 @@ codeunit 6150808 "NPR POS Action: Quantity"
         MUST_BE_NEGATIVE: Label 'Quantity must be negative.';
         SALE_MUST_BE_POSITIVE: Label 'Quantity must be positive on the sales line.';
         SALE_MUST_BE_NEGATIVE: Label 'Quantity must be negative on the sales line.';
-        QtyCaption: Label 'Enter Quantity:';
-        PriceCaption: Label 'Enter Unit Price:';
+        QtyCaption: Label 'Enter Quantity';
+        PriceCaption: Label 'Enter Unit Price';
         WRONG_RETURN_QUANTITY: Label 'The maximum number of units to return for %1 is %2.';
         WRONG_QUANTITY: Label 'The minimum number of units to sell must be greater than zero.';
         ReadingErr: Label 'reading in %1';

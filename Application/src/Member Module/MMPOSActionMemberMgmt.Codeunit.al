@@ -8,9 +8,9 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     var
         QTY_CANT_CHANGE: Label 'Changing quantity for membership sales is not possible.';
         ActionDescription: Label 'This action handles member management functions.';
-        MemberCardPrompt: Label 'Enter Member Card Number:';
-        MemberNumberPrompt: Label 'Enter Member Number:';
-        MembershipNumberPrompt: Label 'Enter Membership Number:';
+        MemberCardPrompt: Label 'Enter Member Card Number';
+        MemberNumberPrompt: Label 'Enter Member Number';
+        MembershipNumberPrompt: Label 'Enter Membership Number';
         MembershipTitle: Label '%1 - Membership Management.';
         RENEW_NOT_VALID: Label 'There are no valid renewal products for this membership at this time.';
         EXTEND_NOT_VALID: Label 'There are no valid extend products for this membership at this time.';

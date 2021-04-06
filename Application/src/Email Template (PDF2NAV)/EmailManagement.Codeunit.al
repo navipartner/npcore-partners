@@ -2,7 +2,7 @@ codeunit 6014450 "NPR E-mail Management"
 {
     var
 
-        Text001: Label 'Enter recipient''s e-mail address:';
+        Text001: Label 'Enter recipient''s e-mail address';
         Text002: Label 'E-mail has been sent.';
         Text003: Label 'The email may not be empty.';
         Text004: Label 'There is not entered any sender email address in the setup.';

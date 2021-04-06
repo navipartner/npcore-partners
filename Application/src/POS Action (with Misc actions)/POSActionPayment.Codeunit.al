@@ -4,8 +4,8 @@ codeunit 6150725 "NPR POS Action: Payment"
         ActionDescription: Label 'This is a built-in action for inserting a payment line into the current transaction';
         Setup: Codeunit "NPR POS Setup";
         PaymentTypeNotFound: Label '%1 %2 for POS unit %3 was not found.';
-        TextAmountLabel: Label 'Enter Amount:';
-        TextVoucherLabel: Label 'Enter Voucher Number:';
+        TextAmountLabel: Label 'Enter Amount';
+        TextVoucherLabel: Label 'Enter Voucher Number';
         MissingImpl: Label 'Payment failed!\%1 = %2, %3 = %4 on %5 = %6 did not respond with being handled.\\Check the setup for %1 and %5.';
         NO_SALES_LINES: Label 'There are no sales lines in the POS. You must add at least one sales line before handling payment.';
         ReadingErr: Label 'reading in %1';

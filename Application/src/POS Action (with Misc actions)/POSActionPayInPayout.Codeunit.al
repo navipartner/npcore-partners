@@ -3,8 +3,8 @@ codeunit 6150809 "NPR POSAction: PayIn Payout"
     var
         ActionDescription: Label 'This built in function handles cash deposit / withdrawls from the till';
         PayOptionType: Option PAYIN,PAYOUT;
-        AmountPrompt: Label 'Enter Amount.';
-        DescriptionPrompt: Label 'Enter Description.';
+        AmountPrompt: Label 'Enter Amount';
+        DescriptionPrompt: Label 'Enter Description';
         VATSetupError: Label 'Pay-in and Pay-out are cash transactions that must not use accounts that post VAT. Check setup for account %1.';
         ReadingErr: Label 'reading in %1';
 
