@@ -3,7 +3,7 @@ codeunit 6150838 "NPR POS Action: Block Discount"
     var
         ActionDescription: Label 'This action toggles the state of "Custom Disc Block" field.';
         Title: Label 'Block / Unblock Discount';
-        PasswordPrompt: Label 'Enter %1:';
+        PasswordPrompt: Label 'Enter %1';
 
     local procedure ActionCode(): Code[20]
     begin

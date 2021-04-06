@@ -3,7 +3,7 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
     var
         Text000: Label 'Deliver Collect in Store Documents';
         Text001: Label 'Collect in Store';
-        Text002: Label 'Enter Collect Reference No.:';
+        Text002: Label 'Enter Collect Reference No.';
         Text003: Label 'Processing Status is ''%1''.\Continue delivering %2 %3?';
         Text004: Label 'Delivery Status is ''%1''.\Continue delivering %2 %3?';
         Text005: Label 'Document ''%1'' has no lines to deliver.';

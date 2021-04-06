@@ -18,7 +18,7 @@ codeunit 6014613 "NPR Tax Free GB I2" implements "NPR Tax Free Handler Interface
         Caption_CancelOperation: Label 'Cancel tax free operation?';
         Error_ConsolidationEligible: Label 'Consolidation is not eligible. VAT or issue date is outside the allowed range.';
         Caption_UseID: Label 'Does the customer have Global Blue Tax Free identification available?';
-        Caption_GlobalBlueIdentifier: Label 'Global Blue Card:';
+        Caption_GlobalBlueIdentifier: Label 'Global Blue Card';
         Caption_MemberCard: Label 'Global Blue Member Card';
         Error_MinimumParameters: Label 'Global Blue Shop ID, Desk ID, Username and Password must be specified before auto desk configure can be performed.';
         Caption_TravellerLookupFail: Label 'Identifier lookup failed.';

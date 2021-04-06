@@ -6,7 +6,7 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
 
     var
         Text000: Label 'This action handles Scan Discount Coupon.';
-        Text001: Label 'Scan Coupon:';
+        Text001: Label 'Scan Coupon';
         Text002: Label 'Discount Coupon';
         Text003: Label 'Coupon Reference No. is too long';
         Text004: Label 'Invalid Coupon Reference No.';
