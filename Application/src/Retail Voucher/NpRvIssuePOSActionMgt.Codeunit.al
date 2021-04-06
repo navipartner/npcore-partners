@@ -2,12 +2,12 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt."
 {
     var
         Text000: Label 'This action Issues Retail Vouchers.';
-        Text001: Label 'Select Voucher Type:';
+        Text001: Label 'Select Voucher Type';
         Text002: Label 'Issue Retail Vouchers';
-        Text003: Label 'Enter Quantity:';
-        Text004: Label 'Enter Amount:';
-        Text005: Label 'Enter Discount Amount:';
-        Text006: Label 'Enter Discount Percent:';
+        Text003: Label 'Enter Quantity';
+        Text004: Label 'Enter Amount';
+        Text005: Label 'Enter Discount Amount';
+        Text006: Label 'Enter Discount Percent';
         QtyNotPositiveErr: Label 'You must specify a positive quantity.';
         ConfirmReenterQtyMsg: Label '\Do you want to re-enter the quantity?';
         ReadingErr: Label 'reading in %1 of %2';

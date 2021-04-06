@@ -9,8 +9,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         PAYMENT_OPTION: Label 'No Payment,Prepayment Percent,Prepayment Amount,Pay & Post';
         PAYMENT_OPTION_SPLIT: Label 'No Payment,Prepayment Percent,Prepayment Amount,Split Pay & Post,Full Pay & Post';
         PAYMENT_OPTION_DESC: Label 'Select document payment';
-        TextExtDocNoLabel: Label 'Enter External Document No.:';
-        TextAttentionLabel: Label 'Enter Attention:';
+        TextExtDocNoLabel: Label 'Enter External Document No.';
+        TextAttentionLabel: Label 'Enter Attention';
         TextConfirmTitle: Label 'Confirm action';
         TextConfirmLead: Label 'Export active sale to NAV sales document?';
         TextPrepaymentTitle: Label 'Prepayment';

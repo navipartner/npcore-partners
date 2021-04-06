@@ -6,7 +6,7 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         Text002: Label 'New Discount Coupon: %1';
         Text003: Label 'This action Issues Discount Coupons.';
         Text004: Label 'Issue Discount Coupons';
-        Text005: Label 'Enter Quantity:';
+        Text005: Label 'Enter Quantity';
         Text006: Label 'Checks On-Sale Discount Coupons on Sale Line Insert';
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnAfterEndSale', '', true, true)]

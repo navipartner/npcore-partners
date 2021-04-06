@@ -40,7 +40,7 @@ codeunit 6151292 "NPR SS Action: NpRv Apply"
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     var
         ApplyVoucherCaptionTxt: Label 'Apply Retail Voucher';
-        EnterRefNoCaptionTxt: Label 'Enter Vourcher Reference No.:';
+        EnterRefNoCaptionTxt: Label 'Enter Vourcher Reference No.';
         CaptionsDictionary: Dictionary of [Text, Text];
         ActionCaption: Text;
     begin

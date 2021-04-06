@@ -89,9 +89,9 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     var
-        MEMBERCARD_PROMPT: Label 'Enter Member Card Number:';
-        MEMBERNUMBER_PROMPT: Label 'Enter Member Number:';
-        MEMBERSHIPNUMBER_PROMPT: Label 'Enter Membership Number:';
+        MEMBERCARD_PROMPT: Label 'Enter Member Card Number';
+        MEMBERNUMBER_PROMPT: Label 'Enter Member Number';
+        MEMBERSHIPNUMBER_PROMPT: Label 'Enter Membership Number';
         DIALOG_TITLE: Label '%1 - Membership Management.';
     begin
         Captions.AddActionCaption(ActionCode, 'MemberCardPrompt', MEMBERCARD_PROMPT);
@@ -769,7 +769,7 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
 
         if (not MemberRetailIntegration.TranslateBarcodeToItemVariant(ExternalItemNo, ItemNo, VariantCode, Resolver)) then
             Error(NotFoundErr, ExternalItemNo);
-           
+
         Line.Type := Line.Type::Item;
         Line."No." := ItemNo;
         Line."Variant Code" := VariantCode;

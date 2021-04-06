@@ -3,7 +3,7 @@ codeunit 6150850 "NPR POS Action: CK Payment"
     var
         ActionDescription: Label 'This is a built-in action for CashKeeper Payments';
         Setup: Codeunit "NPR POS Setup";
-        TextAmountLabel: Label 'Enter Amount:';
+        TextAmountLabel: Label 'Enter Amount';
         PaymentTypeNotFound: Label '%1 %2 for POS unit was not found.';
         CashkeeperNotFound: Label 'CashKeeper Setup for POS unit %3 was not found.';
         NoCashBackErr: Label 'It is not allowed to enter an amount that is bigger than what is stated on the receipt for this payment type';
