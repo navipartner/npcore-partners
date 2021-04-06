@@ -4,7 +4,7 @@ codeunit 6151612 "NPR AF SFTP Client"
         //CodeUnit variables
         SftpClient: HttpClient;
         gConvert: Codeunit "Base64 Convert";
-        gAzureKeyVault: Codeunit "Azure Key Vault";
+        gAzureKeyVault: Codeunit "NPR Azure Key Vault Mgt.";
         //CodeUnit Constants
         gHttpUrlConst, gHttpUsernameConst, gHttpPasswordConst, gHttpPortConst, gHttpPrivateKeyConst : Text;
         gHttpPathConst, gHttpFilePathConst, gHttpFileContentConst, gHttpTimeoutMsConst, gHttpHostKey : Text;
@@ -37,7 +37,7 @@ codeunit 6151612 "NPR AF SFTP Client"
         gPassword := Password;
         gPort := Port;
         gTimeoutMs := TimeoutMs;
-        gAzureKeyVault.GetAzureKeyVaultSecret('SftpAzureFunctionUrl', baseurl);
+        baseurl := gAzureKeyVault.GetSecret('SftpAzureFunctionUrl');
         SftpClient.SetBaseAddress(baseurl);
         gHttpUrlConst := 'url';
         gHttpUsernameConst := 'username';
@@ -53,7 +53,7 @@ codeunit 6151612 "NPR AF SFTP Client"
         gResponseMsg_StatusCode := 'StatusCode';
         gResponseMsg_ServerJson := 'ServerMsg';
         gErrorConst := 'Error';
-        gAzureKeyVault.GetAzureKeyVaultSecret('SftpAzureFunction', gHttpHostKey);
+        gHttpHostKey := gAzureKeyVault.GetSecret('SftpAzureFunction');
     end;
 
     procedure Destruct()
