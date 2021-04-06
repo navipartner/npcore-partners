@@ -1,15 +1,5 @@
 codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
 {
-    // NC2.01/BR /20160818  CASE 248630 NaviConnect
-    // NC2.01/BR /20161110 CASE 261431 SFTP function SendSharpSFTP()
-    // NC2.12/MHA /20180418  CASE 308107 Added functions EmailProcessOutput(),OnRunEndpoint()
-    // NC2.13/MHA /20180613  CASE 318934 Implemented Init framework
-
-
-    trigger OnRun()
-    begin
-    end;
-
     local procedure ProcessNcEndpoints(NcTriggerCode: Code[20]; Output: Text; Filename: Text; var NcTask: Record "NPR Nc Task")
     var
         NcTrigger: Record "NPR Nc Trigger";
@@ -130,11 +120,6 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
     local procedure SendFtp(NcEndpointFTP: Record "NPR Nc Endpoint FTP"; OutputText: Text; Filename: Text; var ResponseDescriptionText: Text; var ResponseCodeText: Text; var ConnectionString: Text): Boolean
     var
         "Field": Record "Field";
-        Credential: DotNet NPRNetNetworkCredential;
-        FtpWebRequest: DotNet NPRNetFtpWebRequest;
-        FtpWebResponse: DotNet NPRNetFtpWebResponse;
-        UTF8Encoding: DotNet NPRNetUTF8Encoding;
-        IoStream: DotNet NPRNetStream;
     begin
         if not NcEndpointFTP.Enabled then
             exit(false);
@@ -146,14 +131,8 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         case NcEndpointFTP.Type of
             NcEndpointFTP.Type::DotNet:
                 SendDotNetFtp(NcEndpointFTP, OutputText, Filename, ResponseDescriptionText, ResponseCodeText, ConnectionString);
-            //-NC2.01 [261431]
-            //NcEndpointFTP.Type::ChilkatFTP2 :
-            //  SendChilKatFTP(NcEndpointFTP,OutputText,Filename,ResponseDescriptionText,ResponseCodeText,ConnectionString);
-            //NcEndpointFTP.Type::ChilkatSFTP :
-            //  SendChilKatSFTP(NcEndpointFTP,OutputText,Filename,ResponseDescriptionText,ResponseCodeText,ConnectionString);
             NcEndpointFTP.Type::SharpSFTP:
                 SendSharpSFTP(NcEndpointFTP, OutputText, Filename, ResponseDescriptionText, ResponseCodeText, ConnectionString);
-        //+NC2.01 [261431]
         end;
         exit(true);
     end;
@@ -180,14 +159,8 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         FtpWebRequest.UseBinary := true;
         FtpWebRequest.UsePassive := NcEndpointFTP.Passive;
 
-        FtpWebRequest.Method := 'STOR'; //WebRequestMethods.Ftp.UploadFile
+        FtpWebRequest.Method := 'STOR';
         FtpWebRequest.Credentials := Credential.NetworkCredential(NcEndpointFTP.Username, NcEndpointFTP.Password);
-        //-NC2.01 [261431]
-        // UTF8Encoding := UTF8Encoding.UTF8Encoding;
-        //
-        // FtpWebRequest.ContentLength := UTF8Encoding.GetBytes(OutputText).Length;
-        // IoStream := FtpWebRequest.GetRequestStream;
-        // IoStream.Write(UTF8Encoding.GetBytes(OutputText),0,FtpWebRequest.ContentLength);
         case NcEndpointFTP."File Encoding" of
             NcEndpointFTP."File Encoding"::ANSI:
                 Encoding := Encoding.GetEncoding('windows-1252');
@@ -200,7 +173,6 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         FtpWebRequest.ContentLength := Encoding.GetBytes(OutputText).Length;
         IoStream := FtpWebRequest.GetRequestStream;
         IoStream.Write(Encoding.GetBytes(OutputText), 0, FtpWebRequest.ContentLength);
-        //+NC2.01 [261431]
         IoStream.Flush;
         IoStream.Close;
         Clear(IoStream);
@@ -219,7 +191,6 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         LocalPath: Text;
         RemotePath: Text;
     begin
-        //-NC2.01 [261431]
         LocalPath := TemporaryPath;
         UploadFile.Create(LocalPath + Filename);
         UploadFile.Close;
@@ -249,12 +220,10 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         ResponseDescriptionText := '200 The requested action has been successfully completed';
         ResponseCodeText := '200';
         exit(true);
-        //+NC2.01 [261431]
     end;
 
     local procedure SendFtpOutput(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpointFTP: Record "NPR Nc Endpoint FTP")
     begin
-        //-308107 [308107]
         if not NcEndpointFTP.Enabled then
             exit;
         if NcEndpointFTP.Server = '' then
@@ -266,7 +235,6 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
             NcEndpointFTP.Type::SharpSFTP:
                 SendSFTPOutput(NcTaskOutput, NcEndpointFTP);
         end;
-        //+308107 [308107]
     end;
 
     local procedure SendDotNetFtpOutput(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpointFTP: Record "NPR Nc Endpoint FTP"): Boolean
@@ -281,7 +249,6 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         ServerName: Text;
         Url: Text;
     begin
-        //-NC2.12 [308107]
         ServerName := BuildFTPServerName(NcEndpointFTP.Server);
 
         Url := (ServerName + '/' + NcTaskOutput.Name);
@@ -293,7 +260,7 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         FtpWebRequest.UseBinary := true;
         FtpWebRequest.UsePassive := NcEndpointFTP.Passive;
 
-        FtpWebRequest.Method := 'STOR'; //WebRequestMethods.Ftp.UploadFile
+        FtpWebRequest.Method := 'STOR';
         FtpWebRequest.Credentials := Credential.NetworkCredential(NcEndpointFTP.Username, NcEndpointFTP.Password);
         NcTaskOutput.Data.CreateInStream(InStream);
         Stream := FtpWebRequest.GetRequestStream;
@@ -303,7 +270,6 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         Clear(Stream);
 
         FtpWebResponse := FtpWebRequest.GetResponse;
-        //+NC2.12 [308107]
     end;
 
     local procedure SetupNCTaskLine()
@@ -325,10 +291,6 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         exit('ftp://' + Servername);
     end;
 
-    local procedure "--- Init"()
-    begin
-    end;
-
     local procedure InitEndpoint(NcEndpointFTP: Record "NPR Nc Endpoint FTP")
     var
         Credential: DotNet NPRNetNetworkCredential;
@@ -337,7 +299,6 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         FtpPath: Text;
         List: Text;
     begin
-        //-NC2.13 [318934]
         Credential := Credential.NetworkCredential(NcEndpointFTP.Username, NcEndpointFTP.Password);
         FtpPath := NcEndpointFTP.Server;
         TryListFtpDirectory(FtpPath, Credential, List);
@@ -347,7 +308,6 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
 
         FtpFolders := NcEndpointFTP.Directory;
         CreateFtpFolders(NcEndpointFTP.Server, Credential, FtpFolders);
-        //+NC2.13 [318934]
     end;
 
     local procedure CreateFtpFolders(FtpServer: Text; var Credential: DotNet NPRNetNetworkCredential; FtpFolders: Text)
@@ -356,21 +316,18 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         FtpPath: Text;
         List: Text;
     begin
-        //-NC2.13 [318934]
         FtpPath := FtpServer;
         while CutNextFtpFolder(FtpFolders, FtpFolder) do begin
             FtpPath += '/' + FtpFolder;
             if (not TryListFtpDirectory(FtpPath, Credential, List)) or (List = '') then
                 TryCreateFtpFolder(FtpPath, Credential);
         end;
-        //+NC2.13 [318934]
     end;
 
     local procedure CutNextFtpFolder(var FtpFolders: Text; var FtpFolder: Text): Boolean
     var
         Position: Integer;
     begin
-        //-NC2.13 [318934]
         Position := StrPos(FtpFolders, '/');
         while Position = 1 do begin
             FtpFolders := DelStr(FtpFolders, 1, 1);
@@ -388,7 +345,6 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
             FtpFolders := DelStr(FtpFolders, 1, Position);
         end;
         exit(true);
-        //+NC2.13 [318934]
     end;
 
     [TryFunction]
@@ -398,9 +354,8 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         FtpWebResponse: DotNet NPRNetFtpWebResponse;
         MemoryStream: DotNet NPRNetMemoryStream;
     begin
-        //-NC2.13 [318934]
         FtpWebRequest := FtpWebRequest.Create(FtpPath);
-        FtpWebRequest.Method := 'MKD'; //WebRequestMethods.Ftp.UploadFile
+        FtpWebRequest.Method := 'MKD';
         FtpWebRequest.Credentials := Credential;
         FtpWebResponse := FtpWebRequest.GetResponse;
         MemoryStream := FtpWebResponse.GetResponseStream();
@@ -409,7 +364,6 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         Clear(MemoryStream);
         FtpWebRequest.Abort();
         Clear(FtpWebRequest);
-        //+NC2.13 [318934]
     end;
 
     [TryFunction]
@@ -420,9 +374,8 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         MemoryStream: DotNet NPRNetMemoryStream;
         StreamReader: DotNet NPRNetStreamReader;
     begin
-        //-NC2.13 [318934]
         FtpWebRequest := FtpWebRequest.Create(FtpPath);
-        FtpWebRequest.Method := 'LIST'; //WebRequestMethods.Ftp.ListDirectory
+        FtpWebRequest.Method := 'LIST';
         FtpWebRequest.Credentials := Credential;
         FtpWebResponse := FtpWebRequest.GetResponse;
         MemoryStream := FtpWebResponse.GetResponseStream();
@@ -435,15 +388,13 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         Clear(MemoryStream);
         FtpWebRequest.Abort();
         Clear(FtpWebRequest);
-        //+NC2.13 [318934]
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151519, 'OnHasInitEndpoint', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Endpoint Mgt.", 'OnHasInitEndpoint', '', true, true)]
     local procedure OnHasInitEndpoint(NcEndpoint: Record "NPR Nc Endpoint"; var EndpointHasInit: Boolean)
     var
         NcEndpointFTP: Record "NPR Nc Endpoint FTP";
     begin
-        //-NC2.13 [318934]
         if NcEndpoint."Endpoint Type" <> NcEndpointFTP.GetEndpointTypeCode() then
             exit;
         if not NcEndpoint.Enabled then
@@ -452,16 +403,13 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
             exit;
 
         EndpointHasInit := true;
-
-        //+NC2.13 [318934]
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151519, 'OnInitEndpoint', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Endpoint Mgt.", 'OnInitEndpoint', '', true, true)]
     local procedure OnInitEndpoint(NcEndpoint: Record "NPR Nc Endpoint")
     var
         NcEndpointFTP: Record "NPR Nc Endpoint FTP";
     begin
-        //-NC2.13 [318934]
         if NcEndpoint."Endpoint Type" <> NcEndpointFTP.GetEndpointTypeCode() then
             exit;
         if not NcEndpoint.Enabled then
@@ -470,41 +418,31 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
             exit;
 
         InitEndpoint(NcEndpointFTP);
-        //+NC2.13 [318934]
-    end;
-
-    local procedure "---Subscribers"()
-    begin
     end;
 
     local procedure SendSFTPOutput(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpointFTP: Record "NPR Nc Endpoint FTP")
     var
-        SSHNETSFTPClient: Codeunit "NPR SSH.NET SFTP Client";
-        TempBlob: Codeunit "Temp Blob";
+        AFSFTPClient: Codeunit "NPR AF SFTP Client";
         Istream: InStream;
-        OStream: OutStream;
         RemotePath: Text;
     begin
-        SSHNETSFTPClient.Construct(NcEndpointFTP.Server, NcEndpointFTP.Username, NcEndpointFTP.Password, NcEndpointFTP.Port, 10000);
-        SSHNETSFTPClient.SetKeepAliveInterval(0, 0, 0);
+        AFSFTPClient.Construct(NcEndpointFTP.Server, NcEndpointFTP.Username, NcEndpointFTP.Password, NcEndpointFTP.Port, 10000);
         if NcEndpointFTP.Directory <> '' then
             RemotePath := '/' + NcEndpointFTP.Directory.TrimStart('/').TrimEnd('/') + '/'
         else
             RemotePath := '/';
         NcTaskOutput.Data.CreateInStream(Istream);
-        TempBlob.CreateOutStream(OStream);
-        CopyStream(OStream, Istream);
-        SSHNETSFTPClient.UploadFileFromBlob(TempBlob, RemotePath + NcTaskOutput.Name);
-        SSHNETSFTPClient.Destruct();
+        AFSFTPClient.UploadFile(Istream, RemotePath + NcTaskOutput.Name);
+        AFSFTPClient.Destruct();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151522, 'OnAfterGetOutputTriggerTask', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Trigger Task Mgt.", 'OnAfterGetOutputTriggerTask', '', false, false)]
     local procedure OnAfterGetOutputTriggerTaskFTPOutput(NcTriggerCode: Code[20]; Output: Text; var NcTask: Record "NPR Nc Task"; Filename: Text; Subject: Text; Body: Text)
     begin
         ProcessNcEndpoints(NcTriggerCode, Output, Filename, NcTask);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151531, 'OnSetupEndpointTypes', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Nc Endpoint Type", 'OnSetupEndpointTypes', '', false, false)]
     local procedure OnSetupEndpointTypeInsertEndpointTypeCode()
     var
         NcEndpointFTP: Record "NPR Nc Endpoint FTP";
@@ -517,7 +455,7 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151533, 'OnOpenEndpointSetup', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Nc Endpoint", 'OnOpenEndpointSetup', '', false, false)]
     local procedure OnOpenEndpointSetupOpenPage(var Sender: Record "NPR Nc Endpoint"; var Handled: Boolean)
     var
         NcEndpointFTP: Record "NPR Nc Endpoint FTP";
@@ -541,7 +479,7 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151533, 'OnAfterDeleteEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Nc Endpoint", 'OnAfterDeleteEvent', '', false, false)]
     local procedure OnDeleteEndpoint(var Rec: Record "NPR Nc Endpoint"; RunTrigger: Boolean)
     var
         NcEndpointFTP: Record "NPR Nc Endpoint FTP";
@@ -550,19 +488,17 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
             NcEndpointFTP.Delete(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151519, 'OnRunEndpoint', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Endpoint Mgt.", 'OnRunEndpoint', '', true, true)]
     local procedure OnRunEndpoint(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpoint: Record "NPR Nc Endpoint")
     var
         NcEndpointFTP: Record "NPR Nc Endpoint FTP";
     begin
-        //-NC2.12 [308107]
         if NcEndpoint."Endpoint Type" <> NcEndpointFTP.GetEndpointTypeCode() then
             exit;
         if not NcEndpointFTP.Get(NcEndpoint.Code) then
             exit;
 
         SendFtpOutput(NcTaskOutput, NcEndpointFTP);
-        //+NC2.12 [308107]
     end;
 }
 
