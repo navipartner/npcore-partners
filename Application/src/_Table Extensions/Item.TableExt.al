@@ -1,7 +1,5 @@
 tableextension 6014427 "NPR Item" extends Item
 {
-    LookupPageID = "Item List";
-    DrillDownPageID = "Item List";
     fields
     {
         modify(Description)
