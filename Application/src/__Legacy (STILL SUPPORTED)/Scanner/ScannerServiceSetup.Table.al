@@ -2,6 +2,8 @@ table 6059996 "NPR Scanner Service Setup"
 {
     Caption = 'Scanner Service Setup';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Not used.';
 
     fields
     {
@@ -9,16 +11,22 @@ table 6059996 "NPR Scanner Service Setup"
         {
             Caption = 'No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(11; "Log Request"; Boolean)
         {
             Caption = 'Log Request';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
         field(12; "Stock-Take Config Code"; Code[10])
         {
             Caption = 'Stock-Take Conf. Code';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
     }
 
@@ -26,6 +34,8 @@ table 6059996 "NPR Scanner Service Setup"
     {
         key(Key1; "No.")
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
     }
 
