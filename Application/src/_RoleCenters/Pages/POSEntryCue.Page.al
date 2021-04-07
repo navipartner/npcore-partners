@@ -54,21 +54,6 @@ page 6151260 "NPR POS Entry Cue"
                     DrillDownPageID = "NPR Mixed Discount List";
                     ToolTip = 'Specifies the value of the Mix Discount field';
                 }
-                field(Voucher; Rec."Voucher List")
-                {
-                    Caption = 'Voucher';
-                    ApplicationArea = Basic, Suite;
-                    DrillDownPageID = "NPR NpRv Vouchers";
-                    ToolTip = 'Specifies the value of the Voucher field';
-                }
-                field(Coupon; Rec."Coupon List")
-
-                {
-                    Caption = 'Coupon';
-                    ApplicationArea = Basic, Suite;
-                    DrillDownPageID = "NPR NpDc Coupons";
-                    ToolTip = 'Specifies the value of the Coupon field';
-                }
             }
         }
     }

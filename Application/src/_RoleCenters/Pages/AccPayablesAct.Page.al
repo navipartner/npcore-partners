@@ -27,49 +27,12 @@ page 6151254 "NPR Acc. Payables Act"
                     DrillDownPageID = "Purchase Return Order List";
                     ToolTip = 'Specifies the number of purchase return orders that are displayed in the Finance Cue on the Role Center. The documents are filtered by today''s date.';
                 }
-                field("Outstanding Vendor Invoices"; Rec."Outstanding Vendor Invoices")
-                {
-                    ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the number of invoices from your vendors that have not been paid yet.';
-                }
 
                 field("Pending Inc. Documents"; Rec."NPR Pending Inc. Documents")
                 {
                     ApplicationArea = All;
                     DrillDownPageId = "Incoming Documents";
                     ToolTip = 'Specifies the value of the NPR Pending Inc. Documents field';
-                }
-            }
-            cuegroup(Control6014404)
-            {
-                Caption = 'Actions';
-                actions
-                {
-                    action("Edit Payment Journal")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Edit Payment Journal';
-                        Image = TileBrickProducts;
-                        RunObject = Page "Payment Journal";
-                        ToolTip = 'Pay your vendors by filling the payment journal automatically according to payments due, and potentially export all payment to your bank for automatic processing.';
-                    }
-                    action("New Purchase Credit Memo")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'New Purchase Credit Memo';
-                        RunObject = Page "Purchase Credit Memo";
-                        RunPageMode = Create;
-                        Image = TileNew;
-                        ToolTip = 'Specifies a new purchase credit memo so you can manage returned items to a vendor.';
-                    }
-                    action("Edit Purchase Journal")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Edit Purchase Journal';
-                        RunObject = Page "Purchase Journal";
-                        Image = TileBrickCustomer;
-                        ToolTip = 'Post purchase invoices in a purchase journal that may already contain journal lines.';
-                    }
                 }
             }
             cuegroup("Document Approvals")

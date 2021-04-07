@@ -14,6 +14,21 @@ page 6151255 "NPR Activities"
             {
                 Caption = 'SALES';
                 ShowCaption = true;
+                field("Import Pending"; Rec."Import Pending")
+                {
+                    ApplicationArea = All;
+                    Caption = 'Import Unprocessed';
+                    DrillDownPageID = "NPR Nc Import List";
+                    ToolTip = 'Specifies the value of the Import Unprocessed field';
+
+                }
+                field("Task List"; Rec."Task List")
+                {
+                    ApplicationArea = All;
+                    Caption = 'Task List';
+                    DrillDownPageId = "NPR Nc Task List";
+                    ToolTip = 'Specifies the value of the Task List field';
+                }
                 field("Daily Sales Orders"; Rec."Daily Sales Orders")
                 {
                     ApplicationArea = All;
@@ -42,22 +57,6 @@ page 6151255 "NPR Activities"
                     DrillDownPageId = "Sales Order List";
                     ToolTip = 'Specifies the value of the Shipped Sales Orders field';
 
-                }
-
-                field("Import Pending"; Rec."Import Pending")
-                {
-                    ApplicationArea = All;
-                    Caption = 'Import Unprocessed';
-                    DrillDownPageID = "NPR Nc Import List";
-                    ToolTip = 'Specifies the value of the Import Unprocessed field';
-
-                }
-                field("Task List"; Rec."Task List")
-                {
-                    ApplicationArea = All;
-                    Caption = 'Task List';
-                    DrillDownPageId = "NPR Nc Task List";
-                    ToolTip = 'Specifies the value of the Task List field';
                 }
             }
         }
