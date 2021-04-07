@@ -47,12 +47,20 @@ codeunit 6014442 "NPR BC RetDataMod AR Upgr."
         VATAmountLine: Record "VAT Amount Line";
         HasOpenPOSLedgerRegister: Boolean;
     begin
+        /*
         AuditRoll.SetCurrentKey("Clustered Key");
         AuditRolltoPOSEntryLink.LockTable;
         if AuditRolltoPOSEntryLink.FindLast then
             AuditRoll.SetFilter("Clustered Key", '>%1', AuditRolltoPOSEntryLink."Link Entry No.")
         else
             InitDatamodel;
+        */
+
+        //full cleanup is required due to balancing audit roll posting bug
+        AuditRoll.SetCurrentKey("Clustered Key");
+        AuditRolltoPOSEntryLink.LockTable;
+        AuditRolltoPOSEntryLink.DeleteAll();
+        InitDatamodel;
 
         StartDateTime := CurrentDateTime;
 
