@@ -6,14 +6,14 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
         {
             trigger OnAfterValidate()
             begin
-                CalcItemGroupUnitCost();
+                NPRCalcItemGroupUnitCost();
             end;
         }
         modify("VAT Prod. Posting Group")
         {
             trigger OnAfterValidate()
             begin
-                CalcItemGroupUnitCost();
+                NPRCalcItemGroupUnitCost();
             end;
         }
         field(6014404; "NPR Discount Type"; Option)
@@ -146,7 +146,7 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
     }
 
 
-    procedure CalcItemGroupUnitCost(): Boolean
+    procedure NPRCalcItemGroupUnitCost(): Boolean
     var
         SalesHeader: Record "Sales Header";
         Item: Record Item;
