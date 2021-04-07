@@ -14,7 +14,7 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
                     SalesLine.SetRange(Type, SalesLine.Type::Item);
                     if SalesLine.FindSet(true) then
                         repeat
-                            if SalesLine.CalcItemGroupUnitCost() then
+                            if SalesLine.NPRCalcItemGroupUnitCost() then
                                 SalesLine.Modify();
                         until SalesLine.Next = 0;
                 end;
