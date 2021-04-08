@@ -16,7 +16,7 @@ codeunit 6014442 "NPR BC RetDataMod AR Upgr."
 
     trigger OnUpgradePerCompany()
     var
-        UpgTagDef: Codeunit "NPR UPG POS SS Prof Tag Def";
+        UpgTagDef: Codeunit "NPR UPG Ret.Dat.Mod.Tag Def";
         UpgradeTagMgt: Codeunit "Upgrade Tag";
     begin
 
