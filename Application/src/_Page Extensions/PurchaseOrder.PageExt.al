@@ -10,51 +10,6 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 ToolTip = 'Specifies the value of the Posting Description field';
             }
         }
-        addafter(Control71)
-        {
-            field("NPR Sell-to Customer Name"; Rec."NPR Sell-to Customer Name")
-            {
-                ApplicationArea = All;
-                Editable = false;
-                ToolTip = 'Specifies the value of the NPR Sell-to Customer Name field';
-            }
-            field("NPR Sell-to Customer Name 2"; Rec."NPR Sell-to Customer Name 2")
-            {
-                ApplicationArea = All;
-                Editable = false;
-                ToolTip = 'Specifies the value of the NPR Sell-to Customer Name 2 field';
-            }
-            field("NPR Sell-to Address"; Rec."NPR Sell-to Address")
-            {
-                ApplicationArea = All;
-                Editable = false;
-                ToolTip = 'Specifies the value of the NPR Sell-to Address field';
-            }
-            field("NPR Sell-to Address 2"; Rec."NPR Sell-to Address 2")
-            {
-                ApplicationArea = All;
-                Editable = false;
-                ToolTip = 'Specifies the value of the NPR Sell-to Address 2 field';
-            }
-            field("NPR Sell-to City"; Rec."NPR Sell-to City")
-            {
-                ApplicationArea = All;
-                Editable = false;
-                ToolTip = 'Specifies the value of the NPR Sell-to City field';
-            }
-            field("NPR Sell-to Post Code"; Rec."NPR Sell-to Post Code")
-            {
-                ApplicationArea = All;
-                Editable = false;
-                ToolTip = 'Specifies the value of the NPR Sell-to Post Code field';
-            }
-            field("NPR Sell-to Phone No."; Rec."NPR Sell-to Phone No.")
-            {
-                ApplicationArea = All;
-                Editable = false;
-                ToolTip = 'Specifies the value of the NPR Sell-to Phone No. field';
-            }
-        }
         addafter(Control3)
         {
             part("NPR NPAttributes"; "NPR NP Attributes FactBox")
