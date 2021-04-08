@@ -7,6 +7,8 @@ tableextension 6014445 "NPR Warehouse Activity Line" extends "Warehouse Activity
             Caption = 'Rem. Qty. to Pick (Base)';
             DataClassification = CustomerContent;
             Description = 'NPR5.33';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Not used.';
         }
     }
 }

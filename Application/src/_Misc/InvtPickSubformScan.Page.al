@@ -257,7 +257,6 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                     begin
                         CallSplitLine();
                         WhseActivityHeader.Get(Rec."Activity Type", Rec."No.");
-                        InventoryPickScan.UpdateRemQtyToPick(WhseActivityHeader);
                     end;
                 }
             }

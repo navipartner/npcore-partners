@@ -167,15 +167,6 @@ page 6014460 "NPR Inventory Pick Scan"
                     end;
                 }
             }
-            part(Control6014405; "NPR Invt. Pick Subform Scan 2")
-            {
-                Editable = false;
-                SubPageLink = "Activity Type" = FIELD(Type),
-                              "No." = FIELD("No.");
-                SubPageView = SORTING("Activity Type", "No.", "Sorting Sequence No.")
-                              WHERE(Breakbulk = CONST(false));
-                ApplicationArea = All;
-            }
             part(WhseActivityLines; "NPR Invt. Pick Subform Scan")
             {
                 SubPageLink = "Activity Type" = FIELD(Type),
@@ -290,7 +281,6 @@ page 6014460 "NPR Inventory Pick Scan"
                         CreateInvtPick: Codeunit "Create Inventory Pick/Movement";
                     begin
                         CreateInvtPick.Run(Rec);
-                        UpdateRemQtyToPick(Rec);
                     end;
                 }
                 action(DoAutofillQtyToHandle)
@@ -423,7 +413,6 @@ page 6014460 "NPR Inventory Pick Scan"
     trigger OnOpenPage()
     begin
         Rec.ErrorIfUserIsNotWhseEmployee();
-        UpdateRemQtyToPick(Rec);
         QtyToHandleGlobal := 1;
     end;
 
@@ -438,9 +427,7 @@ page 6014460 "NPR Inventory Pick Scan"
         LotNo: Code[20];
         SerialNo: Code[20];
         QtyToHandleGlobal: Decimal;
-        QtyToHandleErr: Label '%1 must not be %2.';
         CantDistributeQtyErr: Label 'Available quantity for distribution is %1. You''ve set %2. Please change %3 and try again.';
-        LineDoesntExistErr: Label 'Line with %1: %2, %3: %4 and %5: %6 doesn''t exist.';
         LotNoCaption: Label 'Lot No.';
         QtyToHandleCaption: Label 'Qty. to Handle';
         SerialNoCaption: Label 'Serial No.';
@@ -526,11 +513,10 @@ page 6014460 "NPR Inventory Pick Scan"
         if QtyToHandleGlobal = 0 then
             Error(QtyToHandleErr, QtyToHandleCaption);
         SetWhseActivityLineFilterFromItemReference(WhseActivityLine, ItemReference);
-        with WhseActivityLine do
-            if FindSet then
-                repeat
-                    TotalQty += "Qty. (Base)" - "Qty. to Handle (Base)";
-                until Next = 0;
+        if WhseActivityLine.FindSet then
+            repeat
+                TotalQty += WhseActivityLine."Qty. (Base)" - WhseActivityLine."Qty. to Handle (Base)";
+            until WhseActivityLine.Next = 0;
         if QtyToHandleGlobal > TotalQty then
             Error(CantDistributeQtyErr, TotalQty, QtyToHandleGlobal, QtyToHandleCaption);
     end;
@@ -556,24 +542,23 @@ page 6014460 "NPR Inventory Pick Scan"
         SetWhseActivityLineFilterFromItemReference(WhseActivityLine, ItemReference);
         TotalQtyToHandle := QtyToHandleGlobal;
         OutstandingQty := TotalQtyToHandle;
-        with WhseActivityLine do begin
-            SetFilter("Qty. Outstanding (Base)", '<>0');
-            if SNRequired then
-                SetRange("Serial No.", SerialNo);
-            if LNRequired then
-                SetRange("Lot No.", LotNo);
-            DistributeQty(WhseActivityLine, OutstandingQty, false);
-            if (OutstandingQty > 0) and (SNRequired or LNRequired) then begin
-                SetRange("Serial No.", '');
-                SetRange("Lot No.", '');
-                DistributeQty(WhseActivityLine, OutstandingQty, SNRequired or LNRequired);
-                while OutstandingQty > 0 do begin
-                    SetRange("Serial No.");
-                    SetRange("Lot No.");
-                    SplitLineAndAssignValue(WhseActivityLine, OutstandingQty);
-                end;
+        WhseActivityLine.SetFilter(WhseActivityLine."Qty. Outstanding (Base)", '<>0');
+        if SNRequired then
+            WhseActivityLine.SetRange(WhseActivityLine."Serial No.", SerialNo);
+        if LNRequired then
+            WhseActivityLine.SetRange(WhseActivityLine."Lot No.", LotNo);
+        DistributeQty(WhseActivityLine, OutstandingQty, false);
+        if (OutstandingQty > 0) and (SNRequired or LNRequired) then begin
+            WhseActivityLine.SetRange(WhseActivityLine."Serial No.", '');
+            WhseActivityLine.SetRange(WhseActivityLine."Lot No.", '');
+            DistributeQty(WhseActivityLine, OutstandingQty, SNRequired or LNRequired);
+            while OutstandingQty > 0 do begin
+                WhseActivityLine.SetRange(WhseActivityLine."Serial No.");
+                WhseActivityLine.SetRange(WhseActivityLine."Lot No.");
+                SplitLineAndAssignValue(WhseActivityLine, OutstandingQty);
             end;
         end;
+
     end;
 
     local procedure DistributeQty(var WhseActivityLine: Record "Warehouse Activity Line"; var QtyToHandle: Decimal; AssignTracking: Boolean)
@@ -589,7 +574,6 @@ page 6014460 "NPR Inventory Pick Scan"
                     QtyToAssign := WhseActivityLine."Qty. (Base)";
                 QtyToHandle -= QtyToAssign - WhseActivityLine."Qty. to Handle (Base)";
                 WhseActivityLine.Validate("Qty. to Handle (Base)", QtyToAssign);
-                WhseActivityLine."NPR Rem. Qty. to Pick (Base)" := WhseActivityLine."Qty. (Base)" - WhseActivityLine."Qty. to Handle (Base)";
                 WhseActivityLine.Modify(true);
                 if AssignTracking then begin
                     if SNRequired then
@@ -611,64 +595,47 @@ page 6014460 "NPR Inventory Pick Scan"
         QtyToWork: Decimal;
         NoLinesToHandle: Label 'There aren''t any more available lines to be handled.';
     begin
-        with WhseActivityLine do begin
-            if FindSet then begin
-                repeat
-                    TempWhseActivLine := WhseActivityLine;
-                    TempWhseActivLine.Insert;
-                until Next = 0;
-            end;
-            if FindSet then
-                repeat
-                    Splitted := ("Qty. (Base)" > "Qty. to Handle (Base)") and ("Qty. (Base)" > 1) and ("Qty. Outstanding (Base)" > 0);
-                    if Splitted then begin
-                        SourceWhseActivityLine.Copy(WhseActivityLine);
-                        Validate("Serial No.", '');
-                        Validate("Lot No.", '');
-                        QtyToWork := QtyToHandle;
-                        if QtyToHandle > "Qty. (Base)" - "Qty. to Handle (Base)" then
-                            QtyToWork := "Qty. (Base)" - "Qty. to Handle (Base)";
-                        Validate("Qty. to Handle (Base)", QtyToWork);
-                        "NPR Rem. Qty. to Pick (Base)" := "Qty. (Base)" - "Qty. to Handle (Base)";
-                        QtyToHandle -= QtyToWork;
-                        Modify(true);
-                        SplitLine(WhseActivityLine);
-                        if SNRequired then
-                            Validate("Serial No.", SerialNo);
-                        if LNRequired then
-                            Validate("Lot No.", LotNo);
-                        Modify(true);
-                    end;
-                until (Next = 0) or Splitted;
-            if not Splitted then
-                Error(NoLinesToHandle);
-            if FindSet then
-                repeat
-                    FoundNewLine := not TempWhseActivLine.Get("Activity Type", "No.", "Line No.");
-                    if FoundNewLine then
-                        TempWhseActivLine := WhseActivityLine;
-                until (Next = 0) or FoundNewLine;
-        end;
-        with NewWhseActivityLine do begin
-            Get(TempWhseActivLine."Activity Type", TempWhseActivLine."No.", TempWhseActivLine."Line No.");
-            Validate("Qty. to Handle (Base)", SourceWhseActivityLine."Qty. to Handle (Base)");
-            "NPR Rem. Qty. to Pick (Base)" := "Qty. (Base)" - "Qty. to Handle (Base)";
-            Validate("Serial No.", SourceWhseActivityLine."Serial No.");
-            Validate("Lot No.", SourceWhseActivityLine."Lot No.");
-            Modify(true);
-        end;
-    end;
-
-    procedure UpdateRemQtyToPick(WhseActivityHeader: Record "Warehouse Activity Header")
-    var
-        WhseActivityLine: Record "Warehouse Activity Line";
-    begin
-        WhseActivityLine.SetRange("Activity Type", WhseActivityHeader.Type);
-        WhseActivityLine.SetRange("No.", WhseActivityHeader."No.");
-        if WhseActivityLine.FindSet() then
+        if WhseActivityLine.FindSet then begin
             repeat
-                WhseActivityLine."NPR Rem. Qty. to Pick (Base)" := WhseActivityLine."Qty. (Base)" - WhseActivityLine."Qty. to Handle (Base)";
-                WhseActivityLine.Modify();
-            until WhseActivityLine.Next() = 0;
+                TempWhseActivLine := WhseActivityLine;
+                TempWhseActivLine.Insert;
+            until WhseActivityLine.Next = 0;
+        end;
+        if WhseActivityLine.FindSet then
+            repeat
+                Splitted := (WhseActivityLine."Qty. (Base)" > WhseActivityLine."Qty. to Handle (Base)") and (WhseActivityLine."Qty. (Base)" > 1) and (WhseActivityLine."Qty. Outstanding (Base)" > 0);
+                if Splitted then begin
+                    SourceWhseActivityLine.Copy(WhseActivityLine);
+                    WhseActivityLine.Validate(WhseActivityLine."Serial No.", '');
+                    WhseActivityLine.Validate(WhseActivityLine."Lot No.", '');
+                    QtyToWork := QtyToHandle;
+                    if QtyToHandle > WhseActivityLine."Qty. (Base)" - WhseActivityLine."Qty. to Handle (Base)" then
+                        QtyToWork := WhseActivityLine."Qty. (Base)" - WhseActivityLine."Qty. to Handle (Base)";
+                    WhseActivityLine.Validate(WhseActivityLine."Qty. to Handle (Base)", QtyToWork);
+                    QtyToHandle -= QtyToWork;
+                    WhseActivityLine.Modify(true);
+                    WhseActivityLine.SplitLine(WhseActivityLine);
+                    if SNRequired then
+                        WhseActivityLine.Validate(WhseActivityLine."Serial No.", SerialNo);
+                    if LNRequired then
+                        WhseActivityLine.Validate(WhseActivityLine."Lot No.", LotNo);
+                    WhseActivityLine.Modify(true);
+                end;
+            until (WhseActivityLine.Next = 0) or Splitted;
+        if not Splitted then
+            Error(NoLinesToHandle);
+        if WhseActivityLine.FindSet then
+            repeat
+                FoundNewLine := not TempWhseActivLine.Get(WhseActivityLine."Activity Type", WhseActivityLine."No.", WhseActivityLine."Line No.");
+                if FoundNewLine then
+                    TempWhseActivLine := WhseActivityLine;
+            until (WhseActivityLine.Next = 0) or FoundNewLine;
+
+        NewWhseActivityLine.Get(TempWhseActivLine."Activity Type", TempWhseActivLine."No.", TempWhseActivLine."Line No.");
+        NewWhseActivityLine.Validate(NewWhseActivityLine."Qty. to Handle (Base)", SourceWhseActivityLine."Qty. to Handle (Base)");
+        NewWhseActivityLine.Validate(NewWhseActivityLine."Serial No.", SourceWhseActivityLine."Serial No.");
+        NewWhseActivityLine.Validate(NewWhseActivityLine."Lot No.", SourceWhseActivityLine."Lot No.");
+        NewWhseActivityLine.Modify(true);
+
     end;
 }
