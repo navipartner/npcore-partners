@@ -1172,7 +1172,7 @@ codeunit 6151002 "NPR POS Proxy - Display"
         Type: DotNet NPRNetType;
         Activator: DotNet NPRNetActivator;
         Arr: DotNet NPRNetArray;
-        String: DotNet NPRNetString;
+        String: Text;
         Int: Integer;
     begin
         Arr := Arr.CreateInstance(GetDotNetType(Type), 2);
