@@ -144,6 +144,11 @@ codeunit 6150706 "NPR POS Sale Line"
     end;
 
     procedure InsertLine(var Line: Record "NPR Sale Line POS") Return: Boolean
+    begin
+        exit(InsertLine(Line, true));
+    end;
+
+    procedure InsertLine(var Line: Record "NPR Sale Line POS"; IncludeDiscountFields: Boolean) Return: Boolean
     var
         Contact: Record Contact;
         Linie: Record "NPR Sale Line POS";
@@ -207,15 +212,20 @@ codeunit 6150706 "NPR POS Sale Line"
             end;
             Validate("Serial No. not Created", Line."Serial No. not Created");
 
-            Validate("Discount Type", Line."Discount Type");
-            Validate("Discount Code", Line."Discount Code");
+            if IncludeDiscountFields then begin
+                Validate("Discount Type", Line."Discount Type");
+                Validate("Discount Code", Line."Discount Code");
 
-            Validate("Allow Line Discount", Line."Allow Line Discount");
-            if Line."Discount %" > 0 then
-                Validate("Discount %", Line."Discount %");
+                Validate("Allow Line Discount", Line."Allow Line Discount");
+                if not "Allow Line Discount" then
+                    Validate("Discount %", 0)
+                else
+                    if Line."Discount %" > 0 then
+                        Validate("Discount %", Line."Discount %");
 
-            Validate("Allow Invoice Discount", Line."Allow Invoice Discount");
-            Validate("Invoice Discount Amount", Line."Invoice Discount Amount");
+                Validate("Allow Invoice Discount", Line."Allow Invoice Discount");
+                Validate("Invoice Discount Amount", Line."Invoice Discount Amount");
+            end;
 
             if (Line."Unit Price" <> 0) and UseLinePriceVATParams then
                 ConvertPriceToVAT(Line."Price Includes VAT", Line."VAT Bus. Posting Group", Line."VAT Prod. Posting Group", Rec, Line."Unit Price")
