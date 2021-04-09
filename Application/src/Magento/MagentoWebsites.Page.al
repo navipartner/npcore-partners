@@ -40,7 +40,6 @@ page 6151403 "NPR Magento Websites"
                     field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                     {
                         ApplicationArea = All;
-                        Visible = false;
                         ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                     }
                     field("Location Code"; Rec."Location Code")
@@ -77,7 +76,7 @@ page 6151403 "NPR Magento Websites"
                 Caption = 'Setup Websites';
                 Image = Setup;
                 Promoted = true;
-				PromotedOnly = true;
+                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

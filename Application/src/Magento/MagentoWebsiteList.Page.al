@@ -38,7 +38,6 @@ page 6151404 "NPR Magento Website List"
                 field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
-                    Visible = false;
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
             }
