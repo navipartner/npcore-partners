@@ -594,9 +594,11 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
             end;
         end;
 
-        if (MagentoWebsite.Code <> '') and (MagentoWebsite."Global Dimension 1 Code" <> '') then begin
-            SalesHeader.Validate(SalesHeader."Shortcut Dimension 1 Code", MagentoWebsite."Global Dimension 1 Code");
-            SalesHeader.Validate("Shortcut Dimension 2 Code", MagentoWebsite."Global Dimension 2 Code");
+        if MagentoWebsite.Code <> '' then begin
+            if MagentoWebsite."Global Dimension 1 Code" <> '' then
+                SalesHeader.Validate("Shortcut Dimension 1 Code", MagentoWebsite."Global Dimension 1 Code");
+            if MagentoWebsite."Global Dimension 2 Code" <> '' then
+                SalesHeader.Validate("Shortcut Dimension 2 Code", MagentoWebsite."Global Dimension 2 Code");
         end;
         SalesHeader.Validate("Location Code", MagentoWebsite."Location Code");
         SalesHeader.Validate("Currency Code", GetCurrencyCode(NpXmlDomMgt.GetElementCode(XmlElement, 'currency_code', MaxStrLen(SalesHeader."Currency Code"), false)));
