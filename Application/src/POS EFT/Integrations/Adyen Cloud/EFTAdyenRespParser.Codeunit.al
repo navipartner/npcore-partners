@@ -699,8 +699,7 @@ codeunit 6184529 "NPR EFT Adyen Resp. Parser"
         if TotalLength = 2 then
             CreditCardTransaction.Text := ' '
         else
-            if TotalLength <= 40 then
-                CreditCardTransaction.Text := Name + PadStr('', 40 - StrLen(Name) - StrLen(Value), ' ') + Value;
+            CreditCardTransaction.Text := Name + ' ' + Value;
 
         CreditCardTransaction."Entry No." := EntryNo;
         CreditCardTransaction.Insert;
