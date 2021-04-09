@@ -1,4 +1,4 @@
-codeunit 6014422 "NPR BC RetDataMod AR Upgr."
+codeunit 6014422 "NPR UPG RetDataMod AR Upgr."
 {
     Subtype = Upgrade;
 
@@ -46,6 +46,9 @@ codeunit 6014422 "NPR BC RetDataMod AR Upgr."
         POSLedgerRegister: Record "NPR POS Period Register";
         VATAmountLine: Record "VAT Amount Line";
         HasOpenPOSLedgerRegister: Boolean;
+        i: Integer;
+        POSEntryCommentLine: Record "NPR POS Entry Comm. Line";
+        POSTaxAmountLine: Record "NPR POS Tax Amount Line";
     begin
         /*
         AuditRoll.SetCurrentKey("Clustered Key");
@@ -57,12 +60,14 @@ codeunit 6014422 "NPR BC RetDataMod AR Upgr."
         */
 
         //full cleanup is required due to balancing audit roll posting bug
-        AuditRoll.SetCurrentKey("Clustered Key");
         AuditRolltoPOSEntryLink.LockTable;
         AuditRolltoPOSEntryLink.DeleteAll();
         InitDatamodel;
 
         StartDateTime := CurrentDateTime;
+
+        //AuditRoll.SetCurrentKey("Sale Date", "Sales Ticket No.", "Line No.");
+        //AuditRoll.SetRange("Sale Date", DMY2Date(1, 1, 2020), WorkDate());
 
         if AuditRoll.FindSet then begin
             repeat
@@ -141,9 +146,27 @@ codeunit 6014422 "NPR BC RetDataMod AR Upgr."
                 UpdatePOSEntry(POSEntry, AuditRoll);
                 xAuditRoll := AuditRoll;
             until AuditRoll.Next = 0;
+
+            Commit();
+            POSEntry.LockTable();
+            POSSalesLine.LockTable();
+            POSPaymentLine.LockTable();
+            POSBalancingLine.LockTable();
+            POSLedgerRegister.LockTable();
+            POSEntryCommentLine.LockTable();
+            POSTaxAmountLine.LockTable();
+
             if NoOfPOSEntriesCreated > 0 then begin
                 FinalizePOSEntry(POSEntry, AuditRoll);
                 CalcVATAmountLines(POSEntry, VATAmountLine, POSSalesLine);
+                Commit();
+                POSEntry.LockTable();
+                POSSalesLine.LockTable();
+                POSPaymentLine.LockTable();
+                POSBalancingLine.LockTable();
+                POSLedgerRegister.LockTable();
+                POSEntryCommentLine.LockTable();
+                POSTaxAmountLine.LockTable();
                 PersistVATAmountLines(POSEntry, VATAmountLine);
             end;
         end;
@@ -511,6 +534,14 @@ codeunit 6014422 "NPR BC RetDataMod AR Upgr."
             POSLedgerRegister.DeleteAll;
             POSEntryCommentLine.DeleteAll;
             POSTaxAmountLine.DeleteAll;
+            Commit;
+            POSEntry.LockTable();
+            POSSalesLine.LockTable();
+            POSPaymentLine.LockTable();
+            POSBalancingLine.LockTable();
+            POSLedgerRegister.LockTable();
+            POSEntryCommentLine.LockTable();
+            POSTaxAmountLine.LockTable();
         end;
     end;
 
