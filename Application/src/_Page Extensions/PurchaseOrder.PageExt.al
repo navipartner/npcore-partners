@@ -10,16 +10,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 ToolTip = 'Specifies the value of the Posting Description field';
             }
         }
-        addafter(Control3)
-        {
-            part("NPR NPAttributes"; "NPR NP Attributes FactBox")
-            {
-                Provider = PurchLines;
-                SubPageLink = "No." = FIELD("No.");
-                Visible = true;
-                ApplicationArea = All;
-            }
-        }
+
     }
     actions
     {
