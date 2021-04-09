@@ -3,7 +3,6 @@ codeunit 6014496 "NPR Reten. Pol. Install"
     // based on codeunit 3999 "Reten. Pol. Install - BaseApp" from Base App
 
     Subtype = Install;
-    Access = Internal;
     Permissions =
         tabledata "Retention Period" = ri,
         tabledata "Retention Policy Setup" = ri,
