@@ -65,15 +65,9 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 ToolTip = 'Specifies the value of the NPR Kolli field';
             }
         }
-        addafter("Attached Documents")
+        modify(Control1900316107)
         {
-            part("NPR NPAttributes"; "NPR NP Attributes FactBox")
-            {
-                Provider = SalesLines;
-                SubPageLink = "No." = FIELD("No.");
-                Visible = true;
-                ApplicationArea = All;
-            }
+            Visible = false;
         }
     }
     actions
