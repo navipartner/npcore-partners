@@ -77,4 +77,31 @@ page 6150632 "NPR POS Audit Profiles"
             }
         }
     }
+    actions
+    {
+        area(Navigation)
+        {
+            action(Setup)
+            {
+                Caption = 'Additional Setup';
+                Image = Setup;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                ApplicationArea = All;
+                ToolTip = 'Additional Setup for fiscalization.';
+
+                trigger OnAction()
+                begin
+                    OnHandlePOSAuditProfileAdditionalSetup(Rec);
+                end;
+            }
+        }
+    }
+
+    [IntegrationEvent(false, false)]
+    local procedure OnHandlePOSAuditProfileAdditionalSetup(POSAuditProfile: Record "NPR POS Audit Profile")
+    begin
+    end;
 }
