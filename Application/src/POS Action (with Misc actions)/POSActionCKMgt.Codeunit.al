@@ -126,7 +126,7 @@ codeunit 6150854 "NPR POS Action - CK Mgt."
         POSUnit: Record "NPR POS Unit";
         CashKeeperOverview: Record "NPR CashKeeper Overview";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         OverviewAmout: Integer;
     begin
         State := State.Deserialize(Data);

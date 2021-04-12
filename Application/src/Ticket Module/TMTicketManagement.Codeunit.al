@@ -91,7 +91,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         _TicketExecutionContext: Option SALES,ADMISSION;
 
     [EventSubscriber(ObjectType::"Codeunit", Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSSalesLine', '', true, true)]
-    local procedure IssueTicketsFromPosEntrySaleLine(POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Sales Line")
+    local procedure IssueTicketsFromPosEntrySaleLine(POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line")
     var
         Token: Text[100];
     begin
@@ -295,7 +295,7 @@ codeunit 6059784 "NPR TM Ticket Management"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
-    local procedure PrintTicketsOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
+    local procedure PrintTicketsOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     begin
         if (POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrentCodeunitId()) then
             exit;

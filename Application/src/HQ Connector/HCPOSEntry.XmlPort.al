@@ -253,7 +253,7 @@ xmlport 6150901 "NPR HC POS Entry"
                         {
                         }
                     }
-                    tableelement(possalesline; "NPR POS Sales Line")
+                    tableelement(possalesline; "NPR POS Entry Sales Line")
                     {
                         LinkTable = POSEntry;
                         MinOccurs = Zero;
@@ -549,7 +549,7 @@ xmlport 6150901 "NPR HC POS Entry"
                             }
                         }
                     }
-                    tableelement(pospaymentline; "NPR POS Payment Line")
+                    tableelement(pospaymentline; "NPR POS Entry Payment Line")
                     {
                         LinkTable = POSEntry;
                         MinOccurs = Zero;
@@ -676,7 +676,7 @@ xmlport 6150901 "NPR HC POS Entry"
                             }
                         }
                     }
-                    tableelement(postaxamountline; "NPR POS Tax Amount Line")
+                    tableelement(postaxamountline; "NPR POS Entry Tax Line")
                     {
                         LinkTable = POSEntry;
                         MinOccurs = Zero;

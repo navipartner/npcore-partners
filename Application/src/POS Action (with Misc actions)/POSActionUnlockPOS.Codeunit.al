@@ -46,7 +46,7 @@ codeunit 6150836 "NPR POS Action: UnlockPOS"
         POSSetup: Codeunit "NPR POS Setup";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         PasswordValid: Boolean;
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSUnit: Record "NPR POS Unit";
     begin
         if not Action.IsThisAction(ActionCode) then

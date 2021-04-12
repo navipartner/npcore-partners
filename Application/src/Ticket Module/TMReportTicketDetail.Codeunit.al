@@ -33,7 +33,7 @@ codeunit 6060121 "NPR TM Report - Ticket Detail."
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         Admission: Record "NPR TM Admission";
         PosEntry: Record "NPR POS Entry";
-        PosEntrySalesLine: Record "NPR POS Sales Line";
+        PosEntrySalesLine: Record "NPR POS Entry Sales Line";
         TMDetTickAccEntry: Record "NPR TM Det. Ticket AccessEntry";
         TMAdmSchEntry: Record "NPR TM Admis. Schedule Entry";
         AdmStartDate: array[10] of Date;

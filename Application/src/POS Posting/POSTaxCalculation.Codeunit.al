@@ -5,10 +5,10 @@ codeunit 6150633 "NPR POS Tax Calculation"
         TaxArea: Record "Tax Area";
         TaxAreaLine: Record "Tax Area Line";
         POSEntry: Record "NPR POS Entry";
-        GlobalTempPOSTaxAmountLine: Record "NPR POS Tax Amount Line" temporary;
-        TempPOSTaxAmountLine2: Record "NPR POS Tax Amount Line" temporary;
-        GlobalPOSSalesLine: Record "NPR POS Sales Line";
-        POSSalesLine2: Record "NPR POS Sales Line";
+        GlobalTempPOSTaxAmountLine: Record "NPR POS Entry Tax Line" temporary;
+        TempPOSTaxAmountLine2: Record "NPR POS Entry Tax Line" temporary;
+        GlobalPOSSalesLine: Record "NPR POS Entry Sales Line";
+        POSSalesLine2: Record "NPR POS Entry Sales Line";
         Currency: Record Currency;
         Text000: Label '%1 in %2 %3 must be filled in with unique values when %4 is %5.';
         TextErrorUpdating: Label 'Error updaing the %1 table for %2 %3.';
@@ -27,7 +27,7 @@ codeunit 6150633 "NPR POS Tax Calculation"
 
     procedure RefreshPOSTaxLines(var POSEntryIn: Record "NPR POS Entry")
     var
-        PersistentPOSTaxAmountLine: Record "NPR POS Tax Amount Line";
+        PersistentPOSTaxAmountLine: Record "NPR POS Entry Tax Line";
         POSPostEntries: Codeunit "NPR POS Post Entries";
     begin
         OnBeforeRefreshTaxPOSEntry(POSEntryIn);
@@ -57,7 +57,7 @@ codeunit 6150633 "NPR POS Tax Calculation"
 
     procedure CalculateSalesTaxLinesPOSEntry(POSEntryIn: Record "NPR POS Entry")
     var
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
     begin
         POSEntry := POSEntryIn;
         Posted := POSEntry."Post Entry Status" >= POSEntry."Post Entry Status"::Posted;
@@ -84,7 +84,7 @@ codeunit 6150633 "NPR POS Tax Calculation"
         EndSalesTaxCalculation(POSEntry."Posting Date");
     end;
 
-    procedure AddPOSSalesLine(POSSalesLine: Record "NPR POS Sales Line")
+    procedure AddPOSSalesLine(POSSalesLine: Record "NPR POS Entry Sales Line")
     var
         RecRef: RecordRef;
     begin
@@ -165,7 +165,7 @@ codeunit 6150633 "NPR POS Tax Calculation"
 
     local procedure ValidateTaxFields(var POSEntryIn: Record "NPR POS Entry")
     var
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
         GLAccount: Record "G/L Account";
@@ -188,7 +188,7 @@ codeunit 6150633 "NPR POS Tax Calculation"
 
     local procedure PersistSalesTaxAmountLines(var POSEntryIn: Record "NPR POS Entry")
     var
-        PersistentPOSTaxAmountLine: Record "NPR POS Tax Amount Line";
+        PersistentPOSTaxAmountLine: Record "NPR POS Entry Tax Line";
     begin
         if GlobalTempPOSTaxAmountLine.FindSet then
             repeat
@@ -201,7 +201,7 @@ codeunit 6150633 "NPR POS Tax Calculation"
 
     local procedure PersistVATAmountLines(var POSEntryIn: Record "NPR POS Entry"; var VATAmountLine: Record "VAT Amount Line")
     var
-        PersistentPOSTaxAmountLine: Record "NPR POS Tax Amount Line";
+        PersistentPOSTaxAmountLine: Record "NPR POS Entry Tax Line";
     begin
         if VATAmountLine.FindSet then
             repeat
@@ -324,7 +324,7 @@ codeunit 6150633 "NPR POS Tax Calculation"
         LineAmountToInvoice: Decimal;
         LineAmountToInvoiceDiscounted: Decimal;
         DeferralAmount: Decimal;
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
     begin
         POSEntry := POSEntryIn;
         Posted := POSEntry."Post Entry Status" >= POSEntry."Post Entry Status"::Posted;
@@ -516,7 +516,7 @@ codeunit 6150633 "NPR POS Tax Calculation"
 
     local procedure HasSalesTaxLines(POSEntryNo: Integer): Boolean
     var
-        POSTaxAmountLine: Record "NPR POS Tax Amount Line";
+        POSTaxAmountLine: Record "NPR POS Entry Tax Line";
     begin
         POSTaxAmountLine.SetRange("POS Entry No.", POSEntryNo);
         POSTaxAmountLine.SetRange("Tax Calculation Type", POSTaxAmountLine."Tax Calculation Type"::"Sales Tax");
@@ -537,7 +537,7 @@ codeunit 6150633 "NPR POS Tax Calculation"
     begin
     end;
 
-    procedure CalculateSalesTaxSaleLinePOS(SalePOS: Record "NPR Sale POS"; var SaleLinePOS: Record "NPR Sale Line POS")
+    procedure CalculateSalesTaxSaleLinePOS(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
     var
         TaxArea: Record "Tax Area";
         SalesTaxCalculate: Codeunit "Sales Tax Calculate";
@@ -569,7 +569,7 @@ codeunit 6150633 "NPR POS Tax Calculation"
         DistTaxOverSaleLinePOS(SaleLinePOS);
     end;
 
-    local procedure AddSaleLinePOS(SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure AddSaleLinePOS(SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         RecRef: RecordRef;
@@ -649,9 +649,9 @@ codeunit 6150633 "NPR POS Tax Calculation"
         end;
     end;
 
-    local procedure DistTaxOverSaleLinePOS(var SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure DistTaxOverSaleLinePOS(var SaleLinePOS: Record "NPR POS Sale Line")
     var
-        tmpSaleLinePOS: Record "NPR Sale Line POS" temporary;
+        tmpSaleLinePOS: Record "NPR POS Sale Line" temporary;
         Amount: Decimal;
         TaxAmount: Decimal;
         ReturnTaxAmount: Decimal;
@@ -781,7 +781,7 @@ codeunit 6150633 "NPR POS Tax Calculation"
 
     procedure EndSalesTaxCalculation(Date: Date)
     var
-        POSTaxAmountLine2: Record "NPR POS Tax Amount Line" temporary;
+        POSTaxAmountLine2: Record "NPR POS Entry Tax Line" temporary;
         TaxDetail: Record "Tax Detail";
         AddedTaxAmount: Decimal;
         TotalTaxAmount: Decimal;
@@ -938,7 +938,7 @@ codeunit 6150633 "NPR POS Tax Calculation"
         end;
     end;
 
-    procedure GetSalesTaxAmountLineTable(var POSTaxAmountLine2: Record "NPR POS Tax Amount Line" temporary)
+    procedure GetSalesTaxAmountLineTable(var POSTaxAmountLine2: Record "NPR POS Entry Tax Line" temporary)
     begin
         GlobalTempPOSTaxAmountLine.Reset;
         if GlobalTempPOSTaxAmountLine.FindSet then
@@ -948,7 +948,7 @@ codeunit 6150633 "NPR POS Tax Calculation"
             until GlobalTempPOSTaxAmountLine.Next = 0;
     end;
 
-    procedure SetTaxBaseAmount(var POSTaxAmountLine: Record "NPR POS Tax Amount Line"; Value: Decimal; ExchangeFactor: Decimal; Increment: Boolean)
+    procedure SetTaxBaseAmount(var POSTaxAmountLine: Record "NPR POS Entry Tax Line"; Value: Decimal; ExchangeFactor: Decimal; Increment: Boolean)
     begin
         with POSTaxAmountLine do begin
             if Increment then
@@ -967,7 +967,7 @@ codeunit 6150633 "NPR POS Tax Calculation"
           );
     end;
 
-    procedure HandleRoundTaxUpOrDown(var POSTaxAmountLine: Record "NPR POS Tax Amount Line"; RoundTax: Option "To Nearest",Up,Down; TotalTaxAmount: Decimal; TaxAreaCode: Code[20]; TaxGroupCode: Code[20])
+    procedure HandleRoundTaxUpOrDown(var POSTaxAmountLine: Record "NPR POS Entry Tax Line"; RoundTax: Option "To Nearest",Up,Down; TotalTaxAmount: Decimal; TaxAreaCode: Code[20]; TaxGroupCode: Code[20])
     var
         RoundedAmount: Decimal;
         RoundingError: Decimal;

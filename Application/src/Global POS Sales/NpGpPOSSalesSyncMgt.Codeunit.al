@@ -104,7 +104,7 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
 
     local procedure InitReqBody(POSEntry: Record "NPR POS Entry"; ServiceName: Text; var XmlDoc: XmlDocument)
     var
-        POSSalesLine: Record "NPR POS Sales Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
         POSInfoPOSEntry: Record "NPR POS Info POS Entry";
         RetailCrossReference: Record "NPR Retail Cross Reference";
         Xml: Text;

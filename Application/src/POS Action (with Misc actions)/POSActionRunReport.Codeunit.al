@@ -43,8 +43,8 @@ codeunit 6150810 "NPR POSAction: Run Report"
         "Record": Variant;
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SalePOS: Record "NPR Sale POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
     begin
         if not Action.IsThisAction(ActionCode) then
             exit;

@@ -1,9 +1,9 @@
-table 6151002 "NPR POS Quote Entry"
+table 6151002 "NPR POS Saved Sale Entry"
 {
-    Caption = 'POS Quote Entry';
+    Caption = 'POS Saved Sale Entry';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR POS Quotes";
-    LookupPageID = "NPR POS Quotes";
+    DrillDownPageID = "NPR POS Saved Sales";
+    LookupPageID = "NPR POS Saved Sales";
 
     fields
     {
@@ -93,7 +93,7 @@ table 6151002 "NPR POS Quote Entry"
         }
         field(1000; Amount; Decimal)
         {
-            CalcFormula = Sum("NPR POS Quote Line".Amount WHERE("Quote Entry No." = FIELD("Entry No."),
+            CalcFormula = Sum("NPR POS Saved Sale Line".Amount WHERE("Quote Entry No." = FIELD("Entry No."),
                                                              "Sale Type" = FILTER(Sale | "Debit Sale" | Deposit),
                                                              Type = FILTER(<> Comment & <> "Open/Close")));
             Caption = 'Amount';
@@ -103,7 +103,7 @@ table 6151002 "NPR POS Quote Entry"
         }
         field(1005; "Amount Including VAT"; Decimal)
         {
-            CalcFormula = Sum("NPR POS Quote Line"."Amount Including VAT" WHERE("Quote Entry No." = FIELD("Entry No."),
+            CalcFormula = Sum("NPR POS Saved Sale Line"."Amount Including VAT" WHERE("Quote Entry No." = FIELD("Entry No."),
                                                                              "Sale Type" = FILTER(Sale | "Debit Sale" | Deposit),
                                                                              Type = FILTER(<> Comment & <> "Open/Close")));
             Caption = 'Amount Including VAT';
@@ -112,7 +112,7 @@ table 6151002 "NPR POS Quote Entry"
         }
         field(1010; "Contains EFT Approval"; Boolean)
         {
-            CalcFormula = Exist("NPR POS Quote Line" WHERE("Quote Entry No." = FIELD("Entry No."),
+            CalcFormula = Exist("NPR POS Saved Sale Line" WHERE("Quote Entry No." = FIELD("Entry No."),
                                                         "EFT Approved" = CONST(true)));
             Caption = 'Contains EFT Approval';
             FieldClass = FlowField;
@@ -132,7 +132,7 @@ table 6151002 "NPR POS Quote Entry"
 
     trigger OnDelete()
     var
-        POSQuoteLine: Record "NPR POS Quote Line";
+        POSQuoteLine: Record "NPR POS Saved Sale Line";
     begin
         POSQuoteLine.SetRange("Quote Entry No.", "Entry No.");
         POSQuoteLine.DeleteAll(not SkipLineDeleteTriggerValue);

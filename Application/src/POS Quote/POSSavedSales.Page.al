@@ -1,11 +1,11 @@
-page 6151002 "NPR POS Quotes"
+page 6151002 "NPR POS Saved Sales"
 {
-    Caption = 'POS Quotes';
-    CardPageID = "NPR POS Quote Card";
+    Caption = 'POS Saved Sales';
+    CardPageID = "NPR POS Saved Sale Card";
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
-    SourceTable = "NPR POS Quote Entry";
+    SourceTable = "NPR POS Saved Sale Entry";
     UsageCategory = Lists;
     ApplicationArea = All;
 
@@ -102,7 +102,7 @@ page 6151002 "NPR POS Quotes"
 
                 trigger OnAction()
                 var
-                    POSQuoteMgt: Codeunit "NPR POS Quote Mgt.";
+                    POSQuoteMgt: Codeunit "NPR POS Saved Sale Mgt.";
                 begin
                     POSQuoteMgt.ViewPOSSalesData(Rec);
                 end;
@@ -115,8 +115,8 @@ page 6151002 "NPR POS Quotes"
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     var
-        POSQuote: Record "NPR POS Quote Entry";
-        EntriesLeft: Label 'You have not closed all the POS Quotes. If you continue with the balancing process, the remaining quotes will stay in the system.\Are you sure you want to continue?';
+        POSQuote: Record "NPR POS Saved Sale Entry";
+        EntriesLeft: Label 'You have not closed all the POS Saved Sales. If you continue with the balancing process, the remaining quotes will stay in the system.\Are you sure you want to continue?';
         ConfrimCancel: Label 'Are you sure you want to cancel the balancing process?';
     begin
         if IsInEndOfTheDayProcess then begin

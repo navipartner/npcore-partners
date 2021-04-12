@@ -49,7 +49,7 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         POSUnit: Record "NPR POS Unit";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         JSON: Codeunit "NPR POS JSON Management";
         POSSale: Codeunit "NPR POS Sale";
         EventNo: Code[20];
@@ -128,7 +128,7 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
     local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         Job: Record Job;
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
     begin
         if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
@@ -189,7 +189,7 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
         OldDimSetEntryTmp: Record "Dimension Set Entry" temporary;
         Job: Record Job;
         POSUnit: Record "NPR POS Unit";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         DimMgt: Codeunit DimensionManagement;
         POSSale: Codeunit "NPR POS Sale";
         OldDimeSetID: Integer;

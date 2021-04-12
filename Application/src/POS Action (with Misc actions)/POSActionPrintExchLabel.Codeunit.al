@@ -76,9 +76,9 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel"
         JSON: Codeunit "NPR POS JSON Management";
         Date: Date;
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         ExchangeLabelMgt: Codeunit "NPR Exchange Label Mgt.";
-        PrintLines: Record "NPR Sale Line POS";
+        PrintLines: Record "NPR POS Sale Line";
         CalendarObject: JsonObject;
         "Count": Integer;
         i: Integer;

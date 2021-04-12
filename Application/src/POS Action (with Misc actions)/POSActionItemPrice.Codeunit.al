@@ -57,8 +57,8 @@ codeunit 6150852 "NPR POS Action - Item Price"
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SalePOS: Record "NPR Sale POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
         LineNumber: Integer;
         ItemIdentifyerType: Text;
         PriceExclVat: Boolean;

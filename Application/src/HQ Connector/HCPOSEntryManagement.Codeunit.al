@@ -200,8 +200,8 @@ codeunit 6150915 "NPR HC POS Entry Management"
 
     local procedure InsertPOSSalesLine(Element: XmlElement; var POSEntry: Record "NPR POS Entry")
     var
-        TempPOSSalesLine: Record "NPR POS Sales Line" temporary;
-        POSSalesLine: Record "NPR POS Sales Line";
+        TempPOSSalesLine: Record "NPR POS Entry Sales Line" temporary;
+        POSSalesLine: Record "NPR POS Entry Sales Line";
         OrigPOSEntry: Record "NPR POS Entry";
         OStream: OutStream;
         TempDimensionBuffer: Record "Dimension Buffer" temporary;
@@ -322,8 +322,8 @@ codeunit 6150915 "NPR HC POS Entry Management"
 
     local procedure InsertPOSPaymentLine(Element: XmlElement; var POSEntry: Record "NPR POS Entry")
     var
-        TempPOSPaymentLine: Record "NPR POS Payment Line" temporary;
-        POSPaymentLine: Record "NPR POS Payment Line";
+        TempPOSPaymentLine: Record "NPR POS Entry Payment Line" temporary;
+        POSPaymentLine: Record "NPR POS Entry Payment Line";
         OrigPOSEntry: Record "NPR POS Entry";
         OStream: OutStream;
         TempDimensionBuffer: Record "Dimension Buffer" temporary;
@@ -399,8 +399,8 @@ codeunit 6150915 "NPR HC POS Entry Management"
 
     local procedure InsertPOSTaxAmountLine(Element: XmlElement; var POSEntry: Record "NPR POS Entry")
     var
-        TempPOSTaxAmountLine: Record "NPR POS Tax Amount Line" temporary;
-        POSTaxAmountLine: Record "NPR POS Tax Amount Line";
+        TempPOSTaxAmountLine: Record "NPR POS Entry Tax Line" temporary;
+        POSTaxAmountLine: Record "NPR POS Entry Tax Line";
         OStream: OutStream;
     begin
         POSEntry.TestField("Entry No.");

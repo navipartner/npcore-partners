@@ -5,7 +5,7 @@ page 6150654 "NPR POS Paym. Line Subpage"
     PageType = ListPart;
     UsageCategory = Administration;
     ApplicationArea = All;
-    SourceTable = "NPR POS Payment Line";
+    SourceTable = "NPR POS Entry Payment Line";
 
     layout
     {

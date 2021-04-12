@@ -2,8 +2,8 @@ codeunit 6151602 "NPR NpDc Non-POS Coupon WS"
 {
     procedure ApplyCouponDiscount(var coupon_application: XMLport "NPR NpDc Ext. Coupon Appl.")
     var
-        TempSalePOS: Record "NPR Sale POS" temporary;
-        TempSaleLinePOS: Record "NPR Sale Line POS" temporary;
+        TempSalePOS: Record "NPR POS Sale" temporary;
+        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         TempNpDcExtCouponBuffer: Record "NPR NpDc Ext. Coupon Buffer" temporary;
         NpDcNonPOSApplicationMgt: Codeunit "NPR NpDc Non-POS App. Mgt.";
     begin

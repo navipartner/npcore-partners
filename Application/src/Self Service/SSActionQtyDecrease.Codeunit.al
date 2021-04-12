@@ -49,7 +49,7 @@ codeunit 6151281 "NPR SS Action - Qty Decrease"
     procedure DecreaseSalelineQuantity(POSSession: Codeunit "NPR POS Session"; DecreaseBy: Decimal)
     var
         SaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
     begin
 

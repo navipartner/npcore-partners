@@ -46,7 +46,7 @@ codeunit 6150875 "NPR POS Action: Raptor"
     local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         RaptorAction: Record "NPR Raptor Action";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         RaptorMgt: Codeunit "NPR Raptor Management";
         RaptorActionCode: Code[20];
@@ -83,7 +83,7 @@ codeunit 6150875 "NPR POS Action: Raptor"
     local procedure TryToRunAction("Action": Record "NPR POS Action"; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
         RaptorAction: Record "NPR Raptor Action";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         RaptorMgt: Codeunit "NPR Raptor Management";
         RaptorActionCode: Code[20];

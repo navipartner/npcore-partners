@@ -145,8 +145,8 @@ codeunit 6150792 "NPR POS Action - Discount"
         Quantity: Decimal;
         POSSale: Codeunit "NPR POS Sale";
         DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra;
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         View: Codeunit "NPR POS View";
         TotalPrice: Decimal;
         PresetMultiLineDiscTarget: Integer;
@@ -310,7 +310,7 @@ codeunit 6150792 "NPR POS Action - Discount"
     local procedure OnActionCurrentSalespersonPassword(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         Salesperson: Record "Salesperson/Purchaser";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         SalespersonPassword: Text;
     begin
@@ -492,9 +492,9 @@ codeunit 6150792 "NPR POS Action - Discount"
 
     #region Locals
 
-    local procedure ApplyDiscountOnLines(var SalePOS: Record "NPR Sale POS"; DiscountType: Option DiscountAmt,DiscountPct,LineAmt; Discount: Decimal)
+    local procedure ApplyDiscountOnLines(var SalePOS: Record "NPR POS Sale"; DiscountType: Option DiscountAmt,DiscountPct,LineAmt; Discount: Decimal)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         ApplyFilterOnLines(SalePOS, SaleLinePOS);
         if not SaleLinePOS.FindSet then
@@ -505,7 +505,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         until SaleLinePOS.Next = 0;
     end;
 
-    local procedure ApplyDiscountOnLine(var SaleLinePOS: Record "NPR Sale Line POS"; DiscountType: Option DiscountAmt,DiscountPct,LineAmt; Discount: Decimal)
+    local procedure ApplyDiscountOnLine(var SaleLinePOS: Record "NPR POS Sale Line"; DiscountType: Option DiscountAmt,DiscountPct,LineAmt; Discount: Decimal)
     var
         PrevRec: Text;
     begin
@@ -557,7 +557,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         UpdateSalesVAT(SaleLinePOS."Orig. POS Sale ID");
     end;
 
-    local procedure ApplyFilterOnLines(var SalePOS: Record "NPR Sale POS"; var SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure ApplyFilterOnLines(var SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
     var
         UnexpectedFilterType: Label 'Unexpected quantity type filter. This is a critical programming error. Please contact system vendor.';
     begin
@@ -581,9 +581,9 @@ codeunit 6150792 "NPR POS Action - Discount"
             SaleLinePOS.SetFilter("Item Disc. Group", DiscountGroupFilter);
     end;
 
-    local procedure GetLinesTotalDiscountableValue(var SalePOS: Record "NPR Sale POS") TotalLineValue: Decimal
+    local procedure GetLinesTotalDiscountableValue(var SalePOS: Record "NPR POS Sale") TotalLineValue: Decimal
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         ApplyFilterOnLines(SalePOS, SaleLinePOS);
 
@@ -594,7 +594,7 @@ codeunit 6150792 "NPR POS Action - Discount"
 
     end;
 
-    local procedure GetSingleLineTotalDiscountableValue(SaleLinePOS: Record "NPR Sale Line POS"; IncludeDiscount: Boolean) LineValue: Decimal
+    local procedure GetSingleLineTotalDiscountableValue(SaleLinePOS: Record "NPR POS Sale Line"; IncludeDiscount: Boolean) LineValue: Decimal
     begin
         if not IncludeDiscount then
             SaleLinePOS."Discount Amount" := 0;
@@ -615,9 +615,9 @@ codeunit 6150792 "NPR POS Action - Discount"
             LineValue := -LineValue;
     end;
 
-    local procedure SetTotalDiscountAmount(var SalePOS: Record "NPR Sale POS"; TotalDiscountAmount: Decimal)
+    local procedure SetTotalDiscountAmount(var SalePOS: Record "NPR POS Sale"; TotalDiscountAmount: Decimal)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         TotalPrice: Decimal;
         DiscountPct: Decimal;
     begin
@@ -631,7 +631,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         AdjustRoundingForTotalAmountDiscount(SalePOS, (TotalPrice - TotalDiscountAmount));
     end;
 
-    local procedure SetTotalAmount(var SalePOS: Record "NPR Sale POS"; Amount: Decimal)
+    local procedure SetTotalAmount(var SalePOS: Record "NPR POS Sale"; Amount: Decimal)
     var
         t001: Label 'Total Amount entered must be less than the Sale Total!';
         DiscountPct: Decimal;
@@ -647,14 +647,14 @@ codeunit 6150792 "NPR POS Action - Discount"
         AdjustRoundingForTotalAmountDiscount(SalePOS, Amount);
     end;
 
-    local procedure SetDiscountPctABS(SalePOS: Record "NPR Sale POS"; DiscountPct: Decimal)
+    local procedure SetDiscountPctABS(SalePOS: Record "NPR POS Sale"; DiscountPct: Decimal)
     begin
         ApplyDiscountOnLines(SalePOS, "DiscType.DiscountPct", DiscountPct);
     end;
 
-    local procedure SetDiscountPctREL(SalePOS: Record "NPR Sale POS"; DiscountPct: Decimal)
+    local procedure SetDiscountPctREL(SalePOS: Record "NPR POS Sale"; DiscountPct: Decimal)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         RelativeDiscountPct: Decimal;
     begin
         ApplyFilterOnLines(SalePOS, SaleLinePOS);
@@ -667,9 +667,9 @@ codeunit 6150792 "NPR POS Action - Discount"
         until SaleLinePOS.Next = 0;
     end;
 
-    local procedure SetDiscountPctExtra(SalePOS: Record "NPR Sale POS"; ExtraDiscountPct: Decimal)
+    local procedure SetDiscountPctExtra(SalePOS: Record "NPR POS Sale"; ExtraDiscountPct: Decimal)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         NewDiscountPct: Decimal;
     begin
         ApplyFilterOnLines(SalePOS, SaleLinePOS);
@@ -682,22 +682,22 @@ codeunit 6150792 "NPR POS Action - Discount"
         until SaleLinePOS.Next = 0;
     end;
 
-    procedure SetLineAmount(var SaleLinePOS: Record "NPR Sale Line POS"; LineAmount: Decimal)
+    procedure SetLineAmount(var SaleLinePOS: Record "NPR POS Sale Line"; LineAmount: Decimal)
     begin
         ApplyDiscountOnLine(SaleLinePOS, "DiscType.LineAmt", LineAmount);
     end;
 
-    local procedure SetLineDiscountAmount(var SaleLinePOS: Record "NPR Sale Line POS"; DiscountAmount: Decimal)
+    local procedure SetLineDiscountAmount(var SaleLinePOS: Record "NPR POS Sale Line"; DiscountAmount: Decimal)
     begin
         ApplyDiscountOnLine(SaleLinePOS, "DiscType.DiscountAmt", DiscountAmount);
     end;
 
-    procedure SetLineDiscountPctABS(var SaleLinePOS: Record "NPR Sale Line POS"; DiscountPct: Decimal)
+    procedure SetLineDiscountPctABS(var SaleLinePOS: Record "NPR POS Sale Line"; DiscountPct: Decimal)
     begin
         ApplyDiscountOnLine(SaleLinePOS, "DiscType.DiscountPct", DiscountPct);
     end;
 
-    local procedure SetLineDiscountPctREL(var SaleLinePOS: Record "NPR Sale Line POS"; DiscountPct: Decimal)
+    local procedure SetLineDiscountPctREL(var SaleLinePOS: Record "NPR POS Sale Line"; DiscountPct: Decimal)
     var
         RelativeDiscountPct: Decimal;
     begin
@@ -705,7 +705,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         ApplyDiscountOnLine(SaleLinePOS, "DiscType.DiscountPct", RelativeDiscountPct);
     end;
 
-    local procedure SetLineDiscountPctExtra(var SaleLinePOS: Record "NPR Sale Line POS"; ExtraDiscountPct: Decimal)
+    local procedure SetLineDiscountPctExtra(var SaleLinePOS: Record "NPR POS Sale Line"; ExtraDiscountPct: Decimal)
     var
         NewDiscountPct: Decimal;
     begin
@@ -713,7 +713,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         ApplyDiscountOnLine(SaleLinePOS, "DiscType.DiscountPct", NewDiscountPct);
     end;
 
-    local procedure SetLineUnitPrice(var SaleLinePOS: Record "NPR Sale Line POS"; UnitPrice: Decimal)
+    local procedure SetLineUnitPrice(var SaleLinePOS: Record "NPR POS Sale Line"; UnitPrice: Decimal)
     var
         PrevRec: Text;
     begin
@@ -734,9 +734,9 @@ codeunit 6150792 "NPR POS Action - Discount"
         UpdateSalesVAT(SaleLinePOS."Orig. POS Sale ID");
     end;
 
-    local procedure AdjustRoundingForTotalAmountDiscount(var SalePOS: Record "NPR Sale POS"; Amount: Decimal)
+    local procedure AdjustRoundingForTotalAmountDiscount(var SalePOS: Record "NPR POS Sale"; Amount: Decimal)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         TotalLineValue: Decimal;
     begin
         ApplyFilterOnLines(SalePOS, SaleLinePOS);
@@ -750,7 +750,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         end;
     end;
 
-    local procedure AddDimensionToDimensionSet(var SaleLinePOS: Record "NPR Sale Line POS"; DimensionCode: Code[20]; DimensionValueCode: Code[20])
+    local procedure AddDimensionToDimensionSet(var SaleLinePOS: Record "NPR POS Sale Line"; DimensionCode: Code[20]; DimensionValueCode: Code[20])
     var
         TempDimensionSetEntry: Record "Dimension Set Entry" temporary;
         DimensionManagement: Codeunit DimensionManagement;
@@ -801,7 +801,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         DimValueCode := DimValue.Code;
     end;
 
-    local procedure GetMultiLineDiscountTarget(SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS"; PresetMultiLineDiscTarget: Option Auto,"Positive Only","Negative Only",All,Ask; AllowAllLines: Boolean)
+    local procedure GetMultiLineDiscountTarget(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; PresetMultiLineDiscTarget: Option Auto,"Positive Only","Negative Only",All,Ask; AllowAllLines: Boolean)
     var
         DefaultOptionNo: Integer;
         NoOfNegativeLines: Integer;
@@ -863,7 +863,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         end;
     end;
 
-    local procedure GetSignFactor(SaleLinePOS: Record "NPR Sale Line POS"): Integer
+    local procedure GetSignFactor(SaleLinePOS: Record "NPR POS Sale Line"): Integer
     begin
         if SaleLinePOS.Quantity < 0 then
             exit(-1);
@@ -872,7 +872,7 @@ codeunit 6150792 "NPR POS Action - Discount"
 
     local procedure UpdateSalesVAT(POSSaleID: Integer)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         if (not SaleLinePOS.SetCurrentKey("Orig. POS Sale ID")) then;
 
@@ -896,7 +896,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         AddDimensionValueCode := JSON.GetString('addDimensionValueCode');
     end;
 
-    local procedure ApplyAdditionalParams(var SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure ApplyAdditionalParams(var SaleLinePOS: Record "NPR POS Sale Line")
     begin
         if ApprovedBySalespersonCode <> '' then
             SaleLinePOS."Discount Authorised by" := ApprovedBySalespersonCode;

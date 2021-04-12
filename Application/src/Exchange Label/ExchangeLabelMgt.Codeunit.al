@@ -41,7 +41,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
                     AssignCode20FieldValue(ExchangeLabel."Sales Header No.", RecRef, 'Document No.');
                     AssignCode10FieldValue(ExchangeLabel."Unit of Measure", RecRef, 'Unit of Measure');
                 end;
-            DATABASE::"NPR Sale Line POS":
+            DATABASE::"NPR POS Sale Line":
                 begin
                     AssignCode10FieldValue(ExchangeLabel."Register No.", RecRef, 'Register No.');
                     AssignCode20FieldValue(ExchangeLabel."Sales Ticket No.", RecRef, 'Sales Ticket No.');
@@ -89,9 +89,9 @@ codeunit 6014498 "NPR Exchange Label Mgt."
     local procedure PrintLabels(PrintType: Option Single,LineQuantity,All,Selection,Package; var LineRef: RecordRef; ValidFromDate: Date): Boolean
     var
         ExchangeLabel: Record "NPR Exchange Label";
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SaleLinePOSSelected: Record "NPR Sale Line POS";
-        SalePOS: Record "NPR Sale POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSSelected: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
         t001: Label 'No lines to print exchange labels from';
         FieldRef: FieldRef;
         Dialog: Dialog;
@@ -156,7 +156,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
         end;
     end;
 
-    procedure PrintLabelsFromPOSWithoutPrompts(PrintType: Option Single,LineQuantity,All,Selection,Package; var SaleLinePOS: Record "NPR Sale Line POS"; var ValidFromDate: Date)
+    procedure PrintLabelsFromPOSWithoutPrompts(PrintType: Option Single,LineQuantity,All,Selection,Package; var SaleLinePOS: Record "NPR POS Sale Line"; var ValidFromDate: Date)
     var
         RecRef: RecordRef;
     begin
@@ -205,12 +205,12 @@ codeunit 6014498 "NPR Exchange Label Mgt."
         end;
     end;
 
-    procedure ScanExchangeLabel(var SalePOS: Record "NPR Sale POS"; var Validering: Code[20]; var CopyValidering: Code[20]) Found: Boolean
+    procedure ScanExchangeLabel(var SalePOS: Record "NPR POS Sale"; var Validering: Code[20]; var CopyValidering: Code[20]) Found: Boolean
     var
         ExchangeLabel: Record "NPR Exchange Label";
         Item: Record Item;
         ExchangeLabelSetup: record "NPR Exchange Label Setup";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         LineNo: Integer;
         SalesPrice: Decimal;
     begin
@@ -296,8 +296,8 @@ codeunit 6014498 "NPR Exchange Label Mgt."
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         //-NPR5.49 [345209]
         case RecRef.Number of
@@ -309,7 +309,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
                     if SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.") and (not SalesHeader."Prices Including VAT") then
                         UnitPrice *= (1 + (SalesLine."VAT %" / 100));
                 end;
-            DATABASE::"NPR Sale Line POS":
+            DATABASE::"NPR POS Sale Line":
                 begin
                     RecRef.SetTable(SaleLinePOS);
                     UnitPrice := SaleLinePOS."Unit Price";
@@ -346,7 +346,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
                     else
                         SalesPrice := UnitPrice;
                 end;
-            DATABASE::"NPR Sale Line POS":
+            DATABASE::"NPR POS Sale Line":
                 begin
                     AssignDecimalFieldValue(UnitPrice, RecRef, 'Amount Including VAT');
                     AssignDecimalFieldValue(Quantity, RecRef, 'Quantity');
@@ -355,7 +355,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
         end;
     end;
 
-    procedure GetLabelGroupBatchNo(SaleLinePOS: Record "NPR Sale Line POS") NextGroupNo: Integer
+    procedure GetLabelGroupBatchNo(SaleLinePOS: Record "NPR POS Sale Line") NextGroupNo: Integer
     var
         ExchangeLabel: Record "NPR Exchange Label";
     begin
@@ -370,7 +370,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
 
     procedure IsItemLine(RecRef: RecordRef): Boolean
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         SalesLine: Record "Sales Line";
         Type: Integer;
     begin
@@ -380,7 +380,7 @@ codeunit 6014498 "NPR Exchange Label Mgt."
                     AssignIntegerFieldValue(Type, RecRef, 'Type');
                     exit(Type = SalesLine.Type::Item.AsInteger())
                 end;
-            DATABASE::"NPR Sale Line POS":
+            DATABASE::"NPR POS Sale Line":
                 begin
                     AssignIntegerFieldValue(Type, RecRef, 'Type');
                     exit(Type = SaleLinePOS.Type::Item)
@@ -439,11 +439,11 @@ codeunit 6014498 "NPR Exchange Label Mgt."
 
     local procedure InitRetailReference(var LineRef: RecordRef) ReferenceNo: Code[50]
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         NpGpPOSSalesInitMgt: Codeunit "NPR NpGp POS Sales Init Mgt.";
     begin
         //-NPR5.51
-        if LineRef.Number <> DATABASE::"NPR Sale Line POS" then
+        if LineRef.Number <> DATABASE::"NPR POS Sale Line" then
             exit;
 
         LineRef.SetTable(SaleLinePOS);

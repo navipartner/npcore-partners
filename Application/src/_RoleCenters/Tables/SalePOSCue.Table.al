@@ -12,7 +12,7 @@ table 6059986 "NPR Sale POS Cue"
         }
         field(2; "Saved Sales"; Integer)
         {
-            CalcFormula = Count("NPR Sale POS" WHERE("Saved Sale" = CONST(true),
+            CalcFormula = Count("NPR POS Sale" WHERE("Saved Sale" = CONST(true),
                                                   "Register No." = FIELD("Register Filter"),
                                                   "Salesperson Code" = FIELD("Salesperson Filter"),
                                                   Date = FIELD("Date Filter")));

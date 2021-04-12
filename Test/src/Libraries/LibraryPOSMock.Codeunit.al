@@ -51,7 +51,7 @@ codeunit 85003 "NPR Library - POS Mock"
 
     procedure CreateItemLineWithDiscount(POSSession: Codeunit "NPR POS Session"; ItemNo: Text; Quantity: Decimal; DiscountPct: Decimal)
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         SaleLineOut: Codeunit "NPR POS Sale Line";
         POSActionDiscount: Codeunit "NPR POS Action - Discount";
     begin
@@ -70,7 +70,7 @@ codeunit 85003 "NPR Library - POS Mock"
         ItemReference: Record "Item Reference";
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         ActionID: Guid;
     begin
         POSSession.GetFrontEnd(FrontEnd, true);
@@ -81,7 +81,7 @@ codeunit 85003 "NPR Library - POS Mock"
 
     procedure EndSale(POSSession: Codeunit "NPR POS Session"): Boolean
     var
-        SalePOS: record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
     begin
         POSSession.GetSale(POSSale);
@@ -98,10 +98,10 @@ codeunit 85003 "NPR Library - POS Mock"
         POSActionPayment: Codeunit "NPR POS Action: Payment";
         POSPaymentMethod: Record "NPR POS Payment Method";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         FrontEnd: Codeunit "NPR POS Front End Management";
         Handled: Boolean;
-        NewSalePOS: Record "NPR Sale POS";
+        NewSalePOS: Record "NPR POS Sale";
         ActionID: Guid;
     begin
         POSSession.GetFrontEnd(FrontEnd, true);
@@ -140,8 +140,8 @@ codeunit 85003 "NPR Library - POS Mock"
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
         VoucherType: Record "NPR NpRv Voucher Type";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         TempVoucher: Record "NPR NpRv Voucher" temporary;
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         POSSale: Codeunit "NPR POS Sale";
@@ -224,7 +224,7 @@ codeunit 85003 "NPR Library - POS Mock"
 
     internal procedure PayWithVoucherAndTryEndSaleAndStartNew(POSSession: Codeunit "NPR POS Session"; VoucherType: Code[20]; VoucherReferenceNo: Text[30]): Boolean
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
     begin
         VoucherPayment(POSSession, VoucherReferenceNo, VoucherType);
@@ -242,13 +242,13 @@ codeunit 85003 "NPR Library - POS Mock"
 
     local procedure VoucherPayment(POSSession: Codeunit "NPR POS Session"; VoucherReferenceNo: Text[30]; VoucherTypeCode: Code[20])
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         VoucherType: Record "NPR NpRv Voucher Type";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         FrontEnd: Codeunit "NPR POS Front End Management";
         POSSale: Codeunit "NPR POS Sale";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
-        POSLine: Record "NPR Sale Line POS";
+        POSLine: Record "NPR POS Sale Line";
     begin
         if VoucherReferenceNo = '' then
             exit;
@@ -343,7 +343,7 @@ codeunit 85003 "NPR Library - POS Mock"
             IssueReturnVoucher(POSSession, NpRvVoucher."Voucher Type");
     end;
 
-    local procedure TryPOSPost(SalePOS: Record "NPR Sale POS"): Boolean
+    local procedure TryPOSPost(SalePOS: Record "NPR POS Sale"): Boolean
     var
         POSPostMock: Codeunit "NPR Library - POS Post Mock";
     begin

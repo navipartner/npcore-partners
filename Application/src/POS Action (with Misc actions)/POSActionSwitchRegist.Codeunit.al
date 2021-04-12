@@ -71,7 +71,7 @@ codeunit 6150804 "NPR POS Action: Switch Regist."
 
     local procedure OnActionList(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         NewRegisterNo: Code[10];
     begin

@@ -190,11 +190,11 @@ table 6014430 "NPR Line Dimension"
 
     procedure UpdateGlobalDimCode(GlobalDimCodeNo: Integer; "Table ID": Integer; Kassenr: Code[10]; Bonnr: Code[20]; Dato2: Date; EkspArt: Option; LinjeNr: Integer; Nr: Code[20]; NewDimValue: Code[20])
     var
-        Ekspedition: Record "NPR Sale POS";
-        Ekspeditionlinie: Record "NPR Sale Line POS";
+        Ekspedition: Record "NPR POS Sale";
+        Ekspeditionlinie: Record "NPR POS Sale Line";
     begin
         case "Table ID" of
-            DATABASE::"NPR Sale POS":
+            DATABASE::"NPR POS Sale":
                 begin
                     Ekspedition.SetRange("Register No.", Kassenr);
                     Ekspedition.SetRange("Sales Ticket No.", Bonnr);
@@ -208,7 +208,7 @@ table 6014430 "NPR Line Dimension"
                         Ekspedition.Modify(true);
                     end;
                 end;
-            DATABASE::"NPR Sale Line POS":
+            DATABASE::"NPR POS Sale Line":
                 begin
                     if Ekspeditionlinie.Get(Kassenr, Bonnr, Dato2, EkspArt, LinjeNr) then begin
                         case GlobalDimCodeNo of
@@ -226,10 +226,10 @@ table 6014430 "NPR Line Dimension"
     procedure UpdateLineDim(var NPRLineDim: Record "NPR Line Dimension"; FromOnDelete: Boolean)
     var
         NewNPRLineDim: Record "NPR Line Dimension";
-        "Ekspedition linie": Record "NPR Sale Line POS";
+        "Ekspedition linie": Record "NPR POS Sale Line";
     begin
-        if (NPRLineDim."Table ID" = DATABASE::"NPR Sale POS") then begin
-            NewNPRLineDim.SetRange("Table ID", DATABASE::"NPR Sale Line POS");
+        if (NPRLineDim."Table ID" = DATABASE::"NPR POS Sale") then begin
+            NewNPRLineDim.SetRange("Table ID", DATABASE::"NPR POS Sale Line");
             NewNPRLineDim.SetRange("Register No.", NPRLineDim."Register No.");
             NewNPRLineDim.SetRange("Sales Ticket No.", NPRLineDim."Sales Ticket No.");
             NewNPRLineDim.SetRange("Sale Type", NPRLineDim."Sale Type");
@@ -246,14 +246,14 @@ table 6014430 "NPR Line Dimension"
                 if not FromOnDelete then
                     repeat
                         InsertNew(
-                          NPRLineDim, DATABASE::"NPR Sale Line POS", "Ekspedition linie");
+                          NPRLineDim, DATABASE::"NPR POS Sale Line", "Ekspedition linie");
                     until "Ekspedition linie".Next = 0;
             end;
         end;
     end;
     #endregion
     #region InsertNew
-    local procedure InsertNew(var NPRLineDim: Record "NPR Line Dimension"; TableNo: Integer; var "Ekspedition linie": Record "NPR Sale Line POS")
+    local procedure InsertNew(var NPRLineDim: Record "NPR Line Dimension"; TableNo: Integer; var "Ekspedition linie": Record "NPR POS Sale Line")
     var
         NewNPRLineDim: Record "NPR Line Dimension";
     begin
@@ -296,12 +296,12 @@ table 6014430 "NPR Line Dimension"
     var
         NPRLineDimHeader: Record "NPR Line Dimension";
         NPRLineDimLine: Record "NPR Line Dimension";
-        Ekspeditionlinie: Record "NPR Sale Line POS";
+        Ekspeditionlinie: Record "NPR POS Sale Line";
         LineTableNo: Integer;
     begin
         case TableNo of
-            DATABASE::"NPR Sale POS":
-                LineTableNo := DATABASE::"NPR Sale Line POS";
+            DATABASE::"NPR POS Sale":
+                LineTableNo := DATABASE::"NPR POS Sale Line";
         end;
 
         NPRLineDimHeader.SetRange("Table ID", TableNo);
@@ -331,7 +331,7 @@ table 6014430 "NPR Line Dimension"
                     NPRLineDimLine.SetRange("Dimension Code", NPRLineDimHeader."Dimension Code");
                     NPRLineDimLine.DeleteAll;
                     case TableNo of
-                        DATABASE::"NPR Sale POS":
+                        DATABASE::"NPR POS Sale":
                             begin
                                 Ekspeditionlinie.SetRange("Register No.", Kassenr);
                                 Ekspeditionlinie.SetRange("Sales Ticket No.", Bonnr);

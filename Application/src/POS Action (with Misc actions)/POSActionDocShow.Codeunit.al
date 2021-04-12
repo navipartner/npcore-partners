@@ -47,9 +47,9 @@ codeunit 6150867 "NPR POS Action: Doc. Show"
         SelectType: Integer;
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         SalesHeader: Record "Sales Header";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         SalesOrderViewString: Text;
         SelectCustomer: Boolean;
     begin
@@ -94,7 +94,7 @@ codeunit 6150867 "NPR POS Action: Doc. Show"
     local procedure CheckCustomer(POSSession: Codeunit "NPR POS Session"; SelectCustomer: Boolean): Boolean
     var
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         Customer: Record Customer;
     begin
         POSSession.GetSale(POSSale);

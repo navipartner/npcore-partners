@@ -99,8 +99,8 @@ codeunit 6060160 "NPR POS Action: Get Event"
         JobPlanningLine: Record "Job Planning Line";
         JobTask: Record "Job Task";
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SalePOS: Record "NPR Sale POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
     begin

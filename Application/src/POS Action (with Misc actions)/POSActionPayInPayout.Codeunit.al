@@ -145,7 +145,7 @@ codeunit 6150809 "NPR POSAction: PayIn Payout"
 
     local procedure RegisterAccountSales(POSSession: Codeunit "NPR POS Session"; AccountNo: Code[20]; Description: Text; Amount: Decimal; PayOption: Option)
     var
-        Line: Record "NPR Sale Line POS";
+        Line: Record "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
     begin
 
@@ -176,8 +176,8 @@ codeunit 6150809 "NPR POSAction: PayIn Payout"
 
     local procedure ApplyReasonCode(ReasonCode: Code[10]; var POSSession: Codeunit "NPR POS Session")
     var
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
     begin

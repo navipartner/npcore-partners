@@ -1,6 +1,6 @@
 codeunit 6014435 "NPR Credit Sale Post-Process"
 {
-    TableNo = "NPR Sale POS";
+    TableNo = "NPR POS Sale";
 
     trigger OnRun()
     begin
@@ -19,7 +19,7 @@ codeunit 6014435 "NPR Credit Sale Post-Process"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnFinishCreditSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
+    local procedure OnFinishCreditSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     begin
     end;
 

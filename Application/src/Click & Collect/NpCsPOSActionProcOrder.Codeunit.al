@@ -204,7 +204,7 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order"
         POSStore: Record "NPR POS Store";
         POSMenuButton: Record "NPR POS Menu Button";
         POSParameterValue: Record "NPR POS Parameter Value";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
     begin
         POSSession.GetSale(POSSale);

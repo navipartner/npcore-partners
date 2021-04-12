@@ -113,7 +113,7 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         NPRESeating: Record "NPR NPRE Seating";
         NPRESeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         NPREWaiterPad: Record "NPR NPRE Waiter Pad";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         POSSale: Codeunit "NPR POS Sale";
@@ -325,7 +325,7 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
     var
         TempNPREWaiterPad: Record "NPR NPRE Waiter Pad" temporary;
         NPREWaiterPad: Record "NPR NPRE Waiter Pad";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         POSSale: Codeunit "NPR POS Sale";
@@ -440,9 +440,9 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         exit(DecValue);
     end;
 
-    local procedure GetAddOnQty(SaleLinePOS: Record "NPR Sale Line POS"; ItemAddOnLine: Record "NPR NpIa Item AddOn Line") Qty: Decimal
+    local procedure GetAddOnQty(SaleLinePOS: Record "NPR POS Sale Line"; ItemAddOnLine: Record "NPR NpIa Item AddOn Line") Qty: Decimal
     var
-        SaleLinePOS2: Record "NPR Sale Line POS";
+        SaleLinePOS2: Record "NPR POS Sale Line";
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
         ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
     begin
@@ -465,7 +465,7 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         exit(Qty);
     end;
 
-    local procedure GetNextPOSAddOnLineNo(SaleLinePOS: Record "NPR Sale Line POS") LineNo: Integer
+    local procedure GetNextPOSAddOnLineNo(SaleLinePOS: Record "NPR POS Sale Line") LineNo: Integer
     var
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
         ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";

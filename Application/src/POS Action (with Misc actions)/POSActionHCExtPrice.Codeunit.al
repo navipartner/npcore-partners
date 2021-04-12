@@ -36,8 +36,8 @@ codeunit 6150909 "NPR POS Action: HC Ext. Price"
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CustomerPriceManagement: Codeunit "NPR POS HC Ext. Price";
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SalePOS: Record "NPR Sale POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
         TmpSalesLine: Record "Sales Line" temporary;
         GeneralLedgerSetup: Record "General Ledger Setup";
         EndpointSetup: Record "NPR POS HC Endpoint Setup";

@@ -144,7 +144,7 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         NPRESeating: Record "NPR NPRE Seating";
         NPREWaiterPad: Record "NPR NPRE Waiter Pad";
         NPRESeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         WaiterPadPOSManagement: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
@@ -182,7 +182,7 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
 
     local procedure OnActionAddPresetValuesToContext(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session")
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         Seating: Record "NPR NPRE Seating";
         POSSale: Codeunit "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
@@ -267,7 +267,7 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDataSourceExtensionReadData', '', true, false)]
     local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         Seating: Record "NPR NPRE Seating";
         WaiterPad: Record "NPR NPRE Waiter Pad";
         POSSale: Codeunit "NPR POS Sale";

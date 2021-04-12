@@ -1,10 +1,10 @@
 codeunit 6150738 "NPR POS Try Resume&CancelSale"
 {
-    TableNo = "NPR Sale POS";
+    TableNo = "NPR POS Sale";
 
     trigger OnRun()
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         SalePOS := Rec;
         ResumeAndCancelSale(SalePOS);
@@ -29,7 +29,7 @@ codeunit 6150738 "NPR POS Try Resume&CancelSale"
             Error(NotInitializedErr);
     end;
 
-    local procedure ResumeAndCancelSale(SalePOS: Record "NPR Sale POS")
+    local procedure ResumeAndCancelSale(SalePOS: Record "NPR POS Sale")
     var
         POSUnit: Record "NPR POS Unit";
         POSActionCancelSale: Codeunit "NPR POSAction: Cancel Sale";
@@ -61,7 +61,7 @@ codeunit 6150738 "NPR POS Try Resume&CancelSale"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150739, 'OnBeforePromptResumeSale', '', false, false)]
-    local procedure SetCancelOrPark(var SalePOS: Record "NPR Sale POS"; POSSession: Codeunit "NPR POS Session"; var SkipDialog: Boolean; var ActionOption: Option " ",Resume,CancelAndNew,SaveAsQuote; var ActionOnCancelError: Option " ",Resume,SaveAsQuote,ShowError; var Handled: Boolean)
+    local procedure SetCancelOrPark(var SalePOS: Record "NPR POS Sale"; POSSession: Codeunit "NPR POS Session"; var SkipDialog: Boolean; var ActionOption: Option " ",Resume,CancelAndNew,SaveAsQuote; var ActionOnCancelError: Option " ",Resume,SaveAsQuote,ShowError; var Handled: Boolean)
     begin
         /*
         SkipDialog := TRUE;

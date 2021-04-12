@@ -38,7 +38,7 @@ codeunit 6150681 "NPR NPRE RVA: Set R-View"
     local procedure SaveToWaiterPad(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management");
     var
         NPREWaiterPad: Record "NPR NPRE Waiter Pad";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         NPREWaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
     begin

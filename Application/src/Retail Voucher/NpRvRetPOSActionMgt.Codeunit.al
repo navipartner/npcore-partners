@@ -206,7 +206,7 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
     local procedure ContactInfo(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session")
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
     begin
         POSSession.GetPaymentLine(POSPaymentLine);
@@ -228,7 +228,7 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
 
     local procedure ScanReferenceNos(POSSession: Codeunit "NPR POS Session")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
@@ -375,7 +375,7 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         Contact: Record Contact;
         Customer: Record Customer;
         VoucherType: Record "NPR NpRv Voucher Type";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         NpRvModuleSendDefault: Codeunit "NPR NpRv Module Send: Def.";
         POSSale: Codeunit "NPR POS Sale";
         Email: Text;

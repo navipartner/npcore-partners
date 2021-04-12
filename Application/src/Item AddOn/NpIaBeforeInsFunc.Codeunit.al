@@ -1,9 +1,9 @@
 codeunit 6151129 "NPR NpIa Before Ins. Func."
 {
     [EventSubscriber(ObjectType::Codeunit, 6151125, 'BeforeInsertPOSAddOnLine', '', true, true)]
-    local procedure UnitPriceFromMaster(SalePOS: Record "NPR Sale POS"; AppliesToLineNo: Integer; var NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line")
+    local procedure UnitPriceFromMaster(SalePOS: Record "NPR POS Sale"; AppliesToLineNo: Integer; var NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         NpIaItemAddOnLineSetup: Record "NPR NpIa ItemAddOn Line Setup";
     begin
         if NpIaItemAddOnLine."Before Insert Function" <> 'UnitPriceFromMaster' then

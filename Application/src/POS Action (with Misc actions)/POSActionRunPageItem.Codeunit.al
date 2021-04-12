@@ -17,7 +17,7 @@ codeunit 6150847 "NPR POS Action: RunPage (Item)"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         with Sender do
             if DiscoverAction(
@@ -75,7 +75,7 @@ codeunit 6150847 "NPR POS Action: RunPage (Item)"
     local procedure OnActionRunPageItem(POSSession: Codeunit "NPR POS Session"; JSON: Codeunit "NPR POS JSON Management")
     var
         Item: Record Item;
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         PageId: Integer;
     begin

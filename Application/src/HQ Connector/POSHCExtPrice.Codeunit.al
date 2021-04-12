@@ -4,7 +4,7 @@ codeunit 6150910 "NPR POS HC Ext. Price"
         InvalidXml: Label 'The response is not in valid XML format.\\%1';
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Price Calc. Mgt.", 'OnFindItemPrice', '', true, true)]
-    local procedure FindHQConnectorPrice(POSPricingProfile: Record "NPR POS Pricing Profile"; SalePOS: Record "NPR Sale POS"; var SaleLinePOS: Record "NPR Sale Line POS"; var Handled: Boolean)
+    local procedure FindHQConnectorPrice(POSPricingProfile: Record "NPR POS Pricing Profile"; SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; var Handled: Boolean)
     var
         EndpointSetup: Record "NPR POS HC Endpoint Setup";
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -39,7 +39,7 @@ codeunit 6150910 "NPR POS HC Ext. Price"
         UpdateSaleLinePOS(TmpSalesLine, SaleLinePOS);
     end;
 
-    procedure UpdateSaleLinePOS(TmpSalesLine: Record "Sales Line" temporary; var SaleLinePOS: Record "NPR Sale Line POS")
+    procedure UpdateSaleLinePOS(TmpSalesLine: Record "Sales Line" temporary; var SaleLinePOS: Record "NPR POS Sale Line")
     begin
         SaleLinePOS."Unit Price" := TmpSalesLine."Unit Price";
 
@@ -120,7 +120,7 @@ codeunit 6150910 "NPR POS HC Ext. Price"
         NumberText: Text[100];
         DecimalNumber: Decimal;
         IntegerNumber: Integer;
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
 
         if Element.IsEmpty then begin

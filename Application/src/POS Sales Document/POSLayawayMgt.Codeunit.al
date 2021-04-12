@@ -179,7 +179,7 @@ codeunit 6014425 "NPR POS Layaway Mgt."
         CreditMemoCustLedgerEntry: Record "Cust. Ledger Entry";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         LAYAWAY_REFUND: Label 'Layaway Refund';
     begin
         if not SalesCrMemoHeader.Get(CreditMemoNo) then

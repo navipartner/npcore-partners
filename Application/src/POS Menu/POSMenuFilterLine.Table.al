@@ -85,7 +85,7 @@ table 6150716 "NPR POS Menu Filter Line"
                 "Field": Record "Field";
             begin
                 Field.Reset;
-                Field.SetRange(TableNo, DATABASE::"NPR Sale POS");
+                Field.SetRange(TableNo, DATABASE::"NPR POS Sale");
                 FieldLookup.SetTableView(Field);
                 FieldLookup.LookupMode(true);
                 if FieldLookup.RunModal = ACTION::LookupOK then begin
@@ -111,7 +111,7 @@ table 6150716 "NPR POS Menu Filter Line"
                 "Field": Record "Field";
             begin
                 Field.Reset;
-                Field.SetRange(TableNo, DATABASE::"NPR Sale Line POS");
+                Field.SetRange(TableNo, DATABASE::"NPR POS Sale Line");
                 FieldLookup.SetTableView(Field);
                 FieldLookup.LookupMode(true);
                 if FieldLookup.RunModal = ACTION::LookupOK then begin

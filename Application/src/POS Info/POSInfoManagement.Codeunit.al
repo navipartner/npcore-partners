@@ -15,7 +15,7 @@ codeunit 6150640 "NPR POS Info Management"
         ConfirmRetry: Label 'Do you want to try again?';
 
     [EventSubscriber(ObjectType::Table, 6014406, 'OnAfterValidateEvent', 'No.', false, false)]
-    local procedure OnAfterValidateSalesLineNoSaleLinePos(var Rec: Record "NPR Sale Line POS"; var xRec: Record "NPR Sale Line POS"; CurrFieldNo: Integer)
+    local procedure OnAfterValidateSalesLineNoSaleLinePos(var Rec: Record "NPR POS Sale Line"; var xRec: Record "NPR POS Sale Line"; CurrFieldNo: Integer)
     var
         POSInfoLinkTable: Record "NPR POS Info Link Table";
         POSInfoTransaction: Record "NPR POS Info Transaction";
@@ -34,10 +34,10 @@ codeunit 6150640 "NPR POS Info Management"
     end;
 
     [EventSubscriber(ObjectType::Table, 6014405, 'OnBeforeValidateEvent', 'Customer No.', false, false)]
-    local procedure OnBeforeValidateCustomerNoSalePos(var Rec: Record "NPR Sale POS"; var xRec: Record "NPR Sale POS"; CurrFieldNo: Integer)
+    local procedure OnBeforeValidateCustomerNoSalePos(var Rec: Record "NPR POS Sale"; var xRec: Record "NPR POS Sale"; CurrFieldNo: Integer)
     var
         POSInfoLinkTable: Record "NPR POS Info Link Table";
-        pSaleLinePos: Record "NPR Sale Line POS";
+        pSaleLinePos: Record "NPR POS Sale Line";
         FrontEndUpdateIsNeeded: Boolean;
     begin
         POSInfoLinkTable.Reset;
@@ -58,7 +58,7 @@ codeunit 6150640 "NPR POS Info Management"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150614, 'OnAfterInsertPOSEntry', '', true, true)]
-    local procedure OnAfterInsertPOSEntry(var SalePOS: Record "NPR Sale POS"; var POSEntry: Record "NPR POS Entry")
+    local procedure OnAfterInsertPOSEntry(var SalePOS: Record "NPR POS Sale"; var POSEntry: Record "NPR POS Entry")
     var
         POSInfoTransaction: Record "NPR POS Info Transaction";
         POSInfoAuditRoll: Record "NPR POS Info Audit Roll";
@@ -96,7 +96,7 @@ codeunit 6150640 "NPR POS Info Management"
     end;
 
     [EventSubscriber(ObjectType::Table, 6014405, 'OnAfterDeleteEvent', '', true, true)]
-    local procedure OnAfterDeleteSalePOS(var Rec: Record "NPR Sale POS"; RunTrigger: Boolean)
+    local procedure OnAfterDeleteSalePOS(var Rec: Record "NPR POS Sale"; RunTrigger: Boolean)
     var
         POSInfoTransaction: Record "NPR POS Info Transaction";
     begin
@@ -107,12 +107,12 @@ codeunit 6150640 "NPR POS Info Management"
     end;
 
     [EventSubscriber(ObjectType::Table, 6014406, 'OnAfterDeleteEvent', '', true, true)]
-    local procedure OnAfterDeleteSaleLinePOS(var Rec: Record "NPR Sale Line POS"; RunTrigger: Boolean)
+    local procedure OnAfterDeleteSaleLinePOS(var Rec: Record "NPR POS Sale Line"; RunTrigger: Boolean)
     begin
         DeleteLine(Rec);
     end;
 
-    local procedure ProcessPOSInfoLinkEntries(var POSInfoLinkTable: Record "NPR POS Info Link Table"; pSaleLinePos: Record "NPR Sale Line POS"; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask) FrontEndUpdateIsNeeded: Boolean
+    local procedure ProcessPOSInfoLinkEntries(var POSInfoLinkTable: Record "NPR POS Info Link Table"; pSaleLinePos: Record "NPR POS Sale Line"; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask) FrontEndUpdateIsNeeded: Boolean
     var
         POSInfo: Record "NPR POS Info";
         TempPOSInfoTransaction: Record "NPR POS Info Transaction" temporary;
@@ -137,13 +137,13 @@ codeunit 6150640 "NPR POS Info Management"
             until TempPOSInfoTransaction.Next = 0;
     end;
 
-    procedure ProcessPOSInfoMenuFunction(pSaleLinePos: Record "NPR Sale Line POS"; pPOSInfoCode: Code[20]; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask; pClearInfo: Boolean) FrontEndUpdateIsNeeded: Boolean
+    procedure ProcessPOSInfoMenuFunction(pSaleLinePos: Record "NPR POS Sale Line"; pPOSInfoCode: Code[20]; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask; pClearInfo: Boolean) FrontEndUpdateIsNeeded: Boolean
     var
         POSInfo: Record "NPR POS Info";
         POSInfoTransaction: Record "NPR POS Info Transaction";
         POSInfoTransParam: Record "NPR POS Info Transaction";
-        SaleLinePos2: Record "NPR Sale Line POS";
-        SaleLinePosTmp: Record "NPR Sale Line POS" temporary;
+        SaleLinePos2: Record "NPR POS Sale Line";
+        SaleLinePosTmp: Record "NPR POS Sale Line" temporary;
     begin
         POSInfo.Get(pPOSInfoCode);
         CheckAndAdjustApplicationScope(pSaleLinePos, POSInfo, pApplicScope);
@@ -163,9 +163,9 @@ codeunit 6150640 "NPR POS Info Management"
             CallFrontEndUpdate();
     end;
 
-    local procedure CheckAndAdjustApplicationScope(pSaleLinePos: Record "NPR Sale Line POS"; POSInfo: Record "NPR POS Info"; var pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask)
+    local procedure CheckAndAdjustApplicationScope(pSaleLinePos: Record "NPR POS Sale Line"; POSInfo: Record "NPR POS Info"; var pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask)
     var
-        SaleLinePos2: Record "NPR Sale Line POS";
+        SaleLinePos2: Record "NPR POS Sale Line";
     begin
         if pApplicScope = pApplicScope::"New Lines" then
             POSInfo.TestField("Copy from Header", true);
@@ -185,7 +185,7 @@ codeunit 6150640 "NPR POS Info Management"
             Error('');
     end;
 
-    local procedure ConfirmPOSInfoTransOverwrite(pSaleLinePos: Record "NPR Sale Line POS"; POSInfo: Record "NPR POS Info"; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask)
+    local procedure ConfirmPOSInfoTransOverwrite(pSaleLinePos: Record "NPR POS Sale Line"; POSInfo: Record "NPR POS Info"; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask)
     var
         POSInfoTransaction: Record "NPR POS Info Transaction";
         Confirmed: Boolean;
@@ -198,7 +198,7 @@ codeunit 6150640 "NPR POS Info Management"
             Error('');
     end;
 
-    local procedure SetPosInfoTransactionFilters(var POSInfoTransaction: Record "NPR POS Info Transaction"; pSaleLinePos: Record "NPR Sale Line POS"; POSInfo: Record "NPR POS Info"; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask)
+    local procedure SetPosInfoTransactionFilters(var POSInfoTransaction: Record "NPR POS Info Transaction"; pSaleLinePos: Record "NPR POS Sale Line"; POSInfo: Record "NPR POS Info"; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask)
     begin
         POSInfoTransaction.SetRange("Register No.", pSaleLinePos."Register No.");
         POSInfoTransaction.SetRange("Sales Ticket No.", pSaleLinePos."Sales Ticket No.");
@@ -270,12 +270,12 @@ codeunit 6150640 "NPR POS Info Management"
         */
     end;
 
-    local procedure SaleLineApplyPOSInfo(pSaleLinePos: Record "NPR Sale Line POS"; POSInfoTransParam: Record "NPR POS Info Transaction"; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask; pClearInfo: Boolean) FrontEndUpdateIsNeeded: Boolean
+    local procedure SaleLineApplyPOSInfo(pSaleLinePos: Record "NPR POS Sale Line"; POSInfoTransParam: Record "NPR POS Info Transaction"; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask; pClearInfo: Boolean) FrontEndUpdateIsNeeded: Boolean
     var
         POSInfo: Record "NPR POS Info";
         POSInfoTransaction: Record "NPR POS Info Transaction";
-        SaleLinePos2: Record "NPR Sale Line POS";
-        SaleLinePosTmp: Record "NPR Sale Line POS" temporary;
+        SaleLinePos2: Record "NPR POS Sale Line";
+        SaleLinePosTmp: Record "NPR POS Sale Line" temporary;
     begin
         FrontEndUpdateIsNeeded := false;
         if not POSInfoTransParam."Once per Transaction" and (pApplicScope in [pApplicScope::"Current Line", pApplicScope::"All Lines"]) then begin
@@ -334,12 +334,12 @@ codeunit 6150640 "NPR POS Info Management"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014407, 'OnAfterDebitSalePostEvent', '', true, true)]
-    local procedure OnAfterDebitSalePostEvent(var Sender: Codeunit "NPR Sales Doc. Exp. Mgt."; SalePOS: Record "NPR Sale POS"; SalesHeader: Record "Sales Header"; Posted: Boolean)
+    local procedure OnAfterDebitSalePostEvent(var Sender: Codeunit "NPR Sales Doc. Exp. Mgt."; SalePOS: Record "NPR POS Sale"; SalesHeader: Record "Sales Header"; Posted: Boolean)
     begin
         PostPOSInfo(SalePOS);
     end;
 
-    procedure PostPOSInfo(PSalePos: Record "NPR Sale POS")
+    procedure PostPOSInfo(PSalePos: Record "NPR POS Sale")
     var
         POSInfoTransaction: Record "NPR POS Info Transaction";
         POSInfoAuditRoll: Record "NPR POS Info Audit Roll";
@@ -429,7 +429,7 @@ codeunit 6150640 "NPR POS Info Management"
         exit(OutPut);
     end;
 
-    procedure DeleteLine(SaleLinePOS: Record "NPR Sale Line POS")
+    procedure DeleteLine(SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSInfoTransaction: Record "NPR POS Info Transaction";
     begin
@@ -439,7 +439,7 @@ codeunit 6150640 "NPR POS Info Management"
         POSInfoTransaction.DeleteAll;
     end;
 
-    procedure RetrieveSavedLines(ToSalePOS: Record "NPR Sale POS"; FromSalePOS: Record "NPR Sale POS")
+    procedure RetrieveSavedLines(ToSalePOS: Record "NPR POS Sale"; FromSalePOS: Record "NPR POS Sale")
     var
         POSInfoTransactionOld: Record "NPR POS Info Transaction";
         POSInfoTransactionNew: Record "NPR POS Info Transaction";
@@ -458,7 +458,7 @@ codeunit 6150640 "NPR POS Info Management"
 
     local procedure UpdatePOSInfoTransaction(var POSInfoTransaction: Record "NPR POS Info Transaction")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         //Register No.,Sales Ticket No.,Date,Sale Type,Line No.
         SaleLinePOS.Reset;
@@ -482,7 +482,7 @@ codeunit 6150640 "NPR POS Info Management"
             until SaleLinePOS.Next = 0;
     end;
 
-    procedure ProcessPOSInfoText(pSaleLinePos: Record "NPR Sale Line POS"; pSalePos: Record "NPR Sale POS"; pPOSInfoCode: Code[20]; pInfoText: Text)
+    procedure ProcessPOSInfoText(pSaleLinePos: Record "NPR POS Sale Line"; pSalePos: Record "NPR POS Sale"; pPOSInfoCode: Code[20]; pInfoText: Text)
     var
         POSInfo: Record "NPR POS Info";
         Info: Text;
@@ -532,7 +532,7 @@ codeunit 6150640 "NPR POS Info Management"
         end;
     end;
 
-    procedure CopyPOSInfoTransFromHeader(SaleLinePos: Record "NPR Sale Line POS"; var POSInfoTransaction: Record "NPR POS Info Transaction"): Boolean
+    procedure CopyPOSInfoTransFromHeader(SaleLinePos: Record "NPR POS Sale Line"; var POSInfoTransaction: Record "NPR POS Info Transaction"): Boolean
     var
         POSInfo: Record "NPR POS Info";
         POSInfoTransaction_Hdr: Record "NPR POS Info Transaction";
@@ -581,7 +581,7 @@ codeunit 6150640 "NPR POS Info Management"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150853, 'OnGetLineStyle', '', false, false)]
-    local procedure FormatSaleLine_OnPOSInfoAssigment(var Color: Text; var Weight: Text; var Style: Text; SaleLinePOS: Record "NPR Sale Line POS"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure FormatSaleLine_OnPOSInfoAssigment(var Color: Text; var Weight: Text; var Style: Text; SaleLinePOS: Record "NPR POS Sale Line"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         POSInfo: Record "NPR POS Info";
         POSInfoTransaction: Record "NPR POS Info Transaction";
@@ -666,8 +666,8 @@ codeunit 6150640 "NPR POS Info Management"
     var
         POSInfo: Record "NPR POS Info";
         POSInfoTransaction: Record "NPR POS Info Transaction";
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
     begin

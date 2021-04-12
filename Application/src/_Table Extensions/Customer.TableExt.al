@@ -215,8 +215,8 @@ tableextension 6014423 "NPR Customer" extends Customer
 
     trigger OnBeforeDelete()
     var
-        SalesLinePOS: Record "NPR Sale Line POS";
-        SalesPOS: Record "NPR Sale POS";
+        SalesLinePOS: Record "NPR POS Sale Line";
+        SalesPOS: Record "NPR POS Sale";
         POSEntry: Record "NPR POS Entry";
         DeleteCustActiveCashErr: Label 'You can''t delete customer %1 as it is used on active cash payment.', Comment = '%1 = Customer';
         DeleteCustActiveSalesDocErr: Label 'You can''t delete customer %1 as it is used on an active sales document.', Comment = '%1 = Customer';

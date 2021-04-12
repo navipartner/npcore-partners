@@ -35,7 +35,7 @@ codeunit 6151282 "NPR SS Action: Delete POS Line"
     local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         SaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         Qty: Integer;
     begin
@@ -51,7 +51,7 @@ codeunit 6151282 "NPR SS Action: Delete POS Line"
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
-        LinePOS: Record "NPR Sale Line POS";
+        LinePOS: Record "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         POSActionDeletePOSLine: Codeunit "NPR POSAction: Delete POS Line";
     begin
@@ -68,8 +68,8 @@ codeunit 6151282 "NPR SS Action: Delete POS Line"
 
     procedure DeleteAccessories(POSSaleLine: Codeunit "NPR POS Sale Line")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SaleLinePOS2: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOS2: Record "NPR POS Sale Line";
     begin
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         if SaleLinePOS.Type <> SaleLinePOS.Type::Item then

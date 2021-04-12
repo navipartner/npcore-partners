@@ -41,8 +41,8 @@ codeunit 6150914 "NPR POS Action: HC Inv.Message"
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSHCGenericWebRequest: Codeunit "NPR POS HC Gen. Web Req.";
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SalePOS: Record "NPR Sale POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
         EndpointSetup: Record "NPR POS HC Endpoint Setup";
         ParametersText: array[6] of Text;
         ResponseText: array[4] of Text;

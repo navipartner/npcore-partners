@@ -1,10 +1,10 @@
-page 6151003 "NPR POS Quote Card"
+page 6151003 "NPR POS Saved Sale Card"
 {
     UsageCategory = None;
-    Caption = 'POS Quote Card';
+    Caption = 'POS Saved Sale Card';
     InsertAllowed = false;
     ModifyAllowed = false;
-    SourceTable = "NPR POS Quote Entry";
+    SourceTable = "NPR POS Saved Sale Entry";
 
     layout
     {
@@ -95,7 +95,7 @@ page 6151003 "NPR POS Quote Card"
                     }
                 }
             }
-            part(Lines; "NPR POS Quote Subpage")
+            part(Lines; "NPR POS Saved Sale Subp.")
             {
                 Caption = 'Lines';
                 SubPageLink = "Quote Entry No." = FIELD("Entry No.");
@@ -117,7 +117,7 @@ page 6151003 "NPR POS Quote Card"
 
                 trigger OnAction()
                 var
-                    POSQuoteMgt: Codeunit "NPR POS Quote Mgt.";
+                    POSQuoteMgt: Codeunit "NPR POS Saved Sale Mgt.";
                 begin
                     POSQuoteMgt.ViewPOSSalesData(Rec);
                 end;

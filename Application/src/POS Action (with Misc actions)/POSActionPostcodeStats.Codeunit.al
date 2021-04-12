@@ -48,7 +48,7 @@ codeunit 6150844 "NPR POS Action: Postcode Stats"
         Context: Codeunit "NPR POS JSON Management";
         JSON: Codeunit "NPR POS JSON Management";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
 
         if not Action.IsThisAction(ActionCode()) then
@@ -68,7 +68,7 @@ codeunit 6150844 "NPR POS Action: Postcode Stats"
         JSON: Codeunit "NPR POS JSON Management";
         POSSale: Codeunit "NPR POS Sale";
         POSAction: Record "NPR POS Action";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;

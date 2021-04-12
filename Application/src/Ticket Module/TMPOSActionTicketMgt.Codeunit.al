@@ -161,7 +161,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         Context: Codeunit "NPR POS JSON Management";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         JSON: Codeunit "NPR POS JSON Management";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         FunctionId: Integer;
         DefaultTicketNumber: Text;
         BeforeWorkflowErr: Label 'executing OnBeforeWorkflow of %1';
@@ -469,7 +469,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterInsertSaleLine', '', true, true)]
-    local procedure UpdateTicketOnSaleLineInsert(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure UpdateTicketOnSaleLineInsert(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SaleLinePOS: Record "NPR POS Sale Line")
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketType: Record "NPR TM Ticket Type";
@@ -538,7 +538,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnBeforeDeletePOSSaleLine', '', true, true)]
-    local procedure OnBeforeDeletePOSSaleLine(SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure OnBeforeDeletePOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketType: Record "NPR TM Ticket Type";
@@ -564,7 +564,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Token: Text[100];
     begin
 
@@ -579,7 +579,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnBeforeSetQuantity', '', true, true)]
-    local procedure OnBeforeSetQuantity(SaleLinePOS: Record "NPR Sale Line POS"; var NewQuantity: Decimal)
+    local procedure OnBeforeSetQuantity(SaleLinePOS: Record "NPR POS Sale Line"; var NewQuantity: Decimal)
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         SeatingUI: Codeunit "NPR TM Seating UI";
@@ -654,7 +654,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014453, 'OnAfterFindSalesLinePrice', '', true, true)]
-    local procedure OnAfterFindSalesLinePrice(SalePOS: Record "NPR Sale POS"; var SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure OnAfterFindSalesLinePrice(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
     var
         TicketUnitPrice: Decimal;
         Token: Text[100];
@@ -677,7 +677,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
     begin
     end;
 
-    local procedure NewTicketSales(SaleLinePOS: Record "NPR Sale Line POS") ReturnCode: Integer
+    local procedure NewTicketSales(SaleLinePOS: Record "NPR POS Sale Line") ReturnCode: Integer
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketType: Record "NPR TM Ticket Type";
@@ -852,7 +852,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         TicketManagement: Codeunit "NPR TM Ticket Management";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         Ticket: Record "NPR TM Ticket";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -862,7 +862,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         UnitPrice: Decimal;
         RevokeQuantity: Integer;
         PosEntry: Record "NPR POS Entry";
-        PosEntrySalesLine: Record "NPR POS Sales Line";
+        PosEntrySalesLine: Record "NPR POS Entry Sales Line";
     begin
 
         if (ExternalTicketNumber = '') then
@@ -921,7 +921,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         TicketManagement: Codeunit "NPR TM Ticket Management";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         Ticket: Record "NPR TM Ticket";
         TicketAccessEntryNo: Integer;
@@ -955,7 +955,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         TicketManagement: Codeunit "NPR TM Ticket Management";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         Ticket: Record "NPR TM Ticket";
         TicketAccessEntryNo: Integer;
@@ -985,7 +985,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         TicketManagement: Codeunit "NPR TM Ticket Management";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         Ticket: Record "NPR TM Ticket";
         TicketAccessEntryNo: Integer;
@@ -1091,7 +1091,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
         PageAction: Action;
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePos: Record "NPR Sale Line POS";
+        SaleLinePos: Record "NPR POS Sale Line";
         BarcodeLibrary: Codeunit "NPR Barcode Image Library";
         Resolver: Integer;
         Ticket: Record "NPR TM Ticket";
@@ -1288,7 +1288,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
     begin
     end;
 
-    local procedure AquireTicketAdmissionSchedule(Token: Text[100]; var SaleLinePOS: Record "NPR Sale Line POS"; HaveSalesLine: Boolean; var ResponseMessage: Text) LookupOK: Boolean
+    local procedure AquireTicketAdmissionSchedule(Token: Text[100]; var SaleLinePOS: Record "NPR POS Sale Line"; HaveSalesLine: Boolean; var ResponseMessage: Text) LookupOK: Boolean
     var
         TicketRetailManagement: Codeunit "NPR TM Ticket Retail Mgt.";
     begin
@@ -1430,7 +1430,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         exit(JSON.GetInteger('numpad'));
     end;
 
-    local procedure IsTicketSalesLine(SaleLinePOS: Record "NPR Sale Line POS"): Boolean
+    local procedure IsTicketSalesLine(SaleLinePOS: Record "NPR POS Sale Line"): Boolean
     var
         TicketType: Record "NPR TM Ticket Type";
         Item: Record Item;

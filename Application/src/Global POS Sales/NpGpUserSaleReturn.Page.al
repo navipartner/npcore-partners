@@ -153,13 +153,13 @@ page 6151174 "NPR NpGp User Sale Return"
 
     var
         TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary;
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         OriginalQuantity: Integer;
         QuantityReturned: Integer;
         QuantityToReturn: Integer;
 
-    procedure SetTables(pSalePOS: Record "NPR Sale POS"; var pTempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary; var pTempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary)
+    procedure SetTables(pSalePOS: Record "NPR POS Sale"; var pTempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary; var pTempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary)
     begin
         TempNpGpPOSSalesEntry := pTempNpGpPOSSalesEntry;
         SalePOS := pSalePOS;

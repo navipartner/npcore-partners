@@ -17,9 +17,9 @@ codeunit 85006 "NPR POS Payment Tests"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
@@ -56,16 +56,16 @@ codeunit 85006 "NPR POS Payment Tests"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         SaleEnded: Boolean;
         Assert: Codeunit "Assert";
         POSEntry: Record "NPR POS Entry";
-        POSSalesLine: Record "NPR POS Sales Line";
-        POSPaymentLine: Record "NPR POS Payment Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
+        POSPaymentLine: Record "NPR POS Entry Payment Line";
     begin
         // [Scenario] Check that a successful cash payment is handled correctly via a created payment line, with sale ending as payment equalled the total.
 
@@ -108,16 +108,16 @@ codeunit 85006 "NPR POS Payment Tests"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         SaleEnded: Boolean;
         Assert: Codeunit "Assert";
         POSEntry: Record "NPR POS Entry";
-        POSSalesLine: Record "NPR POS Sales Line";
-        POSPaymentLine: Record "NPR POS Payment Line";
+        POSSalesLine: Record "NPR POS Entry Sales Line";
+        POSPaymentLine: Record "NPR POS Entry Payment Line";
         POSSetup: Codeunit "NPR POS Setup";
         ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
     begin

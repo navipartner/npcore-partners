@@ -45,9 +45,9 @@ codeunit 6150818 "NPR POSAction: Set TaxAreaCode"
     local procedure SetTaxAreaCode(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         JSON: Codeunit "NPR POS JSON Management";
-        Line: Record "NPR Sale Line POS";
+        Line: Record "NPR POS Sale Line";
         SaleLine: Codeunit "NPR POS Sale Line";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         TaxAreaValue: Code[20];
     begin

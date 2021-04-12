@@ -222,8 +222,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
     var
         JSON: Codeunit "NPR POS JSON Management";
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SalePOS: Record "NPR Sale POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
         Customer: Record Customer;
@@ -376,7 +376,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
-    local procedure ValidateSale(var SalePOS: Record "NPR Sale POS"; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; JSON: Codeunit "NPR POS JSON Management")
+    local procedure ValidateSale(var SalePOS: Record "NPR POS Sale"; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; JSON: Codeunit "NPR POS JSON Management")
     begin
         if JSON.GetBooleanParameterOrFail('BlockEmptySale', ActionCode()) then begin
             if not SaleLinesExists(SalePOS) then
@@ -386,7 +386,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         RetailSalesDocMgt.TestSalePOS(SalePOS);
     end;
 
-    local procedure SelectCustomer(var SalePOS: Record "NPR Sale POS"; POSSale: Codeunit "NPR POS Sale"): Boolean
+    local procedure SelectCustomer(var SalePOS: Record "NPR POS Sale"; POSSale: Codeunit "NPR POS Sale"): Boolean
     var
         Customer: Record Customer;
     begin
@@ -503,16 +503,16 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         POSSession.RequestRefreshData();
     end;
 
-    local procedure SaleLinesExists(SalePOS: Record "NPR Sale POS"): Boolean
+    local procedure SaleLinesExists(SalePOS: Record "NPR POS Sale"): Boolean
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         exit(not SaleLinePOS.IsEmpty);
     end;
 
-    local procedure SetPricesInclVAT(var SalePOS: Record "NPR Sale POS"; var JSON: Codeunit "NPR POS JSON Management")
+    local procedure SetPricesInclVAT(var SalePOS: Record "NPR POS Sale"; var JSON: Codeunit "NPR POS JSON Management")
     begin
         if JSON.GetBooleanParameterOrFail('ForcePricesInclVAT', ActionCode()) and (not SalePOS."Prices Including VAT") then begin
             SalePOS.Validate("Prices Including VAT", true);
@@ -520,7 +520,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         end;
     end;
 
-    local procedure SetReference(var SalePOS: Record "NPR Sale POS"; var JSON: Codeunit "NPR POS JSON Management")
+    local procedure SetReference(var SalePOS: Record "NPR POS Sale"; var JSON: Codeunit "NPR POS JSON Management")
     var
         ExtDocNo: Text;
         Attention: Text;

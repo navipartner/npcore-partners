@@ -1,9 +1,9 @@
-codeunit 6151005 "NPR POS Action: Load POS Quote"
+codeunit 6151005 "NPR POS Action: LoadPOSSvSl"
 {
     var
-        Text000: Label 'Load POS Sale from POS Quote';
-        Text001: Label 'POS Quote';
-        CannotLoad: Label 'The POS Quote is missing essential data and cannot be loaded.';
+        Text000: Label 'Load POS Sale from POS saved Sale';
+        Text001: Label 'POS Saved Sale';
+        CannotLoad: Label 'The POS Saved Sale is missing essential data and cannot be loaded.';
         ReadingErr: Label 'reading in %1';
 
     local procedure ActionCode(): Text
@@ -84,9 +84,9 @@ codeunit 6151005 "NPR POS Action: Load POS Quote"
 
     local procedure OnActionSelectQuote(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        POSQuoteEntry: Record "NPR POS Quote Entry";
-        SalePOS: Record "NPR Sale POS";
-        POSQuoteMgt: Codeunit "NPR POS Quote Mgt.";
+        POSQuoteEntry: Record "NPR POS Saved Sale Entry";
+        SalePOS: Record "NPR POS Sale";
+        POSQuoteMgt: Codeunit "NPR POS Saved Sale Mgt.";
         POSSale: Codeunit "NPR POS Sale";
         SalesTicketNo: Code[20];
         LastQuoteEntryNo: BigInteger;
@@ -124,7 +124,7 @@ codeunit 6151005 "NPR POS Action: Load POS Quote"
 
     local procedure OnActionPreview(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        POSQuoteEntry: Record "NPR POS Quote Entry";
+        POSQuoteEntry: Record "NPR POS Saved Sale Entry";
         PageMgt: Codeunit "Page Management";
         QuoteEntryNo: BigInteger;
     begin
@@ -138,7 +138,7 @@ codeunit 6151005 "NPR POS Action: Load POS Quote"
         POSQuoteEntry.FilterGroup(2);
         POSQuoteEntry.SetRecFilter();
         POSQuoteEntry.FilterGroup(0);
-        IF Page.RunModal(Page::"NPR POS Quote Card", POSQuoteEntry) <> Action::LookupOK then begin
+        IF Page.RunModal(Page::"NPR POS Saved Sale Card", POSQuoteEntry) <> Action::LookupOK then begin
             JSON.SetContext('quote_entry_no', '');
             FrontEnd.SetActionContext(ActionCode(), JSON);
         end;
@@ -146,11 +146,11 @@ codeunit 6151005 "NPR POS Action: Load POS Quote"
 
     local procedure OnActionLoadFromQuote(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        SalePOS: Record "NPR Sale POS";
-        POSQuoteEntry: Record "NPR POS Quote Entry";
-        POSQuoteLine: Record "NPR POS Quote Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
-        SalePOS2: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
+        POSQuoteEntry: Record "NPR POS Saved Sale Entry";
+        POSQuoteLine: Record "NPR POS Saved Sale Line";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS2: Record "NPR POS Sale";
         POSStore: Record "NPR POS Store";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         POSSale: Codeunit "NPR POS Sale";
@@ -191,9 +191,9 @@ codeunit 6151005 "NPR POS Action: Load POS Quote"
         Error(CannotLoad);
     end;
 
-    local procedure DeletePOSSalesLines(SalePOS: Record "NPR Sale POS")
+    local procedure DeletePOSSalesLines(SalePOS: Record "NPR POS Sale")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
@@ -202,19 +202,19 @@ codeunit 6151005 "NPR POS Action: Load POS Quote"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeLoadFromPOSQuote(var SalePOS: Record "NPR Sale POS"; var POSQuoteEntry: Record "NPR POS Quote Entry";
+    local procedure OnBeforeLoadFromPOSQuote(var SalePOS: Record "NPR POS Sale"; var POSQuoteEntry: Record "NPR POS Saved Sale Entry";
         var XmlDoc: XmlDocument)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterLoadFromQuote(POSQuoteEntry: Record "NPR POS Quote Entry"; var SalePOS: Record "NPR Sale POS")
+    local procedure OnAfterLoadFromQuote(POSQuoteEntry: Record "NPR POS Saved Sale Entry"; var SalePOS: Record "NPR POS Sale")
     begin
     end;
 
-    procedure LoadFromQuote(var POSQuoteEntry: Record "NPR POS Quote Entry"; var SalePOS: Record "NPR Sale POS"): Boolean
+    procedure LoadFromQuote(var POSQuoteEntry: Record "NPR POS Saved Sale Entry"; var SalePOS: Record "NPR POS Sale"): Boolean
     var
-        POSQuoteMgt: Codeunit "NPR POS Quote Mgt.";
+        POSQuoteMgt: Codeunit "NPR POS Saved Sale Mgt.";
         XmlDoc: XmlDocument;
     begin
         POSQuoteEntry.SkipLineDeleteTrigger(true);

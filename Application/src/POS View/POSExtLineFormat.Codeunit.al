@@ -25,7 +25,7 @@ codeunit 6150853 "NPR POS Ext.: Line Format."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDataSourceExtensionReadData', '', false, false)]
     local procedure OnReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        SaleLine: Record "NPR Sale Line POS";
+        SaleLine: Record "NPR POS Sale Line";
         Color: Text;
         Weight: Text;
         Style: Text;
@@ -50,7 +50,7 @@ codeunit 6150853 "NPR POS Ext.: Line Format."
     end;
 
     [BusinessEvent(false)]
-    local procedure OnGetLineStyle(var Color: Text; var Weight: Text; var Style: Text; SaleLinePOS: Record "NPR Sale Line POS"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure OnGetLineStyle(var Color: Text; var Weight: Text; var Style: Text; SaleLinePOS: Record "NPR POS Sale Line"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
     end;
 }

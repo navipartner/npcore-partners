@@ -6,7 +6,7 @@ page 6014554 "NPR TouchScreen: SalesLineZoom"
     PageType = Card;
     UsageCategory = Administration;
     ApplicationArea = All;
-    SourceTable = "NPR Sale Line POS";
+    SourceTable = "NPR POS Sale Line";
 
     layout
     {

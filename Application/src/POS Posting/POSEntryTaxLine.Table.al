@@ -1,9 +1,9 @@
-table 6150629 "NPR POS Tax Amount Line"
+table 6150629 "NPR POS Entry Tax Line"
 {
-    Caption = 'POS Tax Amount Line';
+    Caption = 'POS Entry Tax Line';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR POS Tax Line List";
-    LookupPageID = "NPR POS Tax Line List";
+    DrillDownPageID = "NPR POS Entry Tax Line List";
+    LookupPageID = "NPR POS Entry Tax Line List";
 
     fields
     {

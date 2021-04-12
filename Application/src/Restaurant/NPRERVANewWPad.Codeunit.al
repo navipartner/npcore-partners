@@ -51,7 +51,7 @@ codeunit 6150682 "NPR NPRE RVA: New WPad"
         SeatingLocation: Record "NPR NPRE Seating Location";
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         WaiterPad: Record "NPR NPRE Waiter Pad";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         NPREFrontendAssistant: Codeunit "NPR NPRE Frontend Assistant";
         POSSale: Codeunit "NPR POS Sale";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";

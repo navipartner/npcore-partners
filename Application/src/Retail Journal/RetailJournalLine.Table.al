@@ -546,13 +546,13 @@ table 6014422 "NPR Retail Journal Line"
 
     procedure FindItemSalesPrice()
     var
-        TempSalePOS: Record "NPR Sale POS" temporary;
-        TempSaleLinePOS: Record "NPR Sale Line POS" temporary;
+        TempSalePOS: Record "NPR POS Sale" temporary;
+        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         POSSalesPriceCalcMgt: Codeunit "NPR POS Sales Price Calc. Mgt.";
         Item: Record Item;
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
         TMPDiscountPriority: Record "NPR Discount Priority" temporary;
-        TempSaleLinePOS2: Record "NPR Sale Line POS" temporary;
+        TempSaleLinePOS2: Record "NPR POS Sale Line" temporary;
         POSUnit: Record "NPR POS Unit";
         POSPricingProfile: Record "NPR POS Pricing Profile";
     begin

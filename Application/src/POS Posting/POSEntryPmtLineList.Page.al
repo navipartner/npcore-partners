@@ -1,12 +1,12 @@
-page 6150655 "NPR POS Sales Line List"
+page 6150656 "NPR POS Entry Pmt. Line List"
 {
-    Caption = 'POS Sales Line List';
+    Caption = 'POS Entry Payment Line List';
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
     ApplicationArea = All;
     PromotedActionCategories = 'New,Process,Report,POS Entry';
-    SourceTable = "NPR POS Sales Line";
+    SourceTable = "NPR POS Entry Payment Line";
 
     layout
     {
@@ -49,71 +49,40 @@ page 6150655 "NPR POS Sales Line List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Period Register No. field';
                 }
-                field(Type; Type)
+                field("POS Payment Method Code"; "POS Payment Method Code")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Type field';
+                    ToolTip = 'Specifies the value of the POS Payment Method Code field';
                 }
-                field("No."; "No.")
+                field("POS Payment Bin Code"; "POS Payment Bin Code")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the No. field';
+                    ToolTip = 'Specifies the value of the POS Payment Bin Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Location Code"; "Location Code")
+                field(Amount; Amount)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Location Code field';
-                }
-                field(Quantity; Quantity)
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Quantity field';
-                }
-                field("Unit of Measure Code"; "Unit of Measure Code")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Unit of Measure Code field';
-                }
-                field("Unit Price"; "Unit Price")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Unit Price field';
-                }
-                field("Line Discount %"; "Line Discount %")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Line Discount % field';
-                }
-                field("Amount Excl. VAT"; "Amount Excl. VAT")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Amount Excl. VAT field';
-                }
-                field("Amount Incl. VAT"; "Amount Incl. VAT")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Amount Incl. VAT field';
+                    ToolTip = 'Specifies the value of the Amount field';
                 }
                 field("Currency Code"; "Currency Code")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Currency Code field';
+                    ToolTip = 'Specifies the value of the Paid Currency Code field';
                 }
-                field("Withhold Item"; "Withhold Item")
+                field("Amount (Sales Currency)"; "Amount (Sales Currency)")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Withhold Item field';
+                    ToolTip = 'Specifies the value of the Amount (Sales Currency) field';
                 }
-                field("Discount Authorised by"; "Discount Authorised by")
+                field("Amount (LCY)"; "Amount (LCY)")
                 {
                     ApplicationArea = All;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Discount Authorised by field';
+                    ToolTip = 'Specifies the value of the Amount (LCY) field';
                 }
                 field("POS Entry No."; "POS Entry No.")
                 {

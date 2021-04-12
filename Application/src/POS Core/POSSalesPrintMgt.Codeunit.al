@@ -25,7 +25,7 @@ codeunit 6150729 "NPR POS Sales Print Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
-    local procedure PrintReceiptOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
+    local procedure PrintReceiptOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     begin
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
@@ -36,7 +36,7 @@ codeunit 6150729 "NPR POS Sales Print Mgt."
         PrintPOSEntrySalesReceipt(SalePOS);
     end;
 
-    procedure PrintPOSEntrySalesReceipt(SalePOS: Record "NPR Sale POS")
+    procedure PrintPOSEntrySalesReceipt(SalePOS: Record "NPR POS Sale")
     var
         POSEntry: Record "NPR POS Entry";
         RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";

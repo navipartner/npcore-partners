@@ -54,7 +54,7 @@ codeunit 6150827 "NPR POS Action: Item Card"
         JSON: Codeunit "NPR POS JSON Management";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
-        LinePOS: Record "NPR Sale Line POS";
+        LinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         CurrentView: Codeunit "NPR POS View";
         RetailItemCard: Page "Item Card";

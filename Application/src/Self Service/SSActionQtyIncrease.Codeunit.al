@@ -48,7 +48,7 @@ codeunit 6151280 "NPR SS Action - Qty Increase"
     procedure IncreaseSalelineQuantity(POSSession: Codeunit "NPR POS Session"; IncreaseBy: Decimal)
     var
         SaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
     begin
 

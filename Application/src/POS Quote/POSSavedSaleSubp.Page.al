@@ -1,11 +1,11 @@
-page 6151004 "NPR POS Quote Subpage"
+page 6151004 "NPR POS Saved Sale Subp."
 {
-    Caption = 'POS Quote Subpage';
+    Caption = 'POS Saved Sale Subpage';
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
     ApplicationArea = All;
-    SourceTable = "NPR POS Quote Line";
+    SourceTable = "NPR POS Saved Sale Line";
 
     layout
     {

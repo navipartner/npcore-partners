@@ -22,7 +22,7 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
         FoundSalesPrice: Boolean;
         SalesPriceCalcMgt: Codeunit "Sales Price Calc. Mgt.";
 
-    procedure InitTempPOSItemSale(var TempSaleLinePOS: Record "NPR Sale Line POS" temporary; var TempSalePOS: Record "NPR Sale POS" temporary)
+    procedure InitTempPOSItemSale(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempSalePOS: Record "NPR POS Sale" temporary)
     var
         VATPostingSetup: Record "VAT Posting Setup";
         POSTaxCalculation: Codeunit "NPR POS Tax Calculation";
@@ -41,7 +41,7 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
         TempSaleLinePOS."VAT Bus. Posting Group" := Item."VAT Bus. Posting Gr. (Price)";
     end;
 
-    procedure FindItemPrice(SalePOS: Record "NPR Sale POS"; var SaleLinePOS: Record "NPR Sale Line POS")
+    procedure FindItemPrice(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSUnit: Record "NPR POS Unit";
         POSPricingProfile: Record "NPR POS Pricing Profile";
@@ -62,17 +62,17 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnFindItemPrice(POSPricingProfile: Record "NPR POS Pricing Profile"; SalePOS: Record "NPR Sale POS"; var SaleLinePOS: Record "NPR Sale Line POS"; var Handled: Boolean)
+    local procedure OnFindItemPrice(POSPricingProfile: Record "NPR POS Pricing Profile"; SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnAfterFindSalesLinePrice(SalePOS: Record "NPR Sale POS"; var SaleLinePOS: Record "NPR Sale Line POS")
+    procedure OnAfterFindSalesLinePrice(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Price Calc. Mgt.", 'OnFindItemPrice', '', true, true)]
-    local procedure FindBestRetailPrice(POSPricingProfile: Record "NPR POS Pricing Profile"; SalePOS: Record "NPR Sale POS"; var SaleLinePOS: Record "NPR Sale Line POS"; var Handled: Boolean)
+    local procedure FindBestRetailPrice(POSPricingProfile: Record "NPR POS Pricing Profile"; SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; var Handled: Boolean)
     begin
         if POSPricingProfile."Item Price Codeunit ID" <> GetPublisherCodeunitId() then
             exit;
@@ -85,9 +85,9 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
         OnAfterFindSalesLinePrice(SalePOS, SaleLinePOS);
     end;
 
-    local procedure FindSalesLinePrice(SalePOS: Record "NPR Sale POS"; var SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure FindSalesLinePrice(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
     var
-        TempSaleLinePOS: Record "NPR Sale Line POS" temporary;
+        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
     begin
         if SaleLinePOS.Type <> SaleLinePOS.Type::Item then
             exit;
@@ -129,7 +129,7 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
             SaleLinePOS."Discount %" := 0;
     end;
 
-    procedure FindSalesLineLineDisc(SalePOS: Record "NPR Sale POS"; var SaleLinePOS: Record "NPR Sale Line POS")
+    procedure FindSalesLineLineDisc(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
     begin
         if SaleLinePOS.Type <> SaleLinePOS.Type then
             exit;
@@ -142,7 +142,7 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
         SaleLinePOS."Discount %" := TempSalesLineDisc."Line Discount %";
     end;
 
-    local procedure SalesLinePriceExists(SalePOS: Record "NPR Sale POS"; var SaleLinePOS: Record "NPR Sale Line POS"; ShowAll: Boolean): Boolean
+    local procedure SalesLinePriceExists(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; ShowAll: Boolean): Boolean
     var
         Customer: Record Customer;
     begin
@@ -162,7 +162,7 @@ codeunit 6014453 "NPR POS Sales Price Calc. Mgt."
         exit(TempSalesPrice.FindFirst());
     end;
 
-    procedure SalesLineLineDiscExists(SalePOS: Record "NPR Sale POS"; var SaleLinePOS: Record "NPR Sale Line POS"; ShowAll: Boolean): Boolean
+    procedure SalesLineLineDiscExists(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; ShowAll: Boolean): Boolean
     var
         Customer: Record Customer;
     begin

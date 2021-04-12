@@ -1,4 +1,4 @@
-codeunit 85007 "NPR POS Quote Tests"
+codeunit 85007 "NPR POS Saved Sale Tests"
 {
     Subtype = Test;
 
@@ -15,18 +15,18 @@ codeunit 85007 "NPR POS Quote Tests"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
         SaleEnded: Boolean;
         POSEntry: Record "NPR POS Entry";
-        POSActionSavePOSQuote: codeunit "NPR POS Action: SavePOSQuote";
-        POSActionLoadPOSQuote: codeunit "NPR POS Action: Load POS Quote";
-        POSQuoteEntry: Record "NPR POS Quote Entry";
-        POSQuoteLine: Record "NPR POS Quote Line";
+        POSActionSavePOSQuote: codeunit "NPR POS Action: SavePOSSvSl";
+        POSActionLoadPOSQuote: codeunit "NPR POS Action: LoadPOSSvSl";
+        POSQuoteEntry: Record "NPR POS Saved Sale Entry";
+        POSQuoteLine: Record "NPR POS Saved Sale Line";
     begin
         // [Given] POS & Payment setup
         InitializeData();
@@ -50,7 +50,7 @@ codeunit 85007 "NPR POS Quote Tests"
         _POSSession.Destructor();
         Clear(_POSSession);
 
-        // Load POS Quote in the another POS session
+        // Load POS Saved Sale in the another POS session
         InitializeData();
         NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -68,18 +68,18 @@ codeunit 85007 "NPR POS Quote Tests"
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSession: Codeunit "NPR POS Session";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         POSSale: Codeunit "NPR POS Sale";
         Assert: Codeunit "Assert";
         SaleEnded: Boolean;
         POSEntry: Record "NPR POS Entry";
-        POSActionSavePOSQuote: codeunit "NPR POS Action: SavePOSQuote";
-        POSActionLoadPOSQuote: codeunit "NPR POS Action: Load POS Quote";
-        POSQuoteEntry: Record "NPR POS Quote Entry";
-        POSQuoteLine: Record "NPR POS Quote Line";
+        POSActionSavePOSQuote: codeunit "NPR POS Action: SavePOSSvSl";
+        POSActionLoadPOSQuote: codeunit "NPR POS Action: LoadPOSSvSl";
+        POSQuoteEntry: Record "NPR POS Saved Sale Entry";
+        POSQuoteLine: Record "NPR POS Saved Sale Line";
     begin
         //Switch to previous date to make a quote
         WorkDate(CalcDate('<-2D>', Today()));
@@ -106,7 +106,7 @@ codeunit 85007 "NPR POS Quote Tests"
         _POSSession.Destructor();
         Clear(_POSSession);
 
-        // Load POS Quote in the another POS session
+        // Load POS Saved Sale in the another POS session
 
         //Switch to current date to restore a quote
         WorkDate(Today());

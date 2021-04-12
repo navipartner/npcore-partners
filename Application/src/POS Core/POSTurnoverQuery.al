@@ -18,7 +18,7 @@ query 6014400 "NPR POS Turnover"
             {
 
             }
-            dataitem(POS_Sales_Line; "NPR POS Sales Line")
+            dataitem(POS_Sales_Line; "NPR POS Entry Sales Line")
             {
                 DataItemLink = "POS Entry No." = POS_Entry."Entry No.";
                 SqlJoinType = InnerJoin;

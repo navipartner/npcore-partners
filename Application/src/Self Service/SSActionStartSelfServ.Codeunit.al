@@ -53,7 +53,7 @@ codeunit 6151286 "NPR SS Action: Start SelfServ."
     procedure StartSelfService(POSSession: Codeunit "NPR POS Session"; SalespersonCode: Code[20]; LanguageCode: Code[10])
     var
         POSUnit: Record "NPR POS Unit";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         POSUnitIdentityRec: Record "NPR POS Unit Identity";
         UserSetup: Record "User Setup";

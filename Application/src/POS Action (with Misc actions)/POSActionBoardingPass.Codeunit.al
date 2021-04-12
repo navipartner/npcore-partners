@@ -117,7 +117,7 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
     var
         JSON: Codeunit "NPR POS JSON Management";
         SaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         BoardingPassString: Text;
         RequiredTravelToday: Boolean;
@@ -132,7 +132,7 @@ codeunit 6150837 "NPR POS Action: Boarding Pass"
         InfoCode: Text;
         POSInfoManagement: Codeunit "NPR POS Info Management";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         SettingScopeErr: Label 'setting scope in %1';
         ReadingErr: Label 'reading in %1';
     begin

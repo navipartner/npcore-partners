@@ -72,7 +72,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
         Amount: Decimal;
         EFTSetup: Record "NPR EFT Setup";
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         if not Action.IsThisAction(ActionCode) then
             exit;
@@ -134,7 +134,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
     procedure PrepareGiftCardLoopBusinessLogic(POSSession: Codeunit "NPR POS Session"; PaymentType: Text; Amount: Decimal; DiscountPercent: Decimal; NoOfVouchers: Integer)
     var
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         if NoOfVouchers = 0 then
             NoOfVouchers := 1;
@@ -166,7 +166,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
         Variant: Variant;
         POSSale: Codeunit "NPR POS Sale";
         EFTSetup: Record "NPR EFT Setup";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSPaymentMethod: Record "NPR POS Payment Method";
         EFTPaymentMgt: Codeunit "NPR EFT Transaction Mgt.";
     begin
@@ -188,7 +188,7 @@ codeunit 6150874 "NPR POS Action: EFT Gift Card"
 
     procedure InsertVoucherDiscountLine(POSSession: Codeunit "NPR POS Session"): Guid
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSPaymentMethod: Record "NPR POS Payment Method";
         LineAmount: Decimal;

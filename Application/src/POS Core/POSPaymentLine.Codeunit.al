@@ -1,8 +1,8 @@
 codeunit 6150707 "NPR POS Payment Line"
 {
     var
-        Rec: Record "NPR Sale Line POS";
-        Sale: Record "NPR Sale POS";
+        Rec: Record "NPR POS Sale Line";
+        Sale: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         Setup: Codeunit "NPR POS Setup";
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -86,7 +86,7 @@ codeunit 6150707 "NPR POS Payment Line"
         Rec.FindLast();
     end;
 
-    procedure GetCurrentPaymentLine(var PaymentLinePOS: Record "NPR Sale Line POS")
+    procedure GetCurrentPaymentLine(var PaymentLinePOS: Record "NPR POS Sale Line")
     begin
         RefreshCurrent();
 
@@ -97,14 +97,14 @@ codeunit 6150707 "NPR POS Payment Line"
     //Look at how the payment action calculates remaining amount to pay instead of using the parameter in new code.
     procedure CalculateBalance(var SaleAmount: Decimal; var PaidAmount: Decimal; var ReturnAmount: Decimal; var Subtotal: Decimal)
     var
-        PaymentLine: Record "NPR Sale Line POS";
+        PaymentLine: Record "NPR POS Sale Line";
         POSUnit: Record "NPR POS Unit";
         RoundingAmount: Decimal;
         Decimal: Decimal;
         DiscountRounding: Decimal;
         i: Integer;
         t001: Label 'You have to set a return payment type on the register.';
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
         ReturnRounding: Decimal;
     begin
         if (not Initialized) then
@@ -151,7 +151,7 @@ codeunit 6150707 "NPR POS Payment Line"
 
     procedure GetNextLineNo() NextLineNo: Integer
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
         SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
         SaleLinePOS.SetRange("Register No.", Sale."Register No.");
@@ -162,12 +162,12 @@ codeunit 6150707 "NPR POS Payment Line"
         exit(NextLineNo);
     end;
 
-    procedure GetPaymentLine(var PaymentLinePOS: Record "NPR Sale Line POS")
+    procedure GetPaymentLine(var PaymentLinePOS: Record "NPR POS Sale Line")
     begin
         SetPaymentLineType(PaymentLinePOS);
     end;
 
-    local procedure SetPaymentLineType(var PaymentLinePOS: Record "NPR Sale Line POS")
+    local procedure SetPaymentLineType(var PaymentLinePOS: Record "NPR POS Sale Line")
     begin
         with PaymentLinePOS do begin
             "Register No." := Sale."Register No.";
@@ -178,7 +178,7 @@ codeunit 6150707 "NPR POS Payment Line"
         end;
     end;
 
-    procedure InsertPaymentLine(Line: Record "NPR Sale Line POS"; ForeignCurrencyAmount: Decimal) Return: Boolean
+    procedure InsertPaymentLine(Line: Record "NPR POS Sale Line"; ForeignCurrencyAmount: Decimal) Return: Boolean
     begin
 
         ValidatePaymentLine(Line);
@@ -221,7 +221,7 @@ codeunit 6150707 "NPR POS Payment Line"
         POSSale.RefreshCurrent();
     end;
 
-    local procedure ValidatePaymentLine(Line: Record "NPR Sale Line POS")
+    local procedure ValidatePaymentLine(Line: Record "NPR POS Sale Line")
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
         POSPaymentMethodNotFound: Label '%1 %2 for POS unit %3 was not found.';
@@ -234,7 +234,7 @@ codeunit 6150707 "NPR POS Payment Line"
         POSPaymentMethod.TestField("Block POS Payment", false);
     end;
 
-    local procedure ApplyForeignAmountConversion(var SaleLinePOS: Record "NPR Sale Line POS"; PrecalculatedAmount: Boolean; ForeignAmount: Decimal)
+    local procedure ApplyForeignAmountConversion(var SaleLinePOS: Record "NPR POS Sale Line"; PrecalculatedAmount: Boolean; ForeignAmount: Decimal)
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
     begin
@@ -253,7 +253,7 @@ codeunit 6150707 "NPR POS Payment Line"
             SaleLinePOS.Validate("Amount Including VAT", Round(SaleLinePOS."Currency Amount" * POSPaymentMethod."Fixed Rate" / 100, 0.01, POSPaymentMethod.GetRoundingType()));
     end;
 
-    local procedure ReverseUnrealizedSalesVAT(var SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure ReverseUnrealizedSalesVAT(var SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
         Currency: Record Currency;
@@ -394,17 +394,17 @@ codeunit 6150707 "NPR POS Payment Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterInsertPaymentLine(SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure OnAfterInsertPaymentLine(SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeDeleteLine(var SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure OnBeforeDeleteLine(var SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterDeleteLine(SaleLinePOS: Record "NPR Sale Line POS")
+    local procedure OnAfterDeleteLine(SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 }

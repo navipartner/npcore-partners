@@ -37,7 +37,7 @@ codeunit 6150793 "NPR POS Action: Open Drawer"
         JSON: Codeunit "NPR POS JSON Management";
         CashDrawerNo: Code[10];
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
         POSUnit: Record "NPR POS Unit";
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -73,7 +73,7 @@ codeunit 6150793 "NPR POS Action: Open Drawer"
         Handled := true;
     end;
 
-    local procedure OpenDrawer(CashDrawerNo: Code[10]; SalePOS: Record "NPR Sale POS")
+    local procedure OpenDrawer(CashDrawerNo: Code[10]; SalePOS: Record "NPR POS Sale")
     var
         POSPaymentBin: Record "NPR POS Payment Bin";
         POSPaymentBinInvokeMgt: Codeunit "NPR POS Payment Bin Eject Mgt.";

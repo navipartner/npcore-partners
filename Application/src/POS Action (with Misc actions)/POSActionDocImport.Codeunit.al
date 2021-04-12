@@ -100,7 +100,7 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
     local procedure CheckCustomer(POSSession: Codeunit "NPR POS Session"; SelectCustomer: Boolean): Boolean
     var
         POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         Customer: Record Customer;
     begin
         POSSession.GetSale(POSSale);
@@ -123,7 +123,7 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
 
     local procedure SetPosSaleCustomer(POSSale: Codeunit "NPR POS Sale"; CustomerNo: Code[20])
     var
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         POSSale.GetCurrentSale(SalePOS);
         if SalePOS."Customer No." <> '' then
@@ -140,7 +140,7 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
         RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
         POSSale: Codeunit "NPR POS Sale";
         POSStore: Record "NPR POS Store";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -169,7 +169,7 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
     var
         JSON: Codeunit "NPR POS JSON Management";
         RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         DocumentType: Option Quote,"Order",Invoice,CreditMemo,BlanketOrder,ReturnOrder;
         OrderType: Option NotSet,"Order",Lending;
@@ -344,7 +344,7 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
         POSMenuButton: Record "NPR POS Menu Button";
         POSParameterValue: Record "NPR POS Parameter Value";
         POSStore: Record "NPR POS Store";
-        SalePOS: Record "NPR Sale POS";
+        SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
     begin
         POSSession.GetSale(POSSale);
