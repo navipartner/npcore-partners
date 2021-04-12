@@ -3,7 +3,7 @@ table 6014402 "NPR Payment Type POS"
 
     Caption = 'Payment Type';
     DataClassification = CustomerContent;
-    ObsoleteState = Removed;
+    ObsoleteState = Pending;
     ObsoleteReason = 'Is replaced by POS Payment Method';
 
     fields
@@ -19,7 +19,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Description';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -29,7 +29,7 @@ table 6014402 "NPR Payment Type POS"
             DataClassification = CustomerContent;
             OptionCaption = ' ,Cash,Terminal Card,Manual Card,Other Credit Cards,Credit Voucher,Gift Voucher,Electronic Funds Transfer,Foreign Currency,Foreign Credit Voucher,Foreign Gift Voucher,Debit sale,Invoice,Finance Agreement,Payout,DIBS,Loyalty Card';
             OptionMembers = " ",Cash,"Terminal Card","Manual Card","Other Credit Cards","Credit Voucher","Gift Voucher",EFT,"Foreign Currency","Foreign Credit Voucher","Foreign Gift Voucher","Debit sale",Invoice,"Finance Agreement",Payout,DIBS,"Point Card";
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -38,7 +38,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'G/L Account';
             DataClassification = CustomerContent;
             TableRelation = "G/L Account";
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -48,7 +48,7 @@ table 6014402 "NPR Payment Type POS"
             DataClassification = CustomerContent;
             OptionCaption = ' ,Active,Passive';
             OptionMembers = " ",Active,Passive;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -56,7 +56,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Prefix';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -70,7 +70,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'Cost Account';
             DataClassification = CustomerContent;
             TableRelation = "G/L Account";
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
 
@@ -79,7 +79,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Sale Line Text';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -87,7 +87,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Search Description';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -97,7 +97,7 @@ table 6014402 "NPR Payment Type POS"
             DataClassification = CustomerContent;
             OptionCaption = 'Condensed,Single Entry';
             OptionMembers = Condensed,"Single Entry";
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -105,7 +105,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Via Cash Terminal';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -113,7 +113,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Date Filter';
             FieldClass = FlowFilter;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -121,7 +121,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Amount in Audit Roll';
             FieldClass = FlowField;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -130,7 +130,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'Customer';
             DataClassification = CustomerContent;
             TableRelation = Customer;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -140,7 +140,7 @@ table 6014402 "NPR Payment Type POS"
             DataClassification = CustomerContent;
             OptionCaption = 'G/L Account,Customer,Bank';
             OptionMembers = "G/L Account",Customer,Bank;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -148,7 +148,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Cash Register Filter';
             FieldClass = FlowFilter;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -156,7 +156,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Fixed Rate';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -164,7 +164,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Reference Incoming';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -172,7 +172,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Receipt filter';
             FieldClass = FlowFilter;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -180,7 +180,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Receipt - Post it now';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -188,7 +188,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Rounding precision';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -197,7 +197,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'No. Sales in audit roll';
             Description = 'Tæller kun linier m. linienr=10000,vare, salg';
             FieldClass = FlowField;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -206,7 +206,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'Normal sale in audit roll';
             Description = 'Tæller "bel¢b inkl. moms" hvis salg, vare';
             FieldClass = FlowField;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -215,7 +215,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'Debit sale in audit roll';
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -224,7 +224,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'No. items in audit roll';
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -233,7 +233,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'Cost amount in audit roll';
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -242,7 +242,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'No. sales lines in audit roll';
             Description = 'Tæller alle linier m. type <>Afbrudt &<>Åben/Luk';
             FieldClass = FlowField;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -251,7 +251,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'Salesperson filter';
             FieldClass = FlowFilter;
             TableRelation = "Salesperson/Purchaser".Code;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -260,7 +260,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'No. items in audit debit';
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -269,7 +269,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'No. item linies in audit debit';
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -278,7 +278,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'No. debit sales in audit roll';
             Description = 'Tæller linie debetsalg,linienr=10000';
             FieldClass = FlowField;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
 
@@ -287,7 +287,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Euro';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
 
@@ -297,7 +297,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'Bank';
             DataClassification = CustomerContent;
             TableRelation = "Bank Account"."No.";
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -307,7 +307,7 @@ table 6014402 "NPR Payment Type POS"
             DataClassification = CustomerContent;
             Description = 'Deprecated';
             TableRelation = "G/L Account";
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -316,7 +316,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'Fee Pct';
             DataClassification = CustomerContent;
             Description = 'Deprecated';
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -325,7 +325,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'Fixed fee';
             DataClassification = CustomerContent;
             Description = 'Deprecated';
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -335,7 +335,7 @@ table 6014402 "NPR Payment Type POS"
             DataClassification = CustomerContent;
             Description = 'Deprecated';
             TableRelation = Item;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -343,7 +343,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Norm sales in audit ex VAT';
             FieldClass = FlowField;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -351,7 +351,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Max amount';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'Moved to NPR POS Payment Method';
         }
@@ -359,7 +359,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Min amount';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'Moved to NPR POS Payment Method';
         }
@@ -368,7 +368,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'Cost amount in audit';
             Description = 'Calcformula tilf¢jet';
             FieldClass = FlowField;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -377,7 +377,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'Debit sales in audit ex VAT';
             Description = 'Calcformula tilf¢jet';
             FieldClass = FlowField;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -388,7 +388,7 @@ table 6014402 "NPR Payment Type POS"
             Description = 'Cardholder Verification Method';
             OptionCaption = 'CVM not forced,Forced Signature,Forced Pin';
             OptionMembers = "CVM not Forced","Forced Signature","Forced Pin";
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -398,7 +398,7 @@ table 6014402 "NPR Payment Type POS"
             DataClassification = CustomerContent;
             OptionCaption = 'Not forced,Forced Online,Forced Offline';
             OptionMembers = "Not Forced","Forced Online","Forced Offline";
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -408,7 +408,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'Global Dimension Code 1 Filter';
             FieldClass = FlowFilter;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -418,7 +418,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'Global Dimension Code 2 Filter';
             FieldClass = FlowFilter;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -428,7 +428,7 @@ table 6014402 "NPR Payment Type POS"
             DataClassification = CustomerContent;
             Description = 'NPR5.48';
             TableRelation = Location;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -436,7 +436,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Check';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -444,7 +444,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Common Company Clearing';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -453,7 +453,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'Day Clearing Account';
             DataClassification = CustomerContent;
             TableRelation = "G/L Account";
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -461,7 +461,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Forced amount';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'Moved to NPR POS Payment Method';
         }
@@ -469,7 +469,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Incl. in balancing';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -478,7 +478,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'Counted';
             Editable = false;
             FieldClass = FlowField;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -486,7 +486,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Match Sales Amount';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'Moved to NPR POS Payment Method';
         }
@@ -494,7 +494,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Fixed Amount';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Gift voucher won''t be used anymore';
             ObsoleteTag = 'NPR Gift Voucher';
         }
@@ -502,7 +502,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Qty. Per Sale';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Gift voucher won''t be used anymore';
             ObsoleteTag = 'NPR Gift Voucher';
         }
@@ -510,7 +510,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Min Sales Amount';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Gift voucher won''t be used anymore';
             ObsoleteTag = 'NPR Gift Voucher';
         }
@@ -518,7 +518,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Validated by user';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -528,7 +528,7 @@ table 6014402 "NPR Payment Type POS"
             DataClassification = CustomerContent;
             OptionCaption = 'Never,Always,Negative,Positive';
             OptionMembers = Never,Always,Negative,Positive;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -536,7 +536,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Reverse Unrealized VAT';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'Moved to NPR POS Payment Method';
         }
@@ -545,7 +545,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'Open Drawer';
             DataClassification = CustomerContent;
             Description = 'NPR5.51';
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'Moved to NPR POS Payment Method';
         }
@@ -555,7 +555,7 @@ table 6014402 "NPR Payment Type POS"
             DataClassification = CustomerContent;
             Description = 'NPR5.52,NPR5.53';
             InitValue = true;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'Moved to NPR POS Payment Method';
         }
@@ -564,7 +564,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'Zero as Default on Popup';
             DataClassification = CustomerContent;
             Description = 'NPR5.55';
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'Moved to NPR POS Payment Method';
         }
@@ -572,7 +572,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'No Min Amount on Web Orders';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -581,7 +581,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'PBS Gift Voucher';
             DataClassification = CustomerContent;
             Description = 'Deprecated';
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Gift voucher won''t be used anymore';
             ObsoleteTag = 'NPR Gift Voucher';
         }
@@ -590,7 +590,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'PBS Customer ID';
             DataClassification = CustomerContent;
             Description = 'Deprecated';
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -599,7 +599,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'PBS Gift Voucher Barcode';
             DataClassification = CustomerContent;
             Description = 'Deprecated';
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Gift voucher won''t be used anymore';
             ObsoleteTag = 'NPR Gift Voucher';
         }
@@ -607,7 +607,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Loyalty Card Type';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -617,7 +617,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'Only used by Global Dimension 1';
             DataClassification = CustomerContent;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'Moved to NPR POS Payment Method';
         }
@@ -627,7 +627,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'Only used by Global Dimension 2';
             DataClassification = CustomerContent;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'Moved to NPR POS Payment Method';
         }
@@ -636,7 +636,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'Auto end sale';
             DataClassification = CustomerContent;
             InitValue = true;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'Moved to NPR POS Payment Method';
         }
@@ -645,7 +645,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'Payment Method Code';
             DataClassification = CustomerContent;
             TableRelation = "Payment Method";
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'Moved to NPR POS Payment Method';
         }
@@ -655,7 +655,7 @@ table 6014402 "NPR Payment Type POS"
             DataClassification = CustomerContent;
             OptionCaption = 'Currency,New inventory,Transfer to Bank';
             OptionMembers = Normal,Primo,Bank;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -665,7 +665,7 @@ table 6014402 "NPR Payment Type POS"
             DataClassification = CustomerContent;
             Description = 'Invokes this codeunit when a Sale Line POS with type payment is being inserted.';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type - Integration cleanup';
         }
         field(351; "On Sale End Codeunit"; Integer)
@@ -674,7 +674,7 @@ table 6014402 "NPR Payment Type POS"
             DataClassification = CustomerContent;
             Description = 'Invokes this codeunit before a sale is finished. Can interrupt the end of a sale.';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type - Integration cleanup';
         }
         field(352; "Post Processing Codeunit"; Integer)
@@ -683,7 +683,7 @@ table 6014402 "NPR Payment Type POS"
             DataClassification = CustomerContent;
             Description = 'Invokes this codeunit when a sale is finished eg. transferred to the auditroll.';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type - Integration cleanup';
         }
         field(501; "Payment Card Type"; Option)
@@ -692,7 +692,7 @@ table 6014402 "NPR Payment Type POS"
             DataClassification = CustomerContent;
             OptionCaption = 'Other,Dankort,VisaDankort,Visa,VisaElectron,Mastercard,Maestro,JCB,DinersClub,AmericanExpress';
             OptionMembers = other,dankort,visadankort,visa,visaelectron,mastercard,maestro,jcb,dinersclub,americanexpress;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -700,7 +700,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'End time filter';
             FieldClass = FlowFilter;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -708,7 +708,7 @@ table 6014402 "NPR Payment Type POS"
         {
             Caption = 'Dev Term';
             DataClassification = CustomerContent;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -717,7 +717,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'Surcharge Service Item No.';
             DataClassification = CustomerContent;
             TableRelation = Item WHERE(Type = CONST(Service));
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'Moved to NPR POS Payment Method';
         }
@@ -726,7 +726,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'Tip Service Item No.';
             DataClassification = CustomerContent;
             TableRelation = Item WHERE(Type = CONST(Service));
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'Moved to NPR POS Payment Method';
         }
@@ -735,7 +735,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'MobilePay Merchant ID';
             DataClassification = CustomerContent;
             Description = 'MbP1.80';
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -744,7 +744,7 @@ table 6014402 "NPR Payment Type POS"
             Caption = 'MobilePay API Key';
             DataClassification = CustomerContent;
             Description = 'MbP1.80';
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
@@ -755,7 +755,7 @@ table 6014402 "NPR Payment Type POS"
             Description = 'MbP1.80';
             OptionCaption = 'PROD,DEMO';
             OptionMembers = PROD,DEMO;
-            ObsoleteState = Removed;
+            ObsoleteState = Pending;
             ObsoleteReason = 'Payment Type POS cleanup';
             ObsoleteTag = 'NPR Payment Type POS';
         }
