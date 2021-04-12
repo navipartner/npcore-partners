@@ -1,4 +1,4 @@
-page 6151241 "NPR Retail Manager RC"
+page 6151241 "NPR Retail Manager Role Center"
 {
     Caption = 'NP Retail Manager';
     PageType = RoleCenter;
@@ -206,10 +206,6 @@ page 6151241 "NPR Retail Manager RC"
             group(Reports)
             {
                 Caption = 'List & Reports';
-                group(ActionGroup6014408)
-                {
-                    Caption = 'Retail';
-                    Image = Report;
                     group(Management)
                     {
                         Caption = 'Management';
@@ -241,27 +237,6 @@ page 6151241 "NPR Retail Manager RC"
                                 RunObject = Report "NPR Sale Statistics per Vendor";
                                 ApplicationArea = All;
                                 ToolTip = 'Executes the NPR Sale Statistics per Vendor action';
-                            }
-                        }
-                        group(Webshop)
-                        {
-                            Caption = 'Webshop';
-                            Image = Web;
-                            action("NPR List of Sales Invoices")
-                            {
-                                Caption = 'NPR List of Sales Invoices';
-                                Image = Report2;
-                                RunObject = Report "NPR List of Sales Invoices";
-                                ApplicationArea = All;
-                                ToolTip = 'Executes the NPR List of Sales Invoices action';
-                            }
-                            action("NPR Item Wise Sales Figures")
-                            {
-                                Caption = 'NPR Item Wise Sales Figures';
-                                Image = Report2;
-                                RunObject = Report "NPR Item Wise Sales Figures";
-                                ApplicationArea = All;
-                                ToolTip = 'Executes the NPR Item Wise Sales Figures action';
                             }
                         }
                         group(History)
@@ -616,7 +591,7 @@ page 6151241 "NPR Retail Manager RC"
                             }
                         }
                     }
-                }
+                
             }
 
         }

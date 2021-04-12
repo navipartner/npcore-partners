@@ -351,26 +351,6 @@ page 6014453 "NPR Campaign Discount"
                         end;
                     }
                 }
-                separator(Separator1160330004)
-                {
-                }
-                action("Copy to all companies")
-                {
-                    Caption = 'Copy to all companies';
-                    Image = Copy;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Copy to all companies action';
-
-                    trigger OnAction()
-                    begin
-                        Rec.SetRange(Code, Rec.Code);
-                        Report.RunModal(Report::"NPR Data Cleanup Fill", false, false, Rec);
-                        Rec.SetRange(Code);
-                    end;
-                }
-                separator(Separator1160330020)
-                {
-                }
                 action("Send to Retail Journal")
                 {
                     Caption = 'Send to Retail Journal';

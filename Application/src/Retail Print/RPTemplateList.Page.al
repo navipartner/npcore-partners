@@ -65,10 +65,6 @@ page 6014639 "NPR RP Template List"
             {
                 Caption = 'Create Copy';
                 Image = Copy;
-                Promoted = true;
-				PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Create Copy action';
 
@@ -85,10 +81,6 @@ page 6014639 "NPR RP Template List"
             {
                 Caption = 'Export Package (Selected)';
                 Image = Export;
-                Promoted = true;
-				PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Export Package (Selected) action';
 
@@ -105,10 +97,6 @@ page 6014639 "NPR RP Template List"
             {
                 Caption = 'Export Package (All)';
                 Image = Export;
-                Promoted = true;
-				PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Export Package (All) action';
 
@@ -125,10 +113,6 @@ page 6014639 "NPR RP Template List"
             {
                 Caption = 'Import Package File';
                 Image = Import;
-                Promoted = true;
-				PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Import Package File action';
 
@@ -143,10 +127,6 @@ page 6014639 "NPR RP Template List"
             {
                 Caption = 'Download Template data';
                 Image = ImportDatabase;
-                Promoted = true;
-				PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
                 ApplicationArea = All;
                 ToolTip = 'Downloads Template data.';
 

@@ -115,6 +115,36 @@ page 6014450 "NPR Mixed Discount"
                                     end;
                                 }
                             }
+                            group(Control6014407)
+                            {
+                                ShowCaption = false;
+                                Visible = (Rec."Discount Type" <> Rec."Discount Type"::"Total Discount Amt. per Min. Qty.") AND (Rec."Discount Type" <> Rec."Discount Type"::"Multiple Discount Levels") AND (NOT Rec."Lot");
+                                field(MinimumDiscount; MixedDiscountMgt.CalcExpectedDiscAmount(Rec, false))
+                                {
+                                    ApplicationArea = All;
+                                    Caption = 'Min. Discount Amount';
+                                    ToolTip = 'Specifies the value of the Min. Discount Amount field';
+                                }
+                                field(MaximumDiscount; MixedDiscountMgt.CalcExpectedDiscAmount(Rec, true))
+                                {
+                                    ApplicationArea = All;
+                                    Caption = 'Max. Discount Amount';
+                                    Editable = false;
+                                    ToolTip = 'Specifies the value of the Max. Discount Amount field';
+                                }
+                            }
+                            group(Control6014417)
+                            {
+                                ShowCaption = false;
+                                Visible = (Rec."Discount Type" <> Rec."Discount Type"::"Total Discount Amt. per Min. Qty.") AND (Rec."Lot");
+                                field(Discount; MixedDiscountMgt.CalcExpectedDiscAmount(Rec, true))
+                                {
+                                    ApplicationArea = All;
+                                    Caption = 'Discount Amount';
+                                    Editable = false;
+                                    ToolTip = 'Specifies the value of the Discount Amount field';
+                                }
+                            }
                         }
                     }
                     grid(Control6150660)
@@ -249,6 +279,18 @@ page 6014450 "NPR Mixed Discount"
                                     ToolTip = 'Specifies the value of the Block Custom Discount field';
                                 }
                             }
+                            field("Created the"; Rec."Created the")
+                            {
+                                ApplicationArea = All;
+                                Editable = false;
+                                ToolTip = 'Specifies the value of the Created Date field';
+                            }
+                            field("Last Date Modified"; Rec."Last Date Modified")
+                            {
+                                ApplicationArea = All;
+                                Editable = false;
+                                ToolTip = 'Specifies the value of the Last Date Modified field';
+                            }
                         }
                     }
                 }
@@ -298,15 +340,13 @@ page 6014450 "NPR Mixed Discount"
                 }
             }
 
-            group(Control6150618)
+
+            part(Control6014425; "NPR Mixed Disc. Time Interv.")
             {
-                ShowCaption = false;
-                part(Control6014425; "NPR Mixed Disc. Time Interv.")
-                {
-                    SubPageLink = "Mix Code" = FIELD(Code);
-                    ApplicationArea = All;
-                }
+                SubPageLink = "Mix Code" = FIELD(Code);
+                ApplicationArea = All;
             }
+
             part(DiscountLevels; "NPR Mixed Discount Levels")
             {
                 SubPageLink = "Mixed Discount Code" = FIELD(Code);
@@ -319,15 +359,6 @@ page 6014450 "NPR Mixed Discount"
                 SubPageLink = Code = FIELD(Code);
                 UpdatePropagation = Both;
                 ApplicationArea = All;
-            }
-        }
-        area(factboxes)
-        {
-            part(MinimumDiscountFactBox; "NPR Mix Discount FactBox")
-            {
-                SubPageLink = Code = field(Code);
-                ApplicationArea = All;
-                Caption = 'Discount Amount';
             }
         }
     }
@@ -547,6 +578,7 @@ page 6014450 "NPR Mixed Discount"
         TxtCompressItems: Label 'Compressed to Item Discount Group';
         TxtCompChngeContinue: Label 'Compression will change one or more Item Disc. Group. Do you wish to continue?';
         DiscountLevelsApplicable: Boolean;
+        MixedDiscountMgt: Codeunit "NPR Mixed Discount Management";
 
     procedure TransferToMix()
     var

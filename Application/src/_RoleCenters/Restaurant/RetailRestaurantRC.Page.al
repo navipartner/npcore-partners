@@ -1,4 +1,4 @@
-page 6151334 "NPR Restaurant RC"
+page 6151334 "NPR Retail Restaurant RC"
 {
     Caption = 'NP Retail Restaurant', Comment = '{Dependency=Match,"ProfileDescription_NPR RESTAURANT"}';
     PageType = RoleCenter;
@@ -8,10 +8,6 @@ page 6151334 "NPR Restaurant RC"
     {
         area(rolecenter)
         {
-            part(HeadlineControl; "NPR Restaurant Headline RC")
-            {
-                ApplicationArea = Basic, Suite;
-            }
             part("NP Retail Resturant Cue"; "NPR Restaurant Activities")
             {
                 ApplicationArea = Basic, Suite;
