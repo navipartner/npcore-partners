@@ -372,7 +372,7 @@ codeunit 6150723 "NPR POS Action: Insert Item"
         end;
 
         POSSession.GetSaleLine(SaleLine);
-        SaleLine.InsertLine(Line);
+        SaleLine.InsertLine(Line, false);
         AddAccessories(Item, SaleLine);
         AutoExplodeBOM(Item, SaleLine);
         AddItemAddOns(FrontEnd, Item, Line."Line No.");
